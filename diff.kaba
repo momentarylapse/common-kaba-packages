@@ -1,0 +1,81 @@
+use "common.kaba"
+use "parser.kaba"
+
+
+Term *DiffFunction(string func, Term *param)
+	if func == "exp"
+		return AddFunction("exp", param)
+	if func == "sin"
+		return AddFunction("cos", param)
+	if func == "cos"
+		return AddOperator("-", AddNumerical("0"), AddFunction("sin", param))
+	if func == "sinh"
+		return AddFunction("cosh", param)
+	if func == "cosh"
+		return AddFunction("sinh", param)
+	if func == "ln"
+		return AddOperator("/", AddNumerical("1"), param)
+	if func == "sqrt"
+		return AddOperator("/", AddNumerical("1"), AddFunction("sqrt", param))
+	RaiseExecError("Funktion '" + func + "' nicht ableitbar")
+	return nil
+
+
+// d/dx
+Term *Diff(Term *t)
+	if !t
+		return nil
+	Term* a, b
+	if t.Param.num > 0
+		a = t.Param[0]
+	if t.Param.num > 1
+		b = t.Param[1]
+
+	// selbst
+	if t.Type == TypeNumerical
+		return AddNumerical("0")
+	if t.Type == TypeVariable
+		if t.Name == "x"
+			return AddNumerical("1")
+		return AddNumerical("0")
+	if t.Type == TypeFunction
+		// diff(f(a))  ->  f'(a) * diff(a)
+		return AddOperator("*", DiffFunction(t.Name, a),
+		                        Diff(a))
+	if t.Type == TypeOperator
+		if (t.Name == "+") or (t.Name == "-")
+			// diff(a + b)  ->  diff(a) + diff(b)
+			return AddOperator(t.Name, Diff(a),
+			                           Diff(b))
+		if t.Name == "*"
+			// diff(a * b)  ->  diff(a) * b + a * diff(b)
+			return AddOperator("+", AddOperator("*", Diff(a),
+			                                         b),
+			                        AddOperator("*", a,
+			                                         Diff(b)))
+		if t.Name == "/"
+			// diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
+			return AddOperator("-", AddOperator("/", Diff(a),
+			                                         b),
+			                        AddOperator("/", AddOperator("*", a,
+			                                                          Diff(b)),
+			                                         AddOperator("^", b,
+			                                                          AddNumerical("2"))))
+		if t.Name == "^"
+			if b.Type == TypeNumerical
+				// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
+				return AddOperator("*", b,
+				                        AddOperator("*", AddOperator("^", a,
+				                                                          AddNumerical((b.Name.int() - 1).str())),
+				                                         Diff(a)))
+			// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
+			return AddOperator("+", AddOperator("*", b,
+			                                         AddOperator("*", AddOperator("^", a,
+			                                                                           AddOperator("-", b,
+			                                                                                            AddNumerical("1"))),
+			                                                          Diff(a))),
+			                        AddOperator("*", AddFunction("ln", a),
+			                                         AddOperator("*", AddOperator("^", a, b),
+			                                                          Diff(b))))
+	RaiseExecError("unbekannte Ableitung...")
+	return nil

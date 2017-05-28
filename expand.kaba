@@ -1,0 +1,74 @@
+use "common.kaba"
+use "parser.kaba"
+
+Term *Expand(Term *t)
+	if !t
+		return nil
+	// rekursiv
+	bool need_new = false
+	Term*[8] p
+	for pp,i in t.Param
+		p[i] = Expand(pp)
+		if p[i] != pp
+			need_new = true
+	if need_new
+		t = CopyTerm(t)
+		for i in 0:t.Param.num
+			t.Param[i] = p[i]
+
+	// selbst
+	if t.Name == "*"
+		Term *p1 = t.Param[0]
+		Term *p2 = t.Param[1]
+		
+		if (p1.Name == "+") or (p1.Name == "-")
+			// (x + y) * z  ->  x * z + y * z
+			Term* t_l = CopyTerm(t)
+			t_l.Param[0] = p1.Param[0]
+			t_l.Param[1] = p2
+			Term* t_r = CopyTerm(t)
+			t_r.Param[0] = p1.Param[1]
+			t_r.Param[1] = p2
+			Term* t_sum = CopyTerm(p1)
+			t_sum.Param[0] = t_l
+			t_sum.Param[1] = t_r
+			//print ExprToStr(t_sum)
+			return Expand(t_sum)
+		else if (p2.Name == "+") or (p2.Name == "-")
+			// z * (x + y)  ->  z * x + z * y
+			Term* t_l = CopyTerm(t)
+			t_l.Param[0] = p1
+			t_l.Param[1] = p2.Param[0]
+			Term* t_r = CopyTerm(t)
+			t_r.Param[0] = p1
+			t_r.Param[1] = p2.Param[1]
+			Term* t_sum = CopyTerm(p2)
+			t_sum.Param[0] = t_l
+			t_sum.Param[1] = t_r
+			return Expand(t_sum)
+	else if t.Name == "^"
+		Term* p1 = t.Param[0]
+		Term* p2 = t.Param[1]
+		if p2.Type == TypeNumerical
+			if p1.Name == "*"
+				// (a * b)^c  ->  a^c * b^c
+				Term* t_l = CopyTerm(t)
+				t_l.Param[0] = p1.Param[0]
+				t_l.Param[1] = p2
+				Term* t_r = CopyTerm(t)
+				t_r.Param[0] = p1.Param[1]
+				t_r.Param[1] = p2
+				Term *t_mul = CopyTerm(p1)
+				t_mul.Param[0] = t_l
+				t_mul.Param[1] = t_r
+				return Expand(t_mul)
+			else if (p1.Name == "+") or (p1.Name == "-")
+				int e = p2.Name.int()
+				Term* t_mul = CopyTerm(p1)
+				for i in 1:e
+					Term* t_l = t_mul
+					Term* t_r = CopyTerm(p1)
+					t_mul = AddOperator("*", t_l, t_r)
+				return Expand(t_mul)
+		
+	return t

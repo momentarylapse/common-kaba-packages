@@ -1,0 +1,263 @@
+use "common.kaba"
+use "parser.kaba"
+
+string add(string a, string b)
+	//return i2s(s2i(a) + s2i(b))
+	vli va = a, vb = b
+	return (va + vb).str()
+
+string sub(string a, string b)
+	//return i2s(s2i(a) - s2i(b))
+	vli va = a, vb = b
+	return (va - vb).str()
+
+string mul(string a, string b)
+	//return i2s(s2i(a) * s2i(b))
+	vli va = a, vb = b
+	return (va * vb).str()
+
+/*string mod(string a, string b)
+	//return i2s(s2i(a) * s2i(b))
+	vli va = a, vb = b, rem
+	va.div(b, rem)
+	return rem.str()*/
+
+string exponent(string a, string b)
+	vli va = a, vb = b
+	return va.pow(vb).str()
+
+string gcd(string a, string b)
+	vli va = a, vb = b
+	return va.gcd(vb).str()
+
+void GetEqualOps(Term* t, Term*[] l)
+	if t.Type == TypeOperator
+		Term* p1 = t.Param[0]
+		Term* p2 = t.Param[1]
+		Term*[] l2
+		if p1.Name == t.Name
+			GetEqualOps(p1, l2)
+		else
+			l.add(p1)
+		if p2.Name == t.Name
+			GetEqualOps(p2, l2)
+		else
+			l.add(p2)
+		for i in 0:l2.num
+			l.add(l2[i])
+
+Term *SimplifyNumericalDivision(Term *t, string a, string b)
+	vli va = a
+	vli vb = b
+	vli tt = va, rem
+	tt.div(vb, rem)
+	vli vli0 = 0
+	if rem == vli0
+		return AddNumerical(tt.str())
+	string g = gcd(a, b)
+	if g != "1"
+		vli vg = g
+		va.idiv(vg, tt)
+		vb.idiv(vg, tt)
+		if vb.sign
+			vb.sign = false
+			va.sign = !va.sign
+		return AddOperator(t.Name, AddNumerical(va.str()), AddNumerical(vb.str()))
+	return t
+
+Term *SimplifyNumericals(Term *t)
+	if !t
+		return nil
+	// rekursiv
+	bool need_new = false
+	Term*[8] p
+	for i in 0:t.Param.num
+		p[i] = SimplifyNumericals(t.Param[i])
+		if p[i] != t.Param[i]
+			need_new = true
+	if need_new
+		t = CopyTerm(t)
+		for i in 0:t.Param.num
+			t.Param[i] = p[i]
+		
+	// selbst
+	if t.Type == TypeOperator
+		Term *p1 = t.Param[0]
+		Term *p2 = t.Param[1]
+		if (p1.Type == TypeNumerical) and (p2.Type == TypeNumerical)
+			string a = p1.Name
+			string b = p2.Name
+			/*if t.Name == "+"
+				return AddNumerical(add(a, b))*/
+			if t.Name == "-"
+				return AddNumerical(sub(a, b))
+			/*if t.Name == "*"
+				return AddNumerical(mul(a, b))*/
+			if t.Name == "/"
+				return SimplifyNumericalDivision(t, a, b)
+			if t.Name == "^"
+				return AddNumerical(exponent(a, b))
+	return t
+
+bool LiterallyEqual(Term *a, Term *b)
+	if a.Name != b.Name
+		return false
+	for i in 0:a.Param.num
+		if !LiterallyEqual(a.Param[i], b.Param[i])
+			return false
+	return true
+
+void SortExprList(Term*[] l, int[] n, bool find_duplicate)
+	// alle Terme "rendern"...   besser eine comp(term, term)-Funktion
+	string[] s
+	for i in 0:l.num
+		string ss = ExprToStr(l[i])
+		s.add(ss)
+	
+	// sortieren
+	for i in 0:l.num-1
+		for j in i+1:l.num
+			if s[i].compare(s[j]) > 0
+				l.swap(i, j)
+				s.swap(i, j)
+	if find_duplicate
+		for i in 0:l.num
+			int num = 1
+			for j in i+1:l.num
+				if s[i] == s[j]
+					l.remove(j)
+					s[j].clear()
+					s.remove(j)
+					j --
+					num ++
+				else
+					break
+			n.add(num)
+	
+	// aufräumen
+	for i in 0:s.num
+		s[i].clear()
+
+Term *Multiple(Term *t, int n)
+	if n == 1
+		return t
+	if n == 0
+		return AddNumerical("0")
+	return AddOperator("*", AddNumerical(n.str()), t)
+
+Term *Potence(Term *t, int n)
+	if n == 1
+		return t
+	if n == 0
+		return AddNumerical("1")
+	return AddOperator("^", t, AddNumerical(n.str()))
+
+// Zahlfaktoren zusammenfassen
+// TODO: gleiche Faktoren mit unterschiedlichen Potenzen... Potenzen addieren
+// TODO: Brüche... kürzen...
+Term* NormalizeProduct(Term* t)
+	if t.Type != TypeOperator
+		return t
+	Term*[] l
+	GetEqualOps(t, l)
+	string num = "1"
+	for i in 0:l.num
+		if l[i].Type == TypeNumerical
+			num = mul(num, l[i].Name)
+			l.remove(i)
+			i --
+	
+	if num == "0"
+		return AddNumerical("0")
+	if l.num == 0
+		return AddNumerical(num)
+	
+	int[] neq
+	SortExprList(l, neq, true)
+	
+	Term* t_r = Potence(l[0], neq[0])
+	for i in 1:l.num
+		Term* t_mul = CopyTerm(t)
+		t_mul.Param[0] = t_r
+		t_mul.Param[1] = Potence(l[i], neq[i])
+		t_r = t_mul
+	if num != "1"
+		Term* t_mul = CopyTerm(t)
+		t_mul.Param[0] = AddNumerical(num)
+		t_mul.Param[1] = t_r
+		t_r = t_mul
+	return t_r
+
+// Zahlterme zusammenfassen
+// TODO: gleiche Summanden...
+Term *NormalizeSum(Term *t)
+	Term*[] l
+	GetEqualOps(t, l)
+	string num = "0"
+	for i in 0:l.num
+		if l[i].Type == TypeNumerical
+			num = add(num, l[i].Name)
+			l.remove(i)
+			i --
+	
+	if l.num == 0
+		return AddNumerical(num)
+
+	int[] neq
+	SortExprList(l, neq, true)
+	
+	Term* t_r = Multiple(l[0], neq[0])
+	for i in 1:l.num
+		Term *t_sum = CopyTerm(t)
+		t_sum.Param[0] = t_r
+		t_sum.Param[1] = Multiple(l[i], neq[i])
+		t_r = t_sum
+	t_r = NormalizeProduct(t_r)
+	if num != "0"
+		return AddOperator("+", t_r, AddNumerical(num))
+	return t_r
+
+Term *NormalizeExponent(Term *t)
+	Term *p1 = t.Param[1]
+	if p1.Type == TypeNumerical
+		if p1.Name == "1"
+			return t.Param[0]
+		if p1.Name == "0"
+			return AddNumerical("1")
+	return t
+
+Term *NormalizeRec(Term *t, bool do_normalize)
+	if !t
+		return nil
+	// rekursiv
+	bool need_new = false
+	Term*[8] p
+	for i in 0:t.Param.num
+		bool dnr = true
+		if t.Name == "*"
+			if t.Param[i].Name == "*"
+				dnr = false
+		if t.Name == "+"
+			if t.Param[i].Name == "+"
+				dnr = false
+		p[i] = NormalizeRec(t.Param[i], dnr)
+		if p[i] != t.Param[i]
+			need_new = true
+	if need_new
+		t = CopyTerm(t)
+		for i in 0:t.Param.num
+			t.Param[i] = p[i]
+		
+	// selbst
+	if do_normalize
+		if t.Name == "*"
+			return NormalizeProduct(t)
+		if t.Name == "+"
+			return NormalizeSum(t)
+		if t.Name == "^"
+			return NormalizeExponent(t)
+	return t
+
+Term *Normalize(Term *t)
+	return NormalizeRec(t, true)
+	

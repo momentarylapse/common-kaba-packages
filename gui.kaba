@@ -1,0 +1,29 @@
+use "common.kaba"
+use "parser.kaba"
+use "simplify.kaba"
+use "kabama.kaba"
+
+class KabamaWindow extends Dialog
+
+	void onOk()
+		string s = getString("edit")
+		setString("list", s + "\\" + ExprToStr(ExecuteComplete(Parse(s))))
+
+	void __init__()
+		super.__init__("kabama", 800, 600, nil, false)
+		print(self)
+		addGrid("", 0, 0, 1, 2, "table")
+		print("a")
+		setTarget("table", 0)
+		addListView("in\\out", 0, 0, 0, 0, "list")
+		addGrid("", 0, 1, 2, 1, "table2")
+		setTarget("table2", 0)
+		addEdit("!expandx", 0, 0, 0, 0, "edit")
+		addDefButton("Ok", 1, 0, 0, 0, "ok")
+		setImage("ok", "hui:ok")
+	
+		event("ok", &onOk)
+	
+void main()
+	Window *win = new KabamaWindow
+	win.run()

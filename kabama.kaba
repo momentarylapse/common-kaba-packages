@@ -1,0 +1,44 @@
+use "common.kaba"
+use "parser.kaba"
+use "simplify.kaba"
+use "expand.kaba"
+use "diff.kaba"
+
+
+Term *Execute(Term *t)
+	if !t
+		return nil
+	// rekursiv
+	bool need_new = false
+	Term*[8] p
+	for pp,i in t.Param
+		p[i] = Execute(pp)
+		if p[i] != pp
+			need_new = true
+	if need_new
+		t = CopyTerm(t)
+		for pp,i in t.Param
+			pp = p[i]
+		
+	// selbst
+	if t.Name == "expand"
+		return Expand(t.Param[0])
+	if t.Name == "diff"
+		return Diff(t.Param[0])
+	return t
+
+Term *ExecuteComplete(Term *t)
+	ExecError = false
+	t = SimplifyNumericals(t)
+	t = Execute(t)
+	t = Normalize(t)
+	t = SimplifyNumericals(t)
+	return t
+
+void main(string[] arg)
+	if arg.num > 0
+		Term *t = Parse(arg[0])
+		if !ParserError
+			//print ExprToStr(t)
+			t = ExecuteComplete(t)
+			print(ExprToStr(t))

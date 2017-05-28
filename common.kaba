@@ -1,0 +1,102 @@
+enum
+	TypeNumerical
+	TypeConstant
+	TypeVariable
+	TypeOperator
+	TypeFunction
+
+enum
+	CharLetter
+	CharNumber
+	CharSign
+
+class Term
+	int Type
+	string Name
+	Term*[] Param
+	void __init__(int type, string name)
+		Type = type
+		Name = name
+	void __delete__()
+		for p in Param
+			delete p
+
+
+Term *CopyTerm(Term *t)
+	Term *r = new Term(t.Type, t.Name)
+	for p in t.Param
+		r.Param.add(CopyTerm(p))
+	return r
+
+Term *PermuteOperator(Term *t)
+	Term *r = CopyTerm(t)
+	r.Param[0] = t.Param[1]
+	r.Param[1] = t.Param[0]
+	return r
+
+// (a+b)+(c+d)
+// 0 -> ~
+// 1 -> (b + a) + (c + d)
+// 2 -> (c + d) + .....
+Term *PermuteLiftOperator__(Term *t, int n)
+	Term *r = CopyTerm(t)
+	r.Param[0] = t.Param[1]
+	r.Param[1] = t.Param[0]
+	return r
+
+bool ParserError
+string ParserMsg
+
+bool ExecError
+string ExecMsg
+
+
+void RaiseParserError(string s)
+	ParserError = true
+	ParserMsg = s
+	//print "Parser Fehler: " + s
+
+void RaiseExecError(string s)
+	ExecError = true
+	ExecMsg = s
+	//print "Fehler: " + s
+
+bool NeedsBrackets(Term *t, Term *sub)
+	//return sub.Type == TypeOperator
+	if t.Name == "^"
+		return sub.Type == TypeOperator
+	if t.Name == "/"
+		return sub.Type == TypeOperator
+	if t.Name == "-"
+		return sub.Type == TypeOperator
+	if t.Name == "*"
+		if (sub.Name == "+") or (sub.Name == "-")
+			return true
+	return false
+
+string ExprToStr(Term *t)
+	if ParserError
+		return "Fehler: " + ParserMsg
+	if ExecError
+		return "Fehler: " + ExecMsg
+	if !t
+		return "-nil-"
+	string r = "?"
+	if t.Type == TypeOperator
+		string a = ExprToStr(t.Param[0])
+		string b = ExprToStr(t.Param[1])
+		if NeedsBrackets(t, t.Param[0])
+			a = "(" + a + ")"
+		if NeedsBrackets(t, t.Param[1])
+			b = "(" + b + ")"
+		if t.Name == "*"
+			r = a + " " + b
+		else
+			r = a + " " + t.Name + " " + b
+	else if t.Type == TypeNumerical
+		r = t.Name
+	else if t.Type == TypeVariable
+		r = t.Name
+	else if t.Type == TypeFunction
+		r = t.Name + "(" + ExprToStr(t.Param[0]) + ")"
+	return r
