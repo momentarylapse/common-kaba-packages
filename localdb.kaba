@@ -1,0 +1,264 @@
+use "config.kaba"
+
+
+
+class Tag
+	string key
+	string value
+	string str()
+		return key + "=" + value.hex(false)
+
+string tags2str(Tag[] tags)
+	string r
+	for t,i in tags
+		if i > 0
+			r += ","
+		r += t.str()
+	return r
+
+Tag str2tag(string s)
+	string[] a = s.explode("=")
+	Tag t
+	t.key = a[0]
+	t.value = a[1]
+	return t
+
+Tag strh2tag(string s)
+	string[] a = s.explode("=")
+	Tag t
+	t.key = a[0]
+	t.value = a[1].unhex()
+	return t
+
+
+Tag[] strh2tags(string s)
+	Tag[] tags
+	string[] a = s.explode(",")
+	for b in a
+		tags.add(strh2tag(b))
+	return tags
+
+
+Tag[] str2tags(string s)
+	Tag[] tags
+	string[] a = s.explode(",")
+	for b in a
+		tags.add(str2tag(b))
+	return tags
+
+class LocalFile
+	int id
+	string path
+	string hash
+	int mtime
+	int size
+	string[] options
+	Tag[] tags
+	bool is(string option)
+		for o in options
+			if o == option
+				return true
+		return false
+	void set(string option)
+		if is(option)
+			return
+		options.add(option)
+	void unset(string option)
+		for o,i in options
+			if o == option
+				options.remove(i)
+				return
+
+class LocalFileDB
+	LocalFile[] files
+	void load()
+		files.clear()
+		File *f = FileOpen("db")
+		if !f
+			return
+		int n
+		f >> n
+		for i in 0:n
+			LocalFile ff
+			string temp
+			f >> ff.id
+			f >> ff.path
+			f >> ff.hash
+			f >> ff.mtime
+			f >> ff.size
+			f >> temp
+			ff.options = temp.explode(",")
+			f >> temp
+			ff.tags = strh2tags(temp)
+			ff.unset("")
+			if ff.path.num > 0
+				LocalFile *l = find_by_hash(ff.hash)
+				if l
+					print("HASH COLLISION: " + ff.path + "  <->  " + l.path)
+				files.add(ff)
+		delete(f)
+
+	void save()
+		File *f = FileCreate("db")
+		f << files.num
+		for ff in files
+			f << ff.id
+			f << ff.path
+			f << ff.hash
+			f << ff.mtime
+			f << ff.size
+			f << ff.options.join(",")
+			f << tags2str(ff.tags)
+		delete(f)
+
+	LocalFile *find_by_id(int id)
+		for f in files
+			if id == f.id
+				return &f
+		return nil
+
+	LocalFile *find_by_path(string path)
+		for f in files
+			if path == f.path
+				return &f
+		return nil
+
+	LocalFile *find_by_hash(string hash)
+		for f in files
+			if hash == f.hash
+				return &f
+		return nil
+		
+	LocalFile*[] find_by_tags(string str)
+		Tag[] tags = str2tags(str)
+		LocalFile*[] list
+		for f in files
+			bool ok = true
+			for t in tags
+				bool found = false
+				for tt in f.tags
+					if tt.key == t.key and tt.value == t.value
+						found = true
+						break
+				if !found
+					ok = false
+					break
+			if ok
+				list.add(&f)
+		return list
+	
+	void drop(LocalFile f)
+		for ff,i in files
+			if ff.path == f.path and ff.hash == f.hash
+				print("DROP " + f.path)
+				files.remove(i)
+				return
+
+	LocalFile[] get_in_dir(string dir, bool recursive)
+		string dir2 = dir
+		if dir2.tail(1) != "/"
+			dir2 += "/"
+			
+		LocalFile[] list
+		if recursive
+			for f in files
+				if f.path.head(dir2.num) == dir2
+					list.add(f)
+		else
+			for f in files
+				if f.path.dirname() == dir2
+					list.add(f)
+		return list
+
+	void update_file(string path)
+		LocalFile *f = find_by_path(path)
+		if f
+			if f.is("nonlocal")
+				f.unset("nonlocal")
+				print("NON-NONLOCAL " + path)
+			File* ff = FileOpen(path)
+			int mtime = ff.getMDate().time
+			if mtime == f.mtime
+				if f.id < 0 and conf.show_pure_local
+					print("+  " + path)
+				// ok
+				if conf.verbose
+					print("=  " + path)
+			else
+				// changed?
+				string hash = FileHash(path, "md5")
+				if hash == f.hash
+					// ok
+					f.mtime = mtime
+					if conf.verbose
+						print("=  " + path)
+				else
+					print("~  " + path)
+					f.hash = hash
+					f.mtime = mtime
+					f.size = ff.getSize()
+					if conf.verbose
+						print("     hash: " + f.hash)
+						print("     time: " + f.mtime)
+						print("     size: " + f.size)
+			delete ff
+		else
+			string hash = FileHash(path, "md5")
+			f = find_by_hash(hash)
+			if f
+				print("+  " + path)
+				print(" FOUND BY HASH " + f.path)
+			else
+				// new
+				print("+  " + path)
+				LocalFile l
+				l.path = path
+				l.hash = hash
+				l.id = -1
+				File* ff = FileOpen(path)
+				l.mtime = ff.getMDate().time
+				l.size = ff.getSize()
+				delete ff
+				if conf.verbose
+					print("     hash: " + l.hash)
+					print("     time: " + l.mtime)
+					print("     size: " + l.size)
+				files.add(l)
+	
+	void update_by_working_dir(string dir)
+		DirEntry[] list = DirSearch(dir, "*", true)
+		for e in list
+			if e.is_dir
+				if e.name.head(1) != "."
+					update_by_working_dir(dir + "/" + e.name)
+			else
+				update_file(dir + "/" + e.name)
+	
+	// check for local changes
+	void update_local(string dir)
+		print("update local " + dir)
+		
+		update_by_working_dir(dir)
+		
+		LocalFile[] dbfiles = get_in_dir(dir, true)
+		LocalFile[] todrop
+		for ff in dbfiles
+			if ff.is("nonlocal")
+				print("+R " + ff.path)
+				continue
+					
+			if FileExists(ff.path)
+				nil
+				// already checked...
+			else
+				print("-  " + ff.path)
+				ff.set("deleted")
+				
+				if conf.drop_deleted
+					todrop.add(ff)
+		
+		for ff in todrop
+			drop(ff)
+			
+		save()
+LocalFileDB db

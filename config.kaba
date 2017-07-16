@@ -1,0 +1,110 @@
+const string SERVER = "hinoki"
+const string YII = "/home/michi/www/_alexandria4/yii"
+const string TEMP_OUT = "/tmp/sisyphos_out"
+
+
+
+	
+string get_tag(string[] parts, string key)
+	for p in parts
+		if p.find("=", 0) < 0
+			continue
+		string[] kv = p.explode("=")
+		if kv[0] == key
+			return kv[1]
+	return ""
+
+class ConfigDir
+	string dir
+	ConfigDirSync[] syncs
+	
+	void add_sync(string filter, string options)
+		ConfigDirSync s
+		s.dir = dir
+		s.filter = filter
+		s.options = options
+		syncs.add(s)
+
+class ConfigDirSync
+	string dir
+	string filter
+	string options
+	
+
+
+	string[] get_structure()
+		string[] oo = options.explode(";")
+		for o in oo
+			if o.substr(0,10) == "structure="
+				return o.substr(10,-1).explode("/")
+
+	string guess_dir(string[] parts)
+		string[] structure = get_structure()
+		string dir
+		for s in structure
+			string v = get_tag(parts, s)
+			if v.num > 0
+				dir += v + "/"
+		return dir
+
+
+class Config
+	void __init__()
+		verbose = false
+		allow_remote_pull = false
+		allow_remote_push = false
+		allow_local_search = true
+		allow_remote_search = true
+		show_pure_local = false
+		drop_deleted = false
+		pull_tags = false
+
+	void load()
+		File *f = FileOpen("sisyphos.conf")
+		int n, m
+		f >> n
+		for i in 0:n
+			ConfigDir e
+			f >> e.dir
+			f >> m
+			for j in 0:m
+				ConfigDirSync s
+				s.dir = e.dir
+				f >> s.filter
+				f >> s.options
+				e.syncs.add(s)
+			dirs.add(e)
+		delete f
+	void save()
+		File *f = FileCreate("sisyphos.conf")
+		f << dirs.num
+		for e in dirs
+			f << e.dir
+			f << e.syncs.num
+			for s in e.syncs
+				f << s.filter
+				f << s.options
+		delete f
+	void add(string dir, string filter)
+		for e in dirs
+			if e.dir == dir
+				e.add_sync(filter, "")
+				return
+		ConfigDir e
+		e.dir = dir
+		e.add_sync(filter, "")
+		dirs.add(e)
+		
+	ConfigDir[] dirs
+	
+	// runtime
+	bool verbose
+	bool allow_remote_pull
+	bool allow_remote_push
+	bool allow_local_search
+	bool allow_remote_search
+	bool show_pure_local
+	bool drop_deleted
+	bool pull_tags
+
+Config conf

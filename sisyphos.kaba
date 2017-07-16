@@ -1,0 +1,233 @@
+use "localdb.kaba"
+use "config.kaba"
+
+
+class DirChange
+	int i
+
+void make_all_dirs(string path)
+	string[] parts = path.explode("/")
+	string dir
+	for p,i in parts
+		if i == parts.num - 1
+			break
+		if i > 0
+			dir += "/"
+		dir += p
+		DirCreate(dir)
+
+void update_remote_sync(string r, ConfigDirSync sync, string dest)
+
+	string[] list = r.explode("\n")
+	for l in list
+		string[] parts = l.explode("\t")
+		if parts.num < 6
+			continue
+		int id = parts[0].int()
+		string hash = parts[3]
+		LocalFile *lf = db.find_by_id(id)
+		if lf
+			if conf.pull_tags
+				lf.tags.clear()
+				for i in 6:parts.num
+					lf.tags.add(str2tag(parts[i]))
+			
+			if lf.is("nonlocal")
+				FileToCopy ff
+				ff.id = id
+				ff.remotepath = parts[4]
+				tocopy.add(ff)
+				copysize += lf.size / 1024
+				continue
+				
+			// ok... but should check for changes
+			if conf.verbose
+				print("==  " + lf.path)
+			continue
+	
+		string rel_name = sync.guess_dir(parts) + parts[5].replace("/", " - ")
+		lf = db.find_by_hash(hash)
+		if lf
+			if lf.id >= 0
+				print("HASH COLLISION " + lf.path + "  <->  " + "REMOTE...")
+			lf.id = id
+			if conf.verbose
+				print("RELINK " + lf.path + "  ->  " + id)
+			continue
+	
+		// new remote file
+		print("+R  " + rel_name)
+		LocalFile ll
+		ll.id = id
+		ll.path = dest + "/" + rel_name
+		ll.hash = hash
+		ll.size = parts[2].int()
+		ll.mtime = parts[1].int()
+		for i in 6:parts.num
+			ll.tags.add(str2tag(parts[i]))
+		ll.set("nonlocal")
+		db.files.add(ll)
+		
+		FileToCopy ff
+		ff.id = id
+		ff.remotepath = parts[4]
+		tocopy.add(ff)
+		copysize += ll.size / 1024
+		if conf.verbose
+			print("    id:   " + ll.id)
+			print("    hash: " + ll.hash)
+			print("    time: " + ll.mtime)
+			print("    size: " + ll.size)
+
+// get remote file list and check
+void update_remote(ConfigDirSync[] syncs, string dest)
+	//for s in syncs
+	//	print("update remote " + dest + "    " + s.filter)
+	print("update remote " + dest)
+	DirCreate(dest)
+	
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	for s,i in syncs
+		if i > 0
+			cmd += "echo -=-=-=-=-=; "
+	
+		string quality = "perfect"
+		if s.options.find("quality=medium", 0) >= 0
+			quality = "medium"
+		cmd += "php " + YII + " file/find-sisyphos \\\"" + ssh_escape(s.filter) + "\\\" " + quality + "; "
+	cmd += "\""
+	print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+		
+	tocopy.clear()
+	copysize = 0
+	
+	string r = FileRead(TEMP_OUT).trim()
+	string[] rs = r.explode("-=-=-=-=-=\n")
+	
+	for s,i in syncs
+		if i < rs.num
+			update_remote_sync(rs[i], s, dest)
+		
+	db.save()
+	
+void pull()
+	if tocopy.num == 0
+		return
+	
+	print("kopiere " + (copysize/1024) + " MB")
+	for tc in tocopy
+		LocalFile *l = db.find_by_id(tc.id)
+		make_all_dirs(l.path)
+		string cmd = "scp"
+		string rp = scp_escape(tc.remotepath)
+		cmd += " " + SERVER + ":" + rp
+		cmd += " \"" + bash_escape(l.path) + "\""
+		//print(cmd)
+		_exec_(cmd)
+	
+		File *f = FileOpen(l.path)
+		if f
+			if f.getSize() == l.size
+				l.unset("nonlocal")
+				delete f
+				continue
+			delete f
+		print("---Fehler---")
+		//return
+	db.save()
+
+
+class FileToCopy
+	int id
+	string remotepath
+FileToCopy[] tocopy
+int copysize
+
+string scp_escape(string s)
+	string r = s
+	r = r.replace("(", "\\\\\\(")
+	r = r.replace(")", "\\\\\\)")
+	r = r.replace("'", "\\\\\\'")
+	r = r.replace(" ", "\\\\\\ ")
+	return r
+
+string ssh_escape(string s)
+	string r = s
+	r = r.replace(" ", "\\\\ ")
+	r = r.replace("(", "\\\\(")
+	r = r.replace(")", "\\\\)")
+	r = r.replace("'", "\\\\'")
+	return r
+
+string bash_escape(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("`", "\\`")
+	return r
+
+
+void main(string[] arg)
+	if arg.num == 0
+		print("find <FILTER>")
+		print("add <DIR> <FILTER>")
+		print("status")
+		print("status")
+		print("push")
+		print("pull")
+		return
+
+	conf.load()
+	db.load()
+	
+	
+	for a in arg
+		if a == "--verbose"
+			conf.verbose = true
+		else if a == "--drop-deleted"
+			conf.drop_deleted = true
+		else if a == "--pull-tags"
+			conf.pull_tags = true
+
+
+	if arg[0] == "add"
+		if arg.num < 3
+			print("ERROR: add <DIR> <FILTER>")
+			return
+		conf.add(arg[1], arg[2])
+		conf.save()
+		return
+		
+	else if arg[0] == "find"
+		if arg.num < 2
+			print("ERROR: find <FILTER>")
+			return
+		LocalFile*[] files = db.find_by_tags(arg[1])
+		for f in files
+			print(f.path)
+		return
+	else if arg[0] == "status" or arg[0] == "update-local"
+		conf.show_pure_local = (arg[0] == "status")
+		for e in conf.dirs
+			if conf.allow_local_search
+				db.update_local(e.dir)
+		return
+	else if arg[0] == "pull"
+		for e in conf.dirs
+			if conf.allow_local_search
+				db.update_local(e.dir)
+			
+			if conf.allow_remote_search
+				update_remote(e.syncs, e.dir)
+				if conf.allow_remote_pull
+					pull()
+		return
+	else if arg[0] == "pull"
+		print("not yet...")
+		return
+	else
+		print(arg[0] + "  ???")
+		return
+	
