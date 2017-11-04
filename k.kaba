@@ -368,6 +368,13 @@ class Variable
 				//return ai.v.compare(bf.v)
 		return 0
 
+class Function
+	string name
+	Variable*[] params
+	SyntaxNodeBlock* block
+	void __init__(string n)
+		name = n
+		block = nil
 
 void FuncSin(Variable* r, Variable*[] p)
 	if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
@@ -409,7 +416,9 @@ class SyntaxNodeVariable extends SyntaxNode
 		v = _v
 		type = TYPE_VARIABLE
 	override string str()
-		return "variable " + v.name
+		if v.writable
+			return "variable " + v.name
+		return "const " + v.v.str()
 
 class SyntaxNodeOperator extends SyntaxNode
 	string op
@@ -432,14 +441,17 @@ class SyntaxNodeOperator extends SyntaxNode
 		return 5
 
 class SyntaxNodeFunction extends SyntaxNode
-	string func
-	void __init__(string _func)
+	//string func
+	Function* func
+	
+	void __init__(Function* _func)
 		func = _func
 		type = TYPE_FUNCTION
 	override string str()
-		return "function " + func
+		return "function " + func.name
 
 class SyntaxNodeBlock extends SyntaxNode
+	Function*[] funcs
 	override void __init__()
 		type = TYPE_BLOCK
 	override string str()
@@ -473,7 +485,7 @@ class SyntaxNodeWhile extends SyntaxNode
 
 class SyntaxTree
 	Variable*[] vars
-	SyntaxNode* block
+	SyntaxNodeBlock* block
 	
 	Lines lines
 	int cur_line_no
@@ -530,6 +542,11 @@ class SyntaxTree
 		c.setString(s)
 		vars.add(c)
 		return c
+	Function* getFunc(string name)
+		for f in block.funcs
+			if f.name == name
+				return f
+		return nil
 	SyntaxNode* getNuclearOperand()
 		if isNumber(cur[0])
 			return new SyntaxNodeVariable(addConstNumber(cur))
@@ -554,7 +571,11 @@ class SyntaxTree
 			return nil
 		return new SyntaxNodeOperator(cur)
 	SyntaxNode* getOperandFunc()
-		SyntaxNode* sn = new SyntaxNodeFunction(cur)
+		Function* func = getFunc(cur)
+		if !func
+			setError("unknown function")
+			return nil
+		SyntaxNode* sn = new SyntaxNodeFunction(func)
 		next()
 		if error
 			return nil
@@ -587,7 +608,7 @@ class SyntaxTree
 			SyntaxNode *sn = getOperandGreedy()
 			next()
 			if cur != ")"
-				setError(") erwartet")
+				setError(") expected")
 				return nil
 			return sn
 		if cur_word+1 < cur_line.words.num
@@ -669,11 +690,46 @@ class SyntaxTree
 		// else
 		sn.block_else = parseBlock()
 		return sn
+	SyntaxNode* getFunctionDef()
+		int indent0 = cur_line.indent
+		next()
+		if error
+			return nil
+		Function *func = new Function(cur)
+		SyntaxNodeFunction *sn = new SyntaxNodeFunction(func)
+		next()
+		if error
+			return nil
+		if cur != "("
+			setError("( expected")
+			return nil
+		next()
+		if error
+			return nil
+		while cur != ")"
+			func.params.add(new Variable(cur))
+			next()
+			if error
+				return nil
+			if cur == ")"
+				break
+			if cur != ","
+				setError(", or ) expected")
+				return nil
+			next()
+			if error
+				return nil
+		
+		setError("aaaaa " + func.name)
+		return sn
+		
 	SyntaxNode *parseLine()
 		if cur == "if"
 			return getSpecialCommandIf()
 		if cur == "while"
 			return getSpecialCommandWhile()
+		if cur == "def"
+			return getFunctionDef()
 		SyntaxNode *sn = getOperandGreedy()
 		if error
 			return nil
@@ -792,12 +848,12 @@ class Interpreter
 				setError("unbehandelter Operator: " + op.op)
 		else if sn.type == TYPE_FUNCTION
 			SyntaxNodeFunction *func = sn
-			if func.func == "sin"
+			if func.func.name == "sin"
 				FuncSin(ret, params)
-			else if func.func == "print"
+			else if func.func.name == "print"
 				FuncPrint(ret, params)
 			else
-				setError("unbekannte Funktion: " + func.func)
+				setError("unbekannte Funktion: " + func.func.name)
 		else if sn.type == TYPE_IF
 			Variable dummy
 			SyntaxNodeIf *_if = sn
@@ -840,7 +896,7 @@ void main(string[] arg)
 	verbose = false
 	string filename
 	for a in arg
-		if a == "verbose"
+		if a == "--verbose"
 			verbose = true
 		else
 			filename = a
