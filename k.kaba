@@ -874,15 +874,17 @@ class Context
 	Variable*[] vars
 	Variable* ret
 	Function* func
-	bool returning
-	bool breaking
+	bool flag_return
+	bool flag_break
+	bool flag_continue
 	void __init__(string _name, Context* p)
 		name = _name
 		parent = p
 		ret = nil
 		func = nil
-		returning = false
-		breaking = false
+		flag_return = false
+		flag_break = false
+		flag_continue = false
 	void __delete__()
 		for v in vars
 			delete v
@@ -952,7 +954,7 @@ class Interpreter
 				params.add(temp)
 				is_temp.add(true)
 				
-				if cur_context.returning or cur_context.breaking
+				if cur_context.flag_return or cur_context.flag_break or cur_context.flag_continue
 					break
 		
 		// execute
@@ -1029,9 +1031,10 @@ class Interpreter
 			Variable dummy
 			SyntaxNodeWhile *_while = sn
 			while params[0].v.bool()
+				cur_context.flag_continue = false
 				doNode(_while.block, &dummy)
 				
-				if cur_context.returning or cur_context.breaking
+				if cur_context.flag_return or cur_context.flag_break
 					break
 
 				// reevaluate
@@ -1039,15 +1042,15 @@ class Interpreter
 					doNode(sn.params[0], params[0])
 					if error
 						return
-			cur_context.breaking = false
+			cur_context.flag_break = false
 		else if sn.type == TYPE_RETURN
 			if params.num > 0
 				*cur_context.ret = *params[0]
-			cur_context.returning = true
+			cur_context.flag_return = true
 		else if sn.type == TYPE_BREAK
-			cur_context.breaking = true
-		//else if sn.type == TYPE_CONTINUE
-		//	cur_context.breaking = true
+			cur_context.flag_break = true
+		else if sn.type == TYPE_CONTINUE
+			cur_context.flag_continue = true
 		else if sn.type == TYPE_BLOCK
 			nil
 		else
