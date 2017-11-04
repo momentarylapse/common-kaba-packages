@@ -1,4 +1,9 @@
-def test(a,b)
-	print("hallo")
+print("hallo")
+b=2
+a=b
 
-test()
+def test(a,b,c)
+	print("hallo test", a, b)
+
+test(b+1)
+a=3

@@ -371,10 +371,15 @@ class Variable
 class Function
 	string name
 	Variable*[] params
+	Variable*[] vars
 	SyntaxNodeBlock* block
 	void __init__(string n)
 		name = n
 		block = nil
+	Variable* addVar(string name)
+		Variable *v = new Variable(name)
+		vars.add(v)
+		return v
 
 void FuncSin(Variable* r, Variable*[] p)
 	if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
@@ -441,7 +446,6 @@ class SyntaxNodeOperator extends SyntaxNode
 		return 5
 
 class SyntaxNodeFunction extends SyntaxNode
-	//string func
 	Function* func
 	
 	void __init__(Function* _func)
@@ -451,7 +455,6 @@ class SyntaxNodeFunction extends SyntaxNode
 		return "function " + func.name
 
 class SyntaxNodeBlock extends SyntaxNode
-	Function*[] funcs
 	override void __init__()
 		type = TYPE_BLOCK
 	override string str()
@@ -485,7 +488,13 @@ class SyntaxNodeWhile extends SyntaxNode
 
 class SyntaxTree
 	Variable*[] vars
-	SyntaxNodeBlock* block
+	Function* func_main
+	Function*[] funcs
+	Function*[] internal_funcs
+	
+	
+	Function* cur_func
+	
 	
 	Lines lines
 	int cur_line_no
@@ -496,7 +505,7 @@ class SyntaxTree
 		return cur_line_no >= lines.lines.num - 1
 	void nextLine()
 		if endOfFile()
-			setError("unerwartetes Dateiende")
+			setError("unexpected end of file")
 			return
 		cur_line_no ++
 		cur_line = lines.lines[cur_line_no]
@@ -506,44 +515,45 @@ class SyntaxTree
 		return cur_word >= cur_line.words.num - 1
 	void next()
 		if endOfLine()
-			setError("unerwartetes Zeilenende")
+			setError("unexpected end of line")
 			return
 		cur_word ++
 		cur = cur_line.words[cur_word]
 	
 	bool error
 	void setError(string msg)
-		print("---Fehler---")
-		print("Zeile " + (cur_line.physical_line_no + 1) + " bei " + cur)
+		print("=== error ===")
+		print("line " + (cur_line.physical_line_no + 1) + " at " + cur)
 		print(msg)
 		error = true
 	
 	Variable* getVar(string name)
-		for v in vars
+		for v in cur_func.vars
 			if v.name == name
 				return v
 		return nil
-	Variable* addVar(string name)
-		Variable *v = new Variable(name)
-		vars.add(v)
-		return v
 	Variable* addConstNumber(string s)
-		Variable* c = new Variable("")//s)
+		Variable* c = cur_func.addVar("")//s)
 		c.writable = false
 		if s.find(".", 0) >= 0
 			c.setFloat(s.float())
 		else
 			c.setInt(s.int())
-		vars.add(c)
 		return c
 	Variable* addConstString(string s)
-		Variable* c = new Variable("")//s)
+		Variable* c = cur_func.addVar("")//s)
 		c.writable = false
 		c.setString(s)
-		vars.add(c)
 		return c
+	Function* addFunc(string name)
+		Function* f = new Function(name)
+		funcs.add(f)
+		return f
 	Function* getFunc(string name)
-		for f in block.funcs
+		for f in funcs
+			if f.name == name
+				return f
+		for f in internal_funcs
 			if f.name == name
 				return f
 		return nil
@@ -553,7 +563,7 @@ class SyntaxTree
 		if cur[0] == '"' // "
 			return new SyntaxNodeVariable(addConstString(unescape(cur)))
 		if isOperator(cur[0])
-			setError("Variablennamen erwartet")
+			setError("variable name expected")
 			return nil
 		Variable* v = getVar(cur)
 		if v
@@ -562,12 +572,12 @@ class SyntaxTree
 		if cur_word == 0
 			if cur_line.words.num >= 2
 				if cur_line.words[1] == "="
-					return new SyntaxNodeVariable(addVar(cur))
+					return new SyntaxNodeVariable(cur_func.addVar(cur))
 		setError("unknown operand")
 		return nil
 	SyntaxNode* getOperator()
 		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
-			setError("Operator erwartet")
+			setError("operator expected")
 			return nil
 		return new SyntaxNodeOperator(cur)
 	SyntaxNode* getOperandFunc()
@@ -580,7 +590,7 @@ class SyntaxTree
 		if error
 			return nil
 		if cur != "("
-			setError("( nach Funktionsnamen erwartet")
+			setError("( after function name expected")
 			return nil
 		next()
 		if error
@@ -594,7 +604,7 @@ class SyntaxTree
 			sn.params.add(param)
 			next()
 			if cur != "," and cur != ")"
-				setError(", oder ) nach Parameter erwartet")
+				setError(", or ) after parameter expexted")
 				return nil
 			if cur == ")"
 				break
@@ -690,38 +700,44 @@ class SyntaxTree
 		// else
 		sn.block_else = parseBlock()
 		return sn
-	SyntaxNode* getFunctionDef()
+	void parseFunctionDef()
+		Function* prev_func = cur_func
 		int indent0 = cur_line.indent
 		next()
 		if error
-			return nil
+			return
 		Function *func = new Function(cur)
-		SyntaxNodeFunction *sn = new SyntaxNodeFunction(func)
+		funcs.add(func)
+		cur_func = func
 		next()
 		if error
-			return nil
+			return
 		if cur != "("
 			setError("( expected")
-			return nil
+			return
 		next()
 		if error
-			return nil
+			return
 		while cur != ")"
-			func.params.add(new Variable(cur))
+			//Variable* v = ad
+			func.params.add(func.addVar(cur))
 			next()
 			if error
-				return nil
+				return
 			if cur == ")"
 				break
 			if cur != ","
 				setError(", or ) expected")
-				return nil
+				return
 			next()
 			if error
-				return nil
+				return
+		if !endOfLine()
+			setError("end of line expexted")
+			return
 		
-		setError("aaaaa " + func.name)
-		return sn
+		func.block = parseBlock()
+		cur_func = prev_func
 		
 	SyntaxNode *parseLine()
 		if cur == "if"
@@ -729,22 +745,25 @@ class SyntaxTree
 		if cur == "while"
 			return getSpecialCommandWhile()
 		if cur == "def"
-			return getFunctionDef()
+			parseFunctionDef()
+			return nil
 		SyntaxNode *sn = getOperandGreedy()
 		if error
 			return nil
 		if !endOfLine()
-			setError("hier sollte die Zeile enden?")
+			setError("end of line expected")
 		return sn
 	SyntaxNode *parseBlock()
-		SyntaxNode *sn = new SyntaxNodeBlock
+		SyntaxNodeBlock *sn = new SyntaxNodeBlock
 		nextLine()
 		if error
 			return nil
 		int indent0 = cur_line.indent
-		sn.params.add(parseLine())
+		SyntaxNode *sub = parseLine()
 		if error
 			return nil
+		if sub
+			sn.params.add(sub)
 		while !endOfFile()
 			if lines.lines[cur_line_no + 1].indent < indent0
 				return sn
@@ -752,7 +771,9 @@ class SyntaxTree
 				sn.params.add(parseBlock())
 			else
 				nextLine()
-				sn.params.add(parseLine())
+				sub = parseLine()
+				if sub
+					sn.params.add(sub)
 			if error
 				return nil
 		return sn
@@ -761,35 +782,54 @@ class SyntaxTree
 		error = false
 		LiteralParser lp
 		
-		Variable* v = addVar("true")
+		func_main = addFunc("main")
+		
+		Variable* v = func_main.addVar("true")
 		v.setBool(true)
 		v.writable = false
-		v = addVar("false")
+		v = func_main.addVar("false")
 		v.writable = false
 		v.setBool(false)
-		v = addVar("nil")
+		v = func_main.addVar("nil")
 		v.writable = false
-		v = addVar("pi")
+		v = func_main.addVar("pi")
 		v.setFloat(3.141592654)
 		v.writable = false
+		
+		Function* f = new Function("sin")
+		internal_funcs.add(f)
+		f = new Function("print")
+		internal_funcs.add(f)
 		
 		lines = lp.parse(source)
 		cur_line_no = -1
 		//lines.show()
-		block = parseBlock()
+		cur_func = func_main
+		func_main.block = parseBlock()
 	void show()
-		block.show(0)
+		print("--- syntax tree ---")
+		for f in funcs
+			print("function " + f.name)
+			f.block.show(1)
+		print("--- ---")
 	void showVars()
+		print("--- variables ---")
 		for v in vars
 			v.show()
+		for f in funcs
+			print(">> " + f.name)
+			for v in f.vars
+				v.show()
+		print("--- ---")
 
 class Interpreter
+	SyntaxTree* syntax
 	bool error
 	void setError(string msg)
-		print("----Fehler beim Ausführen----")
+		print("=== error during execution ==")
 		print(msg)
 		error = true
-	void doNode(SyntaxTree syntax, SyntaxNode *sn, Variable *ret)
+	void doNode(SyntaxNode *sn, Variable *ret)
 		Variable*[] params
 		bool[] is_temp
 		for p in sn.params
@@ -799,7 +839,7 @@ class Interpreter
 				is_temp.add(false)
 			else
 				Variable *temp = new Variable
-				doNode(syntax, p, temp)
+				doNode(p, temp)
 				if error
 					return
 				params.add(temp)
@@ -845,40 +885,44 @@ class Interpreter
 			else if op.op == "not"
 				ret.setBool(params[0].v.bool())
 			else
-				setError("unbehandelter Operator: " + op.op)
+				setError("unhandled operator: " + op.op)
 		else if sn.type == TYPE_FUNCTION
 			SyntaxNodeFunction *func = sn
-			if func.func.name == "sin"
-				FuncSin(ret, params)
-			else if func.func.name == "print"
-				FuncPrint(ret, params)
+			if func.func.block
+				doNode(func.func.block, ret)
 			else
-				setError("unbekannte Funktion: " + func.func.name)
+				if func.func.name == "sin"
+					FuncSin(ret, params)
+				else if func.func.name == "print"
+					FuncPrint(ret, params)
+				else
+					setError("unhandled internal function: " + func.func.name)
 		else if sn.type == TYPE_IF
 			Variable dummy
 			SyntaxNodeIf *_if = sn
 			if params[0].v.bool()
-				doNode(syntax, _if.block, &dummy)
+				doNode(_if.block, &dummy)
 			else if _if.block_else
-				doNode(syntax, _if.block_else, &dummy)
+				doNode(_if.block_else, &dummy)
 		else if sn.type == TYPE_WHILE
 			Variable dummy
 			SyntaxNodeWhile *_while = sn
 			while params[0].v.bool()
-				doNode(syntax, _while.block, &dummy)
+				doNode(_while.block, &dummy)
 
 				// reevaluate
 				if sn.params[0].type != TYPE_VARIABLE
-					doNode(syntax, sn.params[0], params[0])
+					doNode(sn.params[0], params[0])
 					if error
 						return
 		for p,i in params
 			if is_temp[i]
 				delete p
-	void run(SyntaxTree syntax)
+	void run(SyntaxTree _syntax)
+		syntax = &_syntax
 		error = false
 		Variable dummy
-		doNode(syntax, syntax.block, &dummy)
+		doNode(syntax.func_main.block, &dummy)
 
 void eval(string source)
 	SyntaxTree syntax
