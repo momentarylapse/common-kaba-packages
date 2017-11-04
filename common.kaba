@@ -1,37 +1,58 @@
 enum
-	TypeNumerical
-	TypeConstant
-	TypeVariable
-	TypeOperator
-	TypeFunction
+	TYPE_NUMBER
+	TYPE_CONSTANT
+	TYPE_VARIABLE
+	TYPE_OPERATOR
+	TYPE_FUNCTION
 
 enum
-	CharLetter
-	CharNumber
-	CharSign
+	CHAR_LETTER
+	CHAR_NUMBER
+	CHAR_SIGN
 
 class Term
-	int Type
-	string Name
-	Term*[] Param
-	void __init__(int type, string name)
-		Type = type
-		Name = name
+	int type
+	string name
+	Term*[] params
+	void __init__(int _type, string _name)
+		type = _type
+		name = _name
 	void __delete__()
-		for p in Param
+		for p in params
 			delete p
+	Term* shallow_copy()
+		Term* c = new Term(type, name)
+		for p in params
+			c.params.add(p)
+		return c
+	Term* copy()
+		Term* c = new Term(type, name)
+		for p in params
+			c.params.add(p.copy())
+		return c
+		
 
+Term *AddNumber(string s)
+	return new Term(TYPE_NUMBER, s)
 
-Term *CopyTerm(Term *t)
-	Term *r = new Term(t.Type, t.Name)
-	for p in t.Param
-		r.Param.add(CopyTerm(p))
-	return r
+Term *AddVariable(string s)
+	return new Term(TYPE_VARIABLE, s)
+
+Term *AddOperator(string s, Term *p1, Term *p2)
+	Term *t = new Term(TYPE_OPERATOR, s)
+	t.params.add(p1)
+	t.params.add(p2)
+	return t
+
+Term *AddFunction(string s, Term *param)
+	Term *t = new Term(TYPE_FUNCTION, s)
+	t.params.add(param)
+	return t
 
 Term *PermuteOperator(Term *t)
-	Term *r = CopyTerm(t)
-	r.Param[0] = t.Param[1]
-	r.Param[1] = t.Param[0]
+	Term *r = t.copy()
+	r.params[0] = t.params[1].copy()
+	r.params[1] = t.params[0].copy()
 	return r
 
 // (a+b)+(c+d)
@@ -39,9 +60,9 @@ Term *PermuteOperator(Term *t)
 // 1 -> (b + a) + (c + d)
 // 2 -> (c + d) + .....
 Term *PermuteLiftOperator__(Term *t, int n)
-	Term *r = CopyTerm(t)
-	r.Param[0] = t.Param[1]
-	r.Param[1] = t.Param[0]
+	Term *r = t.copy()
+	r.params[0] = t.params[1].copy()
+	r.params[1] = t.params[0].copy()
 	return r
 
 bool ParserError
@@ -63,14 +84,14 @@ void RaiseExecError(string s)
 
 bool NeedsBrackets(Term *t, Term *sub)
 	//return sub.Type == TypeOperator
-	if t.Name == "^"
-		return sub.Type == TypeOperator
-	if t.Name == "/"
-		return sub.Type == TypeOperator
-	if t.Name == "-"
-		return sub.Type == TypeOperator
-	if t.Name == "*"
-		if (sub.Name == "+") or (sub.Name == "-")
+	if t.name == "^"
+		return sub.type == TYPE_OPERATOR
+	if t.name == "/"
+		return sub.type == TYPE_OPERATOR
+	if t.name == "-"
+		return sub.type == TYPE_OPERATOR
+	if t.name == "*"
+		if (sub.name == "+") or (sub.name == "-")
 			return true
 	return false
 
@@ -82,21 +103,21 @@ string ExprToStr(Term *t)
 	if !t
 		return "-nil-"
 	string r = "?"
-	if t.Type == TypeOperator
-		string a = ExprToStr(t.Param[0])
-		string b = ExprToStr(t.Param[1])
-		if NeedsBrackets(t, t.Param[0])
+	if t.type == TYPE_OPERATOR
+		string a = ExprToStr(t.params[0])
+		string b = ExprToStr(t.params[1])
+		if NeedsBrackets(t, t.params[0])
 			a = "(" + a + ")"
-		if NeedsBrackets(t, t.Param[1])
+		if NeedsBrackets(t, t.params[1])
 			b = "(" + b + ")"
-		if t.Name == "*"
+		if t.name == "*"
 			r = a + " " + b
 		else
-			r = a + " " + t.Name + " " + b
-	else if t.Type == TypeNumerical
-		r = t.Name
-	else if t.Type == TypeVariable
-		r = t.Name
-	else if t.Type == TypeFunction
-		r = t.Name + "(" + ExprToStr(t.Param[0]) + ")"
+			r = a + " " + t.name + " " + b
+	else if t.type == TYPE_NUMBER
+		r = t.name
+	else if t.type == TYPE_VARIABLE
+		r = t.name
+	else if t.type == TYPE_FUNCTION
+		r = t.name + "(" + ExprToStr(t.params[0]) + ")"
 	return r

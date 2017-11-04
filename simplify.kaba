@@ -31,29 +31,30 @@ string gcd(string a, string b)
 	return va.gcd(vb).str()
 
 void GetEqualOps(Term* t, Term*[] l)
-	if t.Type == TypeOperator
-		Term* p1 = t.Param[0]
-		Term* p2 = t.Param[1]
+	if t.type == TYPE_OPERATOR
+		Term* p1 = t.params[0]
+		Term* p2 = t.params[1]
 		Term*[] l2
-		if p1.Name == t.Name
+		if p1.name == t.name
 			GetEqualOps(p1, l2)
 		else
 			l.add(p1)
-		if p2.Name == t.Name
+		if p2.name == t.name
 			GetEqualOps(p2, l2)
 		else
 			l.add(p2)
 		for i in 0:l2.num
 			l.add(l2[i])
 
-Term *SimplifyNumericalDivision(Term *t, string a, string b)
+// a/b kürzen
+Term *SimplifyNumberDivision(Term *t, string a, string b)
 	vli va = a
 	vli vb = b
 	vli tt = va, rem
 	tt.div(vb, rem)
 	vli vli0 = 0
 	if rem == vli0
-		return AddNumerical(tt.str())
+		return AddNumber(tt.str())
 	string g = gcd(a, b)
 	if g != "1"
 		vli vg = g
@@ -62,7 +63,7 @@ Term *SimplifyNumericalDivision(Term *t, string a, string b)
 		if vb.sign
 			vb.sign = false
 			va.sign = !va.sign
-		return AddOperator(t.Name, AddNumerical(va.str()), AddNumerical(vb.str()))
+		return AddOperator(t.name, AddNumber(va.str()), AddNumber(vb.str()))
 	return t
 
 Term *SimplifyNumericals(Term *t)
@@ -71,39 +72,39 @@ Term *SimplifyNumericals(Term *t)
 	// rekursiv
 	bool need_new = false
 	Term*[8] p
-	for i in 0:t.Param.num
-		p[i] = SimplifyNumericals(t.Param[i])
-		if p[i] != t.Param[i]
+	for i in 0:t.params.num
+		p[i] = SimplifyNumericals(t.params[i])
+		if p[i] != t.params[i]
 			need_new = true
 	if need_new
-		t = CopyTerm(t)
-		for i in 0:t.Param.num
-			t.Param[i] = p[i]
+		t = t.copy()
+		for i in 0:t.params.num
+			t.params[i] = p[i]
 		
 	// selbst
-	if t.Type == TypeOperator
-		Term *p1 = t.Param[0]
-		Term *p2 = t.Param[1]
-		if (p1.Type == TypeNumerical) and (p2.Type == TypeNumerical)
-			string a = p1.Name
-			string b = p2.Name
-			/*if t.Name == "+"
-				return AddNumerical(add(a, b))*/
-			if t.Name == "-"
-				return AddNumerical(sub(a, b))
-			/*if t.Name == "*"
-				return AddNumerical(mul(a, b))*/
-			if t.Name == "/"
-				return SimplifyNumericalDivision(t, a, b)
-			if t.Name == "^"
-				return AddNumerical(exponent(a, b))
+	if t.type == TYPE_OPERATOR
+		Term *p1 = t.params[0]
+		Term *p2 = t.params[1]
+		if (p1.type == TYPE_NUMBER) and (p2.type == TYPE_NUMBER)
+			string a = p1.name
+			string b = p2.name
+			/*if t.name == "+"
+				return AddNumber(add(a, b))*/
+			if t.name == "-"
+				return AddNumber(sub(a, b))
+			/*if t.name == "*"
+				return AddNumber(mul(a, b))*/
+			if t.name == "/"
+				return SimplifyNumberDivision(t, a, b)
+			if t.name == "^"
+				return AddNumber(exponent(a, b))
 	return t
 
 bool LiterallyEqual(Term *a, Term *b)
-	if a.Name != b.Name
+	if a.name != b.name
 		return false
-	for i in 0:a.Param.num
-		if !LiterallyEqual(a.Param[i], b.Param[i])
+	for i in 0:a.params.num
+		if !LiterallyEqual(a.params[i], b.params[i])
 			return false
 	return true
 
@@ -142,49 +143,49 @@ Term *Multiple(Term *t, int n)
 	if n == 1
 		return t
 	if n == 0
-		return AddNumerical("0")
-	return AddOperator("*", AddNumerical(n.str()), t)
+		return AddNumber("0")
+	return AddOperator("*", AddNumber(n.str()), t)
 
 Term *Potence(Term *t, int n)
 	if n == 1
 		return t
 	if n == 0
-		return AddNumerical("1")
-	return AddOperator("^", t, AddNumerical(n.str()))
+		return AddNumber("1")
+	return AddOperator("^", t, AddNumber(n.str()))
 
 // Zahlfaktoren zusammenfassen
 // TODO: gleiche Faktoren mit unterschiedlichen Potenzen... Potenzen addieren
 // TODO: Brüche... kürzen...
 Term* NormalizeProduct(Term* t)
-	if t.Type != TypeOperator
+	if t.type != TYPE_OPERATOR
 		return t
 	Term*[] l
 	GetEqualOps(t, l)
 	string num = "1"
 	for i in 0:l.num
-		if l[i].Type == TypeNumerical
-			num = mul(num, l[i].Name)
+		if l[i].type == TYPE_NUMBER
+			num = mul(num, l[i].name)
 			l.remove(i)
 			i --
 	
 	if num == "0"
-		return AddNumerical("0")
+		return AddNumber("0")
 	if l.num == 0
-		return AddNumerical(num)
+		return AddNumber(num)
 	
 	int[] neq
 	SortExprList(l, neq, true)
 	
 	Term* t_r = Potence(l[0], neq[0])
 	for i in 1:l.num
-		Term* t_mul = CopyTerm(t)
-		t_mul.Param[0] = t_r
-		t_mul.Param[1] = Potence(l[i], neq[i])
+		Term* t_mul = t.copy()
+		t_mul.params[0] = t_r
+		t_mul.params[1] = Potence(l[i], neq[i])
 		t_r = t_mul
 	if num != "1"
-		Term* t_mul = CopyTerm(t)
-		t_mul.Param[0] = AddNumerical(num)
-		t_mul.Param[1] = t_r
+		Term* t_mul = t.copy()
+		t_mul.params[0] = AddNumber(num)
+		t_mul.params[1] = t_r
 		t_r = t_mul
 	return t_r
 
@@ -195,36 +196,36 @@ Term *NormalizeSum(Term *t)
 	GetEqualOps(t, l)
 	string num = "0"
 	for i in 0:l.num
-		if l[i].Type == TypeNumerical
-			num = add(num, l[i].Name)
+		if l[i].type == TYPE_NUMBER
+			num = add(num, l[i].name)
 			l.remove(i)
 			i --
 	
 	if l.num == 0
-		return AddNumerical(num)
+		return AddNumber(num)
 
 	int[] neq
 	SortExprList(l, neq, true)
 	
 	Term* t_r = Multiple(l[0], neq[0])
 	for i in 1:l.num
-		Term *t_sum = CopyTerm(t)
-		t_sum.Param[0] = t_r
-		t_sum.Param[1] = Multiple(l[i], neq[i])
+		Term *t_sum = t.copy()
+		t_sum.params[0] = t_r
+		t_sum.params[1] = Multiple(l[i], neq[i])
 		t_r = t_sum
 	t_r = NormalizeProduct(t_r)
 	if num != "0"
-		return AddOperator("+", t_r, AddNumerical(num))
+		return AddOperator("+", t_r, AddNumber(num))
 	return t_r
 
 Term *NormalizeExponent(Term *t)
-	Term *p1 = t.Param[1]
-	if p1.Type == TypeNumerical
-		if p1.Name == "1"
-			return t.Param[0]
-		if p1.Name == "0"
-			return AddNumerical("1")
-	return t
+	Term *p1 = t.params[1]
+	if p1.type == TYPE_NUMBER
+		if p1.name == "1"
+			return t.params[0]
+		if p1.name == "0"
+			return AddNumber("1")
+	return t.copy()
 
 Term *NormalizeRec(Term *t, bool do_normalize)
 	if !t
@@ -232,29 +233,29 @@ Term *NormalizeRec(Term *t, bool do_normalize)
 	// rekursiv
 	bool need_new = false
 	Term*[8] p
-	for i in 0:t.Param.num
+	for i in 0:t.params.num
 		bool dnr = true
-		if t.Name == "*"
-			if t.Param[i].Name == "*"
+		if t.name == "*"
+			if t.params[i].name == "*"
 				dnr = false
-		if t.Name == "+"
-			if t.Param[i].Name == "+"
+		if t.name == "+"
+			if t.params[i].name == "+"
 				dnr = false
-		p[i] = NormalizeRec(t.Param[i], dnr)
-		if p[i] != t.Param[i]
+		p[i] = NormalizeRec(t.params[i], dnr)
+		if p[i] != t.params[i]
 			need_new = true
 	if need_new
-		t = CopyTerm(t)
-		for i in 0:t.Param.num
-			t.Param[i] = p[i]
+		t = t.copy()
+		for i in 0:t.params.num
+			t.params[i] = p[i]
 		
 	// selbst
 	if do_normalize
-		if t.Name == "*"
+		if t.name == "*"
 			return NormalizeProduct(t)
-		if t.Name == "+"
+		if t.name == "+"
 			return NormalizeSum(t)
-		if t.Name == "^"
+		if t.name == "^"
 			return NormalizeExponent(t)
 	return t
 

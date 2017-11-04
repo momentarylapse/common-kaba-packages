@@ -7,19 +7,19 @@ void RaiseParserError(string s)
 
 int CharType(char c)
 	if (c >= 'a') and (c <= 'z')
-		return CharLetter
+		return CHAR_LETTER
 	if (c >= 'A') and (c <= 'Z')
-		return CharLetter
+		return CHAR_LETTER
 	if (c >= '0') and (c <= '9')
-		return CharNumber
-	return CharSign
+		return CHAR_NUMBER
+	return CHAR_SIGN
 
 string GetExpr(string s, int p)
 	string r
 	char c = s[p]
 	int ct = CharType(c)
 	r.add(c)
-	if ct != CharSign
+	if ct != CHAR_SIGN
 		for i in p+1:s.num
 			if CharType(s[i]) == ct
 				r.add(s[i])
@@ -55,23 +55,6 @@ int OperatorRank(string s)
 	if (s == "^")
 		return 3
 	return -1
-
-Term *AddNumerical(string s)
-	return new Term(TypeNumerical, s)
-
-Term *AddVariable(string s)
-	return new Term(TypeVariable, s)
-
-Term *AddOperator(string s, Term *p1, Term *p2)
-	Term *t = new Term(TypeOperator, s)
-	t.Param.add(p1)
-	t.Param.add(p2)
-	return t
-
-Term *AddFunction(string s, Term *param)
-	Term *t = new Term(TypeFunction, s)
-	t.Param.add(param)
-	return t
 
 int GetBrackets(string[] e, int i0)
 	int np = 1
@@ -109,9 +92,9 @@ Term *ParsePart(string[] e)
 		else if e[i] == ")"
 			RaiseParserError("überflüssige Klammer )")
 			return nil
-		else if CharType(e[i][0]) == CharNumber
-			eid.add(AddNumerical(e[i]))
-		else if CharType(e[i][0]) == CharLetter
+		else if CharType(e[i][0]) == CHAR_NUMBER
+			eid.add(AddNumber(e[i]))
+		else if CharType(e[i][0]) == CHAR_LETTER
 			if IsFunction(e[i])
 				if e[i+1] != "("
 					RaiseParserError("Klammer ( nach Funktion vermisst")
@@ -130,7 +113,7 @@ Term *ParsePart(string[] e)
 				i = i_last
 			else
 				eid.add(AddVariable(e[i]))
-		else if CharType(e[i][0]) == CharSign
+		else if CharType(e[i][0]) == CHAR_SIGN
 			if OperatorRank(e[i]) < 0
 				RaiseParserError("unbekannter Operator '" + e[i] + "'")
 				return nil
@@ -146,15 +129,15 @@ Term *ParsePart(string[] e)
 		int i_sig, sig = -1
 		for i in 0:eid.num
 			if (i % 2) == 1
-				int os = OperatorRank(eid[i].Name)
+				int os = OperatorRank(eid[i].name)
 				if os > sig
 					sig = os
 					i_sig = i
-		if eid[i_sig].Type != TypeOperator
+		if eid[i_sig].type != TYPE_OPERATOR
 			RaiseParserError("Operator vermisst")
 			return nil
-		eid[i_sig].Param[0] = eid[i_sig - 1]
-		eid[i_sig].Param[1] = eid[i_sig + 1]
+		eid[i_sig].params[0] = eid[i_sig - 1]
+		eid[i_sig].params[1] = eid[i_sig + 1]
 		eid[i_sig - 1] = eid[i_sig]
 		eid.remove(i_sig)
 		eid.remove(i_sig)

@@ -6,25 +6,17 @@ use "diff.kaba"
 
 
 Term *Execute(Term *t)
-	if !t
-		return nil
-	// rekursiv
-	bool need_new = false
-	Term*[8] p
-	for pp,i in t.Param
-		p[i] = Execute(pp)
-		if p[i] != pp
-			need_new = true
-	if need_new
-		t = CopyTerm(t)
-		for pp,i in t.Param
-			pp = p[i]
-		
 	// selbst
-	if t.Name == "expand"
-		return Expand(t.Param[0])
-	if t.Name == "diff"
-		return Diff(t.Param[0])
+	if t.name == "expand"
+		return Expand(Execute(t.params[0]))
+	if t.name == "diff"
+		return Diff(Execute(t.params[0]))
+
+	// rekursiv
+	Term* r = t.shallow_copy()
+	for pp,i in t.params
+		r.params[i] = Execute(pp)
+		
 	return t
 
 Term *ExecuteComplete(Term *t)
@@ -32,7 +24,7 @@ Term *ExecuteComplete(Term *t)
 	t = SimplifyNumericals(t)
 	t = Execute(t)
 	t = Normalize(t)
-	t = SimplifyNumericals(t)
+	//t = SimplifyNumericals(t)
 	return t
 
 void main(string[] arg)

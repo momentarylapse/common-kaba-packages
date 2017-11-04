@@ -8,74 +8,75 @@ Term *DiffFunction(string func, Term *param)
 	if func == "sin"
 		return AddFunction("cos", param)
 	if func == "cos"
-		return AddOperator("-", AddNumerical("0"), AddFunction("sin", param))
+		return AddOperator("-", AddNumber("0"), AddFunction("sin", param))
 	if func == "sinh"
 		return AddFunction("cosh", param)
 	if func == "cosh"
 		return AddFunction("sinh", param)
 	if func == "ln"
-		return AddOperator("/", AddNumerical("1"), param)
+		return AddOperator("/", AddNumber("1"), param)
 	if func == "sqrt"
-		return AddOperator("/", AddNumerical("1"), AddFunction("sqrt", param))
+		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", param))
 	RaiseExecError("Funktion '" + func + "' nicht ableitbar")
 	return nil
 
 
 // d/dx
+// always copies...
 Term *Diff(Term *t)
 	if !t
 		return nil
 	Term* a, b
-	if t.Param.num > 0
-		a = t.Param[0]
-	if t.Param.num > 1
-		b = t.Param[1]
+	if t.params.num > 0
+		a = t.params[0]
+	if t.params.num > 1
+		b = t.params[1]
 
 	// selbst
-	if t.Type == TypeNumerical
-		return AddNumerical("0")
-	if t.Type == TypeVariable
-		if t.Name == "x"
-			return AddNumerical("1")
-		return AddNumerical("0")
-	if t.Type == TypeFunction
+	if t.type == TYPE_NUMBER
+		return AddNumber("0")
+	if t.type == TYPE_VARIABLE
+		if t.name == "x"
+			return AddNumber("1")
+		return AddNumber("0")
+	if t.type == TYPE_FUNCTION
 		// diff(f(a))  ->  f'(a) * diff(a)
-		return AddOperator("*", DiffFunction(t.Name, a),
+		return AddOperator("*", DiffFunction(t.name, a.copy()),
 		                        Diff(a))
-	if t.Type == TypeOperator
-		if (t.Name == "+") or (t.Name == "-")
+	if t.type == TYPE_OPERATOR
+		if (t.name == "+") or (t.name == "-")
 			// diff(a + b)  ->  diff(a) + diff(b)
-			return AddOperator(t.Name, Diff(a),
+			return AddOperator(t.name, Diff(a),
 			                           Diff(b))
-		if t.Name == "*"
+		if t.name == "*"
 			// diff(a * b)  ->  diff(a) * b + a * diff(b)
 			return AddOperator("+", AddOperator("*", Diff(a),
-			                                         b),
-			                        AddOperator("*", a,
+			                                         b.copy()),
+			                        AddOperator("*", a.copy(),
 			                                         Diff(b)))
-		if t.Name == "/"
+		if t.name == "/"
 			// diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
 			return AddOperator("-", AddOperator("/", Diff(a),
-			                                         b),
-			                        AddOperator("/", AddOperator("*", a,
+			                                         b.copy()),
+			                        AddOperator("/", AddOperator("*", a.copy(),
 			                                                          Diff(b)),
-			                                         AddOperator("^", b,
-			                                                          AddNumerical("2"))))
-		if t.Name == "^"
-			if b.Type == TypeNumerical
+			                                         AddOperator("^", b.copy(),
+			                                                          AddNumber("2"))))
+		if t.name == "^"
+			if b.type == TYPE_NUMBER
 				// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
-				return AddOperator("*", b,
-				                        AddOperator("*", AddOperator("^", a,
-				                                                          AddNumerical((b.Name.int() - 1).str())),
+				return AddOperator("*", b.copy(),
+				                        AddOperator("*", AddOperator("^", a.copy(),
+				                                                          AddNumber((b.name.int() - 1).str())),
 				                                         Diff(a)))
 			// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
-			return AddOperator("+", AddOperator("*", b,
-			                                         AddOperator("*", AddOperator("^", a,
-			                                                                           AddOperator("-", b,
-			                                                                                            AddNumerical("1"))),
+			return AddOperator("+", AddOperator("*", b.copy(),
+			                                         AddOperator("*", AddOperator("^", a.copy(),
+			                                                                           AddOperator("-", b.copy(),
+			                                                                                            AddNumber("1"))),
 			                                                          Diff(a))),
-			                        AddOperator("*", AddFunction("ln", a),
-			                                         AddOperator("*", AddOperator("^", a, b),
+			                        AddOperator("*", AddFunction("ln", a.copy()),
+			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
 			                                                          Diff(b))))
 	RaiseExecError("unbekannte Ableitung...")
 	return nil
