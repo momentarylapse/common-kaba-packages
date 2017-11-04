@@ -399,6 +399,9 @@ enum
 	TYPE_BLOCK
 	TYPE_IF
 	TYPE_WHILE
+	TYPE_BREAK
+	TYPE_CONTINUE
+	TYPE_RETURN
 
 class SyntaxNode
 	int type
@@ -485,6 +488,12 @@ class SyntaxNodeWhile extends SyntaxNode
 		block.show(indent+1)
 		if block_else
 			block_else.show(indent+1)
+
+class SyntaxNodeReturn extends SyntaxNode
+	override void __init__()
+		type = TYPE_RETURN
+	override string str()
+		return "return"
 
 class SyntaxTree
 	Variable*[] vars
@@ -664,6 +673,21 @@ class SyntaxTree
 			sn.remove(imin*2)
 			rank.remove(imin)
 		return sn[0]
+	SyntaxNode *getSpecialCommandReturn()
+		SyntaxNodeReturn *sn = new SyntaxNodeReturn
+		while !endOfLine()
+			next()
+			if error
+				return nil
+			sn.params.add(getOperandGreedy())
+			if !endOfLine()
+				setError("multi return not supported")
+				return nil
+				next()
+				if cur != ","
+					setError(", or end of line expected")
+					return nil
+		return sn
 	SyntaxNode *getSpecialCommandIf()
 		int indent0 = cur_line.indent
 		SyntaxNodeIf *sn = new SyntaxNodeIf
@@ -744,6 +768,8 @@ class SyntaxTree
 			return getSpecialCommandIf()
 		if cur == "while"
 			return getSpecialCommandWhile()
+		if cur == "return"
+			return getSpecialCommandReturn()
 		if cur == "def"
 			parseFunctionDef()
 			return nil
@@ -824,11 +850,19 @@ class SyntaxTree
 
 class Interpreter
 	SyntaxTree* syntax
+	Function*[] func_stack
+	Variable*[] ret_stack
 	bool error
 	void setError(string msg)
 		print("=== error during execution ==")
 		print(msg)
 		error = true
+	void stack_push(Function* func, Variable* ret)
+		func_stack.add(func)
+		ret_stack.add(ret)
+	void stack_pop()
+		func_stack.remove(func_stack.num - 1)
+		ret_stack.remove(ret_stack.num - 1)
 	void doNode(SyntaxNode *sn, Variable *ret)
 		Variable*[] params
 		bool[] is_temp
@@ -889,7 +923,12 @@ class Interpreter
 		else if sn.type == TYPE_FUNCTION
 			SyntaxNodeFunction *func = sn
 			if func.func.block
+				int n = min(sn.params.num,func.func.params.num)
+				for i in 0:n
+					*func.func.params[i] = *params[i]
+				stack_push(func.func, ret)
 				doNode(func.func.block, ret)
+				stack_pop()
 			else
 				if func.func.name == "sin"
 					FuncSin(ret, params)
@@ -915,6 +954,13 @@ class Interpreter
 					doNode(sn.params[0], params[0])
 					if error
 						return
+		else if sn.type == TYPE_RETURN
+			if params.num > 0
+				*ret_stack[ret_stack.num-1] = *params[0]
+		else if sn.type == TYPE_BLOCK
+			nil
+		else
+			setError("????"+sn.type)
 		for p,i in params
 			if is_temp[i]
 				delete p
@@ -922,6 +968,7 @@ class Interpreter
 		syntax = &_syntax
 		error = false
 		Variable dummy
+		stack_push(syntax.func_main, &dummy)
 		doNode(syntax.func_main.block, &dummy)
 
 void eval(string source)
