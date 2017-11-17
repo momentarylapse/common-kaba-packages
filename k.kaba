@@ -370,6 +370,10 @@ class DynamicValueStateString extends DynamicValueState
 		return v
 	override string render()
 		return "'" + v + "'"
+	override int int()
+		return v.int()
+	override float float()
+		return v.float()
 	override bool bool()
 		return v.num > 0
 	override DynamicValueState* copy()
@@ -522,9 +526,40 @@ class FunctionSin extends Function
 		is_internal = true
 	override void call(Variable* r, Variable*[] p)
 		if p.num > 0
-			if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
-				r.v.setFloat(sin(p[0].v.float()))
-				
+			r.v.setFloat(sin(p[0].v.float()))
+
+class FunctionCos extends Function
+	override void __init__()
+		super.__init__("cos")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			r.v.setFloat(cos(p[0].v.float()))
+
+class FunctionTan extends Function
+	override void __init__()
+		super.__init__("tan")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			r.v.setFloat(tan(p[0].v.float()))
+
+class FunctionSqrt extends Function
+	override void __init__()
+		super.__init__("sqrt")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			r.v.setFloat(sqrt(p[0].v.float()))
+
+class FunctionAbs extends Function
+	override void __init__()
+		super.__init__("abs")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			r.v.setFloat(abs(p[0].v.float()))
+
 class FunctionPrint extends Function
 	override void __init__()
 		super.__init__("print")
@@ -575,11 +610,43 @@ class FunctionRange extends Function
 			a.a.add(ii)
 			i += step
 
+class FunctionStr extends Function
+	override void __init__()
+		super.__init__("str")
+		is_internal = true
+	override void call(Variable *r, Variable*[] p)
+		if p.num > 0
+			r.v.setString(p[0].v.str())
+
+class FunctionInt extends Function
+	override void __init__()
+		super.__init__("int")
+		is_internal = true
+	override void call(Variable *r, Variable*[] p)
+		if p.num > 0
+			r.v.setInt(p[0].v.int())
+
+class FunctionFloat extends Function
+	override void __init__()
+		super.__init__("float")
+		is_internal = true
+	override void call(Variable *r, Variable*[] p)
+		if p.num > 0
+			r.v.setFloat(p[0].v.float())
+
+class FunctionBool extends Function
+	override void __init__()
+		super.__init__("bool")
+		is_internal = true
+	override void call(Variable *r, Variable*[] p)
+		if p.num > 0
+			r.v.setBool(p[0].v.bool())
+
 enum
 	TYPE_OPERATOR
 	TYPE_VARIABLE
 	TYPE_CONST
-	TYPE_FUNCTION
+	TYPE_CALL
 	TYPE_BLOCK
 	TYPE_IF
 	TYPE_WHILE
@@ -644,14 +711,14 @@ class SyntaxNodeOperator extends SyntaxNode
 			return 10
 		return 5
 
-class SyntaxNodeFunction extends SyntaxNode
+class SyntaxNodeCall extends SyntaxNode
 	string name
 	
 	void __init__(string _name)
 		name = _name
-		type = TYPE_FUNCTION
+		type = TYPE_CALL
 	override string str()
-		return "function " + name
+		return "call " + name
 
 class SyntaxNodeBlock extends SyntaxNode
 	override void __init__()
@@ -842,7 +909,7 @@ class SyntaxTree
 		next()
 		return sn
 	SyntaxNode* getOperandFunc()
-		SyntaxNode* sn = new SyntaxNodeFunction(cur)
+		SyntaxNode* sn = new SyntaxNodeCall(cur)
 		next() // name
 		if error
 			return nil
@@ -1179,9 +1246,17 @@ class SyntaxTree
 		v.writable = false
 		
 		internal_funcs.add(new FunctionSin)
+		internal_funcs.add(new FunctionCos)
+		internal_funcs.add(new FunctionTan)
+		internal_funcs.add(new FunctionSqrt)
+		internal_funcs.add(new FunctionAbs)
 		internal_funcs.add(new FunctionLen)
 		internal_funcs.add(new FunctionRange)
 		internal_funcs.add(new FunctionPrint)
+		internal_funcs.add(new FunctionStr)
+		internal_funcs.add(new FunctionInt)
+		internal_funcs.add(new FunctionFloat)
+		internal_funcs.add(new FunctionBool)
 		
 		lines = lp.parse(source)
 		
@@ -1328,8 +1403,8 @@ class Interpreter
 				ret.v.setBool(params[0].v.bool())
 			else
 				setError("unhandled operator: " + op.op)
-		else if sn.type == TYPE_FUNCTION
-			SyntaxNodeFunction *func = sn
+		else if sn.type == TYPE_CALL
+			SyntaxNodeCall *func = sn
 			Function* f = syntax.getFunc(func.name)
 			if !f
 				setError("unknown function: " + func.name)
@@ -1439,12 +1514,17 @@ void eval(string source)
 
 void main(string[] arg)
 	verbose = false
-	string filename
+	string input
+	bool from_file = true
 	for a in arg
 		if a == "--verbose"
 			verbose = true
+		else if a == "-C" or a == "--command"
+			from_file = false
 		else
-			filename = a
-	if filename.num > 0
-		string source = FileRead(filename)
+			input = a
+	if input.num > 0
+		string source = input
+		if from_file
+			source = FileRead(input)
 		eval(source)
