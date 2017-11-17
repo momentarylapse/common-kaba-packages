@@ -834,7 +834,7 @@ class SyntaxTree
 			if cur != "]"
 				setError("] expected")
 			next() // "]"
-			return el
+			return checkOperandExtensions(el)
 		
 		return sn
 	SyntaxNode* getOperand()
