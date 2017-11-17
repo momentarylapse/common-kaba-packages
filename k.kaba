@@ -130,8 +130,158 @@ enum
 
 class DynamicValue
 	int type
+	DynamicValueState* s
 	void __init__()
+		s = new DynamicValueState
 		type = TYPE_NONE
+	virtual void __delete__()
+		delete s
+	string str()
+		return s.str()
+	string render()
+		return s.render()
+	int int()
+		return s.int()
+	float float()
+		return s.float()
+	bool bool()
+		return s.bool()
+	DynamicValue* get_element(DynamicValue* i)
+		return s.get_element(i)
+	void add(DynamicValue* el)
+		s.add(el)
+	DynamicValue* copy()
+		DynamicValue* c = new DynamicValue
+		delete c.s
+		c.s = s.copy()
+		return c
+	void setType(int _type)
+		if type != _type
+			//clear()
+			delete s
+			type = _type
+			if type == TYPE_BOOL
+				s = new DynamicValueStateBool
+			else if type == TYPE_INT
+				s = new DynamicValueStateInt
+			else if type == TYPE_FLOAT
+				s = new DynamicValueStateFloat
+			else if type == TYPE_STRING
+				s = new DynamicValueStateString
+			else if type == TYPE_ARRAY
+				s = new DynamicValueStateArray
+			else
+				s = new DynamicValueState
+	void setBool(bool b)
+		setType(TYPE_BOOL)
+		DynamicValueStateBool *sb = s
+		sb.v = b
+	void setInt(int i)
+		setType(TYPE_INT)
+		DynamicValueStateInt *si = s
+		si.v = i
+	void setFloat(float f)
+		setType(TYPE_FLOAT)
+		DynamicValueStateFloat *sf = s
+		sf.v = f
+	void setString(string _s)
+		setType(TYPE_STRING)
+		DynamicValueStateString *ss = s
+		ss.v = _s
+	void __assign__(DynamicValue b)
+		if b.type == TYPE_BOOL
+			setBool(b.bool())
+		else if b.type == TYPE_INT
+			setInt(b.int())
+		else if b.type == TYPE_FLOAT
+			setFloat(b.float())
+		else if b.type == TYPE_STRING
+			setString(b.str())
+		else if b.type == TYPE_ARRAY
+			setType(TYPE_ARRAY)
+			DynamicValueStateArray* ba = b.s
+			for el in ba.a
+				s.add(el)
+
+	void __iadd__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(s.int() + b.int())
+			else if type == TYPE_FLOAT
+				setInt(s.int() + b.float())
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(s.float() + b.int())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() + b.float())
+		else if b.type == TYPE_STRING
+			if type == TYPE_STRING
+				setString(s.str() + b.str())
+		else if b.type == TYPE_ARRAY
+			if type == TYPE_ARRAY
+				DynamicValueStateArray* ba = b.s
+				for el in ba.a
+					s.add(el)
+
+	void __isub__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(s.int() - b.int())
+			else if type == TYPE_FLOAT
+				setInt(s.int() - b.float())
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(s.float() - b.int())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() - b.float())
+
+	void __imul__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(s.int() * b.int())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() * b.int())
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(s.int() * b.float())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() * b.float())
+
+	void __idiv__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(s.int() / b.int())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() / b.int())
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(s.int() / b.float())
+			else if type == TYPE_FLOAT
+				setFloat(s.float() / b.float())
+
+	int compare(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				return s.int() - b.int()
+			else if type == TYPE_FLOAT
+				return (s.float() - b.float()) * 1000.0
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				return (s.float() - b.float()) * 1000.0
+			else if type == TYPE_FLOAT
+				return (s.float() - b.float()) * 1000.0
+		else if b.type == TYPE_STRING
+			if type == TYPE_STRING
+				if s.str() < b.str()
+					return -1
+				if s.str() > b.str()
+					return 1
+				return 0
+				//return ai.v.compare(bf.v)
+		return 0
+
+
+class DynamicValueState
 	virtual void __delete__()
 	virtual string str()
 		return "nil"
@@ -146,13 +296,12 @@ class DynamicValue
 	virtual DynamicValue* get_element(DynamicValue* i)
 		return nil
 	virtual void add(DynamicValue* el)
-	virtual DynamicValue* copy()
+	virtual DynamicValueState* copy()
 		
 
-class DynamicValueInt extends DynamicValue
+class DynamicValueStateInt extends DynamicValueState
 	int v
 	override void __init__()
-		type = TYPE_INT
 		v = 0
 	override void __delete__()
 	override string str()
@@ -161,30 +310,28 @@ class DynamicValueInt extends DynamicValue
 		return v
 	override float float()
 		return v
-	override DynamicValue* copy()
-		DynamicValueInt* c = new DynamicValueInt
+	override DynamicValueState* copy()
+		DynamicValueStateInt* c = new DynamicValueStateInt
 		c.v = v
 		return c
 
-class DynamicValueBool extends DynamicValue
+class DynamicValueStateBool extends DynamicValueState
 	bool v
 	override void __init__()
-		type = TYPE_BOOL
 		v = false
 	override void __delete__()
 	override string str()
 		return v.str()
 	override bool bool()
 		return v
-	override DynamicValue* copy()
-		DynamicValueBool* c = new DynamicValueBool
+	override DynamicValueState* copy()
+		DynamicValueStateBool* c = new DynamicValueStateBool
 		c.v = v
 		return c
 
-class DynamicValueFloat extends DynamicValue
+class DynamicValueStateFloat extends DynamicValueState
 	float v
 	override void __init__()
-		type = TYPE_FLOAT
 		v = 0.0
 	override void __delete__()
 	override string str()
@@ -193,15 +340,14 @@ class DynamicValueFloat extends DynamicValue
 		return v
 	override float float()
 		return v
-	override DynamicValue* copy()
-		DynamicValueFloat* c = new DynamicValueFloat
+	override DynamicValueState* copy()
+		DynamicValueStateFloat* c = new DynamicValueStateFloat
 		c.v = v
 		return c
 
-class DynamicValueString extends DynamicValue
+class DynamicValueStateString extends DynamicValueState
 	string v
 	override void __init__()
-		type = TYPE_STRING
 		v.__init__()
 	override void __delete__()
 	override string str()
@@ -210,16 +356,13 @@ class DynamicValueString extends DynamicValue
 		return "'" + v + "'"
 	override bool bool()
 		return v.num > 0
-	override DynamicValue* copy()
-		DynamicValueString* c = new DynamicValueString
+	override DynamicValueState* copy()
+		DynamicValueStateString* c = new DynamicValueStateString
 		c.v = v
 		return c
 
-class DynamicValueArray extends DynamicValue
+class DynamicValueStateArray extends DynamicValueState
 	DynamicValue*[] a
-	override void __init__()
-		type = TYPE_ARRAY
-		//a.__init__()
 	override void __delete__()
 		for e in a
 			delete e
@@ -235,30 +378,30 @@ class DynamicValueArray extends DynamicValue
 	override DynamicValue* get_element(DynamicValue* i)
 		if i.type != TYPE_INT
 			return nil
-		DynamicValueInt* ii = i
+		DynamicValueStateInt* ii = i.s
 		if ii.v < 0 or ii.v >= a.num
 			return nil
 		return a[ii.v]
 	override void add(DynamicValue* el)
 		a.add(el.copy())
-	override DynamicValue* copy()
-		DynamicValueArray* c = new DynamicValueArray
+	override DynamicValueState* copy()
+		DynamicValueStateArray* c = new DynamicValueStateArray
 		for el in a
 			c.add(el)
 		return c
 
 class Variable
+	DynamicValue* v
 	string name
 	bool writable
-	DynamicValue *v
 	bool is_ref
 	void __init__()
 		v = new DynamicValue
 		is_ref = false
 		writable = true
 	void __init__(string _name)
-		name = _name
 		v = new DynamicValue
+		name = _name
 		is_ref = false
 		writable = true
 	void __delete__()
@@ -292,160 +435,13 @@ class Variable
 		s += v.render()
 		print(s)
 	void setType(int _type)
-		if v.type != _type
-			clear()
-			if _type == TYPE_BOOL
-				v = new DynamicValueBool
-			else if _type == TYPE_INT
-				v = new DynamicValueInt
-			else if _type == TYPE_FLOAT
-				v = new DynamicValueFloat
-			else if _type == TYPE_STRING
-				v = new DynamicValueString
-			else if _type == TYPE_ARRAY
-				v = new DynamicValueArray
-			else
-				v = new DynamicValue
+		v.setType(_type)
 	void setReference(DynamicValue* r)
 		clear()
 		is_ref = true
 		v = r
-	void setBool(bool b)
-		setType(TYPE_BOOL)
-		DynamicValueBool *vb = v
-		vb.v = b
-	void setInt(int i)
-		setType(TYPE_INT)
-		DynamicValueInt *vi = v
-		vi.v = i
-	void setFloat(float f)
-		setType(TYPE_FLOAT)
-		DynamicValueFloat *vf = v
-		vf.v = f
-	void setString(string s)
-		setType(TYPE_STRING)
-		DynamicValueString *vs = v
-		vs.v = s
 		
 
-	void __assign__(Variable b)
-		if b.v.type == TYPE_BOOL
-			setBool(b.v.bool())
-		else if b.v.type == TYPE_INT
-			setInt(b.v.int())
-		else if b.v.type == TYPE_FLOAT
-			setFloat(b.v.float())
-		else if b.v.type == TYPE_STRING
-			setString(b.v.str())
-		else if b.v.type == TYPE_ARRAY
-			setType(TYPE_ARRAY)
-			DynamicValueArray* ba = b.v
-			for el in ba.a
-				v.add(el)
-
-	void __iadd__(Variable b)
-		if b.v.type == TYPE_INT
-			if v.type == TYPE_INT
-				setInt(v.int() + b.v.int())
-			else if v.type == TYPE_FLOAT
-				setInt(v.int() + b.v.float())
-		else if b.v.type == TYPE_FLOAT
-			if v.type == TYPE_INT
-				setFloat(v.float() + b.v.int())
-			else if v.type == TYPE_FLOAT
-				setFloat(v.float() + b.v.float())
-		else if b.v.type == TYPE_STRING
-			if v.type == TYPE_STRING
-				setString(v.str() + b.v.str())
-		else if b.v.type == TYPE_ARRAY
-			if v.type == TYPE_ARRAY
-				DynamicValueArray* ba = b.v
-				for el in ba.a
-					v.add(el)
-
-	void __isub__(Variable b)
-		if b.v.type == TYPE_INT
-			DynamicValueInt *bi = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt *ai = v
-				ai.v -= bi.v
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat *af = v
-				af.v -= bi.v
-		else if b.v.type == TYPE_FLOAT
-			DynamicValueFloat *bf = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt* ai = v
-				setFloat(ai.v - bf.v)
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat* af = v
-				af.v -= bf.v
-
-	void __imul__(Variable b)
-		if b.v.type == TYPE_INT
-			DynamicValueInt *bi = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt *ai = v
-//				ai.v *= bi.v
-				ai.v = ai.v * bi.v
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat *af = v
-				af.v *= bi.v
-		else if b.v.type == TYPE_FLOAT
-			DynamicValueFloat *bf = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt* ai = v
-				setFloat(ai.v * bf.v)
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat* af = v
-				af.v *= bf.v
-
-	void __idiv__(Variable b)
-		if b.v.type == TYPE_INT
-			DynamicValueInt *bi = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt *ai = v
-				ai.v /= bi.v
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat *af = v
-				af.v /= bi.v
-		else if b.v.type == TYPE_FLOAT
-			DynamicValueFloat *bf = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt* ai = v
-				setFloat(ai.v / bf.v)
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat* af = v
-				af.v /= bf.v
-
-	int compare(Variable b)
-		if b.v.type == TYPE_INT
-			DynamicValueInt *bi = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt *ai = v
-				return ai.v - bi.v
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat *af = v
-				return (af.v - bi.v)*1000.0
-		else if b.v.type == TYPE_FLOAT
-			DynamicValueFloat *bf = b.v
-			if v.type == TYPE_INT
-				DynamicValueInt* ai = v
-				return (ai.v - bf.v)*1000.0
-			else if v.type == TYPE_FLOAT
-				DynamicValueFloat* af = v
-				return (af.v - bf.v)*1000.0
-		else if b.v.type == TYPE_STRING
-			DynamicValueString *bs = b.v
-			if v.type == TYPE_STRING
-				DynamicValueString *as = v
-				if as.v < bs.v
-					return -1
-				if as.v > bs.v
-					return 1
-				return 0
-				//return ai.v.compare(bf.v)
-		return 0
 
 class Function
 	string name
@@ -471,7 +467,7 @@ class FunctionSin extends Function
 	override void call(Variable* r, Variable*[] p)
 		if p.num > 0
 			if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
-				r.setFloat(sin(p[0].v.float()))
+				r.v.setFloat(sin(p[0].v.float()))
 				
 class FunctionPrint extends Function
 	override void __init__()
@@ -491,16 +487,16 @@ class FunctionLen extends Function
 	override void call(Variable* r, Variable*[] p)
 		if p.num > 0
 			if p[0].v.type == TYPE_ARRAY
-				DynamicValueArray* a = p[0].v
-				r.setInt(a.a.num)
+				DynamicValueStateArray* a = p[0].v.s
+				r.v.setInt(a.a.num)
 
 class FunctionRange extends Function
 	override void __init__()
 		super.__init__("range")
 		is_internal = true
 	override void call(Variable* r, Variable*[] p)
-		r.setType(TYPE_ARRAY)
-		DynamicValueArray* a = r.v
+		r.v.setType(TYPE_ARRAY)
+		DynamicValueStateArray* a = r.v.s
 		int start = 0
 		int end = 0
 		int step = 1
@@ -515,8 +511,8 @@ class FunctionRange extends Function
 
 		int i = start
 		while i < end
-			DynamicValueInt* ii = new DynamicValueInt
-			ii.v = i
+			DynamicValue* ii = new DynamicValue
+			ii.setInt(i)
 			a.a.add(ii)
 			i += step
 
@@ -734,13 +730,13 @@ class SyntaxTree
 	Variable* addConstNumber(string s)
 		Variable* c = addConst()
 		if s.find(".", 0) >= 0
-			c.setFloat(s.float())
+			c.v.setFloat(s.float())
 		else
-			c.setInt(s.int())
+			c.v.setInt(s.int())
 		return c
 	Variable* addConstString(string s)
 		Variable* c = addConst()
-		c.setString(s)
+		c.v.setString(s)
 		return c
 	Function* addFunc(string name)
 		Function* f = new Function(name)
@@ -1078,15 +1074,15 @@ class SyntaxTree
 		func_main = addFunc("main")
 		
 		Variable* v = addGlobalVar("true")
-		v.setBool(true)
+		v.v.setBool(true)
 		v.writable = false
 		v = addGlobalVar("false")
 		v.writable = false
-		v.setBool(false)
+		v.v.setBool(false)
 		v = addGlobalVar("nil")
 		v.writable = false
 		v = addGlobalVar("pi")
-		v.setFloat(3.141592654)
+		v.v.setFloat(3.141592654)
 		v.writable = false
 		
 		internal_funcs.add(new FunctionSin)
@@ -1199,43 +1195,43 @@ class Interpreter
 		if sn.type == TYPE_OPERATOR
 			SyntaxNodeOperator *op = sn
 			if op.op == "="
-				*params[0] = *params[1]
+				*params[0].v = *params[1].v
 			else if op.op == "+"
-				*ret = *params[0]
-				*ret += *params[1]
+				*ret.v = *params[0].v
+				*ret.v += *params[1].v
 			else if op.op == "+="
-				*params[0] += *params[1]
+				*params[0].v += *params[1].v
 			else if op.op == "-"
-				*ret = *params[0]
-				*ret -= *params[1]
+				*ret.v = *params[0].v
+				*ret.v -= *params[1].v
 			else if op.op == "-="
-				*params[0] -= *params[1]
+				*params[0].v -= *params[1].v
 			else if op.op == "*"
-				*ret = *params[0]
-				*ret *= *params[1]
+				*ret.v = *params[0].v
+				*ret.v *= *params[1].v
 			else if op.op == "*="
-				*params[0] *= *params[1]
+				*params[0].v *= *params[1].v
 			else if op.op == "/"
-				*ret = *params[0]
-				*ret /= *params[1]
+				*ret.v = *params[0].v
+				*ret.v /= *params[1].v
 			else if op.op == "/="
-				*params[0] /= *params[1]
+				*params[0].v /= *params[1].v
 			else if op.op == ">"
-				ret.setBool(params[0].compare(*params[1]) > 0)
+				ret.v.setBool(params[0].v.compare(*params[1].v) > 0)
 			else if op.op == "<"
-				ret.setBool(params[0].compare(*params[1]) < 0)
+				ret.v.setBool(params[0].v.compare(*params[1].v) < 0)
 			else if op.op == "=="
-				ret.setBool(params[0].compare(*params[1]) == 0)
+				ret.v.setBool(params[0].v.compare(*params[1].v) == 0)
 			else if op.op == ">="
-				ret.setBool(params[0].compare(*params[1]) >= 0)
+				ret.v.setBool(params[0].v.compare(*params[1].v) >= 0)
 			else if op.op == "<="
-				ret.setBool(params[0].compare(*params[1]) <= 0)
+				ret.v.setBool(params[0].v.compare(*params[1].v) <= 0)
 			else if op.op == "and"
-				ret.setBool(params[0].v.bool() and params[1].v.bool())
+				ret.v.setBool(params[0].v.bool() and params[1].v.bool())
 			else if op.op == "or"
-				ret.setBool(params[0].v.bool() or params[1].v.bool())
+				ret.v.setBool(params[0].v.bool() or params[1].v.bool())
 			else if op.op == "not"
-				ret.setBool(params[0].v.bool())
+				ret.v.setBool(params[0].v.bool())
 			else
 				setError("unhandled operator: " + op.op)
 		else if sn.type == TYPE_FUNCTION
@@ -1248,7 +1244,7 @@ class Interpreter
 				stack_push(f, ret)
 				int n = min(sn.params.num,f.params.num)
 				for i in 0:n
-					*cur_context.vars[i] = *params[i]
+					*cur_context.vars[i].v = *params[i].v
 				doNode(f.block, ret)
 				stack_pop()
 			else
@@ -1280,7 +1276,7 @@ class Interpreter
 			if params[1].v.type != TYPE_ARRAY
 				setError("for needs array")
 				return
-			DynamicValueArray* a = params[1].v
+			DynamicValueStateArray* a = params[1].v.s
 			SyntaxNodeFor *_for = sn
 			for el in a.a
 				params[0].setReference(el)
@@ -1295,7 +1291,7 @@ class Interpreter
 			cur_context.flag_break = false
 		else if sn.type == TYPE_RETURN
 			if params.num > 0
-				*cur_context.ret = *params[0]
+				*cur_context.ret.v = *params[0].v
 			cur_context.flag_return = true
 		else if sn.type == TYPE_BREAK
 			cur_context.flag_break = true
