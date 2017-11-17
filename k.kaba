@@ -135,12 +135,19 @@ class DynamicValue
 	virtual void __delete__()
 	virtual string str()
 		return "nil"
+	virtual string render()
+		return str()
 	virtual int int()
 		return 0
 	virtual float float()
 		return 0.0
 	virtual bool bool()
 		return false
+	virtual DynamicValue* get_element(int i)
+		return nil
+	virtual void add(DynamicValue* el)
+	virtual DynamicValue* copy()
+		
 
 class DynamicValueInt extends DynamicValue
 	int v
@@ -154,6 +161,10 @@ class DynamicValueInt extends DynamicValue
 		return v
 	override float float()
 		return v
+	override DynamicValue* copy()
+		DynamicValueInt* c = new DynamicValueInt
+		c.v = v
+		return c
 
 class DynamicValueBool extends DynamicValue
 	bool v
@@ -165,6 +176,10 @@ class DynamicValueBool extends DynamicValue
 		return v.str()
 	override bool bool()
 		return v
+	override DynamicValue* copy()
+		DynamicValueBool* c = new DynamicValueBool
+		c.v = v
+		return c
 
 class DynamicValueFloat extends DynamicValue
 	float v
@@ -178,6 +193,10 @@ class DynamicValueFloat extends DynamicValue
 		return v
 	override float float()
 		return v
+	override DynamicValue* copy()
+		DynamicValueFloat* c = new DynamicValueFloat
+		c.v = v
+		return c
 
 class DynamicValueString extends DynamicValue
 	string v
@@ -187,8 +206,43 @@ class DynamicValueString extends DynamicValue
 	override void __delete__()
 	override string str()
 		return v
+	override string render()
+		return "'" + v + "'"
 	override bool bool()
 		return v.num > 0
+	override DynamicValue* copy()
+		DynamicValueString* c = new DynamicValueString
+		c.v = v
+		return c
+
+class DynamicValueArray extends DynamicValue
+	DynamicValue*[] a
+	override void __init__()
+		type = TYPE_ARRAY
+		//a.__init__()
+	override void __delete__()
+		for e in a
+			delete e
+	override string str()
+		string s = "["
+		for e,i in a
+			if i > 0
+				s += ","
+			s += e.render()
+		return s + "]"
+	override bool bool()
+		return a.num > 0
+	override DynamicValue* get_element(int i)
+		if i < 0 or i >= a.num
+			return nil
+		return a[i]
+	override void add(DynamicValue* el)
+		a.add(el.copy())
+	override DynamicValue* copy()
+		DynamicValueArray* c = new DynamicValueArray
+		for el in a
+			c.add(el)
+		return c
 
 class Variable
 	string name
@@ -218,15 +272,13 @@ class Variable
 			s += "float "
 		else if v.type == TYPE_STRING
 			s += "string "
+		else if v.type == TYPE_ARRAY
+			s += "array "
 		else
 			s += "??? "
 		if name.num > 0
 			s += name + " = "
-		if v.type == TYPE_STRING
-			s += "'"
-		s += v.str()
-		if v.type == TYPE_STRING
-			s += "'"
+		s += v.render()
 		print(s)
 	void setType(int _type)
 		if v.type != _type
@@ -239,6 +291,8 @@ class Variable
 				v = new DynamicValueFloat
 			else if _type == TYPE_STRING
 				v = new DynamicValueString
+			else if _type == TYPE_ARRAY
+				v = new DynamicValueArray
 			else
 				v = new DynamicValue
 	void setBool(bool b)
@@ -268,6 +322,11 @@ class Variable
 			setFloat(b.v.float())
 		else if b.v.type == TYPE_STRING
 			setString(b.v.str())
+		else if b.v.type == TYPE_ARRAY
+			setType(TYPE_ARRAY)
+			DynamicValueArray* ba = b.v
+			for el in ba.a
+				v.add(el)
 
 	void __iadd__(Variable b)
 		if b.v.type == TYPE_INT
@@ -404,6 +463,7 @@ enum
 	TYPE_BREAK
 	TYPE_CONTINUE
 	TYPE_RETURN
+	TYPE_ARRAY_BUILDER
 
 class SyntaxNode
 	int type
@@ -516,6 +576,12 @@ class SyntaxNodeContinue extends SyntaxNode
 		type = TYPE_CONTINUE
 	override string str()
 		return "continue"
+
+class SyntaxNodeArrayBuilder extends SyntaxNode
+	override void __init__()
+		type = TYPE_ARRAY_BUILDER
+	override string str()
+		return "[]"
 
 class SyntaxTree
 	Context* vars
@@ -638,7 +704,25 @@ class SyntaxTree
 			if error
 				return nil
 		return sn
+	SyntaxNode* getOperandArrayBuilder()
+		SyntaxNodeArrayBuilder *sn = new SyntaxNodeArrayBuilder
+		next() // "["
+		while true
+			if cur == "]"
+				break
+			SyntaxNode *sub = getOperandGreedy()
+			if error
+				return nil
+			sn.params.add(sub)
+			next()
+			if cur != "," and cur != "]"
+				setError(", or ] expected")
+				return nil
+			if cur == ","
+				next()
+		return sn
 	SyntaxNode* getOperand()
+		// bracket?
 		if cur == "("
 			next()
 			SyntaxNode *sn = getOperandGreedy()
@@ -647,6 +731,12 @@ class SyntaxTree
 				setError(") expected")
 				return nil
 			return sn
+		
+		// [a,b,c]
+		if cur == "["
+			return getOperandArrayBuilder()
+		
+		// function call?
 		if cur_word+1 < cur_line.words.num
 			if cur_line.words[cur_word+1] == "("
 				return getOperandFunc()
@@ -658,7 +748,7 @@ class SyntaxTree
 		if error
 			return nil
 		while !endOfLine()
-			if cur_line.words[cur_word + 1] == "," or cur_line.words[cur_word + 1] == ")"
+			if cur_line.words[cur_word + 1] == "," or cur_line.words[cur_word + 1] == ")" or cur_line.words[cur_word + 1] == "]"
 				break
 			next()
 			if error
@@ -1053,6 +1143,10 @@ class Interpreter
 			cur_context.flag_continue = true
 		else if sn.type == TYPE_BLOCK
 			nil
+		else if sn.type == TYPE_ARRAY_BUILDER
+			ret.setType(TYPE_ARRAY)
+			for c in params
+				ret.v.add(c.v)
 		else
 			setError("????"+sn.type)
 		for p,i in params
