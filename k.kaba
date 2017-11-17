@@ -251,15 +251,23 @@ class Variable
 	string name
 	bool writable
 	DynamicValue *v
+	bool is_ref
 	void __init__()
 		v = new DynamicValue
+		is_ref = false
 		writable = true
 	void __init__(string _name)
 		name = _name
 		v = new DynamicValue
+		is_ref = false
 		writable = true
 	void __delete__()
-		delete v
+		clear()
+	void clear()
+		if !is_ref
+			delete v
+		is_ref = false
+		v = nil
 	void show()
 		string s
 		if writable
@@ -285,7 +293,7 @@ class Variable
 		print(s)
 	void setType(int _type)
 		if v.type != _type
-			delete v
+			clear()
 			if _type == TYPE_BOOL
 				v = new DynamicValueBool
 			else if _type == TYPE_INT
@@ -298,6 +306,10 @@ class Variable
 				v = new DynamicValueArray
 			else
 				v = new DynamicValue
+	void setReference(DynamicValue* r)
+		clear()
+		is_ref = true
+		v = r
 	void setBool(bool b)
 		setType(TYPE_BOOL)
 		DynamicValueBool *vb = v
@@ -438,34 +450,75 @@ class Variable
 class Function
 	string name
 	string[] params
+	bool is_internal
 	//Variable*[] params
 	//Variable*[] vars
 	SyntaxNodeBlock* block
 	void __init__(string n)
 		name = n
 		block = nil
+		is_internal = false
 	//Variable* addVar(string name)
 	//	Variable *v = new Variable(name)
 	//	vars.add(v)
 	//	return v
+	virtual void call(Variable* r, Variable*[] p)
 
-void FuncSin(Variable* r, Variable*[] p)
-	if p.num > 0
-		if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
-			r.setFloat(sin(p[0].v.float()))
+class FunctionSin extends Function
+	override void __init__()
+		super.__init__("sin")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
+				r.setFloat(sin(p[0].v.float()))
+				
+class FunctionPrint extends Function
+	override void __init__()
+		super.__init__("print")
+		is_internal = true
+	override void call(Variable *r, Variable*[] p)
+		string s
+		for pp in p
+			s += pp.v.str()
+			s += " "
+		print(s)
+		
+class FunctionLen extends Function
+	override void __init__()
+		super.__init__("len")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		if p.num > 0
+			if p[0].v.type == TYPE_ARRAY
+				DynamicValueArray* a = p[0].v
+				r.setInt(a.a.num)
 
-void FuncPrint(Variable *r, Variable*[] p)
-	string s
-	for pp in p
-		s += pp.v.str()
-		s += " "
-	print(s)
+class FunctionRange extends Function
+	override void __init__()
+		super.__init__("range")
+		is_internal = true
+	override void call(Variable* r, Variable*[] p)
+		r.setType(TYPE_ARRAY)
+		DynamicValueArray* a = r.v
+		int start = 0
+		int end = 0
+		int step = 1
 	
-void FuncLen(Variable* r, Variable*[] p)
-	if p.num > 0
-		if p[0].v.type == TYPE_ARRAY
-			DynamicValueArray* a = p[0].v
-			r.setInt(a.a.num)
+		if p.num == 1
+			end = p[0].v.int()
+		if p.num >= 2
+			start = p[0].v.int()
+			end = p[1].v.int()
+		if p.num >= 3
+			step = p[2].v.int()
+
+		int i = start
+		while i < end
+			DynamicValueInt* ii = new DynamicValueInt
+			ii.v = i
+			a.a.add(ii)
+			i += step
 
 enum
 	TYPE_OPERATOR
@@ -475,6 +528,7 @@ enum
 	TYPE_BLOCK
 	TYPE_IF
 	TYPE_WHILE
+	TYPE_FOR
 	TYPE_BREAK
 	TYPE_CONTINUE
 	TYPE_RETURN
@@ -570,6 +624,19 @@ class SyntaxNodeWhile extends SyntaxNode
 		block_else = nil
 	override string str()
 		return "while"
+	override void showPost(int indent)
+		block.show(indent+1)
+		if block_else
+			block_else.show(indent+1)
+
+class SyntaxNodeFor extends SyntaxNode
+	SyntaxNode* block, block_else
+	override void __init__()
+		type = TYPE_FOR
+		block = nil
+		block_else = nil
+	override string str()
+		return "for"
 	override void showPost(int indent)
 		block.show(indent+1)
 		if block_else
@@ -851,7 +918,7 @@ class SyntaxTree
 	SyntaxNode *getSpecialCommandIf()
 		int indent0 = cur_line.indent
 		SyntaxNodeIf *sn = new SyntaxNodeIf
-		next()
+		next() // "if"
 		sn.params.add(getOperandGreedy())
 		if error
 			return nil
@@ -869,6 +936,32 @@ class SyntaxTree
 	SyntaxNode *getSpecialCommandWhile()
 		int indent0 = cur_line.indent
 		SyntaxNodeWhile *sn = new SyntaxNodeWhile
+		next() // "while"
+		sn.params.add(getOperandGreedy())
+		if error
+			return nil
+		sn.block = parseBlock()
+		if error
+			return nil
+		if endOfFile()
+			return sn
+		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
+			return sn
+		nextLine()
+		// else
+		sn.block_else = parseBlock()
+		return sn
+	SyntaxNode *getSpecialCommandFor()
+		int indent0 = cur_line.indent
+		SyntaxNodeFor *sn = new SyntaxNodeFor
+		next() // "for"
+		SyntaxNodeVariable* var = new SyntaxNodeVariable(cur)
+		next()
+		var.allow_create = true
+		sn.params.add(var)
+		if cur != "in"
+			setError("in extected")
+			return nil
 		next()
 		sn.params.add(getOperandGreedy())
 		if error
@@ -934,6 +1027,8 @@ class SyntaxTree
 			return getSpecialCommandIf()
 		if cur == "while"
 			return getSpecialCommandWhile()
+		if cur == "for"
+			return getSpecialCommandFor()
 		if cur == "return"
 			return getSpecialCommandReturn()
 		if cur == "break"
@@ -994,12 +1089,10 @@ class SyntaxTree
 		v.setFloat(3.141592654)
 		v.writable = false
 		
-		Function* f = new Function("sin")
-		internal_funcs.add(f)
-		f = new Function("print")
-		internal_funcs.add(f)
-		f = new Function("len")
-		internal_funcs.add(f)
+		internal_funcs.add(new FunctionSin)
+		internal_funcs.add(new FunctionLen)
+		internal_funcs.add(new FunctionRange)
+		internal_funcs.add(new FunctionPrint)
 		
 		lines = lp.parse(source)
 		cur_line_no = -1
@@ -1159,14 +1252,7 @@ class Interpreter
 				doNode(f.block, ret)
 				stack_pop()
 			else
-				if func.name == "sin"
-					FuncSin(ret, params)
-				else if func.name == "print"
-					FuncPrint(ret, params)
-				else if func.name == "len"
-					FuncLen(ret, params)
-				else
-					setError("unknown function: " + func.name)
+				f.call(ret, params)
 		else if sn.type == TYPE_IF
 			Variable dummy
 			SyntaxNodeIf *_if = sn
@@ -1175,10 +1261,10 @@ class Interpreter
 			else if _if.block_else
 				doNode(_if.block_else, &dummy)
 		else if sn.type == TYPE_WHILE
-			Variable dummy
 			SyntaxNodeWhile *_while = sn
 			while params[0].v.bool()
 				cur_context.flag_continue = false
+				Variable dummy
 				doNode(_while.block, &dummy)
 				
 				if cur_context.flag_return or cur_context.flag_break
@@ -1189,6 +1275,23 @@ class Interpreter
 					doNode(sn.params[0], params[0])
 					if error
 						return
+			cur_context.flag_break = false
+		else if sn.type == TYPE_FOR
+			if params[1].v.type != TYPE_ARRAY
+				setError("for needs array")
+				return
+			DynamicValueArray* a = params[1].v
+			SyntaxNodeFor *_for = sn
+			for el in a.a
+				params[0].setReference(el)
+				cur_context.flag_continue = false
+				
+				Variable dummy
+				doNode(_for.block, &dummy)
+				
+				if cur_context.flag_return or cur_context.flag_break
+					break
+					
 			cur_context.flag_break = false
 		else if sn.type == TYPE_RETURN
 			if params.num > 0
@@ -1207,11 +1310,7 @@ class Interpreter
 		else if sn.type == TYPE_ARRAY_ELEMENT
 			DynamicValue *dv = params[0].v.get_element(params[1].v)
 			if dv
-				Variable vvv
-				DynamicValue *dv0 = vvv.v
-				vvv.v = dv
-				*ret = vvv
-				vvv.v = dv0
+				ret.setReference(dv)
 		else
 			setError("unhandled node: " + sn.type)
 		for p,i in params
