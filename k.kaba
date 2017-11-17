@@ -143,7 +143,7 @@ class DynamicValue
 		return 0.0
 	virtual bool bool()
 		return false
-	virtual DynamicValue* get_element(int i)
+	virtual DynamicValue* get_element(DynamicValue* i)
 		return nil
 	virtual void add(DynamicValue* el)
 	virtual DynamicValue* copy()
@@ -232,10 +232,13 @@ class DynamicValueArray extends DynamicValue
 		return s + "]"
 	override bool bool()
 		return a.num > 0
-	override DynamicValue* get_element(int i)
-		if i < 0 or i >= a.num
+	override DynamicValue* get_element(DynamicValue* i)
+		if i.type != TYPE_INT
 			return nil
-		return a[i]
+		DynamicValueInt* ii = i
+		if ii.v < 0 or ii.v >= a.num
+			return nil
+		return a[ii.v]
 	override void add(DynamicValue* el)
 		a.add(el.copy())
 	override DynamicValue* copy()
@@ -342,6 +345,11 @@ class Variable
 		else if b.v.type == TYPE_STRING
 			if v.type == TYPE_STRING
 				setString(v.str() + b.v.str())
+		else if b.v.type == TYPE_ARRAY
+			if v.type == TYPE_ARRAY
+				DynamicValueArray* ba = b.v
+				for el in ba.a
+					v.add(el)
 
 	void __isub__(Variable b)
 		if b.v.type == TYPE_INT
@@ -442,8 +450,9 @@ class Function
 	//	return v
 
 void FuncSin(Variable* r, Variable*[] p)
-	if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
-		r.setFloat(sin(p[0].v.float()))
+	if p.num > 0
+		if p[0].v.type == TYPE_FLOAT or p[0].v.type == TYPE_INT
+			r.setFloat(sin(p[0].v.float()))
 
 void FuncPrint(Variable *r, Variable*[] p)
 	string s
@@ -451,6 +460,12 @@ void FuncPrint(Variable *r, Variable*[] p)
 		s += pp.v.str()
 		s += " "
 	print(s)
+	
+void FuncLen(Variable* r, Variable*[] p)
+	if p.num > 0
+		if p[0].v.type == TYPE_ARRAY
+			DynamicValueArray* a = p[0].v
+			r.setInt(a.a.num)
 
 enum
 	TYPE_OPERATOR
@@ -464,6 +479,7 @@ enum
 	TYPE_CONTINUE
 	TYPE_RETURN
 	TYPE_ARRAY_BUILDER
+	TYPE_ARRAY_ELEMENT
 
 class SyntaxNode
 	int type
@@ -581,6 +597,12 @@ class SyntaxNodeArrayBuilder extends SyntaxNode
 	override void __init__()
 		type = TYPE_ARRAY_BUILDER
 	override string str()
+		return "new []"
+
+class SyntaxNodeArrayElement extends SyntaxNode
+	override void __init__()
+		type = TYPE_ARRAY_ELEMENT
+	override string str()
 		return "[]"
 
 class SyntaxTree
@@ -611,12 +633,20 @@ class SyntaxTree
 		cur = cur_line.words[0]
 	bool endOfLine()
 		return cur_word >= cur_line.words.num - 1
-	void next()
+	void expect_more()
 		if endOfLine()
 			setError("unexpected end of line")
-			return
+	void next()
+		/*if endOfLine()
+			setError("unexpected end of line")
+			return*/
+		cur = peek()
 		cur_word ++
-		cur = cur_line.words[cur_word]
+		//cur = cur_line.words[cur_word]
+	string peek()
+		if cur_word+1 < cur_line.words.num
+			return cur_line.words[cur_word+1]
+		return ""
 	
 	bool error
 	void setError(string msg)
@@ -659,32 +689,38 @@ class SyntaxTree
 		return nil
 	SyntaxNode* getNuclearOperand()
 		if isNumber(cur[0])
-			return new SyntaxNodeConst(addConstNumber(cur))
+			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstNumber(cur))
+			next()
+			return sn
 		if cur[0] == '"' // "
-			return new SyntaxNodeConst(addConstString(unescape(cur)))
+			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstString(unescape(cur)))
+			next()
+			return sn
 		if isOperator(cur[0])
 			setError("variable name expected")
 			return nil
 		SyntaxNodeVariable* sn = new SyntaxNodeVariable(cur)
 		if cur_word == 0
-			if cur_line.words.num >= 2
-				if cur_line.words[1] == "="
-					sn.allow_create = true
+			if peek() == "="
+				sn.allow_create = true
+		next()
 		return sn
 	SyntaxNode* getOperator()
 		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
 			setError("operator expected")
 			return nil
-		return new SyntaxNodeOperator(cur)
+		SyntaxNode* sn = new SyntaxNodeOperator(cur)
+		next()
+		return sn
 	SyntaxNode* getOperandFunc()
 		SyntaxNode* sn = new SyntaxNodeFunction(cur)
-		next()
+		next() // name
 		if error
 			return nil
 		if cur != "("
 			setError("( after function name expected")
 			return nil
-		next()
+		next() // "("
 		if error
 			return nil
 		if cur == ")"
@@ -694,7 +730,6 @@ class SyntaxTree
 			if error
 				return nil
 			sn.params.add(param)
-			next()
 			if cur != "," and cur != ")"
 				setError(", or ) after parameter expexted")
 				return nil
@@ -703,60 +738,78 @@ class SyntaxTree
 			next()
 			if error
 				return nil
+		next() // ")"
 		return sn
 	SyntaxNode* getOperandArrayBuilder()
 		SyntaxNodeArrayBuilder *sn = new SyntaxNodeArrayBuilder
 		next() // "["
-		while true
-			if cur == "]"
-				break
+		while cur != "]"
 			SyntaxNode *sub = getOperandGreedy()
 			if error
 				return nil
 			sn.params.add(sub)
-			next()
 			if cur != "," and cur != "]"
 				setError(", or ] expected")
 				return nil
 			if cur == ","
 				next()
+		next() // "]"
+		return sn
+	SyntaxNode* checkOperandExtensions(SyntaxNode* sn)
+		if cur == "["
+			SyntaxNodeArrayElement* el = new SyntaxNodeArrayElement
+			el.params.add(sn)
+			next() // "["
+			SyntaxNode* index = getOperandGreedy()
+			if error
+				return nil
+			el.params.add(index)
+			if cur != "]"
+				setError("] expected")
+			next() // "]"
+			return el
+		
 		return sn
 	SyntaxNode* getOperand()
 		// bracket?
 		if cur == "("
 			next()
 			SyntaxNode *sn = getOperandGreedy()
-			next()
+			if error
+				return nil
 			if cur != ")"
 				setError(") expected")
 				return nil
-			return sn
+			next() // ")"
+			return checkOperandExtensions(sn)
 		
 		// [a,b,c]
 		if cur == "["
 			return getOperandArrayBuilder()
 		
 		// function call?
-		if cur_word+1 < cur_line.words.num
-			if cur_line.words[cur_word+1] == "("
-				return getOperandFunc()
+		if peek() == "("
+			return checkOperandExtensions(getOperandFunc())
+		
+		// basic
 		SyntaxNode* sn = getNuclearOperand()
-		return sn
+		if error
+			return nil
+		return checkOperandExtensions(sn)
+	
+	
+	// sequence of [operand operator operand ...]
 	SyntaxNode* getOperandGreedy()
 		SyntaxNode*[] sn
 		sn.add(getOperand())
 		if error
 			return nil
 		while !endOfLine()
-			if cur_line.words[cur_word + 1] == "," or cur_line.words[cur_word + 1] == ")" or cur_line.words[cur_word + 1] == "]"
+			if cur == "," or cur == ")" or cur == "]"
 				break
-			next()
 			if error
 				return nil
 			sn.add(getOperator())
-			if error
-				return nil
-			next()
 			if error
 				return nil
 			sn.add(getOperand())
@@ -945,6 +998,8 @@ class SyntaxTree
 		internal_funcs.add(f)
 		f = new Function("print")
 		internal_funcs.add(f)
+		f = new Function("len")
+		internal_funcs.add(f)
 		
 		lines = lp.parse(source)
 		cur_line_no = -1
@@ -1108,6 +1163,8 @@ class Interpreter
 					FuncSin(ret, params)
 				else if func.name == "print"
 					FuncPrint(ret, params)
+				else if func.name == "len"
+					FuncLen(ret, params)
 				else
 					setError("unknown function: " + func.name)
 		else if sn.type == TYPE_IF
@@ -1147,8 +1204,16 @@ class Interpreter
 			ret.setType(TYPE_ARRAY)
 			for c in params
 				ret.v.add(c.v)
+		else if sn.type == TYPE_ARRAY_ELEMENT
+			DynamicValue *dv = params[0].v.get_element(params[1].v)
+			if dv
+				Variable vvv
+				DynamicValue *dv0 = vvv.v
+				vvv.v = dv
+				*ret = vvv
+				vvv.v = dv0
 		else
-			setError("????"+sn.type)
+			setError("unhandled node: " + sn.type)
 		for p,i in params
 			if is_temp[i]
 				delete p

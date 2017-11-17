@@ -1,4 +1,6 @@
-i = 32
-a = [1,2,"test",[i+1,[]]]
-print(a)
+a = [1,2,"test", []] + [7]
+i = 0
+while i < len(a)
+	print(a[i])
+	i += 1
 
