@@ -1,0 +1,7 @@
+a = {"test":42}
+a[7] = "hallo"
+print(a)
+a["test"] = ["hallo",[]]
+print(a)
+print(a["test"])
+print(len(a))

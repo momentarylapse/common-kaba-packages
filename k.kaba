@@ -10,7 +10,7 @@ bool isNumber(char c)
 	return (c >= '0') and (c <= '9')
 
 bool isOperator(char c)
-	return (c == '(') or (c == ')') or (c == '=') or (c == '+') or (c == '-') or (c == '*') or (c == '/') or (c == '%') or (c == '.') or (c == ',') or (c == '[') or (c == ']') or (c == '!') or (c == '<') or (c == '>')
+	return (c == '(') or (c == ')') or (c == '=') or (c == '+') or (c == '-') or (c == '*') or (c == '/') or (c == '%') or (c == '.') or (c == ',') or (c == '[') or (c == ']') or (c == '{') or (c == '}') or (c == '!') or (c == '<') or (c == '>') or (c == ':')
 
 
 string unescape(string s)
@@ -71,7 +71,7 @@ class LiteralParser
 				j ++
 			else
 				r.add(source[j])
-				if source[j] == '"' // "
+				if source[j] == '"' or source[j] == 0x27 // " or '
 					break
 		return r
 
@@ -95,7 +95,7 @@ class LiteralParser
 		for i in l.indent:source.num
 			if isWhitespace(source[i])
 				continue
-			if source[i] == '"' // "
+			if source[i] == '"' or source[i] == 0x27 // " or '
 				temp = getString(source, i)
 			else if isNumber(source[i])
 				temp = getNumber(source, i)
@@ -126,6 +126,7 @@ enum
 	TYPE_FLOAT
 	TYPE_STRING
 	TYPE_ARRAY
+	TYPE_DICT
 	TYPE_OBJECT
 
 class DynamicValue
@@ -154,6 +155,7 @@ class DynamicValue
 		DynamicValue* c = new DynamicValue
 		delete c.s
 		c.s = s.copy()
+		c.type = type
 		return c
 	void setType(int _type)
 		if type != _type
@@ -170,6 +172,8 @@ class DynamicValue
 				s = new DynamicValueStateString
 			else if type == TYPE_ARRAY
 				s = new DynamicValueStateArray
+			else if type == TYPE_DICT
+				s = new DynamicValueStateDict
 			else
 				s = new DynamicValueState
 	void setBool(bool b)
@@ -202,6 +206,12 @@ class DynamicValue
 			DynamicValueStateArray* ba = b.s
 			for el in ba.a
 				s.add(el)
+		else if b.type == TYPE_DICT
+			setType(TYPE_DICT)
+			DynamicValueStateDict* bd = b.s
+			DynamicValueStateDict* ad = s
+			for el,i in bd.values
+				ad.add(bd.keys[i], el)
 
 	void __iadd__(DynamicValue b)
 		if b.type == TYPE_INT
@@ -222,6 +232,12 @@ class DynamicValue
 				DynamicValueStateArray* ba = b.s
 				for el in ba.a
 					s.add(el)
+		else if b.type == TYPE_DICT
+			if type == TYPE_DICT
+				DynamicValueStateDict* bd = b.s
+				DynamicValueStateDict* ad = s
+				for el,i in bd.values
+					ad.add(bd.keys[i], el)
 
 	void __isub__(DynamicValue b)
 		if b.type == TYPE_INT
@@ -278,7 +294,7 @@ class DynamicValue
 					return 1
 				return 0
 				//return ai.v.compare(bf.v)
-		return 0
+		return -1
 
 
 class DynamicValueState
@@ -387,7 +403,45 @@ class DynamicValueStateArray extends DynamicValueState
 	override DynamicValueState* copy()
 		DynamicValueStateArray* c = new DynamicValueStateArray
 		for el in a
-			c.add(el)
+			c.add(el.copy())
+		return c
+
+class DynamicValueStateDict extends DynamicValueState
+	DynamicValue*[] keys
+	DynamicValue*[] values
+	override void __delete__()
+		for e in values
+			delete e
+		for e in keys
+			delete e
+	override string str()
+		string s = "{"
+		for e,i in values
+			if i > 0
+				s += ","
+			s += keys[i].render() + ":" + e.render()
+		return s + "}"
+	override bool bool()
+		return values.num > 0
+	override DynamicValue* get_element(DynamicValue* key)
+		for k,j in keys
+			if k.compare(*key) == 0
+				return values[j]
+		
+		DynamicValue* val = new DynamicValue
+		values.add(val)
+		keys.add(key.copy())
+		return val
+	void add(DynamicValue* key, DynamicValue* val)
+		for k,j in keys
+			if k.compare(*key) == 0
+				return
+		values.add(val.copy())
+		keys.add(key.copy())
+	override DynamicValueState* copy()
+		DynamicValueStateDict* c = new DynamicValueStateDict
+		for v,i in values
+			c.add(keys[i].copy(),v.copy())
 		return c
 
 class Variable
@@ -428,6 +482,8 @@ class Variable
 			s += "string "
 		else if v.type == TYPE_ARRAY
 			s += "array "
+		else if v.type == TYPE_DICT
+			s += "dict "
 		else
 			s += "??? "
 		if name.num > 0
@@ -489,6 +545,9 @@ class FunctionLen extends Function
 			if p[0].v.type == TYPE_ARRAY
 				DynamicValueStateArray* a = p[0].v.s
 				r.v.setInt(a.a.num)
+			if p[0].v.type == TYPE_DICT
+				DynamicValueStateDict* a = p[0].v.s
+				r.v.setInt(a.values.num)
 
 class FunctionRange extends Function
 	override void __init__()
@@ -529,6 +588,7 @@ enum
 	TYPE_CONTINUE
 	TYPE_RETURN
 	TYPE_ARRAY_BUILDER
+	TYPE_DICT_BUILDER
 	TYPE_ARRAY_ELEMENT
 
 class SyntaxNode
@@ -562,7 +622,7 @@ class SyntaxNodeConst extends SyntaxNode
 		v = _v
 		type = TYPE_CONST
 	override string str()
-		return "const " + v.v.str()
+		return "const " + v.v.render()
 
 class SyntaxNodeOperator extends SyntaxNode
 	string op
@@ -662,6 +722,12 @@ class SyntaxNodeArrayBuilder extends SyntaxNode
 	override string str()
 		return "new []"
 
+class SyntaxNodeDictBuilder extends SyntaxNode
+	override void __init__()
+		type = TYPE_DICT_BUILDER
+	override string str()
+		return "new {}"
+
 class SyntaxNodeArrayElement extends SyntaxNode
 	override void __init__()
 		type = TYPE_ARRAY_ELEMENT
@@ -755,7 +821,7 @@ class SyntaxTree
 			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstNumber(cur))
 			next()
 			return sn
-		if cur[0] == '"' // "
+		if cur[0] == '"' or cur[0] == 0x27 // " or '
 			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstString(unescape(cur)))
 			next()
 			return sn
@@ -818,6 +884,29 @@ class SyntaxTree
 				next()
 		next() // "]"
 		return sn
+	SyntaxNode* getOperandDictBuilder()
+		SyntaxNodeDictBuilder *sn = new SyntaxNodeDictBuilder
+		next() // "{"
+		while cur != "}"
+			SyntaxNode *key = getOperandGreedy()
+			if error
+				return nil
+			sn.params.add(key)
+			if cur != ":"
+				setError(": expected")
+				return nil
+			next() // ":"
+			SyntaxNode *val = getOperandGreedy()
+			if error
+				return nil
+			sn.params.add(val)
+			if cur != "," and cur != "}"
+				setError(", or } expected")
+				return nil
+			if cur == ","
+				next()
+		next() // "}"
+		return sn
 	SyntaxNode* checkOperandExtensions(SyntaxNode* sn)
 		if cur == "["
 			SyntaxNodeArrayElement* el = new SyntaxNodeArrayElement
@@ -850,6 +939,10 @@ class SyntaxTree
 		if cur == "["
 			return getOperandArrayBuilder()
 		
+		// {a,b,c}
+		if cur == "{"
+			return getOperandDictBuilder()
+		
 		// function call?
 		if peek() == "("
 			return checkOperandExtensions(getOperandFunc())
@@ -868,7 +961,7 @@ class SyntaxTree
 		if error
 			return nil
 		while !endOfLine()
-			if cur == "," or cur == ")" or cur == "]"
+			if cur == "," or cur == ")" or cur == "]" or cur == "}" or cur == ":"
 				break
 			if error
 				return nil
@@ -1091,6 +1184,7 @@ class SyntaxTree
 		internal_funcs.add(new FunctionPrint)
 		
 		lines = lp.parse(source)
+		
 		cur_line_no = -1
 		//lines.show()
 		cur_func = func_main
@@ -1303,6 +1397,12 @@ class Interpreter
 			ret.setType(TYPE_ARRAY)
 			for c in params
 				ret.v.add(c.v)
+		else if sn.type == TYPE_DICT_BUILDER
+			ret.setType(TYPE_DICT)
+			DynamicValueStateDict *ds = ret.v.s
+			int n = params.num / 2
+			for i in 0:n
+				ds.add(params[0].v, params[1].v)
 		else if sn.type == TYPE_ARRAY_ELEMENT
 			DynamicValue *dv = params[0].v.get_element(params[1].v)
 			if dv
