@@ -127,6 +127,7 @@ enum
 	TYPE_STRING
 	TYPE_ARRAY
 	TYPE_DICT
+	TYPE_FUNCTION
 	TYPE_OBJECT
 
 class DynamicValue
@@ -174,6 +175,8 @@ class DynamicValue
 				s = new DynamicValueStateArray
 			else if type == TYPE_DICT
 				s = new DynamicValueStateDict
+			else if type == TYPE_FUNCTION
+				s = new DynamicValueStateFunction
 			else
 				s = new DynamicValueState
 	void setBool(bool b)
@@ -192,6 +195,10 @@ class DynamicValue
 		setType(TYPE_STRING)
 		DynamicValueStateString *ss = s
 		ss.v = _s
+	void setFunction(Function *f)
+		setType(TYPE_FUNCTION)
+		DynamicValueStateFunction *sf = s
+		sf.func = f
 	void __assign__(DynamicValue b)
 		if b.type == TYPE_BOOL
 			setBool(b.bool())
@@ -212,6 +219,9 @@ class DynamicValue
 			DynamicValueStateDict* ad = s
 			for el,i in bd.values
 				ad.add(bd.keys[i], el)
+		else if b.type == TYPE_FUNCTION
+			DynamicValueStateFunction* bf = b.s
+			setFunction(bf.func)
 
 	void __iadd__(DynamicValue b)
 		if b.type == TYPE_INT
@@ -299,6 +309,8 @@ class DynamicValue
 
 class DynamicValueState
 	virtual void __delete__()
+	virtual string type()
+		return "???"
 	virtual string str()
 		return "nil"
 	virtual string render()
@@ -320,6 +332,8 @@ class DynamicValueStateInt extends DynamicValueState
 	override void __init__()
 		v = 0
 	override void __delete__()
+	override string type()
+		return "int"
 	override string str()
 		return v.str()
 	override int int()
@@ -336,6 +350,8 @@ class DynamicValueStateBool extends DynamicValueState
 	override void __init__()
 		v = false
 	override void __delete__()
+	override string type()
+		return "bool"
 	override string str()
 		return v.str()
 	override bool bool()
@@ -350,6 +366,8 @@ class DynamicValueStateFloat extends DynamicValueState
 	override void __init__()
 		v = 0.0
 	override void __delete__()
+	override string type()
+		return "float"
 	override string str()
 		return v.str()
 	override int int()
@@ -366,6 +384,8 @@ class DynamicValueStateString extends DynamicValueState
 	override void __init__()
 		v.__init__()
 	override void __delete__()
+	override string type()
+		return "str"
 	override string str()
 		return v
 	override string render()
@@ -386,6 +406,8 @@ class DynamicValueStateArray extends DynamicValueState
 	override void __delete__()
 		for e in a
 			delete e
+	override string type()
+		return "array"
 	override string str()
 		string s = "["
 		for e,i in a
@@ -418,6 +440,8 @@ class DynamicValueStateDict extends DynamicValueState
 			delete e
 		for e in keys
 			delete e
+	override string type()
+		return "dict"
 	override string str()
 		string s = "{"
 		for e,i in values
@@ -448,6 +472,15 @@ class DynamicValueStateDict extends DynamicValueState
 			c.add(keys[i].copy(),v.copy())
 		return c
 
+class DynamicValueStateFunction extends DynamicValueState
+	Function* func
+	override void __init__()
+		func = nil
+	override string type()
+		return "func"
+	override string str()
+		return "<func>"
+
 class Variable
 	DynamicValue* v
 	string name
@@ -476,20 +509,7 @@ class Variable
 		else
 			s += "const "
 		
-		if v.type == TYPE_BOOL
-			s += "bool "
-		else if v.type == TYPE_INT
-			s += "int "
-		else if v.type == TYPE_FLOAT
-			s += "float "
-		else if v.type == TYPE_STRING
-			s += "string "
-		else if v.type == TYPE_ARRAY
-			s += "array "
-		else if v.type == TYPE_DICT
-			s += "dict "
-		else
-			s += "??? "
+		//s += v.s.type() + " "
 		if name.num > 0
 			s += name + " = "
 		s += v.render()
@@ -510,72 +530,63 @@ class Function
 	//Variable*[] params
 	//Variable*[] vars
 	SyntaxNodeBlock* block
-	void __init__(string n)
-		name = n
+	void __init__(string _name)
+		name = _name
 		block = nil
 		is_internal = false
 	//Variable* addVar(string name)
 	//	Variable *v = new Variable(name)
 	//	vars.add(v)
 	//	return v
-	virtual void call(Variable* r, Variable*[] p)
+	virtual void call(Interpreter *inter, Variable* ret, Variable*[] p)
+			inter.stack_push(self, ret)
+			int n = min(p.num, params.num)
+			for i in 0:n
+				*inter.cur_context.vars[i].v = *p[i].v
+			inter.doNode(block, ret)
+			inter.stack_pop()
 
-class FunctionSin extends Function
+
+class FunctionInternal extends Function
 	override void __init__()
-		super.__init__("sin")
+		super.__init__("")
 		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+
+class FunctionSin extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(sin(p[0].v.float()))
 
-class FunctionCos extends Function
-	override void __init__()
-		super.__init__("cos")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+class FunctionCos extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(cos(p[0].v.float()))
 
-class FunctionTan extends Function
-	override void __init__()
-		super.__init__("tan")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+class FunctionTan extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(tan(p[0].v.float()))
 
-class FunctionSqrt extends Function
-	override void __init__()
-		super.__init__("sqrt")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+class FunctionSqrt extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(sqrt(p[0].v.float()))
 
-class FunctionAbs extends Function
-	override void __init__()
-		super.__init__("abs")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+class FunctionAbs extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(abs(p[0].v.float()))
 
-class FunctionPrint extends Function
-	override void __init__()
-		super.__init__("print")
-		is_internal = true
-	override void call(Variable *r, Variable*[] p)
+class FunctionPrint extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
 		string s
 		for pp in p
 			s += pp.v.str()
 			s += " "
 		print(s)
-		
-class FunctionLen extends Function
-	override void __init__()
-		super.__init__("len")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+
+class FunctionLen extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		if p.num > 0
 			if p[0].v.type == TYPE_ARRAY
 				DynamicValueStateArray* a = p[0].v.s
@@ -584,11 +595,8 @@ class FunctionLen extends Function
 				DynamicValueStateDict* a = p[0].v.s
 				r.v.setInt(a.values.num)
 
-class FunctionRange extends Function
-	override void __init__()
-		super.__init__("range")
-		is_internal = true
-	override void call(Variable* r, Variable*[] p)
+class FunctionRange extends FunctionInternal
+	override void call(Interpreter *inter, Variable* r, Variable*[] p)
 		r.v.setType(TYPE_ARRAY)
 		DynamicValueStateArray* a = r.v.s
 		int start = 0
@@ -610,37 +618,44 @@ class FunctionRange extends Function
 			a.a.add(ii)
 			i += step
 
-class FunctionStr extends Function
-	override void __init__()
-		super.__init__("str")
-		is_internal = true
-	override void call(Variable *r, Variable*[] p)
+class FunctionStr extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setString(p[0].v.str())
 
-class FunctionInt extends Function
-	override void __init__()
-		super.__init__("int")
-		is_internal = true
-	override void call(Variable *r, Variable*[] p)
+class FunctionInt extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setInt(p[0].v.int())
 
-class FunctionFloat extends Function
-	override void __init__()
-		super.__init__("float")
-		is_internal = true
-	override void call(Variable *r, Variable*[] p)
+class FunctionFloat extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(p[0].v.float())
 
-class FunctionBool extends Function
-	override void __init__()
-		super.__init__("bool")
-		is_internal = true
-	override void call(Variable *r, Variable*[] p)
+class FunctionBool extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setBool(p[0].v.bool())
+
+class FunctionMap extends FunctionInternal
+	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+		if p.num >= 2
+			if p[0].v.type == TYPE_FUNCTION and p[1].v.type == TYPE_ARRAY
+				r.v.setType(TYPE_ARRAY)
+				DynamicValueStateFunction *f = p[0].v.s
+				DynamicValueStateArray *pa = p[1].v.s
+				DynamicValueStateArray *ra = r.v.s
+				for e in pa.a
+					Variable temp
+					Variable temp2
+					temp2.setReference(e)
+					Variable*[] pp
+					pp.add(&temp2)
+					inter.stack_push(self, &temp)
+					f.func.call(inter, &temp, pp)
+					inter.stack_pop()
+					ra.a.add(temp.v.copy())
 
 enum
 	TYPE_OPERATOR
@@ -873,16 +888,16 @@ class SyntaxTree
 		return c
 	Function* addFunc(string name)
 		Function* f = new Function(name)
+		Variable* v = addGlobalVar(name)
+		v.v.setFunction(f)
 		funcs.add(f)
 		return f
-	Function* getFunc(string name)
-		for f in funcs
-			if f.name == name
-				return f
-		for f in internal_funcs
-			if f.name == name
-				return f
-		return nil
+	void add_internal_func(string name, Function *f)
+		f.name = name
+		Variable* v = addGlobalVar(name)
+		internal_funcs.add(f)
+		v.v.setFunction(f)
+		
 	SyntaxNode* getNuclearOperand()
 		if isNumber(cur[0])
 			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstNumber(cur))
@@ -1145,8 +1160,7 @@ class SyntaxTree
 		next()
 		if error
 			return
-		Function *func = new Function(cur)
-		funcs.add(func)
+		Function *func = addFunc(cur)
 		cur_func = func
 		next()
 		if error
@@ -1245,18 +1259,19 @@ class SyntaxTree
 		v.v.setFloat(3.141592654)
 		v.writable = false
 		
-		internal_funcs.add(new FunctionSin)
-		internal_funcs.add(new FunctionCos)
-		internal_funcs.add(new FunctionTan)
-		internal_funcs.add(new FunctionSqrt)
-		internal_funcs.add(new FunctionAbs)
-		internal_funcs.add(new FunctionLen)
-		internal_funcs.add(new FunctionRange)
-		internal_funcs.add(new FunctionPrint)
-		internal_funcs.add(new FunctionStr)
-		internal_funcs.add(new FunctionInt)
-		internal_funcs.add(new FunctionFloat)
-		internal_funcs.add(new FunctionBool)
+		add_internal_func("sin", new FunctionSin)
+		add_internal_func("cos", new FunctionCos)
+		add_internal_func("tan", new FunctionTan)
+		add_internal_func("sqrt", new FunctionSqrt)
+		add_internal_func("abs", new FunctionAbs)
+		add_internal_func("len", new FunctionLen)
+		add_internal_func("range", new FunctionRange)
+		add_internal_func("print", new FunctionPrint)
+		add_internal_func("str", new FunctionStr)
+		add_internal_func("int", new FunctionInt)
+		add_internal_func("float", new FunctionFloat)
+		add_internal_func("bool", new FunctionBool)
+		add_internal_func("map", new FunctionMap)
 		
 		lines = lp.parse(source)
 		
@@ -1404,20 +1419,25 @@ class Interpreter
 			else
 				setError("unhandled operator: " + op.op)
 		else if sn.type == TYPE_CALL
-			SyntaxNodeCall *func = sn
-			Function* f = syntax.getFunc(func.name)
-			if !f
-				setError("unknown function: " + func.name)
+			SyntaxNodeCall *call = sn
+			Variable* v = cur_context.get(call.name)
+			if !v
+				setError("function not found: " + call.name)
 				return
-			if f.block
-				stack_push(f, ret)
+			if v.v.type != TYPE_FUNCTION
+				setError("is not a function: " + call.name)
+				return
+			DynamicValueStateFunction* fs = v.v.s
+			Function *f = fs.func
+			stack_push(f, ret)
+			f.call(self, ret, params)
+			/*if f.block
 				int n = min(sn.params.num,f.params.num)
 				for i in 0:n
 					*cur_context.vars[i].v = *params[i].v
-				doNode(f.block, ret)
-				stack_pop()
-			else
-				f.call(ret, params)
+			else*/
+			stack_pop()
+				
 		else if sn.type == TYPE_IF
 			Variable dummy
 			SyntaxNodeIf *_if = sn

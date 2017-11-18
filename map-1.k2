@@ -1,0 +1,5 @@
+def f(x)
+	return x*x
+
+print(map(f, range(100)))
+
