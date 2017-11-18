@@ -257,7 +257,7 @@ class DynamicValue
 				setInt(s.int() - b.float())
 		else if b.type == TYPE_FLOAT
 			if type == TYPE_INT
-				setFloat(s.float() - b.int())
+				setFloat(s.float() - b.float())
 			else if type == TYPE_FLOAT
 				setFloat(s.float() - b.float())
 
