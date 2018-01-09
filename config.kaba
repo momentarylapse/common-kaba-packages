@@ -1,5 +1,5 @@
-const string SERVER = "hinoki"
-const string YII = "/home/michi/www/_alexandria4/yii"
+const string SERVER = "michi.is-a-geek.org"
+const string YII = "/var/www/html/_alexandria4/yii"
 const string TEMP_OUT = "/tmp/sisyphos_out"
 
 
@@ -17,6 +17,7 @@ string get_tag(string[] parts, string key)
 class ConfigDir
 	string dir
 	ConfigDirSync[] syncs
+	string[] ignore
 	
 	void add_sync(string filter, string options)
 		ConfigDirSync s
@@ -73,6 +74,11 @@ class Config
 				f >> s.filter
 				f >> s.options
 				e.syncs.add(s)
+			f >> m
+			for j in 0:m
+				string ignore
+				f >> ignore
+				e.ignore.add(ignore)
 			dirs.add(e)
 		delete f
 	void save()
@@ -84,6 +90,9 @@ class Config
 			for s in e.syncs
 				f << s.filter
 				f << s.options
+			f << e.ignore.num
+			for i in e.ignore
+				f << i
 		delete f
 	void add(string dir, string filter)
 		for e in dirs

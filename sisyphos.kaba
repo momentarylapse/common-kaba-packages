@@ -23,7 +23,7 @@ void update_remote_sync(string r, ConfigDirSync sync, string dest)
 		string[] parts = l.explode("\t")
 		if parts.num < 6
 			continue
-		int id = parts[0].int()
+		string id = parts[0]
 		string hash = parts[3]
 		LocalFile *lf = db.find_by_id(id)
 		if lf
@@ -48,7 +48,7 @@ void update_remote_sync(string r, ConfigDirSync sync, string dest)
 		string rel_name = sync.guess_dir(parts) + parts[5].replace("/", " - ")
 		lf = db.find_by_hash(hash)
 		if lf
-			if lf.id >= 0
+			if lf.id.num >= 0
 				print("HASH COLLISION " + lf.path + "  <->  " + "REMOTE...")
 			lf.id = id
 			if conf.verbose
@@ -138,9 +138,8 @@ void pull()
 		//return
 	db.save()
 
-
 class FileToCopy
-	int id
+	string id
 	string remotepath
 FileToCopy[] tocopy
 int copysize
@@ -174,9 +173,9 @@ void main(string[] arg)
 		print("find <FILTER>")
 		print("add <DIR> <FILTER>")
 		print("status")
-		print("status")
 		print("push")
 		print("pull")
+		print("rehash")
 		return
 
 	conf.load()
@@ -197,8 +196,6 @@ void main(string[] arg)
 			print("ERROR: add <DIR> <FILTER>")
 			return
 		conf.add(arg[1], arg[2])
-		conf.save()
-		return
 		
 	else if arg[0] == "find"
 		if arg.num < 2
@@ -207,27 +204,27 @@ void main(string[] arg)
 		LocalFile*[] files = db.find_by_tags(arg[1])
 		for f in files
 			print(f.path)
-		return
 	else if arg[0] == "status" or arg[0] == "update-local"
 		conf.show_pure_local = (arg[0] == "status")
 		for e in conf.dirs
 			if conf.allow_local_search
-				db.update_local(e.dir)
-		return
+				db.update_local(e)
+		db.show_status()
 	else if arg[0] == "pull"
 		for e in conf.dirs
 			if conf.allow_local_search
-				db.update_local(e.dir)
+				db.update_local(e)
 			
 			if conf.allow_remote_search
 				update_remote(e.syncs, e.dir)
 				if conf.allow_remote_pull
 					pull()
-		return
-	else if arg[0] == "pull"
+	else if arg[0] == "push"
 		print("not yet...")
-		return
+	else if arg[0] == "rehash"
+		db.rehash()
 	else
 		print(arg[0] + "  ???")
-		return
 	
+	if db.dirty
+		db.save()
