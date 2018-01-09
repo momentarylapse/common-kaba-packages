@@ -6,6 +6,8 @@ class Tag
 	string key
 	string value
 	string str()
+		return key + "=" + value
+	string strh()
 		return key + "=" + value.hex(false)
 
 string tags2str(Tag[] tags)
@@ -13,7 +15,7 @@ string tags2str(Tag[] tags)
 	for t,i in tags
 		if i > 0
 			r += ","
-		r += t.str()
+		r += t.strh()
 	return r
 
 Tag str2tag(string s)
@@ -111,6 +113,7 @@ class LocalFile
 class DBVisitor
 	LocalFileDB* db
 	string[] ignore
+	string[] paths
 	void __init__(LocalFileDB *_db)
 		db = _db
 				
@@ -123,16 +126,24 @@ class DBVisitor
 	void add_ignored(string[] ig)
 		for i in ig
 			ignore.add(i)
-	
-	void recurse(string dir)
+
+	void find_paths(string dir)
 		DirEntry[] list = DirSearch(dir, "*", true)
 		for e in list
 			if e.is_dir
 				if e.name.head(1) != "."
-					recurse(dir + "/" + e.name)
+					find_paths(dir + "/" + e.name)
 			else
-				if !is_ignored(dir + "/" + e.name)
-					visit(dir + "/" + e.name)
+				string path = (dir + "/" + e.name).replace("//", "/")
+				if !is_ignored(path)
+					paths.add(path)
+	
+	void recurse(string dir)
+		find_paths(dir)
+		for p in paths
+			visit(p)
+		paths.clear()
+		
 	virtual void visit(string path)
 
 class DBUpdater extends DBVisitor
@@ -200,7 +211,11 @@ class DBStatusReporter extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
 	override void visit(string path)
-		print(path)
+		LocalFile *f = db.find_by_path(path)
+		if f
+			print("   " + path)
+		else
+			print("?  " + path)
 		
 class DBDropper extends DBVisitor
 	override void __init__(LocalFileDB* _db)
@@ -441,8 +456,17 @@ class LocalFileDB
 				f.hash = h2
 				save()
 
-	void show_status()
+	void list(string dir)
 		conf.show_pure_local = true
+		DBVisitor* vis = new DBStatusReporter(self)
+		for e in conf.dirs
+			vis.add_ignored(e.ignore)
+		vis.recurse(dir)
+		delete vis
+
+	void show_status()
+		if conf.verbose
+			conf.show_pure_local = true
 		for f in files
 			f.show()
 		/*DBVisitor* vis = new DBStatusReporter(self)

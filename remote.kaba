@@ -1,0 +1,73 @@
+use "config.kaba"
+use "localdb.kaba"
+
+
+string scp_escape(string s)
+	string r = s
+	r = r.replace("(", "\\\\\\(")
+	r = r.replace(")", "\\\\\\)")
+	r = r.replace("'", "\\\\\\'")
+	r = r.replace(" ", "\\\\\\ ")
+	return r
+
+string ssh_escape(string s)
+	string r = s
+	r = r.replace(" ", "\\\\ ")
+	r = r.replace("(", "\\\\(")
+	r = r.replace(")", "\\\\)")
+	r = r.replace("'", "\\\\'")
+	return r
+
+
+class RemoteFile extends LocalFile
+	string rel_name
+	override void show()
+		if conf.verbose
+			print("")
+		print(path)
+		if conf.verbose
+			print("hash: " + hash)
+			print("id:   " + id)
+			print("size: " + size)
+			//print(tags2str(tags))
+			for t in tags
+				print(t.str())
+
+RemoteFile[] remote_parse(string r)
+	RemoteFile[] rfiles
+	string[] list = r.explode("\n")
+	for l in list
+		string[] parts = l.explode("\t")
+		if parts.num < 6
+			continue
+		RemoteFile rf
+		rf.id = parts[0]
+		rf.mtime = parts[1].int()
+		rf.size = parts[2].int()
+		rf.hash = parts[3]
+		rf.path = parts[4]
+		rf.rel_name = parts[5]
+		for i in 6:parts.num
+			rf.tags.add(str2tag(parts[i]))
+		rfiles.add(rf)
+	return rfiles
+
+RemoteFile[] remote_find(string filter)
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	string quality = "perfect"
+//	if s.options.find("quality=medium", 0) >= 0
+//		quality = "medium"
+	cmd += "php " + YII + " file/find-sisyphos \\\"" + ssh_escape(filter) + "\\\" " + quality + "; "
+	cmd += "\""
+	print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+		
+	//tocopy.clear()
+	//copysize = 0
+	
+	string r = FileRead(TEMP_OUT).trim()
+	return remote_parse(r)
+	//string[] rs = r.explode("-=-=-=-=-=\n")
+	//return rs
+

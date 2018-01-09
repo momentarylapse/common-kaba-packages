@@ -1,5 +1,6 @@
 use "localdb.kaba"
 use "config.kaba"
+use "remote.kaba"
 
 
 class DirChange
@@ -144,22 +145,6 @@ class FileToCopy
 FileToCopy[] tocopy
 int copysize
 
-string scp_escape(string s)
-	string r = s
-	r = r.replace("(", "\\\\\\(")
-	r = r.replace(")", "\\\\\\)")
-	r = r.replace("'", "\\\\\\'")
-	r = r.replace(" ", "\\\\\\ ")
-	return r
-
-string ssh_escape(string s)
-	string r = s
-	r = r.replace(" ", "\\\\ ")
-	r = r.replace("(", "\\\\(")
-	r = r.replace(")", "\\\\)")
-	r = r.replace("'", "\\\\'")
-	return r
-
 string bash_escape(string s)
 	string r = s
 	r = r.replace("\\", "\\\\")
@@ -174,6 +159,7 @@ void main(string[] arg)
 		print("add-filter <DIR> <FILTER>")
 		print("add/addr <PATH>            # add file/dir to local db")
 		print("rm/rmr <PATH>              # drop file/dir from local db")
+		print("list <DIR>                 # only show")
 		print("status                     # only show")
 		print("sync                       # ...")
 		print("push")
@@ -209,6 +195,11 @@ void main(string[] arg)
 			print(f.path)
 	else if arg[0] == "status"
 		db.show_status()
+	else if arg[0] == "list"
+		if arg.num < 2
+			print("ERROR: list <DIR>")
+			return
+		db.list(arg[1])
 	else if arg[0] == "addr" or arg[0] == "add"
 		if arg.num < 2
 			print("ERROR: add/addr <PATH>")
@@ -219,6 +210,17 @@ void main(string[] arg)
 			print("ERROR: rm/rmr <PATH>")
 			return
 		db.rm_recursive(arg[1], arg[0] == "rmr")
+	else if arg[0] == "remote"
+		if arg.num < 2
+			print("ERROR: remote ...")
+			return
+		if arg[1] == "find"
+			if arg.num < 3
+				print("ERROR: remote find <FILTER>")
+				return
+			RemoteFile[] rfiles = remote_find(arg[2])
+			for f in rfiles
+				f.show()
 	else if arg[0] == "__status" or arg[0] == "__update-local"
 		conf.show_pure_local = (arg[0] == "__status")
 		for e in conf.dirs
