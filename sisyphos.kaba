@@ -171,8 +171,11 @@ string bash_escape(string s)
 void main(string[] arg)
 	if arg.num == 0
 		print("find <FILTER>")
-		print("add <DIR> <FILTER>")
-		print("status")
+		print("add-filter <DIR> <FILTER>")
+		print("add/addr <PATH>            # add file/dir to local db")
+		print("rm/rmr <PATH>              # drop file/dir from local db")
+		print("status                     # only show")
+		print("sync                       # ...")
 		print("push")
 		print("pull")
 		print("rehash")
@@ -191,9 +194,9 @@ void main(string[] arg)
 			conf.pull_tags = true
 
 
-	if arg[0] == "add"
+	if arg[0] == "add-filter"
 		if arg.num < 3
-			print("ERROR: add <DIR> <FILTER>")
+			print("ERROR: add-filter <DIR> <FILTER>")
 			return
 		conf.add(arg[1], arg[2])
 		
@@ -204,13 +207,25 @@ void main(string[] arg)
 		LocalFile*[] files = db.find_by_tags(arg[1])
 		for f in files
 			print(f.path)
-	else if arg[0] == "status" or arg[0] == "update-local"
-		conf.show_pure_local = (arg[0] == "status")
+	else if arg[0] == "status"
+		db.show_status()
+	else if arg[0] == "addr" or arg[0] == "add"
+		if arg.num < 2
+			print("ERROR: add/addr <PATH>")
+			return
+		db.add_recursive(arg[1], arg[0] == "addr")
+	else if arg[0] == "rm" or arg[0] == "rmr"
+		if arg.num < 2
+			print("ERROR: rm/rmr <PATH>")
+			return
+		db.rm_recursive(arg[1], arg[0] == "rmr")
+	else if arg[0] == "__status" or arg[0] == "__update-local"
+		conf.show_pure_local = (arg[0] == "__status")
 		for e in conf.dirs
 			if conf.allow_local_search
 				db.update_local(e)
 		db.show_status()
-	else if arg[0] == "pull"
+	/*else if arg[0] == "pull"
 		for e in conf.dirs
 			if conf.allow_local_search
 				db.update_local(e)
@@ -220,7 +235,7 @@ void main(string[] arg)
 				if conf.allow_remote_pull
 					pull()
 	else if arg[0] == "push"
-		print("not yet...")
+		print("not yet...")*/
 	else if arg[0] == "rehash"
 		db.rehash()
 	else

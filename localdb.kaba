@@ -108,6 +108,108 @@ class LocalFile
 			s += "\n" + t.key + " = " + t.value
 		return s
 
+class DBVisitor
+	LocalFileDB* db
+	string[] ignore
+	void __init__(LocalFileDB *_db)
+		db = _db
+				
+	bool is_ignored(string path)
+		for i in ignore
+			if path.match(i)
+				return true
+		return false
+	
+	void add_ignored(string[] ig)
+		for i in ig
+			ignore.add(i)
+	
+	void recurse(string dir)
+		DirEntry[] list = DirSearch(dir, "*", true)
+		for e in list
+			if e.is_dir
+				if e.name.head(1) != "."
+					recurse(dir + "/" + e.name)
+			else
+				if !is_ignored(dir + "/" + e.name)
+					visit(dir + "/" + e.name)
+	virtual void visit(string path)
+
+class DBUpdater extends DBVisitor
+	override void __init__(LocalFileDB* _db)
+		super.__init__(_db)
+	override void visit(string path)
+		//print("update " + path)
+		LocalFile *f = db.find_by_path(path)
+		if f
+			if f.is("nonlocal")
+				f.unset("nonlocal")
+				print("NON-NONLOCAL " + path)
+			File* ff = FileOpen(path)
+			int mtime = ff.getMDate().time
+			if mtime == f.mtime
+				if f.id == "" and conf.show_pure_local
+					print("ADD  " + path)
+				// ok
+				if conf.verbose
+					print("=  " + path)
+			else
+				// changed?
+				string hash = FileHash(path, "md5")
+				if hash == f.hash
+					// ok
+					f.mtime = mtime
+					if conf.verbose
+						print("=  " + path)
+				else
+					print("~  " + path)
+					f.hash = hash
+					f.mtime = mtime
+					f.size = ff.getSize()
+					if conf.verbose
+						print("     hash: " + f.hash)
+						print("     time: " + f.mtime)
+						print("     size: " + f.size)
+			delete ff
+		else
+			string hash = FileHash(path, "md5")
+			f = db.find_by_hash(hash)
+			if f
+				//print(" FOUND BY HASH " + f.path)
+				// moved
+				print("MOVE  " + f.path + " > " + path)
+				f.path = path
+			else
+				// new
+				print("ADD  " + path)
+				LocalFile l
+				l.path = path
+				l.hash = hash
+				l.id = -1
+				File* ff = FileOpen(path)
+				l.mtime = ff.getMDate().time
+				l.size = ff.getSize()
+				delete ff
+				if conf.verbose
+					print("     hash: " + l.hash)
+					print("     time: " + l.mtime)
+					print("     size: " + l.size)
+				db.files.add(l)
+
+class DBStatusReporter extends DBVisitor
+	override void __init__(LocalFileDB* _db)
+		super.__init__(_db)
+	override void visit(string path)
+		print(path)
+		
+class DBDropper extends DBVisitor
+	override void __init__(LocalFileDB* _db)
+		super.__init__(_db)
+	override void visit(string path)
+		LocalFile *f = db.find_by_path(path)
+		if f
+			db.drop(*f)
+
 class LocalFileDB
 	LocalFile[] files
 	bool dirty
@@ -249,84 +351,14 @@ class LocalFileDB
 					list.add(f)
 		return list
 
-	void update_file(string path)
-		LocalFile *f = find_by_path(path)
-		if f
-			if f.is("nonlocal")
-				f.unset("nonlocal")
-				print("NON-NONLOCAL " + path)
-			File* ff = FileOpen(path)
-			int mtime = ff.getMDate().time
-			if mtime == f.mtime
-				if f.id == "" and conf.show_pure_local
-					print("ADD  " + path)
-				// ok
-				if conf.verbose
-					print("=  " + path)
-			else
-				// changed?
-				string hash = FileHash(path, "md5")
-				if hash == f.hash
-					// ok
-					f.mtime = mtime
-					if conf.verbose
-						print("=  " + path)
-				else
-					print("~  " + path)
-					f.hash = hash
-					f.mtime = mtime
-					f.size = ff.getSize()
-					if conf.verbose
-						print("     hash: " + f.hash)
-						print("     time: " + f.mtime)
-						print("     size: " + f.size)
-			delete ff
-		else
-			string hash = FileHash(path, "md5")
-			f = find_by_hash(hash)
-			if f
-				//print(" FOUND BY HASH " + f.path)
-				// moved
-				print("MOVE  " + f.path + " > " + path)
-				f.path = path
-			else
-				// new
-				print("ADD  " + path)
-				LocalFile l
-				l.path = path
-				l.hash = hash
-				l.id = -1
-				File* ff = FileOpen(path)
-				l.mtime = ff.getMDate().time
-				l.size = ff.getSize()
-				delete ff
-				if conf.verbose
-					print("     hash: " + l.hash)
-					print("     time: " + l.mtime)
-					print("     size: " + l.size)
-				files.add(l)
-				
-	bool is_ignored(string path, string[] ignore)
-		for i in ignore
-			if path.match(i)
-				return true
-		return false
-	
-	void update_by_working_dir(string dir, string[] ignore)
-		DirEntry[] list = DirSearch(dir, "*", true)
-		for e in list
-			if e.is_dir
-				if e.name.head(1) != "."
-					update_by_working_dir(dir + "/" + e.name, ignore)
-			else
-				if !is_ignored(dir + "/" + e.name, ignore)
-					update_file(dir + "/" + e.name)
-	
 	// check for local changes
 	void update_local(ConfigDir e)
 		print("update local " + e.dir)
 		
-		update_by_working_dir(e.dir, e.ignore)
+		DBUpdater* up = new DBUpdater(self)
+		up.add_ignored(e.ignore)
+		up.recurse(e.dir)
+		delete up
 		
 		LocalFile[] dbfiles = get_in_dir(e.dir, true)
 		LocalFile[] todrop
@@ -349,6 +381,53 @@ class LocalFileDB
 			drop(ff)
 			
 		save()
+
+	// check for local changes
+	void add_recursive(string path, bool is_dir)
+		
+		DBUpdater* up = new DBUpdater(self)
+		for e in conf.dirs
+			up.add_ignored(e.ignore)
+		if is_dir
+			up.recurse(path)
+		else
+			up.visit(path)
+		delete up
+		
+		/*LocalFile[] dbfiles = get_in_dir(e.dir, true)
+		LocalFile[] todrop
+		for ff in dbfiles
+			if ff.is("nonlocal")
+				print("+R " + ff.path)
+				continue
+					
+			if FileExists(ff.path)
+				nil
+				// already checked...
+			else
+				print("-  " + ff.path)
+				ff.set("deleted")
+				
+				if conf.drop_deleted
+					todrop.add(ff)
+		
+		for ff in todrop
+			drop(ff)*/
+			
+		save()
+
+	void rm_recursive(string path, bool is_dir)
+		
+		DBVisitor* vis = new DBDropper(self)
+		for e in conf.dirs
+			vis.add_ignored(e.ignore)
+		if is_dir
+			vis.recurse(path)
+		else
+			vis.visit(path)
+		delete vis
+			
+		save()
 	
 	void rehash()
 		for f in files
@@ -363,7 +442,13 @@ class LocalFileDB
 				save()
 
 	void show_status()
+		conf.show_pure_local = true
 		for f in files
 			f.show()
+		/*DBVisitor* vis = new DBStatusReporter(self)
+		for e in conf.dirs
+			vis.add_ignored(e.ignore)
+			vis.recurse(e.dir)
+		delete vis*/
 	
 LocalFileDB db
