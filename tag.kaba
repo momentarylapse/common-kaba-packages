@@ -1,0 +1,47 @@
+
+
+class Tag
+	string key
+	string value
+	string str()
+		return key + "=" + value
+	string strh()
+		return key + "=" + value.hex(false)
+
+string tags2str(Tag[] tags)
+	string r
+	for t,i in tags
+		if i > 0
+			r += ","
+		r += t.strh()
+	return r
+
+Tag str2tag(string s)
+	string[] a = s.explode("=")
+	Tag t
+	t.key = a[0]
+	t.value = a[1]
+	return t
+
+Tag strh2tag(string s)
+	string[] a = s.explode("=")
+	Tag t
+	t.key = a[0]
+	t.value = a[1].unhex()
+	return t
+
+
+Tag[] strh2tags(string s)
+	Tag[] tags
+	string[] a = s.explode(",")
+	for b in a
+		tags.add(strh2tag(b))
+	return tags
+
+
+Tag[] str2tags(string s)
+	Tag[] tags
+	string[] a = s.explode(",")
+	for b in a
+		tags.add(str2tag(b))
+	return tags

@@ -1,10 +1,8 @@
 use "localdb.kaba"
 use "config.kaba"
 use "remote.kaba"
+use "tag.kaba"
 
-
-class DirChange
-	int i
 
 void make_all_dirs(string path)
 	string[] parts = path.explode("/")
@@ -188,7 +186,7 @@ void main(string[] arg)
 			if arg.num < 4
 				print("ERROR: filter add <DIR> <FILTER>")
 				return
-			conf.add(arg[2], arg[3])
+			conf.add_filter(arg[2], arg[3], "quality=medium")
 			conf.save()
 		else if arg[1] == "rm"
 			if arg.num == 4

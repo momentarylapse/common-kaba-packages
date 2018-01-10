@@ -101,15 +101,21 @@ class Config
 				print("  filter: " + s.filter)
 				print("    options: " + s.options)
 
-	void add(string dir, string filter)
+	void add_filter(string dir, string filter, string options)
 		for e in dirs
 			if e.dir == dir
-				e.add_sync(filter, "")
+				e.add_sync(filter, options)
 				return
 		ConfigDir e
 		e.dir = dir
-		e.add_sync(filter, "")
+		e.add_sync(filter, options)
 		dirs.add(e)
+	
+	bool dir_is_in_db(string dir)
+		for e in dirs
+			if e.dir == dir.head(e.dir.num)
+				return true
+		return false
 
 	void rm_filter(string dir, string filter)
 		for e in dirs

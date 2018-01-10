@@ -1,56 +1,15 @@
 use "config.kaba"
+use "tag.kaba"
 
-
-
-class Tag
-	string key
-	string value
-	string str()
-		return key + "=" + value
-	string strh()
-		return key + "=" + value.hex(false)
-
-string tags2str(Tag[] tags)
-	string r
-	for t,i in tags
-		if i > 0
-			r += ","
-		r += t.strh()
-	return r
-
-Tag str2tag(string s)
-	string[] a = s.explode("=")
-	Tag t
-	t.key = a[0]
-	t.value = a[1]
-	return t
-
-Tag strh2tag(string s)
-	string[] a = s.explode("=")
-	Tag t
-	t.key = a[0]
-	t.value = a[1].unhex()
-	return t
-
-
-Tag[] strh2tags(string s)
-	Tag[] tags
-	string[] a = s.explode(",")
-	for b in a
-		tags.add(strh2tag(b))
-	return tags
-
-
-Tag[] str2tags(string s)
-	Tag[] tags
-	string[] a = s.explode(",")
-	for b in a
-		tags.add(str2tag(b))
-	return tags
+// fix...
+string get_extension(string path)
+	string[] e = path.explode(".")
+	return e[e.num - 1]
 
 class LocalFile
 	// remote
 	string id
+	string name
 	int remote_mtime
 	// local
 	string path
@@ -101,6 +60,7 @@ class LocalFile
 	string str()
 		string s
 		s += "path: " + path
+		s += "name: " + name
 		s += "\nid: " + id
 		s += "\nhash: " + hash
 		s += "\nmtime: " + mtime
@@ -166,6 +126,8 @@ class DBVisitor
 		
 	virtual void visit(string path)
 
+
+// "add"
 class DBUpdater extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
@@ -210,11 +172,18 @@ class DBUpdater extends DBVisitor
 				// moved
 				print("MOVE  " + f.path + " > " + path)
 				f.path = path
+				// TODO: hash update...
 			else
 				// new
 				print("ADD  " + path)
 				LocalFile l
 				l.path = path
+				l.name = path.basename()
+				string ext = path.extension()
+				if ext.num > 0
+					l.name = l.name.head(l.name.num - ext.num - 1)
+				//print(ext)
+				//print(l.name)
 				l.hash = hash
 				l.id = -1
 				File* ff = FileOpen(path)
@@ -239,6 +208,9 @@ class DBStatusReporter extends DBVisitor
 				print("R  " + path)
 			else if conf.verbose
 				print("   " + path)
+			if conf.verbose
+				print("      name: " + f.name)
+				print("      hash: " + f.hash)
 		else
 			print("?  " + path)
 		
@@ -267,6 +239,7 @@ class LocalFileDB
 			string temp
 			f >> ff.id
 			f >> ff.path
+			f >> ff.name
 			f >> ff.hash
 			f >> ff.mtime
 			f >> ff.remote_mtime
@@ -320,6 +293,7 @@ class LocalFileDB
 		for ff in files
 			f << ff.id
 			f << ff.path
+			f << ff.name
 			f << ff.hash
 			f << ff.mtime
 			f << ff.remote_mtime
@@ -423,6 +397,8 @@ class LocalFileDB
 
 	// check for local changes
 	void add_recursive(string path, bool is_dir)
+		if path[path.num-1] == '/'
+			is_dir = true
 		
 		DBUpdater* up = new DBUpdater(self)
 		if is_dir
@@ -454,6 +430,8 @@ class LocalFileDB
 		save()
 
 	void rm_recursive(string path, bool is_dir)
+		if path[path.num-1] == '/'
+			is_dir = true
 		
 		DBVisitor* vis = new DBDropper(self)
 		if is_dir
@@ -477,6 +455,9 @@ class LocalFileDB
 				save()
 
 	void list(string dir)
+		if !conf.dir_is_in_db(dir)
+			print("ERROR: not in db")
+			return
 		conf.show_pure_local = true
 		DBVisitor* vis = new DBStatusReporter(self)
 		vis.recurse(dir)

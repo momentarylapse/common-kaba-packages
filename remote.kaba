@@ -1,5 +1,6 @@
 use "config.kaba"
 use "localdb.kaba"
+use "tag.kaba"
 
 
 string scp_escape(string s)
@@ -38,7 +39,7 @@ RemoteFile[] remote_parse(string r)
 	string[] list = r.explode("\n")
 	for l in list
 		string[] parts = l.explode("\t")
-		if parts.num < 6
+		if parts.num < 7
 			continue
 		RemoteFile rf
 		rf.id = parts[0]
@@ -46,8 +47,10 @@ RemoteFile[] remote_parse(string r)
 		rf.size = parts[2].int()
 		rf.hash = parts[3]
 		rf.path = parts[4]
-		rf.rel_name = parts[5]
-		for i in 6:parts.num
+		rf.name = parts[5]
+		string extension = parts[6]
+		rf.rel_name = rf.name + "." + extension
+		for i in 7:parts.num
 			rf.tags.add(str2tag(parts[i]))
 		rfiles.add(rf)
 	return rfiles
