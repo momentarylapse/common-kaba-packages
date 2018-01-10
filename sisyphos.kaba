@@ -179,12 +179,36 @@ void main(string[] arg)
 		else if a == "--pull-tags"
 			conf.pull_tags = true
 
-
-	if arg[0] == "add-filter"
-		if arg.num < 3
-			print("ERROR: add-filter <DIR> <FILTER>")
+	if arg[0] == "filter"
+		if arg.num < 2
+			conf.show()
+			print("TRY: filter add/rm")
 			return
-		conf.add(arg[1], arg[2])
+		if arg[1] == "add"
+			if arg.num < 4
+				print("ERROR: filter add <DIR> <FILTER>")
+				return
+			conf.add(arg[2], arg[3])
+			conf.save()
+		else if arg[1] == "rm"
+			if arg.num == 4
+				conf.rm_filter(arg[2], arg[3])
+				conf.save()
+			else if arg.num == 3
+				conf.rm_dir(arg[2])
+				conf.save()
+			else
+				print("ERROR: filter rm <DIR> [<FILTER>]")
+				return
+	else if arg[0] == "ignore"
+		if arg.num < 2
+			print("ERROR: ignore ...")
+			return
+		if arg[1] == "add"
+			if arg.num < 4
+				print("ERROR: filter add <DIR> <FILTER>")
+				return
+			conf.add(arg[2], arg[3])
 		
 	else if arg[0] == "find"
 		if arg.num < 2
@@ -221,15 +245,18 @@ void main(string[] arg)
 			RemoteFile[] rfiles = remote_find(arg[2], "")
 			for f in rfiles
 				f.show()
+		else
+			print("ERROR: remote ...")
+			return
 	else if arg[0] == "sync"
 		remote_sync()
-	else if arg[0] == "__status" or arg[0] == "__update-local"
+	/*else if arg[0] == "__status" or arg[0] == "__update-local"
 		conf.show_pure_local = (arg[0] == "__status")
 		for e in conf.dirs
 			if conf.allow_local_search
 				db.update_local(e)
 		db.show_status()
-	/*else if arg[0] == "pull"
+	else if arg[0] == "pull"
 		for e in conf.dirs
 			if conf.allow_local_search
 				db.update_local(e)

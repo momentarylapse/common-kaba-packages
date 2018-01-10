@@ -94,6 +94,14 @@ class Config
 			for i in e.ignore
 				f << i
 		delete f
+
+	void show()
+		for e in conf.dirs
+			print(e.dir)
+			for s in e.syncs
+				print("  filter: " + s.filter)
+				print("    options: " + s.options)
+
 	void add(string dir, string filter)
 		for e in dirs
 			if e.dir == dir
@@ -103,6 +111,22 @@ class Config
 		e.dir = dir
 		e.add_sync(filter, "")
 		dirs.add(e)
+
+	void rm_filter(string dir, string filter)
+		for e in dirs
+			if e.dir == dir
+				for s,i in e.syncs
+					if s.filter == filter
+						e.syncs.remove(i)
+						return
+		print("not found...")
+
+	void rm_dir(string dir)
+		for e,i in dirs
+			if e.dir == dir
+				dirs.remove(i)
+				return
+		print("not found...")
 		
 	ConfigDir[] dirs
 	
