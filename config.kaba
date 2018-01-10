@@ -73,6 +73,7 @@ class Config
 				f >> s.filter
 				f >> s.options
 				e.syncs.add(s)
+			dirs.add(e)
 		f >> n
 		for i in 0:n
 			string ig

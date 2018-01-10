@@ -134,6 +134,13 @@ class DBVisitor
 				string path = (dir + "/" + e.name).replace("//", "/")
 				if !is_ignored(path)
 					paths.add(path)
+	void sort_paths()
+		for i in 0:paths.num
+			for j in i+1:paths.num
+				if paths[i] > paths[j]
+					string t = paths[i]
+					paths[i] = paths[j]
+					paths[j] = t
 	
 	void recurse(string dir)
 		find_paths(dir)
@@ -143,8 +150,16 @@ class DBVisitor
 	void recurse_all()
 		for e in conf.dirs
 			find_paths(e.dir)
-		//for f in db.files
-		//	bool found 
+		for f in db.files
+			bool found
+			for p in paths
+				if p == f.path
+					found = true
+					break
+			if !found
+				paths.add(f.path)
+				print(f.path)
+		sort_paths()
 		for p in paths
 			visit(p)
 		paths.clear()
@@ -222,7 +237,7 @@ class DBStatusReporter extends DBVisitor
 				print("L  " + path)
 			else if f.is("nonlocal")
 				print("R  " + path)
-			else
+			else if conf.verbose
 				print("   " + path)
 		else
 			print("?  " + path)
