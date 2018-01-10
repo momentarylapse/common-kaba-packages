@@ -1,11 +1,6 @@
 use "config.kaba"
 use "tag.kaba"
 
-// fix...
-string get_extension(string path)
-	string[] e = path.explode(".")
-	return e[e.num - 1]
-
 class LocalFile
 	// remote
 	string id
@@ -80,14 +75,15 @@ class DBVisitor
 				return true
 		return false
 
-	void find_paths(string dir)
+	void find_paths(string _dir)
+		string dir = dir_canonical(_dir)
 		DirEntry[] list = DirSearch(dir, "*", true)
 		for e in list
 			if e.is_dir
 				if e.name.head(1) != "."
-					find_paths(dir + "/" + e.name)
+					find_paths(dir + e.name)
 			else
-				string path = (dir + "/" + e.name).replace("//", "/")
+				string path = (dir + e.name)
 				if !is_ignored(path)
 					paths.add(path)
 	void sort_paths()
@@ -368,19 +364,17 @@ class LocalFileDB
 				dirty = true
 				return
 
-	LocalFile[] get_in_dir(string dir, bool recursive)
-		string dir2 = dir
-		if dir2.tail(1) != "/"
-			dir2 += "/"
+	LocalFile[] get_in_dir(string _dir, bool recursive)
+		string dir = dir_canonical(_dir)
 			
 		LocalFile[] list
 		if recursive
 			for f in files
-				if f.path.head(dir2.num) == dir2
+				if f.path.head(dir.num) == dir
 					list.add(f)
 		else
 			for f in files
-				if f.path.dirname() == dir2
+				if f.path.dirname() == dir
 					list.add(f)
 		return list
 
