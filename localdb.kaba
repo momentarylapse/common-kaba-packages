@@ -11,6 +11,7 @@ class LocalFile
 	string id
 	string name
 	int remote_mtime
+	string remote_path
 	// local
 	string path
 	string hash // can be "" if not local
@@ -63,9 +64,9 @@ class LocalFile
 		//if remote_mtime != 0 and remote_mtime != mtime
 		//	s += "\nmtime: " + mtime + " (REMOTE)"
 		print(l + "size:    " + size)
-		print(l + "options: " + options)
+		//print(l + "options: " + options)
 		for t in tags
-			print(l + "" + t.key + " = " + t.value)
+			print(l + "  tag:   " + t.key + " = " + t.value)
 
 class DBVisitor
 	LocalFileDB* db
@@ -189,7 +190,7 @@ class DBUpdater extends DBVisitor
 				//print(ext)
 				//print(l.name)
 				l.hash = hash
-				l.id = -1
+				l.id = ""
 				File* ff = FileOpen(path)
 				l.mtime = ff.getMDate().time
 				l.size = ff.getSize()
@@ -215,7 +216,20 @@ class DBStatusReporter extends DBVisitor
 			if conf.verbose
 				f.show_info("      ")
 		else
-			print("?  " + path)
+			print("?   " + path)
+
+class DBLister extends DBVisitor
+	override void __init__(LocalFileDB* _db)
+		super.__init__(_db)
+	override void visit(string path)
+		LocalFile *f = db.find_by_path(path)
+		if f
+			f.show()
+			if conf.verbose
+				f.show_info("      ")
+		else
+			print("?   " + path)
+		
 		
 class DBDropper extends DBVisitor
 	override void __init__(LocalFileDB* _db)
@@ -242,6 +256,7 @@ class LocalFileDB
 			string temp
 			f >> ff.id
 			f >> ff.path
+			f >> ff.remote_path
 			f >> ff.name
 			f >> ff.hash
 			f >> ff.mtime
@@ -296,6 +311,7 @@ class LocalFileDB
 		for ff in files
 			f << ff.id
 			f << ff.path
+			f << ff.remote_path
 			f << ff.name
 			f << ff.hash
 			f << ff.mtime
@@ -447,7 +463,6 @@ class LocalFileDB
 	
 	void rehash()
 		for f in files
-			//LocalFile* f = find_by_path("/home/michi/Dokumente/Wichtige Dokumente/Bank/Kontoauszug 649433009 - 2015-01.pdf")
 			print(f.path)
 			string h2 = FileHash(f.path, "md5")
 			if h2.num == 0
@@ -470,7 +485,7 @@ class LocalFileDB
 			print("ERROR: not in db")
 			return
 		conf.show_pure_local = true
-		DBVisitor* vis = new DBStatusReporter(self)
+		DBVisitor* vis = new DBLister(self)
 		vis.recurse(dir)
 		delete vis
 

@@ -3,6 +3,24 @@ use "localdb.kaba"
 use "tag.kaba"
 
 
+void make_all_dirs(string path)
+	string[] parts = path.explode("/")
+	string dir
+	for p,i in parts
+		if i == parts.num - 1
+			break
+		if i > 0
+			dir += "/"
+		dir += p
+		DirCreate(dir)
+
+string bash_escape(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("`", "\\`")
+	return r
+
 string scp_escape(string s)
 	string r = s
 	r = r.replace("(", "\\\\\\(")
@@ -22,19 +40,8 @@ string ssh_escape(string s)
 
 class RemoteFile extends LocalFile
 	string rel_name
-	override void show()
-		if conf.verbose
-			print("")
-		print(path)
-		if conf.verbose
-			print("hash: " + hash)
-			print("id:   " + id)
-			print("size: " + size)
-			//print(tags2str(tags))
-			for t in tags
-				print(t.str())
 
-RemoteFile[] remote_parse(string r)
+RemoteFile[] remote_parse(string r, string options)
 	RemoteFile[] rfiles
 	string[] list = r.explode("\n")
 	for l in list
@@ -46,12 +53,13 @@ RemoteFile[] remote_parse(string r)
 		rf.mtime = parts[1].int()
 		rf.size = parts[2].int()
 		rf.hash = parts[3]
-		rf.path = parts[4]
+		rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
 		rf.rel_name = rf.name + "." + extension
 		for i in 7:parts.num
 			rf.tags.add(str2tag(parts[i]))
+		rf.options = options.explode(",")
 		rfiles.add(rf)
 	return rfiles
 
@@ -70,7 +78,26 @@ RemoteFile[] remote_find(string filter, string options)
 	//copysize = 0
 	
 	string r = FileRead(TEMP_OUT).trim()
-	return remote_parse(r)
+	return remote_parse(r, options)
+	//string[] rs = r.explode("-=-=-=-=-=\n")
+	//return rs
+
+RemoteFile[] remote_info(string id, string options)
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	string quality = "perfect"
+	if options.find("quality=medium", 0) >= 0
+		quality = "medium"
+	cmd += "php " + YII + " file/info-sisyphos " + id + " " + quality + "; "
+	cmd += "\""
+	print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+		
+	//tocopy.clear()
+	//copysize = 0
+	
+	string r = FileRead(TEMP_OUT).trim()
+	return remote_parse(r, options)
 	//string[] rs = r.explode("-=-=-=-=-=\n")
 	//return rs
 
@@ -80,6 +107,7 @@ void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
 	if lf
 		if conf.pull_tags
 			lf.sync_tags(rf.tags)
+		lf.remote_path = rf.remote_path
 		
 		// equal?
 		if lf.hash == rf.hash
@@ -129,3 +157,57 @@ void remote_sync()
 			for f in rfiles
 				remote_sync_file(f, s)
 			db.save()
+
+
+void remote_find_and_show(string filter)
+	RemoteFile[] rfiles = remote_find(filter, "")
+	for f in rfiles
+		f.show()
+		if conf.verbose
+			f.show_info("      ")
+
+void remote_download(string path)
+	LocalFile* f = db.find_by_path(path)
+	if !f
+		print("ERROR: not in db")
+		return
+
+	if !f.is("nonlocal")
+		print("ERROR: no nonlocal")
+		return
+	if f.remote_path.num == 0
+		print("ERROR: no remote path")
+		return
+	print(f.remote_path)
+	
+	/*RemoteFile[] rfiles = remote_info(f.id, f.options)
+	if rfiles.num < 1
+		print("ERROR: no remote file???")
+		return
+	RemoteFile ff = rfiles[0]
+	print(ff.remote_path)
+//	ff.show()*/
+	
+	
+	make_all_dirs(f.path)
+	string cmd = "scp"
+	string rp = scp_escape(f.remote_path)
+	cmd += " " + SERVER + ":" + rp
+	cmd += " \"" + bash_escape(f.path) + "\""
+	//print(cmd)
+	_exec_(cmd)
+	
+	File *ff = FileOpen(f.path)
+	if ff
+		if ff.getSize() == f.size
+			f.unset("nonlocal")
+			db.save()
+			delete ff
+			return
+		delete ff
+	print("---Fehler---")
+
+void remote_pull()
+	for f in db.files
+		if f.is("nonlocal")
+			remote_download(f.path)

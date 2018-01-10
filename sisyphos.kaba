@@ -4,16 +4,6 @@ use "remote.kaba"
 use "tag.kaba"
 
 
-void make_all_dirs(string path)
-	string[] parts = path.explode("/")
-	string dir
-	for p,i in parts
-		if i == parts.num - 1
-			break
-		if i > 0
-			dir += "/"
-		dir += p
-		DirCreate(dir)
 
 void update_remote_sync(string r, ConfigDirSync sync, string dest)
 
@@ -143,14 +133,6 @@ class FileToCopy
 FileToCopy[] tocopy
 int copysize
 
-string bash_escape(string s)
-	string r = s
-	r = r.replace("\\", "\\\\")
-	r = r.replace("\"", "\\\"")
-	r = r.replace("`", "\\`")
-	return r
-
-
 void main(string[] arg)
 	if arg.num == 0
 		print("find <FILTER>")
@@ -260,14 +242,19 @@ void main(string[] arg)
 			if arg.num < 3
 				print("ERROR: remote find <FILTER>")
 				return
-			RemoteFile[] rfiles = remote_find(arg[2], "")
-			for f in rfiles
-				f.show()
+			remote_find_and_show(arg[2])
 		else
 			print("ERROR: remote ...")
 			return
 	else if arg[0] == "sync"
 		remote_sync()
+	else if arg[0] == "download"
+		if arg.num < 2
+			print("ERROR: download <path>")
+			return
+		remote_download(arg[1])
+	else if arg[0] == "pull"
+		remote_pull()
 	/*else if arg[0] == "__status" or arg[0] == "__update-local"
 		conf.show_pure_local = (arg[0] == "__status")
 		for e in conf.dirs
