@@ -114,20 +114,15 @@ class LocalFile
 
 class DBVisitor
 	LocalFileDB* db
-	string[] ignore
 	string[] paths
 	void __init__(LocalFileDB *_db)
 		db = _db
 				
 	bool is_ignored(string path)
-		for i in ignore
+		for i in conf.ignore
 			if path.match(i)
 				return true
 		return false
-	
-	void add_ignored(string[] ig)
-		for i in ig
-			ignore.add(i)
 
 	void find_paths(string dir)
 		DirEntry[] list = DirSearch(dir, "*", true)
@@ -142,6 +137,14 @@ class DBVisitor
 	
 	void recurse(string dir)
 		find_paths(dir)
+		for p in paths
+			visit(p)
+		paths.clear()
+	void recurse_all()
+		for e in conf.dirs
+			find_paths(e.dir)
+		//for f in db.files
+		//	bool found 
 		for p in paths
 			visit(p)
 		paths.clear()
@@ -215,7 +218,12 @@ class DBStatusReporter extends DBVisitor
 	override void visit(string path)
 		LocalFile *f = db.find_by_path(path)
 		if f
-			print("   " + path)
+			if f.id.num == 0
+				print("L  " + path)
+			else if f.is("nonlocal")
+				print("R  " + path)
+			else
+				print("   " + path)
 		else
 			print("?  " + path)
 		
@@ -373,7 +381,6 @@ class LocalFileDB
 		print("update local " + e.dir)
 		
 		DBUpdater* up = new DBUpdater(self)
-		up.add_ignored(e.ignore)
 		up.recurse(e.dir)
 		delete up
 		
@@ -403,8 +410,6 @@ class LocalFileDB
 	void add_recursive(string path, bool is_dir)
 		
 		DBUpdater* up = new DBUpdater(self)
-		for e in conf.dirs
-			up.add_ignored(e.ignore)
 		if is_dir
 			up.recurse(path)
 		else
@@ -436,8 +441,6 @@ class LocalFileDB
 	void rm_recursive(string path, bool is_dir)
 		
 		DBVisitor* vis = new DBDropper(self)
-		for e in conf.dirs
-			vis.add_ignored(e.ignore)
 		if is_dir
 			vis.recurse(path)
 		else
@@ -461,20 +464,16 @@ class LocalFileDB
 	void list(string dir)
 		conf.show_pure_local = true
 		DBVisitor* vis = new DBStatusReporter(self)
-		for e in conf.dirs
-			vis.add_ignored(e.ignore)
 		vis.recurse(dir)
 		delete vis
 
 	void show_status()
 		if conf.verbose
 			conf.show_pure_local = true
-		for f in files
-			f.show()
-		/*DBVisitor* vis = new DBStatusReporter(self)
-		for e in conf.dirs
-			vis.add_ignored(e.ignore)
-			vis.recurse(e.dir)
-		delete vis*/
+		//for f in files
+		//	f.show()
+		DBVisitor* vis = new DBStatusReporter(self)
+		vis.recurse_all()
+		delete vis
 	
 LocalFileDB db

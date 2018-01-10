@@ -17,7 +17,6 @@ string get_tag(string[] parts, string key)
 class ConfigDir
 	string dir
 	ConfigDirSync[] syncs
-	string[] ignore
 	
 	void add_sync(string filter, string options)
 		ConfigDirSync s
@@ -74,12 +73,11 @@ class Config
 				f >> s.filter
 				f >> s.options
 				e.syncs.add(s)
-			f >> m
-			for j in 0:m
-				string ignore
-				f >> ignore
-				e.ignore.add(ignore)
-			dirs.add(e)
+		f >> n
+		for i in 0:n
+			string ig
+			f >> ig
+			ignore.add(ig)
 		delete f
 	void save()
 		File *f = FileCreate("sisyphos.conf")
@@ -90,9 +88,9 @@ class Config
 			for s in e.syncs
 				f << s.filter
 				f << s.options
-			f << e.ignore.num
-			for i in e.ignore
-				f << i
+		f << ignore.num
+		for i in ignore
+			f << i
 		delete f
 
 	void show()
@@ -129,6 +127,7 @@ class Config
 		print("not found...")
 		
 	ConfigDir[] dirs
+	string[] ignore
 	
 	// runtime
 	bool verbose

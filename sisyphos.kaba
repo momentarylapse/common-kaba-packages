@@ -202,13 +202,28 @@ void main(string[] arg)
 				return
 	else if arg[0] == "ignore"
 		if arg.num < 2
-			print("ERROR: ignore ...")
+			for i in conf.ignore
+				print(i)
+			print("TRY: ignore add/rm <PATH>")
 			return
 		if arg[1] == "add"
-			if arg.num < 4
-				print("ERROR: filter add <DIR> <FILTER>")
+			if arg.num < 3
+				print("ERROR: ignore add <PATH>")
 				return
-			conf.add(arg[2], arg[3])
+			conf.ignore.add(arg[2])
+			conf.save()
+		else if arg[1] == "rm"
+			if arg.num < 3
+				print("ERROR: ignore rm <PATH>")
+				return
+			for ig,i in conf.ignore
+				if ig == arg[2]
+					conf.ignore.remove(i)
+					break
+			conf.save()
+		else
+			print("ERROR: ignore ?")
+			return
 		
 	else if arg[0] == "find"
 		if arg.num < 2
