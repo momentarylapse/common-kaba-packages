@@ -52,12 +52,12 @@ RemoteFile[] remote_parse(string r)
 		rfiles.add(rf)
 	return rfiles
 
-RemoteFile[] remote_find(string filter)
+RemoteFile[] remote_find(string filter, string options)
 	string cmd = "ssh " + SERVER + " command=\""
 	
 	string quality = "perfect"
-//	if s.options.find("quality=medium", 0) >= 0
-//		quality = "medium"
+	if options.find("quality=medium", 0) >= 0
+		quality = "medium"
 	cmd += "php " + YII + " file/find-sisyphos \\\"" + ssh_escape(filter) + "\\\" " + quality + "; "
 	cmd += "\""
 	print(cmd)
@@ -71,3 +71,58 @@ RemoteFile[] remote_find(string filter)
 	//string[] rs = r.explode("-=-=-=-=-=\n")
 	//return rs
 
+
+void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
+	LocalFile *lf = db.find_by_id(rf.id)
+	if lf
+		if conf.pull_tags
+			lf.sync_tags(rf.tags)
+		
+		// equal?
+		if lf.hash == rf.hash
+			if conf.verbose
+				print("==  " + lf.path)
+			return
+		
+		print("CHANGED  " + lf.path)
+		/*if lf.is("nonlocal")
+			FileToCopy ff
+			ff.id = rf.id
+			ff.remotepath = rf.path
+			tocopy.add(ff)
+			copysize += lf.size / 1024
+			continue*/
+				
+		// ok... but should check for changes
+	else
+		string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
+		lf = db.find_by_hash(rf.hash)
+		if lf
+			if lf.id.num > 0
+				print("HASH COLLISION  " + lf.path + "  <->  " + "REMOTE...")
+			lf.id = rf.id
+			//if conf.verbose
+			print("RELINK  " + lf.path)// + "  ->  " + rf.id)
+			lf.sync_tags(rf.tags)
+			return
+	
+		// new remote file
+		print("+R  " + rf.rel_name)
+		LocalFile ll = rf
+		ll.path = sync.dir + "/" + rf.rel_name
+		ll.set("nonlocal")
+		db.files.add(ll)
+		
+		if conf.verbose
+			print("    id:   " + ll.id)
+			print("    hash: " + ll.hash)
+			print("    time: " + ll.mtime)
+			print("    size: " + ll.size)
+
+void remote_sync()
+	for e in conf.dirs
+		for s in e.syncs
+			RemoteFile[] rfiles = remote_find(s.filter, s.options)
+			for f in rfiles
+				remote_sync_file(f, s)
+			db.save()

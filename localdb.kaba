@@ -83,6 +83,8 @@ class LocalFile
 	void merge(LocalFile* f)
 		for o in f.options
 			set(o)
+	void sync_tags(Tag[] rtags)
+		tags = rtags // TODO
 	void show()
 		//if is("nonlocal")
 		//	print("NON-NONLOCAL " + path)

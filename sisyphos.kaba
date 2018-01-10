@@ -161,7 +161,7 @@ void main(string[] arg)
 		print("rm/rmr <PATH>              # drop file/dir from local db")
 		print("list <DIR>                 # only show")
 		print("status                     # only show")
-		print("sync                       # ...")
+		print("sync                       # sync db entries (not files)")
 		print("push")
 		print("pull")
 		print("rehash")
@@ -218,9 +218,11 @@ void main(string[] arg)
 			if arg.num < 3
 				print("ERROR: remote find <FILTER>")
 				return
-			RemoteFile[] rfiles = remote_find(arg[2])
+			RemoteFile[] rfiles = remote_find(arg[2], "")
 			for f in rfiles
 				f.show()
+	else if arg[0] == "sync"
+		remote_sync()
 	else if arg[0] == "__status" or arg[0] == "__update-local"
 		conf.show_pure_local = (arg[0] == "__status")
 		for e in conf.dirs
