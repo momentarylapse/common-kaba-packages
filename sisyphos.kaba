@@ -237,6 +237,11 @@ void main(string[] arg)
 			print("ERROR: list <DIR>")
 			return
 		db.list(arg[1])
+	else if arg[0] == "info"
+		if arg.num < 2
+			print("ERROR: info <path>")
+			return
+		db.info(arg[1])
 	else if arg[0] == "addr" or arg[0] == "add"
 		if arg.num < 2
 			print("ERROR: add/addr <PATH>")

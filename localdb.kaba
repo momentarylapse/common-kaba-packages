@@ -44,33 +44,28 @@ class LocalFile
 			set(o)
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
-	void show()
-		//if is("nonlocal")
-		//	print("NON-NONLOCAL " + path)
+	string status_str()
 		if id.num > 0
-			if mtime == remote_mtime
-				if conf.verbose
-					print("=   " + path)
-			else
-				print("~   " + path)
+			if is("nonlocal")
+				return "R   "
+			return "    "
 		else
 			// only local
-			if conf.show_pure_local
-				print("L+  " + path)
-	string str()
-		string s
-		s += "path: " + path
-		s += "name: " + name
-		s += "\nid: " + id
-		s += "\nhash: " + hash
-		s += "\nmtime: " + mtime
-		if remote_mtime != 0 and remote_mtime != mtime
-			s += "\nmtime: " + mtime + " (REMOTE)"
-		s += "\nsize: " + size
-		s += "\noptions: " + options
+			return "L   "
+	void show()
+		print(status_str() + path)
+	void show_info(string l)
+		//print(l + "path: " + path)
+		print(l + "name:    " + name)
+		print(l + "id:      " + id)
+		print(l + "hash:    " + hash)
+		//print(l + "mtime:   " + mtime)
+		//if remote_mtime != 0 and remote_mtime != mtime
+		//	s += "\nmtime: " + mtime + " (REMOTE)"
+		print(l + "size:    " + size)
+		print(l + "options: " + options)
 		for t in tags
-			s += "\n" + t.key + " = " + t.value
-		return s
+			print(l + "" + t.key + " = " + t.value)
 
 class DBVisitor
 	LocalFileDB* db
@@ -104,6 +99,16 @@ class DBVisitor
 	
 	void recurse(string dir)
 		find_paths(dir)
+		LocalFile[] files = db.get_in_dir(dir, true)
+		for f in files
+			bool found = false
+			for p in paths
+				if p == f.path
+					found = true
+					break
+			if !found
+				paths.add(f.path)
+		sort_paths()
 		for p in paths
 			visit(p)
 		paths.clear()
@@ -111,14 +116,13 @@ class DBVisitor
 		for e in conf.dirs
 			find_paths(e.dir)
 		for f in db.files
-			bool found
+			bool found = false
 			for p in paths
 				if p == f.path
 					found = true
 					break
 			if !found
 				paths.add(f.path)
-				print(f.path)
 		sort_paths()
 		for p in paths
 			visit(p)
@@ -203,14 +207,13 @@ class DBStatusReporter extends DBVisitor
 		LocalFile *f = db.find_by_path(path)
 		if f
 			if f.id.num == 0
-				print("L  " + path)
+				f.show()
 			else if f.is("nonlocal")
-				print("R  " + path)
+				f.show()
 			else if conf.verbose
-				print("   " + path)
+				f.show()
 			if conf.verbose
-				print("      name: " + f.name)
-				print("      hash: " + f.hash)
+				f.show_info("      ")
 		else
 			print("?  " + path)
 		
@@ -276,9 +279,9 @@ class LocalFileDB
 							dirty = true
 							continue
 						else
-							print(ff.str())
+							ff.show()
 							print("   <->")
-							print(l.str())
+							l.show()
 							print("###################################")
 					else
 						print("HASH COLLISION: " + ff.path + "  <->  " + l.path)
@@ -454,6 +457,14 @@ class LocalFileDB
 				f.hash = h2
 				save()
 
+	void info(string path)
+		LocalFile* f = db.find_by_path(path)
+		if !f
+			print("ERROR: not in db")
+			return
+		f.show()
+		f.show_info("      ")
+
 	void list(string dir)
 		if !conf.dir_is_in_db(dir)
 			print("ERROR: not in db")
@@ -466,8 +477,6 @@ class LocalFileDB
 	void show_status()
 		if conf.verbose
 			conf.show_pure_local = true
-		//for f in files
-		//	f.show()
 		DBVisitor* vis = new DBStatusReporter(self)
 		vis.recurse_all()
 		delete vis
