@@ -140,7 +140,7 @@ void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
 		// new remote file
 		print("+R  " + rf.rel_name)
 		LocalFile ll = rf
-		ll.path = sync.dir + "/" + rf.rel_name
+		ll.path = sync.dir + rf.rel_name
 		ll.set("nonlocal")
 		db.files.add(ll)
 		
