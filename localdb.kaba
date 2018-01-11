@@ -86,8 +86,14 @@ class LocalFile
 			p1 = e.structure.find("}", p0)
 			if p1 < 0
 				break
-			string key = e.structure.substr(p0+1,p1-p0-1)
-			spath = spath.replace("{" + key + "}", get_tag(key))
+			string kkey = e.structure.substr(p0+1,p1-p0-1)
+			string[] xkey = kkey.explode(":")
+			string val = get_tag(xkey[0])
+			if xkey.num > 1
+				int n = xkey[1].int()
+				while val.num < n
+					val = "0" + val
+			spath = spath.replace("{" + kkey + "}", val)
 		return e.dir + spath
 
 
