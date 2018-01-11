@@ -220,11 +220,31 @@ void remote_download(LocalFile* f)
 		return
 	print("---ERROR---")
 
-void remote_upload(string path)
-	LocalFile* f = db.find_by_path(path)
+
+void remote_push(string dir)
+	set_working_dir(dir)
+	
+	LocalFile*[] files
+	LocalFile* ff = db.find_by_path(dir)
+	if ff
+		files.add(ff)
+	else
+		files = db.get_in_dir(dir)
+	for f in files
+		if f.pure_local() //or f.is(CHANGED_FILE)
+			remote_upload(f)
+		if f.is(CHANGED_META)
+			remote_upload_meta(f)
+
+
+void remote_upload(LocalFile* f)
 	
 	if !f.pure_local()
 		print("ERROR: not pure local")
+		return
+	
+	if f.path.extension() == ""
+		print("ERROR: remote does not like files without extension: " + rel_path(f.path))
 		return
 	
 	f.remote_path = ALEX_IN + f.hash + "." + f.path.extension()
@@ -263,6 +283,35 @@ void remote_upload(string path)
 		if p[0] == "bad hash"
 			print("ERROR: upload failed?")
 			return
+	print("ERROR: ????")
+
+
+void remote_upload_meta(LocalFile* f)
+	
+	if f.pure_local()
+		print("ERROR: pure local")
+		return
+
+	string tags = tags2str(f.tags)	
+	
+	string cmd = "ssh " + SERVER + " command=\""
+	cmd += "php " + YII + " file/override-meta-sisyphos " + f.id + " \\\"" + f.name + "\\\" \\\"" + tags + "\\\" ; "
+	cmd += "\""
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+	
+	string r = FileRead(TEMP_OUT).trim()
+	
+	if r == "ok"
+		if conf.verbose
+			print("yay")
+		f.unset(CHANGED_META)
+		db.save()
+		return
+	if r == "not found"
+		print("ERROR: remote did not find")
+		return
 	print("ERROR: ????")
 
 

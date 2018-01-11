@@ -165,12 +165,12 @@ void run_command(string[] arg)
 			return
 		for i in 1:arg.num
 			remote_sync(arg[i])
-	else if arg[0] == "upload"
+	else if arg[0] == "push"
 		if arg.num < 2
-			print("ERROR: upload <PATH>")
+			print("ERROR: push <PATH>")
 			return
 		for i in 1:arg.num
-			remote_upload(arg[i])
+			remote_push(arg[i])
 	else if arg[0] == "pull"
 		if arg.num < 2
 			print("ERROR: pull <PATH>")
