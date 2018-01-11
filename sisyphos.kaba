@@ -82,7 +82,25 @@ void main(string[] arg)
 		else
 			print("ERROR: ignore ?")
 			return
-		
+	else if arg[0] == "tag"
+		if arg[1] == "add"
+			if arg.num < 5
+				print("ERROR: tag add <PATH> <KEY> <VALUE>")
+				return
+			db.tag_add(arg[2], arg[3], arg[4])
+		else if arg[1] == "set"
+			if arg.num < 5
+				print("ERROR: tag set <PATH> <KEY> <VALUE>")
+				return
+			db.tag_set(arg[2], arg[3], arg[4])
+		else if arg[1] == "rm"
+			if arg.num < 5
+				print("ERROR: tag rm <PATH> <KEY> <VALUE>")
+				return
+			db.tag_rm(arg[2], arg[3], arg[4])
+		else
+			print("ERROR: tag ?")
+			return
 	else if arg[0] == "find"
 		if arg.num < 2
 			print("ERROR: find <FILTER>")
@@ -96,22 +114,26 @@ void main(string[] arg)
 		if arg.num < 2
 			print("ERROR: list <DIR>")
 			return
-		db.list(arg[1])
+		for i in 1:arg.num
+			db.list(arg[i])
 	else if arg[0] == "info"
 		if arg.num < 2
 			print("ERROR: info <path>")
 			return
-		db.info(arg[1])
+		for i in 1:arg.num
+			db.info(arg[i])
 	else if arg[0] == "add"
 		if arg.num < 2
 			print("ERROR: add <PATH>")
 			return
-		db.add_recursive(arg[1])
+		for i in 1:arg.num
+			db.add_recursive(arg[i])
 	else if arg[0] == "rm"
 		if arg.num < 2
 			print("ERROR: rm <PATH>")
 			return
-		db.rm_recursive(arg[1])
+		for i in 1:arg.num
+			db.rm_recursive(arg[i])
 	else if arg[0] == "mv"
 		if arg.num < 3
 			print("ERROR: rm <SOURCE> <DEST>")
@@ -140,19 +162,22 @@ void main(string[] arg)
 		if arg.num < 2
 			print("ERROR: download <PATH>")
 			return
-		remote_download(arg[1])
+		for i in 1:arg.num
+			remote_download(arg[i])
 	else if arg[0] == "upload"
 		if arg.num < 2
 			print("ERROR: upload <PATH>")
 			return
-		remote_upload(arg[1])
+		for i in 1:arg.num
+			remote_upload(arg[i])
 	else if arg[0] == "pull"
 		remote_pull()
 	else if arg[0] == "cleanup-structure"
 		if arg.num < 2
 			print("ERROR: cleanup-structure <DIR>")
 			return
-		db.cleanup_structure(arg[1])
+		for i in 1:arg.num
+			db.cleanup_structure(arg[i])
 	else if arg[0] == "rehash"
 		db.rehash()
 	else

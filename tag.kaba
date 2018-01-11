@@ -13,6 +13,14 @@ string tags2str(Tag[] tags)
 	for t,i in tags
 		if i > 0
 			r += ","
+		r += t.str()
+	return r
+
+string tags2strh(Tag[] tags)
+	string r
+	for t,i in tags
+		if i > 0
+			r += ","
 		r += t.strh()
 	return r
 

@@ -223,7 +223,7 @@ void remote_upload(string path)
 	_exec_(cmd)
 	
 
-	string tags = ""	
+	string tags = tags2str(f.tags)	
 	
 	cmd = "ssh " + SERVER + " command=\""
 	cmd += "php " + YII + " file/upload-sisyphos \\\"" + ssh_escape(f.remote_path) + "\\\" \\\"" + f.name + "\\\" " + f.hash + " \\\"" + tags + "\\\" ; "

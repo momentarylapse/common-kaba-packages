@@ -40,6 +40,28 @@ class LocalFile
 			set(o)
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
+	void tag_add(string key, string value)
+		for t in tags
+			if t.key == key and t.value == value
+				return
+		Tag t
+		t.key = key
+		t.value = value
+		tags.add(t)
+	void tag_set(string key, string value)
+		for t in tags
+			if t.key == key
+				t.value = value
+				return
+		Tag t
+		t.key = key
+		t.value = value
+		tags.add(t)
+	void tag_rm(string key, string value)
+		for t,i in tags
+			if t.key == key and t.value == value
+				tags.remove(i)
+				return
 	string status_str()
 		if id.num > 0
 			if is("nonlocal")
@@ -359,7 +381,7 @@ class LocalFileDB
 			f << ff.remote_mtime
 			f << ff.size
 			f << ff.options.join(",")
-			f << tags2str(ff.tags)
+			f << tags2strh(ff.tags)
 		delete(f)
 		dirty = false
 
@@ -555,5 +577,27 @@ class LocalFileDB
 		DBVisitor* vis = new DBStatusReporter(self)
 		vis.recurse_all()
 		delete vis
+	
+	void tag_add(string path, string key, string value)
+		LocalFile* f = db.find_by_path(path)
+		if !f
+			print("ERROR: not in db")
+			return
+		f.tag_add(key, value)
+		db.dirty = true
+	void tag_set(string path, string key, string value)
+		LocalFile* f = db.find_by_path(path)
+		if !f
+			print("ERROR: not in db")
+			return
+		f.tag_set(key, value)
+		db.dirty = true
+	void tag_rm(string path, string key, string value)
+		LocalFile* f = db.find_by_path(path)
+		if !f
+			print("ERROR: not in db")
+			return
+		f.tag_rm(key, value)
+		db.dirty = true
 	
 LocalFileDB db
