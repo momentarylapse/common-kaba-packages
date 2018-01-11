@@ -71,19 +71,24 @@ class LocalFile
 			if t.key == key
 				return t.value
 		return ""
-	string apply_structure(string structure)
-		string spath = structure
+	string apply_structure(ConfigDir e)
+		if e.structure == ""
+			if path.find(e.dir, 0) == 0
+				return path
+			else
+				return e.dir + path
+		string spath = e.structure
 		int p1 = 0
 		while true
-			int p0 = structure.find("{", p1)
+			int p0 = e.structure.find("{", p1)
 			if p0 < 0
 				break
-			p1 = structure.find("}", p0)
+			p1 = e.structure.find("}", p0)
 			if p1 < 0
 				break
-			string key = structure.substr(p0+1,p1-p0-1)
+			string key = e.structure.substr(p0+1,p1-p0-1)
 			spath = spath.replace("{" + key + "}", get_tag(key))
-		return spath
+		return e.dir + spath
 
 
 class DBVisitor
@@ -119,7 +124,7 @@ class DBVisitor
 	
 	void recurse(string dir)
 		find_paths(dir)
-		LocalFile[] files = db.get_in_dir(dir, true)
+		LocalFile*[] files = db.get_in_dir(dir, true)
 		for f in files
 			bool found = false
 			for p in paths
@@ -387,18 +392,18 @@ class LocalFileDB
 				dirty = true
 				return
 
-	LocalFile[] get_in_dir(string _dir, bool recursive)
+	LocalFile*[] get_in_dir(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
 			
-		LocalFile[] list
+		LocalFile*[] list
 		if recursive
 			for f in files
 				if f.path.head(dir.num) == dir
-					list.add(f)
+					list.add(&f)
 		else
 			for f in files
 				if f.path.dirname() == dir
-					list.add(f)
+					list.add(&f)
 		return list
 
 	// check for local changes
@@ -409,7 +414,7 @@ class LocalFileDB
 		up.recurse(e.dir)
 		delete up
 		
-		LocalFile[] dbfiles = get_in_dir(e.dir, true)
+		LocalFile*[] dbfiles = get_in_dir(e.dir, true)
 		LocalFile[] todrop
 		for ff in dbfiles
 			if ff.is("nonlocal")
@@ -424,7 +429,7 @@ class LocalFileDB
 				ff.set("deleted")
 				
 				if conf.drop_deleted
-					todrop.add(ff)
+					todrop.add(*ff)
 		
 		for ff in todrop
 			drop(ff)
@@ -490,12 +495,12 @@ class LocalFileDB
 				save()
 	void cleanup_structure(string _dir)
 		string dir = dir_canonical(_dir)
-		LocalFile[] files = db.get_in_dir(dir, true)
+		LocalFile*[] files = db.get_in_dir(dir, true)
 		for f in files
 			ConfigDir* e = conf.get_cfg(f.path)
 			if !e
 				continue
-			string new_path = e.dir + f.apply_structure(e.structure)
+			string new_path = f.apply_structure(*e)
 			if f.path == new_path
 				continue
 			print(f.path + " -> " + new_path)

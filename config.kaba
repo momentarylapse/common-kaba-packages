@@ -57,7 +57,10 @@ class ConfigDir
 		syncs.add(s)
 
 class ConfigDirSync
+	// from ConfigDir
 	string dir
+	string structure
+	
 	string filter
 	string options
 	
@@ -102,6 +105,7 @@ class Config
 			for j in 0:m
 				ConfigDirSync s
 				s.dir = e.dir
+				s.structure = e.structure
 				f >> s.filter
 				f >> s.options
 				e.syncs.add(s)

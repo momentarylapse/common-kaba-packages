@@ -89,6 +89,7 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 		if conf.pull_tags
 			lf.sync_tags(rf.tags)
 		lf.remote_path = rf.remote_path
+		lf.name = rf.name
 		
 		// equal?
 		if lf.hash == rf.hash
@@ -116,11 +117,12 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 			//if conf.verbose
 			print("RELINK  " + lf.path)// + "  ->  " + rf.id)
 			lf.sync_tags(rf.tags)
+			lf.name = rf.name
 			return
 	
 		// new remote file
 		LocalFile ll = rf
-		ll.path = sync.dir + ll.apply_structure(e.structure)//rf.rel_name
+		ll.path = ll.apply_structure(e)
 		ll.set("nonlocal")
 		db.files.add(ll)
 		print("+R  " + ll.path)
