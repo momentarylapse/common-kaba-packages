@@ -62,6 +62,29 @@ class LocalFile
 		//print(l + "options: " + options)
 		for t in tags
 			print(l + "  tag:   " + t.key + " = " + t.value)
+	string get_tag(string key)
+		if key == "name"
+			return name
+		if key == "ext"
+			return path.extension()
+		for t in tags
+			if t.key == key
+				return t.value
+		return ""
+	string apply_structure(string structure)
+		string spath = structure
+		int p1 = 0
+		while true
+			int p0 = structure.find("{", p1)
+			if p0 < 0
+				break
+			p1 = structure.find("}", p0)
+			if p1 < 0
+				break
+			string key = structure.substr(p0+1,p1-p0-1)
+			spath = spath.replace("{" + key + "}", get_tag(key))
+		return spath
+
 
 class DBVisitor
 	LocalFileDB* db
@@ -465,6 +488,21 @@ class LocalFileDB
 				print(h2 + " != " + f.hash)
 				f.hash = h2
 				save()
+	void cleanup_structure(string _dir)
+		string dir = dir_canonical(_dir)
+		LocalFile[] files = db.get_in_dir(dir, true)
+		for f in files
+			ConfigDir* e = conf.get_cfg(f.path)
+			if !e
+				continue
+			string new_path = e.dir + f.apply_structure(e.structure)
+			if f.path == new_path
+				continue
+			print(f.path + " -> " + new_path)
+			make_all_dirs(new_path)
+			_exec_("mv \"" + bash_escape(f.path) + "\" \"" + bash_escape(new_path) + "\"")
+			f.path = new_path
+			db.save()
 
 	void info(string path)
 		LocalFile* f = db.find_by_path(path)

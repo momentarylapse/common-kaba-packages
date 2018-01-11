@@ -12,7 +12,27 @@ string dir_canonical(string dir)
 	if is_canonical_dir(dir)
 		return dir
 	return dir + "/"
-		
+
+
+// needs to be surrounded by "..."
+string bash_escape(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("`", "\\`")
+	return r
+
+void make_all_dirs(string path)
+	string[] parts = path.explode("/")
+	string dir
+	for p,i in parts
+		if i == parts.num - 1
+			break
+		if i > 0
+			dir += "/"
+		dir += p
+		DirCreate(dir)
+
 
 	
 string get_tag(string[] parts, string key)
@@ -27,6 +47,7 @@ string get_tag(string[] parts, string key)
 class ConfigDir
 	string dir
 	ConfigDirSync[] syncs
+	string structure
 	
 	void add_sync(string filter, string options)
 		ConfigDirSync s
@@ -76,6 +97,7 @@ class Config
 		for i in 0:n
 			ConfigDir e
 			f >> e.dir
+			f >> e.structure
 			f >> m
 			for j in 0:m
 				ConfigDirSync s
@@ -95,6 +117,7 @@ class Config
 		f << dirs.num
 		for e in dirs
 			f << e.dir
+			f << e.structure
 			f << e.syncs.num
 			for s in e.syncs
 				f << s.filter
@@ -107,6 +130,7 @@ class Config
 	void show()
 		for e in conf.dirs
 			print(e.dir)
+			print("structure: " + e.structure)
 			for s in e.syncs
 				print("  filter: " + s.filter)
 				print("    options: " + s.options)
@@ -122,12 +146,15 @@ class Config
 		e.add_sync(filter, options)
 		dirs.add(e)
 	
-	bool dir_is_in_db(string _dir)
+	ConfigDir* get_cfg(string _dir)
 		string dir = dir_canonical(_dir)
 		for e in dirs
 			if e.dir == dir.head(e.dir.num)
-				return true
-		return false
+				return &e
+		return nil
+
+	bool dir_is_in_db(string _dir)
+		return get_cfg(_dir)
 
 	void rm_filter(string _dir, string filter)
 		string dir = dir_canonical(_dir)

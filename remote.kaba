@@ -3,24 +3,6 @@ use "localdb.kaba"
 use "tag.kaba"
 
 
-void make_all_dirs(string path)
-	string[] parts = path.explode("/")
-	string dir
-	for p,i in parts
-		if i == parts.num - 1
-			break
-		if i > 0
-			dir += "/"
-		dir += p
-		DirCreate(dir)
-
-string bash_escape(string s)
-	string r = s
-	r = r.replace("\\", "\\\\")
-	r = r.replace("\"", "\\\"")
-	r = r.replace("`", "\\`")
-	return r
-
 string scp_escape(string s)
 	string r = s
 	r = r.replace("(", "\\\\\\(")
@@ -39,7 +21,6 @@ string ssh_escape(string s)
 
 
 class RemoteFile extends LocalFile
-	string rel_name
 
 RemoteFile[] remote_parse(string r, string options)
 	RemoteFile[] rfiles
@@ -56,7 +37,7 @@ RemoteFile[] remote_parse(string r, string options)
 		rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
-		rf.rel_name = rf.name + "." + extension
+		rf.path = rf.name + "." + extension // temporary
 		for i in 7:parts.num
 			rf.tags.add(str2tag(parts[i]))
 		rf.options = options.explode(",")
@@ -102,7 +83,7 @@ RemoteFile[] remote_info(string id, string options)
 	//return rs
 
 
-void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
+void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 	LocalFile *lf = db.find_by_id(rf.id)
 	if lf
 		if conf.pull_tags
@@ -126,7 +107,7 @@ void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
 				
 		// ok... but should check for changes
 	else
-		string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
+		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		lf = db.find_by_hash(rf.hash)
 		if lf
 			if lf.id.num > 0
@@ -138,11 +119,11 @@ void remote_sync_file(RemoteFile rf, ConfigDirSync sync)
 			return
 	
 		// new remote file
-		print("+R  " + rf.rel_name)
 		LocalFile ll = rf
-		ll.path = sync.dir + rf.rel_name
+		ll.path = sync.dir + ll.apply_structure(e.structure)//rf.rel_name
 		ll.set("nonlocal")
 		db.files.add(ll)
+		print("+R  " + ll.path)
 		
 		if conf.verbose
 			print("    id:   " + ll.id)
@@ -155,7 +136,7 @@ void remote_sync()
 		for s in e.syncs
 			RemoteFile[] rfiles = remote_find(s.filter, s.options)
 			for f in rfiles
-				remote_sync_file(f, s)
+				remote_sync_file(f, e, s)
 			db.save()
 
 
@@ -178,7 +159,7 @@ void remote_download(string path)
 	if f.remote_path.num == 0
 		print("ERROR: no remote path")
 		return
-	print(f.remote_path)
+	//print(f.remote_path)
 	
 	/*RemoteFile[] rfiles = remote_info(f.id, f.options)
 	if rfiles.num < 1
