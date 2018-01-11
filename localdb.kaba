@@ -2,6 +2,7 @@ use "config.kaba"
 use "tag.kaba"
 
 const string NONLOCAL = "nonlocal"
+const string CHANGED = "changed"
 
 class LocalFile
 	bool drop_me
@@ -42,6 +43,8 @@ class LocalFile
 		return id.num == 0
 	bool in_db()
 		return hash.num > 0
+	bool changed()
+		return is(CHANGED)
 	bool mergeable(LocalFile* f)
 		if size != f.size
 			return false
@@ -55,8 +58,9 @@ class LocalFile
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
 	void tag_add(string key, string value)
-		if key == name
+		if key == "name"
 			name = value
+			set(CHANGED)
 			return
 		for t in tags
 			if t.key == key and t.value == value
@@ -65,16 +69,19 @@ class LocalFile
 		t.key = key
 		t.value = value
 		tags.add(t)
+		set(CHANGED)
 	void tag_set(string key, string value)
 		for t in tags
 			if t.key == key
 				t.value = value
+				set(CHANGED)
 				return
 		tag_add(key, value)
 	void tag_rm(string key, string value)
 		for t,i in tags
 			if t.key == key and t.value == value
 				tags.remove(i)
+				set(CHANGED)
 				return
 	string status_str()
 		if !in_db()
@@ -83,6 +90,8 @@ class LocalFile
 			return "L   "
 		if pure_remote()
 			return "R   "
+		if changed()
+			return "C   "
 		return "    "
 	void show()
 		print(status_str() + rel_path(path))
@@ -204,56 +213,57 @@ class DBUpdater extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
 	override void visit(LocalFile* f)
-		//print("update " + path)
 		if f.in_db()
+		
+			// suddenly appearing?!?
 			if f.pure_remote()
 				if FileExists(f.path)
 					f.unset(NONLOCAL)
 					print("NON-NONLOCAL " + f.path)
 					return
+			
+			// lost?
 			if !FileExists(f.path)
-				f.set(NONLOCAL)
-				print("LOST  " + f.path)
+				if !f.pure_remote()
+					f.set(NONLOCAL)
+					print("LOST  " + f.path)
 				return
+			
+			// time
 			File* ff = FileOpen(f.path)
 			int mtime = ff.getMDate().time
 			if mtime == f.mtime
-				if f.id == "" and conf.show_pure_local
-					print("ADD  " + f.path)
-				// ok
 				if conf.verbose
 					print("=  " + f.path)
 			else
 				// changed?
 				string hash = FileHash(f.path, "md5")
 				if hash == f.hash
+					print("TOUCHED  " + f.path)
 					// ok
 					f.mtime = mtime
-					if conf.verbose
-						print("=  " + f.path)
 				else
-					print("~  " + f.path)
+					print("EDITED  " + f.path)
+					f.set(CHANGED)
 					f.hash = hash
 					f.mtime = mtime
 					f.size = ff.getSize()
 					if conf.verbose
-						print("     hash: " + f.hash)
-						print("     time: " + f.mtime)
-						print("     size: " + f.size)
+						f.show_info("      ")
 			delete ff
 		else
+			// new file
+			
 			string hash = FileHash(f.path, "md5")
 			LocalFile* ff = db.find_by_hash(hash)
 			if ff
+				// hash already in db?
 				if FileExists(ff.path)
 					print("ERROR: duplicate + " + f.path + " <-> " + ff.path)
 					return
-				//print(" FOUND BY HASH " + f.path)
-				// moved
-				print("MOVE  " + ff.path + " > " + f.path)
+				print("MOVED  " + ff.path + " > " + f.path)
 				ff.path = f.path
 				db.dirty = true
-				// TODO: hash update...
 			else
 				// new
 				print("ADD  " + f.path)
@@ -264,7 +274,6 @@ class DBUpdater extends DBVisitor
 				//print(ext)
 				//print(l.name)
 				f.hash = hash
-				f.id = ""
 				File* fff = FileOpen(f.path)
 				f.mtime = fff.getMDate().time
 				f.size = fff.getSize()
@@ -425,14 +434,6 @@ class LocalFileDB
 			if ok
 				list.add(&f)
 		return list
-	
-	void drop(LocalFile f)
-		for ff,i in files
-			if ff.path == f.path and ff.hash == f.hash
-				print("DROP " + rel_path(f.path))
-				files.remove(i)
-				dirty = true
-				return
 
 	LocalFile*[] get_in_dir(string _dir)
 		string dir = dir_canonical(_dir)
