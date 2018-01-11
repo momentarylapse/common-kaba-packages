@@ -492,6 +492,21 @@ class LocalFileDB
 			
 		save()
 	
+	void mv(string source, string dest)
+		LocalFile* f = db.find_by_path(source)
+		if !f
+			print("ERROR: not in db")
+			return
+		if FileExists(dest) or db.find_by_path(dest)
+			print("ERROR: dest not available")
+			return
+		f.path = dest
+		db.save()
+		
+		if FileExists(source)
+			make_all_dirs(dest)
+			FileRename(source, dest)
+	
 	void rehash()
 		for f in files
 			print(f.path)

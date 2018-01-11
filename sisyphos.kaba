@@ -15,6 +15,7 @@ void main(string[] arg)
 		print("ignore rm <PATH>")
 		print("add <PATH>                 # add file/dir to local db")
 		print("rm <PATH>                  # drop file/dir from local db")
+		print("mv <SOURCE> <DEST>")
 		print("list <DIR>                 # only show")
 		print("status                     # only show")
 		print("sync                       # sync db entries (not files)")
@@ -111,6 +112,11 @@ void main(string[] arg)
 			print("ERROR: rm <PATH>")
 			return
 		db.rm_recursive(arg[1])
+	else if arg[0] == "mv"
+		if arg.num < 3
+			print("ERROR: rm <SOURCE> <DEST>")
+			return
+		db.mv(arg[1], arg[2])
 	else if arg[0] == "remote"
 		if arg.num < 2
 			print("ERROR: remote ...")
