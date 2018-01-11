@@ -52,7 +52,8 @@ RemoteFile[] remote_find(string filter, string options)
 		quality = "medium"
 	cmd += "php " + YII + " file/find-sisyphos \\\"" + ssh_escape(filter) + "\\\" " + quality + "; "
 	cmd += "\""
-	print(cmd)
+	if conf.verbose
+		print(cmd)
 	_exec_(cmd + " > " + TEMP_OUT)
 		
 	//tocopy.clear()
@@ -71,7 +72,8 @@ RemoteFile[] remote_info(string id, string options)
 		quality = "medium"
 	cmd += "php " + YII + " file/info-sisyphos " + id + " " + quality + "; "
 	cmd += "\""
-	print(cmd)
+	if conf.verbose
+		print(cmd)
 	_exec_(cmd + " > " + TEMP_OUT)
 		
 	//tocopy.clear()
@@ -87,7 +89,8 @@ RemoteFile[] remote_find_by_hash(string hashes)
 	
 	cmd += "php " + YII + " file/info-by-hash-sisyphos " + hashes + "; "
 	cmd += "\""
-	print(cmd)
+	if conf.verbose
+		print(cmd)
 	_exec_(cmd + " > " + TEMP_OUT)
 		
 	//tocopy.clear()
@@ -178,23 +181,14 @@ void remote_download(string path)
 	if f.remote_path.num == 0
 		print("ERROR: no remote path")
 		return
-	//print(f.remote_path)
-	
-	/*RemoteFile[] rfiles = remote_info(f.id, f.options)
-	if rfiles.num < 1
-		print("ERROR: no remote file???")
-		return
-	RemoteFile ff = rfiles[0]
-	print(ff.remote_path)
-//	ff.show()*/
-	
 	
 	make_all_dirs(f.path)
 	string cmd = "scp"
 	string rp = scp_escape(f.remote_path)
 	cmd += " " + SERVER + ":" + rp
 	cmd += " \"" + bash_escape(f.path) + "\""
-	//print(cmd)
+	if conf.verbose
+		print(cmd)
 	_exec_(cmd)
 	
 	File *ff = FileOpen(f.path)
@@ -206,6 +200,56 @@ void remote_download(string path)
 			return
 		delete ff
 	print("---Fehler---")
+
+
+void remote_upload(string path)
+	LocalFile* f = db.find_by_path(path)
+	if !f
+		print("ERROR: not in db")
+		return
+
+	if f.id.num > 0
+		print("ERROR: not pure local")
+		return
+	
+	f.remote_path = ALEX_IN + f.hash + "." + f.path.extension()
+	
+	string cmd = "scp"
+	string rp = scp_escape(f.remote_path)
+	cmd += " \"" + bash_escape(f.path) + "\""
+	cmd += " " + SERVER + ":" + rp
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd)
+	
+
+	string tags = ""	
+	
+	cmd = "ssh " + SERVER + " command=\""
+	cmd += "php " + YII + " file/upload-sisyphos \\\"" + ssh_escape(f.remote_path) + "\\\" \\\"" + f.name + "\\\" " + f.hash + " \\\"" + tags + "\\\" ; "
+	cmd += "\""
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+	
+	string r = FileRead(TEMP_OUT).trim()
+	
+	string[] p = r.explode("\t")
+	if p.num >= 2
+		if p[0] == "ok"
+			f.id = p[1]
+			db.save()
+			return
+		if p[0] == "duplicate"
+			print("hash already in db  -> RELINK")
+			f.id = p[1]
+			db.save()
+			return
+		if p[0] == "bad hash"
+			print("ERROR: upload failed?")
+			return
+	print("ERROR: ????")
+
 
 void remote_pull()
 	for f in db.files

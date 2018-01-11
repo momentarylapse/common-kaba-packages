@@ -2,6 +2,7 @@
 const string SERVER = "myu"
 const string YII = "/var/www/html/_alexandria4/yii"
 const string TEMP_OUT = "/tmp/sisyphos_out"
+const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
 
 bool is_canonical_dir(string dir)
 	if dir.num == 0
@@ -14,8 +15,11 @@ string dir_canonical(string dir)
 	return dir + "/"
 
 string working_dir
-void set_working_dir(string _dir)
-	working_dir = dir_canonical(_dir)
+void set_working_dir(string path)
+	if FileIsDirectory(path)
+		working_dir = dir_canonical(path)
+	else
+		working_dir = dir_canonical(path.dirname())
 
 string rel_path(string path)
 	if path.head(working_dir.num) == working_dir

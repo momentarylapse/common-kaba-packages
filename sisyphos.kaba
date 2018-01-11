@@ -19,6 +19,7 @@ void main(string[] arg)
 		print("status                     # only show")
 		print("sync                       # sync db entries (not files)")
 		print("pull                       # download synced files")
+		print("download/upload <PATH>")
 		print("sync-pure-locals-by-hash <DIR>")
 		print("rehash")
 		return
@@ -134,6 +135,11 @@ void main(string[] arg)
 			print("ERROR: download <PATH>")
 			return
 		remote_download(arg[1])
+	else if arg[0] == "upload"
+		if arg.num < 2
+			print("ERROR: upload <PATH>")
+			return
+		remote_upload(arg[1])
 	else if arg[0] == "pull"
 		remote_pull()
 	else if arg[0] == "cleanup-structure"

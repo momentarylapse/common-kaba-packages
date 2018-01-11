@@ -457,7 +457,7 @@ class LocalFileDB
 	void add_recursive(string path)
 		set_working_dir(path)
 		
-		DBUpdater* vis = new DBUpdater(self)
+		DBVisitor* vis = new DBUpdater(self)
 		vis.recurse(path)
 		delete vis
 		
