@@ -85,19 +85,22 @@ void main(string[] arg)
 	else if arg[0] == "tag"
 		if arg[1] == "add"
 			if arg.num < 5
-				print("ERROR: tag add <PATH> <KEY> <VALUE>")
+				print("ERROR: tag add <KEY> <VALUE> <PATH>")
 				return
-			db.tag_add(arg[2], arg[3], arg[4])
+			for i in 4:arg.num
+				db.tag_add(arg[i], arg[2], arg[3])
 		else if arg[1] == "set"
 			if arg.num < 5
-				print("ERROR: tag set <PATH> <KEY> <VALUE>")
+				print("ERROR: tag set <VALUE> <PATH> <KEY>")
 				return
-			db.tag_set(arg[2], arg[3], arg[4])
+			for i in 4:arg.num
+				db.tag_set(arg[i], arg[2], arg[3])
 		else if arg[1] == "rm"
 			if arg.num < 5
-				print("ERROR: tag rm <PATH> <KEY> <VALUE>")
+				print("ERROR: tag rm <KEY> <VALUE> <PATH>")
 				return
-			db.tag_rm(arg[2], arg[3], arg[4])
+			for i in 4:arg.num
+				db.tag_rm(arg[i], arg[2], arg[3])
 		else
 			print("ERROR: tag ?")
 			return

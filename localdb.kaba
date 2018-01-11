@@ -41,6 +41,9 @@ class LocalFile
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
 	void tag_add(string key, string value)
+		if key == name
+			name = value
+			return
 		for t in tags
 			if t.key == key and t.value == value
 				return
@@ -53,10 +56,7 @@ class LocalFile
 			if t.key == key
 				t.value = value
 				return
-		Tag t
-		t.key = key
-		t.value = value
-		tags.add(t)
+		tag_add(key, value)
 	void tag_rm(string key, string value)
 		for t,i in tags
 			if t.key == key and t.value == value
