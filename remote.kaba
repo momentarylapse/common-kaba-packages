@@ -153,13 +153,15 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 			print("    time: " + ll.mtime)
 			print("    size: " + ll.size)
 
-void remote_sync()
-	for e in conf.dirs
-		for s in e.syncs
-			RemoteFile[] rfiles = remote_find(s.filter, s.options)
-			for f in rfiles
-				remote_sync_file(f, e, s)
-			db.save()
+void remote_sync(string dir)
+	set_working_dir(dir)
+	
+	ConfigDir* e = conf.get_cfg(dir)
+	for s in e.syncs
+		RemoteFile[] rfiles = remote_find(s.filter, s.options)
+		for f in rfiles
+			remote_sync_file(f, *e, s)
+		db.save()
 
 
 void remote_find_and_show(string filter)
@@ -258,12 +260,11 @@ void remote_pull()
 
 
 void remote_sync_pure_locals_by_hash(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir, true)
+	LocalFile*[] files = db.get_in_dir(_dir)
 	string[] hashes
 	for f in files
-		if f.id.num > 0
-			continue
-		hashes.add(f.hash)
+		if f.pure_local()
+			hashes.add(f.hash)
 	if hashes.num == 0
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes.join(","))

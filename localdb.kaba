@@ -1,7 +1,11 @@
 use "config.kaba"
 use "tag.kaba"
 
+const string NONLOCAL = "nonlocal"
+
 class LocalFile
+	bool drop_me
+
 	// remote
 	string id
 	string name
@@ -14,6 +18,10 @@ class LocalFile
 	int size
 	string[] options
 	Tag[] tags
+	
+	void __init__()
+		drop_me = false
+	
 	bool is(string option)
 		for o in options
 			if o == option
@@ -28,6 +36,12 @@ class LocalFile
 			if o == option
 				options.remove(i)
 				return
+	bool pure_remote()
+		return is(NONLOCAL)
+	bool pure_local()
+		return id.num == 0
+	bool in_db()
+		return hash.num > 0
 	bool mergeable(LocalFile* f)
 		if size != f.size
 			return false
@@ -63,13 +77,13 @@ class LocalFile
 				tags.remove(i)
 				return
 	string status_str()
-		if id.num > 0
-			if is("nonlocal")
-				return "R   "
-			return "    "
-		else
-			// only local
+		if !in_db()
+			return "?   "
+		if pure_local()
 			return "L   "
+		if pure_remote()
+			return "R   "
+		return "    "
 	void show()
 		print(status_str() + rel_path(path))
 	void show_info(string l)
@@ -122,6 +136,9 @@ class LocalFile
 class DBVisitor
 	LocalFileDB* db
 	string[] paths
+	LocalFile*[] files
+	LocalFile[] fake_files
+	
 	void __init__(LocalFileDB *_db)
 		db = _db
 				
@@ -142,88 +159,80 @@ class DBVisitor
 				string path = (dir + e.name)
 				if !is_ignored(path)
 					paths.add(path)
-	void sort_paths()
-		for i in 0:paths.num
-			for j in i+1:paths.num
-				if paths[i] > paths[j]
-					string t = paths[i]
-					paths[i] = paths[j]
-					paths[j] = t
+	void sort_files()
+		for i in 0:files.num
+			for j in i+1:files.num
+				if files[i].path > files[j].path
+					LocalFile* f = files[i]
+					files[i] = files[j]
+					files[j] = f
 	
 	void recurse(string dir)
 		if !FileIsDirectory(dir)
+			LocalFile* f = db.find_by_path(dir)
+			if f
+				visit(f)
+				return
 			if FileExists(dir)
-				visit(dir)
+				LocalFile ff
+				ff.path = dir
+				visit(&ff)
 			return
 
+		files = db.get_in_dir(dir)
+		
 		find_paths(dir)
-		LocalFile*[] files = db.get_in_dir(dir, true)
+		for p in paths
+			if !db.find_by_path(p)
+				LocalFile f
+				f.path = p
+				fake_files.add(f)
+		for f in fake_files
+			files.add(&f)
+		sort_files()
 		for f in files
-			bool found = false
-			for p in paths
-				if p == f.path
-					found = true
-					break
-			if !found
-				paths.add(f.path)
-		sort_paths()
-		for p in paths
-			visit(p)
-		paths.clear()
-	void recurse_all()
-		for e in conf.dirs
-			find_paths(e.dir)
-		for f in db.files
-			bool found = false
-			for p in paths
-				if p == f.path
-					found = true
-					break
-			if !found
-				paths.add(f.path)
-		sort_paths()
-		for p in paths
-			visit(p)
+			visit(f)
+		files.clear()
+		fake_files.clear()
 		paths.clear()
 		
-	virtual void visit(string path)
+	virtual void visit(LocalFile* f)
 
 
 // "add"
 class DBUpdater extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
-	override void visit(string path)
+	override void visit(LocalFile* f)
 		//print("update " + path)
-		LocalFile *f = db.find_by_path(path)
-		if f
-			if f.is("nonlocal")
-				if FileExists(path)
-					f.unset("nonlocal")
-					print("NON-NONLOCAL " + path)
+		if f.in_db()
+			if f.pure_remote()
+				if FileExists(f.path)
+					f.unset(NONLOCAL)
+					print("NON-NONLOCAL " + f.path)
 					return
-			if !FileExists(path)
-				f.set("nonlocal")
-				print("LOST  " + path)
+			if !FileExists(f.path)
+				f.set(NONLOCAL)
+				print("LOST  " + f.path)
 				return
-			File* ff = FileOpen(path)
+			File* ff = FileOpen(f.path)
 			int mtime = ff.getMDate().time
 			if mtime == f.mtime
 				if f.id == "" and conf.show_pure_local
-					print("ADD  " + path)
+					print("ADD  " + f.path)
 				// ok
 				if conf.verbose
-					print("=  " + path)
+					print("=  " + f.path)
 			else
 				// changed?
-				string hash = FileHash(path, "md5")
+				string hash = FileHash(f.path, "md5")
 				if hash == f.hash
 					// ok
 					f.mtime = mtime
 					if conf.verbose
-						print("=  " + path)
+						print("=  " + f.path)
 				else
-					print("~  " + path)
+					print("~  " + f.path)
 					f.hash = hash
 					f.mtime = mtime
 					f.size = ff.getSize()
@@ -233,74 +242,59 @@ class DBUpdater extends DBVisitor
 						print("     size: " + f.size)
 			delete ff
 		else
-			string hash = FileHash(path, "md5")
-			f = db.find_by_hash(hash)
-			if f
+			string hash = FileHash(f.path, "md5")
+			LocalFile* ff = db.find_by_hash(hash)
+			if ff
+				if FileExists(ff.path)
+					print("ERROR: duplicate + " + f.path + " <-> " + ff.path)
+					return
 				//print(" FOUND BY HASH " + f.path)
 				// moved
-				print("MOVE  " + f.path + " > " + path)
-				f.path = path
+				print("MOVE  " + ff.path + " > " + f.path)
+				ff.path = f.path
+				db.dirty = true
 				// TODO: hash update...
 			else
 				// new
-				print("ADD  " + path)
-				LocalFile l
-				l.path = path
-				l.name = path.basename()
-				string ext = path.extension()
+				print("ADD  " + f.path)
+				f.name = f.path.basename()
+				string ext = f.path.extension()
 				if ext.num > 0
-					l.name = l.name.head(l.name.num - ext.num - 1)
+					f.name = f.name.head(f.name.num - ext.num - 1)
 				//print(ext)
 				//print(l.name)
-				l.hash = hash
-				l.id = ""
-				File* ff = FileOpen(path)
-				l.mtime = ff.getMDate().time
-				l.size = ff.getSize()
-				delete ff
+				f.hash = hash
+				f.id = ""
+				File* fff = FileOpen(f.path)
+				f.mtime = fff.getMDate().time
+				f.size = fff.getSize()
+				delete fff
 				if conf.verbose
-					print("     hash: " + l.hash)
-					print("     time: " + l.mtime)
-					print("     size: " + l.size)
-				db.files.add(l)
+					f.show_info("      ")
+				db.files.add(*f)
 
 class DBStatusReporter extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
-	override void visit(string path)
-		LocalFile *f = db.find_by_path(path)
-		if f
-			if f.id.num == 0
-				f.show()
-			else if f.is("nonlocal")
-				f.show()
-			else if conf.verbose
-				f.show()
-			if conf.verbose
-				f.show_info("      ")
-		else
-			print("?   " + path)
+	override void visit(LocalFile* f)
+		f.show()
+		if conf.verbose
+			f.show_info("      ")
 
 class DBLister extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
-	override void visit(string path)
-		LocalFile *f = db.find_by_path(path)
-		if f
-			f.show()
-			if conf.verbose
-				f.show_info("      ")
-		else
-			print("?   " + path)
+	override void visit(LocalFile* f)
+		f.show()
+		if conf.verbose
+			f.show_info("      ")
 		
 		
 class DBDropper extends DBVisitor
 	override void __init__(LocalFileDB* _db)
 		super.__init__(_db)
-	override void visit(string path)
-		LocalFile *f = db.find_by_path(path)
-		if f
-			db.drop(*f)
+	override void visit(LocalFile* f)
+		f.drop_me = true
 
 class LocalFileDB
 	LocalFile[] files
@@ -368,6 +362,15 @@ class LocalFileDB
 		if dirty
 			save()
 
+
+	void drop_selected()
+		for i in 0:files.num
+			if files[i].drop_me
+				print("DROP " + files[i].path)
+				files.remove(i)
+				db.dirty = true
+				i --
+
 	void save()
 		File *f = FileCreate("db")
 		f << files.num
@@ -431,22 +434,17 @@ class LocalFileDB
 				dirty = true
 				return
 
-	LocalFile*[] get_in_dir(string _dir, bool recursive)
+	LocalFile*[] get_in_dir(string _dir)
 		string dir = dir_canonical(_dir)
 			
 		LocalFile*[] list
-		if recursive
-			for f in files
-				if f.path.head(dir.num) == dir
-					list.add(&f)
-		else
-			for f in files
-				if f.path.dirname() == dir
-					list.add(&f)
+		for f in files
+			if f.path.head(dir.num) == dir
+				list.add(&f)
 		return list
 
 	// check for local changes
-	void update_local(ConfigDir e)
+	/*void __update_local(ConfigDir e)
 		print("update local " + e.dir)
 		
 		DBUpdater* up = new DBUpdater(self)
@@ -456,7 +454,7 @@ class LocalFileDB
 		LocalFile*[] dbfiles = get_in_dir(e.dir, true)
 		LocalFile[] todrop
 		for ff in dbfiles
-			if ff.is("nonlocal")
+			if ff.pure_remote()
 				print("+R " + ff.path)
 				continue
 					
@@ -473,7 +471,7 @@ class LocalFileDB
 		for ff in todrop
 			drop(ff)
 			
-		save()
+		save()*/
 
 	// check for local changes
 	void add_recursive(string path)
@@ -531,6 +529,8 @@ class LocalFileDB
 	
 	void rehash()
 		for f in files
+			if f.pure_remote()
+				continue
 			print(f.path)
 			string h2 = FileHash(f.path, "md5")
 			if h2.num == 0
@@ -542,7 +542,7 @@ class LocalFileDB
 	void cleanup_structure(string _dir)
 		set_working_dir(_dir)
 		string dir = dir_canonical(_dir)
-		LocalFile*[] files = db.get_in_dir(dir, true)
+		LocalFile*[] files = db.get_in_dir(dir)
 		for f in files
 			ConfigDir* e = conf.get_cfg(f.path)
 			if !e
@@ -571,12 +571,12 @@ class LocalFileDB
 		vis.recurse(dir)
 		delete vis
 
-	void show_status()
+	/*void show_status()
 		if conf.verbose
 			conf.show_pure_local = true
 		DBVisitor* vis = new DBStatusReporter(self)
 		vis.recurse_all()
-		delete vis
+		delete vis*/
 	
 	void tag_add(string path, string key, string value)
 		LocalFile* f = db.find_by_path(path)

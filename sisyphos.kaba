@@ -111,9 +111,9 @@ void main(string[] arg)
 		LocalFile*[] files = db.find_by_tags(arg[1])
 		for f in files
 			print(f.path)
-	else if arg[0] == "status"
-		db.show_status()
-	else if arg[0] == "list"
+	/*else if arg[0] == "status"
+		db.show_status()*/
+	else if arg[0] == "list" or arg[0] == "ls"
 		if arg.num < 2
 			print("ERROR: list <DIR>")
 			return
@@ -155,7 +155,11 @@ void main(string[] arg)
 			print("ERROR: remote ...")
 			return
 	else if arg[0] == "sync"
-		remote_sync()
+		if arg.num < 2
+			print("ERROR: sync <DIR>")
+			return
+		for i in 1:arg.num
+			remote_sync(arg[i])
 	else if arg[0] == "sync-pure-locals-by-hash"
 		if arg.num < 2
 			print("ERROR: sync-pure-locals-by-hash <DIR>")
@@ -186,5 +190,6 @@ void main(string[] arg)
 	else
 		print(arg[0] + "  ???")
 	
+	db.drop_selected()
 	if db.dirty
 		db.save()
