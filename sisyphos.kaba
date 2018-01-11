@@ -13,8 +13,8 @@ void main(string[] arg)
 		print("ignore                     # list ignores")
 		print("ignore add <PATH>")
 		print("ignore rm <PATH>")
-		print("add/addr <PATH>            # add file/dir to local db")
-		print("rm/rmr <PATH>              # drop file/dir from local db")
+		print("add <PATH>                 # add file/dir to local db")
+		print("rm <PATH>                  # drop file/dir from local db")
 		print("list <DIR>                 # only show")
 		print("status                     # only show")
 		print("sync                       # sync db entries (not files)")
@@ -100,16 +100,16 @@ void main(string[] arg)
 			print("ERROR: info <path>")
 			return
 		db.info(arg[1])
-	else if arg[0] == "addr" or arg[0] == "add"
+	else if arg[0] == "add"
 		if arg.num < 2
-			print("ERROR: add/addr <PATH>")
+			print("ERROR: add <PATH>")
 			return
-		db.add_recursive(arg[1], arg[0] == "addr")
-	else if arg[0] == "rm" or arg[0] == "rmr"
+		db.add_recursive(arg[1])
+	else if arg[0] == "rm"
 		if arg.num < 2
-			print("ERROR: rm/rmr <PATH>")
+			print("ERROR: rm <PATH>")
 			return
-		db.rm_recursive(arg[1], arg[0] == "rmr")
+		db.rm_recursive(arg[1])
 	else if arg[0] == "remote"
 		if arg.num < 2
 			print("ERROR: remote ...")

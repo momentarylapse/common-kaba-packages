@@ -49,7 +49,7 @@ class LocalFile
 			// only local
 			return "L   "
 	void show()
-		print(status_str() + path)
+		print(status_str() + rel_path(path))
 	void show_info(string l)
 		//print(l + "path: " + path)
 		print(l + "name:    " + name)
@@ -129,6 +129,11 @@ class DBVisitor
 					paths[j] = t
 	
 	void recurse(string dir)
+		if !FileIsDirectory(dir)
+			if FileExists(dir)
+				visit(dir)
+			return
+
 		find_paths(dir)
 		LocalFile*[] files = db.get_in_dir(dir, true)
 		for f in files
@@ -171,8 +176,14 @@ class DBUpdater extends DBVisitor
 		LocalFile *f = db.find_by_path(path)
 		if f
 			if f.is("nonlocal")
-				f.unset("nonlocal")
-				print("NON-NONLOCAL " + path)
+				if FileExists(path)
+					f.unset("nonlocal")
+					print("NON-NONLOCAL " + path)
+					return
+			if !FileExists(path)
+				f.set("nonlocal")
+				print("LOST  " + path)
+				return
 			File* ff = FileOpen(path)
 			int mtime = ff.getMDate().time
 			if mtime == f.mtime
@@ -393,7 +404,7 @@ class LocalFileDB
 	void drop(LocalFile f)
 		for ff,i in files
 			if ff.path == f.path and ff.hash == f.hash
-				print("DROP " + f.path)
+				print("DROP " + rel_path(f.path))
 				files.remove(i)
 				dirty = true
 				return
@@ -443,16 +454,12 @@ class LocalFileDB
 		save()
 
 	// check for local changes
-	void add_recursive(string path, bool is_dir)
-		if path[path.num-1] == '/'
-			is_dir = true
+	void add_recursive(string path)
+		set_working_dir(path)
 		
-		DBUpdater* up = new DBUpdater(self)
-		if is_dir
-			up.recurse(path)
-		else
-			up.visit(path)
-		delete up
+		DBUpdater* vis = new DBUpdater(self)
+		vis.recurse(path)
+		delete vis
 		
 		/*LocalFile[] dbfiles = get_in_dir(e.dir, true)
 		LocalFile[] todrop
@@ -476,15 +483,11 @@ class LocalFileDB
 			
 		save()
 
-	void rm_recursive(string path, bool is_dir)
-		if path[path.num-1] == '/'
-			is_dir = true
+	void rm_recursive(string path)
+		set_working_dir(path)
 		
 		DBVisitor* vis = new DBDropper(self)
-		if is_dir
-			vis.recurse(path)
-		else
-			vis.visit(path)
+		vis.recurse(path)
 		delete vis
 			
 		save()
@@ -500,6 +503,7 @@ class LocalFileDB
 				f.hash = h2
 				save()
 	void cleanup_structure(string _dir)
+		set_working_dir(_dir)
 		string dir = dir_canonical(_dir)
 		LocalFile*[] files = db.get_in_dir(dir, true)
 		for f in files
@@ -524,6 +528,7 @@ class LocalFileDB
 		f.show_info("      ")
 
 	void list(string dir)
+		set_working_dir(dir)
 		conf.show_pure_local = true
 		DBVisitor* vis = new DBLister(self)
 		vis.recurse(dir)

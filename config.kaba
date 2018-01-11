@@ -13,6 +13,15 @@ string dir_canonical(string dir)
 		return dir
 	return dir + "/"
 
+string working_dir
+void set_working_dir(string _dir)
+	working_dir = dir_canonical(_dir)
+
+string rel_path(string path)
+	if path.head(working_dir.num) == working_dir
+		return path.substr(working_dir.num, -1)
+	return path
+
 
 // needs to be surrounded by "..."
 string bash_escape(string s)
