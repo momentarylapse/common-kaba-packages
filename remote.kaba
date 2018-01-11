@@ -173,6 +173,8 @@ void remote_sync(string dir)
 
 void remote_sync_by_filter(string dir)
 	ConfigDir* e = conf.get_cfg(dir)
+	if !e
+		return
 	for s in e.syncs
 		RemoteFile[] rfiles = remote_find(s.filter, s.options)
 		for f in rfiles
@@ -317,7 +319,13 @@ void remote_upload_meta(LocalFile* f)
 
 void remote_pull(string dir)
 	set_working_dir(dir)
-	LocalFile*[] files = db.get_in_dir(dir)
+	
+	LocalFile*[] files
+	LocalFile* ff = db.find_by_path(dir)
+	if ff
+		files.add(ff)
+	else
+		files = db.get_in_dir(dir)
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
 			remote_download(f)
