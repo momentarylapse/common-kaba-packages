@@ -524,9 +524,6 @@ class LocalFileDB
 		f.show_info("      ")
 
 	void list(string dir)
-		if !conf.dir_is_in_db(dir)
-			print("ERROR: not in db")
-			return
 		conf.show_pure_local = true
 		DBVisitor* vis = new DBLister(self)
 		vis.recurse(dir)
