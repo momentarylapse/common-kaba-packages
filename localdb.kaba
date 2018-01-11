@@ -2,7 +2,8 @@ use "config.kaba"
 use "tag.kaba"
 
 const string NONLOCAL = "nonlocal"
-const string CHANGED = "changed"
+const string CHANGED_FILE = "changed"
+const string CHANGED_META = "changed-meta"
 
 class LocalFile
 	bool drop_me
@@ -43,8 +44,10 @@ class LocalFile
 		return id.num == 0
 	bool in_db()
 		return hash.num > 0
-	bool changed()
-		return is(CHANGED)
+	bool changed_file()
+		return is(CHANGED_FILE)
+	bool changed_meta()
+		return is(CHANGED_META)
 	bool mergeable(LocalFile* f)
 		if size != f.size
 			return false
@@ -60,7 +63,7 @@ class LocalFile
 	void tag_add(string key, string value)
 		if key == "name"
 			name = value
-			set(CHANGED)
+			set(CHANGED_META)
 			return
 		for t in tags
 			if t.key == key and t.value == value
@@ -69,19 +72,19 @@ class LocalFile
 		t.key = key
 		t.value = value
 		tags.add(t)
-		set(CHANGED)
+		set(CHANGED_META)
 	void tag_set(string key, string value)
 		for t in tags
 			if t.key == key
 				t.value = value
-				set(CHANGED)
+				set(CHANGED_META)
 				return
 		tag_add(key, value)
 	void tag_rm(string key, string value)
 		for t,i in tags
 			if t.key == key and t.value == value
 				tags.remove(i)
-				set(CHANGED)
+				set(CHANGED_META)
 				return
 	string status_str()
 		if !in_db()
@@ -90,8 +93,10 @@ class LocalFile
 			return "L   "
 		if pure_remote()
 			return "R   "
-		if changed()
-			return "C   "
+		if changed_file()
+			return "**  "
+		if changed_meta()
+			return "*   "
 		return "    "
 	void show()
 		print(status_str() + rel_path(path))
@@ -244,7 +249,7 @@ class DBUpdater extends DBVisitor
 					f.mtime = mtime
 				else
 					print("EDITED  " + f.path)
-					f.set(CHANGED)
+					f.set(CHANGED_FILE)
 					f.hash = hash
 					f.mtime = mtime
 					f.size = ff.getSize()
@@ -259,7 +264,7 @@ class DBUpdater extends DBVisitor
 			if ff
 				// hash already in db?
 				if FileExists(ff.path)
-					print("ERROR: duplicate + " + f.path + " <-> " + ff.path)
+					print("ERROR: duplicate " + f.path + " <-> " + ff.path)
 					return
 				print("MOVED  " + ff.path + " > " + f.path)
 				ff.path = f.path
@@ -337,40 +342,43 @@ class LocalFileDB
 				ff.hash = ""
 			if ff.id == "-1"
 				ff.id = ""
-				
-			if ff.hash == ""
-				if FileExists(ff.path)
-					print("EMPTY HASH: " + ff.path)
-					ff.hash = FileHash(ff.path, "md5")
+	
+			files.add(ff)
+		delete(f)
+
+	void self_check()
+		for f in files
+			if f.path.num == 0
+				print("EMPTY PATH ...")
+				f.show_info("    ")
+			if f.hash == ""
+				if FileExists(f.path)
+					print("EMPTY HASH: " + f.path)
+					f.hash = FileHash(f.path, "md5")
 					dirty = true
-				else if ff.id == ""
-					print("GHOST: " + ff.path)
+				else if f.id == ""
+					print("GHOST: " + f.path)
+					f.drop_me = true
 					dirty = true
-					continue
 				//else
 					// hash='', id='', no file
 					//print("EMPTY HASH (REMOTE): " + ff.path)
-			if ff.path.num > 0
-				LocalFile *l = find_by_hash(ff.hash)
-				if l
-					if ff.path == l.path
-						print("DUPLICATE: " + ff.path)
-						if l.mergeable(&ff)
-							l.merge(&ff)
+			if f.path.num > 0
+				LocalFile *l = find_by_hash(f.hash)
+				if l and l != &f
+					if f.path == l.path
+						print("DUPLICATE: " + f.path)
+						if l.mergeable(&f)
+							l.merge(&f)
 							dirty = true
-							continue
+							f.drop_me = true
 						else
-							ff.show()
+							f.show()
 							print("   <->")
 							l.show()
 							print("###################################")
 					else
-						print("HASH COLLISION: " + ff.path + "  <->  " + l.path)
-				files.add(ff)
-		delete(f)
-		if dirty
-			save()
-
+						print("HASH COLLISION: " + f.path + "  <->  " + l.path)
 
 	void drop_selected()
 		for i in 0:files.num

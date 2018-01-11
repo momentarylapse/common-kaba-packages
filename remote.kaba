@@ -92,14 +92,24 @@ RemoteFile[] remote_find_by_hash(string hashes)
 	if conf.verbose
 		print(cmd)
 	_exec_(cmd + " > " + TEMP_OUT)
-		
-	//tocopy.clear()
-	//copysize = 0
+
+	string r = FileRead(TEMP_OUT).trim()
+	return remote_parse(r, "")
+
+RemoteFile[] remote_find_by_id(string ids, string options)
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	string quality = "perfect"
+	if options.find("quality=medium", 0) >= 0
+		quality = "medium"
+	cmd += "php " + YII + " file/info-by-id-sisyphos " + ids + " " + quality + "; "
+	cmd += "\""
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
 	
 	string r = FileRead(TEMP_OUT).trim()
 	return remote_parse(r, "")
-	//string[] rs = r.explode("-=-=-=-=-=\n")
-	//return rs
 
 
 
@@ -153,9 +163,15 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 			print("    time: " + ll.mtime)
 			print("    size: " + ll.size)
 
+
 void remote_sync(string dir)
 	set_working_dir(dir)
+	remote_sync_by_filter(dir)
+	remote_sync_by_id(dir)
+	remote_sync_pure_locals_by_hash(dir)
 	
+
+void remote_sync_by_filter(string dir)
 	ConfigDir* e = conf.get_cfg(dir)
 	for s in e.syncs
 		RemoteFile[] rfiles = remote_find(s.filter, s.options)
@@ -171,14 +187,13 @@ void remote_find_and_show(string filter)
 		if conf.verbose
 			f.show_info("      ")
 
-void remote_download(string path)
-	LocalFile* f = db.find_by_path(path)
-	if !f
+void remote_download(LocalFile* f)
+	if !f.in_db()
 		print("ERROR: not in db")
 		return
 
-	if !f.is("nonlocal")
-		print("ERROR: no nonlocal")
+	if !f.pure_remote() and !f.is(CHANGED_FILE)
+		print("ERROR: neither pure remote nor changed")
 		return
 	if f.remote_path.num == 0
 		print("ERROR: no remote path")
@@ -192,25 +207,23 @@ void remote_download(string path)
 	if conf.verbose
 		print(cmd)
 	_exec_(cmd)
-	
+
 	File *ff = FileOpen(f.path)
 	if ff
-		if ff.getSize() == f.size
-			f.unset("nonlocal")
-			db.save()
-			delete ff
-			return
+		f.size = ff.getSize()
+		f.mtime = ff.getMDate().time
+		f.hash = FileHash(f.path, "md5")
+		f.unset(NONLOCAL)
+		f.unset(CHANGED_FILE)
+		db.save()
 		delete ff
-	print("---Fehler---")
-
+		return
+	print("---ERROR---")
 
 void remote_upload(string path)
 	LocalFile* f = db.find_by_path(path)
-	if !f
-		print("ERROR: not in db")
-		return
-
-	if f.id.num > 0
+	
+	if !f.pure_local()
 		print("ERROR: not pure local")
 		return
 	
@@ -253,10 +266,68 @@ void remote_upload(string path)
 	print("ERROR: ????")
 
 
-void remote_pull()
-	for f in db.files
-		if f.is("nonlocal")
-			remote_download(f.path)
+void remote_pull(string dir)
+	set_working_dir(dir)
+	LocalFile*[] files = db.get_in_dir(dir)
+	for f in files
+		if f.pure_remote() or f.is(CHANGED_FILE)
+			remote_download(f)
+		if f.is(CHANGED_META)
+			remote_download_meta(f)
+
+
+void remote_download_meta(LocalFile* f)
+	if f.id.num == 0
+		print("ERROR: no id")
+		return
+	RemoteFile[] rfiles = remote_info(f.id, f.options)
+	for rf in rfiles
+		print("META " + rel_path(f.path))
+		f.unset(CHANGED_META)
+		f.name = rf.name
+		f.tags = rf.tags
+		db.dirty = true
+
+void remote_sync_by_id(string _dir)
+	LocalFile*[] files = db.get_in_dir(_dir)
+	string[] ids_perfect
+	string[] ids_medium
+	for f in files
+		if !f.pure_remote() and !f.pure_local()
+			if f.is("quality=medium")
+				ids_medium.add(f.id)
+			else
+				ids_perfect.add(f.id)
+	RemoteFile[] rfiles, rfiles_medium
+	if ids_perfect.num > 0
+		rfiles = remote_find_by_id(ids_perfect.join(","), "")
+	if ids_medium.num > 0
+		rfiles_medium = remote_find_by_id(ids_medium.join(","), "quality=medium")
+	for rf in rfiles_medium
+		rfiles.add(rf)
+	for rf in rfiles
+		LocalFile* lf = db.find_by_id(rf.id)
+		if lf
+			lf.unset(CHANGED_FILE)
+			lf.unset(CHANGED_META)
+			lf.remote_path = rf.remote_path
+			if lf.hash != rf.hash
+				print("CHANGED HASH " + rel_path(lf.path))
+				lf.set(CHANGED_FILE)
+				db.dirty = true
+			else if lf.name != rf.name
+				print("CHANGED NAME " + rel_path(lf.path))
+				if conf.verbose
+					print(lf.name + " <-> " + rf.name)
+				lf.set(CHANGED_META)
+				db.dirty = true
+			else if !tags_equal(lf.tags, rf.tags)
+				print("CHANGED TAGS " + rel_path(lf.path))
+				if conf.verbose
+					print(tags2str(tags_sort(lf.tags)))
+					print(tags2str(tags_sort(rf.tags)))
+				lf.set(CHANGED_META)
+				db.dirty = true
 
 
 void remote_sync_pure_locals_by_hash(string _dir)
@@ -269,13 +340,13 @@ void remote_sync_pure_locals_by_hash(string _dir)
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes.join(","))
 	for rf in rfiles
+		print(rf.hash)
 		LocalFile* lf = db.find_by_hash(rf.hash)
 		if lf
-			print("RELINK " + lf.path)
-			lf.id = rf.id
-			lf.sync_tags(rf.tags)
+			print(lf.path)
 			lf.remote_path = rf.remote_path
-			lf.name = rf.name
-			db.dirty = true
-		//f.show()
+			if lf.pure_local()
+				print("RELINK " + rel_path(lf.path))
+				lf.id = rf.id
+				db.dirty = true
 

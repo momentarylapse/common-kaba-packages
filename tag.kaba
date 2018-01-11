@@ -7,6 +7,23 @@ class Tag
 		return key + "=" + value
 	string strh()
 		return key + "=" + value.hex(false)
+	bool __lt__(Tag o)
+		if key == o.key
+			return value < o.value
+		return key < o.key
+
+Tag[] tags_sort(Tag[] tags)
+	Tag[] r = tags
+	for i in 0:r.num
+		for j in i+1:r.num
+			if r[j] < r[i]
+				Tag t = r[i]
+				r[i] = r[j]
+				r[j] = t
+	return r
+
+bool tags_equal(Tag[] a, Tag[] b)
+	return tags2str(tags_sort(a)) == tags2str(tags_sort(b))
 
 string tags2str(Tag[] tags)
 	string r
