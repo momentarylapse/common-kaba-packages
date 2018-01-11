@@ -82,6 +82,23 @@ RemoteFile[] remote_info(string id, string options)
 	//string[] rs = r.explode("-=-=-=-=-=\n")
 	//return rs
 
+RemoteFile[] remote_find_by_hash(string hashes)
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	cmd += "php " + YII + " file/info-by-hash-sisyphos " + hashes + "; "
+	cmd += "\""
+	print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+		
+	//tocopy.clear()
+	//copysize = 0
+	
+	string r = FileRead(TEMP_OUT).trim()
+	return remote_parse(r, "")
+	//string[] rs = r.explode("-=-=-=-=-=\n")
+	//return rs
+
+
 
 void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 	LocalFile *lf = db.find_by_id(rf.id)
@@ -194,3 +211,26 @@ void remote_pull()
 	for f in db.files
 		if f.is("nonlocal")
 			remote_download(f.path)
+
+
+void remote_sync_pure_locals_by_hash(string _dir)
+	LocalFile*[] files = db.get_in_dir(_dir, true)
+	string[] hashes
+	for f in files
+		if f.id.num > 0
+			continue
+		hashes.add(f.hash)
+	if hashes.num == 0
+		return
+	RemoteFile[] rfiles = remote_find_by_hash(hashes.join(","))
+	for rf in rfiles
+		LocalFile* lf = db.find_by_hash(rf.hash)
+		if lf
+			print("RELINK " + lf.path)
+			lf.id = rf.id
+			lf.sync_tags(rf.tags)
+			lf.remote_path = rf.remote_path
+			lf.name = rf.name
+			db.dirty = true
+		//f.show()
+
