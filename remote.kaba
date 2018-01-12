@@ -37,6 +37,18 @@ void scp_upload(string source, string dest)
 		print(cmd)
 	_exec_(cmd)
 
+string yii(string action, string[] params)
+	string cmd = "ssh " + SERVER + " command=\""
+	
+	cmd += "php " + YII + " " + action
+	for p in params
+		cmd += " \\\"" + ssh_escape(p) + "\\\""
+	cmd += "; \""
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+	return FileRead(TEMP_OUT).trim()
+
 class RemoteFile extends LocalFile
 
 RemoteFile[] remote_parse(string r, string options)
@@ -65,42 +77,19 @@ RemoteFile[] remote_parse(string r, string options)
 	return rfiles
 
 RemoteFile[] remote_find(string filter, string options)
-	string cmd = "ssh " + SERVER + " command=\""
-	
 	string quality = "perfect"
 	if options.find("quality=medium", 0) >= 0
 		quality = "medium"
-	cmd += "php " + YII + " file/find-sisyphos \\\"" + ssh_escape(filter) + "\\\" " + quality + "; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-		
-	string r = FileRead(TEMP_OUT).trim()
+
+	string r = yii("file/find-sisyphos", [filter, quality])
 	return remote_parse(r, options)
 
 RemoteFile[] remote_find_by_hash(string hashes)
-	string cmd = "ssh " + SERVER + " command=\""
-	
-	cmd += "php " + YII + " file/info-by-hash-sisyphos " + hashes + "; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-
-	string r = FileRead(TEMP_OUT).trim()
+	string r = yii("file/info-by-hash-sisyphos", [hashes])
 	return remote_parse(r, "")
 
-RemoteFile[] remote_find_by_id(string ids, string quality)
-	string cmd = "ssh " + SERVER + " command=\""
-	
-	cmd += "php " + YII + " file/info-by-id-sisyphos " + ids + " " + quality + "; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-	
-	string r = FileRead(TEMP_OUT).trim()
+RemoteFile[] remote_find_by_id(string ids, string quality)	
+	string r = yii("file/info-by-id-sisyphos", [ids, quality])
 	return remote_parse(r, "")
 
 
@@ -188,15 +177,8 @@ void remote_upload(LocalFile* f)
 	scp_upload(f.path, f.remote_path)
 
 	string tags = tags2str(f.tags)	
-	
-	string cmd = "ssh " + SERVER + " command=\""
-	cmd += "php " + YII + " file/upload-sisyphos \\\"" + ssh_escape(f.remote_path) + "\\\" \\\"" + f.name + "\\\" " + f.hash + " \\\"" + tags + "\\\" ; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-	
-	string r = FileRead(TEMP_OUT).trim()
+		
+	string r = yii("file/upload-sisyphos", [f.remote_path, f.name, f.hash, tags])
 	
 	string[] p = r.explode("\t")
 	if p.num >= 2
@@ -223,14 +205,7 @@ void remote_upload_meta(LocalFile* f)
 
 	string tags = tags2str(f.tags)	
 	
-	string cmd = "ssh " + SERVER + " command=\""
-	cmd += "php " + YII + " file/override-meta-sisyphos " + f.id + " \\\"" + f.name + "\\\" \\\"" + tags + "\\\" ; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-	
-	string r = FileRead(TEMP_OUT).trim()
+	string r = yii("file/override-meta-sisyphos", [f.id, f.name, tags])
 	
 	if r == "ok"
 		if conf.verbose
