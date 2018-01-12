@@ -203,19 +203,7 @@ void action_mv(string source, string dest)
 	if FileExists(source)
 		make_all_dirs(dest)
 		FileRename(source, dest)
-	
-void action_rehash()
-	for f in db.files
-		if f.pure_remote()
-			continue
-		print(f.path)
-		string h2 = FileHash(f.path, "md5")
-		if h2.num == 0
-			continue
-		if h2 != f.hash
-			print(h2 + " != " + f.hash)
-			f.hash = h2
-			db.save()
+
 
 void action_cleanup_structure(string _dir)
 	set_working_dir(_dir)
@@ -251,13 +239,6 @@ void action_list(string path)
 		f.show()
 		if conf.verbose
 			f.show_info("      ")
-
-	/*void show_status()
-		if conf.verbose
-			conf.show_pure_local = true
-		DBVisitor* vis = new DBStatusReporter(self)
-		vis.recurse_all()
-		delete vis*/
 
 
 void action_find(string filter)

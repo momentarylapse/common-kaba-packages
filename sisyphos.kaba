@@ -90,6 +90,9 @@ void run_command(string[] arg)
 			print("ERROR: ignore ?")
 			return
 	else if arg[0] == "tag"
+		if arg.num < 2
+			print("TRY: tag add/set/rm")
+			return
 		if arg[1] == "add"
 			if arg.num < 5
 				print("ERROR: tag add <KEY> <VALUE> <PATH>")
@@ -181,10 +184,17 @@ void run_command(string[] arg)
 			return
 		for i in 1:arg.num
 			action_cleanup_structure(arg[i])
-	else if arg[0] == "rehash"
-		action_rehash()
-	else if arg[0] == "self-check"
-		db.self_check()
+	else if arg[0] == "db"
+		if arg.num < 2
+			print("TRY: db rehash/check")
+			return
+		if arg[1] == "rehash"
+			db.rehash()
+		else if arg[1] == "check"
+			db.self_check()
+		else
+			print("ERROR: db...")
+			return
 	else
 		print(arg[0] + "  ???")
 	

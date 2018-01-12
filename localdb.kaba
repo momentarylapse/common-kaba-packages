@@ -288,5 +288,18 @@ class LocalFileDB
 			if f.path.head(dir.num) == dir
 				list.add(&f)
 		return list
+		
+	void rehash()
+		for f in files
+			if f.pure_remote()
+				continue
+			print(f.path)
+			string h2 = FileHash(f.path, "md5")
+			if h2.num == 0
+				continue
+			if h2 != f.hash
+				print(h2 + " != " + f.hash)
+				f.hash = h2
+				save()
 	
 LocalFileDB db
