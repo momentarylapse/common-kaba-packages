@@ -4,6 +4,9 @@ const string YII = "/var/www/html/_alexandria4/yii"
 const string TEMP_OUT = "/tmp/sisyphos_out"
 const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
 
+const string MEDIUM = "medium"
+const string PERFECT = "perfect"
+
 bool is_canonical_dir(string dir)
 	if dir.num == 0
 		return false
@@ -84,6 +87,10 @@ class ConfigDirSync
 		for o in oo
 			if o.substr(0,10) == "structure="
 				return o.substr(10,-1).explode("/")
+	string quality()
+		if options.find("quality=medium", 0) >= 0
+			return MEDIUM
+		return PERFECT
 
 	string guess_dir(string[] parts)
 		string[] structure = get_structure()
@@ -106,6 +113,8 @@ class Config
 		show_pure_local = false
 		drop_deleted = false
 		pull_tags = false
+		default_quality = "perfect"
+		default_structure = "{name}.{ext}"
 
 	void load()
 		File *f = FileOpen("sisyphos.conf")
@@ -154,6 +163,8 @@ class Config
 				print("    options: " + s.options)
 
 	void add_filter(string _dir, string filter, string options)
+		if default_quality == MEDIUM and options == ""
+			options = "quality=medium"
 		string dir = dir_canonical(_dir)
 		for e in dirs
 			if e.dir == dir
@@ -205,5 +216,7 @@ class Config
 	bool show_pure_local
 	bool drop_deleted
 	bool pull_tags
+	string default_quality
+	string default_structure
 
 Config conf

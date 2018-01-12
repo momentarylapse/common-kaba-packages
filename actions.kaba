@@ -214,7 +214,7 @@ void action_cleanup_structure(string _dir)
 		ConfigDir* e = conf.get_cfg(f.path)
 		if !e
 			continue
-		string new_path = f.apply_structure(*e)
+		string new_path = f.apply_structure(e.dir, e.structure)
 		if f.path == new_path
 			continue
 		print("MOVE  " + f.path + " -> " + new_path)
@@ -309,15 +309,21 @@ void action_push(string dir)
 			remote_upload_meta(f)
 
 void action_remote_find(string filter)
-	RemoteFile[] rfiles = remote_find(filter, "")
+	RemoteFile[] rfiles = remote_find(filter, conf.default_quality)
 	for f in rfiles
 		f.show()
 		if conf.show_meta
 			f.show_info("      ")
 
+void action_remote_add(string filter, string dir)
+	remote_sync_by_filter(filter, conf.default_quality, conf.default_structure, dir)
+
 void action_sync(string dir)
 	set_working_dir(dir)
-	//remote_sync_by_filter(dir)
+	/*ConfigDir* e = conf.get_cfg(dir)
+	if e
+		for s in e.syncs
+			remote_sync_by_filter(s.filter, s.quality(), dir)*/
 	remote_sync_by_id(dir)
 	remote_sync_pure_locals_by_hash(dir)
 	

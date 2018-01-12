@@ -121,22 +121,22 @@ class LocalFile
 			if t.key == key
 				return t.value
 		return ""
-	string apply_structure(ConfigDir e)
-		if e.structure == ""
-			if path.find(e.dir, 0) == 0
+	string apply_structure(string root, string structure)
+		if structure == ""
+			if path.find(root, 0) == 0
 				return path
 			else
-				return e.dir + path
-		string spath = e.structure
+				return root + path
+		string spath = structure
 		int p1 = 0
 		while true
-			int p0 = e.structure.find("{", p1)
+			int p0 = structure.find("{", p1)
 			if p0 < 0
 				break
-			p1 = e.structure.find("}", p0)
+			p1 = structure.find("}", p0)
 			if p1 < 0
 				break
-			string kkey = e.structure.substr(p0+1,p1-p0-1)
+			string kkey = structure.substr(p0+1,p1-p0-1)
 			string[] xkey = kkey.explode(":")
 			string val = get_tag(xkey[0])
 			if xkey.num > 1
@@ -144,7 +144,7 @@ class LocalFile
 				while val.num < n
 					val = "0" + val
 			spath = spath.replace("{" + kkey + "}", val)
-		return e.dir + spath
+		return root + spath
 
 
 class LocalFileDB

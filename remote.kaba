@@ -51,7 +51,7 @@ string yii(string action, string[] params)
 
 class RemoteFile extends LocalFile
 
-RemoteFile[] remote_parse(string r, string options)
+RemoteFile[] remote_parse(string r)
 	RemoteFile[] rfiles
 	string[] list = r.explode("\n")
 	for l in list
@@ -69,32 +69,27 @@ RemoteFile[] remote_parse(string r, string options)
 		rf.path = rf.name + "." + extension // temporary
 		for i in 8:parts.num
 			rf.tags.add(str2tag(parts[i]))
-		rf.options = options.explode(",")
 		if parts[7] == "m"
 			rf.set("quality=medium")
 		rf.set(NONLOCAL)
 		rfiles.add(rf)
 	return rfiles
 
-RemoteFile[] remote_find(string filter, string options)
-	string quality = "perfect"
-	if options.find("quality=medium", 0) >= 0
-		quality = "medium"
-
+RemoteFile[] remote_find(string filter, string quality)
 	string r = yii("file/find-sisyphos", [filter, quality])
-	return remote_parse(r, options)
+	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash(string hashes)
 	string r = yii("file/info-by-hash-sisyphos", [hashes])
-	return remote_parse(r, "")
+	return remote_parse(r)
 
 RemoteFile[] remote_find_by_id(string ids, string quality)	
 	string r = yii("file/info-by-id-sisyphos", [ids, quality])
-	return remote_parse(r, "")
+	return remote_parse(r)
 
 
 
-void sync_add_pure_remote(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
+void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 	LocalFile *lf = db.find_by_id(rf.id)
 	if !lf
 		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
@@ -111,7 +106,7 @@ void sync_add_pure_remote(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 	
 		// new remote file
 		LocalFile ll = rf
-		ll.path = ll.apply_structure(e)
+		ll.path = ll.apply_structure(root, structure)
 		ll.set(NONLOCAL)
 		db.files.add(ll)
 		print("ADD PURE REMOTE  " + rel_path(ll.path))
@@ -120,19 +115,15 @@ void sync_add_pure_remote(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 			ll.show_info("      ")
 
 
-void remote_sync_by_filter(string dir)
-	ConfigDir* e = conf.get_cfg(dir)
-	if !e
-		return
-	for s in e.syncs
-		RemoteFile[] rfiles = remote_find(s.filter, s.options)
-		for rf in rfiles
-			LocalFile *lf = db.find_by_id(rf.id)
-			if lf
-				sync_file(rf, lf)
-			else
-				sync_add_pure_remote(rf, *e, s)
-		db.save()
+void remote_sync_by_filter(string filter, string quality, string structure, string dir)
+	RemoteFile[] rfiles = remote_find(filter, quality)
+	for rf in rfiles
+		LocalFile *lf = db.find_by_id(rf.id)
+		if lf
+			sync_file(rf, lf)
+		else
+			sync_add_pure_remote(rf, dir, structure)
+	db.save()
 
 void remote_download(LocalFile* f)
 	if !f.in_db()
@@ -230,9 +221,9 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 			ids_perfect.add(f.id)
 	RemoteFile[] rfiles, rfiles_medium
 	if ids_perfect.num > 0
-		rfiles = remote_find_by_id(ids_perfect.join(","), "perfect")
+		rfiles = remote_find_by_id(ids_perfect.join(","), PERFECT)
 	if ids_medium.num > 0
-		rfiles_medium = remote_find_by_id(ids_medium.join(","), "medium")
+		rfiles_medium = remote_find_by_id(ids_medium.join(","), MEDIUM)
 	for rf in rfiles_medium
 		rfiles.add(rf)
 	return rfiles
