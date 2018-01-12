@@ -313,7 +313,7 @@ void action_remote_find(string filter)
 
 void action_sync(string dir)
 	set_working_dir(dir)
-	remote_sync_by_filter(dir)
+	//remote_sync_by_filter(dir)
 	remote_sync_by_id(dir)
 	remote_sync_pure_locals_by_hash(dir)
 	

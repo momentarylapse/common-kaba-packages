@@ -38,9 +38,11 @@ RemoteFile[] remote_parse(string r, string options)
 		rf.name = parts[5]
 		string extension = parts[6]
 		rf.path = rf.name + "." + extension // temporary
-		for i in 7:parts.num
+		for i in 8:parts.num
 			rf.tags.add(str2tag(parts[i]))
 		rf.options = options.explode(",")
+		if parts[7] == "m"
+			rf.set("quality=medium")
 		rf.set(NONLOCAL)
 		rfiles.add(rf)
 	return rfiles
@@ -114,31 +116,9 @@ RemoteFile[] remote_find_by_id(string ids, string options)
 
 
 
-void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
+void sync_add_pure_remote(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 	LocalFile *lf = db.find_by_id(rf.id)
-	if lf
-		if conf.pull_tags
-			lf.sync_tags(rf.tags)
-		lf.remote_path = rf.remote_path
-		lf.name = rf.name
-		
-		// equal?
-		if lf.hash == rf.hash
-			if conf.verbose
-				print("==  " + rel_path(lf.path))
-			return
-		
-		print("CHANGED  " + rel_path(lf.path))
-		/*if lf.is("nonlocal")
-			FileToCopy ff
-			ff.id = rf.id
-			ff.remotepath = rf.path
-			tocopy.add(ff)
-			copysize += lf.size / 1024
-			continue*/
-				
-		// ok... but should check for changes
-	else
+	if !lf
 		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		lf = db.find_by_hash(rf.hash)
 		if lf
@@ -154,15 +134,12 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 		// new remote file
 		LocalFile ll = rf
 		ll.path = ll.apply_structure(e)
-		ll.set("nonlocal")
+		ll.set(NONLOCAL)
 		db.files.add(ll)
-		print("+R  " + ll.path)
+		print("ADD PURE REMOTE  " + rel_path(ll.path))
 		
-		if conf.verbose
-			print("    id:   " + ll.id)
-			print("    hash: " + ll.hash)
-			print("    time: " + ll.mtime)
-			print("    size: " + ll.size)
+		if conf.show_meta or conf.verbose
+			ll.show_info("      ")
 
 
 void remote_sync_by_filter(string dir)
@@ -171,8 +148,12 @@ void remote_sync_by_filter(string dir)
 		return
 	for s in e.syncs
 		RemoteFile[] rfiles = remote_find(s.filter, s.options)
-		for f in rfiles
-			remote_sync_file(f, *e, s)
+		for rf in rfiles
+			LocalFile *lf = db.find_by_id(rf.id)
+			if lf
+				sync_file(rf, lf)
+			else
+				sync_add_pure_remote(rf, *e, s)
 		db.save()
 
 
@@ -321,26 +302,36 @@ void remote_sync_by_id(string _dir)
 	for rf in rfiles
 		LocalFile* lf = db.find_by_id(rf.id)
 		if lf
-			lf.unset(CHANGED_FILE)
-			lf.unset(CHANGED_META)
-			lf.remote_path = rf.remote_path
-			if lf.hash != rf.hash
-				print("CHANGED HASH  " + rel_path(lf.path))
-				lf.set(CHANGED_FILE)
-				db.dirty = true
-			else if lf.name != rf.name
-				print("CHANGED NAME  " + rel_path(lf.path))
-				if conf.verbose
-					print(lf.name + " <-> " + rf.name)
-				lf.set(CHANGED_META)
-				db.dirty = true
-			else if !tags_equal(lf.tags, rf.tags)
-				print("CHANGED TAGS  " + rel_path(lf.path))
-				if conf.verbose
-					print(tags2str(tags_sort(lf.tags)))
-					print(tags2str(tags_sort(rf.tags)))
-				lf.set(CHANGED_META)
-				db.dirty = true
+			sync_file(rf, lf)
+
+void sync_file(RemoteFile rf, LocalFile* lf)
+	lf.unset(CHANGED_FILE)
+	lf.unset(CHANGED_META)
+	lf.remote_path = rf.remote_path
+	db.dirty = true
+	if rf.is("quality=medium")
+		lf.set("quality=medium")
+	if lf.pure_local()
+		print("RELINK  " + rel_path(lf.path))
+		lf.id = rf.id
+		//db.dirty = true
+	if lf.hash != rf.hash
+		print("CHANGED HASH  " + rel_path(lf.path))
+		lf.set(CHANGED_FILE)
+		//db.dirty = true
+	if lf.name != rf.name
+		print("CHANGED NAME  " + rel_path(lf.path))
+		if conf.verbose
+			print(lf.name + " <-> " + rf.name)
+		lf.set(CHANGED_META)
+		//db.dirty = true
+	if !tags_equal(lf.tags, rf.tags)
+		print("CHANGED TAGS  " + rel_path(lf.path))
+		if conf.verbose
+			print(tags2str(tags_sort(lf.tags)))
+			print(tags2str(tags_sort(rf.tags)))
+		lf.set(CHANGED_META)
+		//db.dirty = true
 
 
 void remote_sync_pure_locals_by_hash(string _dir)
@@ -353,13 +344,11 @@ void remote_sync_pure_locals_by_hash(string _dir)
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes.join(","))
 	for rf in rfiles
-		print(rf.hash)
+		if conf.verbose
+			print(rf.hash)
 		LocalFile* lf = db.find_by_hash(rf.hash)
 		if lf
-			print(lf.path)
-			lf.remote_path = rf.remote_path
-			if lf.pure_local()
-				print("RELINK  " + rel_path(lf.path))
-				lf.id = rf.id
-				db.dirty = true
+			if conf.verbose
+				print(lf.path)
+			sync_file(rf, lf)
 
