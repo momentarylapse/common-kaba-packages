@@ -282,11 +282,15 @@ void action_pull(string dir)
 		files.add(ff)
 	else
 		files = db.get_in_dir(dir)
+	
+	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
 			remote_download(f)
 		if f.is(CHANGED_META)
-			remote_download_meta(f)
+			need_meta.add(f)
+			
+	remote_download_meta(need_meta)
 
 
 void action_push(string dir)

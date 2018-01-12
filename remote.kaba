@@ -19,6 +19,23 @@ string ssh_escape(string s)
 	r = r.replace("'", "\\\\'")
 	return r
 
+void scp_download(string source, string dest)
+	string cmd = "scp"
+	string rp = scp_escape(source)
+	cmd += " " + SERVER + ":" + rp
+	cmd += " \"" + bash_escape(dest) + "\""
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd)
+
+void scp_upload(string source, string dest)
+	string cmd = "scp"
+	string rp = scp_escape(dest)
+	cmd += " \"" + bash_escape(source) + "\""
+	cmd += " " + SERVER + ":" + rp
+	if conf.verbose
+		print(cmd)
+	_exec_(cmd)
 
 class RemoteFile extends LocalFile
 
@@ -59,33 +76,8 @@ RemoteFile[] remote_find(string filter, string options)
 		print(cmd)
 	_exec_(cmd + " > " + TEMP_OUT)
 		
-	//tocopy.clear()
-	//copysize = 0
-	
 	string r = FileRead(TEMP_OUT).trim()
 	return remote_parse(r, options)
-	//string[] rs = r.explode("-=-=-=-=-=\n")
-	//return rs
-
-RemoteFile[] remote_info(string id, string options)
-	string cmd = "ssh " + SERVER + " command=\""
-	
-	string quality = "perfect"
-	if options.find("quality=medium", 0) >= 0
-		quality = "medium"
-	cmd += "php " + YII + " file/info-sisyphos " + id + " " + quality + "; "
-	cmd += "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-		
-	//tocopy.clear()
-	//copysize = 0
-	
-	string r = FileRead(TEMP_OUT).trim()
-	return remote_parse(r, options)
-	//string[] rs = r.explode("-=-=-=-=-=\n")
-	//return rs
 
 RemoteFile[] remote_find_by_hash(string hashes)
 	string cmd = "ssh " + SERVER + " command=\""
@@ -99,12 +91,9 @@ RemoteFile[] remote_find_by_hash(string hashes)
 	string r = FileRead(TEMP_OUT).trim()
 	return remote_parse(r, "")
 
-RemoteFile[] remote_find_by_id(string ids, string options)
+RemoteFile[] remote_find_by_id(string ids, string quality)
 	string cmd = "ssh " + SERVER + " command=\""
 	
-	string quality = "perfect"
-	if options.find("quality=medium", 0) >= 0
-		quality = "medium"
 	cmd += "php " + YII + " file/info-by-id-sisyphos " + ids + " " + quality + "; "
 	cmd += "\""
 	if conf.verbose
@@ -156,7 +145,6 @@ void remote_sync_by_filter(string dir)
 				sync_add_pure_remote(rf, *e, s)
 		db.save()
 
-
 void remote_download(LocalFile* f)
 	if !f.in_db()
 		print("ERROR: not in db")
@@ -170,13 +158,7 @@ void remote_download(LocalFile* f)
 		return
 	
 	make_all_dirs(f.path)
-	string cmd = "scp"
-	string rp = scp_escape(f.remote_path)
-	cmd += " " + SERVER + ":" + rp
-	cmd += " \"" + bash_escape(f.path) + "\""
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd)
+	scp_download(f.remote_path, f.path)
 
 	File *ff = FileOpen(f.path)
 	if ff
@@ -203,18 +185,11 @@ void remote_upload(LocalFile* f)
 	
 	f.remote_path = ALEX_IN + f.hash + "." + f.path.extension()
 	
-	string cmd = "scp"
-	string rp = scp_escape(f.remote_path)
-	cmd += " \"" + bash_escape(f.path) + "\""
-	cmd += " " + SERVER + ":" + rp
-	if conf.verbose
-		print(cmd)
-	_exec_(cmd)
-	
+	scp_upload(f.path, f.remote_path)
 
 	string tags = tags2str(f.tags)	
 	
-	cmd = "ssh " + SERVER + " command=\""
+	string cmd = "ssh " + SERVER + " command=\""
 	cmd += "php " + YII + " file/upload-sisyphos \\\"" + ssh_escape(f.remote_path) + "\\\" \\\"" + f.name + "\\\" " + f.hash + " \\\"" + tags + "\\\" ; "
 	cmd += "\""
 	if conf.verbose
@@ -269,36 +244,42 @@ void remote_upload_meta(LocalFile* f)
 	print("ERROR: ????")
 
 
+RemoteFile[] remote_get_meta(LocalFile*[] files)
 
-void remote_download_meta(LocalFile* f)
-	if f.id.num == 0
-		print("ERROR: no id")
-		return
-	RemoteFile[] rfiles = remote_info(f.id, f.options)
-	for rf in rfiles
-		print("META  " + rel_path(f.path))
-		f.unset(CHANGED_META)
-		f.name = rf.name
-		f.tags = rf.tags
-		db.dirty = true
-
-void remote_sync_by_id(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir)
 	string[] ids_perfect
 	string[] ids_medium
 	for f in files
-		if !f.pure_remote() and !f.pure_local()
-			if f.is("quality=medium")
-				ids_medium.add(f.id)
-			else
-				ids_perfect.add(f.id)
+		if f.is("quality=medium")
+			ids_medium.add(f.id)
+		else
+			ids_perfect.add(f.id)
 	RemoteFile[] rfiles, rfiles_medium
 	if ids_perfect.num > 0
-		rfiles = remote_find_by_id(ids_perfect.join(","), "")
+		rfiles = remote_find_by_id(ids_perfect.join(","), "perfect")
 	if ids_medium.num > 0
-		rfiles_medium = remote_find_by_id(ids_medium.join(","), "quality=medium")
+		rfiles_medium = remote_find_by_id(ids_medium.join(","), "medium")
 	for rf in rfiles_medium
 		rfiles.add(rf)
+	return rfiles
+
+void remote_download_meta(LocalFile*[] files)
+	RemoteFile[] rfiles = remote_get_meta(files)
+	for rf in rfiles
+		LocalFile* lf = db.find_by_id(rf.id)
+		if lf
+			print("META  " + rel_path(lf.path))
+			lf.unset(CHANGED_META)
+			lf.name = rf.name
+			lf.tags = rf.tags
+			db.dirty = true
+
+void remote_sync_by_id(string _dir)
+	LocalFile*[] files = db.get_in_dir(_dir)
+	LocalFile*[] files_wanted
+	for f in files
+		if !f.pure_remote() and !f.pure_local()
+			files_wanted.add(f)
+	RemoteFile[] rfiles = remote_get_meta(files_wanted)
 	for rf in rfiles
 		LocalFile* lf = db.find_by_id(rf.id)
 		if lf
