@@ -41,6 +41,7 @@ RemoteFile[] remote_parse(string r, string options)
 		for i in 7:parts.num
 			rf.tags.add(str2tag(parts[i]))
 		rf.options = options.explode(",")
+		rf.set(NONLOCAL)
 		rfiles.add(rf)
 	return rfiles
 
@@ -124,10 +125,10 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 		// equal?
 		if lf.hash == rf.hash
 			if conf.verbose
-				print("==  " + lf.path)
+				print("==  " + rel_path(lf.path))
 			return
 		
-		print("CHANGED  " + lf.path)
+		print("CHANGED  " + rel_path(lf.path))
 		/*if lf.is("nonlocal")
 			FileToCopy ff
 			ff.id = rf.id
@@ -142,10 +143,10 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 		lf = db.find_by_hash(rf.hash)
 		if lf
 			if lf.id.num > 0
-				print("HASH COLLISION  " + lf.path + "  <->  " + "REMOTE...")
+				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  " + "REMOTE...")
 			lf.id = rf.id
 			//if conf.verbose
-			print("RELINK  " + lf.path)// + "  ->  " + rf.id)
+			print("RELINK  " + rel_path(lf.path))// + "  ->  " + rf.id)
 			lf.sync_tags(rf.tags)
 			lf.name = rf.name
 			return
@@ -164,13 +165,6 @@ void remote_sync_file(RemoteFile rf, ConfigDir e, ConfigDirSync sync)
 			print("    size: " + ll.size)
 
 
-void remote_sync(string dir)
-	set_working_dir(dir)
-	remote_sync_by_filter(dir)
-	remote_sync_by_id(dir)
-	remote_sync_pure_locals_by_hash(dir)
-	
-
 void remote_sync_by_filter(string dir)
 	ConfigDir* e = conf.get_cfg(dir)
 	if !e
@@ -181,13 +175,6 @@ void remote_sync_by_filter(string dir)
 			remote_sync_file(f, *e, s)
 		db.save()
 
-
-void remote_find_and_show(string filter)
-	RemoteFile[] rfiles = remote_find(filter, "")
-	for f in rfiles
-		f.show()
-		if conf.verbose
-			f.show_info("      ")
 
 void remote_download(LocalFile* f)
 	if !f.in_db()
@@ -221,22 +208,6 @@ void remote_download(LocalFile* f)
 		delete ff
 		return
 	print("---ERROR---")
-
-
-void remote_push(string dir)
-	set_working_dir(dir)
-	
-	LocalFile*[] files
-	LocalFile* ff = db.find_by_path(dir)
-	if ff
-		files.add(ff)
-	else
-		files = db.get_in_dir(dir)
-	for f in files
-		if f.pure_local() //or f.is(CHANGED_FILE)
-			remote_upload(f)
-		if f.is(CHANGED_META)
-			remote_upload_meta(f)
 
 
 void remote_upload(LocalFile* f)
@@ -317,21 +288,6 @@ void remote_upload_meta(LocalFile* f)
 	print("ERROR: ????")
 
 
-void remote_pull(string dir)
-	set_working_dir(dir)
-	
-	LocalFile*[] files
-	LocalFile* ff = db.find_by_path(dir)
-	if ff
-		files.add(ff)
-	else
-		files = db.get_in_dir(dir)
-	for f in files
-		if f.pure_remote() or f.is(CHANGED_FILE)
-			remote_download(f)
-		if f.is(CHANGED_META)
-			remote_download_meta(f)
-
 
 void remote_download_meta(LocalFile* f)
 	if f.id.num == 0
@@ -339,7 +295,7 @@ void remote_download_meta(LocalFile* f)
 		return
 	RemoteFile[] rfiles = remote_info(f.id, f.options)
 	for rf in rfiles
-		print("META " + rel_path(f.path))
+		print("META  " + rel_path(f.path))
 		f.unset(CHANGED_META)
 		f.name = rf.name
 		f.tags = rf.tags
@@ -369,17 +325,17 @@ void remote_sync_by_id(string _dir)
 			lf.unset(CHANGED_META)
 			lf.remote_path = rf.remote_path
 			if lf.hash != rf.hash
-				print("CHANGED HASH " + rel_path(lf.path))
+				print("CHANGED HASH  " + rel_path(lf.path))
 				lf.set(CHANGED_FILE)
 				db.dirty = true
 			else if lf.name != rf.name
-				print("CHANGED NAME " + rel_path(lf.path))
+				print("CHANGED NAME  " + rel_path(lf.path))
 				if conf.verbose
 					print(lf.name + " <-> " + rf.name)
 				lf.set(CHANGED_META)
 				db.dirty = true
 			else if !tags_equal(lf.tags, rf.tags)
-				print("CHANGED TAGS " + rel_path(lf.path))
+				print("CHANGED TAGS  " + rel_path(lf.path))
 				if conf.verbose
 					print(tags2str(tags_sort(lf.tags)))
 					print(tags2str(tags_sort(rf.tags)))
@@ -403,7 +359,7 @@ void remote_sync_pure_locals_by_hash(string _dir)
 			print(lf.path)
 			lf.remote_path = rf.remote_path
 			if lf.pure_local()
-				print("RELINK " + rel_path(lf.path))
+				print("RELINK  " + rel_path(lf.path))
 				lf.id = rf.id
 				db.dirty = true
 

@@ -98,6 +98,7 @@ class ConfigDirSync
 class Config
 	void __init__()
 		verbose = false
+		show_meta = false
 		allow_remote_pull = false
 		allow_remote_push = false
 		allow_local_search = true
@@ -196,6 +197,7 @@ class Config
 	
 	// runtime
 	bool verbose
+	bool show_meta
 	bool allow_remote_pull
 	bool allow_remote_push
 	bool allow_local_search

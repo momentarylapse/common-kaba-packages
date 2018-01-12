@@ -1,5 +1,6 @@
 use "localdb.kaba"
 use "config.kaba"
+use "remote.kaba"
 
 
 // mix db files with "real" files
@@ -79,14 +80,14 @@ void file_add(LocalFile* f)
 		if f.pure_remote()
 			if FileExists(f.path)
 				f.unset(NONLOCAL)
-				print("NON-NONLOCAL " + f.path)
+				print("NON-NONLOCAL " + rel_path(f.path))
 				return
 		
 		// lost?
 		if !FileExists(f.path)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
-				print("LOST  " + f.path)
+				print("LOST  " + rel_path(f.path))
 			return
 		
 		// time
@@ -94,21 +95,21 @@ void file_add(LocalFile* f)
 		int mtime = ff.getMDate().time
 		if mtime == f.mtime
 			if conf.verbose
-				print("=  " + f.path)
+				print("=  " + rel_path(f.path))
 		else
 			// changed?
 			string hash = FileHash(f.path, "md5")
 			if hash == f.hash
-				print("TOUCHED  " + f.path)
+				print("TOUCHED  " + rel_path(f.path))
 				// ok
 				f.mtime = mtime
 			else
-				print("EDITED  " + f.path)
+				print("EDITED  " + rel_path(f.path))
 				f.set(CHANGED_FILE)
 				f.hash = hash
 				f.mtime = mtime
 				f.size = ff.getSize()
-				if conf.verbose
+				if conf.verbose or conf.show_meta
 					f.show_info("      ")
 		delete ff
 	else
@@ -119,14 +120,14 @@ void file_add(LocalFile* f)
 		if ff
 			// hash already in db?
 			if FileExists(ff.path)
-				print("ERROR: duplicate " + f.path + " <-> " + ff.path)
+				print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
 				return
-			print("MOVED  " + ff.path + " > " + f.path)
+			print("MOVED  " + rel_path(ff.path) + " > " + rel_path(f.path))
 			ff.path = f.path
 			db.dirty = true
 		else
 			// new
-			print("ADD  " + f.path)
+			print("ADD  " + rel_path(f.path))
 			f.name = f.path.basename()
 			string ext = f.path.extension()
 			if ext.num > 0
@@ -138,7 +139,7 @@ void file_add(LocalFile* f)
 			f.mtime = fff.getMDate().time
 			f.size = fff.getSize()
 			delete fff
-			if conf.verbose
+			if conf.show_meta or conf.verbose
 				f.show_info("      ")
 			db.files.add(*f)
 
@@ -216,9 +217,9 @@ void action_cleanup_structure(string _dir)
 		string new_path = f.apply_structure(*e)
 		if f.path == new_path
 			continue
-		print(f.path + " -> " + new_path)
+		print("MOVE  " + f.path + " -> " + new_path)
 		make_all_dirs(new_path)
-		_exec_("mv \"" + bash_escape(f.path) + "\" \"" + bash_escape(new_path) + "\"")
+		FileRename(f.path, new_path)
 		f.path = new_path
 		db.save()
 
@@ -237,7 +238,7 @@ void action_list(string path)
 	LocalFile*[] files = lister.find(path)
 	for f in files
 		f.show()
-		if conf.verbose
+		if conf.show_meta or conf.verbose
 			f.show_info("      ")
 
 
@@ -269,3 +270,51 @@ void action_tag_rm(string path, string key, string value)
 		return
 	f.tag_rm(key, value)
 	db.dirty = true
+
+
+
+void action_pull(string dir)
+	set_working_dir(dir)
+	
+	LocalFile*[] files
+	LocalFile* ff = db.find_by_path(dir)
+	if ff
+		files.add(ff)
+	else
+		files = db.get_in_dir(dir)
+	for f in files
+		if f.pure_remote() or f.is(CHANGED_FILE)
+			remote_download(f)
+		if f.is(CHANGED_META)
+			remote_download_meta(f)
+
+
+void action_push(string dir)
+	set_working_dir(dir)
+	
+	LocalFile*[] files
+	LocalFile* ff = db.find_by_path(dir)
+	if ff
+		files.add(ff)
+	else
+		files = db.get_in_dir(dir)
+	for f in files
+		if f.pure_local() //or f.is(CHANGED_FILE)
+			remote_upload(f)
+		if f.is(CHANGED_META)
+			remote_upload_meta(f)
+
+void action_remote_find(string filter)
+	RemoteFile[] rfiles = remote_find(filter, "")
+	for f in rfiles
+		f.show()
+		if conf.show_meta
+			f.show_info("      ")
+
+void action_sync(string dir)
+	set_working_dir(dir)
+	remote_sync_by_filter(dir)
+	remote_sync_by_id(dir)
+	remote_sync_pure_locals_by_hash(dir)
+	
+
