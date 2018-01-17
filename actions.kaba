@@ -254,7 +254,6 @@ void action_tag_add(string path, string key, string value)
 		print("ERROR: not in db")
 		return
 	f.tag_add(key, value)
-	db.dirty = true
 
 void action_tag_set(string path, string key, string value)
 	LocalFile* f = db.find_by_path(path)
@@ -262,7 +261,6 @@ void action_tag_set(string path, string key, string value)
 		print("ERROR: not in db")
 		return
 	f.tag_set(key, value)
-	db.dirty = true
 
 void action_tag_rm(string path, string key, string value)
 	LocalFile* f = db.find_by_path(path)
@@ -270,20 +268,13 @@ void action_tag_rm(string path, string key, string value)
 		print("ERROR: not in db")
 		return
 	f.tag_rm(key, value)
-	db.dirty = true
 
 
 
-void action_pull(string dir)
-	set_working_dir(dir)
+void action_pull(string path)
+	set_working_dir(path)
 	
-	LocalFile*[] files
-	LocalFile* ff = db.find_by_path(dir)
-	if ff
-		files.add(ff)
-	else
-		files = db.get_in_dir(dir)
-	
+	LocalFile*[] files = db.get(path)
 	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
@@ -294,15 +285,10 @@ void action_pull(string dir)
 	remote_download_meta(need_meta)
 
 
-void action_push(string dir)
-	set_working_dir(dir)
+void action_push(string path)
+	set_working_dir(path)
 	
-	LocalFile*[] files
-	LocalFile* ff = db.find_by_path(dir)
-	if ff
-		files.add(ff)
-	else
-		files = db.get_in_dir(dir)
+	LocalFile*[] files = db.get(path)
 	for f in files
 		if f.pure_local() //or f.is(CHANGED_FILE)
 			remote_upload(f)
@@ -328,4 +314,9 @@ void action_sync(string dir)
 	remote_sync_by_id(dir)
 	remote_sync_pure_locals_by_hash(dir)
 	
-
+void action_tag_auto(string path)
+	set_working_dir(path)
+	LocalFile*[] files = db.get(path)
+	for f in files
+		auto_tag(f)
+	

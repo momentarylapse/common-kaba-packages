@@ -33,10 +33,12 @@ class LocalFile
 		if is(option)
 			return
 		options.add(option)
+		db.dirty = true
 	void unset(string option)
 		for o,i in options
 			if o == option
 				options.remove(i)
+				db.dirty = true
 				return
 	bool pure_remote()
 		return is(NONLOCAL)
@@ -60,9 +62,12 @@ class LocalFile
 			set(o)
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
+		db.dirty = true
 	void tag_add(string key, string value)
 		if key == "name"
 			name = value
+			if conf.verbose
+				print("NAME  " + name)
 			set(CHANGED_META)
 			return
 		for t in tags
@@ -72,18 +77,29 @@ class LocalFile
 		t.key = key
 		t.value = value
 		tags.add(t)
+		db.dirty = true
+		if conf.verbose
+			print("TAG ADD  " + t.str())
 		set(CHANGED_META)
 	void tag_set(string key, string value)
 		for t in tags
 			if t.key == key
+				if t.value == value
+					return
 				t.value = value
+				db.dirty = true
+				if conf.verbose
+					print("TAG SET  " + t.str())
 				set(CHANGED_META)
 				return
 		tag_add(key, value)
 	void tag_rm(string key, string value)
 		for t,i in tags
 			if t.key == key and t.value == value
+				if conf.verbose
+					print("TAG RM  " + t.str())
 				tags.remove(i)
+				db.dirty = true
 				set(CHANGED_META)
 				return
 	string status_str()
@@ -117,6 +133,10 @@ class LocalFile
 			return name
 		if key == "ext"
 			return path.extension()
+		if key == "id"
+			return id
+		if key == "hash"
+			return hash
 		for t in tags
 			if t.key == key
 				return t.value
@@ -288,6 +308,15 @@ class LocalFileDB
 			if f.path.head(dir.num) == dir
 				list.add(&f)
 		return list
+
+	LocalFile*[] get(string path)
+		LocalFile*[] files
+		LocalFile* ff = find_by_path(path)
+		if ff
+			files.add(ff)
+		else
+			files = get_in_dir(path)
+		return files
 		
 	void rehash()
 		for f in files
@@ -303,3 +332,17 @@ class LocalFileDB
 				save()
 	
 LocalFileDB db
+
+void auto_tag(LocalFile *f)
+	if !FileExists(f.path)
+		return
+	string ext = f.path.extension()
+	if ext == "pdf"
+		string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
+		if s.num > 0
+			f.tag_set("pages", s.int().str())
+	if ext == "jpg" or ext == "png" or ext == "bmp"
+		string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
+		if s.num >= 2
+			f.tag_set("width", s[0].int().str())
+			f.tag_set("height", s[1].int().str())

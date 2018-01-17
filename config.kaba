@@ -1,5 +1,5 @@
-//const string SERVER = "michi.is-a-geek.org"
-const string SERVER = "myu"
+const string SERVER = "michi.is-a-geek.org"
+//const string SERVER = "myu"
 const string YII = "/var/www/html/_alexandria4/yii"
 const string TEMP_OUT = "/tmp/sisyphos_out"
 const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
@@ -59,6 +59,13 @@ string get_tag(string[] parts, string key)
 		if kv[0] == key
 			return kv[1]
 	return ""
+
+
+string shell_exec(string cmd)
+	//if conf.verbose
+	//	print(cmd)
+	_exec_(cmd + " > " + TEMP_OUT)
+	return FileRead(TEMP_OUT).trim()
 
 class ConfigDir
 	string dir

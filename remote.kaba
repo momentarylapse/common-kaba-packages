@@ -46,8 +46,7 @@ string yii(string action, string[] params)
 	cmd += "; \""
 	if conf.verbose
 		print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-	return FileRead(TEMP_OUT).trim()
+	return shell_exec(cmd).trim()
 
 class RemoteFile extends LocalFile
 
