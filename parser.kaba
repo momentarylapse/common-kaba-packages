@@ -1,25 +1,22 @@
 use "common.kaba"
 
-void RaiseParserError(string s)
-	ParserError = true
-	ParserMsg = s
-	print("Parser Fehler: " + s)
+class SyntaxError extends Exception
 
 int CharType(char c)
 	if (c >= 'a') and (c <= 'z')
-		return CharLetter
+		return CHAR_LETTER
 	if (c >= 'A') and (c <= 'Z')
-		return CharLetter
+		return CHAR_LETTER
 	if (c >= '0') and (c <= '9')
-		return CharNumber
-	return CharSign
+		return CHAR_NUMBER
+	return CHAR_SIGN
 
 string GetExpr(string s, int p)
 	string r
 	char c = s[p]
 	int ct = CharType(c)
 	r.add(c)
-	if ct != CharSign
+	if ct != CHAR_SIGN
 		for i in p+1:s.num
 			if CharType(s[i]) == ct
 				r.add(s[i])
@@ -29,7 +26,6 @@ string GetExpr(string s, int p)
 
 string[] expr
 void Analyze(string s)
-	ParserError = false
 	expr.clear()
 	s.replace(" ", "")
 	s.replace("\t", "")
@@ -56,23 +52,6 @@ int OperatorRank(string s)
 		return 3
 	return -1
 
-Term *AddNumerical(string s)
-	return new Term(TypeNumerical, s)
-
-Term *AddVariable(string s)
-	return new Term(TypeVariable, s)
-
-Term *AddOperator(string s, Term *p1, Term *p2)
-	Term *t = new Term(TypeOperator, s)
-	t.Param.add(p1)
-	t.Param.add(p2)
-	return t
-
-Term *AddFunction(string s, Term *param)
-	Term *t = new Term(TypeFunction, s)
-	t.Param.add(param)
-	return t
-
 int GetBrackets(string[] e, int i0)
 	int np = 1
 	for j in i0+1:e.num
@@ -82,16 +61,14 @@ int GetBrackets(string[] e, int i0)
 			np --
 			if np == 0
 				return j
-	RaiseParserError("Klammer ) vermisst")
-	return -1
+	raise(new SyntaxError("Klammer ) vermisst"))
 	
 
 Term *ParsePart(string[] e)
 	//print e
 
 	if e.num == 0
-		RaiseParserError("leerer Ausdruck")
-		return nil
+		raise(new SyntaxError("leerer Ausdruck"))
 	
 	Term*[] eid
 	
@@ -99,29 +76,21 @@ Term *ParsePart(string[] e)
 		//print i
 		if e[i] == "("
 			int i_last = GetBrackets(e, i)
-			if ParserError
-				return nil
 			if i_last <= i + 2
-				RaiseParserError("leere Klammer")
-				return nil
+				raise(new SyntaxError("leere Klammer"))
 			eid.add(ParsePart(e.subarray(i + 1, i_last - i - 1)))
 			i = i_last
 		else if e[i] == ")"
-			RaiseParserError("überflüssige Klammer )")
-			return nil
-		else if CharType(e[i][0]) == CharNumber
-			eid.add(AddNumerical(e[i]))
-		else if CharType(e[i][0]) == CharLetter
+			raise(new SyntaxError("überflüssige Klammer )"))
+		else if CharType(e[i][0]) == CHAR_NUMBER
+			eid.add(AddNumber(e[i]))
+		else if CharType(e[i][0]) == CHAR_LETTER
 			if IsFunction(e[i])
 				if e[i+1] != "("
-					RaiseParserError("Klammer ( nach Funktion vermisst")
-					return nil
+					raise(new SyntaxError("Klammer ( nach Funktion vermisst"))
 				int i_last = GetBrackets(e, i + 1)
-				if ParserError
-					return nil
 				if i_last <= i + 2
-					RaiseParserError("fehlender Funktionsparameter")
-					return nil
+					raise(new SyntaxError("fehlender Funktionsparameter"))
 				string[] ee
 				for j in i+2:i_last
 					ee.add(e[j])
@@ -130,31 +99,26 @@ Term *ParsePart(string[] e)
 				i = i_last
 			else
 				eid.add(AddVariable(e[i]))
-		else if CharType(e[i][0]) == CharSign
+		else if CharType(e[i][0]) == CHAR_SIGN
 			if OperatorRank(e[i]) < 0
-				RaiseParserError("unbekannter Operator '" + e[i] + "'")
-				return nil
+				raise(new SyntaxError("unbekannter Operator '" + e[i] + "'"))
 			eid.add(AddOperator(e[i], nil, nil))
-		if ParserError
-			return nil
 	
 	if (eid.num % 2) != 1
-		RaiseParserError("Operator/Operand kaputt")
-		return nil
+		raise(new SyntaxError("Operator/Operand kaputt"))
 	
 	while eid.num > 2
 		int i_sig, sig = -1
 		for i in 0:eid.num
 			if (i % 2) == 1
-				int os = OperatorRank(eid[i].Name)
+				int os = OperatorRank(eid[i].name)
 				if os > sig
 					sig = os
 					i_sig = i
-		if eid[i_sig].Type != TypeOperator
-			RaiseParserError("Operator vermisst")
-			return nil
-		eid[i_sig].Param[0] = eid[i_sig - 1]
-		eid[i_sig].Param[1] = eid[i_sig + 1]
+		if eid[i_sig].type != TYPE_OPERATOR
+			raise(new SyntaxError("Operator vermisst"))
+		eid[i_sig].params[0] = eid[i_sig - 1]
+		eid[i_sig].params[1] = eid[i_sig + 1]
 		eid[i_sig - 1] = eid[i_sig]
 		eid.remove(i_sig)
 		eid.remove(i_sig)

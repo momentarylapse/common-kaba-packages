@@ -7,68 +7,73 @@ Term *Expand(Term *t)
 	// rekursiv
 	bool need_new = false
 	Term*[8] p
-	for pp,i in t.Param
+	for pp,i in t.params
 		p[i] = Expand(pp)
 		if p[i] != pp
 			need_new = true
 	if need_new
-		t = CopyTerm(t)
-		for i in 0:t.Param.num
-			t.Param[i] = p[i]
+		t = t.copy()
+		for i in 0:t.params.num
+			t.params[i] = p[i]
 
 	// selbst
-	if t.Name == "*"
-		Term *p1 = t.Param[0]
-		Term *p2 = t.Param[1]
+	if t.name == "*"
+		Term *p1 = t.params[0]
+		Term *p2 = t.params[1]
 		
-		if (p1.Name == "+") or (p1.Name == "-")
+		if (p1.name == "+") or (p1.name == "-")
 			// (x + y) * z  ->  x * z + y * z
-			Term* t_l = CopyTerm(t)
-			t_l.Param[0] = p1.Param[0]
-			t_l.Param[1] = p2
-			Term* t_r = CopyTerm(t)
-			t_r.Param[0] = p1.Param[1]
-			t_r.Param[1] = p2
-			Term* t_sum = CopyTerm(p1)
-			t_sum.Param[0] = t_l
-			t_sum.Param[1] = t_r
+			Term* t_l = t.copy()
+			t_l.params[0] = p1.params[0]
+			t_l.params[1] = p2
+			Term* t_r = t.copy()
+			t_r.params[0] = p1.params[1]
+			t_r.params[1] = p2
+			Term* t_sum = p1.copy()
+			t_sum.params[0] = t_l
+			t_sum.params[1] = t_r
 			//print ExprToStr(t_sum)
 			return Expand(t_sum)
-		else if (p2.Name == "+") or (p2.Name == "-")
+		else if (p2.name == "+") or (p2.name == "-")
 			// z * (x + y)  ->  z * x + z * y
-			Term* t_l = CopyTerm(t)
-			t_l.Param[0] = p1
-			t_l.Param[1] = p2.Param[0]
-			Term* t_r = CopyTerm(t)
-			t_r.Param[0] = p1
-			t_r.Param[1] = p2.Param[1]
-			Term* t_sum = CopyTerm(p2)
-			t_sum.Param[0] = t_l
-			t_sum.Param[1] = t_r
+			Term* t_l = t.copy()
+			t_l.params[0] = p1
+			t_l.params[1] = p2.params[0]
+			Term* t_r = t.copy()
+			t_r.params[0] = p1
+			t_r.params[1] = p2.params[1]
+			Term* t_sum = p2.copy()
+			t_sum.params[0] = t_l
+			t_sum.params[1] = t_r
 			return Expand(t_sum)
-	else if t.Name == "^"
-		Term* p1 = t.Param[0]
-		Term* p2 = t.Param[1]
-		if p2.Type == TypeNumerical
-			if p1.Name == "*"
+	else if t.name == "^"
+		Term* p1 = t.params[0]
+		Term* p2 = t.params[1]
+		if p2.type == TYPE_NUMBER
+			if p1.name == "*"
 				// (a * b)^c  ->  a^c * b^c
-				Term* t_l = CopyTerm(t)
-				t_l.Param[0] = p1.Param[0]
-				t_l.Param[1] = p2
-				Term* t_r = CopyTerm(t)
-				t_r.Param[0] = p1.Param[1]
-				t_r.Param[1] = p2
-				Term *t_mul = CopyTerm(p1)
-				t_mul.Param[0] = t_l
-				t_mul.Param[1] = t_r
+				Term* t_l = t.copy()
+				t_l.params[0] = p1.params[0]
+				t_l.params[1] = p2
+				Term* t_r = t.copy()
+				t_r.params[0] = p1.params[1]
+				t_r.params[1] = p2
+				Term *t_mul = p1.copy()
+				t_mul.params[0] = t_l
+				t_mul.params[1] = t_r
 				return Expand(t_mul)
-			else if (p1.Name == "+") or (p1.Name == "-")
-				int e = p2.Name.int()
-				Term* t_mul = CopyTerm(p1)
+			else if (p1.name == "+") or (p1.name == "-")
+				int e = p2.name.int()
+				Term* t_mul = p1.copy()
 				for i in 1:e
 					Term* t_l = t_mul
-					Term* t_r = CopyTerm(p1)
+					Term* t_r = p1.copy()
 					t_mul = AddOperator("*", t_l, t_r)
 				return Expand(t_mul)
+		if p1.name == "^"
+			// (a ^ b) ^ c -> a ^ (b * c)
+			Term* t_mul = AddOperator("*", p1.params[1], p2)
+			t = AddOperator("^", p1.params[0], t_mul)
+			return Expand(t)
 		
 	return t
