@@ -816,6 +816,8 @@ class SyntaxNodeArrayElement extends SyntaxNode
 	override string str()
 		return "[]"
 
+class SyntaxError extends Exception
+
 class SyntaxTree
 	Context* vars
 	Variable*[] consts
@@ -859,12 +861,9 @@ class SyntaxTree
 			return cur_line.words[cur_word+1]
 		return ""
 	
-	bool error
 	void setError(string msg)
-		print("=== error ===")
-		print("line " + (cur_line.physical_line_no + 1) + " at " + cur)
-		print(msg)
-		error = true
+		string c = "line " + (cur_line.physical_line_no + 1) + " at " + cur
+		raise(new SyntaxError("Syntax error: " + msg + "\n" + c))
 	
 	Variable* addGlobalVar(string name)
 		Variable* v = new Variable(name)
@@ -909,7 +908,6 @@ class SyntaxTree
 			return sn
 		if isOperator(cur[0])
 			setError("variable name expected")
-			return nil
 		SyntaxNodeVariable* sn = new SyntaxNodeVariable(cur)
 		if cur_word == 0
 			if peek() == "="
@@ -919,27 +917,19 @@ class SyntaxTree
 	SyntaxNode* getOperator()
 		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
 			setError("operator expected")
-			return nil
 		SyntaxNode* sn = new SyntaxNodeOperator(cur)
 		next()
 		return sn
 	SyntaxNode* getOperandFunc()
 		SyntaxNode* sn = new SyntaxNodeCall(cur)
 		next() // name
-		if error
-			return nil
 		if cur != "("
 			setError("( after function name expected")
-			return nil
 		next() // "("
-		if error
-			return nil
 		if cur == ")"
 			return sn
 		while true
 			SyntaxNode *param = getOperandGreedy()
-			if error
-				return nil
 			sn.params.add(param)
 			if cur != "," and cur != ")"
 				setError(", or ) after parameter expexted")
@@ -947,8 +937,6 @@ class SyntaxTree
 			if cur == ")"
 				break
 			next()
-			if error
-				return nil
 		next() // ")"
 		return sn
 	SyntaxNode* getOperandArrayBuilder()
@@ -956,12 +944,9 @@ class SyntaxTree
 		next() // "["
 		while cur != "]"
 			SyntaxNode *sub = getOperandGreedy()
-			if error
-				return nil
 			sn.params.add(sub)
 			if cur != "," and cur != "]"
 				setError(", or ] expected")
-				return nil
 			if cur == ","
 				next()
 		next() // "]"
@@ -971,20 +956,14 @@ class SyntaxTree
 		next() // "{"
 		while cur != "}"
 			SyntaxNode *key = getOperandGreedy()
-			if error
-				return nil
 			sn.params.add(key)
 			if cur != ":"
 				setError(": expected")
-				return nil
 			next() // ":"
 			SyntaxNode *val = getOperandGreedy()
-			if error
-				return nil
 			sn.params.add(val)
 			if cur != "," and cur != "}"
 				setError(", or } expected")
-				return nil
 			if cur == ","
 				next()
 		next() // "}"
@@ -995,8 +974,6 @@ class SyntaxTree
 			el.params.add(sn)
 			next() // "["
 			SyntaxNode* index = getOperandGreedy()
-			if error
-				return nil
 			el.params.add(index)
 			if cur != "]"
 				setError("] expected")
@@ -1009,11 +986,8 @@ class SyntaxTree
 		if cur == "("
 			next()
 			SyntaxNode *sn = getOperandGreedy()
-			if error
-				return nil
 			if cur != ")"
 				setError(") expected")
-				return nil
 			next() // ")"
 			return checkOperandExtensions(sn)
 		
@@ -1031,8 +1005,6 @@ class SyntaxTree
 		
 		// basic
 		SyntaxNode* sn = getNuclearOperand()
-		if error
-			return nil
 		return checkOperandExtensions(sn)
 	
 	
@@ -1040,19 +1012,11 @@ class SyntaxTree
 	SyntaxNode* getOperandGreedy()
 		SyntaxNode*[] sn
 		sn.add(getOperand())
-		if error
-			return nil
 		while !endOfLine()
 			if cur == "," or cur == ")" or cur == "]" or cur == "}" or cur == ":"
 				break
-			if error
-				return nil
 			sn.add(getOperator())
-			if error
-				return nil
 			sn.add(getOperand())
-			if error
-				return nil
 		return linkOperators(sn)
 	SyntaxNode* linkOperators(SyntaxNode*[] sn)
 		int[] rank
@@ -1075,12 +1039,9 @@ class SyntaxTree
 		SyntaxNodeReturn *sn = new SyntaxNodeReturn
 		while !endOfLine()
 			next()
-			if error
-				return nil
 			sn.params.add(getOperandGreedy())
 			if !endOfLine()
 				setError("multi return not supported")
-				return nil
 				next()
 				if cur != ","
 					setError(", or end of line expected")
@@ -1091,11 +1052,7 @@ class SyntaxTree
 		SyntaxNodeIf *sn = new SyntaxNodeIf
 		next() // "if"
 		sn.params.add(getOperandGreedy())
-		if error
-			return nil
 		sn.block = parseBlock()
-		if error
-			return nil
 		if endOfFile()
 			return sn
 		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
@@ -1109,11 +1066,7 @@ class SyntaxTree
 		SyntaxNodeWhile *sn = new SyntaxNodeWhile
 		next() // "while"
 		sn.params.add(getOperandGreedy())
-		if error
-			return nil
 		sn.block = parseBlock()
-		if error
-			return nil
 		if endOfFile()
 			return sn
 		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
@@ -1132,14 +1085,9 @@ class SyntaxTree
 		sn.params.add(var)
 		if cur != "in"
 			setError("in extected")
-			return nil
 		next()
 		sn.params.add(getOperandGreedy())
-		if error
-			return nil
 		sn.block = parseBlock()
-		if error
-			return nil
 		if endOfFile()
 			return sn
 		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
@@ -1158,36 +1106,23 @@ class SyntaxTree
 		Function* prev_func = cur_func
 		int indent0 = cur_line.indent
 		next()
-		if error
-			return
 		Function *func = addFunc(cur)
 		cur_func = func
 		next()
-		if error
-			return
 		if cur != "("
 			setError("( expected")
-			return
 		next()
-		if error
-			return
 		while cur != ")"
 			//Variable* v = ad
 			func.params.add(cur)
 			next()
-			if error
-				return
 			if cur == ")"
 				break
 			if cur != ","
 				setError(", or ) expected")
-				return
 			next()
-			if error
-				return
 		if !endOfLine()
 			setError("end of line expexted")
-			return
 		
 		func.block = parseBlock()
 		cur_func = prev_func
@@ -1209,20 +1144,14 @@ class SyntaxTree
 			parseFunctionDef()
 			return nil
 		SyntaxNode *sn = getOperandGreedy()
-		if error
-			return nil
 		if !endOfLine()
 			setError("end of line expected")
 		return sn
 	SyntaxNode *parseBlock()
 		SyntaxNodeBlock *sn = new SyntaxNodeBlock
 		nextLine()
-		if error
-			return nil
 		int indent0 = cur_line.indent
 		SyntaxNode *sub = parseLine()
-		if error
-			return nil
 		if sub
 			sn.params.add(sub)
 		while !endOfFile()
@@ -1235,12 +1164,9 @@ class SyntaxTree
 				sub = parseLine()
 				if sub
 					sn.params.add(sub)
-			if error
-				return nil
 		return sn
 	
 	void create(string source)
-		error = false
 		LiteralParser lp
 		
 		vars = new Context("-global-", nil)
@@ -1320,15 +1246,14 @@ class Context
 		for v in vars
 			v.show()
 
+class RuntimeError extends Exception
+
 class Interpreter
 	SyntaxTree* syntax
 	Context*[] contexts
 	Context* cur_context
-	bool error
 	void setError(string msg)
-		print("=== error during execution ==")
-		print(msg)
-		error = true
+		raise(new RuntimeError("Runtime error: " + msg))
 	void stack_push(Function* func, Variable* ret)
 		cur_context = new Context(func.name, cur_context)
 		cur_context.func = func
@@ -1357,7 +1282,6 @@ class Interpreter
 						cur_context.add(v)
 					else
 						setError("variable not found: " + vv.name)
-						return
 				params.add(v)
 				is_temp.add(false)
 			else if p.type == TYPE_CONST
@@ -1367,8 +1291,6 @@ class Interpreter
 			else
 				Variable *temp = new Variable
 				doNode(p, temp)
-				if error
-					return
 				params.add(temp)
 				is_temp.add(true)
 				
@@ -1423,10 +1345,8 @@ class Interpreter
 			Variable* v = cur_context.get(call.name)
 			if !v
 				setError("function not found: " + call.name)
-				return
 			if v.v.type != TYPE_FUNCTION
 				setError("is not a function: " + call.name)
-				return
 			DynamicValueStateFunction* fs = v.v.s
 			Function *f = fs.func
 			stack_push(f, ret)
@@ -1458,13 +1378,10 @@ class Interpreter
 				// reevaluate
 				if sn.params[0].type != TYPE_VARIABLE
 					doNode(sn.params[0], params[0])
-					if error
-						return
 			cur_context.flag_break = false
 		else if sn.type == TYPE_FOR
 			if params[1].v.type != TYPE_ARRAY
 				setError("for needs array")
-				return
 			DynamicValueStateArray* a = params[1].v.s
 			SyntaxNodeFor *_for = sn
 			for el in a.a
@@ -1510,7 +1427,6 @@ class Interpreter
 				
 	void run(SyntaxTree _syntax)
 		syntax = &_syntax
-		error = false
 		Variable dummy
 		cur_context = syntax.vars
 		stack_push(syntax.func_main, &dummy)
@@ -1519,8 +1435,6 @@ class Interpreter
 void eval(string source)
 	SyntaxTree syntax
 	syntax.create(source)
-	if syntax.error
-		return
 	if verbose
 		syntax.show()
 	Interpreter inter
@@ -1547,4 +1461,9 @@ void main(string[] arg)
 		string source = input
 		if from_file
 			source = FileRead(input)
-		eval(source)
+		try
+			eval(source)
+		except Exception as e
+			print("------------------------------------------------")
+			print(e.message())
+			print("------------------------------------------------")
