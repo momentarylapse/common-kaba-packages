@@ -121,8 +121,8 @@ void file_add(LocalFile* f)
 		// new file
 		
 		string hash = FileHash(f.path, "md5")
-		LocalFile* ff = db.find_by_hash(hash)
-		if ff
+		try
+			LocalFile* ff = db.find_by_hash(hash)
 			// hash already in db?
 			if FileExists(ff.path)
 				print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
@@ -130,7 +130,7 @@ void file_add(LocalFile* f)
 			print("MOVED  " + rel_path(ff.path) + " > " + rel_path(f.path))
 			ff.path = f.path
 			db.dirty = true
-		else
+		except
 			// new
 			print("ADD  " + rel_path(f.path))
 			f.name = f.path.basename()
@@ -160,30 +160,9 @@ void file_add(LocalFile* f)
 // check for local changes
 void action_add(string path)
 	set_working_dir(path)
-	
 	LocalFile*[] files = lister.find(path)
 	for f in files
 		file_add(f)
-		
-		/*LocalFile[] dbfiles = get_in_dir(e.dir, true)
-		LocalFile[] todrop
-		for ff in dbfiles
-			if ff.is("nonlocal")
-				print("+R " + ff.path)
-				continue
-					
-			if FileExists(ff.path)
-				nil
-				// already checked...
-			else
-				print("-  " + ff.path)
-				ff.set("deleted")
-				
-				if conf.drop_deleted
-					todrop.add(ff)
-		
-		for ff in todrop
-			drop(ff)*/
 			
 	db.save()
 
@@ -196,26 +175,26 @@ void action_rm(string path)
 	db.save()
 	
 void action_mv(string source, string dest)
-	LocalFile* f = db.find_by_path(source)
-	if !f
-		print("ERROR: not in db")
-		return
-	if FileExists(dest) or db.find_by_path(dest)
-		print("ERROR: dest not available")
-		return
-	f.path = dest
-	db.save()
+	try
+		LocalFile* f = db.find_by_path(source)
+		if FileExists(dest) or db.has_path(dest)
+			raise(new Exception("target already exists"))
+		print("MOVE  " + rel_path(source) + " -> " + rel_path(dest))
+		f.path = dest
+		db.save()
 		
-	if FileExists(source)
-		make_all_dirs(dest)
-		FileRename(source, dest)
+		if FileExists(source)
+			make_all_dirs(dest)
+			FileRename(source, dest)
+	except Exception as e
+		error_out(e)
 
 
 void structure_file(LocalFile* f, string structure, string root)
 	string new_path = f.apply_structure(root, structure)
 	if f.path == new_path
 		return
-	print("MOVE  " + f.path + " -> " + new_path)
+	print("MOVE  " + rel_path(f.path) + " -> " + rel_path(new_path))
 	make_all_dirs(new_path)
 	try
 		if !f.pure_remote()
@@ -223,7 +202,7 @@ void structure_file(LocalFile* f, string structure, string root)
 		f.path = new_path
 		db.save()
 	except FileError as e
-		print("ERROR: " + e.message())
+		error_out(e)
 
 void action_structure_apply(string _dir, string structure)
 	set_working_dir(_dir)

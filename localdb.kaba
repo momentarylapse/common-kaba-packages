@@ -265,14 +265,18 @@ class LocalFileDB
 			if id == f.id
 				return &f
 		raise(new Exception("not in db: id=" + id))
-		return nil
 
 	LocalFile *find_by_path(string path)
 		for f in files
 			if path == f.path
 				return &f
-		raise(new Exception("not in db: '" + path + "'"))
-		return nil
+		raise(new Exception("not in db: '" + rel_path(path) + "'"))
+
+	bool has_path(string path)
+		for f in files
+			if path == f.path
+				return true
+		return false
 
 	LocalFile *find_by_hash(string hash)
 		if hash == ""
@@ -282,7 +286,6 @@ class LocalFileDB
 			if hash == f.hash
 				return &f
 		raise(new Exception("not in db: hash=" + hash))
-		return nil
 		
 	LocalFile*[] find_by_tags(string str)
 		Tag[] tags = str2tags(str)
