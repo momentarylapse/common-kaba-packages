@@ -174,9 +174,7 @@ class LocalFileDB
 	void load()
 		files.clear()
 		dirty = false
-		File *f = FileOpen("db")
-		if !f
-			return
+		File *f = FileOpenText("db")
 		int n
 		f >> n
 		for i in 0:n
@@ -246,7 +244,7 @@ class LocalFileDB
 				i --
 
 	void save()
-		File *f = FileCreate("db")
+		File *f = FileCreateText("db")
 		f << files.num
 		for ff in files
 			f << ff.id
@@ -266,20 +264,24 @@ class LocalFileDB
 		for f in files
 			if id == f.id
 				return &f
+		raise(new Exception("not in db: id=" + id))
 		return nil
 
 	LocalFile *find_by_path(string path)
 		for f in files
 			if path == f.path
 				return &f
+		raise(new Exception("not in db: '" + path + "'"))
 		return nil
 
 	LocalFile *find_by_hash(string hash)
 		if hash == ""
+			raise(new Exception("invalid hash"))
 			return nil
 		for f in files
 			if hash == f.hash
 				return &f
+		raise(new Exception("not in db: hash=" + hash))
 		return nil
 		
 	LocalFile*[] find_by_tags(string str)
@@ -310,26 +312,26 @@ class LocalFileDB
 		return list
 
 	LocalFile*[] get(string path)
-		LocalFile*[] files
-		LocalFile* ff = find_by_path(path)
-		if ff
-			files.add(ff)
-		else
-			files = get_in_dir(path)
-		return files
+		try
+			LocalFile*[] files
+			files.add(find_by_path(path))
+			return files
+		except
+			return get_in_dir(path)
 		
 	void rehash()
 		for f in files
 			if f.pure_remote()
 				continue
 			print(f.path)
-			string h2 = FileHash(f.path, "md5")
-			if h2.num == 0
-				continue
-			if h2 != f.hash
-				print(h2 + " != " + f.hash)
-				f.hash = h2
-				save()
+			try
+				string h2 = FileHash(f.path, "md5")
+				if h2 != f.hash
+					print(h2 + " != " + f.hash)
+					f.hash = h2
+					save()
+			except
+				nil
 	
 LocalFileDB db
 

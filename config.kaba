@@ -47,7 +47,11 @@ void make_all_dirs(string path)
 		if i > 0
 			dir += "/"
 		dir += p
-		DirCreate(dir)
+		if i > 0
+			try
+				DirCreate(dir)
+			except
+				nil
 
 
 	
@@ -60,6 +64,9 @@ string get_tag(string[] parts, string key)
 			return kv[1]
 	return ""
 
+
+void error_out(Exception *e)
+	print("ERROR: " + e.message())
 
 string shell_exec(string cmd)
 	//if conf.verbose
@@ -124,7 +131,7 @@ class Config
 		default_structure = "{name}.{ext}"
 
 	void load()
-		File *f = FileOpen("sisyphos.conf")
+		File *f = FileOpenText("sisyphos.conf")
 		int n, m
 		f >> n
 		for i in 0:n
@@ -147,7 +154,7 @@ class Config
 			ignore.add(ig)
 		delete f
 	void save()
-		File *f = FileCreate("sisyphos.conf")
+		File *f = FileCreateText("sisyphos.conf")
 		f << dirs.num
 		for e in dirs
 			f << e.dir
@@ -187,6 +194,7 @@ class Config
 		for e in dirs
 			if e.dir == dir.head(e.dir.num)
 				return &e
+		//raise(new Exception("not found"))
 		return nil
 
 	bool dir_is_in_db(string _dir)

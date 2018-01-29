@@ -263,6 +263,9 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 		//db.dirty = true
 	if lf.hash != rf.hash
 		print("CHANGED HASH  " + rel_path(lf.path))
+		if conf.verbose
+			print(lf.hash)
+			print(rf.hash)
 		lf.set(CHANGED_FILE)
 		//db.dirty = true
 	if lf.name != rf.name

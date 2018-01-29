@@ -6,7 +6,6 @@ use "remote.kaba"
 // mix db files with "real" files
 class DBLister
 	string[] paths
-	LocalFile*[] files
 	LocalFile[] fake_files
 	
 	bool is_ignored(string path)
@@ -26,7 +25,7 @@ class DBLister
 				string path = (dir + e.name)
 				if !is_ignored(path)
 					paths.add(path)
-	void sort_files()
+	void sort_files(LocalFile*[] files)
 		for i in 0:files.num
 			for j in i+1:files.num
 				if files[i].path > files[j].path
@@ -35,32 +34,37 @@ class DBLister
 					files[j] = f
 	
 	LocalFile*[] find(string dir)
-		files.clear()
+		LocalFile*[] files
 		fake_files.clear()
 		paths.clear()
 		
 		if !FileIsDirectory(dir)
-			LocalFile* f = db.find_by_path(dir)
-			if f
+			try
+				LocalFile* f = db.find_by_path(dir)
 				files.add(f)
-			else if FileExists(dir)
-				LocalFile ff
-				ff.path = dir
-				fake_files.add(ff)
-				files.add(&fake_files[0])
+			except
+				if FileExists(dir)
+					LocalFile ff
+					ff.path = dir
+					fake_files.add(ff)
+					files.add(&fake_files[0])
+				else
+					print("ERROR: can't find '" + dir + "'")
 			return files
 
 		files = db.get_in_dir(dir)
 		
 		find_paths(dir)
 		for p in paths
-			if !db.find_by_path(p)
+			try
+				db.find_by_path(p)
+			except
 				LocalFile f
 				f.path = p
 				fake_files.add(f)
 		for f in fake_files
 			files.add(&f)
-		sort_files()
+		sort_files(files)
 		return files
 
 DBLister lister
@@ -207,7 +211,29 @@ void action_mv(string source, string dest)
 		FileRename(source, dest)
 
 
-void action_cleanup_structure(string _dir)
+void structure_file(LocalFile* f, string structure, string root)
+	string new_path = f.apply_structure(root, structure)
+	if f.path == new_path
+		return
+	print("MOVE  " + f.path + " -> " + new_path)
+	make_all_dirs(new_path)
+	try
+		if !f.pure_remote()
+			FileRename(f.path, new_path)
+		f.path = new_path
+		db.save()
+	except FileError as e
+		print("ERROR: " + e.message())
+
+void action_structure_apply(string _dir, string structure)
+	set_working_dir(_dir)
+	string dir = dir_canonical(_dir)
+	LocalFile*[] files = db.get_in_dir(dir)
+	for f in files
+		structure_file(f, structure, dir)
+
+
+void action_structure_auto(string _dir)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
 	LocalFile*[] files = db.get_in_dir(dir)
@@ -215,22 +241,15 @@ void action_cleanup_structure(string _dir)
 		ConfigDir* e = conf.get_cfg(f.path)
 		if !e
 			continue
-		string new_path = f.apply_structure(e.dir, e.structure)
-		if f.path == new_path
-			continue
-		print("MOVE  " + f.path + " -> " + new_path)
-		make_all_dirs(new_path)
-		FileRename(f.path, new_path)
-		f.path = new_path
-		db.save()
+		structure_file(f, e.structure, e.dir)
 
 void action_info(string path)
-	LocalFile* f = db.find_by_path(path)
-	if !f
-		print("ERROR: not in db")
-		return
-	f.show()
-	f.show_info("      ")
+	try
+		LocalFile* f = db.find_by_path(path)
+		f.show()
+		f.show_info("      ")
+	except Exception as e
+		error_out(e)
 
 void action_list(string path)
 	set_working_dir(path)
@@ -249,25 +268,25 @@ void action_find(string filter)
 		f.show()
 	
 void action_tag_add(string path, string key, string value)
-	LocalFile* f = db.find_by_path(path)
-	if !f
-		print("ERROR: not in db")
-		return
-	f.tag_add(key, value)
+	try
+		LocalFile* f = db.find_by_path(path)
+		f.tag_add(key, value)
+	except Exception as e
+		error_out(e)
 
 void action_tag_set(string path, string key, string value)
-	LocalFile* f = db.find_by_path(path)
-	if !f
-		print("ERROR: not in db")
-		return
-	f.tag_set(key, value)
+	try
+		LocalFile* f = db.find_by_path(path)
+		f.tag_set(key, value)
+	except Exception as e
+		error_out(e)
 
 void action_tag_rm(string path, string key, string value)
-	LocalFile* f = db.find_by_path(path)
-	if !f
-		print("ERROR: not in db")
-		return
-	f.tag_rm(key, value)
+	try
+		LocalFile* f = db.find_by_path(path)
+		f.tag_rm(key, value)
+	except Exception as e
+		error_out(e)
 
 
 
