@@ -1,3 +1,5 @@
+use "config.kaba"
+
 class Resource
 	string type
 	string id
@@ -44,15 +46,24 @@ class LangID
 	string title
 	string tooltip
 
+class LangText
+	string orig
+	string trans
+
 class Language
 	string name
 	LangID[] ids
+	LangText[] texts
 	void show()
 		print(name)
 		for i in ids
 			print(i.id)
 			print("\t" + i.title)
 			print("\t" + i.tooltip)
+			
+		for t in texts
+			print(t.orig)
+			print("\t" + t.trans)
 
 void lang_id_add(LangID[] ids, string id, string title, string tooltip, string ns)
 	if id == "?" or id == ""
@@ -85,10 +96,18 @@ void sort_ids(LangID[] ids)
 				ids[i] = ids[j]
 				ids[j] = t
 
-void find_all_ids(string dir, Language lang)
-	DirEntry[] files = DirSearch(dir, "*.hui", false)
+void sort_texts(LangText[] texts)
+	for i in 0:texts.num
+		for j in i+1:texts.num
+			if texts[i].orig > texts[j].orig
+				LangText t = texts[i]
+				texts[i] = texts[j]
+				texts[j] = t
+
+void find_all_ids(Language lang)
+	DirEntry[] files = DirSearch(conf.dir, "*.hui", false)
 	for f in files
-		string source = FileRead(dir + "/" + f.name)
+		string source = FileRead(conf.dir + f.name)
 		Resource r = ParseResource(source, true)
 		//print(r.str(0))
 		
@@ -97,6 +116,20 @@ void find_all_ids(string dir, Language lang)
 	sort_ids(lang.ids)
 	
 //	lang.show()
+
+
+Language load_own_lang()
+	Language own
+	own.name = conf.own_lang_name
+	
+	print("loading own language: " + own.name)
+	find_all_ids(own)
+	
+	parse_source_code_dir(conf.source_code_dir, own)
+	sort_texts(own.texts)
+	print("    " + own.ids.num + " ids, " + own.texts.num + " texts")
+	
+	return own
 
 Language load_prelang(string filename)
 	Language l
@@ -115,6 +148,14 @@ Language load_prelang(string filename)
 			f >> id.title
 			f >> id.tooltip
 			l.ids.add(id)
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangText tt
+			f >> tt.orig
+			f >> tt.trans
+			l.texts.add(tt)
 		delete f
 		//l.show()
 		return l
@@ -124,6 +165,8 @@ Language load_prelang(string filename)
 void check_lang(Language l, Language own)
 	print("checking " + l.name)
 	int nerrors = 0
+	
+	// check ids
 	for i in own.ids
 		
 		bool found_title = false
@@ -134,29 +177,90 @@ void check_lang(Language l, Language own)
 				found_tooltip = (j.tooltip.num > 0)
 				break
 		if i.title.num > 0 and !found_title
-			print("    MISSING title for " + i.id)
+			//print("    MISSING title for " + i.id)
 			nerrors ++
 		if i.tooltip.num > 0 and !found_tooltip
-			print("    MISSING tooltip for " + i.id)
+			//print("    MISSING tooltip for " + i.id)
 			nerrors ++
+	
+	// check texts
+	for t in own.texts
+		bool found = false
+		for tt in l.texts
+			if t.orig == tt.orig
+				found = (tt.trans.num > 0)
+				break
+		if !found
+			//print("    MISSING text: " + t.orig)
+			nerrors ++
+	
 	if nerrors == 0
 		print("    ok, good translation!")
+	else
+		print("    " + nerrors + " missing translations")
 
-void load_prelangs(string dir, Language own)
-	DirEntry[] files = DirSearch(dir, "*.prelang", false)
+Language[] load_prelangs()
+	Language[] langs
+	DirEntry[] files = DirSearch(conf.dir, "*.prelang", false)
 	for f in files
-		Language l = load_prelang(dir + "/" + f.name)
-		check_lang(l, own)
+		Language l = load_prelang(conf.dir + f.name)
+		langs.add(l)
+	return langs
+
+void parse_source_code(string source, Language l)
+	int pos0 = 0
+	while true
+		int pos = source.find("_(\"", pos0)
+		if pos < 0
+			break
+		pos += 3
+		int length = 0
+		for i in 0:1024
+			if source[pos + i] == '\'
+				i ++
+				continue
+			if source[pos + i] == '"'     // "
+				length = i
+				break
 		
+		LangText t
+		t.orig = str_m2utf8(source.substr(pos, length))
+		
+		bool found = false
+		for tt in l.texts
+			if tt.orig == t.orig
+				found = true
+				break
+		if !found
+			l.texts.add(t)
+		//print("    " + source.substr(pos, length))
+		pos0 = pos + length
+
+void parse_source_code_dir(string dir, Language l)
+	DirEntry[] files = DirSearch(dir, "*.cpp", true)
+	for f in files
+		if f.is_dir
+			parse_source_code_dir(dir + f.name + "/", l)
+		else
+			//print(dir + f.name)
+			string source = FileRead(dir + f.name)
+			parse_source_code(source, l)
 		
 		
 
 void export(string dir)
-	Language own_lang
-	find_all_ids(dir, own_lang)
-	load_prelangs(dir, own_lang)
+	conf.set_dir(dir)
+	conf.load()
+	
+	Language own = load_own_lang()
+	
+	Language[] langs = load_prelangs()
+	
+	for l in langs
+		check_lang(l, own)
 
 void main(string[] arg)
+
 	if arg.num > 0
 		if FileIsDirectory(arg[0])
 			export(arg[0])

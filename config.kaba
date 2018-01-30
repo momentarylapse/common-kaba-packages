@@ -1,0 +1,41 @@
+
+// leave \n and \t...
+string str_unescape(string s)
+	return s.replace("\\\"", "\"").replace("\\\\", "\\")
+
+string str_escape(string s)
+	return s.replace("\"", "\\\"").replace("\\", "\\\\")
+
+string str_m2utf8(string s)
+	return s.replace("&a", "ä").replace("&o", "ö").replace("&u", "ü").replace("&A", "Ä").replace("&O", "Ö").replace("&U", "Ü").replace("&s", "ß")
+
+class Config
+	string own_lang_name
+	string source_code_dir
+	string export_dir
+	
+	string dir
+	
+	void set_dir(string _dir)
+		dir = _dir
+		if dir.tail(1) != "/"
+			dir += "/"
+	
+	void load()
+		try
+			File* f = FileOpenText(dir + "export.txt")
+			string t
+			f >> t
+			f >> export_dir
+			f >> t
+			f >> source_code_dir
+			f >> t
+			f >> own_lang_name
+			delete f
+			
+			source_code_dir = dir + source_code_dir
+			export_dir = dir + export_dir
+		except
+			nil
+
+Config conf
