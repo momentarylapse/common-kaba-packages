@@ -1,0 +1,166 @@
+class Resource
+	string type
+	string id
+	string title
+	string tooltip
+	string[] options
+	bool enabled
+	int x, y, w, h
+	int page
+	string image
+	Resource[] children
+	//void reset()
+	extern void show(int indent)
+	extern string str(int indent)
+	
+extern Resource ParseResource(string buffer, bool literally)
+
+class DemoDialog extends Dialog
+	void __init__(string source)
+		super.__init__("", 100, 100, nil, false)
+		setBorderWidth(10)
+		fromSource(source)
+		event("close", &destroy)
+
+void show(string filename)
+	string source = FileRead(filename)
+	//print(source)
+	Resource r = ParseResource(source, true)
+	//r.show(0)
+	//print(r.str(0))
+	
+	if r.type == "Dialog"
+		Dialog* dlg = new DemoDialog(source)
+		dlg.run()
+	else if r.type == "Menu"
+		print("don't know how to show a menu")
+	else
+		print("don't know how to show a " + r.type)
+
+
+
+class LangID
+	string id
+	string title
+	string tooltip
+
+class Language
+	string name
+	LangID[] ids
+	void show()
+		print(name)
+		for i in ids
+			print(i.id)
+			print("\t" + i.title)
+			print("\t" + i.tooltip)
+
+void lang_id_add(LangID[] ids, string id, string title, string tooltip, string ns)
+	if id == "?" or id == ""
+		return
+	string cid = id
+	if cid.find("/", 0) < 0
+		//if ns != id
+		cid = ns + "/" + id
+	for i in ids
+		if i.id == cid
+			return
+	LangID a
+	a.id = cid
+	a.title = title
+	a.tooltip = tooltip
+	ids.add(a)
+	
+
+void get_ids(Resource r, LangID[] ids, string ns)
+	lang_id_add(ids, r.id, r.title, r.tooltip, ns)
+	
+	for c in r.children
+		get_ids(c, ids, ns)
+
+void sort_ids(LangID[] ids)
+	for i in 0:ids.num
+		for j in i+1:ids.num
+			if ids[i].id > ids[j].id
+				LangID t = ids[i]
+				ids[i] = ids[j]
+				ids[j] = t
+
+void find_all_ids(string dir, Language lang)
+	DirEntry[] files = DirSearch(dir, "*.hui", false)
+	for f in files
+		string source = FileRead(dir + "/" + f.name)
+		Resource r = ParseResource(source, true)
+		//print(r.str(0))
+		
+		get_ids(r, lang.ids, r.id)
+	
+	sort_ids(lang.ids)
+	
+//	lang.show()
+
+Language load_prelang(string filename)
+	Language l
+	try
+		File* f = FileOpenText(filename)
+		string t
+		int n
+		f >> t
+		f >> l.name
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangID id
+			f >> id.id
+			f >> id.title
+			f >> id.tooltip
+			l.ids.add(id)
+		delete f
+		//l.show()
+		return l
+	except Exception as e
+		print("ERROR: " + e.message())
+
+void check_lang(Language l, Language own)
+	print("checking " + l.name)
+	int nerrors = 0
+	for i in own.ids
+		
+		bool found_title = false
+		bool found_tooltip = false
+		for j in l.ids
+			if j.id == i.id
+				found_title = (j.title.num > 0)
+				found_tooltip = (j.tooltip.num > 0)
+				break
+		if i.title.num > 0 and !found_title
+			print("    MISSING title for " + i.id)
+			nerrors ++
+		if i.tooltip.num > 0 and !found_tooltip
+			print("    MISSING tooltip for " + i.id)
+			nerrors ++
+	if nerrors == 0
+		print("    ok, good translation!")
+
+void load_prelangs(string dir, Language own)
+	DirEntry[] files = DirSearch(dir, "*.prelang", false)
+	for f in files
+		Language l = load_prelang(dir + "/" + f.name)
+		check_lang(l, own)
+		
+		
+		
+
+void export(string dir)
+	Language own_lang
+	find_all_ids(dir, own_lang)
+	load_prelangs(dir, own_lang)
+
+void main(string[] arg)
+	if arg.num > 0
+		if FileIsDirectory(arg[0])
+			export(arg[0])
+		else if arg[0].tail(4) == ".hui"
+			show(arg[0])
+		else
+			print("???")
