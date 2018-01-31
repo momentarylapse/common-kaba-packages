@@ -1,4 +1,5 @@
 use "config.kaba"
+use "language.kaba"
 
 class Resource
 	string type
@@ -17,6 +18,8 @@ class Resource
 	
 extern Resource ParseResource(string buffer, bool literally)
 
+Resource[] resources
+
 class DemoDialog extends Dialog
 	void __init__(string source)
 		super.__init__("", 100, 100, nil, false)
@@ -29,183 +32,57 @@ void show(string filename)
 	//print(source)
 	Resource r = ParseResource(source, true)
 	//r.show(0)
-	//print(r.str(0))
+	print(r.str(0))
 	
 	if r.type == "Dialog"
 		Dialog* dlg = new DemoDialog(source)
 		dlg.run()
-	else if r.type == "Menu"
-		print("don't know how to show a menu")
 	else
 		print("don't know how to show a " + r.type)
 
 
-
-class LangID
-	string id
-	string title
-	string tooltip
-
-class LangText
-	string orig
-	string trans
-
-class Language
-	string filename
-	string name
-	LangID[] ids
-	LangText[] texts
-	void show()
-		print(name)
-		for i in ids
-			print(i.id)
-			print("\t" + i.title)
-			print("\t" + i.tooltip)
-			
-		for t in texts
-			print(t.orig)
-			print("\t" + t.trans)
-	void add_id(string id, string title, string tooltip)
-		for i in ids
-			if i.id == id
-				if title.num > 0
-					i.title = title
-				if tooltip.num > 0
-					i.tooltip = tooltip
-				return
-		LangID i
-		i.id = id
-		i.title = title
-		i.tooltip = tooltip
-		ids.add(i)
-	void add_text(string orig, string trans)
-		for t in texts
-			if t.orig == orig
-				if trans.num > 0
-					t.trans = trans
-				return
-		LangText t
-		t.orig = orig
-		t.trans = trans
-		texts.add(t)
-		
-	void save()
-		File* f = FileCreateText(filename)
-		f << "// Language"
-		f << name
-		f << "// Num IDs"
-		f << ids.num
-		f << "// Data (ID,Text,Tooltip)"
-		for i in ids
-			f << i.id
-			f << i.title
-			f << i.tooltip
-		f << "// Num Language Strings"
-		f << texts.num
-		f << "// Data (ID,Text)"
-		for t in texts
-			f << t.orig
-			f << t.trans
-		delete f
-
-
-void lang_id_add(LangID[] ids, string id, string title, string tooltip, string ns)
-	if id == "?" or id == ""
-		return
-	string cid = id
-	if cid.find("/", 0) < 0
-		//if ns != id
-		cid = ns + "/" + id
-	for i in ids
-		if i.id == cid
-			return
-	LangID a
-	a.id = cid
-	a.title = title
-	a.tooltip = tooltip
-	ids.add(a)
 	
 
-void get_ids(Resource r, LangID[] ids, string ns)
-	lang_id_add(ids, r.id, r.title, r.tooltip, ns)
+void get_ids(Language l, Resource r, string ns)
+	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
 	
 	for c in r.children
-		get_ids(c, ids, ns)
+		get_ids(l, c, ns)
 
-void sort_ids(LangID[] ids)
-	for i in 0:ids.num
-		for j in i+1:ids.num
-			if ids[i].id > ids[j].id
-				LangID t = ids[i]
-				ids[i] = ids[j]
-				ids[j] = t
 
-void sort_texts(LangText[] texts)
-	for i in 0:texts.num
-		for j in i+1:texts.num
-			if texts[i].orig > texts[j].orig
-				LangText t = texts[i]
-				texts[i] = texts[j]
-				texts[j] = t
-
-void find_all_ids(Language lang)
+Resource[] load_all_huis(bool literally)
+	Resource[] res
 	DirEntry[] files = DirSearch(conf.dir, "*.hui", false)
 	for f in files
 		string source = FileRead(conf.dir + f.name)
-		Resource r = ParseResource(source, true)
-		//print(r.str(0))
+		Resource r = ParseResource(source, literally)
+		if r.type == "Dialog" or r.type == "Menu" or r.type == "Toolbar"
+			res.add(r)
+		else
+			print(" UNKNOWN TYPE " + f.name + ": " + r.type)
+	return res
 		
-		get_ids(r, lang.ids, r.id)
-	
-	sort_ids(lang.ids)
+
+void find_all_ids(Language lang, Resource[] res)
+	for r in res
+		get_ids(lang, r, r.id)
 	
 //	lang.show()
 
 
-Language load_own_lang()
+Language load_own_lang(bool literally)
 	Language own
 	own.name = conf.own_lang_name
 	
 	print("loading own language: " + own.name)
-	find_all_ids(own)
+	resources = load_all_huis(literally)
+	find_all_ids(own, resources)
 	
 	parse_source_code_dir(conf.source_code_dir, own)
-	sort_texts(own.texts)
+	own.sort()
 	print("    " + own.ids.num + " ids, " + own.texts.num + " texts")
 	
 	return own
-
-Language load_prelang(string filename)
-	Language l
-	l.filename = filename
-	//try
-		File* f = FileOpenText(filename)
-		string t
-		int n
-		f >> t
-		f >> l.name
-		f >> t
-		f >> n
-		f >> t
-		for i in 0:n
-			LangID id
-			f >> id.id
-			f >> id.title
-			f >> id.tooltip
-			l.ids.add(id)
-		f >> t
-		f >> n
-		f >> t
-		for i in 0:n
-			LangText tt
-			f >> tt.orig
-			f >> tt.trans
-			l.texts.add(tt)
-		delete f
-		//l.show()
-		return l
-	//except Exception as e
-	//	print("ERROR: " + e.message())
 
 bool check_lang(Language l, Language own, bool create_file)
 	print("checking " + l.name)
@@ -228,14 +105,14 @@ bool check_lang(Language l, Language own, bool create_file)
 		if i.title.num > 0 and !found_title
 			if create_file
 				f << "# id:" + i.id
-				f << i.title
+				f << i.title.escape()
 				f << ""
 			//print("    MISSING title for " + i.id)
 			nerrors ++
 		if i.tooltip.num > 0 and !found_tooltip
 			if create_file
 				f << "# tooltip:" + i.id
-				f << i.tooltip
+				f << i.tooltip.escape()
 				f << ""
 			//print("    MISSING tooltip for " + i.id)
 			nerrors ++
@@ -250,7 +127,7 @@ bool check_lang(Language l, Language own, bool create_file)
 		if !found
 			if create_file
 				f << "# text"
-				f << t.orig
+				f << t.orig.escape()
 				f << ""
 			//print("    MISSING text: " + t.orig)
 			nerrors ++
@@ -263,14 +140,6 @@ bool check_lang(Language l, Language own, bool create_file)
 	if create_file
 		delete f
 	return nerrors == 0
-
-Language[] load_prelangs()
-	Language[] langs
-	DirEntry[] files = DirSearch(conf.dir, "*.prelang", false)
-	for f in files
-		Language l = load_prelang(conf.dir + f.name)
-		langs.add(l)
-	return langs
 
 void parse_source_code(string source, Language l)
 	int pos0 = 0
@@ -289,7 +158,7 @@ void parse_source_code(string source, Language l)
 				break
 		
 		LangText t
-		t.orig = str_m2utf8(source.substr(pos, length)).replace("\t", "\\t")
+		t.orig = str_m2utf8(source.substr(pos, length)).unescape()
 		
 		if t.orig.num > 0
 			bool found = false
@@ -311,22 +180,79 @@ void parse_source_code_dir(string dir, Language l)
 			//print(dir + f.name)
 			string source = FileRead(dir + f.name)
 			parse_source_code(source, l)
-		
-		
+
+
+
+
+void write_resource(File *f, Resource r)
+	f << r.type
+	if r.id.head(1) == "/"
+		f << r.id.substr(1, -1)
+	else
+		f << r.id
+	f << r.options.join(",")
+	f << r.image
+	f << r.enabled
+	f << r.x
+	f << r.y
+	f << r.w
+	f << r.h
+	f << r.page
+	f << r.children.num
+	for c in r.children
+		write_resource(f, c)
+
+
+void write_language(File *f, Language l)
+	LangID[] ids = l.get_useful_ids()
+	LangText[] texts = l.get_useful_texts()
+
+	f << "// Language"
+	f << l.name
+	f << "// Number Of IDs"
+	f << ids.num
+	f << "// Text"
+	for i in ids
+		f << i.id
+		f << i.title.escape()
+		f << i.tooltip.escape()
+	f << "// Num Language Strings"
+	f << texts.num
+	f << "// Text"
+	for t in texts
+		f << t.orig.escape()
+		f << t.trans.escape()
+
+void export_resources(Resource[] res, Language own, Language[] langs)
+	File *f = FileCreateText(conf.export_dir + "hui_resources.txt")
+	f << "t5"
+	f << "// Number Of Resources"
+	f << res.num
+	for r in res
+		f << "// Resource"
+		write_resource(f, r)
+	f << "// Number Of Languages"
+	f << (langs.num + 1)
+	write_language(f, own)
+	for l in langs
+		write_language(f, l)
+
 
 void action_export(string dir)
 	conf.set_dir(dir)
 	conf.load()
 	
-	Language own = load_own_lang()
+	Language own = load_own_lang(true)//false)
 	
 	Language[] langs = load_prelangs()
+	
+	export_resources(resources, own, langs)
 	
 void action_check(string dir)
 	conf.set_dir(dir)
 	conf.load()
 	
-	Language own = load_own_lang()
+	Language own = load_own_lang(true)
 	
 	Language[] langs = load_prelangs()
 	
@@ -344,11 +270,11 @@ void patch_language(Language l, Language own, string filename)
 			if c == ""
 				continue
 			if a.head(5) == "# id:"
-				l.add_id(a.substr(5, -1), c, "")
+				l.add_id(a.substr(5, -1), c.unescape(), "")
 			if a.head(10) == "# tooltip:"
-				l.add_id(a.substr(5, -1), "", c)
+				l.add_id(a.substr(10, -1), "", c.unescape())
 			if a == "# text"
-				l.add_text(b, c)
+				l.add_text(b.unescape(), c.unescape())
 	except
 		nil
 
@@ -356,7 +282,7 @@ void action_translate(string filename)
 	conf.set_dir(filename.dirname())
 	conf.load()
 	
-	Language own = load_own_lang()
+	Language own = load_own_lang(true)
 	
 	Language l = load_prelang(filename)
 	if check_lang(l, own, true)

@@ -1,0 +1,168 @@
+use "config.kaba"
+
+
+class LangID
+	string id
+	string title
+	string tooltip
+
+class LangText
+	string orig
+	string trans
+
+class Language
+	string filename
+	string name
+	LangID[] ids
+	LangText[] texts
+	void show()
+		print(name)
+		for i in ids
+			print(i.id)
+			print("\t" + i.title)
+			print("\t" + i.tooltip)
+			
+		for t in texts
+			print(t.orig)
+			print("\t" + t.trans)
+	void add_id(string id, string title, string tooltip)
+		for i in ids
+			if i.id == id
+				if title.num > 0
+					i.title = title
+				if tooltip.num > 0
+					i.tooltip = tooltip
+				return
+		LangID i
+		i.id = id
+		i.title = title
+		i.tooltip = tooltip
+		ids.add(i)
+	void add_text(string orig, string trans)
+		for t in texts
+			if t.orig == orig
+				if trans.num > 0
+					t.trans = trans
+				return
+		LangText t
+		t.orig = orig
+		t.trans = trans
+		texts.add(t)
+		
+	void save()
+		File* f = FileCreateText(filename)
+		f << "// Language"
+		f << name
+		f << "// Num IDs"
+		f << ids.num
+		f << "// Data (ID,Text,Tooltip)"
+		for i in ids
+			f << i.id
+			f << i.title.escape()
+			f << i.tooltip.escape()
+		f << "// Num Language Strings"
+		f << texts.num
+		f << "// Data (ID,Text)"
+		for t in texts
+			f << t.orig.escape()
+			f << t.trans.escape()
+		delete f
+
+
+	void sort()
+		sort_ids(ids)
+		sort_texts(texts)
+	LangID[] get_useful_ids()
+		LangID[] uids
+		for i in ids
+			if i.title.num > 0 or i.tooltip.num > 0
+				uids.add(i)
+		sort_ids(uids)
+		return uids
+	LangText[] get_useful_texts()
+		LangText[] utexts
+		for t in texts
+			if t.trans.num > 0
+				utexts.add(t)
+		sort_texts(utexts)
+		return utexts
+
+
+
+Language load_prelang(string filename)
+	Language l
+	l.filename = filename
+	//try
+		File* f = FileOpenText(filename)
+		string t
+		int n
+		f >> t
+		f >> l.name
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangID id
+			f >> id.id
+			f >> t
+			id.title = t.unescape()
+			f >> t
+			id.tooltip = t.unescape()
+			l.ids.add(id)
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangText tt
+			f >> t
+			tt.orig = t.unescape()
+			f >> t
+			tt.trans = t.unescape()
+			l.texts.add(tt)
+		delete f
+		//l.show()
+		return l
+	//except Exception as e
+	//	print("ERROR: " + e.message())
+
+
+Language[] load_prelangs()
+	Language[] langs
+	DirEntry[] files = DirSearch(conf.dir, "*.prelang", false)
+	for f in files
+		Language l = load_prelang(conf.dir + f.name)
+		langs.add(l)
+	return langs
+
+void lang_id_add(LangID[] ids, string id, string title, string tooltip, string ns)
+	if id == "?" or id == ""
+		return
+	string cid = id
+	if cid.find("/", 0) < 0
+		//if ns != id
+		cid = ns + "/" + id
+	for i in ids
+		if i.id == cid
+			return
+	LangID a
+	a.id = cid
+	a.title = title
+	a.tooltip = tooltip
+	ids.add(a)
+
+void sort_ids(LangID[] ids)
+	for i in 0:ids.num
+		for j in i+1:ids.num
+			if ids[i].id > ids[j].id
+				LangID t = ids[i]
+				ids[i] = ids[j]
+				ids[j] = t
+
+
+void sort_texts(LangText[] texts)
+	for i in 0:texts.num
+		for j in i+1:texts.num
+			if texts[i].orig > texts[j].orig
+				LangText t = texts[i]
+				texts[i] = texts[j]
+				texts[j] = t

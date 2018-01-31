@@ -1,10 +1,14 @@
 
-// leave \n and \t...
-string str_unescape(string s)
-	return s.replace("\\\"", "\"").replace("\\\\", "\\")
+/*string str_unescape(string s)
+	string r
+	for i in 0:s.num
+	return s.replace("\\\"", "\"").replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
 
 string str_escape(string s)
-	return s.replace("\"", "\\\"").replace("\\", "\\\\")
+	string r
+	for c in s
+		if c == 
+	return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\t", "\\t")*/
 
 string str_m2utf8(string s)
 	return s.replace("&a", "ä").replace("&o", "ö").replace("&u", "ü").replace("&A", "Ä").replace("&O", "Ö").replace("&U", "Ü").replace("&s", "ß")
