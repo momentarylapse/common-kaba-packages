@@ -40,6 +40,6 @@ class Config
 			source_code_dir = dir + source_code_dir
 			export_dir = dir + export_dir
 		except
-			nil
+			pass
 
 Config conf

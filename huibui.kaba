@@ -7,10 +7,7 @@ class Resource
 	string title
 	string tooltip
 	string[] options
-	bool enabled
-	int x, y, w, h
-	int page
-	string image
+	int x, y
 	Resource[] children
 	//void reset()
 	extern void show(int indent)
@@ -26,6 +23,8 @@ class DemoDialog extends Dialog
 		setBorderWidth(10)
 		fromSource(source)
 		event("close", &destroy)
+		event("ok", &destroy)
+		event("cancel", &destroy)
 
 void show(string filename)
 	string source = FileRead(filename)
@@ -191,13 +190,8 @@ void write_resource(File *f, Resource r)
 	else
 		f << r.id
 	f << r.options.join(",")
-	f << r.image
-	f << r.enabled
 	f << r.x
 	f << r.y
-	f << r.w
-	f << r.h
-	f << r.page
 	f << r.children.num
 	for c in r.children
 		write_resource(f, c)
@@ -225,7 +219,7 @@ void write_language(File *f, Language l)
 
 void export_resources(Resource[] res, Language own, Language[] langs)
 	File *f = FileCreateText(conf.export_dir + "hui_resources.txt")
-	f << "t5"
+	f << "t7"
 	f << "// Number Of Resources"
 	f << res.num
 	for r in res
@@ -276,7 +270,7 @@ void patch_language(Language l, Language own, string filename)
 			if a == "# text"
 				l.add_text(b.unescape(), c.unescape())
 	except
-		nil
+		pass
 
 void action_translate(string filename)
 	conf.set_dir(filename.dirname())
@@ -294,11 +288,11 @@ void action_translate(string filename)
 		check_lang(l, own, false)
 		l.save()
 	except
-		nil
+		pass
 	try
 		FileDelete(conf.dir + "TRANS")
 	except
-		nil
+		pass
 
 void action_add(string filename, string name)
 	conf.set_dir(filename.dirname())
