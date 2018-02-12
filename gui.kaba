@@ -7,13 +7,14 @@ class KabamaWindow extends Dialog
 
 	void onOk()
 		string s = getString("edit")
-		setString("list", s + "\\" + ExprToStr(ExecuteComplete(Parse(s))))
+		try
+			setString("list", s + "\\" + ExprToStr(ExecuteComplete(Parse(s))))
+		except Exception as e
+			setString("list", s + "\\Fehler: " + e.message())
 
 	void __init__()
 		super.__init__("kabama", 800, 600, nil, false)
-		print(self)
 		addGrid("", 0, 0, 1, 2, "table")
-		print("a")
 		setTarget("table", 0)
 		addListView("in\\out", 0, 0, 0, 0, "list")
 		addGrid("", 0, 1, 2, 1, "table2")
