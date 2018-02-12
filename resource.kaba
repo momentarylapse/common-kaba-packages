@@ -1,0 +1,33 @@
+use "config.kaba"
+
+class Resource
+	string type
+	string id
+	string title
+	string tooltip
+	string[] options
+	int x, y
+	Resource[] children
+	//void reset()
+	extern void show(int indent)
+	extern string str(int indent)
+	
+extern Resource ParseResource(string buffer, bool literally)
+
+Resource[] resources
+string[] resource_files
+
+
+Resource[] load_all_huis(bool literally)
+	Resource[] res
+	DirEntry[] files = DirSearch(conf.dir, "*.hui", false)
+	for f in files
+		string source = FileRead(conf.dir + f.name)
+		Resource r = ParseResource(source, literally)
+		if r.type == "Dialog" or r.type == "Window" or r.type == "Menu" or r.type == "Toolbar"
+			resource_files.add(conf.dir + f.name)
+			res.add(r)
+		else
+			print(" UNKNOWN TYPE " + f.name + ": " + r.type)
+	return res
+		

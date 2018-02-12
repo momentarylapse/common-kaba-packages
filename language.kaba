@@ -166,3 +166,64 @@ void sort_texts(LangText[] texts)
 				LangText t = texts[i]
 				texts[i] = texts[j]
 				texts[j] = t
+
+
+
+bool check_lang(Language l, Language own, bool create_file)
+	print("checking " + l.name)
+	int nerrors = 0
+	
+	File *f
+	if create_file
+		f = FileCreateText(conf.dir + "TRANS")
+	
+	// check ids
+	for i in own.ids
+		
+		bool found_title = false
+		bool found_tooltip = false
+		for j in l.ids
+			if j.id == i.id
+				found_title = (j.title.num > 0)
+				found_tooltip = (j.tooltip.num > 0)
+				break
+		if i.title.num > 0 and !found_title
+			if create_file
+				f << "# id:" + i.id
+				f << i.title.escape()
+				f << ""
+			//print("    MISSING title for " + i.id)
+			nerrors ++
+		if i.tooltip.num > 0 and !found_tooltip
+			if create_file
+				f << "# tooltip:" + i.id
+				f << i.tooltip.escape()
+				f << ""
+			//print("    MISSING tooltip for " + i.id)
+			nerrors ++
+	
+	// check texts
+	for t in own.texts
+		bool found = false
+		for tt in l.texts
+			if t.orig == tt.orig
+				found = (tt.trans.num > 0)
+				break
+		if !found
+			if create_file
+				f << "# text"
+				f << t.orig.escape()
+				f << ""
+			//print("    MISSING text: " + t.orig)
+			nerrors ++
+	
+	if nerrors == 0
+		print("    ok, good translation!")
+	else
+		print("    " + nerrors + " missing translations")
+
+	if create_file
+		delete f
+	return nerrors == 0
+
+

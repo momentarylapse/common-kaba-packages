@@ -1,0 +1,46 @@
+use "config.kaba"
+use "resource.kaba"
+
+class DemoDialog extends Window
+	void __init__(string source)
+		super.__init__("", 100, 100)
+		setBorderWidth(10)
+		fromSource(source)
+		event("close", &destroy)
+		event("ok", &destroy)
+		event("cancel", &destroy)
+
+class ToolbarDemoDialog extends Dialog
+	void __init__(string source)
+		super.__init__("Toolbar demo", 800, 300, nil, false)
+		toolbar(0).fromSource(source)
+
+class MenuDemoDialog extends Window
+	void __init__(string source)
+		super.__init__("Menu demo", 800, 300)
+		Menu* m = HuiCreateMenuFromSource(source)
+		setMenu(m)
+
+void action_demo(string filename)
+	conf.set_dir(filename.dirname())
+	conf.load()
+	
+	string source = FileRead(filename)
+	//print(source)
+	Resource r = ParseResource(source, true)
+	//r.show(0)
+	print(r.str(0))
+	
+	if r.type == "Dialog" or r.type == "Window"
+		Window* dlg = new DemoDialog(source)
+		dlg.run()
+	else if r.type == "Toolbar"
+		Dialog* dlg = new ToolbarDemoDialog(source)
+		dlg.run()
+	else if r.type == "Menu"
+		Window* dlg = new MenuDemoDialog(source)
+		dlg.run()
+	else
+		print("don't know how to show a " + r.type)
+
+

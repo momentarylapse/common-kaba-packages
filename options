@@ -1,0 +1,77 @@
+== tags ==
+expandx
+noexpandx
+expandy
+noexpandy
+indent
+noindent
+grabfocus
+
+== key=value ==
+width=
+height=
+marginleft=
+marginright=
+margintop=
+marginbottom=
+
+Button
+	flat
+ColorButton
+	alpha
+ComboBox
+	!!editable
+DrawingArea
+	!!opengl
+Edit
+	clear-placeholder
+	clear-completion
+	placeholder=
+	completion=
+Grid
+	buttonbar
+	vertical
+Label
+	bold
+	italic
+	big
+	wrap
+	center
+	right
+	angle=
+ListView
+	multiline/select-multi
+	select-single
+	nobar
+	bar=true/false
+	reorderable
+	format=...
+MultilineEdit
+	!!noframe
+	handlekeys
+	monospace
+Revealer
+	!!slide-up
+	!!slide-down
+	!!slide-left
+	!!slide-right
+	!!cross-fade
+Separator
+	!!vertical
+Slider
+	!!vertical
+	range=min:max:step
+	origin=true/false
+	showvalue=true/false
+	mark=value:title
+	clearmarks
+SpinButton
+	range=...
+	wrap
+	nowrap
+TabControl
+	bar
+	nobar
+TreeView
+	bar
+	nobar
