@@ -281,7 +281,6 @@ class LocalFileDB
 	LocalFile *find_by_hash(string hash)
 		if hash == ""
 			raise(new Exception("invalid hash"))
-			return nil
 		for f in files
 			if hash == f.hash
 				return &f
@@ -334,7 +333,7 @@ class LocalFileDB
 					f.hash = h2
 					save()
 			except
-				nil
+				pass
 	
 LocalFileDB db
 

@@ -26,7 +26,7 @@ void scp_download(string source, string dest)
 	cmd += " \"" + bash_escape(dest) + "\""
 	if conf.verbose
 		print(cmd)
-	_exec_(cmd)
+	shell_execute(cmd)
 
 void scp_upload(string source, string dest)
 	string cmd = "scp"
@@ -35,7 +35,7 @@ void scp_upload(string source, string dest)
 	cmd += " " + SERVER + ":" + rp
 	if conf.verbose
 		print(cmd)
-	_exec_(cmd)
+	shell_execute(cmd)
 
 string yii(string action, string[] params)
 	string cmd = "ssh " + SERVER + " command=\""
@@ -295,9 +295,11 @@ void remote_sync_pure_locals_by_hash(string _dir)
 	for rf in rfiles
 		if conf.verbose
 			print(rf.hash)
-		LocalFile* lf = db.find_by_hash(rf.hash)
-		if lf
+		try
+			LocalFile* lf = db.find_by_hash(rf.hash)
 			if conf.verbose
 				print(lf.path)
 			sync_file(rf, lf)
+		except
+			print("SHOULD NOT BE HERE...")
 

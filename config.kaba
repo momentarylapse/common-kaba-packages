@@ -1,7 +1,6 @@
 const string SERVER = "michi.is-a-geek.org"
 //const string SERVER = "myu"
 const string YII = "/var/www/html/_alexandria4/yii"
-const string TEMP_OUT = "/tmp/sisyphos_out"
 const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
 
 const string MEDIUM = "medium"
@@ -51,7 +50,7 @@ void make_all_dirs(string path)
 			try
 				DirCreate(dir)
 			except
-				nil
+				pass
 
 
 	
@@ -71,8 +70,7 @@ void error_out(Exception *e)
 string shell_exec(string cmd)
 	//if conf.verbose
 	//	print(cmd)
-	_exec_(cmd + " > " + TEMP_OUT)
-	return FileRead(TEMP_OUT).trim()
+	return shell_execute(cmd).trim()
 
 class ConfigDir
 	string dir
