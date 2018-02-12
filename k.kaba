@@ -1404,7 +1404,7 @@ class Interpreter
 		else if sn.type == TYPE_CONTINUE
 			cur_context.flag_continue = true
 		else if sn.type == TYPE_BLOCK
-			nil
+			pass
 		else if sn.type == TYPE_ARRAY_BUILDER
 			ret.setType(TYPE_ARRAY)
 			for c in params
@@ -1459,9 +1459,9 @@ void main(string[] arg)
 			input = a
 	if input.num > 0
 		string source = input
-		if from_file
-			source = FileRead(input)
 		try
+			if from_file
+				source = FileRead(input)
 			eval(source)
 		except Exception as e
 			print("------------------------------------------------")
