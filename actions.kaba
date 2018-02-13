@@ -14,13 +14,13 @@ class DBLister
 				return true
 		return false
 
-	void find_paths(string _dir)
+	void find_paths(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
 		DirEntry[] list = DirSearch(dir, "*", true)
 		for e in list
 			if e.is_dir
-				if e.name.head(1) != "."
-					find_paths(dir + e.name)
+				if e.name.head(1) != "." and recursive
+					find_paths(dir + e.name, recursive)
 			else
 				string path = (dir + e.name)
 				if !is_ignored(path)
@@ -54,7 +54,7 @@ class DBLister
 
 		files = db.get_in_dir(dir, conf.recursive)
 		
-		find_paths(dir)
+		find_paths(dir, conf.recursive)
 		for p in paths
 			try
 				db.find_by_path(p)
