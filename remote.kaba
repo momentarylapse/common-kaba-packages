@@ -239,7 +239,7 @@ void remote_download_meta(LocalFile*[] files)
 			db.dirty = true
 
 void remote_sync_by_id(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir)
+	LocalFile*[] files = db.get_in_dir(_dir, conf.recursive)
 	LocalFile*[] files_wanted
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
@@ -284,7 +284,7 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 
 
 void remote_sync_pure_locals_by_hash(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir)
+	LocalFile*[] files = db.get_in_dir(_dir, conf.recursive)
 	string[] hashes
 	for f in files
 		if f.pure_local()

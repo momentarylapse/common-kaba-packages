@@ -52,7 +52,7 @@ class DBLister
 					print("ERROR: can't find '" + dir + "'")
 			return files
 
-		files = db.get_in_dir(dir)
+		files = db.get_in_dir(dir, conf.recursive)
 		
 		find_paths(dir)
 		for p in paths
@@ -174,9 +174,12 @@ void action_rm(string path)
 		f.drop_me = true
 	db.save()
 	
-void action_mv(string source, string dest)
+void action_mv(string source, string _dest)
 	try
+		string dest = _dest
 		LocalFile* f = db.find_by_path(source)
+		if FileIsDirectory(dest)
+			dest = dir_canonical(dest) + source.basename()
 		if FileExists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
 		print("MOVE  " + rel_path(source) + " -> " + rel_path(dest))
@@ -207,7 +210,7 @@ void structure_file(LocalFile* f, string structure, string root)
 void action_structure_apply(string _dir, string structure)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
-	LocalFile*[] files = db.get_in_dir(dir)
+	LocalFile*[] files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		structure_file(f, structure, dir)
 
@@ -215,7 +218,7 @@ void action_structure_apply(string _dir, string structure)
 void action_structure_auto(string _dir)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
-	LocalFile*[] files = db.get_in_dir(dir)
+	LocalFile*[] files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		ConfigDir* e = conf.get_cfg(f.path)
 		if !e
@@ -247,11 +250,10 @@ void action_find(string filter)
 		f.show()
 	
 void action_tag_add(string path, string key, string value)
-	try
-		LocalFile* f = db.find_by_path(path)
+	set_working_dir(path)
+	LocalFile*[] files = db.get(path, conf.recursive)
+	for f in files
 		f.tag_add(key, value)
-	except Exception as e
-		error_out(e)
 
 void action_tag_set(string path, string key, string value)
 	try
@@ -272,7 +274,7 @@ void action_tag_rm(string path, string key, string value)
 void action_pull(string path)
 	set_working_dir(path)
 	
-	LocalFile*[] files = db.get(path)
+	LocalFile*[] files = db.get(path, conf.recursive)
 	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
@@ -286,7 +288,7 @@ void action_pull(string path)
 void action_push(string path)
 	set_working_dir(path)
 	
-	LocalFile*[] files = db.get(path)
+	LocalFile*[] files = db.get(path, conf.recursive)
 	for f in files
 		if f.pure_local() //or f.is(CHANGED_FILE)
 			remote_upload(f)
@@ -314,7 +316,7 @@ void action_sync(string dir)
 	
 void action_tag_auto(string path)
 	set_working_dir(path)
-	LocalFile*[] files = db.get(path)
+	LocalFile*[] files = db.get(path, conf.recursive)
 	for f in files
 		auto_tag(f)
 	

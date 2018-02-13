@@ -304,22 +304,35 @@ class LocalFileDB
 				list.add(&f)
 		return list
 
-	LocalFile*[] get_in_dir(string _dir)
+	LocalFile*[] get_in_dir(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
 			
 		LocalFile*[] list
-		for f in files
-			if f.path.head(dir.num) == dir
-				list.add(&f)
+		if recursive
+			for f in files
+				if f.path.head(dir.num) == dir
+					if !f.pure_local() and conf.filter_pure_local
+						continue
+					if !f.pure_remote() and conf.filter_pure_remote
+						continue
+					list.add(&f)
+		else
+			for f in files
+				if f.path.dirname() == dir
+					if !f.pure_local() and conf.filter_pure_local
+						continue
+					if !f.pure_remote() and conf.filter_pure_remote
+						continue
+					list.add(&f)
 		return list
 
-	LocalFile*[] get(string path)
+	LocalFile*[] get(string path, bool rec)
 		try
 			LocalFile*[] files
 			files.add(find_by_path(path))
 			return files
 		except
-			return get_in_dir(path)
+			return get_in_dir(path, rec)
 		
 	void rehash()
 		for f in files
@@ -341,12 +354,15 @@ void auto_tag(LocalFile *f)
 	if !FileExists(f.path)
 		return
 	string ext = f.path.extension()
-	if ext == "pdf"
-		string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
-		if s.num > 0
-			f.tag_set("pages", s.int().str())
-	if ext == "jpg" or ext == "png" or ext == "bmp"
-		string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
-		if s.num >= 2
-			f.tag_set("width", s[0].int().str())
-			f.tag_set("height", s[1].int().str())
+	try
+		if ext == "pdf"
+			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
+			if s.num > 0
+				f.tag_set("pages", s.int().str())
+		if ext == "jpg" or ext == "png" or ext == "bmp"
+			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
+			if s.num >= 2
+				f.tag_set("width", s[0].int().str())
+				f.tag_set("height", s[1].int().str())
+	except Exception as e
+		error_out(e)
