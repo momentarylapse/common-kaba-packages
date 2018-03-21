@@ -1,0 +1,147 @@
+class Library
+	string name
+	string[] libs
+	void __init__(string _name, string[] _libs)
+		name = _name
+		libs = _libs
+	virtual bool test()
+	virtual string compiler_flags()
+		return ""
+	virtual string linker_flags()
+		string r
+		for l in libs
+			if l.num > 0
+				r += " -l" + l
+		return r
+
+class LibraryPulseaudio extends Library
+	override void __init__()
+		super.__init__("pulseaudio", ["pulse"])
+	override bool test()
+		return FileExists("/usr/include/pulse/pulseaudio.h")
+
+class LibraryPortaudio extends Library
+	override void __init__()
+		super.__init__("portaudio", ["portaudio"])
+	override bool test()
+		return FileExists("/usr/include/portaudio.h")
+
+class LibraryAlsa extends Library
+	override void __init__()
+		super.__init__("alsa", ["asound"])
+	override bool test()
+		return FileExists("/usr/include/alsa/asoundlib.h")
+
+class LibraryOpenAL extends Library
+	override void __init__()
+		super.__init__("openal", ["openal"])
+	override bool test()
+		return FileExists("/usr/include/AL/al.h")
+	override string compiler_flags()
+		return " -I/usr/include/AL"
+
+class LibraryOgg extends Library
+	override void __init__()
+		super.__init__("ogg", ["ogg", "vorbis", "vorbisfile", "vorbisenc"])
+	override bool test()
+		return FileExists("/usr/include/vorbis/vorbisfile.h") and FileExists("/usr/include/vorbis/vorbisenc.h") and FileExists("/usr/include/ogg/ogg.h")
+
+class LibraryFlac extends Library
+	override void __init__()
+		super.__init__("flac", ["FLAC"])
+	override bool test()
+		return FileExists("/usr/include/FLAC/all.h")
+
+class LibraryUnwind extends Library
+	override void __init__()
+		super.__init__("unwind", ["unwind"])
+	override bool test()
+		return FileExists("/usr/include/unwind.h")
+
+class LibraryZlib extends Library
+	override void __init__()
+		super.__init__("zlib", ["z"])
+	override bool test()
+		return FileExists("/usr/include/zlib.h")
+
+class LibraryXlib extends Library
+	override void __init__()
+		super.__init__("xlib", ["X11"])
+	override bool test()
+		return FileExists("/usr/include/X11/Xlib.h")
+
+class LibraryFftw3 extends Library
+	override void __init__()
+		super.__init__("fftw3", ["fftw3f"])
+	override bool test()
+		return FileExists("/usr/include/fftw3.h")
+
+class LibraryGtk3 extends Library
+	override void __init__()
+		super.__init__("gtk3", [""])
+	override bool test()
+		return FileExists("/usr/include/gtk-3.0/gtk/gtk.h")
+	override string compiler_flags()
+		return " `pkg-config --cflags gtk+-3.0`"
+	override string linker_flags()
+		return " `pkg-config --cflags --libs gtk+-3.0`"
+
+class LibraryGL extends Library
+	override void __init__()
+		super.__init__("gl", ["GL"])
+	override bool test()
+		return FileExists("/usr/include/GL/gl.h")
+
+class LibraryGLU extends Library
+	override void __init__()
+		super.__init__("glu", ["GLU"])
+	override bool test()
+		return FileExists("/usr/include/GL/glu.h")
+
+
+class LibraryManager
+	Library*[] libraries
+
+	void init()
+		libraries.add(new LibraryPulseaudio)
+		libraries.add(new LibraryPortaudio)
+		libraries.add(new LibraryAlsa)
+		libraries.add(new LibraryOgg)
+		libraries.add(new LibraryFlac)
+		libraries.add(new LibraryUnwind)
+		libraries.add(new LibraryXlib)
+		libraries.add(new LibraryGtk3)
+		libraries.add(new LibraryZlib)
+		libraries.add(new LibraryFftw3)
+		libraries.add(new LibraryGL)
+		libraries.add(new LibraryGLU)
+
+
+	bool has(string name)
+		for l in libraries
+			if l.name == name
+				return l.test()
+		raise(new Exception("unknown library: " + name))
+	
+	bool test(string name)
+		print("checking library: " + name)
+		if has(name)
+			print("    ok")
+			return true
+		else
+			print("   NOT FOUND")
+		return false
+
+	string compiler_flags(string name)
+		for l in libraries
+			if l.name == name
+				return l.compiler_flags()
+		raise(new Exception("unknown library: " + name))
+
+	string linker_flags(string name)
+		for l in libraries
+			if l.name == name
+				return l.linker_flags()
+		raise(new Exception("unknown library: " + name))
+
+LibraryManager lib
