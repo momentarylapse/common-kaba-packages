@@ -23,12 +23,19 @@ void main(string[] arg)
 		print("pull <PATH>                # download files/meta")
 		print("upload <PATH>")
 	//	print("sync-pure-locals-by-hash <DIR>")
-		print("rehash")
-		print("self-check")
+		print("db rehash")
+		print("db check")
+		print("db init")
 		return
 
-	conf.load()
-	db.load()
+	try
+		conf.load()
+	except Exception as e
+		print("ERROR: " + e.message())
+	try
+		db.load()
+	except Exception as e
+		print("ERROR: " + e.message())
 	
 	
 	string[] arg2
@@ -234,6 +241,9 @@ void run_command(string[] arg)
 			db.rehash()
 		else if arg[1] == "check"
 			db.self_check()
+		else if arg[1] == "init"
+			conf.save()
+			db.dirty = true
 		else
 			print("ERROR: db...")
 			return
