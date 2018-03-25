@@ -98,6 +98,15 @@ class LibraryGLU extends Library
 	override bool test()
 		return FileExists("/usr/include/GL/glu.h")
 
+// not really....argh
+class LibraryFfmpeg extends Library
+	override void __init__()
+		super.__init__("ffmpeg", ["avutil", "avcodec"])
+	override bool test()
+		return FileExists("/usr/include/ffmpeg/libavcodec/avcodec.h")
+	override string compiler_flags()
+		return " -I/usr/include/ffmpeg/"
+
 
 class LibraryManager
 	Library*[] libraries
@@ -115,6 +124,7 @@ class LibraryManager
 		libraries.add(new LibraryFftw3)
 		libraries.add(new LibraryGL)
 		libraries.add(new LibraryGLU)
+		libraries.add(new LibraryFfmpeg)
 
 
 	bool has(string name)

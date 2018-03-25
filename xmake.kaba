@@ -1,5 +1,10 @@
 use "library.kaba"
 
+string dir_canonical(string dir)
+	if dir.tail(1) == "/"
+		return dir
+	return dir + "/"
+
 class Config
 	string root
 	bool verbose
@@ -9,10 +14,17 @@ class Config
 	string main_file
 	string[] libs
 	string[] libs_optional
+	string[] ignore_libs
 	string flags_global
 	string flags_compiler
 	string flags_linker
 	string[] install
+	
+	bool ignored(string l)
+		for ig in ignore_libs
+			if l == ig
+				return true
+		return false
 	
 	void load()
 		File* f = FileOpenText(conf.root + "xmake.conf")
@@ -49,6 +61,7 @@ class Config
 			else
 				raise(new Exception("unknown tag: " + t))
 		delete f
+
 Config conf
 
 class SourceFile
@@ -124,7 +137,7 @@ void create()
 		cflags += lib.compiler_flags(l)
 		lflags += lib.linker_flags(l)
 	for l in conf.libs_optional
-		if lib.has(l)
+		if lib.has(l) and !conf.ignored(l)
 			cflags += lib.compiler_flags(l)
 			lflags += lib.linker_flags(l)
 			defines += " -DHAS_LIB_" + l.upper() + "=1"
@@ -167,19 +180,47 @@ void create()
 
 void main(string[] arg)
 	lib.init()
-	conf.root = arg[0]
 	conf.verbose = false
-	if conf.root.tail(1) != "/"
-		conf.root += "/"
+	
+	if arg.num == 0
+		return
+	
+	string[] command
+	conf.ignore_libs
+
+	for i in 0:arg.num
+		if arg[i] == "--verbose"
+			conf.verbose = true
+		else if arg[i] == "--ignore-lib"
+			conf.ignore_libs.add(arg[i+1])
+			i ++
+		else if arg[i].find("/", 0) >= 0
+			conf.root = dir_canonical(arg[0])
+		else
+			command.add(arg[i])
+	if command.num > 0
+		if command[0] == "has"
+			if command.num < 2
+				print("library?")
+				return
+			lib.test(command[1])
+			return
+		else
+			print("???")
+			return
+	if conf.root.num == 0
+		return
 	
 	conf.load()
+	
 	if conf.verbose
 		print(conf.install.join("\n"))
 	
 	for l in conf.libs
 		lib.test(l)
 	for l in conf.libs_optional
-		lib.test(l)
+		if !conf.ignored(l)
+			lib.test(l)
 	
 	parse_dir(conf.root)
 	
