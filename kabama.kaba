@@ -20,7 +20,6 @@ Term *Execute(Term *t)
 	return t
 
 Term *ExecuteComplete(Term *t)
-	ExecError = false
 	t = SimplifyNumericals(t)
 	t = Execute(t)
 	t = Normalize(t)
@@ -30,7 +29,6 @@ Term *ExecuteComplete(Term *t)
 void main(string[] arg)
 	if arg.num > 0
 		Term *t = Parse(arg[0])
-		if !ParserError
-			//print ExprToStr(t)
-			t = ExecuteComplete(t)
-			print(ExprToStr(t))
+		//print ExprToStr(t)
+		t = ExecuteComplete(t)
+		print(ExprToStr(t))

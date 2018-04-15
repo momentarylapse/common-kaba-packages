@@ -65,22 +65,8 @@ Term *PermuteLiftOperator__(Term *t, int n)
 	r.params[1] = t.params[0].copy()
 	return r
 
-bool ParserError
-string ParserMsg
 
-bool ExecError
-string ExecMsg
-
-
-void RaiseParserError(string s)
-	ParserError = true
-	ParserMsg = s
-	//print "Parser Fehler: " + s
-
-void RaiseExecError(string s)
-	ExecError = true
-	ExecMsg = s
-	//print "Fehler: " + s
+class RuntimeError extends Exception
 
 bool NeedsBrackets(Term *t, Term *sub)
 	//return sub.Type == TypeOperator
@@ -96,10 +82,6 @@ bool NeedsBrackets(Term *t, Term *sub)
 	return false
 
 string ExprToStr(Term *t)
-	if ParserError
-		return "Fehler: " + ParserMsg
-	if ExecError
-		return "Fehler: " + ExecMsg
 	if !t
 		return "-nil-"
 	string r = "?"

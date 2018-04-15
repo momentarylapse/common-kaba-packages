@@ -17,8 +17,7 @@ Term *DiffFunction(string func, Term *param)
 		return AddOperator("/", AddNumber("1"), param)
 	if func == "sqrt"
 		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", param))
-	RaiseExecError("Funktion '" + func + "' nicht ableitbar")
-	return nil
+	raise(new RuntimeError("Funktion '" + func + "' nicht ableitbar"))
 
 
 // d/dx
@@ -78,5 +77,5 @@ Term *Diff(Term *t)
 			                        AddOperator("*", AddFunction("ln", a.copy()),
 			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
 			                                                          Diff(b))))
-	RaiseExecError("unbekannte Ableitung...")
+	raise(new RuntimeError("unbekannte Ableitung..."))
 	return nil
