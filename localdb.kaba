@@ -166,7 +166,6 @@ class LocalFile
 			spath = spath.replace("{" + kkey + "}", val)
 		return root + spath
 
-
 class LocalFileDB
 	LocalFile[] files
 	bool dirty
@@ -302,6 +301,7 @@ class LocalFileDB
 					break
 			if ok
 				list.add(&f)
+		sort_list(&list, type(list), "path")
 		return list
 
 	LocalFile*[] get_in_dir(string _dir, bool recursive)
@@ -324,6 +324,7 @@ class LocalFileDB
 					if !f.pure_remote() and conf.filter_pure_remote
 						continue
 					list.add(&f)
+		sort_list(&list, type(list), "path")
 		return list
 
 	LocalFile*[] get(string path, bool rec)
@@ -347,6 +348,10 @@ class LocalFileDB
 					save()
 			except
 				pass
+	void optimize()
+		print("optimizing...")
+		sort_list(&files, type(files), "path")
+		dirty = true
 	
 LocalFileDB db
 

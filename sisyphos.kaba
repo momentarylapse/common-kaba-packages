@@ -252,6 +252,8 @@ void run_command(string[] arg)
 			db.rehash()
 		else if arg[1] == "check"
 			db.self_check()
+		else if arg[1] == "optimize"
+			db.optimize()
 		else if arg[1] == "init"
 			conf.save()
 			db.dirty = true
