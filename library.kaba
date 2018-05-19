@@ -98,6 +98,18 @@ class LibraryGLU extends Library
 	override bool test()
 		return FileExists("/usr/include/GL/glu.h")
 
+class LibraryGLEW extends Library
+	override void __init__()
+		super.__init__("glew", ["GLEW"])
+	override bool test()
+		return FileExists("/usr/include/GL/glew.h")
+
+class LibraryGLFW extends Library
+	override void __init__()
+		super.__init__("glfw", ["glfw"])
+	override bool test()
+		return FileExists("/usr/include/GLFW/glfw3.h")
+
 // not really....argh
 class LibraryFfmpeg extends Library
 	override void __init__()
@@ -106,6 +118,12 @@ class LibraryFfmpeg extends Library
 		return FileExists("/usr/include/ffmpeg/libavcodec/avcodec.h")
 	override string compiler_flags()
 		return " -I/usr/include/ffmpeg/"
+
+class LibraryODE extends Library
+	override void __init__()
+		super.__init__("ode", ["ode"])
+	override bool test()
+		return FileExists("/usr/local/include/ode/ode.h")
 
 
 class LibraryManager
@@ -124,7 +142,11 @@ class LibraryManager
 		libraries.add(new LibraryFftw3)
 		libraries.add(new LibraryGL)
 		libraries.add(new LibraryGLU)
+		libraries.add(new LibraryGLEW)
+		libraries.add(new LibraryGLFW)
 		libraries.add(new LibraryFfmpeg)
+		libraries.add(new LibraryOpenAL)
+		libraries.add(new LibraryODE)
 
 
 	bool has(string name)

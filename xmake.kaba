@@ -136,6 +136,7 @@ void create()
 	for l in conf.libs
 		cflags += lib.compiler_flags(l)
 		lflags += lib.linker_flags(l)
+		defines += " -DHAS_LIB_" + l.upper() + "=1"
 	for l in conf.libs_optional
 		if lib.has(l) and !conf.ignored(l)
 			cflags += lib.compiler_flags(l)
