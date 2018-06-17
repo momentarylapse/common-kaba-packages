@@ -125,6 +125,12 @@ class LibraryODE extends Library
 	override bool test()
 		return FileExists("/usr/local/include/ode/ode.h")
 
+class LibraryPSMove extends Library
+	override void __init__()
+		super.__init__("psmove", ["psmoveapi", "psmoveapi_tracker"])
+	override bool test()
+		return FileExists("/usr/local/include/psmoveapi/psmove.h")
+
 
 class LibraryManager
 	Library*[] libraries
@@ -147,6 +153,7 @@ class LibraryManager
 		libraries.add(new LibraryFfmpeg)
 		libraries.add(new LibraryOpenAL)
 		libraries.add(new LibraryODE)
+		libraries.add(new LibraryPSMove)
 
 
 	bool has(string name)
