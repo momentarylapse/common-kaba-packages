@@ -4,8 +4,8 @@ use "resource.kaba"
 class DemoDialog extends Window
 	void __init__(string source)
 		super.__init__("", 100, 100)
-		setBorderWidth(10)
-		fromSource(source)
+		set_border_width(10)
+		from_source(source)
 		event("close", &destroy)
 		event("ok", &destroy)
 		event("cancel", &destroy)
@@ -13,13 +13,13 @@ class DemoDialog extends Window
 class ToolbarDemoDialog extends Dialog
 	void __init__(string source)
 		super.__init__("Toolbar demo", 800, 300, nil, false)
-		toolbar(0).fromSource(source)
+		toolbar(0).from_source(source)
 
 class MenuDemoDialog extends Window
 	void __init__(string source)
 		super.__init__("Menu demo", 800, 300)
 		Menu* m = HuiCreateMenuFromSource(source)
-		setMenu(m)
+		set_menu(m)
 
 void action_demo(string filename)
 	conf.set_dir(filename.dirname())
