@@ -90,30 +90,38 @@ void file_add(LocalFile* f)
 		
 		// time
 		File* ff = FileOpen(f.path)
-		int mtime = ff.getMDate().time
+		int mtime = ff.get_date().time
 		if mtime == f.mtime
 			if conf.verbose
 				print("=  " + rel_path(f.path))
 		else
 			// changed?
-			string hash = FileHash(f.path, "md5")
-			if hash == f.hash
-				print("TOUCHED  " + rel_path(f.path))
-				// ok
-				f.mtime = mtime
-			else
-				print("EDITED  " + rel_path(f.path))
-				f.set(CHANGED_FILE)
-				f.hash = hash
-				f.mtime = mtime
-				f.size = ff.getSize()
-				if conf.verbose or conf.show_meta
-					f.show_info("      ")
+			try
+				string hash = FileHash(f.path, "md5")
+				if hash == f.hash
+					print("TOUCHED  " + rel_path(f.path))
+					// ok
+					f.mtime = mtime
+				else
+					print("EDITED  " + rel_path(f.path))
+					f.set(CHANGED_FILE)
+					f.hash = hash
+					f.mtime = mtime
+					f.size = ff.get_size()
+					if conf.verbose or conf.show_meta
+						f.show_info("      ")
+			except Exception as e
+				print(e.message())
+				return
 		delete ff
 	else
 		// new file
-		
-		string hash = FileHash(f.path, "md5")
+		string hash
+		try
+			hash = FileHash(f.path, "md5")
+		except Exception as e
+			print(e.message())
+			return
 		try
 			LocalFile* ff = db.find_by_hash(hash)
 			// hash already in db?
@@ -134,8 +142,8 @@ void file_add(LocalFile* f)
 			//print(l.name)
 			f.hash = hash
 			File* fff = FileOpen(f.path)
-			f.mtime = fff.getMDate().time
-			f.size = fff.getSize()
+			f.mtime = fff.get_date().time
+			f.size = fff.get_size()
 			delete fff
 			if conf.show_meta or conf.verbose
 				f.show_info("      ")

@@ -141,8 +141,8 @@ void remote_download(LocalFile* f)
 
 	File *ff = FileOpen(f.path)
 	if ff
-		f.size = ff.getSize()
-		f.mtime = ff.getMDate().time
+		f.size = ff.get_size()
+		f.mtime = ff.get_date().time
 		f.hash = FileHash(f.path, "md5")
 		f.unset(NONLOCAL)
 		f.unset(CHANGED_FILE)
