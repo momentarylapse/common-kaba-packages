@@ -83,7 +83,7 @@ void run_command(string[] arg)
 			if arg.num < 4
 				print("ERROR: filter add <DIR> <FILTER>")
 				return
-			conf.add_filter(arg[2], arg[3], "")
+			conf.add_filter(absolute_path(arg[2]), arg[3], "")
 			conf.save()
 		else if arg[1] == "rm"
 			if arg.num == 4
@@ -110,7 +110,7 @@ void run_command(string[] arg)
 			if arg.num < 3
 				print("ERROR: ignore add <PATH>")
 				return
-			conf.ignore.add(arg[2])
+			conf.ignore.add(absolute_path(arg[2]))
 			conf.save()
 		else if arg[1] == "rm"
 			if arg.num < 3
@@ -133,25 +133,25 @@ void run_command(string[] arg)
 				print("ERROR: tag add <KEY> <VALUE> <PATH>")
 				return
 			for i in 4:arg.num
-				action_tag_add(arg[i], arg[2], arg[3])
+				action_tag_add(absolute_path(arg[i]), arg[2], arg[3])
 		else if arg[1] == "set"
 			if arg.num < 5
 				print("ERROR: tag set <VALUE> <PATH> <KEY>")
 				return
 			for i in 4:arg.num
-				action_tag_set(arg[i], arg[2], arg[3])
+				action_tag_set(absolute_path(arg[i]), arg[2], arg[3])
 		else if arg[1] == "rm"
 			if arg.num < 5
 				print("ERROR: tag rm <KEY> <VALUE> <PATH>")
 				return
 			for i in 4:arg.num
-				action_tag_rm(arg[i], arg[2], arg[3])
+				action_tag_rm(absolute_path(arg[i]), arg[2], arg[3])
 		else if arg[1] == "auto"
 			if arg.num < 3
 				print("ERROR: tag auto <PATH>")
 				return
 			for i in 2:arg.num
-				action_tag_auto(arg[i])
+				action_tag_auto(absolute_path(arg[i]))
 		else
 			print("ERROR: tag ?")
 			return
@@ -165,31 +165,31 @@ void run_command(string[] arg)
 			print("ERROR: list <PATH>")
 			return
 		for i in 1:arg.num
-			action_list(arg[i])
+			action_list(absolute_path(arg[i]))
 	else if arg[0] == "info"
 		if arg.num < 2
 			print("ERROR: info <PATH>")
 			return
 		for i in 1:arg.num
-			action_info(arg[i])
+			action_info(absolute_path(arg[i]))
 	else if arg[0] == "add"
 		if arg.num < 2
 			print("ERROR: add <PATH>")
 			return
 		for i in 1:arg.num
-			action_add(arg[i])
+			action_add(absolute_path(arg[i]))
 	else if arg[0] == "rm"
 		if arg.num < 2
 			print("ERROR: rm <PATH>")
 			return
 		for i in 1:arg.num
-			action_rm(arg[i])
+			action_rm(absolute_path(arg[i]))
 	else if arg[0] == "mv"
 		if arg.num < 3
 			print("ERROR: rm <SOURCE1> ... <DEST>")
 			return
 		for i in 1:arg.num-1
-			action_mv(arg[i], arg[arg.num-1])
+			action_mv(absolute_path(arg[i]), absolute_path(arg[arg.num-1]))
 	else if arg[0] == "remote"
 		if arg.num < 2
 			print("ERROR: remote ...")
@@ -203,7 +203,7 @@ void run_command(string[] arg)
 			if arg.num < 3
 				print("ERROR: remote add <FILTER> <DIR>")
 				return
-			action_remote_add(arg[2], arg[3])
+			action_remote_add(arg[2], absolute_path(arg[3]))
 		else
 			print("ERROR: remote ...")
 			return
@@ -212,19 +212,19 @@ void run_command(string[] arg)
 			print("ERROR: sync <DIR>")
 			return
 		for i in 1:arg.num
-			action_sync(arg[i])
+			action_sync(absolute_path(arg[i]))
 	else if arg[0] == "push"
 		if arg.num < 2
 			print("ERROR: push <PATH>")
 			return
 		for i in 1:arg.num
-			action_push(arg[i])
+			action_push(absolute_path(arg[i]))
 	else if arg[0] == "pull"
 		if arg.num < 2
 			print("ERROR: pull <PATH>")
 			return
 		for i in 1:arg.num
-			action_pull(arg[i])
+			action_pull(absolute_path(arg[i]))
 	else if arg[0] == "structure"
 		if arg.num < 2
 			print("TRY: structure apply/auto")
@@ -234,13 +234,13 @@ void run_command(string[] arg)
 				print("ERROR: structure apply <STRUCTURE> <PATH>")
 				return
 			for i in 3:arg.num
-				action_structure_apply(arg[i], arg[2])
+				action_structure_apply(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "auto"
 			if arg.num < 3
 				print("ERROR: structure auto <DIR>")
 				return
 			for i in 2:arg.num
-				action_structure_auto(arg[i])
+				action_structure_auto(absolute_path(arg[i]))
 		else
 			print("ERROR: structure ...")
 			return

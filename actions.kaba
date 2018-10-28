@@ -235,6 +235,7 @@ void action_info(string path)
 		error_out(e)
 
 void action_list(string path)
+	print(path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	
@@ -308,10 +309,10 @@ void action_remote_add(string filter, string dir)
 
 void action_sync(string dir)
 	set_working_dir(dir)
-	/*ConfigDir* e = conf.get_cfg(dir)
+	ConfigDir* e = conf.get_cfg(dir)
 	if e
 		for s in e.syncs
-			remote_sync_by_filter(s.filter, s.quality(), dir)*/
+			remote_sync_by_filter(s.filter, s.quality(), "", dir)
 	remote_sync_by_id(dir)
 	remote_sync_pure_locals_by_hash(dir)
 	

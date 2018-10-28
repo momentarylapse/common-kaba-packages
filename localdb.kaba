@@ -258,6 +258,12 @@ class LocalFileDB
 			f << tags2strh(ff.tags)
 		delete(f)
 		dirty = false
+	
+	bool has_id(string id)
+		for f in files
+			if id == f.id
+				return true
+		return false
 
 	LocalFile *find_by_id(string id)
 		for f in files

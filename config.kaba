@@ -1,6 +1,6 @@
 //const string SERVER = "michi.is-a-geek.org"
 const string SERVER = "myu"
-const string YII = "/var/www/html/_alexandria4/yii"
+const string CMD = "kaba /home/michi/Tools/alex/alex.kaba"
 const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
 
 const string MEDIUM = "medium"
@@ -15,6 +15,25 @@ string dir_canonical(string dir)
 	if is_canonical_dir(dir)
 		return dir
 	return dir + "/"
+
+string canonify(string path)
+	string[] xx = path.explode("/")
+	for i in 0:xx.num
+		if xx[i] == "."
+			xx.remove(i)
+			i -= 1
+		else if xx[i] == ".." and i > 1
+			xx.remove(i-1)
+			xx.remove(i-1)
+			i -= 2
+	return xx.join("/")
+
+string absolute_path(string path)
+	if path.num == 0
+		return path
+	if path[0] == '/'
+		return canonify(path)
+	return canonify(GetCurDir() + path)
 
 string working_dir
 void set_working_dir(string path)
@@ -128,7 +147,7 @@ class Config
 		default_structure = "{name}.{ext}"
 
 	void load()
-		File *f = FileOpenText("sisyphos.conf")
+		File *f = FileOpenText("config")
 		int n, m
 		f >> n
 		for i in 0:n
@@ -151,7 +170,7 @@ class Config
 			ignore.add(ig)
 		delete f
 	void save()
-		File *f = FileCreateText("sisyphos.conf")
+		File *f = FileCreateText("config")
 		f << dirs.num
 		for e in dirs
 			f << e.dir

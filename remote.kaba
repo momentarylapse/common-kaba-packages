@@ -38,12 +38,12 @@ void scp_upload(string source, string dest)
 	shell_execute(cmd)
 
 string yii(string action, string[] params)
-	string cmd = "ssh " + SERVER + " command=\""
+	string cmd = "ssh " + SERVER + " "
 	
-	cmd += "php " + YII + " " + action
+	cmd += CMD + " " + action
 	for p in params
 		cmd += " \\\"" + ssh_escape(p) + "\\\""
-	cmd += "; \""
+	//cmd += ""
 	if conf.verbose
 		print(cmd)
 	return shell_exec(cmd).trim()
@@ -75,25 +75,24 @@ RemoteFile[] remote_parse(string r)
 	return rfiles
 
 RemoteFile[] remote_find(string filter, string quality)
-	string r = yii("file/find-sisyphos", [filter, quality])
+	string r = yii("find", [filter, quality])
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_hash(string hashes)
-	string r = yii("file/info-by-hash-sisyphos", [hashes])
+RemoteFile[] remote_find_by_hash(string[] hashes)
+	string r = yii("by-hash", hashes)
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_id(string ids, string quality)	
-	string r = yii("file/info-by-id-sisyphos", [ids, quality])
+RemoteFile[] remote_find_by_id(string[] ids, string quality)	
+	string r = yii("by-id", ids)//[ids, quality])
 	return remote_parse(r)
 
 
 
 void sync_add_pure_remote(RemoteFile rf, string root, string structure)
-	LocalFile *lf = db.find_by_id(rf.id)
-	if !lf
+	if !db.has_id(rf.id)
 		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
-		lf = db.find_by_hash(rf.hash)
-		if lf
+		try
+			LocalFile* lf = db.find_by_hash(rf.hash)
 			if lf.id.num > 0
 				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  " + "REMOTE...")
 			lf.id = rf.id
@@ -102,25 +101,25 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 			lf.sync_tags(rf.tags)
 			lf.name = rf.name
 			return
-	
-		// new remote file
-		LocalFile ll = rf
-		ll.path = ll.apply_structure(root, structure)
-		ll.set(NONLOCAL)
-		db.files.add(ll)
-		print("ADD PURE REMOTE  " + rel_path(ll.path))
+		except
+			// new remote file
+			LocalFile ll = rf
+			ll.path = ll.apply_structure(root, structure)
+			ll.set(NONLOCAL)
+			db.files.add(ll)
+			print("ADD PURE REMOTE  " + rel_path(ll.path))
 		
-		if conf.show_meta or conf.verbose
-			ll.show_info("      ")
+			if conf.show_meta or conf.verbose
+				ll.show_info("      ")
 
 
 void remote_sync_by_filter(string filter, string quality, string structure, string dir)
 	RemoteFile[] rfiles = remote_find(filter, quality)
 	for rf in rfiles
-		LocalFile *lf = db.find_by_id(rf.id)
-		if lf
+		try
+			LocalFile *lf = db.find_by_id(rf.id)
 			sync_file(rf, lf)
-		else
+		except
 			sync_add_pure_remote(rf, dir, structure)
 	db.save()
 
@@ -220,9 +219,9 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 			ids_perfect.add(f.id)
 	RemoteFile[] rfiles, rfiles_medium
 	if ids_perfect.num > 0
-		rfiles = remote_find_by_id(ids_perfect.join(","), PERFECT)
+		rfiles = remote_find_by_id(ids_perfect, PERFECT)
 	if ids_medium.num > 0
-		rfiles_medium = remote_find_by_id(ids_medium.join(","), MEDIUM)
+		rfiles_medium = remote_find_by_id(ids_medium, MEDIUM)
 	for rf in rfiles_medium
 		rfiles.add(rf)
 	return rfiles
@@ -230,13 +229,16 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 void remote_download_meta(LocalFile*[] files)
 	RemoteFile[] rfiles = remote_get_meta(files)
 	for rf in rfiles
-		LocalFile* lf = db.find_by_id(rf.id)
-		if lf
+		try
+			LocalFile* lf = db.find_by_id(rf.id)
 			print("META  " + rel_path(lf.path))
 			lf.unset(CHANGED_META)
 			lf.name = rf.name
 			lf.tags = rf.tags
 			db.dirty = true
+		except
+			print("XXXXX")
+			pass
 
 void remote_sync_by_id(string _dir)
 	LocalFile*[] files = db.get_in_dir(_dir, conf.recursive)
@@ -246,11 +248,15 @@ void remote_sync_by_id(string _dir)
 			files_wanted.add(f)
 	RemoteFile[] rfiles = remote_get_meta(files_wanted)
 	for rf in rfiles
-		LocalFile* lf = db.find_by_id(rf.id)
-		if lf
+		try
+			LocalFile* lf = db.find_by_id(rf.id)
 			sync_file(rf, lf)
+		except
+			pass
 
 void sync_file(RemoteFile rf, LocalFile* lf)
+	if conf.verbose
+		print("sync " + lf.path)
 	lf.unset(CHANGED_FILE)
 	lf.unset(CHANGED_META)
 	lf.remote_path = rf.remote_path
@@ -291,7 +297,7 @@ void remote_sync_pure_locals_by_hash(string _dir)
 			hashes.add(f.hash)
 	if hashes.num == 0
 		return
-	RemoteFile[] rfiles = remote_find_by_hash(hashes.join(","))
+	RemoteFile[] rfiles = remote_find_by_hash(hashes)
 	for rf in rfiles
 		if conf.verbose
 			print(rf.hash)
