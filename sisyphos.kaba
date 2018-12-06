@@ -8,7 +8,7 @@ use "actions.kaba"
 void main(string[] arg)
 	if arg.num == 0
 		print("commands")
-		print("  find <FILTER>")
+		print("  find <FILTER>              # local search")
 		print("  filter                     # list filters")
 		print("  filter add <DIR> <FILTER>")
 		print("  filter rm <DIR> [<FILTER>]")
@@ -24,6 +24,10 @@ void main(string[] arg)
 		print("  pull <PATH>                # download files/meta")
 		print("  upload <PATH>")
 	//	print("  sync-pure-locals-by-hash <DIR>")
+		print("  remote find <FILTER>")
+		print("  remote id <IDS>")
+		print("  remote hash <HASHES>")
+		print("  remote add <FILTER> <DIR>")
 		print("  db rehash")
 		print("  db check")
 		print("  db init")
@@ -199,6 +203,16 @@ void run_command(string[] arg)
 				print("ERROR: remote find <FILTER>")
 				return
 			action_remote_find(arg[2])
+		else if arg[1] == "hash"
+			if arg.num < 3
+				print("ERROR: remote hash <HASHES>")
+				return
+			action_remote_find_hash(arg[2:])
+		else if arg[1] == "id"
+			if arg.num < 3
+				print("ERROR: remote id <IDS>")
+				return
+			action_remote_find_id(arg[2:])
 		else if arg[1] == "add"
 			if arg.num < 3
 				print("ERROR: remote add <FILTER> <DIR>")
