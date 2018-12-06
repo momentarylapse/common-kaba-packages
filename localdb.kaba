@@ -173,24 +173,23 @@ class LocalFileDB
 	void load()
 		files.clear()
 		dirty = false
-		File *f = FileOpenText("db")
-		int n
-		f >> n
+		//Timer tt
+		string ss = FileRead("db")
+		string[] lines = ss.explode("\n")
+		int n = lines.num / 10
 		for i in 0:n
 			LocalFile ff
-			string temp
-			f >> ff.id
-			f >> ff.path
-			f >> ff.remote_path
-			f >> ff.name
-			f >> ff.hash
-			f >> ff.mtime
-			f >> ff.remote_mtime
-			f >> ff.size
-			f >> temp
-			ff.options = temp.explode(",")
-			f >> temp
-			ff.tags = strh2tags(temp)
+			int i0 = i*10+1
+			ff.id = lines[i0]
+			ff.path = lines[i0+1]
+			ff.remote_path = lines[i0+2]
+			ff.name = lines[i0+3]
+			ff.hash = lines[i0+4]
+			ff.mtime = lines[i0+5].int()
+			ff.remote_mtime = lines[i0+6].int()
+			ff.size = lines[i0+7].int()
+			ff.options = lines[i0+8].explode(",")
+			ff.tags = strh2tags(lines[i0+9])
 			ff.unset("")
 			if ff.hash == "d41d8cd98f00b204e9800998ecf8427e"
 				ff.hash = ""
@@ -198,7 +197,7 @@ class LocalFileDB
 				ff.id = ""
 	
 			files.add(ff)
-		delete(f)
+		//print(tt.get())
 
 	void self_check()
 		for f in files

@@ -3,6 +3,8 @@ use "localdb.kaba"
 use "tag.kaba"
 
 
+const int CHUNK_SIZE = 256
+
 string scp_escape(string s)
 	string r = s
 	r = r.replace("(", "\\\\\\(")
@@ -78,13 +80,39 @@ RemoteFile[] remote_find(string filter, string quality)
 	string r = yii("find", [filter, quality])
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_hash(string[] hashes)
+RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
 	string r = yii("by-hash", hashes)
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_id(string[] ids, string quality)	
+RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)	
 	string r = yii("by-id", ids)//[ids, quality])
 	return remote_parse(r)
+
+RemoteFile[] remote_find_by_hash(string[] hashes)
+	RemoteFile[] rr
+	int done = 0
+	while done < hashes.num
+		int ee = min(done + CHUNK_SIZE, hashes.num)
+		if conf.verbose
+			print("hash... " + done + ":" + ee + " of " + hashes.num)
+		RemoteFile[] r = remote_find_by_hash_chunk(hashes[done:ee])
+		for x in r
+			rr.add(x)
+		done = ee
+	return rr
+
+RemoteFile[] remote_find_by_id(string[] ids, string quality)
+	RemoteFile[] rr
+	int done = 0
+	while done < ids.num
+		int ee = min(done + CHUNK_SIZE, ids.num)
+		if conf.verbose
+			print("ids... " + done + ":" + ee + " of " + ids.num)
+		RemoteFile[] r = remote_find_by_id_chunk(ids[done:ee], quality)
+		for x in r
+			rr.add(x)
+		done = ee
+	return rr
 
 
 
