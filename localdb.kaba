@@ -63,12 +63,15 @@ class LocalFile
 	void sync_tags(Tag[] rtags)
 		tags = rtags // TODO
 		db.dirty = true
+	void set_name(string _name)
+		name = _name
+		db.dirty = true
+		if conf.verbose
+			print("NAME  " + name)
+		set(CHANGED_META)
 	void tag_add(string key, string value)
 		if key == "name"
-			name = value
-			if conf.verbose
-				print("NAME  " + name)
-			set(CHANGED_META)
+			set_name(value)
 			return
 		for t in tags
 			if t.key == key and t.value == value
@@ -82,6 +85,9 @@ class LocalFile
 			print("TAG ADD  " + t.str())
 		set(CHANGED_META)
 	void tag_set(string key, string value)
+		if key == "name"
+			set_name(value)
+			return
 		for t in tags
 			if t.key == key
 				if t.value == value
@@ -115,7 +121,10 @@ class LocalFile
 			return "*   "
 		return "    "
 	void show()
-		print(status_str() + rel_path(path))
+		if pure_remote()
+			print(status_str() + remote_path)
+		else
+			print(status_str() + rel_path(path))
 	void show_info(string l)
 		//print(l + "path: " + path)
 		print(l + "name:    " + name)
@@ -298,7 +307,8 @@ class LocalFileDB
 			for t in tags
 				bool found = false
 				for tt in f.tags
-					if tt.key == t.key and tt.value == t.value
+					//if tt.key == t.key and tt.value == t.value
+					if tt.key == t.key and tt.value.match(t.value)
 						found = true
 						break
 				if !found

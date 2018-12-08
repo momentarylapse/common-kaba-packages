@@ -145,6 +145,7 @@ void file_add(LocalFile* f)
 			f.mtime = fff.get_date().time
 			f.size = fff.get_size()
 			delete fff
+			auto_tag(f)
 			if conf.show_meta or conf.verbose
 				f.show_info("      ")
 			db.files.add(*f)
@@ -234,22 +235,20 @@ void action_info(string path)
 	except Exception as e
 		error_out(e)
 
-void action_list(string path)
-	print(path)
-	set_working_dir(path)
-	conf.show_pure_local = true
-	
-	LocalFile*[] files = lister.find(path)
+void show_files(LocalFile*[] files)
 	for f in files
 		f.show()
 		if conf.show_meta or conf.verbose
 			f.show_info("      ")
 
+void action_list(string path)
+	set_working_dir(path)
+	conf.show_pure_local = true
+	show_files(lister.find(path))
+
 
 void action_find(string filter)
-	LocalFile*[] files = db.find_by_tags(filter)
-	for f in files
-		f.show()
+	show_files(db.find_by_tags(filter))
 	
 void action_tag_add(string path, string key, string value)
 	set_working_dir(path)
@@ -283,8 +282,10 @@ void action_pull(string path)
 			remote_download(f)
 		if f.is(CHANGED_META)
 			need_meta.add(f)
-			
-	remote_download_meta(need_meta)
+
+	if need_meta.num > 0
+		print("downloading meta data")
+		remote_download_meta(need_meta)
 
 
 void action_push(string path)
@@ -293,8 +294,10 @@ void action_push(string path)
 	LocalFile*[] files = db.get(path, conf.recursive)
 	for f in files
 		if f.pure_local() //or f.is(CHANGED_FILE)
+			print("UPLOADING " + rel_path(f.path))
 			remote_upload(f)
 		if f.is(CHANGED_META)
+			print("UPLOADING META " + rel_path(f.path))
 			remote_upload_meta(f)
 
 void show_rfile_list(RemoteFile[] rfiles)
@@ -322,7 +325,9 @@ void action_sync(string dir)
 	if e
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)
+	print("syncing entangled files")
 	remote_sync_by_id(dir)
+	print("matching pure local files by hash")
 	remote_sync_pure_locals_by_hash(dir)
 	
 void action_tag_auto(string path)

@@ -39,6 +39,17 @@ void scp_upload(string source, string dest)
 		print(cmd)
 	shell_execute(cmd)
 
+string remote_interface(string action, string[] params)
+	string cmd = "ssh " + SERVER + " python3 "
+	
+	cmd += " /home/michi/Tools/alex/if-" +  action + ".py"
+	for p in params
+		cmd += " \\\"" + ssh_escape(p) + "\\\""
+	//cmd += ""
+	if conf.verbose
+		print(cmd)
+	return shell_exec(cmd).trim()
+
 string yii(string action, string[] params)
 	string cmd = "ssh " + SERVER + " "
 	
@@ -192,12 +203,21 @@ void remote_upload(LocalFile* f)
 	f.remote_path = ALEX_IN + f.hash + "." + f.path.extension()
 	
 	scp_upload(f.path, f.remote_path)
-
-	string tags = tags2str(f.tags)	
-		
-	string r = yii("file/upload-sisyphos", [f.remote_path, f.name, f.hash, tags])
 	
-	string[] p = r.explode("\t")
+	string r = remote_interface("add", [f.remote_path])
+	if r[:2] != "ok"
+		print("ERROR: upload..." + r)
+		return
+		
+	f.id = r[3:]
+	db.save()
+
+	//string tagsh = tags2strh(f.tags)
+		
+	//string r = yii("upload", [f.remote_path, f.name.hex(false), f.hash, f.mtime.str(), tagsh])
+	//print("answer: " + r)
+	
+	/*string[] p = r.explode("\t")
 	if p.num >= 2
 		if p[0] == "ok"
 			f.id = p[1]
@@ -211,7 +231,7 @@ void remote_upload(LocalFile* f)
 		if p[0] == "bad hash"
 			print("ERROR: upload failed?")
 			return
-	print("ERROR: ????")
+	print("ERROR: ????")*/
 
 
 void remote_upload_meta(LocalFile* f)
@@ -220,9 +240,9 @@ void remote_upload_meta(LocalFile* f)
 		print("ERROR: pure local")
 		return
 
-	string tags = tags2str(f.tags)	
+	string tags = tags2strh(f.tags)	
 	
-	string r = yii("file/override-meta-sisyphos", [f.id, f.name, tags])
+	string r = remote_interface("override-meta", [f.id, f.name.hex(false), tags])
 	
 	if r == "ok"
 		if conf.verbose

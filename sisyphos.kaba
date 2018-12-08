@@ -15,6 +15,10 @@ void main(string[] arg)
 		print("  ignore                     # list ignores")
 		print("  ignore add <PATH>")
 		print("  ignore rm <PATH>")
+		print("  tag add <KEY> <VALUE> <PATH>")
+		print("  tag set <KEY> <VALUE> <PATH>")
+		print("  tag rm <KEY> <VALUE> <PATH>")
+		print("  tag auto <PATH>")
 		print("  add <PATH>                 # add file/dir to local db")
 		print("  rm <PATH>                  # drop file/dir from local db")
 		print("  mv <SOURCE> <DEST>")
@@ -140,7 +144,7 @@ void run_command(string[] arg)
 				action_tag_add(absolute_path(arg[i]), arg[2], arg[3])
 		else if arg[1] == "set"
 			if arg.num < 5
-				print("ERROR: tag set <VALUE> <PATH> <KEY>")
+				print("ERROR: tag set <KEY> <VALUE> <PATH>")
 				return
 			for i in 4:arg.num
 				action_tag_set(absolute_path(arg[i]), arg[2], arg[3])
