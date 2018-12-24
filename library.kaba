@@ -131,6 +131,12 @@ class LibraryPSMove extends Library
 	override bool test()
 		return FileExists("/usr/local/include/psmoveapi/psmove.h")
 
+class LibraryDl extends Library
+	override void __init__()
+		super.__init__("dl", ["dl"])
+	override bool test()
+		return FileExists("/usr/include/dlfcn.h")
+
 
 class LibraryManager
 	Library*[] libraries
@@ -154,6 +160,7 @@ class LibraryManager
 		libraries.add(new LibraryOpenAL)
 		libraries.add(new LibraryODE)
 		libraries.add(new LibraryPSMove)
+		libraries.add(new LibraryDl)
 
 
 	bool has(string name)
