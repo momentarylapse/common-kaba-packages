@@ -174,6 +174,24 @@ class LocalFile
 					val = "0" + val
 			spath = spath.replace("{" + kkey + "}", val)
 		return root + spath
+	bool match(Tag[] mtags)
+		for mt in mtags
+			bool tag_match = false
+			if mt.key == "name"
+				tag_match = name.match(mt.value)
+			else if mt.key == "id"
+				tag_match = id.match(mt.value)
+			else if mt.key == "hash"
+				tag_match = hash.match(mt.value)
+			else
+				for t in tags
+					//if t.key == mt.key and t.value == tm.value
+					if t.key == mt.key and t.value.match(mt.value)
+						tag_match = true
+						break
+			if !tag_match
+				return false
+		return true
 
 class LocalFileDB
 	LocalFile[] files
@@ -303,18 +321,7 @@ class LocalFileDB
 		Tag[] tags = str2tags(str)
 		LocalFile*[] list
 		for f in files
-			bool ok = true
-			for t in tags
-				bool found = false
-				for tt in f.tags
-					//if tt.key == t.key and tt.value == t.value
-					if tt.key == t.key and tt.value.match(t.value)
-						found = true
-						break
-				if !found
-					ok = false
-					break
-			if ok
+			if f.match(tags)
 				list.add(&f)
 		sort_list(&list, type(list), "path")
 		return list

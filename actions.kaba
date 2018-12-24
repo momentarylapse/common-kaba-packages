@@ -127,33 +127,37 @@ void file_add(LocalFile* f)
 			// hash already in db?
 			if FileExists(ff.path)
 				print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
-				return
-			print("MOVED  " + rel_path(ff.path) + " > " + rel_path(f.path))
-			ff.path = f.path
-			db.dirty = true
+				file_add_new(f, hash)
+			else
+				file_move(ff, f.path)
 		except
 			// new
-			print("ADD  " + rel_path(f.path))
-			f.name = f.path.basename()
-			string ext = f.path.extension()
-			if ext.num > 0
-				f.name = f.name.head(f.name.num - ext.num - 1)
-			//print(ext)
-			//print(l.name)
-			f.hash = hash
-			File* fff = FileOpen(f.path)
-			f.mtime = fff.get_date().time
-			f.size = fff.get_size()
-			delete fff
-			auto_tag(f)
-			if conf.show_meta or conf.verbose
-				f.show_info("      ")
-			db.files.add(*f)
+			file_add_new(f, hash)
 
 
+void file_add_new(LocalFile* f, string hash)
+	print("ADD  " + rel_path(f.path))
+	f.name = f.path.basename()
+	string ext = f.path.extension()
+	if ext.num > 0
+		f.name = f.name.head(f.name.num - ext.num - 1)
+	//print(ext)
+	//print(l.name)
+	f.hash = hash
+	File* fff = FileOpen(f.path)
+	f.mtime = fff.get_date().time
+	f.size = fff.get_size()
+	delete fff
+	auto_tag(f)
+	if conf.show_meta or conf.verbose
+		f.show_info("      ")
+	db.files.add(*f)
 
 
-
+void file_move(LocalFile *f, string new_path)
+	print("MOVED  " + rel_path(f.path) + " > " + rel_path(new_path))
+	f.path = new_path
+	db.dirty = true
 
 
 
