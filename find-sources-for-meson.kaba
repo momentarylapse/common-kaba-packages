@@ -1,0 +1,21 @@
+
+string[] sources
+
+void parse_dir(string dir, string root)
+	DirEntry[] files = DirSearch(root + dir, "*.cpp", true)
+	for f in files
+		if f.is_dir
+			parse_dir(dir + f.name + "/", root)
+		else
+			sources.add(dir + f.name)
+
+
+void main(string[] arg)
+	parse_dir("", arg[0])
+	if sources.num == 0
+		return
+	print("['" + sources[0] + "',")
+	for s,i in sources
+		if i > 0 and i < sources.num-1
+			print("\t'" + s + "',")
+	print("\t'" + sources[sources.num - 1] + "']")
