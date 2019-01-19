@@ -10,10 +10,15 @@ grabfocus
 == key=value ==
 width=
 height=
+min-width=    (same as width...)
+min-height=
 marginleft=
 marginright=
 margintop=
 marginbottom=
+padding=
+
+
 
 Button
 	flat
@@ -51,11 +56,11 @@ MultilineEdit
 	handlekeys
 	monospace
 Revealer
-	!!slide-up
-	!!slide-down
-	!!slide-left
-	!!slide-right
-	!!cross-fade
+	slide=up/down/left/right
+	cross-fade
+Scroller
+	scrollx=yes/no
+	scrolly=yes/no
 Separator
 	!!vertical
 Slider
@@ -66,12 +71,13 @@ Slider
 	mark=value:title
 	clearmarks
 SpinButton
-	range=...
+	range=min:max:step
 	wrap
 	nowrap
 TabControl
 	bar
 	nobar
+	left/right/top/bottom
 TreeView
 	bar
 	nobar
