@@ -198,7 +198,7 @@ class DynamicValue
 	void setFunction(Function *f)
 		setType(TYPE_FUNCTION)
 		DynamicValueStateFunction *sf = s
-		sf.func = f
+		sf._func = f
 	void __assign__(DynamicValue b)
 		if b.type == TYPE_BOOL
 			setBool(b.bool())
@@ -221,7 +221,7 @@ class DynamicValue
 				ad.add(bd.keys[i], el)
 		else if b.type == TYPE_FUNCTION
 			DynamicValueStateFunction* bf = b.s
-			setFunction(bf.func)
+			setFunction(bf._func)
 
 	void __iadd__(DynamicValue b)
 		if b.type == TYPE_INT
@@ -473,9 +473,9 @@ class DynamicValueStateDict extends DynamicValueState
 		return c
 
 class DynamicValueStateFunction extends DynamicValueState
-	Function* func
+	Function* _func
 	override void __init__()
-		func = nil
+		_func = nil
 	override string type()
 		return "func"
 	override string str()
@@ -653,7 +653,7 @@ class FunctionMap extends FunctionInternal
 					Variable*[] pp
 					pp.add(&temp2)
 					inter.stack_push(self, &temp)
-					f.func.call(inter, &temp, pp)
+					f._func.call(inter, &temp, pp)
 					inter.stack_pop()
 					ra.a.add(temp.v.copy())
 
@@ -1106,15 +1106,15 @@ class SyntaxTree
 		Function* prev_func = cur_func
 		int indent0 = cur_line.indent
 		next()
-		Function *func = addFunc(cur)
-		cur_func = func
+		Function *f = addFunc(cur)
+		cur_func = f
 		next()
 		if cur != "("
 			setError("( expected")
 		next()
 		while cur != ")"
 			//Variable* v = ad
-			func.params.add(cur)
+			f.params.add(cur)
 			next()
 			if cur == ")"
 				break
@@ -1124,7 +1124,7 @@ class SyntaxTree
 		if !endOfLine()
 			setError("end of line expexted")
 		
-		func.block = parseBlock()
+		f.block = parseBlock()
 		cur_func = prev_func
 		
 	SyntaxNode *parseLine()
@@ -1217,7 +1217,7 @@ class Context
 	Context* parent
 	Variable*[] vars
 	Variable* ret
-	Function* func
+	Function* _func
 	bool flag_return
 	bool flag_break
 	bool flag_continue
@@ -1225,7 +1225,7 @@ class Context
 		name = _name
 		parent = p
 		ret = nil
-		func = nil
+		_func = nil
 		flag_return = false
 		flag_break = false
 		flag_continue = false
@@ -1256,7 +1256,7 @@ class Interpreter
 		raise(new RuntimeError("Runtime error: " + msg))
 	void stack_push(Function* func, Variable* ret)
 		cur_context = new Context(func.name, cur_context)
-		cur_context.func = func
+		cur_context._func = func
 		cur_context.ret = ret
 		for n in func.params
 			cur_context.add(new Variable(n))
@@ -1348,7 +1348,7 @@ class Interpreter
 			if v.v.type != TYPE_FUNCTION
 				setError("is not a function: " + call.name)
 			DynamicValueStateFunction* fs = v.v.s
-			Function *f = fs.func
+			Function *f = fs._func
 			stack_push(f, ret)
 			f.call(self, ret, params)
 			/*if f.block
