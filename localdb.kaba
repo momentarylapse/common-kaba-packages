@@ -201,7 +201,7 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		//Timer tt
-		string ss = FileRead("db")
+		string ss = FileRead(AppDirectory + "sisyphos/db")
 		string[] lines = ss.explode("\n")
 		int n = lines.num / 10
 		for i in 0:n
@@ -269,7 +269,7 @@ class LocalFileDB
 				i --
 
 	void save()
-		File *f = FileCreateText("db")
+		File *f = FileCreateText(AppDirectory + "sisyphos/db")
 		f << files.num
 		for ff in files
 			f << ff.id

@@ -147,7 +147,7 @@ class Config
 		default_structure = "{name}.{ext}"
 
 	void load()
-		File *f = FileOpenText("config")
+		File *f = FileOpenText(AppDirectory + "sisyphos/config")
 		int n, m
 		f >> n
 		for i in 0:n
@@ -170,7 +170,7 @@ class Config
 			ignore.add(ig)
 		delete f
 	void save()
-		File *f = FileCreateText("config")
+		File *f = FileCreateText(AppDirectory + "sisyphos/config")
 		f << dirs.num
 		for e in dirs
 			f << e.dir
