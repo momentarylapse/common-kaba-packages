@@ -76,6 +76,12 @@ class LibraryFftw3 extends Library
 	override bool test()
 		return FileExists("/usr/include/fftw3.h")
 
+class LibraryVulkan extends Library
+	override void __init__()
+		super.__init__("vulkan", ["vulkan"])
+	override bool test()
+		return FileExists("/usr/include/vulkan/vulkan.h")
+
 class LibraryGtk3 extends Library
 	override void __init__()
 		super.__init__("gtk3", [""])
@@ -156,6 +162,7 @@ class LibraryManager
 		libraries.add(new LibraryGLU)
 		libraries.add(new LibraryGLEW)
 		libraries.add(new LibraryGLFW)
+		libraries.add(new LibraryVulkan)
 		libraries.add(new LibraryFfmpeg)
 		libraries.add(new LibraryOpenAL)
 		libraries.add(new LibraryODE)
