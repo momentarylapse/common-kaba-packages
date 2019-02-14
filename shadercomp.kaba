@@ -1,0 +1,82 @@
+string tag_contents(string all, string tag)
+	int i0 = all.find("<" + tag + ">", 0)
+	if i0 < 0
+		return ""
+	int i1 = all.find("</" + tag + ">", i0)
+	if i1 < 0
+		return ""
+	return all[i0+tag.num+2:i1]
+
+string compile_stage(string code, string stage)
+	if code == ""
+		return ""
+	string cmd = "echo '" + code + "' | glslc -fshader-stage=" + stage + " - -o -"
+	//print(cmd)
+	string x = shell_execute(cmd)
+	//print(x.num)
+	return x
+
+class LayoutData
+	string bindings
+	string input
+	string topology
+	int push_size
+
+LayoutData parse_layout(string layout)
+	LayoutData ld
+	ld.push_size = 0
+	ld.topology = "triangles"
+	string[] ll = layout.explode("\n")
+	for s in ll
+		if s == ""
+			continue
+		if s.head(12) == "\tbindings = "
+			ld.bindings = s[12:]
+		else if s.head(12) == "\tpushsize = "
+			ld.push_size = s[12:].int()
+		else if s.head(9) == "\tinput = "
+			ld.input = s[9:]
+		else if s.head(12) == "\ttopology = "
+			ld.topology = s[12:]
+		else
+			print("WARNING: layout info unknown: " + s)
+	return ld
+int extract_push_size(string layout)
+	return 0
+
+void compile(string filename)
+	string all = FileRead(filename)
+	string layout = tag_contents(all, "Layout")
+	string code_vertex = tag_contents(all, "VertexShader")
+	string code_geometry = tag_contents(all, "GeometryShader")
+	string code_fragment = tag_contents(all, "FragmentShader")
+	
+	string x_vertex = compile_stage(code_vertex, "vertex")
+	string x_geometry = compile_stage(code_geometry, "geometry")
+	string x_fragment = compile_stage(code_fragment, "fragment")
+	
+	LayoutData ld = parse_layout(layout)
+	
+	File *f = FileCreate(filename + ".compiled")
+	f << "Info"
+	f << "{version=0.1,shaders=SPIR-V}"
+	f << "Input"
+	f << ld.input
+	f << "Topology"
+	f << ld.topology
+	f << "Bindings"
+	f << ld.bindings
+	f << "PushSize"
+	f << "" + ld.push_size
+	f << "VertexShader"
+	f << x_vertex
+	if x_geometry.num > 0
+		f << "GeometryShader"
+		f << x_geometry
+	f << "FragmentShader"
+	f << x_fragment
+	delete f
+
+void main(string[] arg)
+	for a in arg
+		compile(a)
