@@ -198,9 +198,6 @@ void main(string[] arg)
 	lib.init()
 	conf.verbose = false
 	
-	if arg.num == 0
-		return
-	
 	string[] command
 	conf.ignore_libs
 
@@ -225,18 +222,23 @@ void main(string[] arg)
 			print("???")
 			return
 	if conf.root.num == 0
-		return
+		conf.root = dir_canonical("./")
+	print(conf.root)
 	
 	conf.load()
 	
 	if conf.verbose
 		print(conf.install.join("\n"))
 	
+	string[] missing
 	for l in conf.libs
-		lib.test(l)
+		if !lib.test(l)
+			missing.add(l)
 	for l in conf.libs_optional
 		if !conf.ignored(l)
 			lib.test(l)
+	if missing.num > 0
+		print("ERROR: necessary libraries missing: " + missing)
 	
 	parse_dir(conf.root)
 	
