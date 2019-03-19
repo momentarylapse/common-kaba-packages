@@ -1,0 +1,429 @@
+use "linalg.kaba"
+
+class Node
+	float phi
+	complex pos
+	void __init__(complex p)
+		phi = 0
+		pos = p
+	string tell()
+		return "phi=" + phi
+
+enum
+	TYPE_CABLE
+	TYPE_RESISTOR
+	TYPE_CAPACITOR
+	TYPE_INDUCTOR
+
+class Edge
+	int type
+	int a, b
+	float I, U
+	void __init__(int _type, int[] n)
+		type = _type
+		a = n[0]
+		b = n[1]
+	virtual float g(float dt)
+		return 0.0
+	virtual float I_off(float dt)
+		return 0.0
+	virtual void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	virtual string tell()
+		return "???"
+	virtual void reset_state()
+
+class Cable extends Edge
+	float R
+	void __init__(int[] n)
+		super.__init__(TYPE_CABLE, n)
+	override float g(float dt)
+		return 1000
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	override string tell()
+		return "| U=" + U + " I=" + I
+
+class Resistor extends Edge
+	float R
+	void __init__(int[] n, float _r)
+		super.__init__(TYPE_RESISTOR, n)
+		R = _r
+	override float g(float dt)
+		return 1/R
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = U * g(dt)
+	override string tell()
+		return "R=" + R + " U=" + U + " I=" + I
+
+class Capacitor extends Edge
+	float C, U_prev
+	void __init__(int[] n, float _c)
+		super.__init__(TYPE_CAPACITOR, n)
+		C = _c
+		U_prev = 0
+	override float g(float dt)
+		return C/dt
+	override float I_off(float dt)
+		return -U_prev * C / dt
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = (U - U_prev) * g(dt)
+		U_prev = U
+	override string tell()
+		return "C=" + C + " U=" + U + " I=" + I + " U_prev=" + U_prev + " Q=" + C*U
+	override void reset_state()
+		U_prev = 0
+
+class Inductor extends Edge
+	float L, I_prev
+	void __init__(int[] n, float _l)
+		super.__init__(TYPE_INDUCTOR, n)
+		L = _l
+		I_prev = 0
+	override float g(float dt)
+		return dt/L
+	override float I_off(float dt)
+		return I_prev
+	override void update(Node[] nodes, float dt)
+		U = nodes[b].phi - nodes[a].phi
+		I = I_prev + U * g(dt)
+		I_prev = I
+	override string tell()
+		return "L=" + L + " U=" + U + " I=" + I + " I_prev=" + I_prev
+	override void reset_state()
+		I_prev = 0
+
+class SimResult
+	float[][] U, I
+	float[][] phi
+
+class Circuit
+	Node[] nodes
+	Edge*[] edges
+	int out
+	
+	void __init__()
+		nodes.add(Node(complex(0.2, 0.3)))
+		nodes.add(Node(complex(0.2, 0.7)))
+		out = 1
+	
+	void reset1()
+		nodes.clear()
+		nodes.add(Node(complex(0.1, 0.1)))
+		nodes.add(Node(complex(0.1, 0.4)))
+		nodes.add(Node(complex(0.9, 0.4)))
+		out = 2
+		
+		edges.add(new Resistor([0, 1], 100))
+		edges.add(new Resistor([0, 2], 100))
+		edges.add(new Resistor([0, 2], 100))
+		edges.add(new Resistor([1, 2], 100))
+	
+	void reset_state()
+		for e in edges
+			e.reset_state()
+	
+	void tell()
+		print("---------------------------")
+		for n in nodes
+			print(n.tell())
+		for e,i in edges
+			print(e.tell())
+		print("---------------------------")
+	
+	void quick_out()
+		string s
+		for e in edges
+			s += "" + e.U + "\t" + e.I + "\t"
+		print(s)
+
+	void create_G(Matrix G, float dt)
+		int n = len(nodes)-1
+		G.clear(n,n)
+		for e in edges
+			int a = e.a-1
+			int b = e.b-1
+			float g = e.g(dt)
+			if a >= 0 and b >= 0
+				G.add(a, b, -g)
+				G.add(b, a, -g)
+			if a >= 0
+				G.add(a, a, g)
+			if b >= 0
+				G.add(b, b, g)
+	
+	void create_I(float[] I, float I_in, float dt)
+		int n = nodes.num-1
+		I = [I_in]
+		I.resize(n)
+		for e in edges
+			int a = e.a-1
+			int b = e.b-1
+			float I_off = e.I_off(dt)
+			if a >= 0
+				I[a] += I_off
+			if b >= 0
+				I[b] -= I_off
+
+	void step(float I_in, float dt)
+		int n = nodes.num-1
+		Matrix G
+		create_G(G, dt)
+		//print(G)
+		
+		float[] I
+		create_I(I, I_in, dt)
+	
+		// U = R * I
+		// I = G * U
+		float[] u = G.solve(I)
+		//print(u)
+		
+		// update potentials
+		for i in 0:n
+			nodes[i+1].phi = u[i]
+		// update edges
+		for e in edges
+			e.update(nodes, dt)
+	float get_xxxx()
+		float Uin = nodes[1].phi
+		float Uout = nodes[out].phi
+		float factor = Uout / Uin
+		//print(factor)
+		return factor
+	
+	void simulate(float t_max, float dt, float amp, float omega, int type, SimResult res)
+		for t in 0:t_max:dt
+			float input = amp
+			if type == 1
+				input = amp * sin(t * omega)
+			else if type == 2
+				if sin(t * omega) < 0
+					input = 0
+			step(input, dt)
+			float[] I, U, phi
+			for e in edges
+				I.add(e.I)
+				U.add(e.U)
+			for n in nodes
+				phi.add(n.phi)
+			res.U.add(U)
+			res.I.add(I)
+			res.phi.add(phi)
+			
+
+void _main()
+	Circuit c
+	c.reset1()
+	c.step(1, 0.01)
+
+void draw_line(Painter* p, complex a, complex b)
+	p.draw_line(a.x, a.y, b.x, b.y)
+
+void draw_circle(Painter* p, complex c, float r)
+	p.draw_circle(c.x, c.y, r)
+
+enum
+	SEL_TYPE_NONE
+	SEL_TYPE_NODE
+	SEL_TYPE_EDGE
+
+class Selection
+	int type
+	int index
+	void __init__()
+		type = SEL_TYPE_NONE
+
+class CircuitEditor extends Window
+	Circuit c
+	float w, h
+	Selection sel
+	
+	SimResult res
+	int NT
+	float umin, umax
+	float imin, imax
+	
+	void __init__()
+		super.__init__("Circuit Editor", 800, 600)
+		from_source("
+Grid ? ''
+	DrawingArea area ''
+	Grid ? '' width=250 vertical noexpandx
+		Grid ? ''
+			Text ? 'time'
+			SpinButton t '5.0' range=0:100:0.1 expandx
+			---|
+			Text ? 'dt'
+			SpinButton dt '0.01' range=0:1:0.001
+			---|
+			Text ? 'I input'
+			SpinButton input-amp '1' range=0:100:0.001
+			---|
+			Text ? 'f input'
+			SpinButton input-freq '1' range=0:100:0.001
+			---|
+			Text ? 'type'
+			ComboBox input-type 'const\\sine\\square'
+		Button simulate 'Run' expandx")
+		
+		set_maximized(true)
+		
+		c.nodes.add(Node(complex(0.5, 0.5)))
+		
+		c.edges.add(new Resistor([0, 1], 100.0))
+		c.edges.add(new Capacitor([0, 2], 0.01))
+		//c.edges.add(new Inductor([1, 2], 0.0001))
+		c.edges.add(new Cable([1, 2]))
+		
+		event("simulate", &on_simulate)
+		umin = -100
+		umax = 100
+		imin = -2
+		imax = 2
+
+	complex project_u(int i, float u)
+		return complex(i2f(i) / NT * w, (umax - u) / (umax - umin)  * h)
+	complex project_i(int i, float v)
+		return complex(i2f(i) / NT * w, (imax - v) / (imax - imin)  * h)
+		
+	void on_simulate()
+		float duration = get_float("t")
+		float dt = get_float("dt")
+		float I = get_float("input-amp")
+		float f = get_float("input-freq")
+		int type = get_int("input-type")
+		res.U.clear()
+		res.I.clear()
+		c.reset_state()
+		c.simulate(duration, dt, I, f*2*pi, type, res)
+		redraw("area")
+	
+	complex project(complex p)
+		return complex(p.x * w, h - p.y * h)
+	
+	override void on_left_button_down()
+		sel.type = SEL_TYPE_NONE
+		complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+		for n,i in c.nodes
+			if (m - project(n.pos)).abs() < 20
+				sel.type = SEL_TYPE_NODE
+				sel.index = i
+		for e,i in c.edges
+			complex a = project(c.nodes[e.a].pos)
+			complex b = project(c.nodes[e.b].pos)
+			complex mm = (a+b)*0.5
+			if (m - mm).abs() < 40
+				sel.type = SEL_TYPE_EDGE
+				sel.index = i
+		redraw("area")
+
+	override void on_draw(Painter* p)
+		w = p.width
+		h = p.height
+		
+		// bg
+		p.set_color(White)
+		p.draw_rect(0, 0, w, h)
+		
+		draw_res(p)
+		
+		for e,i in c.edges
+			p.set_color(Black)
+			if sel.type == SEL_TYPE_EDGE and sel.index == i
+				p.set_color(Blue)
+			complex a = project(c.nodes[e.a].pos)
+			complex b = project(c.nodes[e.b].pos)
+			complex m = (a+b)*0.5
+			complex d = (a-b)* (1.0 / (a-b).abs())
+			complex dd = complex(d.y, -d.x)
+			if e.type == TYPE_RESISTOR
+				float l = 35
+				float r = 10
+				draw_line(p, a, m + d*l)
+				draw_line(p, b, m - d*l)
+				draw_line(p, m + d*l + dd*r, m + d*l - dd*r)
+				draw_line(p, m - d*l + dd*r, m - d*l - dd*r)
+				draw_line(p, m + d*l + dd*r, m - d*l + dd*r)
+				draw_line(p, m + d*l - dd*r, m - d*l - dd*r)
+			else if e.type == TYPE_CAPACITOR
+				float l = 30
+				float r = 5
+				draw_line(p, a, m + d*r)
+				draw_line(p, b, m - d*r)
+				draw_line(p, m + d*r - dd*l, m + d*r + dd*l)
+				draw_line(p, m - d*r - dd*l, m - d*r + dd*l)
+			else if e.type == TYPE_INDUCTOR
+				float l = 40
+				float r = 10
+				p.set_fill(false)
+				draw_line(p, a, m + d*l)
+				draw_line(p, b, m - d*l)
+				for t in -1.0:1.0:0.3
+					draw_circle(p, m + t*l*d, r)
+			else if e.type == TYPE_CABLE
+				draw_line(p, a, b)
+			
+			draw_line(p, m + dd*30 - d*30, m + dd*30 + d*30)
+			draw_line(p, m + dd*30 + d*30, m + dd*25 + d*25)
+			draw_line(p, m + dd*30 + d*30, m + dd*35 + d*25)
+		
+		for n,i in c.nodes
+			p.set_color(Black)
+			if sel.type == SEL_TYPE_NODE and sel.index == i
+				p.set_color(Blue)
+			complex pp = project(n.pos)
+			draw_circle(p, pp, 5)
+			if i == 0
+				draw_line(p, pp, pp + complex(0, 20))
+				draw_line(p, pp + complex(-20, 20), pp + complex(20, 20))
+				draw_line(p, pp + complex(-12, 25), pp + complex(12, 25))
+				draw_line(p, pp + complex(-4, 30), pp + complex(4, 30))
+			if i == 1
+				p.draw_str(pp.x - 10, pp.y - 30, "in")
+			
+	void draw_res(Painter* p)
+		
+		NT = len(res.U)
+		if NT == 0
+			return
+		
+		int e = sel.index
+		if sel.type == SEL_TYPE_EDGE
+			p.set_color(Blue)
+			for i in 0:NT
+				draw_circle(p, project_i(i, res.I[i][e]), 2)
+			p.set_color(Red)
+			for i in 0:NT
+				draw_circle(p, project_u(i, res.U[i][e]), 2)
+		else if sel.type == SEL_TYPE_NODE
+			p.set_color(Red)
+			for i in 0:NT
+				draw_circle(p, project_u(i, res.phi[i][e]), 2)
+
+void main()
+	Window* w = new CircuitEditor()
+	w.run()
+	
+	/*Circuit c
+	c.nodes.add(Node(complex(0.1, 0.1)))
+	c.nodes.add(Node(complex(0.1, 0.4)))
+	c.out = 1
+		
+	c.edges.add(new Resistor(0, 1, 100))
+	//c.edges.add(new Capacitor(0, 1, 0.01))
+	c.edges.add(new Inductor(0, 1, 100))
+	
+	float dt = 0.001
+	
+	for i in 0:5000
+		c.step(1, dt)
+		c.quick_out()
+
+	//for i in 0:5
+	//	c.step(1, dt)
+	//	c.tell()*/
