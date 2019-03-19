@@ -78,7 +78,7 @@ Term *ParsePart(string[] e)
 			int i_last = GetBrackets(e, i)
 			if i_last <= i + 2
 				raise(new SyntaxError("leere Klammer"))
-			eid.add(ParsePart(e.subarray(i + 1, i_last - i - 1)))
+			eid.add(ParsePart(e[i+1 : i_last]))
 			i = i_last
 		else if e[i] == ")"
 			raise(new SyntaxError("überflüssige Klammer )"))
