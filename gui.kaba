@@ -40,7 +40,7 @@ class CircuitEditor extends Window
 	color COLOR_TEXT
 	color COLOR_SELECTION
 	
-	void __init__()
+	void __init__(string[] arg)
 		super.__init__("Circuit Editor", 800, 600)
 		from_source("
 Grid ? ''
@@ -84,16 +84,12 @@ Toolbar toolbar ''
 		set_string("add-type", "Inductor")
 		set_string("add-type", "Diode")
 		
-		/*c.nodes.add(Node(complex(0.5, 0.5)))
-		
-		c.edges.add(new Resistor([0, 1], 100.0))
-		c.edges.add(new Capacitor([0, 2], 0.01))
-		//c.edges.add(new Inductor([1, 2], 0.0001))
-		c.edges.add(new Cable([1, 2]))*/
-		
-		c.edges.add(new Diode([0,1]))
+		if len(arg) > 0
+			c.import(FileReadText(arg[0]))
 		
 		event("new", &on_new)
+		event("open", &on_open)
+		event("save", &on_save)
 		event("simulate", &on_simulate)
 		event("add-type", &on_add_type)
 		umin = -100
@@ -107,8 +103,16 @@ Toolbar toolbar ''
 	
 	void on_new()
 		res.clear()
-		c.reset()
+		c.reset_default()
 		redraw("area")
+	
+	void on_save()
+		if HuiFileDialogSave(self, "Save the circuit", "", "*.circuit", "*.circuit")
+			FileWriteText(HuiFilename, c.export())
+	
+	void on_open()
+		if HuiFileDialogOpen(self, "Load the circuit", "", "*.circuit", "*.circuit")
+			c.import(FileReadText(HuiFilename))
 		
 
 	complex project_u(int i, float u)
@@ -199,7 +203,7 @@ Toolbar toolbar ''
 					else if add_type == TYPE_CAPACITOR
 						c.edges.add(new Capacitor([first_node, sel.index], 0.01))
 					else if add_type == TYPE_INDUCTOR
-						c.edges.add(new Inductor([first_node, sel.index], 1))
+						c.edges.add(new Inductor([first_node, sel.index], 1.0))
 					else if add_type == TYPE_DIODE
 						c.edges.add(new Diode([first_node, sel.index]))
 					res.clear()
@@ -321,6 +325,6 @@ Toolbar toolbar ''
 				pp.add(project_u(i, res.phi[i][e]))
 			p.draw_lines(pp)
 
-void main()
-	Window* w = new CircuitEditor()
+void main(string[] arg)
+	Window* w = new CircuitEditor(arg)
 	w.run()
