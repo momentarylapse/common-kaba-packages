@@ -48,6 +48,8 @@ Grid ? ''
 	Grid ? '' width=250 vertical noexpandx
 		Group ? 'Add'
 			ListView add-type 'what' nobar height=200 noexpandy
+		Group ? 'Part'
+			ListView params 'name\\\\value' nobar format=tT height=120 noexpandy expandx
 		Group ? 'Simulation'
 			Grid ? '' vertical
 				Grid ? ''
@@ -64,7 +66,7 @@ Grid ? ''
 					SpinButton input-freq '1' range=0:100:0.001
 					---|
 					Text ? 'type'
-					ComboBox input-type 'const\\\\sine\\\\square\\\\tria'
+					ComboBox input-type '⎻\\\\∿\\\\⎍\\\\◢'
 				Button simulate 'Run' expandx")
 		toolbar(0).from_source("
 Toolbar toolbar ''
@@ -92,10 +94,12 @@ Toolbar toolbar ''
 		event("save", &on_save)
 		event("simulate", &on_simulate)
 		event("add-type", &on_add_type)
+		event_x("params", "hui:change", &on_param)
 		umin = -100
 		umax = 100
 		imin = -2
 		imax = 2
+		load_from_part(nil)
 		
 		COLOR_BACKGROUND = color(1, 0.1, 0.1, 0.1)
 		COLOR_TEXT = White
@@ -113,6 +117,21 @@ Toolbar toolbar ''
 	void on_open()
 		if HuiFileDialogOpen(self, "Load the circuit", "", "*.circuit", "*.circuit")
 			c.import(FileReadText(HuiFilename))
+	
+	void on_param()
+		int row = HuiGetEvent().row
+		string p = get_cell("params", row, 1)
+		if sel.type == SEL_TYPE_EDGE
+			c.edges[sel.index].param[row] = p.float()
+	
+	void load_from_part(Edge *e)
+		reset("params")
+		if !e
+			return
+		string[] names = e.param_names()
+		for n,i in names
+			add_string("params", n + "\\" + e.param[i])
+			
 		
 
 	complex project_u(int i, float u)
@@ -174,11 +193,13 @@ Toolbar toolbar ''
 	
 	override void on_left_button_down()
 		sel.type = SEL_TYPE_NONE
+		load_from_part(nil)
 		complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
 		for n,i in c.nodes
 			if (m - project(n.pos)).abs() < 20
 				sel.type = SEL_TYPE_NODE
 				sel.index = i
+				break
 		for e,i in c.edges
 			complex a = project(c.nodes[e.a].pos)
 			complex b = project(c.nodes[e.b].pos)
@@ -186,6 +207,8 @@ Toolbar toolbar ''
 			if (m - mm).abs() < 40
 				sel.type = SEL_TYPE_EDGE
 				sel.index = i
+				load_from_part(e)
+				break
 		
 		if mode == MODE_ADD_NODE
 			c.nodes.add(Node(unproject(m)))
