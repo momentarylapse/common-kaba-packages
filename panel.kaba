@@ -1,0 +1,285 @@
+use "circuit.kaba"
+
+void draw_line(Painter* p, complex a, complex b)
+	p.draw_line(a.x, a.y, b.x, b.y)
+
+void draw_circle(Painter* p, complex c, float r)
+	p.draw_circle(c.x, c.y, r)
+
+enum
+	SEL_TYPE_NONE
+	SEL_TYPE_NODE
+	SEL_TYPE_EDGE
+
+class Selection
+	int type
+	int index
+	void __init__()
+		type = SEL_TYPE_NONE
+
+enum
+	MODE_DEFAULT
+	MODE_ADD_NODE
+	MODE_ADD_EDGE
+
+class CircuitPanel extends Panel
+	Circuit* c
+	float w, h
+	Selection sel
+	
+	SimResult res
+	int NT
+	float umin, umax
+	float imin, imax
+	
+	int mode
+	int add_type
+	int first_node
+	
+	color COLOR_BACKGROUND
+	color COLOR_TEXT
+	color COLOR_SELECTION
+	
+	void __init__(Circuit* _c)
+		from_source("
+DrawingArea area '' grab-focus")
+		
+		c = _c
+		
+		mode = MODE_DEFAULT
+		
+		umin = -100
+		umax = 100
+		imin = -2
+		imax = 2
+		
+		COLOR_BACKGROUND = color(1, 0.1, 0.1, 0.1)
+		COLOR_TEXT = White
+		COLOR_SELECTION = color(1.0, 0.4, 0.4, 1.0)
+		
+		event_x("area", "hui:draw", &on_draw)
+		event_x("area", "hui:left-button-down", &on_left_button_down)
+		event_x("area", "hui:key-down", &on_key_down)
+	
+	void redraw()
+		redraw("area")	
+		
+
+	complex project_u(int i, float u)
+		return complex(i2f(i) / NT * w, h - (u - umin) / (umax - umin)  * h/4)
+	complex project_i(int i, float v)
+		return complex(i2f(i) / NT * w, h - (v - imin) / (imax - imin)  * h/4)
+		
+	void on_simulate()
+		float duration = get_float("t")
+		float dt = get_float("dt")
+		float I = get_float("input-amp")
+		float f = get_float("input-freq")
+		int type = get_int("input-type")
+		res.clear()
+		c.reset_state()
+		c.simulate(duration, dt, I, f*2*pi, type, res)
+		auto_scale()
+		redraw("area")
+	
+	void auto_scale()
+		umax = 0
+		for uu in res.U
+			for u in uu
+				umax = max(umax, abs(u)*1.2)
+		if umax == 0
+			umax = 1
+		umin = -umax
+		imax = 0
+		for ii in res.I
+			for i in ii
+				imax = max(imax, abs(i)*1.21)
+		if imax == 0
+			imax = 1
+		imin = -imax
+	
+	/*void on_add_type()
+		int t = get_int("")
+		mode = MODE_ADD_EDGE
+		first_node = -1
+		if t == 0
+			mode = MODE_ADD_NODE
+		else if t == 1
+			add_type = TYPE_CABLE
+		else if t == 2
+			add_type = TYPE_RESISTOR
+		else if t == 3
+			add_type = TYPE_CAPACITOR
+		else if t == 4
+			add_type = TYPE_INDUCTOR
+		else if t == 5
+			add_type = TYPE_DIODE
+		redraw("area")*/
+	
+	complex project(complex p)
+		return complex(p.x * w, h - p.y * h)
+	
+	complex unproject(complex p)
+		return complex(p.x / w, (h - p.y) / h)
+	
+	void on_left_button_down()
+		sel.type = SEL_TYPE_NONE
+		//load_from_part(nil)
+		complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+		for n,i in c.nodes
+			if (m - project(n.pos)).abs() < 20
+				sel.type = SEL_TYPE_NODE
+				sel.index = i
+				break
+		for e,i in c.edges
+			complex a = project(c.nodes[e.a].pos)
+			complex b = project(c.nodes[e.b].pos)
+			complex mm = (a+b)*0.5
+			if (m - mm).abs() < 40
+				sel.type = SEL_TYPE_EDGE
+				sel.index = i
+				//load_from_part(e)
+				break
+		
+		if mode == MODE_ADD_NODE
+			c.nodes.add(Node(unproject(m)))
+			res.clear()
+			mode = MODE_DEFAULT
+		else if mode == MODE_ADD_EDGE
+			if sel.type == SEL_TYPE_NODE
+				if first_node < 0
+					first_node = sel.index
+				else
+					if add_type == TYPE_CABLE
+						c.edges.add(new Cable([first_node, sel.index]))
+					else if add_type == TYPE_RESISTOR
+						c.edges.add(new Resistor([first_node, sel.index], 100))
+					else if add_type == TYPE_CAPACITOR
+						c.edges.add(new Capacitor([first_node, sel.index], 0.01))
+					else if add_type == TYPE_INDUCTOR
+						c.edges.add(new Inductor([first_node, sel.index], 1.0))
+					else if add_type == TYPE_DIODE
+						c.edges.add(new Diode([first_node, sel.index]))
+					res.clear()
+					mode = MODE_DEFAULT
+		redraw("area")
+	
+	void on_key_down()
+		if HuiGetEvent().key_code == KEY_DELETE
+			if sel.type == SEL_TYPE_EDGE
+				delete c.edges[sel.index]
+				c.edges.remove(sel.index)
+				sel.type = SEL_TYPE_NONE
+				res.clear()
+		redraw("area")
+
+	void on_draw(Painter* p)
+		w = p.width
+		h = p.height
+		
+		// bg
+		p.set_color(COLOR_BACKGROUND)
+		p.draw_rect(0, 0, w, h)
+		
+		draw_res(p)
+		
+		for e,i in c.edges
+			p.set_color(COLOR_TEXT)
+			if sel.type == SEL_TYPE_EDGE and sel.index == i
+				p.set_color(COLOR_SELECTION)
+			complex a = project(c.nodes[e.a].pos)
+			complex b = project(c.nodes[e.b].pos)
+			complex m = (a+b)*0.5
+			complex d = (a-b)* (1.0 / (a-b).abs())
+			complex dd = complex(d.y, -d.x)
+			if e.type == TYPE_CABLE
+				draw_line(p, a, b)
+			else if e.type == TYPE_RESISTOR
+				float l = 35
+				float r = 10
+				draw_line(p, a, m + d*l)
+				draw_line(p, b, m - d*l)
+				draw_line(p, m + d*l + dd*r, m + d*l - dd*r)
+				draw_line(p, m - d*l + dd*r, m - d*l - dd*r)
+				draw_line(p, m + d*l + dd*r, m - d*l + dd*r)
+				draw_line(p, m + d*l - dd*r, m - d*l - dd*r)
+			else if e.type == TYPE_CAPACITOR
+				float l = 30
+				float r = 5
+				draw_line(p, a, m + d*r)
+				draw_line(p, b, m - d*r)
+				draw_line(p, m + d*r - dd*l, m + d*r + dd*l)
+				draw_line(p, m - d*r - dd*l, m - d*r + dd*l)
+			else if e.type == TYPE_INDUCTOR
+				float l = 40
+				float r = 10
+				p.set_fill(false)
+				draw_line(p, a, m + d*l)
+				draw_line(p, b, m - d*l)
+				for t in -1.0:1.0:0.3
+					draw_circle(p, m + t*l*d, r)
+			else if e.type == TYPE_DIODE
+				float l = 20
+				draw_line(p, a, m + d*l)
+				draw_line(p, b, m - d*l)
+				draw_line(p, m + d*l, m - d*l + dd*l)
+				draw_line(p, m + d*l, m - d*l - dd*l)
+				draw_line(p, m - d*l + dd*l, m - d*l - dd*l)
+				draw_line(p, m + d*l + dd*l, m + d*l - dd*l)
+			
+			draw_line(p, m + dd*30 - d*30, m + dd*30 + d*30)
+			draw_line(p, m + dd*30 + d*30, m + dd*25 + d*25)
+			draw_line(p, m + dd*30 + d*30, m + dd*35 + d*25)
+		
+		p.set_fill(true)
+		for n,i in c.nodes
+			p.set_color(COLOR_TEXT)
+			if sel.type == SEL_TYPE_NODE and sel.index == i
+				p.set_color(COLOR_SELECTION)
+			complex pp = project(n.pos)
+			draw_circle(p, pp, 5)
+			if i == 0
+				draw_line(p, pp, pp + complex(0, 20))
+				draw_line(p, pp + complex(-20, 20), pp + complex(20, 20))
+				draw_line(p, pp + complex(-12, 25), pp + complex(12, 25))
+				draw_line(p, pp + complex(-4, 30), pp + complex(4, 30))
+			if i == 1
+				p.draw_str(pp.x - 38, pp.y - 10, "in")
+			if i == c.out
+				p.draw_str(pp.x + 20, pp.y - 10, "out")
+		
+		if mode == MODE_ADD_EDGE
+			if first_node < 0
+				p.draw_str(0, 0, "click first on node to connect with edge")
+			else
+				p.draw_str(0, 0, "click second on node to connect with edge")
+		else if mode == MODE_ADD_NODE
+			p.draw_str(0, 0, "place the node")
+			
+	void draw_res(Painter* p)
+		
+		NT = len(res.U)
+		if NT == 0
+			return
+		
+		int e = sel.index
+		p.set_color(color(1,0.2,0.2,0.2))
+		draw_line(p, project_i(0,0), project_i(NT,0))
+		if sel.type == SEL_TYPE_EDGE
+			p.set_color(color(1,0,0,0.8))
+			complex[] pp
+			for i in 0:NT
+				pp.add(project_i(i, res.I[i][e]))
+			p.draw_lines(pp)
+			pp.clear()
+			p.set_color(color(1,0.8,0,0))
+			for i in 0:NT
+				pp.add(project_u(i, res.U[i][e]))
+			p.draw_lines(pp)
+		else if sel.type == SEL_TYPE_NODE
+			p.set_color(color(1,0,0.8,0))
+			complex[] pp
+			for i in 0:NT
+				pp.add(project_u(i, res.phi[i][e]))
+			p.draw_lines(pp)
+
