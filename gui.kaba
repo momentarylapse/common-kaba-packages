@@ -1,6 +1,16 @@
 use "circuit.kaba"
 use "panel.kaba"
 
+class EditorPanel extends CircuitPanel
+	CircuitEditor* ed
+	void __init__(CircuitEditor* e)
+		super.__init__(&e.c)
+		ed = e
+	override void on_selection_change()
+		ed.load_from_part(nil)
+		if sel.type == SEL_TYPE_EDGE
+			ed.load_from_part(ed.c.edges[sel.index])
+
 class CircuitEditor extends Window
 	Circuit c
 	CircuitPanel* panel
@@ -34,7 +44,7 @@ Grid root ''
 					Text ? 'type'
 					ComboBox input-type '⎻\\\\∿\\\\⎍\\\\◢'
 				Button simulate 'Run' expandx")
-		panel = new CircuitPanel(&c)
+		panel = new EditorPanel(self)
 		embed(panel, "root", 0,0)
 		toolbar(0).from_source("
 Toolbar toolbar ''
@@ -46,12 +56,9 @@ Toolbar toolbar ''
 		
 		set_maximized(true)
 		
+		for t in 0:NUM_TYPES
+			set_string("add-type", edge_name(t))
 		set_string("add-type", "Node")
-		set_string("add-type", "Cable")
-		set_string("add-type", "Resistor")
-		set_string("add-type", "Capacitor")
-		set_string("add-type", "Inductor")
-		set_string("add-type", "Diode")
 		
 		if len(arg) > 0
 			c.import(FileReadText(arg[0]))
@@ -109,20 +116,12 @@ Toolbar toolbar ''
 	
 	void on_add_type()
 		int t = get_int("")
-		panel.mode = MODE_ADD_EDGE
 		panel.first_node = -1
-		if t == 0
+		if t == NUM_TYPES
 			panel.mode = MODE_ADD_NODE
-		else if t == 1
-			panel.add_type = TYPE_CABLE
-		else if t == 2
-			panel.add_type = TYPE_RESISTOR
-		else if t == 3
-			panel.add_type = TYPE_CAPACITOR
-		else if t == 4
-			panel.add_type = TYPE_INDUCTOR
-		else if t == 5
-			panel.add_type = TYPE_DIODE
+		else if t >= 0
+			panel.mode = MODE_ADD_EDGE
+			panel.add_type = t
 		panel.redraw()
 
 void main(string[] arg)

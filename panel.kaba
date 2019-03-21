@@ -66,9 +66,9 @@ DrawingArea area '' grab-focus")
 		
 
 	complex project_u(int i, float u)
-		return complex(i2f(i) / NT * w, h - (u - umin) / (umax - umin)  * h/4)
+		return complex(i2f(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
 	complex project_i(int i, float v)
-		return complex(i2f(i) / NT * w, h - (v - imin) / (imax - imin)  * h/4)
+		return complex(i2f(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
 	void on_simulate()
 		float duration = get_float("t")
@@ -86,35 +86,17 @@ DrawingArea area '' grab-focus")
 		umax = 0
 		for uu in res.U
 			for u in uu
-				umax = max(umax, abs(u)*1.2)
+				umax = max(umax, abs(u))
 		if umax == 0
 			umax = 1
 		umin = -umax
 		imax = 0
 		for ii in res.I
 			for i in ii
-				imax = max(imax, abs(i)*1.21)
+				imax = max(imax, abs(i))
 		if imax == 0
 			imax = 1
 		imin = -imax
-	
-	/*void on_add_type()
-		int t = get_int("")
-		mode = MODE_ADD_EDGE
-		first_node = -1
-		if t == 0
-			mode = MODE_ADD_NODE
-		else if t == 1
-			add_type = TYPE_CABLE
-		else if t == 2
-			add_type = TYPE_RESISTOR
-		else if t == 3
-			add_type = TYPE_CAPACITOR
-		else if t == 4
-			add_type = TYPE_INDUCTOR
-		else if t == 5
-			add_type = TYPE_DIODE
-		redraw("area")*/
 	
 	complex project(complex p)
 		return complex(p.x * w, h - p.y * h)
@@ -124,7 +106,6 @@ DrawingArea area '' grab-focus")
 	
 	void on_left_button_down()
 		sel.type = SEL_TYPE_NONE
-		//load_from_part(nil)
 		complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
 		for n,i in c.nodes
 			if (m - project(n.pos)).abs() < 20
@@ -138,7 +119,6 @@ DrawingArea area '' grab-focus")
 			if (m - mm).abs() < 40
 				sel.type = SEL_TYPE_EDGE
 				sel.index = i
-				//load_from_part(e)
 				break
 		
 		if mode == MODE_ADD_NODE
@@ -150,18 +130,10 @@ DrawingArea area '' grab-focus")
 				if first_node < 0
 					first_node = sel.index
 				else
-					if add_type == TYPE_CABLE
-						c.edges.add(new Cable([first_node, sel.index]))
-					else if add_type == TYPE_RESISTOR
-						c.edges.add(new Resistor([first_node, sel.index], 100))
-					else if add_type == TYPE_CAPACITOR
-						c.edges.add(new Capacitor([first_node, sel.index], 0.01))
-					else if add_type == TYPE_INDUCTOR
-						c.edges.add(new Inductor([first_node, sel.index], 1.0))
-					else if add_type == TYPE_DIODE
-						c.edges.add(new Diode([first_node, sel.index]))
+					c.add_default([first_node, sel.index], add_type)
 					res.clear()
 					mode = MODE_DEFAULT
+		on_selection_change()
 		redraw("area")
 	
 	void on_key_down()
@@ -183,6 +155,8 @@ DrawingArea area '' grab-focus")
 		
 		draw_res(p)
 		
+		p.set_line_width(2)
+		p.set_fill(false)
 		for e,i in c.edges
 			p.set_color(COLOR_TEXT)
 			if sel.type == SEL_TYPE_EDGE and sel.index == i
@@ -190,15 +164,22 @@ DrawingArea area '' grab-focus")
 			complex a = project(c.nodes[e.a].pos)
 			complex b = project(c.nodes[e.b].pos)
 			complex m = (a+b)*0.5
-			complex d = (a-b)* (1.0 / (a-b).abs())
+			complex d = (b-a)* (1.0 / (b-a).abs())
 			complex dd = complex(d.y, -d.x)
 			if e.type == TYPE_CABLE
 				draw_line(p, a, b)
+			else if e.type == TYPE_SOURCE
+				float l = 25
+				float r = 8
+				draw_line(p, b, m + d*(l+r))
+				draw_line(p, a, m - d*(l+r))
+				draw_circle(p, m + l*d, r)
+				draw_circle(p, m - l*d, r)
 			else if e.type == TYPE_RESISTOR
 				float l = 35
 				float r = 10
-				draw_line(p, a, m + d*l)
-				draw_line(p, b, m - d*l)
+				draw_line(p, b, m + d*l)
+				draw_line(p, a, m - d*l)
 				draw_line(p, m + d*l + dd*r, m + d*l - dd*r)
 				draw_line(p, m - d*l + dd*r, m - d*l - dd*r)
 				draw_line(p, m + d*l + dd*r, m - d*l + dd*r)
@@ -206,22 +187,21 @@ DrawingArea area '' grab-focus")
 			else if e.type == TYPE_CAPACITOR
 				float l = 30
 				float r = 5
-				draw_line(p, a, m + d*r)
-				draw_line(p, b, m - d*r)
+				draw_line(p, b, m + d*r)
+				draw_line(p, a, m - d*r)
 				draw_line(p, m + d*r - dd*l, m + d*r + dd*l)
 				draw_line(p, m - d*r - dd*l, m - d*r + dd*l)
 			else if e.type == TYPE_INDUCTOR
 				float l = 40
 				float r = 10
-				p.set_fill(false)
-				draw_line(p, a, m + d*l)
-				draw_line(p, b, m - d*l)
-				for t in -1.0:1.0:0.3
+				draw_line(p, b, m + d*(l+r))
+				draw_line(p, a, m - d*(l+r))
+				for t in -1.0:1.01:0.5
 					draw_circle(p, m + t*l*d, r)
 			else if e.type == TYPE_DIODE
 				float l = 20
-				draw_line(p, a, m + d*l)
-				draw_line(p, b, m - d*l)
+				draw_line(p, b, m + d*l)
+				draw_line(p, a, m - d*l)
 				draw_line(p, m + d*l, m - d*l + dd*l)
 				draw_line(p, m + d*l, m - d*l - dd*l)
 				draw_line(p, m - d*l + dd*l, m - d*l - dd*l)
@@ -264,13 +244,16 @@ DrawingArea area '' grab-focus")
 		
 		int e = sel.index
 		p.set_color(color(1,0.2,0.2,0.2))
+		p.set_line_width(1)
 		draw_line(p, project_i(0,0), project_i(NT,0))
 		if sel.type == SEL_TYPE_EDGE
 			p.set_color(color(1,0,0,0.8))
 			complex[] pp
 			for i in 0:NT
 				pp.add(project_i(i, res.I[i][e]))
+			p.set_line_width(2)
 			p.draw_lines(pp)
+			p.set_line_width(1)
 			pp.clear()
 			p.set_color(color(1,0.8,0,0))
 			for i in 0:NT
@@ -282,4 +265,10 @@ DrawingArea area '' grab-focus")
 			for i in 0:NT
 				pp.add(project_u(i, res.phi[i][e]))
 			p.draw_lines(pp)
+		
+		p.set_color(COLOR_TEXT)
+		p.draw_str(20, h - 20, "Imax = " + imax + "    Umax = " + umax)
+	
+	virtual void on_selection_change()
+		pass
 

@@ -10,6 +10,7 @@ class Node
 
 enum
 	TYPE_CABLE
+	TYPE_SOURCE
 	TYPE_RESISTOR
 	TYPE_CAPACITOR
 	TYPE_INDUCTOR
@@ -19,6 +20,8 @@ enum
 string edge_name(int t)
 	if t == TYPE_CABLE
 		return "Cable"
+	if t == TYPE_SOURCE
+		return "Source"
 	if t == TYPE_RESISTOR
 		return "Resistor"
 	if t == TYPE_CAPACITOR
@@ -59,7 +62,7 @@ class Edge
 	virtual float I_off(float dt)
 		return 0.0
 	virtual void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 	virtual void iterate(float dt)
 		pass
@@ -74,8 +77,21 @@ class Cable extends Edge
 	override float g(float dt)
 		return 1000
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
+
+class Source extends Edge
+	void __init__(int[] n, float i)
+		super.__init__(TYPE_SOURCE, n, [i, 10000.0])
+	override float g(float dt)
+		return 1 / param[1]
+	override float I_off(float dt)
+		return -param[0]
+	override void update(Node[] nodes, float dt)
+		U = nodes[a].phi - nodes[b].phi
+		I = U * g(dt) + param[0]
+	override string[] param_names()
+		return ["I", "R"]
 
 class Resistor extends Edge
 	void __init__(int[] n, float R)
@@ -83,7 +99,7 @@ class Resistor extends Edge
 	override float g(float dt)
 		return 1 / param[0]
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 	override string[] param_names()
 		return ["R"]
@@ -96,9 +112,9 @@ class Capacitor extends Edge
 	override float g(float dt)
 		return param[0] / dt
 	override float I_off(float dt)
-		return -U_prev * param[0] / dt
+		return U_prev * param[0] / dt
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = (U - U_prev) * g(dt)
 	override void iterate(float dt)
 		U_prev = U
@@ -115,9 +131,9 @@ class Inductor extends Edge
 	override float g(float dt)
 		return dt / param[0]
 	override float I_off(float dt)
-		return I_prev
+		return -I_prev
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = I_prev + U * g(dt)
 	override void iterate(float dt)
 		I_prev = I
@@ -162,12 +178,12 @@ class Diode extends Edge
 		return exp(param[1] + U / param[2] / param[0]) / (param[2]*param[0])
 	override float I_off(float dt)
 		if U > u_high
-			return i_high
+			return -i_high
 		if U < u_low
-			return i_low
-		return (I_id(U) - g(dt) * U)
+			return -i_low
+		return g(dt) * U - I_id(U)
 	override void update(Node[] nodes, float dt)
-		U = nodes[b].phi - nodes[a].phi
+		U = nodes[a].phi - nodes[b].phi
 		I = I_id(U)
 
 class SimResult
@@ -331,16 +347,28 @@ class Circuit
 			else
 				int t = edge_type(x[0])
 				int[] n = [x[1].int(), x[2].int()]
-				if t == TYPE_CABLE
-					edges.add(new Cable(n))
-				else if t == TYPE_RESISTOR
-					edges.add(new Resistor(n, x[3].float()))
-				else if t == TYPE_CAPACITOR
-					edges.add(new Capacitor(n, x[3].float()))
-				else if t == TYPE_INDUCTOR
-					edges.add(new Inductor(n, x[3].float()))
-				else if t == TYPE_DIODE
-					edges.add(new Diode(n))
+				Edge* e = add_default(n, t)
+				for i in 3:len(x)
+					e.param[i] = x[i].float()
+	
+	Edge* add_default(int[]n, int t)
+		Edge* e = nil
+		if t == TYPE_CABLE
+			e = new Cable(n)
+		else if t == TYPE_SOURCE
+			e = new Source(n, 1)
+		else if t == TYPE_RESISTOR
+			e = new Resistor(n, 10)
+		else if t == TYPE_CAPACITOR
+			e = new Capacitor(n, 1)
+		else if t == TYPE_INDUCTOR
+			e = new Inductor(n, 1)
+		else if t == TYPE_DIODE
+			e = new Diode(n)
+		else
+			raise(new Exception("unknown type: " + t))
+		edges.add(e)
+		return e
 
 void _main()
 	Circuit c
