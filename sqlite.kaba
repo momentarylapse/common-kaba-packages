@@ -1,4 +1,4 @@
-const string KABA_LINK = "/usr/lib/libsqlite3.so
+const string KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_open:sqlite3_open
 	_sqlite3_close:sqlite3_close
 	sqlite3_libversion_number:sqlite3_libversion_number
