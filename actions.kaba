@@ -166,7 +166,7 @@ void file_move(LocalFile *f, string new_path)
 // check for local changes
 void action_add(string path)
 	set_working_dir(path)
-	LocalFile*[] files = lister.find(path)
+	let files = lister.find(path)
 	for f in files
 		file_add(f)
 			
@@ -175,7 +175,7 @@ void action_add(string path)
 void action_rm(string path)
 	set_working_dir(path)
 		
-	LocalFile*[] files = lister.find(path)
+	let files = lister.find(path)
 	for f in files
 		f.drop_me = true
 	db.save()
@@ -183,7 +183,7 @@ void action_rm(string path)
 void action_mv(string source, string _dest)
 	try
 		string dest = _dest
-		LocalFile* f = db.find_by_path(source)
+		let f = db.find_by_path(source)
 		if FileIsDirectory(dest)
 			dest = dir_canonical(dest) + source.basename()
 		if FileExists(dest) or db.has_path(dest)
@@ -216,7 +216,7 @@ void structure_file(LocalFile* f, string structure, string root)
 void action_structure_apply(string _dir, string structure)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
-	LocalFile*[] files = db.get_in_dir(dir, conf.recursive)
+	let files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		structure_file(f, structure, dir)
 
@@ -224,7 +224,7 @@ void action_structure_apply(string _dir, string structure)
 void action_structure_auto(string _dir)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
-	LocalFile*[] files = db.get_in_dir(dir, conf.recursive)
+	let files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		ConfigDir* e = conf.get_cfg(f.path)
 		if !e
@@ -233,7 +233,7 @@ void action_structure_auto(string _dir)
 
 void action_info(string path)
 	try
-		LocalFile* f = db.find_by_path(path)
+		let f = db.find_by_path(path)
 		f.show()
 		f.show_info("      ")
 	except Exception as e
@@ -256,20 +256,20 @@ void action_find(string filter)
 	
 void action_tag_add(string path, string key, string value)
 	set_working_dir(path)
-	LocalFile*[] files = db.get(path, conf.recursive)
+	let files = db.get(path, conf.recursive)
 	for f in files
 		f.tag_add(key, value)
 
 void action_tag_set(string path, string key, string value)
 	try
-		LocalFile* f = db.find_by_path(path)
+		let f = db.find_by_path(path)
 		f.tag_set(key, value)
 	except Exception as e
 		error_out(e)
 
 void action_tag_rm(string path, string key, string value)
 	try
-		LocalFile* f = db.find_by_path(path)
+		let f = db.find_by_path(path)
 		f.tag_rm(key, value)
 	except Exception as e
 		error_out(e)
@@ -279,7 +279,7 @@ void action_tag_rm(string path, string key, string value)
 void action_pull(string path)
 	set_working_dir(path)
 	
-	LocalFile*[] files = db.get(path, conf.recursive)
+	let files = db.get(path, conf.recursive)
 	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
@@ -295,7 +295,7 @@ void action_pull(string path)
 void action_push(string path)
 	set_working_dir(path)
 	
-	LocalFile*[] files = db.get(path, conf.recursive)
+	let files = db.get(path, conf.recursive)
 	for f in files
 		if f.pure_local() //or f.is(CHANGED_FILE)
 			print("UPLOADING " + rel_path(f.path))
@@ -303,6 +303,27 @@ void action_push(string path)
 		if f.is(CHANGED_META)
 			print("UPLOADING META " + rel_path(f.path))
 			remote_upload_meta(f)
+
+
+void action_get(string id)
+	try
+		let ff = db.find_by_id(id)
+		if ff.pure_remote()
+			remote_download(ff)
+		else
+			print("id=" + id + " already local: " + ff.path)
+	except
+		let files = remote_find_by_id([id], "")
+		if len(files) > 0
+			LocalFile f = files[0]
+			f.path = GetCurDir() + f.id + "-" + f.name + "." + f.path.extension()
+			db.files.add(f)
+			let ff = db.find_by_id(id)
+			remote_download(ff)
+		else
+			print("not found: id=" + id)
+			return
+		
 
 void show_rfile_list(RemoteFile[] rfiles)
 	for f in rfiles
@@ -325,7 +346,7 @@ void action_remote_add(string filter, string dir)
 
 void action_sync(string dir)
 	set_working_dir(dir)
-	ConfigDir* e = conf.get_cfg(dir)
+	let e = conf.get_cfg(dir)
 	if e
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)
@@ -336,7 +357,7 @@ void action_sync(string dir)
 	
 void action_tag_auto(string path)
 	set_working_dir(path)
-	LocalFile*[] files = db.get(path, conf.recursive)
+	let files = db.get(path, conf.recursive)
 	for f in files
 		auto_tag(f)
 	

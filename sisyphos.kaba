@@ -25,7 +25,8 @@ void main(string[] arg)
 		print("  list <DIR>                 # only show")
 	//	print("  status                     # only show")
 		print("  sync <DIR>                 # sync db entries (not files)")
-		print("  pull <PATH>                # download files/meta")
+		print("  pull <PATH>                # download linked files/meta")
+		print("  get <ID>                   # link and download files")
 		print("  upload <PATH>")
 	//	print("  sync-pure-locals-by-hash <DIR>")
 		print("  remote find <FILTER>")
@@ -242,6 +243,12 @@ void run_command(string[] arg)
 			return
 		for i in 1:arg.num
 			action_pull(absolute_path(arg[i]))
+	else if arg[0] == "get"
+		if arg.num < 2
+			print("ERROR: get <IDs>")
+			return
+		for i in 1:arg.num
+			action_get(arg[i])
 	else if arg[0] == "structure"
 		if arg.num < 2
 			print("TRY: structure apply/auto")
