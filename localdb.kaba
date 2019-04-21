@@ -386,10 +386,38 @@ void auto_tag(LocalFile *f)
 			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
 			if s.num > 0
 				f.tag_set("pages", s.int().str())
-		if ext == "jpg" or ext == "png" or ext == "bmp"
+		else if /*ext == "jpg" or*/ ext == "png" or ext == "bmp"
 			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
 			if s.num >= 2
 				f.tag_set("width", s[0].int().str())
 				f.tag_set("height", s[1].int().str())
+		else if ext == "jpg"
+			string[] s = shell_exec("exif -mi \"" + bash_escape(f.path) + "\"").explode("\n")
+			string model, make
+			for l in s
+				string[] xx = l.explode("\t")
+				if len(xx) < 2
+					continue
+				if xx[0] == "0xa002"
+					f.tag_set("width", xx[1].int())
+				if xx[0] == "0xa003"
+					f.tag_set("height", xx[1].int())
+				if xx[0] == "0x0110"
+					model = xx[1]
+				if xx[0] == "0x010f"
+					make = xx[1]
+				if xx[0] == "0x829a"
+					f.tag_set("exposuretime", xx[1])
+				if xx[0] == "0x829d"
+					f.tag_set("fnumber", xx[1])
+				if xx[0] == "0x8827"
+					f.tag_set("iso", xx[1])
+				if xx[0] == "0x0132"
+					f.tag_set("year", xx[1][:4])
+					f.tag_set("month", xx[1][5:7].int())
+					f.tag_set("day", xx[1][8:10].int())
+					f.tag_set("timeofday", xx[1][11:])
+			if len(make) > 0 and len(model) > 0
+				f.tag_set("camera", make + " " + model)
 	except Exception as e
 		error_out(e)
