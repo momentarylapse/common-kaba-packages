@@ -294,6 +294,15 @@ void action_tag_rm(string path, string tag)
 	for f in files
 		f.tag_rm(t)
 
+void action_tag_get(string path, string key)
+	set_working_dir(path)
+	let files = db.get(path, conf.recursive)
+	for f in files
+		f.show()
+		for t in f.tags
+			if t.key == key
+				print("      " + str(t))
+
 
 
 void action_pull(string path)

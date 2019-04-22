@@ -15,6 +15,7 @@ void main(string[] arg)
 		print("  ignore                     # list ignores")
 		print("  ignore add <PATH>")
 		print("  ignore rm <PATH>")
+		print("  tag get <KEY> <PATH>")
 		print("  tag add <KEY>=<VALUE> <PATH>")
 		print("  tag set <KEY>=<VALUE> <PATH>")
 		print("  tag rm <KEY>=<VALUE> <PATH>")
@@ -140,36 +141,51 @@ void run_command(string[] arg)
 			return
 	else if arg[0] == "tag"
 		if arg.num < 2
-			print("TRY: tag add/set/rm/auto")
+			print("TRY: tag get/add/set/rm/auto/diff")
 			return
 		if arg[1] == "add"
-			if arg.num < 4
+			if arg.num < 3
 				print("ERROR: tag add <KEY>=<VALUE> <PATH>")
 				return
+			if arg.num < 4
+				action_tag_add(absolute_path("./"), arg[2])
 			for i in 3:arg.num
 				action_tag_add(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "set"
-			if arg.num < 4
+			if arg.num < 3
 				print("ERROR: tag set <KEY>=<VALUE> <PATH>")
 				return
+			if arg.num < 4
+				action_tag_set(absolute_path("./"), arg[2])
 			for i in 3:arg.num
 				action_tag_set(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "rm"
-			if arg.num < 4
+			if arg.num < 3
 				print("ERROR: tag rm <KEY>=<VALUE> <PATH>")
 				return
+			if arg.num < 4
+				action_tag_rm(absolute_path("./"), arg[2])
 			for i in 3:arg.num
 				action_tag_rm(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "auto"
-			if arg.num < 3
+			if arg.num < 2
 				print("ERROR: tag auto <PATH>")
 				return
+			if arg.num < 3
+				action_tag_auto(absolute_path("./"))
 			for i in 2:arg.num
 				action_tag_auto(absolute_path(arg[i]))
-		else if arg[1] == "diff"
-			if arg.num < 3
-				print("ERROR: tag diff <PATH>")
+		else if arg[1] == "show" or arg[1] == "get"
+			if arg.num < 2
+				print("ERROR: tag get <KEY> <PATH>")
 				return
+			if arg.num < 3
+				action_tag_get(absolute_path("./"), arg[2])
+			for i in 3:arg.num
+				action_tag_get(absolute_path(arg[i]), arg[2])
+		else if arg[1] == "diff"
+			if arg.num < 2
+				action_tag_diff(absolute_path("./"))
 			for i in 2:arg.num
 				action_tag_diff(absolute_path(arg[i]))
 		else
@@ -192,14 +208,12 @@ void run_command(string[] arg)
 			action_status(absolute_path(arg[i]))
 	else if arg[0] == "info"
 		if arg.num < 2
-			print("ERROR: info <PATH>")
-			return
+			action_info(absolute_path("./"))
 		for i in 1:arg.num
 			action_info(absolute_path(arg[i]))
 	else if arg[0] == "add"
 		if arg.num < 2
-			print("ERROR: add <PATH>")
-			return
+			action_add(absolute_path("./"))
 		for i in 1:arg.num
 			action_add(absolute_path(arg[i]))
 	else if arg[0] == "rm"
@@ -243,26 +257,22 @@ void run_command(string[] arg)
 			return
 	else if arg[0] == "dsync"
 		if arg.num < 2
-			print("ERROR: dsync <DIR>")
-			return
+			action_dsync(absolute_path("./"))
 		for i in 1:arg.num
 			action_dsync(absolute_path(arg[i]))
 	else if arg[0] == "sync"
 		if arg.num < 2
-			print("ERROR: sync <PATH>")
-			return
+			action_sync(absolute_path("./"))
 		for i in 1:arg.num
 			action_sync(absolute_path(arg[i]))
 	else if arg[0] == "push"
 		if arg.num < 2
-			print("ERROR: push <PATH>")
-			return
+			action_push(absolute_path("./"))
 		for i in 1:arg.num
 			action_push(absolute_path(arg[i]))
 	else if arg[0] == "pull"
 		if arg.num < 2
-			print("ERROR: pull <PATH>")
-			return
+			action_pull(absolute_path("./"))
 		for i in 1:arg.num
 			action_pull(absolute_path(arg[i]))
 	else if arg[0] == "get"
