@@ -279,18 +279,19 @@ void remote_download_meta(LocalFile*[] files)
 	RemoteFile[] rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
-			print("META  " + rel_path(lf.path))
-			if conf.pull_tags_only_add
-				for t in rf.tags
-					if tag_multi(t.key)
-						lf.tag_add(t)
-					else
-						lf.tag_set(t)
-			else
-				lf.name = rf.name
-				lf.tags = rf.tags
-				lf.unset(CHANGED_META)
-			db.dirty = true
+			if rf.id == lf.id
+				print("META  " + rel_path(lf.path))
+				if conf.pull_tags_only_add
+					for t in rf.tags
+						if tag_multi(t.key)
+							lf.tag_add(t)
+						else
+							lf.tag_set(t)
+				else
+					lf.name = rf.name
+					lf.tags = rf.tags
+					lf.unset(CHANGED_META)
+				db.dirty = true
 
 void remote_sync_by_id(LocalFile*[] files)
 	LocalFile*[] files_wanted
