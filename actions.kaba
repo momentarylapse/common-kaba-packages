@@ -308,7 +308,7 @@ void action_tag_get(string path, string key)
 void action_pull(string path)
 	set_working_dir(path)
 	
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
@@ -325,7 +325,7 @@ void action_pull(string path)
 void action_push(string path)
 	set_working_dir(path)
 	
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	for f in files
 		if f.pure_local() //or f.is(CHANGED_FILE)
 			print("UPLOADING " + rel_path(f.path))

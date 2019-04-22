@@ -209,8 +209,10 @@ void remote_upload(LocalFile* f)
 	if r[:2] != "ok"
 		print("ERROR: upload..." + r)
 		return
-		
-	f.id = r[3:]
+	int nnn = r[3:].find("\n", 0)
+	if nnn >= 0
+		print("REMOTE WARNING: " + r[4+nnn:])
+	f.id = r[3:].explode("\n")[0]
 	db.save()
 
 	//string tagsh = tags2strh(f.tags)
