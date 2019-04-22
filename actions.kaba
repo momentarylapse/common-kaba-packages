@@ -275,28 +275,28 @@ void action_find(string filter)
 	
 void action_tag_add(string path, string tag)
 	set_working_dir(path)
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_add(t)
 
 void action_tag_set(string path, string tag)
 	set_working_dir(path)
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_set(t)
 
 void action_tag_rm(string path, string tag)
 	set_working_dir(path)
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_rm(t)
 
 void action_tag_get(string path, string key)
 	set_working_dir(path)
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	for f in files
 		f.show()
 		for t in f.tags
@@ -406,6 +406,6 @@ void action_tag_diff(string path)
 		for lf in files
 			if lf.id == rf.id
 				if !tags_equal(lf.tags, rf.tags)
-					print(rel_path(lf.path))
+					lf.show()
 					tags_diff(lf.tags, rf.tags)
 	
