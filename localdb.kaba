@@ -44,6 +44,12 @@ class LocalFile
 		return is(NONLOCAL)
 	bool pure_local()
 		return id.num == 0
+	bool perfectly_fine()
+		if pure_remote() or pure_local()
+			return false
+		if changed_meta() or changed_file()
+			return false
+		return true
 	bool in_db()
 		return hash.num > 0
 	bool changed_file()
@@ -244,7 +250,7 @@ class LocalFileDB
 					// hash='', id='', no file
 					//print("EMPTY HASH (REMOTE): " + ff.path)
 			if f.path.num > 0
-				LocalFile *l = find_by_hash(f.hash)
+				LocalFile *l = by_hash(f.hash)
 				if l and l != &f
 					if f.path == l.path
 						print("DUPLICATE: " + f.path)
@@ -309,13 +315,21 @@ class LocalFileDB
 				return true
 		return false
 
-	LocalFile *find_by_hash(string hash)
+	LocalFile *by_hash(string hash)
 		if hash == ""
 			raise(new Exception("invalid hash"))
 		for f in files
 			if hash == f.hash
 				return &f
 		raise(new Exception("not in db: hash=" + hash))
+
+	/*LocalFile *find_by_hash(string hash)
+		if hash == ""
+			raise(new Exception("invalid hash"))
+		for f in files
+			if hash == f.hash
+				return &f
+		raise(new Exception("not in db: hash=" + hash))*/
 		
 	LocalFile*[] find_by_tags(string str)
 		Tag[] tags = str2tags(str)

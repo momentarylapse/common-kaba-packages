@@ -55,7 +55,8 @@ string yii(string action, string[] params)
 	
 	cmd += CMD + " " + action
 	for p in params
-		cmd += " \\\"" + ssh_escape(p) + "\\\""
+		//cmd += " \\\"" + ssh_escape(p) + "\\\""
+		cmd += " " + ssh_escape(p)
 	//cmd += ""
 	if conf.verbose
 		print(cmd)
@@ -131,7 +132,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 	if !db.has_id(rf.id)
 		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
-			LocalFile* lf = db.find_by_hash(rf.hash)
+			LocalFile* lf = db.by_hash(rf.hash)
 			if lf.id.num > 0
 				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  " + "REMOTE...")
 			lf.id = rf.id
@@ -288,8 +289,7 @@ void remote_download_meta(LocalFile*[] files)
 			print("XXXXX")
 			pass
 
-void remote_sync_by_id(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir, conf.recursive)
+void remote_sync_by_id(LocalFile*[] files)
 	LocalFile*[] files_wanted
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
@@ -337,23 +337,23 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 		//db.dirty = true
 
 
-void remote_sync_pure_locals_by_hash(string _dir)
-	LocalFile*[] files = db.get_in_dir(_dir, conf.recursive)
+void remote_sync_pure_locals_by_hash(LocalFile*[] files)
+	print(len(files))
 	string[] hashes
 	for f in files
 		if f.pure_local()
+			print(f.hash)
 			hashes.add(f.hash)
 	if hashes.num == 0
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes)
+	print(len(rfiles))
 	for rf in rfiles
 		if conf.verbose
 			print(rf.hash)
-		try
-			LocalFile* lf = db.find_by_hash(rf.hash)
-			if conf.verbose
-				print(lf.path)
-			sync_file(rf, lf)
-		except
-			print("SHOULD NOT BE HERE...")
+		for lf in files
+			print(lf.hash + "  " + rf.hash)
+			if lf.hash == rf.hash
+				print("yay")
+				sync_file(rf, lf)
 

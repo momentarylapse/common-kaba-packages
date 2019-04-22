@@ -141,6 +141,7 @@ class Config
 		filter_pure_local = false
 		filter_pure_remote = false
 		show_pure_local = false
+		show_perfectly_fine = true
 		drop_deleted = false
 		pull_tags = false
 		default_quality = "perfect"
@@ -244,6 +245,7 @@ class Config
 	bool filter_pure_local
 	bool filter_pure_remote
 	bool show_pure_local
+	bool show_perfectly_fine
 	bool drop_deleted
 	bool pull_tags
 	string default_quality

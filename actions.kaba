@@ -123,7 +123,7 @@ void file_add(LocalFile* f)
 			print(e.message())
 			return
 		try
-			LocalFile* ff = db.find_by_hash(hash)
+			LocalFile* ff = db.by_hash(hash)
 			// hash already in db?
 			if FileExists(ff.path)
 				print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
@@ -241,6 +241,8 @@ void action_info(string path)
 
 void show_files(LocalFile*[] files)
 	for f in files
+		if f.perfectly_fine() and !conf.show_perfectly_fine
+			continue
 		f.show()
 		if conf.show_meta or conf.verbose
 			f.show_info("      ")
@@ -248,6 +250,12 @@ void show_files(LocalFile*[] files)
 void action_list(string path)
 	set_working_dir(path)
 	conf.show_pure_local = true
+	show_files(lister.find(path))
+
+void action_status(string path)
+	set_working_dir(path)
+	conf.show_pure_local = true
+	conf.show_perfectly_fine = false
 	show_files(lister.find(path))
 
 
@@ -344,16 +352,26 @@ void action_remote_find_id(string[] ids)
 void action_remote_add(string filter, string dir)
 	remote_sync_by_filter(filter, conf.default_quality, conf.default_structure, dir)
 
-void action_sync(string dir)
+void action_dsync(string dir)
 	set_working_dir(dir)
 	let e = conf.get_cfg(dir)
 	if e
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)
+	let files = db.get_in_dir(dir, conf.recursive)
 	print("syncing entangled files")
-	remote_sync_by_id(dir)
+	remote_sync_by_id(files)
 	print("matching pure local files by hash")
-	remote_sync_pure_locals_by_hash(dir)
+	remote_sync_pure_locals_by_hash(files)
+
+void action_sync(string path)
+	set_working_dir(path)
+	try
+		let f = db.find_by_path(path)
+		remote_sync_pure_locals_by_hash([f])
+		remote_sync_by_id([f])
+	except Exception as e
+		print(e)
 	
 void action_tag_auto(string path)
 	set_working_dir(path)
