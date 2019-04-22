@@ -144,6 +144,7 @@ class Config
 		show_perfectly_fine = true
 		drop_deleted = false
 		pull_tags = false
+		pull_tags_only_add = false
 		default_quality = "perfect"
 		default_structure = "{name}.{ext}"
 
@@ -248,6 +249,7 @@ class Config
 	bool show_perfectly_fine
 	bool drop_deleted
 	bool pull_tags
+	bool pull_tags_only_add
 	string default_quality
 	string default_structure
 

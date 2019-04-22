@@ -3,7 +3,7 @@ use "localdb.kaba"
 use "tag.kaba"
 
 
-const int CHUNK_SIZE = 256
+const int CHUNK_SIZE = 128
 
 string scp_escape(string s)
 	string r = s
@@ -278,16 +278,19 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 void remote_download_meta(LocalFile*[] files)
 	RemoteFile[] rfiles = remote_get_meta(files)
 	for rf in rfiles
-		try
-			LocalFile* lf = db.find_by_id(rf.id)
+		for lf in files
 			print("META  " + rel_path(lf.path))
-			lf.unset(CHANGED_META)
-			lf.name = rf.name
-			lf.tags = rf.tags
+			if conf.pull_tags_only_add
+				for t in rf.tags
+					if tag_multi(t.key)
+						lf.tag_add(t)
+					else
+						lf.tag_set(t)
+			else
+				lf.name = rf.name
+				lf.tags = rf.tags
+				lf.unset(CHANGED_META)
 			db.dirty = true
-		except
-			print("XXXXX")
-			pass
 
 void remote_sync_by_id(LocalFile*[] files)
 	LocalFile*[] files_wanted
@@ -296,11 +299,9 @@ void remote_sync_by_id(LocalFile*[] files)
 			files_wanted.add(f)
 	RemoteFile[] rfiles = remote_get_meta(files_wanted)
 	for rf in rfiles
-		try
-			LocalFile* lf = db.find_by_id(rf.id)
-			sync_file(rf, lf)
-		except
-			pass
+		for lf in files
+			if lf.id == rf.id
+				sync_file(rf, lf)
 
 void sync_file(RemoteFile rf, LocalFile* lf)
 	if conf.verbose

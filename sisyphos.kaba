@@ -15,9 +15,9 @@ void main(string[] arg)
 		print("  ignore                     # list ignores")
 		print("  ignore add <PATH>")
 		print("  ignore rm <PATH>")
-		print("  tag add <KEY> <VALUE> <PATH>")
-		print("  tag set <KEY> <VALUE> <PATH>")
-		print("  tag rm <KEY> <VALUE> <PATH>")
+		print("  tag add <KEY>=<VALUE> <PATH>")
+		print("  tag set <KEY>=<VALUE> <PATH>")
+		print("  tag rm <KEY>=<VALUE> <PATH>")
 		print("  tag auto <PATH>")
 		print("  add <PATH>                 # add file/dir to local db")
 		print("  rm <PATH>                  # drop file/dir from local db")
@@ -45,6 +45,7 @@ void main(string[] arg)
 		print("  --pure-local/--local")
 		print("  --pure-remote/--remote")
 		print("  --pull-tags")
+		print("  --pull-tags-only-add")
 		print("  --medium  (quality...)")
 		print("  --structure=<STRUCTURE>")
 		return
@@ -75,6 +76,8 @@ void main(string[] arg)
 			conf.filter_pure_remote = true
 		else if a == "--pull-tags"
 			conf.pull_tags = true
+		else if a == "--pull-tags-only-add"
+			conf.pull_tags_only_add = true
 		else if a == "--medium"
 			conf.default_quality = MEDIUM
 		else if a.head(12) == "--structure="
@@ -139,23 +142,23 @@ void run_command(string[] arg)
 			print("TRY: tag add/set/rm/auto")
 			return
 		if arg[1] == "add"
-			if arg.num < 5
-				print("ERROR: tag add <KEY> <VALUE> <PATH>")
+			if arg.num < 4
+				print("ERROR: tag add <KEY>=<VALUE> <PATH>")
 				return
-			for i in 4:arg.num
-				action_tag_add(absolute_path(arg[i]), arg[2], arg[3])
+			for i in 3:arg.num
+				action_tag_add(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "set"
-			if arg.num < 5
-				print("ERROR: tag set <KEY> <VALUE> <PATH>")
+			if arg.num < 4
+				print("ERROR: tag set <KEY>=<VALUE> <PATH>")
 				return
-			for i in 4:arg.num
-				action_tag_set(absolute_path(arg[i]), arg[2], arg[3])
+			for i in 3:arg.num
+				action_tag_set(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "rm"
-			if arg.num < 5
-				print("ERROR: tag rm <KEY> <VALUE> <PATH>")
+			if arg.num < 4
+				print("ERROR: tag rm <KEY>=<VALUE> <PATH>")
 				return
-			for i in 4:arg.num
-				action_tag_rm(absolute_path(arg[i]), arg[2], arg[3])
+			for i in 3:arg.num
+				action_tag_rm(absolute_path(arg[i]), arg[2])
 		else if arg[1] == "auto"
 			if arg.num < 3
 				print("ERROR: tag auto <PATH>")

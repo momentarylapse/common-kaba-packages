@@ -1,6 +1,7 @@
 use "localdb.kaba"
 use "config.kaba"
 use "remote.kaba"
+use "tag.kaba"
 
 
 // mix db files with "real" files
@@ -272,25 +273,26 @@ void action_status(string path)
 void action_find(string filter)
 	show_files(db.find_by_tags(filter))
 	
-void action_tag_add(string path, string key, string value)
+void action_tag_add(string path, string tag)
 	set_working_dir(path)
 	let files = db.get(path, conf.recursive)
+	let t = str2tag(tag)
 	for f in files
-		f.tag_add(key, value)
+		f.tag_add(t)
 
-void action_tag_set(string path, string key, string value)
-	try
-		let f = db.find_by_path(path)
-		f.tag_set(key, value)
-	except Exception as e
-		error_out(e)
+void action_tag_set(string path, string tag)
+	set_working_dir(path)
+	let files = db.get(path, conf.recursive)
+	let t = str2tag(tag)
+	for f in files
+		f.tag_set(t)
 
-void action_tag_rm(string path, string key, string value)
-	try
-		let f = db.find_by_path(path)
-		f.tag_rm(key, value)
-	except Exception as e
-		error_out(e)
+void action_tag_rm(string path, string tag)
+	set_working_dir(path)
+	let files = db.get(path, conf.recursive)
+	let t = str2tag(tag)
+	for f in files
+		f.tag_rm(t)
 
 
 
@@ -306,7 +308,8 @@ void action_pull(string path)
 			need_meta.add(f)
 
 	if need_meta.num > 0
-		print("downloading meta data")
+		if conf.verbose
+			print("downloading meta data")
 		remote_download_meta(need_meta)
 
 
@@ -376,12 +379,9 @@ void action_dsync(string dir)
 
 void action_sync(string path)
 	set_working_dir(path)
-	try
-		let f = db.find_by_path(path)
-		remote_sync_pure_locals_by_hash([f])
-		remote_sync_by_id([f])
-	except Exception as e
-		print(e)
+	let files = lister.find(path)
+	remote_sync_pure_locals_by_hash(files)
+	remote_sync_by_id(files)
 	
 void action_tag_auto(string path)
 	set_working_dir(path)

@@ -75,39 +75,36 @@ class LocalFile
 		if conf.verbose
 			print("NAME  " + name)
 		set(CHANGED_META)
-	void tag_add(string key, string value)
-		if key == "name"
-			set_name(value)
+	void tag_add(Tag tt)
+		if tt.key == "name"
+			set_name(tt.value)
 			return
 		for t in tags
-			if t.key == key and t.value == value
+			if t.key == tt.key and t.value == tt.value
 				return
-		Tag t
-		t.key = key
-		t.value = value
-		tags.add(t)
+		tags.add(tt)
 		db.dirty = true
 		if conf.verbose
-			print("TAG ADD  " + t.str())
+			print("TAG ADD  " + tt.str())
 		set(CHANGED_META)
-	void tag_set(string key, string value)
-		if key == "name"
-			set_name(value)
+	void tag_set(Tag tt)
+		if tt.key == "name"
+			set_name(tt.value)
 			return
 		for t in tags
-			if t.key == key
-				if t.value == value
+			if t.key == tt.key
+				if t.value == tt.value
 					return
-				t.value = value
-				db.dirty = true
 				if conf.verbose
-					print("TAG SET  " + t.str())
+					print("TAG SET  " + t.str() + "  ->  " + tt.value)
+				t.value = tt.value
+				db.dirty = true
 				set(CHANGED_META)
 				return
-		tag_add(key, value)
-	void tag_rm(string key, string value)
+		tag_add(tt)
+	void tag_rm(Tag tt)
 		for t,i in tags
-			if t.key == key and t.value == value
+			if t.match(tt)
 				if conf.verbose
 					print("TAG RM  " + t.str())
 				tags.remove(i)
@@ -364,12 +361,14 @@ class LocalFileDB
 		return list
 
 	LocalFile*[] get(string path, bool rec)
-		try
-			LocalFile*[] files
-			files.add(find_by_path(path))
-			return files
-		except
+		if FileIsDirectory(path)
 			return get_in_dir(path, rec)
+		LocalFile*[] files
+		try
+			files.add(find_by_path(path))
+		except
+			pass
+		return files
 		
 	void rehash()
 		for f in files
@@ -399,12 +398,12 @@ void auto_tag(LocalFile *f)
 		if ext == "pdf"
 			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
 			if s.num > 0
-				f.tag_set("pages", s.int().str())
+				f.tag_set(Tag("pages", s.int().str()))
 		else if /*ext == "jpg" or*/ ext == "png" or ext == "bmp"
 			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
 			if s.num >= 2
-				f.tag_set("width", s[0].int().str())
-				f.tag_set("height", s[1].int().str())
+				f.tag_set(Tag("width", s[0].int().str()))
+				f.tag_set(Tag("height", s[1].int().str()))
 		else if ext == "jpg"
 			string[] s = shell_exec("exif -mi \"" + bash_escape(f.path) + "\"").explode("\n")
 			string model, make
@@ -413,25 +412,25 @@ void auto_tag(LocalFile *f)
 				if len(xx) < 2
 					continue
 				if xx[0] == "0xa002"
-					f.tag_set("width", xx[1].int())
+					f.tag_set(Tag("width", xx[1].int()))
 				if xx[0] == "0xa003"
-					f.tag_set("height", xx[1].int())
+					f.tag_set(Tag("height", xx[1].int()))
 				if xx[0] == "0x0110"
 					model = xx[1]
 				if xx[0] == "0x010f"
 					make = xx[1]
 				if xx[0] == "0x829a"
-					f.tag_set("exposuretime", xx[1])
+					f.tag_set(Tag("exposuretime", xx[1]))
 				if xx[0] == "0x829d"
-					f.tag_set("fnumber", xx[1])
+					f.tag_set(Tag("fnumber", xx[1]))
 				if xx[0] == "0x8827"
-					f.tag_set("iso", xx[1])
+					f.tag_set(Tag("iso", xx[1]))
 				if xx[0] == "0x0132"
-					f.tag_set("year", xx[1][:4])
-					f.tag_set("month", xx[1][5:7].int())
-					f.tag_set("day", xx[1][8:10].int())
-					f.tag_set("timeofday", xx[1][11:])
+					f.tag_set(Tag("year", xx[1][:4]))
+					f.tag_set(Tag("month", xx[1][5:7].int()))
+					f.tag_set(Tag("day", xx[1][8:10].int()))
+					f.tag_set(Tag("timeofday", xx[1][11:]))
 			if len(make) > 0 and len(model) > 0
-				f.tag_set("camera", make + " " + model)
+				f.tag_set(Tag("camera", make + " " + model))
 	except Exception as e
 		error_out(e)

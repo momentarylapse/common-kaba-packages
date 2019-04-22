@@ -3,6 +3,9 @@
 class Tag
 	string key
 	string value
+	void __init__(string k, string v)
+		key = k
+		value = v
 	string str()
 		return key + "=" + value
 	string strh()
@@ -11,6 +14,8 @@ class Tag
 		if key == o.key
 			return value < o.value
 		return key < o.key
+	bool match(Tag filter)
+		return key == filter.key and value.match(filter.value)
 
 Tag[] tags_sort(Tag[] tags)
 	Tag[] r = tags
@@ -70,3 +75,14 @@ Tag[] str2tags(string s)
 	for b in a
 		tags.add(str2tag(b))
 	return tags
+
+bool tag_multi(string key)
+	if key == "artist"
+		return true
+	if key == "author"
+		return true
+	if key == "category"
+		return true
+	if key == "genre"
+		return true
+	return false
