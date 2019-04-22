@@ -138,8 +138,9 @@ class LocalFile
 		//	s += "\nmtime: " + mtime + " (REMOTE)"
 		print(l + "size:    " + size)
 		//print(l + "options: " + options)
-		for t in tags
-			print(l + "  tag:   " + t.key + " = " + t.value)
+		let _tags = tags_sort(tags)
+		for t in _tags
+			print(l + "  tag:   " + t.key + "=" + t.value)
 	string get_tag(string key)
 		if key == "name"
 			return name

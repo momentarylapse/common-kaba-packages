@@ -385,7 +385,18 @@ void action_sync(string path)
 	
 void action_tag_auto(string path)
 	set_working_dir(path)
-	let files = db.get(path, conf.recursive)
+	let files = lister.find(path)
 	for f in files
 		auto_tag(f)
+	
+void action_tag_diff(string path)
+	set_working_dir(path)
+	let files = lister.find(path)
+	let rfiles = remote_get_meta(files)
+	for rf in rfiles
+		for lf in files
+			if lf.id == rf.id
+				if !tags_equal(lf.tags, rf.tags)
+					print(rel_path(lf.path))
+					tags_diff(lf.tags, rf.tags)
 	

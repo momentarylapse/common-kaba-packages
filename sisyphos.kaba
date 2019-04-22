@@ -19,6 +19,7 @@ void main(string[] arg)
 		print("  tag set <KEY>=<VALUE> <PATH>")
 		print("  tag rm <KEY>=<VALUE> <PATH>")
 		print("  tag auto <PATH>")
+		print("  tag diff <PATH>            # compare to remote")
 		print("  add <PATH>                 # add file/dir to local db")
 		print("  rm <PATH>                  # drop file/dir from local db")
 		print("  mv <SOURCE> <DEST>")
@@ -165,6 +166,12 @@ void run_command(string[] arg)
 				return
 			for i in 2:arg.num
 				action_tag_auto(absolute_path(arg[i]))
+		else if arg[1] == "diff"
+			if arg.num < 3
+				print("ERROR: tag diff <PATH>")
+				return
+			for i in 2:arg.num
+				action_tag_diff(absolute_path(arg[i]))
 		else
 			print("ERROR: tag ?")
 			return
