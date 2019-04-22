@@ -338,22 +338,17 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 
 
 void remote_sync_pure_locals_by_hash(LocalFile*[] files)
-	print(len(files))
 	string[] hashes
 	for f in files
 		if f.pure_local()
-			print(f.hash)
 			hashes.add(f.hash)
 	if hashes.num == 0
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes)
-	print(len(rfiles))
 	for rf in rfiles
 		if conf.verbose
 			print(rf.hash)
 		for lf in files
-			print(lf.hash + "  " + rf.hash)
 			if lf.hash == rf.hash
-				print("yay")
 				sync_file(rf, lf)
 
