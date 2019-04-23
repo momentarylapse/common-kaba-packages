@@ -135,7 +135,7 @@ class ConfigDirSync
 
 class Config
 	void __init__()
-		verbose = false
+		verbosity = 1
 		show_meta = false
 		recursive = false
 		filter_pure_local = false
@@ -240,7 +240,7 @@ class Config
 	string[] ignore
 	
 	// runtime
-	bool verbose
+	int verbosity
 	bool show_meta
 	bool recursive
 	bool filter_pure_local

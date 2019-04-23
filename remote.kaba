@@ -22,20 +22,20 @@ string ssh_escape(string s)
 	return r
 
 void scp_download(string source, string dest)
-	string cmd = "scp"
+	string cmd = "scp -p"
 	string rp = scp_escape(source)
 	cmd += " " + SERVER + ":" + rp
 	cmd += " \"" + bash_escape(dest) + "\""
-	if conf.verbose
+	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 void scp_upload(string source, string dest)
-	string cmd = "scp"
+	string cmd = "scp -p"
 	string rp = scp_escape(dest)
 	cmd += " \"" + bash_escape(source) + "\""
 	cmd += " " + SERVER + ":" + rp
-	if conf.verbose
+	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
@@ -46,7 +46,7 @@ string remote_interface(string action, string[] params)
 	for p in params
 		cmd += " \\\"" + ssh_escape(p) + "\\\""
 	//cmd += ""
-	if conf.verbose
+	if conf.verbosity >= 2
 		print(cmd)
 	return shell_exec(cmd).trim()
 
@@ -58,7 +58,7 @@ string yii(string action, string[] params)
 		//cmd += " \\\"" + ssh_escape(p) + "\\\""
 		cmd += " " + ssh_escape(p)
 	//cmd += ""
-	if conf.verbose
+	if conf.verbosity >= 2
 		print(cmd)
 	return shell_exec(cmd).trim()
 
@@ -105,7 +105,7 @@ RemoteFile[] remote_find_by_hash(string[] hashes)
 	int done = 0
 	while done < hashes.num
 		int ee = min(done + CHUNK_SIZE, hashes.num)
-		if conf.verbose
+		if conf.verbosity >= 2
 			print("hash... " + done + ":" + ee + " of " + hashes.num)
 		RemoteFile[] r = remote_find_by_hash_chunk(hashes[done:ee])
 		for x in r
@@ -118,7 +118,7 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 	int done = 0
 	while done < ids.num
 		int ee = min(done + CHUNK_SIZE, ids.num)
-		if conf.verbose
+		if conf.verbosity >= 2
 			print("ids... " + done + ":" + ee + " of " + ids.num)
 		RemoteFile[] r = remote_find_by_id_chunk(ids[done:ee], quality)
 		for x in r
@@ -149,7 +149,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 			db.files.add(ll)
 			print("ADD PURE REMOTE  " + rel_path(ll.path))
 		
-			if conf.show_meta or conf.verbose
+			if conf.show_meta or conf.verbosity >= 2
 				ll.show_info("      ")
 
 
@@ -248,7 +248,7 @@ void remote_upload_meta(LocalFile* f)
 	string r = remote_interface("override-meta", [f.id, f.name.hex(false), tags])
 	
 	if r == "ok"
-		if conf.verbose
+		if conf.verbosity >= 2
 			print("yay")
 		f.unset(CHANGED_META)
 		db.save()
@@ -307,7 +307,7 @@ void remote_sync_by_id(LocalFile*[] files)
 				sync_file(rf, lf)
 
 void sync_file(RemoteFile rf, LocalFile* lf)
-	if conf.verbose
+	if conf.verbosity >= 2
 		print("sync " + lf.path)
 	lf.unset(CHANGED_FILE)
 	lf.unset(CHANGED_META)
@@ -316,25 +316,29 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 	if rf.is("quality=medium")
 		lf.set("quality=medium")
 	if lf.pure_local()
-		print("RELINK  " + rel_path(lf.path))
+		if conf.verbosity >= 1
+			print("RELINK  " + rel_path(lf.path))
 		lf.id = rf.id
 		//db.dirty = true
 	if lf.hash != rf.hash
-		print("CHANGED HASH  " + rel_path(lf.path))
-		if conf.verbose
+		if conf.verbosity >= 1
+			print("CHANGED HASH  " + rel_path(lf.path))
+		if conf.verbosity >= 2
 			print(lf.hash)
 			print(rf.hash)
 		lf.set(CHANGED_FILE)
 		//db.dirty = true
 	if lf.name != rf.name
-		print("CHANGED NAME  " + rel_path(lf.path))
-		if conf.verbose
+		if conf.verbosity >= 1
+			print("CHANGED NAME  " + rel_path(lf.path))
+		if conf.verbosity >= 2
 			print(lf.name + " <-> " + rf.name)
 		lf.set(CHANGED_META)
 		//db.dirty = true
 	if !tags_equal(lf.tags, rf.tags)
-		print("CHANGED TAGS  " + rel_path(lf.path))
-		if conf.verbose
+		if conf.verbosity >= 1
+			print("CHANGED TAGS  " + rel_path(lf.path))
+		if conf.verbosity >= 2
 			print(tags2str(tags_sort(lf.tags)))
 			print(tags2str(tags_sort(rf.tags)))
 		lf.set(CHANGED_META)
@@ -350,7 +354,7 @@ void remote_sync_pure_locals_by_hash(LocalFile*[] files)
 		return
 	RemoteFile[] rfiles = remote_find_by_hash(hashes)
 	for rf in rfiles
-		if conf.verbose
+		if conf.verbosity >= 2
 			print(rf.hash)
 		for lf in files
 			if lf.hash == rf.hash

@@ -72,7 +72,7 @@ class LocalFile
 	void set_name(string _name)
 		name = _name
 		db.dirty = true
-		if conf.verbose
+		if conf.verbosity > 0
 			print("NAME  " + name)
 		set(CHANGED_META)
 	void tag_add(Tag tt)
@@ -84,7 +84,7 @@ class LocalFile
 				return
 		tags.add(tt)
 		db.dirty = true
-		if conf.verbose
+		if conf.verbosity > 0
 			print("TAG ADD  " + tt.str())
 		set(CHANGED_META)
 	void tag_set(Tag tt)
@@ -95,7 +95,7 @@ class LocalFile
 			if t.key == tt.key
 				if t.value == tt.value
 					return
-				if conf.verbose
+				if conf.verbosity > 0
 					print("TAG SET  " + t.str() + "  ->  " + tt.value)
 				t.value = tt.value
 				db.dirty = true
@@ -105,7 +105,7 @@ class LocalFile
 	void tag_rm(Tag tt)
 		for t,i in tags
 			if t.match(tt)
-				if conf.verbose
+				if conf.verbosity > 0
 					print("TAG RM  " + t.str())
 				tags.remove(i)
 				db.dirty = true
@@ -427,6 +427,10 @@ void auto_tag(LocalFile *f)
 				if xx[0] == "0x8827"
 					f.tag_set(Tag("iso", xx[1]))
 				if xx[0] == "0x0132"
+					if len(xx[1]) != 19
+						continue
+					if xx[1][4] != ':'
+						continue
 					f.tag_set(Tag("year", xx[1][:4]))
 					f.tag_set(Tag("month", xx[1][5:7].int()))
 					f.tag_set(Tag("day", xx[1][8:10].int()))

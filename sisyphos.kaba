@@ -65,7 +65,9 @@ void main(string[] arg)
 	string[] arg2
 	for a in arg
 		if a == "--verbose" or a == "-v"
-			conf.verbose = true
+			conf.verbosity = 5
+		else if a == "--silent" or a == "-s"
+			conf.verbosity = 0
 		else if a == "--drop-deleted"
 			conf.drop_deleted = true
 		else if a == "--show-meta" or a == "--meta" or a == "-m"

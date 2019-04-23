@@ -89,37 +89,41 @@ void file_add(LocalFile* f)
 		if f.pure_remote()
 			if FileExists(f.path)
 				f.unset(NONLOCAL)
-				print("NON-NONLOCAL " + rel_path(f.path))
+				if conf.verbosity >= 1
+					print("NON-NONLOCAL " + rel_path(f.path))
 				return
 		
 		// lost?
 		if !FileExists(f.path)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
-				print("LOST  " + rel_path(f.path))
+				if conf.verbosity >= 1
+					print("LOST  " + rel_path(f.path))
 			return
 		
 		// time
 		File* ff = FileOpen(f.path)
 		int mtime = ff.get_date().time
 		if mtime == f.mtime
-			if conf.verbose
+			if conf.verbosity >= 2
 				print("=  " + rel_path(f.path))
 		else
 			// changed?
 			try
 				string hash = FileHash(f.path, "md5")
 				if hash == f.hash
-					print("TOUCHED  " + rel_path(f.path))
+					if conf.verbosity >= 1
+						print("TOUCHED  " + rel_path(f.path))
 					// ok
 					f.mtime = mtime
 				else
-					print("EDITED  " + rel_path(f.path))
+					if conf.verbosity >= 1
+						print("EDITED  " + rel_path(f.path))
 					f.set(CHANGED_FILE)
 					f.hash = hash
 					f.mtime = mtime
 					f.size = ff.get_size()
-					if conf.verbose or conf.show_meta
+					if conf.verbosity >= 2 or conf.show_meta
 						f.show_info("      ")
 			except Exception as e
 				print(e.message())
@@ -137,7 +141,8 @@ void file_add(LocalFile* f)
 			LocalFile* ff = db.by_hash(hash)
 			// hash already in db?
 			if FileExists(ff.path)
-				print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
+				if conf.verbosity >= 1
+					print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
 				file_add_new(f, hash)
 			else
 				file_move(ff, f.path)
@@ -160,13 +165,14 @@ void file_add_new(LocalFile* f, string hash)
 	f.size = fff.get_size()
 	delete fff
 	auto_tag(f)
-	if conf.show_meta or conf.verbose
+	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")
 	db.files.add(*f)
 
 
 void file_move(LocalFile *f, string new_path)
-	print("MOVED  " + rel_path(f.path) + " > " + rel_path(new_path))
+	if conf.verbosity >= 1
+		print("MOVED  " + rel_path(f.path) + " > " + rel_path(new_path))
 	f.path = new_path
 	db.dirty = true
 
@@ -188,8 +194,13 @@ void action_rm(string path)
 		
 	let files = lister.find(path)
 	for f in files
+		if !f.pure_remote()
+			try
+				FileDelete(f.path)
+			except Exception as e
+				print("ERROR: " + e)
 		f.drop_me = true
-	db.save()
+		db.save()
 	
 void action_mv(string source, string _dest)
 	try
@@ -255,7 +266,7 @@ void show_files(LocalFile*[] files)
 		if f.perfectly_fine() and !conf.show_perfectly_fine
 			continue
 		f.show()
-		if conf.show_meta or conf.verbose
+		if conf.show_meta or conf.verbosity >= 2
 			f.show_info("      ")
 
 void action_list(string path)
@@ -302,6 +313,12 @@ void action_tag_get(string path, string key)
 		for t in f.tags
 			if t.key == key
 				print("      " + str(t))
+		if key == "name"
+			print("      name=" + f.name)
+		else if key == "hash"
+			print("      hash=" + f.hash)
+		else if key == "id" and len(f.id) > 0
+			print("      id=" + f.id)
 
 
 
@@ -317,7 +334,7 @@ void action_pull(string path)
 			need_meta.add(f)
 
 	if need_meta.num > 0
-		if conf.verbose
+		if conf.verbosity >= 2
 			print("downloading meta data")
 		remote_download_meta(need_meta)
 
