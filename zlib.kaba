@@ -1,0 +1,45 @@
+const string KABA_LINK = "/usr/lib64/libz.so
+	_deflate:deflate
+	compressBound:compressBound
+	_compress:compress
+	_uncompress:uncompress
+"
+
+extern int64 compressBound(int l)
+extern int _deflate()
+extern int _compress(void* dest, int64 *dest_len, void* source, int source_len)
+extern int _uncompress(void* dest, int64 *dest_len, void* source, int source_len)
+
+string compress(string s)
+	int64 ll = compressBound(len(s)) + 1024
+	string o
+	o.resize(ll)
+	int r = _compress(&o[0], &ll, &s[0], len(s))
+	o.resize(ll)
+	return o
+
+string uncompress(string s, int len_max)
+	int64 ll = len_max + 1024
+	string o
+	o.resize(ll)
+	int r = _uncompress(&o[0], &ll, &s[0], len(s))
+	o.resize(ll)
+	return o
+
+void __main()
+	string a = "hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla
+	hallo Welt, ein kleiner Test bla bla bla"
+	print(len(a))
+	
+	let oo = compress(a)
+	print(len(oo))
+	print(oo.hex(false))
+	
+	print(uncompress(oo, 65536))
