@@ -158,6 +158,14 @@ void action_swap(string source, string target)
 	swap_translate_source(conf.source_code_dir, l)
 	
 	// should also translate other languages... but... screw it
+
+void show_help()
+	print("check <DIR>")
+	print("export/x <DIR>")
+	print("translate/t <PRELANG-FILE>")
+	print("add <PRELANG-FILE> <LANGUAGE-NAME>")
+	print("swap <PRELANG-FILE> <NEW-PRELANG-FILE>")
+	print("demo <HUI-FILE>")
 	
 
 void main(string[] arg)
@@ -165,9 +173,12 @@ void main(string[] arg)
 	if arg.num > 0
 		if arg[0] == "check" and arg.num >= 2
 			action_check(arg[1])
-		else if arg[0] == "export" and arg.num >= 2
-			action_export(arg[1])
-		else if arg[0] == "translate" and arg.num >= 2
+		else if arg[0] == "export" or arg[0] == "x"
+			if arg.num >= 2
+				action_export(arg[1])
+			else
+				action_export("./")
+		else if (arg[0] == "translate" or arg[0] == "t") and arg.num >= 2
 			action_translate(arg[1])
 		else if arg[0] == "add" and arg.num >= 3
 			action_add(arg[1], arg[2])
@@ -177,9 +188,6 @@ void main(string[] arg)
 			action_demo(arg[1])
 		else
 			print("???")
-			print("check <DIR>")
-			print("export <DIR>")
-			print("translate <PRELANG-FILE>")
-			print("add <PRELANG-FILE> <LANGUAGE-NAME>")
-			print("swap <PRELANG-FILE> <NEW-PRELANG-FILE>")
-			print("demo <HUI-FILE>")
+			show_help()
+	else
+		show_help()
