@@ -1,0 +1,52 @@
+use "project.kaba"
+use "library.kaba"
+
+void create_makefile()
+	File* f = FileCreateText(conf.root + "Makefile")
+	f << "BIN = ../" + conf.binary
+	f << "CPP = g++"
+	string cflags, lflags, defines
+	for l in conf.libs
+		cflags += lib.compiler_flags(l)
+		lflags += lib.linker_flags(l)
+		defines += " -DHAS_LIB_" + l.upper() + "=1"
+	for l in conf.libs_optional
+		if lib.has(l) and !conf.ignored(l)
+			cflags += lib.compiler_flags(l)
+			lflags += lib.linker_flags(l)
+			defines += " -DHAS_LIB_" + l.upper() + "=1"
+		else
+			defines += " -DHAS_LIB_" + l.upper() + "=0"
+	f << "GLOBALFLAGS = " + conf.flags_global + " -std=" + conf.language + " " + defines
+	f << "CXXFLAGS = " + conf.flags_compiler + cflags + " $(GLOBALFLAGS)"
+	f << "CXXFLAGSLINKING = " + conf.flags_linker + lflags + " $(GLOBALFLAGS)"
+	f << ""
+	string[] obj
+	for s in sources
+		if rel(s.filename) != conf.main_file
+			obj.add(rel(s.object()))
+	f << "OBJ = " + obj.join(" \\\n ")
+	f << ""
+	f << "$(BIN) : $(OBJ) " + conf.main_file.replace(".cpp", ".o")
+	f << "\t$(CPP) $(OBJ) " + conf.main_file.replace(".cpp", ".o") + " -o $(BIN) $(CXXFLAGSLINKING)"
+	f << ""
+	f << "all : $(BIN)"
+	f << ""
+	for s in sources
+		string a = rel(s.object()) + " : " + rel(s.filename)
+		for d in s.dep
+			a += " " + rel(d)
+		f << a
+		f << "\t$(CPP) -c " + rel(s.filename) + " -o $@ $(CXXFLAGS)"
+		f << ""
+	f << "install :"
+	for i in conf.install
+		f << i
+	f << ""
+	f << "clean :"
+	f << "\trm -f $(BIN)"
+	f << "\tfind . -name \"*.o\" -exec rm -f {} \\;"
+	f << "\tfind . -name \"*.a\" -exec rm -f {} \\;"
+	f << ""
+
+	delete f

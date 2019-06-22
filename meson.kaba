@@ -1,0 +1,96 @@
+use "project.kaba"
+use "library.kaba"
+
+void create_meson()
+	File* f = FileCreateText(conf.root + "../meson.build")
+	f << "project('" + conf.name + "', 'cpp', default_options : ['cpp_std=" + conf.language + "', 'warning_level=1'])"
+	f << "add_project_arguments('-O2', '-g', '-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])"
+	f << "
+#install_data
+#meson.add_install_script('')
+#install_subdir
+
+cc = meson.get_compiler('cpp')
+
+# mandatory dependencies
+mdep = cc.find_library('m', required : false)
+threaddep = dependency('threads')"
+
+	// argh just by hand for now...
+	string[] vars = ["mdep", "threaddep"]
+	for l in conf.libs
+		if l == "gtk3"
+			vars.add("gtk3dep")
+			f << "gtk3dep = dependency('gtk+-3.0')"
+			f << "add_project_arguments('-DHAS_LIB_GTK3=1', language : ['cpp'])"
+		else if l == "zlib"
+			vars.add("zdep")
+			f << "zdep = dependency('zlib')"
+			f << "add_project_arguments('-DHAS_LIB_ZLIB=1', language : ['cpp'])"
+		else if l == "fftw3"
+			vars.add("fftw3dep")
+			f << "fftw3dep = cc.find_library('fftw3f')"
+			f << "add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])"
+		else
+			print("ERROR: meson + " + l)
+
+	f << "deps = " + str(vars).replace("\"", "")
+	
+	
+	f << "
+
+# optional dependencies
+libs_optional = {"
+	for l,i in conf.libs_optional
+		string e
+		if i < len(conf.libs_optional) - 1
+			e = ","
+		if l == "dl"
+			f << "	'DL':['dl']" + e
+		else if l == "ogg"
+			f << "	'OGG':['ogg', 'vorbis', 'vorbisfile', 'vorbisenc']" + e
+		else if l == "flac"
+			f << "	'FLAC':['FLAC']" + e
+		else if l == "alsa"
+			f << "	'ALSA':['asound']" + e
+		else if l == "pulseaudio"
+			f << "	'PULSEAUDIO':['pulse']" + e
+		else if l == "portaudio"
+			f << "	'PORTAUDIO':['portaudio']" + e
+		else if l == "unwind"
+			f << "	'UNWIND':['unwind']" + e
+		else
+			print("ERROR: meson + (optional) " + l)
+	f << "}"
+	f << "foreach name, libs : libs_optional
+	found = true
+	dd = []
+	foreach l : libs
+		d = cc.find_library(l, required : false)
+		dd += [d]
+		if not d.found()
+			found = false
+		endif
+	endforeach
+	if found
+		add_project_arguments('-DHAS_LIB_' + name + '=1', language : ['cpp'])
+		deps += dd
+	else
+		add_project_arguments('-DHAS_LIB_' + name + '=0', language : ['cpp'])
+	endif
+endforeach
+
+"
+	
+	f << "sources = ["
+	for s,i in sources
+		string e
+		if i < len(sources) - 1
+			e = ","
+		f << "	'src/" + rel(s.filename) + "'" + e
+	f << "]
+
+"
+
+	f << "executable('" + conf.binary + "', sources, dependencies : deps, install : true)"
+

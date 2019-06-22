@@ -169,12 +169,15 @@ class LibraryManager
 		libraries.add(new LibraryPSMove)
 		libraries.add(new LibraryDl)
 
-
-	bool has(string name)
+	Library* get(string name)
 		for l in libraries
 			if l.name == name
-				return l.test()
+				return l
 		raise(new Exception("unknown library: " + name))
+		return nil
+
+	bool has(string name)
+		return get(name).test()
 	
 	bool test(string name)
 		print("checking library: " + name)
@@ -186,15 +189,9 @@ class LibraryManager
 		return false
 
 	string compiler_flags(string name)
-		for l in libraries
-			if l.name == name
-				return l.compiler_flags()
-		raise(new Exception("unknown library: " + name))
+		return get(name).compiler_flags()
 
 	string linker_flags(string name)
-		for l in libraries
-			if l.name == name
-				return l.linker_flags()
-		raise(new Exception("unknown library: " + name))
+		return get(name).linker_flags()
 
 LibraryManager lib

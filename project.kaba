@@ -1,0 +1,150 @@
+
+string dir_absolute(string dir)
+	if dir.head(2) == "./"
+		return dir_absolute(GetCurDir() + dir.substr(2,-1))
+	if dir.head(3) == "../"
+		return dir_absolute(GetCurDir() + dir)
+		
+	string[] xx = dir.explode("/")
+	for x,i in xx
+		if x == ".." and i > 0
+			xx.remove(i)
+			xx.remove(i-1)
+			i -= 2
+	return xx.join("/")
+
+string dir_canonical(string dir)
+	string d = dir_absolute(dir)
+	if d.tail(1) == "/"
+		return d
+	return d + "/"
+
+// project
+class Config
+	string root
+	bool verbose
+	
+	string name
+	string binary
+	string main_file
+	string[] libs
+	string[] libs_optional
+	string[] ignore_libs
+	string language
+	string flags_global
+	string flags_compiler
+	string flags_linker
+	string[] install
+	
+	void __init__()
+		language = "c++14"
+	
+	bool ignored(string l)
+		for ig in ignore_libs
+			if l == ig
+				return true
+		return false
+	
+	void load()
+		File* f = FileOpenText(conf.root + "xmake.conf")
+		string t
+		while true
+			f >> t
+			if t.num == 0
+				break
+			if t == "# project name"
+				f >> name
+			else if t == "# binary name"
+				f >> binary
+			else if t == "# main file"
+				f >> main_file
+			else if t == "# language"
+				f >> language
+			else if t == "# flags"
+				f >> flags_global
+			/*else if t == "# compiler flags"
+				f >> flags_compiler
+			else if t == "# linker flags"
+				f >> flags_linker*/
+			else if t == "# libraries"
+				f >> t
+				libs = t.explode(",")
+			else if t == "# libraries optional"
+				f >> t
+				libs_optional = t.explode(",")
+			else if t == "# install"
+				while true
+					f >> t
+					if t.num == 0
+						break
+					install.add(t)
+				break
+			else
+				raise(new Exception("unknown tag: " + t))
+		delete f
+
+Config conf
+
+class SourceFile
+	string filename
+	string object()
+		return filename.replace(".cpp", ".o")
+	string[] dep
+	bool add_dep(string d)
+		for dd in dep
+			if dd == d
+				return false
+		dep.add(d)
+		return true
+
+SourceFile[] sources
+
+string rel(string filename)
+	return filename.substr(conf.root.num, -1)
+
+string canonical(string filename)
+	string[] p = filename.explode("/")
+	for i in 0:p.num
+		if p[i] == ".." and i > 0
+			p.remove(i)
+			p.remove(i-1)
+			i -= 2
+	return p.join("/")
+			
+
+void find_dep(SourceFile f, string filename)
+	string s
+	try
+		s = FileRead(filename)
+	except
+		return
+	string[] lines = s.explode("\n")
+	
+	for l in lines
+		int p = l.find("#include \"", 0)
+		if p >= 0
+			int q = l.find("\"", p + 11)
+			string d = filename.dirname() + l.substr(p+10, q-p-10)
+			d = canonical(d)
+			if FileExists(d)
+				if f.add_dep(d)
+					//print("  " + rel(d))
+					find_dep(f, d)
+
+void parse_source(string filename)
+	if conf.verbose
+		print(rel(filename))
+	SourceFile f
+	f.filename = filename
+	
+	find_dep(f, filename)
+	
+	sources.add(f)
+
+void parse_dir(string dir)
+	DirEntry[] files = DirSearch(dir, "*.cpp", true)
+	for f in files
+		if f.is_dir
+			parse_dir(dir + f.name + "/")
+		else
+			parse_source(dir + f.name)
