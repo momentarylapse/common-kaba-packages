@@ -13,6 +13,10 @@ class Library
 			if l.num > 0
 				r += " -l" + l
 		return r
+	virtual string[] meson_libs()
+		return libs
+	string define()
+		return "HAS_LIB_" + name.upper()
 
 class LibraryPulseaudio extends Library
 	override void __init__()
@@ -63,6 +67,8 @@ class LibraryZlib extends Library
 		super.__init__("zlib", ["z"])
 	override bool test()
 		return FileExists("/usr/include/zlib.h")
+	override string[] meson_libs()
+		return ["zlib"]
 
 class LibraryXlib extends Library
 	override void __init__()
@@ -84,7 +90,7 @@ class LibraryVulkan extends Library
 
 class LibraryGtk3 extends Library
 	override void __init__()
-		super.__init__("gtk3", [""])
+		super.__init__("gtk3", ["gtk+-3.0"])
 	override bool test()
 		return FileExists("/usr/include/gtk-3.0/gtk/gtk.h")
 	override string compiler_flags()
@@ -193,5 +199,8 @@ class LibraryManager
 
 	string linker_flags(string name)
 		return get(name).linker_flags()
+	
+	string define(string name)
+		return get(name).define()
 
 LibraryManager lib

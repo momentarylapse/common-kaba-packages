@@ -16,73 +16,44 @@ cc = meson.get_compiler('cpp')
 mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')"
 
-	// argh just by hand for now...
 	string[] vars = ["mdep", "threaddep"]
 	for l in conf.libs
-		if l == "gtk3"
-			vars.add("gtk3dep")
-			f << "gtk3dep = dependency('gtk+-3.0')"
-			f << "add_project_arguments('-DHAS_LIB_GTK3=1', language : ['cpp'])"
-		else if l == "zlib"
-			vars.add("zdep")
-			f << "zdep = dependency('zlib')"
-			f << "add_project_arguments('-DHAS_LIB_ZLIB=1', language : ['cpp'])"
-		else if l == "fftw3"
-			vars.add("fftw3dep")
-			f << "fftw3dep = cc.find_library('fftw3f')"
-			f << "add_project_arguments('-DHAS_LIB_FFTW3=1', language : ['cpp'])"
-		else
-			print("ERROR: meson + " + l)
-
+		let ll = lib.get(l)
+		string var = l + "dep"
+		vars.add(var)
+		f << var + " = dependency('" + ll.meson_libs()[0] + "')"
+		f << "add_project_arguments('-D" + ll.define() + "=1', language : ['cpp'])"
 	f << "deps = " + str(vars).replace("\"", "")
 	
 	
+	for l in conf.libs_optional
+		f << "
+# optional dependency: " + l
+		let ll = lib.get(l)
+		let mlibs = ll.meson_libs()
+		string ltest
+		string deps
+		for m,i in mlibs
+			let v = "d"
+			if len(mlibs) > 1
+				v += str(i+1)
+			f << v + " = cc.find_library('" + m + "', required : false)"
+			if i > 0
+				ltest += " and "
+				deps += ","
+			ltest += v + ".found()"
+			deps += v
+		f << "if " + ltest
+		f << "	add_project_arguments('-D" + ll.define() + "=1', language : ['cpp'])"
+		f << "	deps += [" + deps + "]"
+		f << "else"
+		f << "	add_project_arguments('-D" + ll.define() + "=0', language : ['cpp'])"
+		f << "endif"
+
+	
 	f << "
 
-# optional dependencies
-libs_optional = {"
-	for l,i in conf.libs_optional
-		string e
-		if i < len(conf.libs_optional) - 1
-			e = ","
-		if l == "dl"
-			f << "	'DL':['dl']" + e
-		else if l == "ogg"
-			f << "	'OGG':['ogg', 'vorbis', 'vorbisfile', 'vorbisenc']" + e
-		else if l == "flac"
-			f << "	'FLAC':['FLAC']" + e
-		else if l == "alsa"
-			f << "	'ALSA':['asound']" + e
-		else if l == "pulseaudio"
-			f << "	'PULSEAUDIO':['pulse']" + e
-		else if l == "portaudio"
-			f << "	'PORTAUDIO':['portaudio']" + e
-		else if l == "unwind"
-			f << "	'UNWIND':['unwind']" + e
-		else
-			print("ERROR: meson + (optional) " + l)
-	f << "}"
-	f << "foreach name, libs : libs_optional
-	found = true
-	dd = []
-	foreach l : libs
-		d = cc.find_library(l, required : false)
-		dd += [d]
-		if not d.found()
-			found = false
-		endif
-	endforeach
-	if found
-		add_project_arguments('-DHAS_LIB_' + name + '=1', language : ['cpp'])
-		deps += dd
-	else
-		add_project_arguments('-DHAS_LIB_' + name + '=0', language : ['cpp'])
-	endif
-endforeach
-
-"
-	
-	f << "sources = ["
+sources = ["
 	for s,i in sources
 		string e
 		if i < len(sources) - 1
