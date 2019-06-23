@@ -1,4 +1,4 @@
-BASE=/usr/share/kaba
+BASE=/usr/local/share/kaba
 NAME=xmake
 if [ ! -d $BASE/apps ]
 then
