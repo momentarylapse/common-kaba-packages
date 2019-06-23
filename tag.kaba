@@ -3,6 +3,7 @@
 class Tag
 	string key
 	string value
+	void __init__()
 	void __init__(string k, string v)
 		key = k
 		value = v
