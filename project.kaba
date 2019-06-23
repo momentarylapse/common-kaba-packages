@@ -43,6 +43,7 @@ class Config
 	string[] icons
 	string desktop_file
 	string[] mime_files
+	string[] installs
 	
 	void __init__()
 		language = "c++14"
@@ -88,6 +89,9 @@ class Config
 			else if t == "# mime files"
 				f >> t
 				mime_files = t.explode(",")
+			else if t == "# additional install"
+				f >> t
+				installs = t.explode(",")
 			else
 				raise(new Exception("unknown tag: " + t))
 		delete f
@@ -99,7 +103,13 @@ class Config
 		ignore.add(desktop_file)
 		for e in list
 			if !sa_has(ignore, e.name)
+				e.name = "static/" + e.name
 				r.add(e)
+		for i in installs
+			DirEntry e
+			e.name = i
+			e.is_dir = FileIsDirectory("../" + i)
+			r.add(e)
 		return r
 
 Config conf

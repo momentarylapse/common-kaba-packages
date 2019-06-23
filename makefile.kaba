@@ -48,18 +48,21 @@ void create_makefile()
 		f << "	xdg-desktop-menu install " + std + conf.desktop_file
 	for m in conf.mime_files
 		f << "	xdg-mime install " + std + m
-	for i in conf.icons
-		let xx = i.explode(":")
+	for icon,i in conf.icons
+		let xx = icon.explode(":")
+		string e
+		if i < len(conf.icons) - 1
+			e += " --noupdate"
 		if len(xx) == 3
-			f << "	xdg-icon-resource install --context mimetypes --size " + xx[1] + " " + std + xx[0] + " " + xx[2]
+			f << "	xdg-icon-resource install --context mimetypes --size " + xx[1] + " " + std + xx[0] + " " + xx[2] + e
 //	if conf.icon != ""
 //		f << "	cp -f " + conf.icon + " " + datadir
 	let list = conf.needs_installing()
 	for e in list
 		if e.is_dir
-			f << "	cp -rf " + std + e.name + " " + datadir
+			f << "	cp -rf '../" + e.name + "' " + datadir
 		else
-			f << "	cp -f " + std + e.name + " " + datadir
+			f << "	cp -f '../" + e.name + "' " + datadir
 	f << "	cp $(BIN) $(prefix)/bin"
 
 	f << ""
