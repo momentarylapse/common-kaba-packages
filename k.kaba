@@ -548,7 +548,7 @@ class Function
 
 
 class FunctionInternal extends Function
-	override void __init__()
+	void __init__()
 		super.__init__("")
 		is_internal = true
 
