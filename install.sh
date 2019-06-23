@@ -1,4 +1,4 @@
-BASE=/usr/share/kaba
+BASE=/usr/local/share/kaba
 if [ ! -d $BASE/apps ]
 then
 	mkdir $BASE/apps

@@ -247,7 +247,7 @@ void remote_upload_meta(LocalFile* f)
 	
 	string r = remote_interface("override-meta", [f.id, f.name.hex(false), tags])
 	
-	if r == "ok"
+	if r.tail(2) == "ok"
 		if conf.verbosity >= 2
 			print("yay")
 		f.unset(CHANGED_META)
@@ -256,6 +256,7 @@ void remote_upload_meta(LocalFile* f)
 	if r == "not found"
 		print("ERROR: remote did not find")
 		return
+	print(r)
 	print("ERROR: ????")
 
 
