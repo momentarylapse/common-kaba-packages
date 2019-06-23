@@ -19,25 +19,25 @@ class Library
 		return "HAS_LIB_" + name.upper()
 
 class LibraryPulseaudio extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("pulseaudio", ["pulse"])
 	override bool test()
 		return FileExists("/usr/include/pulse/pulseaudio.h")
 
 class LibraryPortaudio extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("portaudio", ["portaudio"])
 	override bool test()
 		return FileExists("/usr/include/portaudio.h")
 
 class LibraryAlsa extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("alsa", ["asound"])
 	override bool test()
 		return FileExists("/usr/include/alsa/asoundlib.h")
 
 class LibraryOpenAL extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("openal", ["openal"])
 	override bool test()
 		return FileExists("/usr/include/AL/al.h")
@@ -45,25 +45,25 @@ class LibraryOpenAL extends Library
 		return " -I/usr/include/AL"
 
 class LibraryOgg extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("ogg", ["ogg", "vorbis", "vorbisfile", "vorbisenc"])
 	override bool test()
 		return FileExists("/usr/include/vorbis/vorbisfile.h") and FileExists("/usr/include/vorbis/vorbisenc.h") and FileExists("/usr/include/ogg/ogg.h")
 
 class LibraryFlac extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("flac", ["FLAC"])
 	override bool test()
 		return FileExists("/usr/include/FLAC/all.h")
 
 class LibraryUnwind extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("unwind", ["unwind"])
 	override bool test()
 		return FileExists("/usr/include/unwind.h")
 
 class LibraryZlib extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("zlib", ["z"])
 	override bool test()
 		return FileExists("/usr/include/zlib.h")
@@ -71,25 +71,25 @@ class LibraryZlib extends Library
 		return ["zlib"]
 
 class LibraryXlib extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("xlib", ["X11"])
 	override bool test()
 		return FileExists("/usr/include/X11/Xlib.h")
 
 class LibraryFftw3 extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("fftw3", ["fftw3f"])
 	override bool test()
 		return FileExists("/usr/include/fftw3.h")
 
 class LibraryVulkan extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("vulkan", ["vulkan"])
 	override bool test()
 		return FileExists("/usr/include/vulkan/vulkan.h")
 
 class LibraryGtk3 extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("gtk3", ["gtk+-3.0"])
 	override bool test()
 		return FileExists("/usr/include/gtk-3.0/gtk/gtk.h")
@@ -99,32 +99,32 @@ class LibraryGtk3 extends Library
 		return " `pkg-config --cflags --libs gtk+-3.0`"
 
 class LibraryGL extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("gl", ["GL"])
 	override bool test()
 		return FileExists("/usr/include/GL/gl.h")
 
 class LibraryGLU extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("glu", ["GLU"])
 	override bool test()
 		return FileExists("/usr/include/GL/glu.h")
 
 class LibraryGLEW extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("glew", ["GLEW"])
 	override bool test()
 		return FileExists("/usr/include/GL/glew.h")
 
 class LibraryGLFW extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("glfw", ["glfw"])
 	override bool test()
 		return FileExists("/usr/include/GLFW/glfw3.h")
 
 // not really....argh
 class LibraryFfmpeg extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("ffmpeg", ["avutil", "avcodec"])
 	override bool test()
 		return FileExists("/usr/include/ffmpeg/libavcodec/avcodec.h")
@@ -132,19 +132,19 @@ class LibraryFfmpeg extends Library
 		return " -I/usr/include/ffmpeg/"
 
 class LibraryODE extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("ode", ["ode"])
 	override bool test()
 		return FileExists("/usr/local/include/ode/ode.h")
 
 class LibraryPSMove extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("psmove", ["psmoveapi", "psmoveapi_tracker"])
 	override bool test()
 		return FileExists("/usr/local/include/psmoveapi/psmove.h")
 
 class LibraryDl extends Library
-	override void __init__()
+	void __init__()
 		super.__init__("dl", ["dl"])
 	override bool test()
 		return FileExists("/usr/include/dlfcn.h")
