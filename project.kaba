@@ -19,6 +19,12 @@ string dir_canonical(string dir)
 		return d
 	return d + "/"
 
+bool sa_has(string[] a, string val)
+	for e in a
+		if e == val
+			return true
+	return false
+
 // project
 class Config
 	string root
@@ -34,7 +40,9 @@ class Config
 	string flags_global
 	string flags_compiler
 	string flags_linker
-	string[] install
+	string[] icons
+	string desktop_file
+	string[] mime_files
 	
 	void __init__()
 		language = "c++14"
@@ -48,7 +56,7 @@ class Config
 	void load()
 		File* f = FileOpenText(conf.root + "xmake.conf")
 		string t
-		while true
+		while !f.eof()
 			f >> t
 			if t.num == 0
 				break
@@ -72,16 +80,27 @@ class Config
 			else if t == "# libraries optional"
 				f >> t
 				libs_optional = t.explode(",")
-			else if t == "# install"
-				while true
-					f >> t
-					if t.num == 0
-						break
-					install.add(t)
-				break
+			else if t == "# icons"
+				f >> t
+				icons = t.explode(",")
+			else if t == "# desktop file"
+				f >> desktop_file
+			else if t == "# mime files"
+				f >> t
+				mime_files = t.explode(",")
 			else
 				raise(new Exception("unknown tag: " + t))
 		delete f
+	
+	DirEntry[] needs_installing()
+		DirEntry[] r
+		let list = DirSearch("../static", "*.*", true)
+		let ignore = mime_files
+		ignore.add(desktop_file)
+		for e in list
+			if !sa_has(ignore, e.name)
+				r.add(e)
+		return r
 
 Config conf
 

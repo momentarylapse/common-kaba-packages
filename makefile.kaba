@@ -20,6 +20,7 @@ void create_makefile()
 	f << "GLOBALFLAGS = " + conf.flags_global + " -std=" + conf.language + " " + defines
 	f << "CXXFLAGS = " + conf.flags_compiler + cflags + " $(GLOBALFLAGS)"
 	f << "CXXFLAGSLINKING = " + conf.flags_linker + lflags + " $(GLOBALFLAGS)"
+	f << "prefix = /usr/local"
 	f << ""
 	string[] obj
 	for s in sources
@@ -40,8 +41,27 @@ void create_makefile()
 		f << "\t$(CPP) -c " + rel(s.filename) + " -o $@ $(CXXFLAGS)"
 		f << ""
 	f << "install :"
-	for i in conf.install
-		f << i
+	let datadir = "$(prefix)/share/" + conf.name
+	let std = "../static/"
+	f << "	mkdir -p " + datadir
+	if conf.desktop_file != ""
+		f << "	xdg-desktop-menu install " + std + conf.desktop_file
+	for m in conf.mime_files
+		f << "	xdg-mime install " + std + m
+	for i in conf.icons
+		let xx = i.explode(":")
+		if len(xx) == 3
+			f << "	xdg-icon-resource install --context mimetypes --size " + xx[1] + " " + std + xx[0] + " " + xx[2]
+//	if conf.icon != ""
+//		f << "	cp -f " + conf.icon + " " + datadir
+	let list = conf.needs_installing()
+	for e in list
+		if e.is_dir
+			f << "	cp -rf " + std + e.name + " " + datadir
+		else
+			f << "	cp -f " + std + e.name + " " + datadir
+	f << "	cp $(BIN) $(prefix)/bin"
+
 	f << ""
 	f << "clean :"
 	f << "\trm -f $(BIN)"

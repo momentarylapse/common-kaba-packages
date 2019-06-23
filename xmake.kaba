@@ -37,9 +37,6 @@ void main(string[] arg)
 	
 	conf.load()
 	
-	if conf.verbose
-		print(conf.install.join("\n"))
-	
 	string[] missing
 	for l in conf.libs
 		if !lib.test(l)

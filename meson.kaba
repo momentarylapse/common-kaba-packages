@@ -64,4 +64,18 @@ sources = ["
 "
 
 	f << "executable('" + conf.binary + "', sources, dependencies : deps, install : true)"
+	
+	f << ""
+	
+	let std = "static/"
+	let list = conf.needs_installing()
+	for e in list
+		if e.is_dir
+			f << "install_subdir('" + std + e.name + "', install_dir : join_paths(get_option('datadir'), '" + conf.name + "'))"
+		else
+			f << "install_data('" + std + e.name + "', install_dir : join_paths(get_option('datadir'), '" + conf.name + "'))"
+	
+	if conf.desktop_file != ""
+		f << "install_data('" + std + conf.desktop_file + "', install_dir : join_paths(get_option('datadir'), 'applications'))"
+
 
