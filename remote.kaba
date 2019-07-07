@@ -66,9 +66,9 @@ class RemoteFile extends LocalFile
 
 RemoteFile[] remote_parse(string r)
 	RemoteFile[] rfiles
-	string[] list = r.explode("\n")
+	let list = r.explode("\n")
 	for l in list
-		string[] parts = l.explode("\t")
+		let parts = l.explode("\t")
 		if parts.num < 7
 			continue
 		RemoteFile rf
@@ -81,7 +81,7 @@ RemoteFile[] remote_parse(string r)
 		string extension = parts[6]
 		rf.path = rf.name + "." + extension // temporary
 		for i in 8:parts.num
-			rf.tags.add(str2tag(parts[i]))
+			rf.tags.add(strh2tag(parts[i]))
 		if parts[7] == "m"
 			rf.set("quality=medium")
 		rf.set(NONLOCAL)
@@ -107,7 +107,7 @@ RemoteFile[] remote_find_by_hash(string[] hashes)
 		int ee = min(done + CHUNK_SIZE, hashes.num)
 		if conf.verbosity >= 2
 			print("hash... " + done + ":" + ee + " of " + hashes.num)
-		RemoteFile[] r = remote_find_by_hash_chunk(hashes[done:ee])
+		let r = remote_find_by_hash_chunk(hashes[done:ee])
 		for x in r
 			rr.add(x)
 		done = ee
@@ -120,7 +120,7 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 		int ee = min(done + CHUNK_SIZE, ids.num)
 		if conf.verbosity >= 2
 			print("ids... " + done + ":" + ee + " of " + ids.num)
-		RemoteFile[] r = remote_find_by_id_chunk(ids[done:ee], quality)
+		let r = remote_find_by_id_chunk(ids[done:ee], quality)
 		for x in r
 			rr.add(x)
 		done = ee
@@ -154,7 +154,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 
 
 void remote_sync_by_filter(string filter, string quality, string structure, string dir)
-	RemoteFile[] rfiles = remote_find(filter, quality)
+	let rfiles = remote_find(filter, quality)
 	for rf in rfiles
 		try
 			LocalFile *lf = db.find_by_id(rf.id)
@@ -279,7 +279,7 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 	return rfiles
 
 void remote_download_meta(LocalFile*[] files)
-	RemoteFile[] rfiles = remote_get_meta(files)
+	let rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
 			if rf.id == lf.id
@@ -301,7 +301,7 @@ void remote_sync_by_id(LocalFile*[] files)
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
 			files_wanted.add(f)
-	RemoteFile[] rfiles = remote_get_meta(files_wanted)
+	let rfiles = remote_get_meta(files_wanted)
 	for rf in rfiles
 		for lf in files
 			if lf.id == rf.id
@@ -353,7 +353,7 @@ void remote_sync_pure_locals_by_hash(LocalFile*[] files)
 			hashes.add(f.hash)
 	if hashes.num == 0
 		return
-	RemoteFile[] rfiles = remote_find_by_hash(hashes)
+	let rfiles = remote_find_by_hash(hashes)
 	for rf in rfiles
 		if conf.verbosity >= 2
 			print(rf.hash)
