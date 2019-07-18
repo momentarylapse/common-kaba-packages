@@ -1,7 +1,8 @@
-use "common.kaba"
-use "parser.kaba"
-use "simplify.kaba"
-use "kabama.kaba"
+use hui
+use common
+use parser
+use simplify
+use kabama
 
 class KabamaWindow extends Dialog
 
