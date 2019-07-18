@@ -1,6 +1,7 @@
-use "config.kaba"
-use "localdb.kaba"
-use "tag.kaba"
+use hui
+use config
+use localdb
+use tag
 
 
 const int CHUNK_SIZE = 128

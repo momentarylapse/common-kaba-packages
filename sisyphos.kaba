@@ -1,8 +1,8 @@
-use "localdb.kaba"
-use "config.kaba"
-use "remote.kaba"
-use "tag.kaba"
-use "actions.kaba"
+use localdb
+use config
+use remote
+use tag
+use actions
 
 
 void main(string[] arg)

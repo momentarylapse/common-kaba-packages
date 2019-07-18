@@ -1,5 +1,6 @@
-use "config.kaba"
-use "tag.kaba"
+use hui
+use config
+use tag
 
 const string NONLOCAL = "nonlocal"
 const string CHANGED_FILE = "changed"

@@ -1,7 +1,7 @@
-use "localdb.kaba"
-use "config.kaba"
-use "remote.kaba"
-use "tag.kaba"
+use localdb
+use config
+use remote
+use tag
 
 
 // mix db files with "real" files

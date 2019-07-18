@@ -1,3 +1,5 @@
+use hui
+
 //const string SERVER = "michi.is-a-geek.org"
 const string SERVER = "myu"
 const string CMD = "kaba /home/michi/Tools/alex/alex.kaba"
