@@ -1,0 +1,8 @@
+// Description
+Gibt die interne Position einer Verbindung aus.\nBei Gelenken ist dies der Drehwinkel zwischen den Objekten, bei einem Schieber die Verschiebung.
+// Parameter axis
+in
+Die gewünschte Achse (0, 1, 2).
+// Return
+Die Position.
+#

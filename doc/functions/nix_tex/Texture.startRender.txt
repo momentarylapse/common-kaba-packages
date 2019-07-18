@@ -1,0 +1,7 @@
+// Description
+Hiermit kann in eine (dynamische!) Textur gerendert werden.\nHat ansonsten denselben Effekt wie [[NixStart]].
+// Return
+<c>true</c>, falls gerendert werden kann.
+// Synopsis
+s:DynamicTexture,NixStart,NixEnd
+#

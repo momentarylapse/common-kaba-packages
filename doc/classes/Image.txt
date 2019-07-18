@@ -1,0 +1,15 @@
+// Description
+Repräsentiert ein Bild.
+// Element width
+Die Breite.
+// Element height
+Die Höhe.
+// Element mode
+Gibt die Farbkodierung an.
+// Element data
+Die Bildpunkte zeilenweise beginnend von oben links. Jeder Bildpunkt ist als 32bit-<t>int</t> gespeichert.
+// Element alpha_used
+Gibt an, ob der Alpha-Kanal benötigt wird.
+// Element error
+Gibt an, ob beim Laden des Bildes ein Fehler aufgetreten ist.
+#

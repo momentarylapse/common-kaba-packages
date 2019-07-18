@@ -1,0 +1,10 @@
+// Description
+L&adt eine (Shader-) Effekt-Datei OpenGL GLSL-Syntax f&ur Vertex- und Pixelshader.\nDer Effekt kann einem Modell oder der ganzen Kamera zugewie&sen werden.
+// Parameter filename
+in
+Der Dateiname (relativ zum "Materials/"-Verzeichnis, ohne Endung).
+// Return
+Eine Referenz auf den Effekt.
+// Synopsis
+NixLoadShader,NixCreateShader,Shader.unref,Shader.setData
+#

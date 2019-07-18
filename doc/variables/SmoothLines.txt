@@ -1,0 +1,3 @@
+// Description
+Legt fest, ob Linien antialiased werden sollen.
+#

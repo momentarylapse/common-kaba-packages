@@ -1,0 +1,13 @@
+// Description
+L&adt ein Objekt und setzt es in die Welt.
+// Parameter filename
+in
+Der Dateiname des Objektes (relativ zum "Objects/"-Verzeichnis, ohne Endung).
+// Parameter pos
+in
+Die Position, an die das Objekt platziert werden soll.
+// Return
+Die Referenz auf das Objekt.
+// Synopsis
+s:Model,CreateObject,GetObjectByName,FindObjects,NextObject
+#

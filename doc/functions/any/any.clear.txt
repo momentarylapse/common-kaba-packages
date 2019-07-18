@@ -1,0 +1,3 @@
+// Description
+Löscht den Inhalt der <t>any</t>-Variablen.
+#

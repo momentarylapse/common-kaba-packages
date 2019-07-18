@@ -1,0 +1,6 @@
+// Description
+Verändert die innere Reibung eines Gelenks.
+// Parameter friction
+in
+Die Reibung.
+#

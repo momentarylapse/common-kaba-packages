@@ -1,0 +1,21 @@
+// Description
+Ein (2d-) Bild auf dem Bildschirm.
+// Element enabled
+Zum Aktivieren/Deaktivieren des Bildes.
+// Element tc_inverted
+Verdreht die Textur, so dass X- und Y-Angaben vertauscht werden.
+// Element pos
+Die Position des Bildes auf dem Bildschirm in relativen Koordinaten. Die Z-Komponente aus [0..1] wird f&ur die Reihenfolge verwendet.
+// Element width
+Breite (relativ zum Bildschirm).
+// Element height
+H&ohe (relativ zum Bildschirm).
+// Element color
+Farbe, der Alpha-Wert kann f&ur die Transparenz verwendet werden.
+// Element texture
+Die Textur. Keine Textur (-1) wird als weiß interpretiert.
+// Element source
+Ein rechteckiger Bereich auf der Textur, der auf das Bild gespannt wird.
+// Element shader
+Ein Shader-Effekt.
+#

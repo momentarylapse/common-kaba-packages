@@ -1,0 +1,33 @@
+// Description
+Enthält die genaue Beschreibung eines Ereignisses der HUI-Oberfläche (Tasten-Druck, Maus-Bewegung, Knopf-Druck, etc.).
+// Element id
+Die ID des Senders (z.B. der Schaltfläche).
+// Element message
+Die genaue Art des Ereignisses (z.B. "hui:key-down").
+// Element mouse_x
+Die X-Position der Maus (relativ zum Fenster).
+// Element mouse_y
+Die Y-Position der Maus.
+// Element key
+Die Taste, die gedrückt/losgelassen wurde.
+// Element key_code
+Die Tastenkombination, die gedrückt wurde.
+// Element width
+...
+// Element height
+...
+// Element button_l
+Ist die linke Maustaste gedrückt?
+// Element button_m
+Ist die mittlere Maustaste gedrückt?
+// Element button_r
+Ist die rechte Maustaste gedrückt?
+// Element text
+Der zur gedrückten Taste gehörende Text (z.B. "a" für <c>KeyA</c>).
+// Element row
+Die aktive Zeile einer ListView.
+// Element column
+Die aktive Spalte einer ListView.
+// Element wheel
+Die Bewegung des Mausrades.
+#

@@ -1,0 +1,43 @@
+// Description
+Eine Menge von 4*4 = 16 Zahlen, die eine Transformation von 3-dimensionalen Vektoren repräsentiert. Diese umfassen lineare Abbildungen (Drehung, Streckung,...) und Translationen.
+// Remarks
+Unwichtig: Theoretisch sind nur 3*3 = 9 Komponenten erforderlich für lineare Abbildungen, aber um die Translation sowie perspektivische Verzerrungen behandeln zu können, benutzt man Vektoren mit einer zusätzlichen Komponente ("projektive Geometrie").
+// Element _00
+-
+// Element _01
+-
+// Element _02
+-
+// Element _03
+-
+// Element _10
+-
+// Element _11
+-
+// Element _12
+-
+// Element _13
+-
+// Element _20
+-
+// Element _21
+-
+// Element _22
+-
+// Element _23
+-
+// Element _30
+-
+// Element _31
+-
+// Element _32
+-
+// Element _33
+-
+// Element _e
+Array aller Elemente (1-dimensional).\nReihenfolge: <tt>_00, _10, _20, _30, _01,...</tt>
+// Element e
+Array aller Elemente (2-dimensional).\nZuordnung: <tt>_e[i][j] = _ji</tt>
+// Synopsis
+vector,f:vector.transform,f:vector.transformNormal,s:matrix,f:MatrixIdentity,f:MatrixInverse,f:MatrixScale,f:MatrixTranslation,f:MatrixRotation,f:MatrixRotationX,f:MatrixRotationY,f:MatrixRotationZ,f:MatrixRotationQ,f:MatrixRotationView,f:MatrixMultiply
+#

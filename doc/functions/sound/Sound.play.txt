@@ -1,0 +1,6 @@
+// Description
+Startet das Abspielen einer Sounddatei.
+// Parameter loop
+in
+Soll die Datei als Schleife abgespielt werden?
+#

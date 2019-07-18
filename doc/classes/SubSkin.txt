@@ -1,0 +1,13 @@
+// Description
+Ein primitiver Teil einer Modell Oberfläche. Dieser gehört einem einzigen Material an.
+// Element num_triangles
+Die Anzahl der enthaltenen Dreiecke.
+// Element triangle_index
+Ein Array von Indizes von Vertizes im Skin. Jeweils 3 werden als ein Dreieck interpretiert.
+// Element skin_vertex
+Für jeden Vertex der Dreiecke ergeben 2 Zahlen die Koordinaten des Punktes auf der Textur.
+// Element normal
+Jedem Vertex der Dreiecke ist ein Normalenvektor zugeordnet. Er bestimmt die Helligkeit zu einer Lichtquelle.
+// Synopsis
+Model,Skin
+#

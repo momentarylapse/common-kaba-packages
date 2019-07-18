@@ -1,0 +1,9 @@
+// Description
+Springt an eine Stelle innerhalb der Datei.
+// Parameter pos
+in
+Die neue Position bzw. die Sprungdistanz (abhängig von <v>absolute</v>).
+// Parameter absolute
+in
+<c>true</c>: es wird an die Stelle <v>pos</v> bytes vom Anfang der Datei entfernt gesprungen\n<c>false</c>: es wird von der aktuellen Position aus <v>pos</v> bytes weiter gesprungen (bzw. zurück, falls <v>pos</v> negativ ist).
+#

@@ -1,0 +1,8 @@
+// Description
+Berechnet den (minimalen) Abstand eines Punktes zu einer Ebene.
+// Parameter p
+in
+Der Punkt.
+// Return
+Der Abstand.
+#

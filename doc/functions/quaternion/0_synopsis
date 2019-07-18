@@ -1,0 +1,9 @@
+s:quaternion,
+QuaternionRotationV,
+QuaternionRotationA,
+QuaternionDrag,
+quaternion.getAngles,
+QuaternionInterpolate,
+quaternion.bar,
+quaternion.invert,
+quaternion.normalize

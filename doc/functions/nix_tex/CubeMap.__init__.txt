@@ -1,0 +1,8 @@
+// Description
+Erzeugt eine CubeMap.
+// Parameter size
+in
+Die Höhe und Breite der 6 Texturen. (Muss eine Zweierpotenz sein!)
+// Synopsis
+LoadTexture,Texture.startRender,NixEnd
+#

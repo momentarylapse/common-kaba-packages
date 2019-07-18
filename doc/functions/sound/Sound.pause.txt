@@ -1,0 +1,6 @@
+// Description
+Pausiert eine Sounddatei oder setzt sie wieder fort.
+// Parameter pause
+in
+Soll pausiert oder fortgesetzt werden?
+#

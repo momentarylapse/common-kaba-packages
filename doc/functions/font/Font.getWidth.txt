@@ -1,0 +1,11 @@
+// Description
+Ermittelt die Breite eines darzustellenden Textes relativ zur Bildschirmbreite.
+// Parameter size
+in
+Die Schrifthöhe, relativ zum Bildschirm.
+// Parameter s
+in
+Der zu messende Text.
+// Return
+Die Breite des Textes.
+#

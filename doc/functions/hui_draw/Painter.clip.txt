@@ -1,0 +1,6 @@
+// Description
+Schränkt nachfolgende Zeichenbefehle auf ein Rechteck ein.
+// Parameter r
+in
+Das Rechteck.
+#

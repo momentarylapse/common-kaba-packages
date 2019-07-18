@@ -1,0 +1,11 @@
+// Description
+Erzeugt eine <t>float</t> Zufallszahl aus einem Intervall.
+// Parameter min
+in
+Die untere Grenze (inklusive).
+// Parameter max
+in
+Die obere Grenze (exklusive).
+// Return
+Die Zufallszahl.
+#

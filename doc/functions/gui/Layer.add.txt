@@ -1,0 +1,6 @@
+// Description
+Fügt einem GUI-Element ein Kind-Element hinzu.
+// Parameter p
+in
+Das Kind-Element.
+#

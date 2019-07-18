@@ -1,0 +1,9 @@
+// Description
+Stellt einen Bildschrim ausf&ullenden Status-/Ladebalken dar.\nIst eine Scriptdatei als "Hauptmen&u" angegeben und gibt es in dieser eine Funktion mit dem Namen "DrawSplashScreen", so wird diese aufgerufen (so kann der Ladebildschirm selbst gestaltet werden).
+// Parameter status
+in
+Der anzuzeigende Statustext.
+// Parameter progress
+in
+Der Fortschritt (aus [0..1]).
+#

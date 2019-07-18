@@ -1,0 +1,6 @@
+// Description
+Setzt die globale, ungerichtete Lichtquelle.
+// Parameter ambient
+in
+Die Farbe der Lichtquelle.
+#

@@ -1,0 +1,7 @@
+// Description
+Ein Interpolierer für eine Liste von <t>float</t>-Werten.
+// Element type
+Die Art der Interpolation (nur zu internen Zwecken).
+// Synopsis
+FloatInterpolator,VectorInterpolator
+#

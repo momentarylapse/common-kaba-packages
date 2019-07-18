@@ -1,0 +1,6 @@
+// Description
+Speichert das Bild in einer Datei.
+// Parameter filename
+in
+Der Dateiname, in den das Bild gespeichert werden soll (bisher ist nur *.bmp und *.tga erlaubt).
+#

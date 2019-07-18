@@ -1,0 +1,3 @@
+// Description
+Normiert eine Quaternionen.\nRotationen werden von Einheits-Quaternionen dargestellt, nach manchen Berechnungen müssen sie wieder normiert werden.
+#

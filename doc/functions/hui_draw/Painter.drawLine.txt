@@ -1,0 +1,15 @@
+// Description
+Zeichnet eine gerade Linie.
+// Parameter x1
+in
+Die Start-X-Position.
+// Parameter y1
+in
+Die Start-Y-Position.
+// Parameter x2
+in
+Die End-X-Position.
+// Parameter y2
+in
+Die End-Y-Position.
+#

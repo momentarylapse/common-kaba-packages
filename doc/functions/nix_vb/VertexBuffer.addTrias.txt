@@ -1,0 +1,17 @@
+// Description
+Fügt Vertex-Punkte und Dreiecke zu einem VertexBuffer hinzu.\nJedes Dreieck wird durch je 3 aufeinander folgende Vertex-Punkte, 3 Normalen-Vektoren und 6 Textur-Koordinaten beschrieben.
+// Parameter num_trias
+in
+Die Anzahl der hinzuzufügenden Dreiecke.
+// Parameter p
+in
+Der Array der Vertex-Punkte. ( <t>vector</t>[ <v>num_trias</v> * 3 ] )
+// Parameter n
+in
+Der Array der Normalen-Vektoren. ( <t>vector</t>[ <v>num_trias</v> * 3 ] )
+// Parameter t
+in
+Der Array der Textur-Koordinaten. Je 2 aufeinander folgende Werte ergeben u- und v-Koordinate der Textur an einem Eckpunkt. ( <t>float</t>[ <v>num_trias</v> * 6 ] )
+// Synopsis
+s:VertexBuffer,VertexBuffer.clear,VertexBuffer.addTrias,VertexBuffer.addTria
+#

@@ -1,0 +1,5 @@
+// Description
+Entfernt Whitespace vom Anfang und Ende eines <t>string</t>s.
+// Return
+Der getrimmte Text.
+#

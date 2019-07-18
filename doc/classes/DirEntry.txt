@@ -1,0 +1,11 @@
+// Description
+Ein einzelner Dateieintrag in einem Verzeichnis.\n[[f:DirSearch]] liefert einen Array dieser Einträge.
+// Element name
+Der Name der Datei ohne Verzeichnispfad.
+// Element is_dir
+Gibt an, ob es sich um ein Verzeichnis handelt.
+// Element size
+Die Dateigröße in bytes.
+// Synopsis
+f:DirSearch
+#

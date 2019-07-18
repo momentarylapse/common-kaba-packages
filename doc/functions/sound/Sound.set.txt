@@ -1,0 +1,21 @@
+// Description
+Setzt alle für das Abspielen eines Sounds relevanten Daten.
+// Parameter pos
+in
+Die Position der Soundquelle innerhalb der 3d-Welt.
+// Parameter vel
+in
+Die Geschwindigkeit, mit der sich die Soundquelle bewegt. (wird für den Dopplereffekt verwendet)
+// Parameter r_min
+in
+Die Reichweite, in der der Sound mit maximaler Lautstärke hörbar ist.
+// Parameter r_max
+in
+Die Reichweite, in der der Sound gerade noch hörbar ist.
+// Parameter speed
+in
+Die Abspielgeschwindigkeit. 1 ist die nat&urliche Geschwindigkeit.
+// Parameter volume
+in
+Die Lautstärke (aus [0..1]).
+#

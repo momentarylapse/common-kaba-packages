@@ -1,0 +1,7 @@
+// Description
+Maximiert ein Fenster in den Vollbildmodus.
+// Parameter fullscreen
+in
+<c>true</c> maximiert das Fenster, <c>false</c> versetzt es wieder in seine Ausgangsgröße.
+#
+

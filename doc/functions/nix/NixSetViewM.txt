@@ -1,0 +1,8 @@
+// Description
+Die "Kamera" direkt als Matrix setzen.
+// Parameter view_mat
+in
+Die Darstellungs-Matrix (Translation/Rotation/Skalierung)
+// Synopsis
+NixSetViewM,NixSetViewV
+#

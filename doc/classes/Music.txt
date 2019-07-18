@@ -1,0 +1,5 @@
+// Description
+Eine geladene Musik-Datei.\nSie wird unabhängig vom Standort im Hintergrund abgespielt.
+// Remark
+Diese Klasse ist optimiert, mit großen Dateien umzugehen (sie nutzt Streaming).
+#

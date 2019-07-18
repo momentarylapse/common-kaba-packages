@@ -1,0 +1,5 @@
+// Description
+Löst eine Referenzierung einer Shader-Datei.\nWird dieselbe Datei via [[NixLoadShader]] geladen, wird intern nur ein Referenzzähler erhöht. Der Shader wird gelöscht, sobald alle Referenzen entfernt wurden.
+// Synopsis
+NixLoadShader,NixCreateShader,Shader.unref,Shader.setData
+#

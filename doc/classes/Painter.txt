@@ -1,0 +1,7 @@
+// Description
+Das Interface, über das auf Fenster gezeichnet werden kann.
+// Element width
+Die Breite des Zeichen-Bereichs (DrawingArea).
+// Element height
+Die Breite des Zeichen-Bereichs.
+#

@@ -1,0 +1,11 @@
+// Description
+Liefert den größeren zweier Werte.
+// Parameter a
+in
+Der erste Wert.
+// Parameter b
+in
+Der zweite Wert.
+// Return
+Der größere Wert.
+#

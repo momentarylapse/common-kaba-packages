@@ -1,0 +1,5 @@
+// Description
+Berechnet den Flächeninhalt des Rechtecks.
+// Return
+Die Fläche.
+#

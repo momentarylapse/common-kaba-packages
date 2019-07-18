@@ -1,0 +1,11 @@
+// Description
+Berechnet die Potenz einer <t>vli</t>-Variablen modulo einer weiteren.
+// Parameter exp
+in
+Der Exponent.
+// Parameter mod
+in
+Der Wert, modulo dem gerechnet werden soll.
+// Return
+Die Potenz <tt>(self ^ exp) modulo mod</tt>.
+#

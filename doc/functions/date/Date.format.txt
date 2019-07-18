@@ -1,0 +1,8 @@
+// Description
+Liefert eine formatierte Darstellung eines Zeitpunktes.
+// Parameter f
+in
+Die Wahl der Darstellung (siehe http://cplusplus.com/reference/clibrary/ctime/strftime/).\nZ.B. <tt>"%c"</tt> oder <tt>"%a %x %X"</tt> für <tt>"Mo 1.1.2004 12:34:56"</tt>.
+// Return
+Das Datum als Text.
+#

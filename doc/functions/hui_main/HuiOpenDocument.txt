@@ -1,0 +1,6 @@
+// Description
+Öffnet eine Datei mit dem dafür vorgesehenen Programm.
+// Parameter filename
+in
+Die Datei, die geöffnet werden soll.
+#

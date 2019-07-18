@@ -1,0 +1,9 @@
+// Description
+Dividiert eine <t>vli</t>-Variable durch eine zweite und überschreibt sich selbst mit dem Ergebnis.\n<tt>self = self / div,   rem = self mod div</tt>
+// Parameter div
+in
+Der Divisor.
+// Parameter rem
+out
+Der Rest.
+#

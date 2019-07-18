@@ -1,0 +1,5 @@
+// Description
+Liefert die Größe der Datei.
+// Return
+Die Größe in byte.
+#

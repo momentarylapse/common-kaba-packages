@@ -1,0 +1,3 @@
+// Description
+Ein Puffer für 3d-Geometrie.
+#

@@ -1,0 +1,6 @@
+s:Music,
+LoadMusic,
+Music.play,
+Music.pause,
+Music.stop,
+Music.setRate

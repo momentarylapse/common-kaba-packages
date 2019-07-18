@@ -1,0 +1,6 @@
+// Description
+Löscht die Liste der automatischen Vervollständigung einer Schaltfläche.
+// Parameter id
+in
+Die Schaltfläche.
+#

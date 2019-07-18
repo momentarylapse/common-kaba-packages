@@ -1,0 +1,6 @@
+// Description
+Legt fest, ob Linien geglättet werden sollen.
+// Parameter enabled
+in
+Antialiasing aktivieren?
+#

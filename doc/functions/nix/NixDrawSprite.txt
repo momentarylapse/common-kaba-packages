@@ -1,0 +1,12 @@
+// Description
+Zeichnet ein "Sprite" (ein quadratisches 2d-Objekt in der 3d-Welt).
+// Parameter source
+in
+Der zu verwendende Bereich der Textur (<c>r_id</c> = komplett).
+// Parameter pos
+in
+Die Position im 3d-Raum (Mittelpunkt).
+// Parameter radius
+in
+Der Radius (halbe Kantenlänge des Quadrates).
+#

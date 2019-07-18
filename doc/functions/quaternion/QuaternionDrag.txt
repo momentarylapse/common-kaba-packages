@@ -1,0 +1,15 @@
+// Description
+Verdreht eine Quaternion um Euler-Winkel.
+// Parameter q
+in,out
+Die Rotations-Quaternion.
+// Parameter up
+in
+Ein Vektor, der das "Oben" der Eulerwinkel definiert (muss nicht normiert sein).
+// Parameter dang
+in
+Der relative Drehwinkel (im Bogenmaß).
+// Parameter reset_z
+in
+Gibt an, ob der z-Anteil der Eulerwinkel (im relativen Koordinatensystem) auf 0 gesetzt werden soll.\nNützlich, für eine Kamera-Steuerung, die iterativ von der Maus gedreht werden soll, die Kamera aber stabil in der Ebene bleiben soll.
+#

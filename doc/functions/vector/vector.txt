@@ -1,0 +1,14 @@
+// Description
+Erstellt einen Vektor aus den 3 Komponenten (x,y,z).
+// Parameter x
+in
+Die X-Komponente.
+// Parameter y
+in
+Die Y-Komponente.
+// Parameter z
+in
+Die Z-Komponente.
+// Return
+Die zu einem Vektor vereinten Koordinaten.
+#

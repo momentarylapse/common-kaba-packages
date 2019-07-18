@@ -1,0 +1,8 @@
+// Description
+Falls die <t>any</t>-Variable ein Array ist, so wird der zum Index gehörige Eintrag zurückgegeben.
+// Parameter index
+in
+Der Array-Index.
+// Return
+Der zugehörige Wert.
+#

@@ -1,0 +1,17 @@
+// Description
+Zwingt eine Zahl in ein Intervall, indem sie auf die näheste Intervallsgrenze geschoben wird, falls sie außerhalb liegt.
+// Parameter i
+in
+Die Zahl.
+// Parameter min
+in
+Die untere Intervallsgrenze.
+// Parameter max
+in
+Die obere Intervallsgrenze.
+// Return
+Die Zahl im Intervall.
+// Synopsis
+abs,clamp,loop,clampi,loopi
+#
+

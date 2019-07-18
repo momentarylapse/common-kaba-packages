@@ -1,0 +1,21 @@
+// Description
+Konfiguriert eine Lichtquelle als punktförmige Lichtquelle (z.B. Kerze).
+// Parameter light
+in
+Die Lichtquelle.
+// Parameter pos
+in
+Die Position der Lichtquelle.
+// Parameter radius
+in
+Die Reichweite des Lichtes.
+// Parameter ambient
+in
+Die ungerichtete Farb-Komponente.
+// Parameter diffuse
+in
+Die gerichtete Farb-Komponente.
+// Parameter specular
+in
+Das Glanzlicht.
+#

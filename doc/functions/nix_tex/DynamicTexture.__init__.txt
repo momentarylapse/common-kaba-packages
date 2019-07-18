@@ -1,0 +1,11 @@
+// Description
+Erzeugt eine dynamische Textur. Dies ist eine Textur, in die die Engine hinein "rendern" kann.\nWird [[Texture.startRender]] mit der dynamischen Textur als Parameter ausgeführt, werden alle folgenden Befehle zum Zeichnen/Darstellen in diese Textur umgeleitet, bis zum nächsten [[NixEnd]].
+// Parameter width
+in
+Die Breite der Textur. (Muss eine Zweierpotenz sein!)
+// Parameter height
+in
+Die Höhe der Textur. (Muss eine Zweierpotenz sein!)
+// Synopsis
+LoadTexture,Texture.startRender,NixEnd
+#

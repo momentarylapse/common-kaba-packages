@@ -1,0 +1,5 @@
+// Description
+Gibt das aktuelle Arbeitsverzeichnis an.
+// Return
+Das Arbeitsverzeichnis.
+#

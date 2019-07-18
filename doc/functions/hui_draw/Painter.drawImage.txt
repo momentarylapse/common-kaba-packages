@@ -1,0 +1,12 @@
+// Description
+Stellt ein Bild dar.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die y-Position.
+// Parameter image
+in
+Das zu zeichnende Bild.
+#

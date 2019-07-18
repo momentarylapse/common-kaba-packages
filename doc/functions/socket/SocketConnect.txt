@@ -1,0 +1,11 @@
+// Description
+Stellt eine Verbindung zu einem anderen Computer bzw. darauf laufenden Programm im Netzwerk her.\nDazu muss auf dem fremden Computer bereits ein Programm mit [[SocketListen]] und [[Socket.accept]] auf einen Verbindungsaufbau warten.
+// Parameter addr
+in
+Die Addresse des Computers, also dessen Name (z.B. "localhost") oder dessen IP-Addresse (z.B. "127.0.0.1").
+// Parameter port
+in
+Die Port-Nummer. Es muss die selbe sein, die vom fremden Programm an [[SocketListen]] übergeben wurde.
+// Return
+Im Erfolgsfall die Verbindung, ansonsten <c>nil</c>.
+#

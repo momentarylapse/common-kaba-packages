@@ -1,0 +1,8 @@
+// Description
+Erzeugt eine <t>int</t> Zufallszahl aus einem Intervall.
+// Parameter max
+in
+Die obere Grenze (exklusive).
+// Return
+Die Zufallszahl.
+#

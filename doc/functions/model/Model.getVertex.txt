@@ -1,0 +1,11 @@
+// Description
+Gibt einen einzelnen Vertex-Punkt eines Modelles in Welt-Koordinaten zur&uck.\n---ethisch nicht perfekt---
+// Parameter index
+in
+Der Index des Vertex-Punktes.
+// Parameter skin
+in
+Die Detailstufe.\n<c>SkinHigh</c>: hohe Detailstufe\n<c>SkinMedium</c>: mittlere Detailstufe\n<c>SkinLow</c>: niedere Detailstufe
+// Return
+Die Position in Welt-Koordinaten.
+#

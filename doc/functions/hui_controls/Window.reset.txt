@@ -1,0 +1,7 @@
+// Description
+Löscht die Daten einer Schaltfläche (z.B. Text eines Texteingabefeldes).
+// Parameter id
+in
+Die ID der Schaltfläche.
+#
+

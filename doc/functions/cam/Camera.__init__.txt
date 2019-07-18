@@ -1,0 +1,12 @@
+// Description
+Erschafft eine neue (zusätzliche) Kamera, also einen "stillen Beobachter", der das Gesehene auf dem Bildschirm darstellt.\nEine Kamera ist immer schon beim Start einer Karte vorhanden ([[v:Cam]]), weitere sind vorallem für einen "Splitscreen"-Mehrspieler-Modus oder spezielle visuelle Effekte nützlich. Man kann den Kameras auch Shader-Dateien zuweisen, die die Ansicht nachträglich verändern.
+// Parameter pos
+in
+Die Position in der Welt, an der die Kamera "stehen" soll.
+// Parameter ang
+in
+Die Ausrichtung, die die Kamera in der Welt haben soll.
+// Parameter dest
+in
+Der Ausschnitt des Bildschirms, auf dem die Ansicht der Kamera zu sehen sein soll. <c>r_id</c> nimmt den kompletten Bildschirm in Anspruch.
+#

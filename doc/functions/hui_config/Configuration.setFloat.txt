@@ -1,0 +1,9 @@
+// Description
+Schreibt eine Kommazahl in die Datei "Data/config.txt".
+// Parameter name
+in
+Der Bezeichner ("Variablenname")
+// Parameter value
+in
+Der Wert.
+#

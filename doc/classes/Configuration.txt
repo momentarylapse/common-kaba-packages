@@ -1,0 +1,6 @@
+// Description
+Repräsentiert eine Konfigurationsdatei.\nEs wird eine Standard-Datei durch die Variable [[v:HuiConfig]] genutzt.
+// Synopsis
+v:HuiConfig
+#
+

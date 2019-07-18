@@ -1,0 +1,18 @@
+// Description
+Erschafft einen Strahl, ein langgezogenes Partikel.
+// Parameter pos
+in
+Position, an der der Strahl entstehen soll.
+// Parameter length
+in
+Vektorielle Länge des Strahles, also die Differenz aus Endpunkt und Position
+// Parameter texture
+in
+Die Textur.
+// Parameter ttl
+in
+Zeit (in Sekunden Spielzeit), die dem Strahl bleibt, bis er automatisch gelöscht wird.
+// Parameter radius
+in
+Der Radius. (= Dicke des Striches)
+#

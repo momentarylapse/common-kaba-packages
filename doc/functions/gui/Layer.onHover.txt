@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die in jedem Frame der Engine aufgerufen wird, solange sich die Maus über dem GUI-Element befindet.
+#

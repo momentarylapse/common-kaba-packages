@@ -1,0 +1,23 @@
+// Description
+Ein Terrain diehnt als Boden/Landschaft im Spiel.\nEs ist ein automatisch mit Polygonen bespanntes Gitter, das in der X-Z-Ebene liegt aber jedem Gitterpunkt eine eigene "Höhe" in der Y-Richtung zuordnet.
+// Element pos
+Die Position des kompletten Terrains (der Ecke (0,0)).
+// Element num_x
+Die Anzahl der Flächen-Streifen in X-Richtung. ('''sollte nicht geändert werden!''')
+// Element num_z
+Die Anzahl der Flächen-Streifen in Z-Richtung. ('''sollte nicht geändert werden!''')
+// Element height
+Ein Array, der die Höhe jedes Gitterpunktes über der Position <v>pos.y</v> enthält.\nDer Gitterpunkt an der Stelle (x,z) wird dabei angesprochen als <v>height</v>[ x * (<v>num_z</v> + 1 ) + z ].
+// Element pattern
+Gibt den Abstand in X-und Z-Richtung zwischen den Gitterpunkten an (als X- und Z-Komponente des Vektors).
+// Element material
+Das Material (enthält die Texturen, Farben und Shader).
+// Element texture_scale
+Die Verzerrung der jeweiligen Textur. Die X- und Z-Komponente des Vektors gibt dabei an, wieweit die Textur-Koordinaten von benachbarten Gitterpunkten in X- und Z-Richtung auseinander liegen.
+// Remarks
+Nach dem Ändern von <v>pos</v>, <v>height[n]</v> und <v>pattern</v> muss [[f:Terrain.update]] aufgerufen werden, damit diese Änderungen auch sichtbar werden.
+// Remarks
+Änderungen von <v>num_textures</v>, <v>texture[n]</v> und <v>texture_scale[n]</v> sind sofort sichtbar.
+// Synopsis
+vector
+#

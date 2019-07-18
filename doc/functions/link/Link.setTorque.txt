@@ -1,0 +1,6 @@
+// Description
+Weist dem Scharnier ein Drehmoment zu, das beide Objekte gegeneinander verdreht.
+// Parameter torque
+in
+Das Drehmoment.
+#

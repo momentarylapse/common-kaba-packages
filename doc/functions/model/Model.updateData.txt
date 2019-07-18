@@ -1,0 +1,3 @@
+// Description
+Berechnet physikalische Daten (<v>matrix</v>, <v>theta</v>) neu.\nMuss aufgerufen werden, nachdem <v>pos</v> etc. vom Script verändert wurden.
+#

@@ -1,0 +1,3 @@
+// Description
+Wählt eine perspektivische Transformation von Kamera-Koordinaten auf das Fenster (bzw. das aktive Ziel).
+#

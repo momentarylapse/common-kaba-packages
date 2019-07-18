@@ -1,0 +1,5 @@
+// Description
+Liefert einen Hash zu gegebenen Daten.\nDies ist eine <t>int</t>-Zahl, die zufällig, aber für dieselben Daten immer gleich ist.
+// Return
+Der Hash-Wert.
+#

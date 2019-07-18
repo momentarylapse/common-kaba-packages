@@ -1,0 +1,8 @@
+// Description
+Testet, ob der <t>string</t> ein bestimmtes Muster erfüllt.
+// Parameter glob
+in
+Das Muster, bestehend aus festen Zeichen und Sternchen. Z.B. <tt>"*Test*.txt"</tt>.
+// Return
+<c>true</c> falls das Muster erfüllt wird, ansonsten <c>false</c>.
+#

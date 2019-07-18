@@ -1,0 +1,23 @@
+// Description
+Generiert eine Feder-Verbindung zwischen zwei Objekten.
+// Parameter o1
+in
+Das eine Objekt.
+// Parameter o2
+in
+Das andere Objekt.
+// Parameter p1
+in
+Der Befestigungspunkt am ersten Objekt. (globale Koordinaten)
+// Parameter p2
+in
+Der Befestigungspunkt am zweiten Objekt. (globale Koordinaten)
+// Parameter dx0
+in
+Anfangsauslenkung aus der Ruhelage.
+// Parameter k
+in
+Die Federkonstante.
+// Remark
+Die Federkraft ist linear: '' Kraft = ( aktueller_Abstand_der_Befestigungspunkte - Anfangs_Abstand_der_Befestigungspunkte + dx0 ) * k ''
+#

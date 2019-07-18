@@ -1,0 +1,5 @@
+// Description
+Liefert eine formatierte Darstellung eines Zeitpunktes.\n(Ungefähr in der Form <tt>"Mo 1.1.2004 12:34:56"</tt>)
+// Return
+Das Datum als Text.
+#

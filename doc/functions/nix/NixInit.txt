@@ -1,0 +1,12 @@
+// Description
+Initialisiert die Grafik-Bibliothek und startet den Grafikmodus eines Fensters.
+// Parameter api
+in
+Die zu verwendende Grafik-Bibliothek (<c>"OpenGL"</c> oder <c>"None"</c>).
+// Parameter w
+in
+Das Fenster, das den Grafk-Modus beherbergen soll.
+// Parameter id
+in
+Die ID des Kontrollfeldes (DrawingArea), in dem gezeichnet werden soll.
+#

@@ -1,0 +1,8 @@
+// Description
+Berechnet den n&achste Frame eines Modelles.\nDazu geh&oren bisher nur Animationen.\nUntermodelle werden rekursiv mit ausgef&uhrt.
+// Parameter mod
+in
+Das Modell.
+// Remark
+Die Engine f&uhrt diese Funktion automatisch f&ur alle Modelle von Objekten aus.
+#

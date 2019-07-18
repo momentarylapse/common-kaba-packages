@@ -1,0 +1,14 @@
+// Description
+Durchsucht ein Verzeichnis nach Dateien.
+// Parameter dir
+in
+Das zu durchsuchende Verzeichnis.
+// Parameter filter
+in
+Der Datei-Filter. Z.B. "*.txt", um nach Text-Dateien suchen zu lassen.
+// Parameter show_dirs
+in
+Gibt an, ob die Unterverzeichisse zu den Suchergebnissen hinzugef&ugt werden sollen.
+// Return
+Eine Liste von Dateieinträgen
+#

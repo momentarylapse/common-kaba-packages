@@ -1,0 +1,9 @@
+// Description
+Definiert den Bereich, in dem sich eine Verbindung intern bewegen darf.
+// Parameter min
+in
+Die minimale Auslenkung.
+// Parameter max
+in
+Die maximale Auslenkung.
+#

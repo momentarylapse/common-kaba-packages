@@ -1,0 +1,8 @@
+// Description
+Schreibt einen <t>string</t> in eine Datei.
+// Parameter s
+in
+Der <t>string</t>.
+// Return
+Die Anzahl der geschriebenen bytes.
+#

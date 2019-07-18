@@ -1,0 +1,15 @@
+// Description
+Gibt den Inhalt einer einzelnen Listen-Zelle zurück.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter row
+in
+Die Zeile der Liste.
+// Parameter column
+in
+Die Spalte der Liste.
+// Return
+Die Auswahl.
+#
+

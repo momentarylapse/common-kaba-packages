@@ -1,0 +1,3 @@
+// Description
+Die Breite in Pixeln von z.B. durch [[f:NixDrawLine]] dargestellten Linien.
+#

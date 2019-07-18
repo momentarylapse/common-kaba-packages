@@ -1,0 +1,11 @@
+// Description
+Eine Oberfl&ache eines Modells.
+// Element vertex
+Anzahl der Vertex-Punkte.
+// Element bone_index
+Die Knochen, denen die Vertizes zugeordnet sind.
+// Element sub
+Die primitiven Teil-Oberflächen. Jedem Material ist eines zugeordnet.
+// Synopsis
+Model,SubSkin
+#

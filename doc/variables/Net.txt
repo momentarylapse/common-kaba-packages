@@ -1,0 +1,5 @@
+// Description
+Die aktuellen Einstellungen des Netzwerkes.
+// Synopsis
+s:NetworkData
+#

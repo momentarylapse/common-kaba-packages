@@ -1,0 +1,8 @@
+// Description
+Lädt eine Bilddatei.
+// Parameter filename
+in
+Der zu ladende Dateiname.
+// Return
+Das geladene Bild, oder <c>nil</c>, falls es nicht geladen werden kann.
+#

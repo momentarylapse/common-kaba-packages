@@ -1,0 +1,10 @@
+// Description
+L&adt ein Spiel, das auf einem anderen Computer im Netzwerk l&auft.\nHierzu muss vorher [[FindHosts]] ausgeführt werden, das die verfügbaren Hosts und Spiele auflistet.
+// Parameter host
+in
+Eine Host-Datenstruktur aus der von [[FindHosts]] erstellten Liste.
+// Remark
+Die Welt des Hostes wird &uber das Netzwerk übertragen, sie muss nicht lokal vorhanden sein.\nAußerdem werden auch alle fehlenden Dateien vom Host geladen.
+// Synopsis
+FindHosts,LoadGameState,SaveGameState,LoadWorld
+#

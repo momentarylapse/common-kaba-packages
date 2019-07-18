@@ -1,0 +1,10 @@
+// Description
+Ändert den Text einer Schaltfläche.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter s
+in
+Der neue Text.
+#
+

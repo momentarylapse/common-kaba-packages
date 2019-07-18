@@ -1,0 +1,15 @@
+// Description
+Nebel.\nBisher kann nur die Globale Variable [[v:GlobalFog]] für den (globalen!) Nebel verwendet werden.
+// Element enabled
+Zum Aktivieren/Deaktivieren des Nebels.
+// Element mode
+Der Typ der Nebel-Formel.\n<c>FogLinear</c>: lineare Interpolation, ( <v>end</v> - Abstand ) / ( <v>end</v> - <v>start</v>).\n<c>FogExp</c>: exponentielle Interpolation, exp( - Abstand * <v>density</v> ).\n<c>FogExp2</c>: exponentielle Interpolation, exp( - ( Abstand * <v>density</v> )^2 ).
+// Element start
+Nur für <c>FogLinear</c>: minimaler Abstand, ab dem der Nebel verwendet wird.
+// Element end
+Nur für <c>FogLinear</c>: maximaler Abstand, ab dem der Nebel alles komplett überlagert.
+// Element density
+Nur für <c>FogExp</c> und <c>FogExp2</c>: Die Intensität des Nebels.
+// Element color
+Die Farbe des Nebels.
+#

@@ -1,0 +1,5 @@
+// Description
+Berechnet aus einem Richtungs-Einheitsvektor die zugeh&origen Winkelangaben in Bezug auf die Z-Achse, der Richtungs-Vektor (0,0,1) wird somit zum Winkel (0,0,0).
+// Return
+Die Winkelangaben.\nDie Z-Komponente des erhaltenen Winkels wird immer 0 sein, sie kann mit nur einem Richtungsvektor nicht bestimmt werden (siehe [[VecDir2Ang2]]).
+#

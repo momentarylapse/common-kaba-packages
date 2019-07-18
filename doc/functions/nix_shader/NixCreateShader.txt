@@ -1,0 +1,10 @@
+// Description
+Erzeugt einen neuen Shader aus Quellcode.
+// Parameter source
+in
+Der Shader-Quellcode.
+// Return
+Eine Referenz auf den Effekt.
+// Synopsis
+NixLoadShader,NixCreateShader,Shader.unref,Shader.setData
+#

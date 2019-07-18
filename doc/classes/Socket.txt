@@ -1,0 +1,7 @@
+// Description
+Repräsentiert eine Netzwerk-Verbindung, über die Daten ausgetauscht werden kann.
+// Element uid
+Eine (innerhalb des Programms) eindeutige ID der Socket.
+// Remark
+Die Daten können mit den Streamoperatoren gepuffert gesendet werden.
+#

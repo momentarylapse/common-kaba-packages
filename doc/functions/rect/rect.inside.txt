@@ -1,0 +1,11 @@
+// Description
+Testet, ob ein Punkt innerhalb des Rechtecks liegt.
+// Parameter x
+in
+Die x-Komponente des Punktes.
+// Parameter y
+in
+Die y-Komponente des Punktes.
+// Return
+<c>true</c> falls der Punkt im Rechteck liegt, ansonsten <c>false</c>.
+#

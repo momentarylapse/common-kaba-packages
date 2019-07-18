@@ -1,0 +1,5 @@
+// Description
+Repräsentiert ein Fenster der grafischen Oberfläche.
+// Synopsis
+Menu,Dialog
+#

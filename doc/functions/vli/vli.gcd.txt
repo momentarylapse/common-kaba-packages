@@ -1,0 +1,10 @@
+// Description
+Berechnet den größten gemeinsamen Teiler zweier <t>vli</t>-Variablen.
+// Parameter v
+in
+Der zweite Wert.
+// Return
+Der größte gemeinsame Teiler von <v>self</v> und <tt>v</tt>.
+// Remark
+Das Ergebnis ist immer positiv.
+#

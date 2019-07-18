@@ -1,0 +1,8 @@
+// Description
+Vergleicht zwei <t>vli</t>-Variablen.
+// Parameter v
+in
+Der Wert mit dem verglichen werden soll.
+// Return
+0, falls beide Werte gleich sind,\n> 0, falls der erste größer ist,\n< 0, falls der zweite größer ist.
+#

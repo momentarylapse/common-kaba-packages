@@ -1,0 +1,9 @@
+// Description
+Gibt den Wert einer Schaltfläche zurück.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Return
+Der Wert.
+#
+

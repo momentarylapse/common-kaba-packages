@@ -1,0 +1,10 @@
+s:Configuration,
+Configuration.getInt,
+Configuration.getFloat,
+Configuration.getBool,
+Configuration.getStr,
+Configuration.setInt,
+Configuration.setFloat,
+Configuration.setBool,
+Configuration.setStr,
+v:HuiConfig

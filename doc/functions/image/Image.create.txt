@@ -1,0 +1,12 @@
+// Description
+Erzeugt ein leeres Bild.
+// Parameter width
+in
+Die neue Breite.
+// Parameter height
+in
+Die neue Höhe.
+// Parameter c
+in
+Die Farbe, mit der das komplette Bild eingefärbt werden soll.
+#

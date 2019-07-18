@@ -1,0 +1,5 @@
+// Description
+Eine geladene Sound-Datei.\nSie hat eine Position und Geschwindigkeit, ihr Klang hängt somit vom Standort des Zuhörers ab.
+// Remark
+Diese Klasse ist dazu optimiert, viele gleiche Dateien zu laden.
+#

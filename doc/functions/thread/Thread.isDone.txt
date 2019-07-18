@@ -1,0 +1,7 @@
+// Description
+Testet, ob der Thread beendet ist.
+// Return
+<c>true</c>, falls der Thread beendet ist.
+// Synopsis
+s:Thread,Thread.run,Thread.kill,Thread.isDone,Thread.join,ThreadExit,ThreadSelf
+#

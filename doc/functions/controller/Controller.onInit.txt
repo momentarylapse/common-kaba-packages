@@ -1,0 +1,4 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, nachdem der Controller erschaffen wurde.
+#
+

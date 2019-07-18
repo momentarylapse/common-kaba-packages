@@ -1,0 +1,12 @@
+// Description
+Erzeugt eine Ebene aus einem Punkt und einem Normalenvektor.
+// Parameter pl
+out
+Die Ebene.
+// Parameter p
+in
+Der Punkt.
+// Parameter n
+in
+Der Normalenvektor.
+#

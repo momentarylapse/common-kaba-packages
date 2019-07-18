@@ -1,0 +1,23 @@
+// Description
+Die optischen Eigenschaften eines Modells oder einer Geometrie.
+// Element shader
+Der Shader, der die Geometrie verschönern soll. (Zu laden mit [[f:NixLoadShader]])
+// Element ambient
+Die Ambient-Farbe des Materials. (richtungslos)
+// Element diffuse
+Die Diffuse-Farbe des Materials. (gerichtet)
+// Element specular
+Die Specular-Farbe des Materials. (glänzend)
+// Element emission
+Die Emission-Farbe des Materials. (selbstleuchtend)
+// Element shininess
+Der Glanz-Faktor der Specular-Farbe des Materials.
+// Element alpha_factor
+Die Transparenz-Faktor (strenggenommen die Sichtbarkeit!), falls die Art der Transparenz auf Alpha-Faktor gestellt ist.
+// Element num_textures
+Anzahl der Texturen.
+// Element texture
+Die Texturen. Meist wird nur <v>texture[0]</v> verwendet.
+// Synopsis
+Model,Skin
+#

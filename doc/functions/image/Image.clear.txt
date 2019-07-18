@@ -1,0 +1,3 @@
+// Description
+Löscht das Bild.
+#

@@ -1,0 +1,20 @@
+// Description
+Stellt einen String im aktuellen X-Font auf dem Bildschirm dar. Allerdings werden die Buchstaben vertikal angeordnet.
+// Parameter x
+in
+Die X-Position (0=links, 1=rechts).
+// Parameter y
+in
+Die Y-Position (0=oben, 1=unten)
+// Parameter z
+in
+Die Bildschirm-Tiefe (0=vorne, 0.999=hinten)
+// Parameter size
+in
+Die Schrift-Höhe (1=Bildschirmhöhe).
+// Parameter str
+in
+Der darzustellende Text.
+// Return
+Die Breite des Textes in relativen [0,1]-Koordinaten.
+#

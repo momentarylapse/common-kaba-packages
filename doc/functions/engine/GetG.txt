@@ -1,0 +1,8 @@
+// Description
+Hiermit kann der lokale Wert des Gravitationsfeldes abgefragt werden. Dieser setzt sich aus dem konstanten Anteil durch [[v:Gravitation]] und zus&atzlichen, von Modellen/Effekten etc erstellten Feldern zusammen.
+// Parameter pos
+in
+Die Position, an der das Gravitationsfeld bestimmt werden soll.
+// Return
+Der ermittelte Gravitationswert.
+#

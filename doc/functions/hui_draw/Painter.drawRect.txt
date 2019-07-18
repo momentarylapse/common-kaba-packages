@@ -1,0 +1,15 @@
+// Description
+Zeichnet ein einfarbiges Rechteck.
+// Parameter x
+in
+Die X-Position des linken Randes.
+// Parameter y
+in
+Die Y-Position des oberen Randes.
+// Parameter w
+in
+Die Breite.
+// Parameter h
+in
+Die Höhe.
+#

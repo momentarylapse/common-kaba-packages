@@ -1,0 +1,18 @@
+// Description
+Erstellt ein normales Fenster.
+// Parameter title
+in
+Der Text in der Titelleiste.
+// Parameter x
+in
+Die X-Koordinate der Position.
+// Parameter y
+in
+Die Y-Koordinate der Position.
+// Parameter width
+in
+Die Fensterbreite.
+// Parameter height
+in
+Die Fensterhöhe.
+#

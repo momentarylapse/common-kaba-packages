@@ -1,0 +1,11 @@
+// Description
+Berechnet das Skalarprodukt zweier Vektoren ("inneres Produkt", "Punktprodukt") (<math> \langle v1 , v2 \rangle </math>), es ergibt sich aus <math> \operatorname{L&ange}(v1) \cdot \operatorname{L&ange}(v2) * \cos ( \operatorname{WinkelZwischen}(v1,v2) ) </math>, ist also <math>=0</math> f&ur orthogonale (senkrechte) Vektoren.\nEs gilt (<math>> \langle v1 , v2 \rangle = \langle v2 , v1 \rangle </math>).
+// Parameter v1
+in
+Erster Vektor
+// Parameter v2
+in
+Zweiter Vektor.
+// Return
+Das Skalarprodukt, es wird berechnet durch <math> v1.x \cdot v2.x + v1.y \cdot v2.y + v1.z \cdot v2.z </math>.
+#

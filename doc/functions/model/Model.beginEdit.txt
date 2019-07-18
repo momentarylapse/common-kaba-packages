@@ -1,0 +1,7 @@
+// Description
+Sollte vor dem Editieren der geometrischen Daten eines Modelles ausgeführt werden!\nNach dem Editieren [[f:Model.endEdit]] verwenden.
+// Parameter skin
+in
+Die zu bearbeitende Oberfläche des Modells.
+#
+

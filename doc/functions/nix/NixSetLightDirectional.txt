@@ -1,0 +1,18 @@
+// Description
+Konfiguriert eine Lichtquelle als gerichtete, homogene Lichtquelle (z.B. Sonne).
+// Parameter light
+in
+Die Lichtquelle.
+// Parameter dir
+in
+Die (Einheits-)Richtung des Lichtes.
+// Parameter ambient
+in
+Die ungerichtete Farb-Komponente.
+// Parameter diffuse
+in
+Die gerichtete Farb-Komponente.
+// Parameter specular
+in
+Das Glanzlicht.
+#

@@ -1,0 +1,8 @@
+// Description
+Das Transparenz-Verhalten konfigurieren.\nEinfacher Modus.
+// Parameter mode
+in
+<c>AlphaNone</c>: nicht transparent,\n<c>AlphaColorKey</c>: eine Farbe (grün) ausschneiden (weich),\n<c>AlphaColorKeyHard</c>: eine Farbe (grün) ausschneiden,\n<c>AlphaAdd</c>: additiv über den Hintergrund zeichnen,\n<c>AlphaMaterial</c>: den Diffuse/Alpha-Wert des Materials entscheiden lassen.
+// Synopsis
+NixSetAlphaM,NixSetAlphaSD
+#

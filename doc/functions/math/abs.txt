@@ -1,0 +1,9 @@
+// Description
+Berechnet den Betrag einer float-Zahl.
+// Parameter f
+in
+Eingabe
+// Return
+Der Betrag
+#
+

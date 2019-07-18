@@ -1,0 +1,6 @@
+// Description
+Macht das Objekt sichtbar/unsichtbar.
+// Parameter visible
+in
+Die gewollte Sichtbarkeit.
+#

@@ -1,0 +1,11 @@
+// Description
+Erzeugt eine skalierte Version des Bildes.
+// Parameter width
+in
+Die neue Breite.
+// Parameter height
+in
+Die neue Höhe.
+// Return
+Das skalierte Bild.
+#

@@ -1,0 +1,22 @@
+// Description
+Fügt dem Fenster einen Fortschritts-Balken hinzu.
+// Parameter title
+in
+Die Aufschrift.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die Y-Position.
+// Parameter width
+in
+Die Breite.
+// Parameter height
+in
+Die Höhe.
+// Parameter id
+in
+Die ID, sie diehnt zur Idendifizierung der Schaltfläche.
+#
+

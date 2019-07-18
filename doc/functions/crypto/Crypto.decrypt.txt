@@ -1,0 +1,11 @@
+// Description
+Entschlüsselt eine Nachricht.
+// Parameter str
+in
+Die zu entschlüsselnde Nachricht.
+// Parameter cut
+in
+Gibt an, ob automatisch bei einem gefundenen Null-Zeichen abgeschnitten werden soll.\nNützlich für Text-Nachrichten.
+// Return
+Die entschlüsselte Nachricht.
+#

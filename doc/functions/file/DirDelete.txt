@@ -1,0 +1,8 @@
+// Description
+Löscht ein Verzeichnis samt Inhalt.
+// Parameter dir
+in
+Der Verzeichnisname.
+// Return
+<c>true</c>, falls das Löschen erfolgreich war.
+#

@@ -1,0 +1,10 @@
+// Description
+Die Umkehrung zu [[f:vector.transform]], d.h. <v>v_out</v> = <v>m</v>^-1 * <v>v_in</v>.
+// Parameter m
+in
+Transformations-Matrix
+// Return
+Ergebnis der Transformation
+// Synopsis
+s:matrix
+#

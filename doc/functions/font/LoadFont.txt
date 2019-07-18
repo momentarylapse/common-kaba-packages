@@ -1,0 +1,8 @@
+// Description
+L&adt eine Schriftarten- (Font-) Datei.
+// Parameter filename
+in
+Der Dateiname der Schriftart. (relativ zum "Material/"-Verzeichnis und ohne Datei-Endung).
+// Return
+Die Referenz auf die Schriftart. Sie kann zum Beispiel der <v>xxx.font</v> Komponente einer [[s:Text]]-Variable zugewiesen werden.
+#

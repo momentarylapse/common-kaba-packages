@@ -1,0 +1,5 @@
+// Description
+Beendet den Thread von außen.
+// Synopsis
+s:Thread,Thread.run,Thread.kill,Thread.isDone,Thread.join,ThreadExit,ThreadSelf
+#

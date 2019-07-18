@@ -1,0 +1,7 @@
+// Description
+Prüft, ob ein Fenster im Vordergrund ist oder ob ein Kontrollfeld den Fokus hat.
+// Parameter id
+in
+Die id des zu testenden Kontrollfeldes.
+#
+

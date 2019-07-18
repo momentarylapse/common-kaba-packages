@@ -1,0 +1,11 @@
+// Description
+Liest einen <t>bool</t>-Wert aus der Datei "Data/config.txt".
+// Parameter name
+in
+Der Bezeichner ("Variablenname")
+// Parameter default
+in
+Der Standart-Wert, der benutzt werden soll, falls dem Bezeichner noch kein Wert zugeordnet ist.
+// Return
+Der Wert.
+#

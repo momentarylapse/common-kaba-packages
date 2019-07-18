@@ -1,0 +1,5 @@
+// Description
+Stellt eine 3d-Geometrie dar.
+// Synopsis
+s:VertexBuffer,VertexBuffer.clear,VertexBuffer.addTrias
+#

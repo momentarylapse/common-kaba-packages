@@ -1,0 +1,8 @@
+// Description
+Erzeugt einen Zufallsvektor, der innerhalb einer Kugel um den Ursprung liegt.
+// Parameter r
+in
+Der Radius der Kugel.
+// Return
+Der Zufallsvektor.
+#

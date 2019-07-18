@@ -1,0 +1,10 @@
+// Description
+Ändert den Wert einer Schaltfläche.\nFür TabControls wird die aktuelle Tab-Seite gesetzt, für ListViews die aktuelle Auswahl.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter i
+in
+Der Zahlwert.
+#
+

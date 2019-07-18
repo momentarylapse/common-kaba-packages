@@ -1,0 +1,10 @@
+s:any,
+any.clear,
+any.get,
+any.hset,
+any.at,
+any.aset,
+any.bool,
+any.int,
+any.float,
+any.str

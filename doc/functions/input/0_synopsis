@@ -1,0 +1,12 @@
+v:Mouse,
+v:MouseRel,
+v:MouseD,
+v:MouseDRel,
+GetButton,
+GetButtonUp,
+GetButtonDown,
+GetKey,
+GetKeyDown,
+GetKeyDownRep,
+GetKeyUp,
+GetKeyName

@@ -1,0 +1,7 @@
+LoadSound,
+EmitSound,
+Sound.set,
+Sound.play,
+Sound.stop,
+Sound.pause,
+SaveSound

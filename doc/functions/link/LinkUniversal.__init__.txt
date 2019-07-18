@@ -1,0 +1,18 @@
+// Description
+Generiert eine "doppelte" Scharnier-Verbindung zwischen zwei Objekten.
+// Parameter o1
+in
+Das eine Objekt.
+// Parameter o2
+in
+Das andere Objekt.
+// Parameter p
+in
+Ein Punkt durch die Drehachse (globale Koordinaten).
+// Parameter ax1
+in
+Der Einheits-Richtungsvektor der ersten Drehachse.
+// Parameter ax2
+in
+Der Einheits-Richtungsvektor der zweiten Drehachse.
+#

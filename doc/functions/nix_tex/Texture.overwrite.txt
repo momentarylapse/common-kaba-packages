@@ -1,0 +1,8 @@
+// Description
+Überschreibt die Textur mit einem Bild.
+// Parameter image
+in
+Das Quell-Bild.
+// Synopsis
+LoadTexture,Texture.overwrite
+#

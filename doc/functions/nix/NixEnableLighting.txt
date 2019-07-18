@@ -1,0 +1,6 @@
+// Description
+Steuert die Licht-Berechnung beim Rendern.
+// Parameter enabled
+in
+Alle Lichtquellen an/aus schalten. (aus = maximale Helligkeit)
+#

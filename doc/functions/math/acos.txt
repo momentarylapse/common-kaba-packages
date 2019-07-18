@@ -1,0 +1,8 @@
+// Description
+Berechnet den Arcus-Kosinus von x.
+// Parameter x
+in
+Parameter, dessen Arcus-Kosinus berechnet werden soll.\nMuss aus (-1,1) sein.
+// Return
+Ein Wert aus (0,<c>pi</c>).
+#

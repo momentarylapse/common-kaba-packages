@@ -1,0 +1,6 @@
+// Description
+Setzt den inneren Zustand des Generators.
+// Parameter str
+in
+Text, aus dem der neue Zustand erzeugt wird.
+#

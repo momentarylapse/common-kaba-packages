@@ -1,0 +1,9 @@
+// Description
+Gibt die (mehrfache) Auswahl einer Listen-Schaltfläche zurück.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Return
+Die Indizes der ausgewählten Elemente.
+#
+

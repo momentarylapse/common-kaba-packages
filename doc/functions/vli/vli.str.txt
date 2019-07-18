@@ -1,0 +1,5 @@
+// Description
+Gibt den Wert einer <t>vli</t>-Variablen als <t>string</t> im Dezimalsystem zurück.
+// Return
+Der Wert in dezimaler Darstellung.
+#

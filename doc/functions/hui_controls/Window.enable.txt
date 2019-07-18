@@ -1,0 +1,10 @@
+// Description
+Aktiviert oder Deaktiviert eine Schaltfläche.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter enabled
+in
+Der neue Status der Schaltfläche.
+#
+

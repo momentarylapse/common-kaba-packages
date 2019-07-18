@@ -1,0 +1,6 @@
+// Description
+Weist dem Programm eine Funktion zu, die regelmäßig (und oft!) ausgeführt werden soll.
+// Parameter idle_func
+in
+Ein Pointer auf die Funktion
+#

@@ -1,0 +1,8 @@
+// Description
+Ermittelt die Gr&o&se eines Variablentyps.
+// Parameter type
+in
+Der Variablentyp.
+// Return
+Die Gr&o&se in byte.
+#

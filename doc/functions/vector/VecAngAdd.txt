@@ -1,0 +1,11 @@
+// Description
+Addiert zwei Winkel/Drehungen.\nIntern wird eine Quaternion-Multiplikation verwendet, man kann nicht einfach die Komponenten addieren. Die Parameter sind nicht vertauschbar!
+// Parameter ang1
+in
+Die erste Drehung.
+// Parameter ang2
+in
+Die zweite Drehung.
+// Return
+Die Summe der Drehungen.
+#

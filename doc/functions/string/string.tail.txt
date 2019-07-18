@@ -1,0 +1,8 @@
+// Description
+Liefert eine Teilabschnitt vom Ende eines <t>string</t>s.
+// Parameter size
+in
+Die Länge des Stücks.
+// Return
+Der Teilstring.
+#

@@ -1,0 +1,53 @@
+// Description
+Speichert und steuert aktuelle Engine Einstellungen.
+// Element app_name
+Der Name der Engine.
+// Element version
+Die Versionsnummer der Engine.
+// Element initial_world
+Der (Datei-) Name der ersten Welt, die die Engine beim Start laden soll. Sie ist in der Datei "game.ini" eingetragen ist.
+// Element second_world
+Ist in der Datei "game.ini" gespeichert, wird aber von der Engine nicht interpretiert.\nKann zum Beispiel genutzt werden, um zuerst ein Intro oder ein Menü als Spielwelt zu laden (über <tt>initial_world</tt>) und danach eine richtige Spielwelt, die trotzdem durch den Editor auswählbar bleiben soll.
+// Element physics_enabled
+Zum Aktivieren/Deaktivieren der Physik-Engine.\nBei aktivierter Physik kann über <tt>collisions_enabled</tt> die Kollisionserkennung deaktiviert werden.
+// Element collisions_enabled
+Zum Aktivieren/Deaktivieren der Kollisionserkennung.\nIst die Physik generell deaktiviert (<tt>physics_enabled</tt>), so wird diese Variable ignoriert.
+// Element debug
+Zum Aktivieren von Debug-Ausgaben der Engine, wie die Framerate.\n<tt>show_timings</tt> kann dabei für detailliertere Angaben genutzt werden.
+// Element show_timings
+Zeigt unter anderem die einzelnen Berechenzeiten für verschiedene Teile der Engine an.\nHat nur Auswirkungen, wenn <tt>debug</tt> gesetzt ist!
+// Element wire_mode
+Drahtgitter-Modus.\nWird diese Variable auf <c>true</c> gesetzt, werden die einzelnen Dreiecke der Welt nicht mehr ausgefüllt, sondern nur noch deren Kanten dargestellt. (Hat eher Fehlerfindungs- denn künstlerische Werte)
+// Element console_enabled
+Blendet eine Konsole ein, in der die (Debug-) Ausgaben der Engine angesehen werden und eigene Script-Befehle ausgeführt werden können.\nDie Konsolen-Tasten:\nEscape - Konsole Schließen\nPfeiltasteHoch/Runter - Zum vorherigen/nächsten Befehl wechseln\nReturn - Eingetippten Befehl ausführen\nPgUp/Down - In den Nachrichten scrollen.
+// Element record
+Lässt jedes Bild als Screenshot speichern, die Zeitabstände zwischen den Frames werden (unabhängig von der realen Berechnungszeit) als 0.04 Sekunden behandelt (25 Bilder pro Sekunde).\nDiehnt zum Rendern von Videosequenzen.
+// Element resetting_game
+Ist nur gesetzt, wenn gerade die Welt gelöscht wird.
+// Element shadow_color
+Die Farbe, in der die Schatten-Bereiche dargestellt werden.\nDer Alphawert ist dabei die Deckkraft der Schatten.
+// Element shadow_light
+Durch setzen dieser Variable auf den Index einer Lichtquelle wird diese für die Schattenerzeugung ausgewählt.
+// Element shadow_lower_detail
+Wenn diese Variable auf <c>true</c> gesetzt wird, wird statt der hohen Detailstufe von Modellen  nur die mittler als Geometrie des Schattens genutzt.
+// Element shadow_level
+--Experimentell---\nLegt fest, welche Objekte einen Schatten werfen.\n0 = keinerlei Schatten\n1 = nur bewegliche Objekte.
+// Element elapsed
+Gibt die Zeit an, die im letzten Spiele-Frame verging.\nSie zählt in '''Spielzeit''', also abhängig von <tt>time_scale</tt>, im Gegesatz zu <tt>elapsed_rt</tt>.
+// Element elapsed_rt
+Gibt die Zeit an, die im letzten Spiele-Frame verging.\nSie zählt in '''Echtzeit''', also unabhängig von <tt>time_scale</tt>, im Gegesatz zu <tt>elapsed</tt>.
+// Element time_scale
+Sie ist der Faktor zwischen Echtzeit und Spielzeit.\nWährend <tt>elapsed_rt</tt> die real vergangene Zeit im letzten Spiel-Frame angibt, gilt <tt>elapsed = elapsed_rt * time_scale</tt>.
+// Element fps_max
+Maximalwert der Framerate.\nSteigt die Bildrate über diesen Wert, wird die Engine die überschüssige Zeit warten. Dies verhindert ein störendes Ruckeln, das auf manchen Computern auftreten kann.\nDer Startwert ist 60.
+// Element fps_min
+Minimalwert der Framerate.\nSinkt die Bildrate unter diesen Wert, wird die Variable <tt>elapsed_rt</tt> auf <tt>1 / fps_min</tt> gesetzt, <tt>elapsed</tt> entsprechend auf <tt>1 / fps_min * time_scale</tt>. Dies garantiert das Funktionieren physikalischer Abläufe, wenn das Spiel strapaziert wird.\nStartwert ist 10.
+// Element multisampling
+Regelt, wie oft ein Frame gerendert werden soll, um einen Kantenglättungseffekt zu erzielen.\nErlaubt sind 0, 2, 4.
+// Element detail_factor
+Der Detail-Grad der Engine.\nStandart-Wert: 100.
+// Element default_font
+Diese Variable wird beim Start auf den in der Datei "game.ini" stehenden Font gesetzt.
+// Element mirror_level_max
+Maximale Anzahl der (rekursiven) Reflexionen von Spiegeln.
+#

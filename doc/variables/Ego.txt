@@ -1,0 +1,5 @@
+// Description
+Das Objekt, das den Spieler selbst repr&asentiert. Sie wird im Editor f&ur die Welt gesetzt, hat aber nur Auswirkungen auf Scripte, falls diese sie benutzen.
+// Synopsis
+s:Model
+#

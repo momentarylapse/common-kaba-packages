@@ -1,0 +1,5 @@
+// Description
+Erzeugt eine Text-Darstellung des Schlüssels.
+// Return
+Die Darstellung als <t>string</t>.
+#

@@ -1,0 +1,10 @@
+s:plane,
+s:vector,
+s:matrix,
+PlaneFromPoints,
+PlaneFromPointNormal,
+plane.inverse,
+plane.distance,
+PlaneTransform,
+plane.intersectLine,
+GetBaryCentric

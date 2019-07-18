@@ -1,0 +1,11 @@
+// Description
+Die "Kamera" durch Vektoren setzen.
+// Parameter pos
+in
+Die Kamera-Position.
+// Parameter ang
+in
+Die Kamera-Orientierung (Euler-Winkel im Bogenmaß).
+// Synopsis
+NixSetViewM,NixSetViewV
+#

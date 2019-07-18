@@ -1,0 +1,8 @@
+// Description
+Berechnet aus zwei Richtungs-Einheitsvektoren die zugehörigen Winkelangaben in Bezug auf die Z-Achse. <v>dir</v> wird dabei wie in [[vector.dir2ang]] zu den X- und Y-Komponenten des Winkels, aus <v>up</v> wird zusätzlich eine Z-Komponente berechnet.
+// Parameter up
+in
+Einheitsvektor nach "oben".
+// Return
+Die Winkelangaben.
+#

@@ -1,0 +1,3 @@
+// Description
+Die aktuelle vertikale Aufl&osung des Bildschirmes.
+#

@@ -1,0 +1,8 @@
+// Description
+Vergleicht zwei <t>string</t>s lexikalisch, d.h. beide werden von vorne Zeichen für Zeichen verglichen, der erste Unterschied ist entscheident.\nDiese Version ignoriert Groß- und Kleinschreibung (im Gegensatz zu [[f:string.compare]].
+// Parameter str
+in
+Der <t>string</t>, mit dem verglichen werden soll.
+// Return
+0: falls beide identisch sind,\n>0: <v>self</v> steht nach <str> im Lexikon,\n<0: <self> steht vor <v>str</v>.
+#

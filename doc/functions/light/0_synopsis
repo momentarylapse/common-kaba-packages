@@ -1,0 +1,4 @@
+s:Light,
+Light.setColors,
+Light.setDirectional,
+Light.setRadial

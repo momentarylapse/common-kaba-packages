@@ -1,0 +1,6 @@
+// Description
+Zeichnet ein gefülltes Polygon aus einer Liste von Punkten.
+// Parameter p
+in
+Ein Array der Punkte.
+#

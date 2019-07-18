@@ -1,0 +1,6 @@
+// Description
+Erzeugt einen Schlüssel aus einer Text-Darstellung.
+// Parameter str
+in
+Die einzulesende Text-Darstellung.
+#

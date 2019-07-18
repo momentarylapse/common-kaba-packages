@@ -1,0 +1,8 @@
+// Description
+Erzeugt eine interne Repräsentation eines Bildes.
+// Parameter image
+Das Bild.
+in
+// Return
+Eine Referenz in Form eines Strings.\nDieser kann z.B. in [[v:Window.SetString]] in eine Liste geschrieben werden, um das Bild anzuzeigen.
+#

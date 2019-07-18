@@ -1,0 +1,6 @@
+// Description
+Wählt die Art der Interpolation.
+// Parameter type
+in
+Zur Auswahl stehen <tt>"lerp"</tt> (stückweise linear), <tt>"cubic-spline"</tt> und <tt>"cubic-spline-notang"</tt> (automatische Tangenten).
+#

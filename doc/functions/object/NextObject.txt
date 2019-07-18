@@ -1,0 +1,10 @@
+// Description
+Springt von einem Objekt zum nächsten in der Liste [[v:Object]].
+// Parameter o
+in,out
+Das zu iterierende Objekt.\nDie Variable wird auf das nächste Objekt gesetzt.\nWird der Wert auf <c>nil</c> gesetzt, gibt die Funktion das erste Objekt zurück.
+// Return
+<c>true</c>, falls ein weiteres Objekt gefunden wurde, ansonsten <c>false</c>.
+// Synopsis
+s:Model,CreateObject,GetObjectByName,FindObjects,NextObject
+#

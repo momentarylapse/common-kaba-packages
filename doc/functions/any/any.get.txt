@@ -1,0 +1,8 @@
+// Description
+Falls die <t>any</t>-Variable eine Hashmap ist, so wird der zum Schlüssel gehörige Eintrag zurückgegeben.
+// Parameter key
+in
+Der Schlüssel.
+// Return
+Der zugehörige Wert.
+#

@@ -1,0 +1,5 @@
+// Description
+Berechnet den Betrag einer komplexen Zahl: \n<tt>sqrt(x² + y²)</tt>.
+// Return
+Der Betrag.
+#

@@ -1,0 +1,17 @@
+// Description
+Eine Ebene.\nAlle Punkte (x,y,z) auf der Ebene (a,b,c,d) erf&ullen die Gleichung <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>. Allgemein kann der Abstand eines beliebigen Punktes (x,y,z) zur Ebene &uber <math> a \cdot x + b \cdot y + c \cdot z + d </math> berechnet werden.
+// Element a
+Die a-Komponente.
+// Element b
+Die b-Komponente.
+// Element c
+Die c-Komponente.
+// Element d
+Die d-Komponente.
+// Element n
+Der Normalenvektor.\nDieser ist nur eine Uminterpretation von <math>(a, b, c)</math> als <t>vector</t>.
+// Remarks
+(a,b,c) kann als (Einheits-) Normalenvektor auf der Ebene interpretiert werden, d als der (minimale) Abstand der Ebene zum Ursprung.
+// Synopsis
+f:PlaneFromPoints,f:PlaneFromPointNormal,f:plane.inverse,f:PlaneTransform,f:plane.intersectLine,f:GetBaryCentric
+#

@@ -1,0 +1,5 @@
+// Description
+Konvertiert alle Kleinbuchstaben eines Texts in Großbuchstaben.
+// Return
+Der konvertierte Text.
+#

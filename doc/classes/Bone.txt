@@ -1,0 +1,17 @@
+// Description
+Repräsentiert die zusammenhängenden Teile eines animierbaren Modells ("Knochen" des "Skeletts").
+// Element parent
+Gibt für jeden Knochen den übergeordneten Knochen an. Für freie Knochen -1.
+// Element pos
+Die Position relativ zum übergeordneten Knochen (im unanimierten Zustand). Für freie Knochen die Position relativ zum Modell-Mittelpunkt.
+// Element cur_pos
+Die aktuelle Position eines freien Knochens im animierten Zustand.\nIst keine Animation aktiv, kann hiermit das Skelett per Script bewegt werden, sofern vorher [[f:Model.beginEditMove]] ausgeführt wurde!
+// Element cur_ang
+Die aktuelle Ausrichtung eines Knochens im animierten Zustand.\nIst keine Animation aktiv, kann hiermit das Skelett per Script bewegt werden!
+// Element model
+Die Untermodelle an den verschiedenen Gelenkpunkten des Skelettes.\nSollten nicht direkt geändert werden. Stattdessen sollte [[f:Model.setBoneModel]] genutzt werden.
+// Element dmatrix
+Die Matrizen der Untermodelle. Sie transformieren von Untermodell-Koordinaten in das System des aktuellen Modelles.
+// Synopsis
+Model,Skin,vector,matrix,quaternion
+#

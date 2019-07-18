@@ -1,0 +1,5 @@
+// Description
+Liefert eine menschlich lesbare Repräsentation als <t>string</t>.
+// Return
+Die Text-Repräsentation.
+#

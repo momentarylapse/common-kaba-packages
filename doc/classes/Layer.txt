@@ -1,0 +1,9 @@
+// Description
+Eine Anzeigen-Gruppe. Die Eigenschften beeinflussen auch die Elemente!
+// Element enabled
+'''false''' deaktiviert alle Elemente.
+// Element pos
+Die Position der Gruppe. Sie wird allen Elementen hinzuaddiert (nur bei der Dastellung auf dem Bildschirm).
+// Element color
+Die Farbe der Gruppe. Alle Farben der Elemente werden zur Darstellung mit diesem Wert multipliziert. Weis l&asst die Elemente somit unver&andert.
+#

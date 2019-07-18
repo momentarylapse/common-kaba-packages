@@ -1,0 +1,12 @@
+// Description
+Definiert den Bereich, in dem sich eine Verbindung intern bewegen darf.
+// Parameter axis
+in
+Die gewünschte Achse (0, 1, 2).
+// Parameter min
+in
+Die minimale Auslenkung.
+// Parameter max
+in
+Die maximale Auslenkung.
+#

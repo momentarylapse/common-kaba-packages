@@ -1,0 +1,5 @@
+// Description
+Liest ein Daten-Packet direkt aus einer Netzwerkverbindung.
+// Return
+Der gelesene Daten-Puffer.
+#

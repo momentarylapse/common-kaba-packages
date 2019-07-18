@@ -1,0 +1,7 @@
+// Description
+Sucht nach Spielen, die gerade im Netzwerk laufen.\nEs werden nur Host-Addressen in die Suche einbezogen, die in der Datei config.txt stehen, bzw. im String [[v:Net]]<tt>.host_names</tt>.
+// Return
+Eine Liste von gefundenen Hosts.
+// Synopsis
+LoadGameFromHost,s:HostData
+#

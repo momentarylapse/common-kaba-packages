@@ -1,0 +1,10 @@
+// Description
+Ändert die Position des Mauszeigers relativ zu einem Fenster.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die Y-Position.
+#
+

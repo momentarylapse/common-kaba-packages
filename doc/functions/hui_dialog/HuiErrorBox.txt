@@ -1,0 +1,12 @@
+// Description
+Ein Dialog als Fehlermeldung.
+// Parameter root
+in
+Das übergeordnete Fenster (kann <c>nil</c> sein).
+// Parameter title
+in
+Der Titel des Fenster.
+// Parameter text
+in
+Der eigentliche Fehler-Text, der ausgegeben werden soll.
+#

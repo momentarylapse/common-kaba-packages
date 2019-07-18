@@ -1,0 +1,5 @@
+// Description
+Liefert die aktuelle Lese/Schreib-Position innerhalb der Datei.
+// Return
+Die aktuelle Position in byte.
+#

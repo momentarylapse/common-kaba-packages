@@ -1,0 +1,6 @@
+// Description
+Zwingt eine Schaltfläche dazu, neu gerendert zu werden.
+// Parameter id
+in
+Die ID der Schaltfläche (...des Zeichenbereiches).
+#

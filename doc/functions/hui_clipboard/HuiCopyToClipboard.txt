@@ -1,0 +1,8 @@
+// Description
+Speichert Text in der systemweiten Zwischenablage.
+// Parameter buffer
+int
+Der zu speichernde Text.
+// Synopsis
+HuiCopyToClipboard,HuiPasteFromClipboard
+#

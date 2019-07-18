@@ -1,0 +1,8 @@
+// Description
+Berechnet den Sinus von x.
+// Parameter x
+in
+Winkel  (im Bogenma&s), dessen Sinus berechnet werden soll.
+// Return
+Ja, was wohl?
+#

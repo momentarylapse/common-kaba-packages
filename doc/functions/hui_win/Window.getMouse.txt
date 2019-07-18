@@ -1,0 +1,17 @@
+// Description
+Frägt den aktuellen Zustand der Maus ab.\n...Veraltet!
+// Parameter x
+out
+Die X-Position der Maus (relativ zum Fensterinhalt).
+// Parameter y
+out
+Die Y-Position der Maus.
+// Parameter button
+in
+Wählt eine Maustaste aus, die abgefragt werden soll (0 = links, 1 = mittlere, 2 = rechts).
+// Parameter change
+in
+???
+// Return
+<c>true</c>, falls die gewählt Maustaste gedrückt ist.
+#

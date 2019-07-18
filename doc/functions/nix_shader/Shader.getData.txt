@@ -1,0 +1,14 @@
+// Description
+Variablen aus einem Shader-Programm auslesen.
+// Parameter name
+in
+Der Name der Variablen.
+// Parameter data
+in
+Das Ziel, in das die Daten kopiert werden sollen.
+// Parameter size
+in
+Größe der Daten.
+// Synopsis
+Shader.setData,Shader.getData,NixLoadShader
+#

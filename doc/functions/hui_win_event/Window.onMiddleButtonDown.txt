@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, wenn der mittlere Mausknopf im Standardfeld gedrückt wird.
+#

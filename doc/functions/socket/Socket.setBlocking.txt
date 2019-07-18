@@ -1,0 +1,6 @@
+// Description
+Legt fest, ob Befehle wie z.B. [[Socket.accept]] auf das fremde Programm warten sollen ("blockieren"), oder sofort wieder die Kontrolle abgeben, wenn nichts zu tun ist.
+// Parameter block
+in
+Der neue Blockier-Modus.
+#

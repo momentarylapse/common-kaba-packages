@@ -1,0 +1,11 @@
+// Description
+Erstellt eine Matrix, die die Kamera um den Ursprung verdreht.\nSie wird um die Achsen gedreht in der Reihenfolge (Z,X,Y), wobei die Drehachsen nicht mitgedreht werden.\nDie errechnete Matrix ist die Inverse zu der von [[MatrixRotation]], denn eine Kamera-Drehung nach rechts dreht in Wirklichkeit alle Objekte nach links.
+// Parameter m_out
+out
+Die Rotations-Matrix.
+// Parameter ang
+in
+Die Drehwinkel um die jeweiligen Achsen sind die Komponenten des Vektors (im Bogenma&s).
+// Synopsis
+s:vector
+#

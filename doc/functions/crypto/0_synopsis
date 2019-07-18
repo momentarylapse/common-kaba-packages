@@ -1,0 +1,6 @@
+CryptoCreateKeys,
+s:Crypto,
+Crypto.encrypt,
+Crypto.decrypt,
+Crypto.str,
+Crypto.fromStr

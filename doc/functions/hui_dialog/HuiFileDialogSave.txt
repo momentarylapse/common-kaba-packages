@@ -1,0 +1,22 @@
+// Description
+Ein Dialog zum Speichern von Dateien.
+// Parameter root
+in
+Das übergeordnete Fenster (kann <c>nil</c> sein).
+// Parameter title
+in
+Der Titel des Fenster.
+// Parameter dir
+in
+Das anfangs angezeigte Verzeichnis.
+// Parameter show_filter
+in
+Der (für den Benutzer angezeigte) Datei-Filter ("Textdateien *.txt").
+// Parameter filter
+in
+Der (echte) Datei-Filter ("*.txt*).
+// Return
+<c>true</c>, falls eine Datei ausgegählt wurde, ansonsten <c>false</c>.
+// Synopsis
+v:HuiFilename
+#

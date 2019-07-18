@@ -1,0 +1,15 @@
+// Description
+Bündelt die von [[f:Trace]] ermittelten Daten.
+// Element type
+Gibt an, ob der Strahl auf ein Objekt oder ein Terrain getroffen ist.
+// Element point
+Der Auftreffpunkt des Strahles.
+// Element terrain
+Das getroffene Terrain.
+// Element object
+Das getroffene Objekt. Dies kann das getroffene Modell selbst sein, oder das oberste Modell in einer Verschachtelung von Skeletten.
+// Element model
+Das getroffene Modell.
+// Synopsis
+f:Trace
+#

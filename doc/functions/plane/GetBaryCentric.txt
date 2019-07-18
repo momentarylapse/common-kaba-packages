@@ -1,0 +1,21 @@
+// Description
+Liefert die Barizentrische Koordinaten eines Punktes innerhalb eines Dreiecks. Falls der Punkt in der Ebene des Dreiecks liegt, gilt: <v>p</v> = (1 - <v>f</v> - <v>g</v>)*<v>a</v> + <v>f</v>*<v>b</v> + <v>g</v>*<v>b</v>, ansonsten wird der Punkt vorher in die Ebene projiziert.
+// Parameter p
+in
+Der Punkt.
+// Parameter a
+in
+Punkt 1 des Dreiecks.
+// Parameter b
+in
+Punkt 2 des Dreiecks.
+// Parameter c
+in
+Punkt 3 des Dreiecks.
+// Parameter f
+out
+1. Barizentrische Koordinate.
+// Parameter g
+out
+2. Barizentrische Koordinate.
+#

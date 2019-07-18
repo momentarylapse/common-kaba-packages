@@ -1,0 +1,5 @@
+// Description
+Fragt einen Timer ab, um ein Zeitintervall zu messen.
+// Return
+Die Zeit in Sekunden, die seit dem letzten Abfragen dieses Timers verging.
+#

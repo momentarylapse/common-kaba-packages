@@ -1,0 +1,7 @@
+// Description
+Ändert die ID eines Fensters.\nHierdurch wird dem Fenster ein neuer Titel gegeben, falls unter dieser ID Text hinterlegt ist.
+// Parameter id
+in
+Die neue ID.
+#
+

@@ -1,0 +1,5 @@
+// Description
+Ein Controller repräsentiert Benutzereingaben oder steuert automatische Abläufe.\nEr ist mit keinem Element der Spielwelt direkt verbunden, kann aber auf Maus und Tastatur reagieren.
+// Element enabled
+Zum Aktivieren/Deaktivieren des Controllers.
+#

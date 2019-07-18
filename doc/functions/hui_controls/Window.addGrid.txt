@@ -1,0 +1,22 @@
+// Description
+Fügt dem Fenster eine Tabelle zur Ausrichtung weiterer Eingabefelder hinzu.
+// Parameter title
+in
+Die Aufschrift.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die Y-Position.
+// Parameter width
+in
+Die Breite (Anzahl der Spalten).
+// Parameter height
+in
+Die Höhe (Anzahl der Zeilen).
+// Parameter id
+in
+Die ID, sie diehnt zur Idendifizierung der Schaltfläche und als Nachricht, das dem Fenster von der Schaltfläche geschickt wird (wenn der Text verändert wird).
+#
+

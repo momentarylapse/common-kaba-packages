@@ -1,0 +1,7 @@
+// Description
+Eine komplexe Zahl.\nDer komplexe Wert ist <tt> x + i y </tt> mit der imaginären Einheit <tt> i = sqrt(-1) </tt>.
+// Element x
+Der Realteil.
+// Element y
+Der Imanginärteil.
+#

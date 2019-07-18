@@ -1,0 +1,9 @@
+// Description
+Erzeugt ein Tastenkürzel für einen Befehl.
+// Parameter id
+in
+Die ID des Befehls.
+// Parameter key_code
+in
+Das Tastenkürzel (z.B. <tt>KeyControl + KeyS</tt>).
+#

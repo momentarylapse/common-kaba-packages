@@ -1,0 +1,5 @@
+// Description
+Gibt den Inhalt der <t>any</t>-Variablen (falls möglich) als <t>float</t> zurück.
+// Return
+Die Zahl.
+#

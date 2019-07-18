@@ -1,0 +1,6 @@
+// Description
+Stellt die Abspielgeschwindigkeit einer Musik-Datei ein.
+// Parameter rate
+in
+Die Abspielgeschwindigkeit. 1 ist natürlich.
+#

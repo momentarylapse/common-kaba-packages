@@ -1,0 +1,15 @@
+// Description
+Interpoliert zwischen 2 Quaternionen.\nGedanklich entspricht dies <tt>q_out = (1-t) * q_0 + t * q_1</tt>.
+// Parameter q_out
+out
+Die interpolierte Rotations-Quaternion.
+// Parameter q_0
+in
+Die erste Quaternion.
+// Parameter q_1
+in
+Die zweite Quaternion.
+// Parameter t
+in
+Der Interpolationsparameter.
+#

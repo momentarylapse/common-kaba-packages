@@ -1,0 +1,11 @@
+// Description
+Ändert den Namen einer Datei, bzw. verschiebt sie.
+// Parameter source
+in
+Der ursprüngliche Dateiname.
+// Parameter dest
+in
+Der neue Dateiname.
+// Return
+<c>true</c>, falls das Umbenennen erfolgreich war.
+#

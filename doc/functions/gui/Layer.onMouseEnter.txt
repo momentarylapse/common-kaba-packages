@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, die sich Maus von außerhalb auf das GUI-Element bewegt hat.
+#

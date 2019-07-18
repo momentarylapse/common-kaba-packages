@@ -1,0 +1,8 @@
+// Description
+Zerlegt einen <t>string</t> in einer Wortliste.\nDazu wird nach einem Worttrenner gesucht und bei jedem Vorkommen getrennt.
+// Parameter str
+in
+Der Worttrenner.
+// Return
+Die Liste von Worten.
+#

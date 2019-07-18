@@ -1,0 +1,5 @@
+// Description
+Erzeugt einen normierten Zufallsvektor.
+// Return
+Der Zufallsvektor.
+#

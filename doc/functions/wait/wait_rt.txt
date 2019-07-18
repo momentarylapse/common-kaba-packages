@@ -1,0 +1,10 @@
+// Description
+L&asst das Script eine gewisse Zeit lang pausieren.
+// Parameter time
+in
+Wartedauer in Sekunden. ('''Echtzeit''')
+// Remark
+Ist nur sinnvoll, wenn das Script in der Welt eingetragen, oder einem Objekt zugeordnet ist. In einer Callback-Funktion, etwa bei einem Partikel wird die Funktion nach diesem Befehl nicht weiter ausgef&uhrt!
+// Synopsis
+wait,wait_rt,wait_of
+#

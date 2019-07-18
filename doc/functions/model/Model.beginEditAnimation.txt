@@ -1,0 +1,5 @@
+// Description
+Aktiviert die direkte Skelett-Animation per Script.\nNach diesem Befehl können <v>bone[].cur_pos</v> und <v>bone[].cur_ang</v> eines Modells direkt gesetzt werden.
+// Remark
+Sobald [[Model.resetAnimation]] ausgeführt wird, wird der normale Animationsmodus aktiviert und die direkten Beeinflussungen wieder ignoriert.
+#

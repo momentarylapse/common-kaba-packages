@@ -1,0 +1,13 @@
+// Description
+Konfiguriert die Farben einer Lichtquelle.
+// Parameter am
+in
+Der ambient-Anteil des Lichtes (ungerichtet).
+// Parameter di
+in
+Der diffuse-Anteil des Lichtes (gerichtet).
+// Parameter sp
+in
+Der specular-Anteil des Lichtes (gerichtet, Kamera-abhängig).
+#
+

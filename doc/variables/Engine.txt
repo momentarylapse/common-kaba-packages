@@ -1,0 +1,5 @@
+// Description
+Die aktuellen Einstellungen der Engine.
+// Synopsis
+s:EngineData
+#

@@ -1,0 +1,3 @@
+// Description
+Die aktuelle Farbtiefe des Bildschirmes in bit.
+#

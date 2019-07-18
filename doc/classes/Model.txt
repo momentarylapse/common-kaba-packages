@@ -1,0 +1,73 @@
+// Description
+Ein Modell eben.
+// Element skin
+Die Oberflächen des Modells.
+// Element skin0
+Die Oberfläche der hohen Detailstufe.
+// Element skin1
+Die Oberfläche der mittleren Detailstufe.
+// Element skin2
+Die Oberfläche der niederen Detailstufe.
+// Element detail_dist
+Die jeweiligen Sichtweiten der Detailstufen.
+// Element bone
+Die Liste der Knochen für Skelett-Animationen.\n''Die Anzahl der Knochen sollte auf keinen Fall geändert werden... bisher ist keine Sicherung dagegen eingebaut''
+// Element min
+Eine Ecke der einhüllenden "Box".
+// Element max
+Die andere Ecke.
+// Element pos
+Die Position des Objektes.
+// Element vel
+Die Geschwindigkeit. Über sie wird die Position des Objektes automatisch verändert.
+// Element vel_surf
+"Oberflächen-Geschwindigkeit". Ähnlich eines Förderbandes.
+// Element ang
+Die Ausrichtung als Vektor, dessen Komponenten die Drehung um die jeweilige Achse angibt (im Bogenmaß).
+// Element rot
+Die Rotation. Die Richtung des Vektors ist die Drehachse, die Länge die Drehgeschwindigkeit (im Bogenmaß pro Sekunde).
+// Element theta_0
+Der Trägheitstensor (in Welt-Koordinaten-Richtung).
+// Element theta
+Der Trägheitstensor (in Modell-Koordinaten-Richtung).
+// Element test_collisions
+Kollisionstests erlauben? (eher für Debug-Zwecke)
+// Element matrix
+Die aktuelle Matrix, die Modell- in Weltkoordinaten transformiert. Wird automatisch für Objekte berechnet.
+// Element material
+Liste der vom Modell benutzten Materialien. (enthalten Farben, Texturen und andere Eigenschaften)
+// Element allow_shadow
+Darf die Engine Schatten darstellen? (falls Schatten generell aktiviert sind)
+// Element name
+Ein Name. (Über ihn kann das Objekt auch mit [[f:GetObjectByName]] gefunden werden)
+// Element description
+Eine Beschreibung.\nIst für Items gedacht.
+// Element on_ground
+Gibt an, ob das Objekt auf dem Boden aufliegt.
+// Element ground_id
+Der Index des Objektes, auf dem das Objekt steht. Steht das Objekt auf einem Terrain, ist es der Terrain-Index + 0x40000000...
+// Element ground_normal
+Die Oberflächennormale des Grundes.
+// Element g_factor
+Ein Faktor für die Gravitationsbeschleunigung ('''default: 1''').
+// Element object_id
+Der (eindeutige!) Index im Array der Objekte einer Welt.
+// Element active_physics
+Erlaubt es dem Objekt, sich zu bewegen und auf seinem Weg auf Kollisionen etc zu achten.\nHat nur eine Auswirkung, wenn auch <v>passive_physics</v> aktiv ist!
+// Element passive_physics
+Bestimmt, ob dieses Objekt als physikalisches Hindernis diehnen darf.
+// Element mass
+Die Masse. (Beeinflusst das Verhalten bei einer Kollision)
+// Element radius
+Der Radius einer Kugel, die das Objekt komplett einschließt. Wird automatisch vom Modell übernommen und diehnt hauptsächlich physikalischen Berechnungen.
+// Element var
+Ein Array von zusätzlichen (<t>float</t>) Variablen für Scripte.
+// Element var_i
+Der selbe Array von Script-Variablen, allerdings als <t>int</t> interpretiert.
+// Element item
+Ein Array von Items. Dieser kann als Inventar genutzt werden.
+// Element parent
+Das Skelett, falls dieses Modell Teil eines Skelettes ist.
+// Synopsis
+f:LoadModel,vector,matrix,matrix3,Skin,SubSkin,Material,Bone,f:CreateObject,f:GetObjectByName
+#

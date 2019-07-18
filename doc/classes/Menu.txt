@@ -1,0 +1,5 @@
+// Description
+Ein Menü der grafischen Oberfläche.
+// Synopsis
+Window
+#

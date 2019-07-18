@@ -1,0 +1,8 @@
+// Description
+Testet, ob eine Taste gerade gedr&uckt wurde (also in diesem Frame gedr&uckt ist, es aber im letzten noch nicht war).
+// Parameter id
+in
+Index der zu pr&ufenden Taste. (z.B. <c>KEY_ESCAPE</c> f&ur die [Escape]-Taste)
+// Return
+<c>true</c>, falls gerade gedr&uckt worden, ansonsten <c>false</c>.
+#

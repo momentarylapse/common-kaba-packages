@@ -1,0 +1,3 @@
+// Description
+Ein Mutex wird genutzt, um bei mehreren Threads sicherzustellen, dass bestimmte Programmabschnitte nur jeweils von einem einzelnen Thread gleichzeitig besucht werden kann.
+#

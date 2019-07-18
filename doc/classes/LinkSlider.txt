@@ -1,0 +1,4 @@
+// Description
+Eine Schieber-Verbindung zwischen zwei Objekten.\nKeine Drehbewegungen sind erlaubt.
+#
+

@@ -1,0 +1,5 @@
+// Description
+Relative Position des Mauszeigers.\nX- und Y-Komponente nehmen Werte zwischen 0 (linke obere Ecke) und 1 (rechte untere Ecke) an. Die Z-Komponente ist 0.
+// Synopsis
+Mouse,MouseRel,MouseD,MouseDRel,f:GetButton,f:GetButtonUp,f:GetButtonDown,f:GetKey,f:GetKeyDown,f:GetKeyUp,f:GetKeyDownRep,f:GetKeyName
+#

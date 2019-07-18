@@ -1,0 +1,23 @@
+// Description
+Speichert und steuert die Netzwerk-Einstellungen.
+// Element enabled
+Zum Aktivieren/Deaktivieren der Netzwerkunterstützung.
+// Element session_name
+Name des aktuellen Spieles.\nDurch [[f:FindHosts]] wird dieser Name auf den vorhandenen Host-Computern abgefragt gespeichert.\nBeim Laden einer Welt wird der Name auf den Dateinamen der Welt gesetzt.
+// Element host_names
+Die Liste der Host-Computern, die durch [[f:FindHosts]] überprüft werden sollen.\nDie einzelnen Computer können als IP-Addressen oder als Domain-Namen angegeben und durch Strichpunkte getrennt werden.\nBeispiel: "www.michi.is-a-geek.org;192.168.1.100;localhost".
+// Element is_host
+Ist gesetzt, falls das eigene Programm Teil eines Netzwerkspieles ist und dabei als Host fungiert.
+// Element is_client
+Ist gesetzt, falls das eigene Programm Teil eines Netzwerkspieles ist und dabei als Client fungiert.
+// Element has_read
+Gibt an, ob im letzten Frame Daten über das Netzwerk empfangen wurden.\n''Zu Debug-Zwecken!!!''
+// Element has_written
+Gibt an, ob im letzten Frame Daten über das Netzwerk versandt wurden.\n''Zu Debug-Zwecken!!!''
+// Element sock_to_host
+Auf einem Client ist dies die Verbindung zum Server.
+// Element sock_to_client
+Auf dem Server sind dies die Verbindungen zu den einzelnen Clients.
+// Element cur_sock
+Gibt die aktuell genutzte Verbindung wärend dem Übermitteln von Netzwerkdaten an.
+#

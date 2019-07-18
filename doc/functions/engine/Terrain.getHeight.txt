@@ -1,0 +1,10 @@
+// Description
+Liefert die Höhe (Y-Koordinate) eines Punktes auf einem Terrain.
+// Parameter p
+in
+Der Punkt auf dem Terrain (nur die X- und Z-Koordinate werden verwendet).
+// Return
+Die Höhe (Y-Koordinate), falls der Punkt auf dem entsprechenden Terrain liegt.
+// Synopsis
+s:Terrain,Terrain.update,Terrain.getHeight
+#

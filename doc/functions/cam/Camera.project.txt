@@ -1,0 +1,8 @@
+// Description
+Projiziert einen Punkt im 3d-Raum auf den Bildschirm.
+// Parameter v
+in
+Der Punkt im 3d-Raum.
+// Return
+Die Projektion auf den Bildschirm in relativen Koordinaten <tt>[0..1] x [0..1]</tt>.\nDie z-Komponente ist negativ, falls der Punkt hinter der Kamera liegt.
+#

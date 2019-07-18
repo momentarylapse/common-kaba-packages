@@ -1,0 +1,5 @@
+// Description
+Liefert zu einem kompletten Pfad das Verzeichnis.\nZ.B. "/langer/pfad/datei.txt" -> "/langer/pfad/".
+// Return
+Das Verzeichnis.
+#

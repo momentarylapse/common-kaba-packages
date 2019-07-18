@@ -1,0 +1,5 @@
+// Description
+Erzeugt eine <t>float</t> Zufallszahl zwischen 0 und 1.
+// Return
+Die Zufallszahl.
+#

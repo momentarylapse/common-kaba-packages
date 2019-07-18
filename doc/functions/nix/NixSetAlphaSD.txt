@@ -1,0 +1,11 @@
+// Description
+Das Transparenz-Verhalten konfigurieren.\nQuelle (zu zeichnen) und Ziel (Hintergrund) werden mit dem jeweiligen Term (Parameter) skaliert und zusammenaddiert.
+// Parameter source
+in
+<c>AlphaZero</c>: Null,\n<c>AlphaOne</c>: Eins,\n<c>AlphaSourceColor</c>: die Farbe der Quelle,\n<c>AlphaSourceInvColor</c>: die inverse (1 - x) Farbe der Quelle,\n<c>AlphaSourceAlpha</c>: der Alphawert der Quelle,\n<c>AlphaSourceInvAlpha</c>: der inverse Alphawert der Quelle,\n<c>AlphaDestColor</c>: die Farbe des Ziels,\n<c>AlphaDestInvColor</c>: die inverse (1 - x) Farbe des Ziels,\n<c>AlphaDestAlpha</c>: der Alphawert des Ziels,\n<c>AlphaDestInvAlpha</c>: der inverse Alphawert des Ziels
+// Parameter dest
+in
+-ebenso-
+// Synopsis
+NixSetAlphaM,NixSetAlphaSD
+#

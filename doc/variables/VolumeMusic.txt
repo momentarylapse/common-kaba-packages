@@ -1,0 +1,5 @@
+// Description
+Zur Lautstärkeregulierung aller Musik-Dateien.
+// Synopsis
+VolumeMusic,VolumeSounds,f:LoadMusic
+#

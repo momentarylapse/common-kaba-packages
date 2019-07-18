@@ -1,0 +1,6 @@
+// Description
+Prüft, ob ein Fenster maximiert ist.
+// Return
+<c>true</c>, falls das Fenster maximiert ist.
+#
+

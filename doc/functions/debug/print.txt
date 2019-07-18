@@ -1,0 +1,6 @@
+// Description
+Gibt zu Debug-Zwecken einen String aus. Die Ausgabe erfolgt in die Datei "message.txt".
+// Parameter str
+in
+Der auszugebende String.
+#

@@ -1,0 +1,21 @@
+// Description
+Wählt eine orthogonale Transformation von Kamera-Koordinaten auf das Fenster (bzw. das aktive Ziel).
+// Parameter centerx
+in
+Die X-Position auf die der Ursprung abgebildet wird.
+// Parameter centery
+in
+Die Y-Position auf die der Ursprung abgebildet wird.
+// Parameter map_width
+in
+...
+// Parameter map_height
+in
+...
+// Parameter zmin
+in
+Die minimal darstellbare Tiefe.
+// Parameter zmax
+in
+Die maximal darstellbare Tiefe.
+#

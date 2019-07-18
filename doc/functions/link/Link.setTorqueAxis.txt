@@ -1,0 +1,9 @@
+// Description
+Weist dem Scharnier ein Drehmoment zu, das beide Objekte gegeneinander verdreht.
+// Parameter axis
+in
+Die gewünschte Achse (0, 1, 2).
+// Parameter torque
+in
+Das Drehmoment.
+#

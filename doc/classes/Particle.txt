@@ -1,0 +1,27 @@
+// Description
+Ein einzelnes Partikel.
+// Element enabled
+Sobald dieses Element auf false gesetzt wird, ist das Partikel unsichtbar und wird von der Engine ignoriert. ('''default''': <c>true</c>)
+// Element suicidal
+L&asst die Lebenszeit des Partikels herabz&ahlen und es automatisch l&oschen, sobald sie negativ wird. ('''default''': <c>true</c>)
+// Element pos
+Die Position.
+// Element vel
+Die Geschwindigkeit.
+// Element time_to_live
+Die (automatisch herabz&ahlende) Rest-Lebenszeit.
+// Element radius
+Der Radius. (= halbe Kantenl&ange des quadratischen Partikels)
+// Element color
+Die F&arbung. Alpha wird f&ur die Transparenz ber&ucksichtigt! ('''default''': weiß)
+// Element texture
+Die Textur.
+// Element source
+Gibt den Ausschnitt der Textur an, der auf dem Partikel zu sehen sein soll. ('''default''': <c>r_id</c> = rect(0, 1, 0, 1))
+// Element func_delta_t
+Die Wartezeit (in Spielzeit), die zwischen den Aufrufen der Callback-Funktion gewartet werden soll. ('''default''': 0.1)
+// Element elapsed
+Die Zeit (in Spielzeit), die seit dem letzten Aufruf von <v>OnIterate</v> vergangen ist.
+// Synopsis
+Beam,ParticleRot
+#

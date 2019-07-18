@@ -1,0 +1,10 @@
+// Description
+Erzeugt eine Zufallszahl vom Typ <t>float</t>.
+// Parameter max
+in
+Die obere Grenze f&ur die Zufallszahl.
+// Return
+Eine Zufallszahl aus dem halboffenen Intervall [0..<v>max</v>).
+// Synopsis
+randi,rand_seed
+#

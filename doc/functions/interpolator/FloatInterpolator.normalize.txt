@@ -1,0 +1,3 @@
+// Description
+Normalisiert den Parameterbereich. D.h. danach ist der Parameterbereich [0..1].
+#

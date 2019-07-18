@@ -1,0 +1,8 @@
+// Description
+Verschlüsselt eine Nachricht.
+// Parameter str
+in
+Die zu verschlüsselnde Nachricht.
+// Return
+Die verschlüsselte Nachricht.
+#
