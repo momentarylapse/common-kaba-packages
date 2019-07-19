@@ -23,7 +23,7 @@ Ist die mittlere Maustaste gedrückt?
 // Element button_r
 Ist die rechte Maustaste gedrückt?
 // Element text
-Der zur gedrückten Taste gehörende Text (z.B. "a" für <c>KeyA</c>).
+Der zur gedrückten Taste gehörende Text (z.B. "a" für <c>KEY_A</c>).
 // Element row
 Die aktive Zeile einer ListView.
 // Element column

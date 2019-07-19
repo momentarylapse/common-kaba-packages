@@ -33,82 +33,108 @@ string show_func(string ns, Function* f)
 	
 	return wiki
 
+string show_var(string ns, Variable *v)
+	string wiki = "== Kaba variable " + v.name + " ==\n\n"
+	
+	wiki += "=== Syntax ===\n\n"
+	wiki += "<syntaxhighlight lang=\"kaba\">\n"
+	wiki += v.type.name + " " + v.name + "\n"
+	wiki += "</syntaxhighlight>\n\n"
+	
+	return wiki
+
 
 string class_extension(Class *c)
 	if c.parent
 		return " extends " + c.parent.name
 	return ""
 
-bool func_interesting(Function* f)
-	if f.name == "__init__"
-		return true
-	if f.name[:1] == "_"
-		return false
-	return true
+Function*[] func_extract(ClassFunction[] ff)
+	Function*[] r
+	for f in ff
+		r.add(f.func)
+	return r
+
+Function*[] func_interesting(Function*[] ff, Class* _class)
+	Function*[] r
+	for f in ff
+		if f.class != _class
+			continue
+		else if f.name == "__init__"
+			r.add(f)
+		else if f.name[:1] == "@" or f.name[:1] == "_" or f.name[:1] == "-"
+			continue
+		else
+			r.add(f)
+	return r
 
 string show_class(string ns, Class* c)
 	string wiki = "== Kaba class " + c.name + " ==\n\n"
+	
+	let funcs = func_interesting(func_extract(c.functions), c)
 	
 	wiki += "=== Syntax ===\n\n"
 	wiki += "<syntaxhighlight lang=\"kaba\">\n"
 	wiki += "class " + c.name + class_extension(c) + "\n"
 	for e in c.elements
 		wiki += SHIFT + e.type.name + " " + e.name + "\n"
-	for f in c.functions
-		if func_interesting(f.func)
-			wiki += SHIFT + f.func.return_type.name + " " + f.func.name + "(" + func_params(f.func) + ")\n"
+	for f in funcs
+		wiki += SHIFT + f.return_type.name + " " + f.name + "(" + func_params(f) + ")\n"
 	wiki += "</syntaxhighlight>\n\n"
 	
-	wiki += "\n=== Functions ===\n\n"
-	for f in c.functions
-		if func_interesting(f.func)
-			wiki += "; <tt>" + f.func.return_type.name + " [[kaba." + ns + "." + c.name + "." + f.func.name + "|" + f.func.name + "]](" + func_params(f.func) + ")\n"
+	if len(funcs) > 0
+		wiki += "\n=== Functions ===\n\n"
+		for f in funcs
+			wiki += "; <tt>" + f.return_type.name + " [[kaba." + ns + "." + c.name + "." + f.name + "|" + f.name + "]](" + func_params(f) + ")\n"
 			wiki += ": description\n\n"
-			wiki_upload("kaba." + ns + "." + c.name + "." + f.func.name, show_func(ns + "." + c.name, f.func))
-	wiki += "\n=== Elements ===\n\n"
-	for e in c.elements
-		wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
-		wiki += ": description\n\n"
+	
+	if len(c.elements) > 0	
+		wiki += "\n=== Elements ===\n\n"
+		for e in c.elements
+			wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
+			wiki += ": description\n\n"
 	return wiki
 
-
-
-string show_package(Package p)
-	string wiki = "== Kaba package " + p.name + " ==\n\n"
-	if p.used_by_default
-		wiki = "== Kaba package " + p.name + " (default) ==\n\n"
-		
-	wiki += "=== Classes ===\n\n"
-	let classes = p.classes()
-	for c in classes
+Class*[] classes_interesting(Class*[] cc)
+	Class*[] r
+	for c in cc
 		if c.name.find("*", 0) >= 0 or c.name.find("&", 0) >= 0
 			continue
 		if c.name.find("@", 0) >= 0 or c.name[0] == '-'
 			continue
 		if c.name.find("[", 0) >= 0 or c.name.find("{", 0) >= 0
 			continue
-		wiki += "* <tt>class [[kaba." + p.name + "." + c.name + "|" + c.name + "]]" + class_extension(c) + "</tt>\n\n"
-		
-		wiki_upload("kaba." + p.name + "." + c.name, show_class(p.name, c))
+		r.add(c)
+	return r
 
-	wiki += "=== Functions ===\n\n"
-	let funcs = p.functions()
-	for f in funcs
-		if f.name.find("@", 0) >= 0 or f.name[0] == '-' or f.name[0] == '_'
-			continue
-		if f.class
-			continue
-		wiki += "* <tt>" + f.return_type.name + " [[kaba." + p.name + "." + f.name + "|" + f.name + "]](" + func_params(f) + ")\n\n"
-		
-		wiki_upload("kaba." + p.name + "." + f.name, show_func(p.name, f))
 
-	wiki += "=== Variables ===\n\n"
+string show_package(Package p)
+	string wiki = "== Kaba package " + p.name + " ==\n\n"
+	if p.used_by_default
+		wiki = "== Kaba package " + p.name + " (default) ==\n\n"
+	let classes = classes_interesting(p.classes())
+	if len(classes) > 0
+		wiki += "=== Classes ===\n\n"
+		for c in classes
+			wiki += "* <tt>class '''[[kaba." + p.name + "." + c.name + "|" + c.name + "]]'''" + class_extension(c) + "</tt>\n"
+
+	let funcs = func_interesting(p.functions(), nil)
+	if len(funcs) > 0
+		wiki += "\n=== Functions ===\n\n"
+		for f in funcs
+			wiki += "* <tt>" + f.return_type.name + " '''[[kaba." + p.name + "." + f.name + "|" + f.name + "]]'''(" + func_params(f) + ")\n"
+
 	let vars = p.variables()
-	for v in vars
-		wiki += "* <tt>" + v.type.name + " [[kaba." + p.name + "." + v.name + "|" + v.name + "]]</tt>\n\n"
+	if len(vars) > 0
+		wiki += "\n=== Variables ===\n\n"
+		for v in vars
+			wiki += "* <tt>" + v.type.name + " '''[[kaba." + p.name + "." + v.name + "|" + v.name + "]]'''</tt>\n"
+
 	let consts = p.constants()
-	for c in consts
-		wiki += "* <tt>const " + c.type.name + " " + c.name + "</tt>\n\n"
+	if len(consts) > 0
+		wiki += "\n=== Constants ===\n\n"
+		for c in consts
+			wiki += "* <tt>const " + c.type.name + " '''" + c.name + "'''</tt>\n"
 	return wiki
 
 
@@ -123,9 +149,26 @@ void wiki_upload(string name, string wiki)
 	let f = FileCreateText(name + ".txt")
 	f << wiki
 	delete f
-	
 
 void main()
 	wiki_upload("kaba.reference", make_reference())
+	
+	
 	for p in packages
 		wiki_upload("kaba." + p.name, show_package(p))
+		
+		let classes = classes_interesting(p.classes())
+		for c in classes
+			wiki_upload("kaba." + p.name + "." + c.name, show_class(p.name, c))
+			
+			let funcs = func_interesting(func_extract(c.functions), c)
+			for f in funcs
+				wiki_upload("kaba." + p.name + "." + c.name + "." + f.name, show_func(p.name + "." + c.name + "." + c.name, f))
+				
+		let funcs = func_interesting(p.functions(), nil)
+		for f in funcs
+			wiki_upload("kaba." + p.name + "." + f.name, show_func(p.name, f))
+
+		let vars = p.variables()
+		for v in vars
+			wiki_upload("kaba." + p.name + "." + v.name, show_var(p.name, v))
