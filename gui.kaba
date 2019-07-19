@@ -1,5 +1,6 @@
-use "circuit.kaba"
-use "panel.kaba"
+use hui
+use circuit
+use panel
 
 class EditorPanel extends CircuitPanel
 	CircuitEditor* ed

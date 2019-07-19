@@ -1,4 +1,5 @@
-use "circuit.kaba"
+use hui
+use circuit
 
 void draw_line(Painter* p, complex a, complex b)
 	p.draw_line(a.x, a.y, b.x, b.y)
