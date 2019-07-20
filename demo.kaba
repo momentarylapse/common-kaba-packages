@@ -1,5 +1,6 @@
-use "config.kaba"
-use "resource.kaba"
+use hui
+use config
+use resource
 
 class DemoDialog extends Window
 	void __init__(string source)

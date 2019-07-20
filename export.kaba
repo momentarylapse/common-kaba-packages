@@ -1,6 +1,6 @@
-use "config.kaba"
-use "resource.kaba"
-use "language.kaba"
+use config
+use resource
+use language
 
 void write_resource(File *f, Resource r)
 	f << r.type

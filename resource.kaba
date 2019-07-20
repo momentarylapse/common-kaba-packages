@@ -1,4 +1,4 @@
-use "config.kaba"
+use config
 
 class Resource
 	string type

@@ -1,5 +1,5 @@
-use "config.kaba"
-use "language.kaba"
+use config
+use language
 
 class SourceParser
 	string source

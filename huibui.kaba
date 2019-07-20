@@ -1,9 +1,9 @@
-use "config.kaba"
-use "language.kaba"
-use "resource.kaba"
-use "source.kaba"
-use "demo.kaba"
-use "export.kaba"
+use config
+use language
+use resource
+use source
+use demo
+use export
 	
 
 void get_ids(Language l, Resource r, string ns)
