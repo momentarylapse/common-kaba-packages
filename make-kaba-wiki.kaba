@@ -4,6 +4,7 @@ use kaba
 const string SHIFT = "    "
 
 Package*[] external_packages
+Package*[] external_libs
 
 string func_params(Function* f)
 	string params
@@ -177,6 +178,7 @@ string make_reference()
 	string wiki = "== Kaba reference ==\n"
 
 	wiki += "\n=== Packages ===\n\n"
+	wiki += "\n; internal\n\n"
 	for p in packages
 		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>"
 		if p.used_by_default
@@ -185,6 +187,10 @@ string make_reference()
 
 	wiki += "\n; external\n\n"
 	for p in external_packages
+		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>\n"
+
+	wiki += "\n; external libs\n\n"
+	for p in external_libs
 		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
@@ -207,13 +213,23 @@ void find_external()
 		p.name = e.name[:-5]
 		external_packages.add(p)
 
+void find_external_libs()
+	let list = DirSearch("lib", "*.kaba", false)
+	for e in list
+		let p = load_script("lib/" + e.name, true)
+		p.name = e.name[:-5]
+		external_libs.add(p)
+
 void main()
 	find_external()
+	find_external_libs()
 	wiki_upload("kaba.reference", make_reference())
 
 	for p in packages
 		make_package(p)
 	for p in external_packages
+		make_package(p)
+	for p in external_libs
 		make_package(p)
 
 void make_package(Package* p)	

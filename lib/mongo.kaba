@@ -1,0 +1,165 @@
+const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
+	_mongoc_init:mongoc_init
+	_mongoc_cleanup:mongoc_cleanup
+	_mongoc_client_new:mongoc_client_new
+	_mongoc_client_get_collection:mongoc_client_get_collection
+	_mongoc_collection_find_with_opts:mongoc_collection_find_with_opts
+	_mongoc_cursor_next:mongoc_cursor_next
+	_mongoc_cursor_destroy:mongoc_cursor_destroy
+	_mongoc_collection_destroy:mongoc_collection_destroy
+	_mongoc_client_destroy:mongoc_client_destroy
+/usr/lib64/libbson-1.0.so
+	bson_new_from_json:bson_new_from_json
+	bson_as_canonical_extended_json:bson_as_canonical_extended_json
+	bson_as_relaxed_extended_json:bson_as_relaxed_extended_json
+	bson_free:bson_free
+	bson_destroy:bson_destroy
+	bson_new_from_data:bson_new_from_data
+	bson_iter_init:bson_iter_init
+	bson_iter_next:bson_iter_next
+	_bson_iter_key:bson_iter_key
+	bson_iter_int32:bson_iter_int32
+	_bson_iter_utf8:bson_iter_utf8
+	bson_iter_array:bson_iter_array
+	bson_iter_type:bson_iter_type"
+
+extern void _mongoc_init()
+extern void _mongoc_cleanup()
+extern void* _mongoc_client_new(char* uri)
+extern void* _mongoc_client_get_collection(void* client, char* db, char* col)
+extern void* _mongoc_collection_find_with_opts(void* col, void* filter, void* x, void* y)
+extern bool _mongoc_cursor_next(void* cur, void* bson)
+extern void _mongoc_cursor_destroy(void* cur)
+extern void _mongoc_collection_destroy(void* col)
+extern void _mongoc_client_destroy(void* client)
+
+extern void* bson_new_from_json(char* json, int len, void* err)
+extern char* bson_as_canonical_extended_json(void* bson, void* __len)
+extern char* bson_as_relaxed_extended_json(void* bson, void* __len)
+extern void bson_free(void* str)
+extern void bson_destroy(void* bson)
+extern void* bson_new_from_data(char* data, int length)
+extern bool bson_iter_init(void* i, void* bson)
+extern bool bson_iter_next(void* i)
+extern char[0]* _bson_iter_key(void* i)
+extern int bson_iter_int32(void* i)
+extern char[0]* _bson_iter_utf8(void* i, void* __len)
+extern void bson_iter_array(void* i, int* len, void* a)
+extern int bson_iter_type(void* i)
+
+string char_to_str(char[0]* p)
+	string t
+	for i in 0:10000
+		if p[i] == 0
+			break
+		t.add(p[i])
+	return t
+
+void* json_to_bson(string json)
+	string t = json
+	t.add(0)
+	return bson_new_from_json(&t[0], json.num, nil)
+
+string bson_to_json(void *bson)
+	//char[0]* x = bson_as_canonical_extended_json(bson, nil)
+	char[0]* x = bson_as_relaxed_extended_json(bson, nil)
+	string t = char_to_str(x)
+	bson_free(x)
+	return t
+
+string bson_iter_key(void* i)
+	return char_to_str(_bson_iter_key(i))
+string bson_iter_str(void* i)
+	return char_to_str(_bson_iter_utf8(i, nil))
+
+string[] bson_iter_str_array(void *i)
+	string[] r
+	int[16] itarray
+	int length = 0
+	char* array
+	bson_iter_array(i, &length, &array)
+	void* bson = bson_new_from_data(array, length)
+	bson_iter_init(&itarray, bson)
+	while bson_iter_next(&itarray)
+		r.add(bson_iter_str(&itarray))
+	return r
+
+class Mongo
+	void* client
+	void __init__(string host)
+		_mongoc_init()
+		client = __mongo_client_new("mongodb://" + host + ":27017/?appname=kaba")
+		if !client
+			raise(new Exception("can not connect to " + host))
+
+	void __delete__()
+		if client
+			_mongoc_client_destroy(client)
+		_mongoc_cleanup()
+
+	Collection* get_collection(string db, string col)
+		Collection* c = new Collection
+		c.col = __mongoc_client_get_collection(client, db, col)
+		if !c.col
+			raise(new Exception("can not open collection"))
+		return c
+
+
+class Collection
+	void* col
+	void __init__()
+		col = nil
+	void __delete__()
+		if col
+			_mongoc_collection_destroy(col)
+	Result* find(string json)
+		void* b = json_to_bson(json)
+
+		Result* r = new Result
+		r.cur = _mongoc_collection_find_with_opts(col, b, nil, nil)
+		return r
+
+class Result
+	void* cur
+	void* doc
+	void __delete__()
+		if cur
+			_mongoc_cursor_destroy(cur)
+	bool has_more()
+		return _mongoc_cursor_next(cur, &doc)
+		// bson_to_json(doc)
+
+
+void* __mongo_client_new(string uri)
+	string t = uri
+	t.add(0)
+	return _mongoc_client_new(&t[0])
+
+void* __mongoc_client_get_collection(void* client, string db, string col)
+	string t1 = db
+	t1.add(0)
+	string t2 = col
+	t2.add(0)
+	return _mongoc_client_get_collection(client, &t1[0], &t2[0])
+
+
+
+
+/*void __main()
+	void* b = json_to_bson("{\"a\":1,\"b\":2}")
+	print(p2s(b))
+	print(bson_to_json(b))
+	bson_destroy(b)*/
+
+void main()
+	let m = new Mongo("localhost")
+	let col = m.get_collection("wiki", "articles")
+	let r = col.find("{\"name\":\"Hauptseite\"}")
+
+	while r.has_more()
+		print(bson_to_json(r.doc))
+
+	delete r
+	delete col
+	delete m
+
