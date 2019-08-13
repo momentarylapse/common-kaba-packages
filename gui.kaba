@@ -1,3 +1,4 @@
+use file
 use hui
 use circuit
 use panel
@@ -62,7 +63,7 @@ Toolbar toolbar ''
 		set_string("add-type", "Node")
 		
 		if len(arg) > 0
-			c.import(FileReadText(arg[0]))
+			c.import(Filesystem.read_text(arg[0]))
 		
 		event("new", &on_new)
 		event("open", &on_open)
@@ -79,11 +80,11 @@ Toolbar toolbar ''
 	
 	void on_save()
 		if HuiFileDialogSave(self, "Save the circuit", "", "*.circuit", "*.circuit")
-			FileWriteText(HuiFilename, c.export())
+			Filesystem.write_text(HuiFilename, c.export())
 	
 	void on_open()
 		if HuiFileDialogOpen(self, "Load the circuit", "", "*.circuit", "*.circuit")
-			c.import(FileReadText(HuiFilename))
+			c.import(Filesystem.read_text(HuiFilename))
 	
 	void on_param()
 		int row = HuiGetEvent().row
