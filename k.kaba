@@ -1,3 +1,4 @@
+use file
 const int CHAR_NL = 0x0a
 const int CHAR_TAB = 0x09
 
@@ -1461,7 +1462,7 @@ void main(string[] arg)
 		string source = input
 		try
 			if from_file
-				source = FileRead(input)
+				source = Filesystem.read(input)
 			eval(source)
 		except Exception as e
 			print("------------------------------------------------")
