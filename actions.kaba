@@ -1,3 +1,4 @@
+use file
 use localdb
 use config
 use remote
@@ -17,7 +18,7 @@ class DBLister
 
 	void find_paths(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
-		DirEntry[] list = DirSearch(dir, "*", true)
+		let list = Filesystem.search(dir, "*", true)
 		for e in list
 			if e.is_dir
 				if e.name.head(1) != "." and recursive
@@ -28,7 +29,7 @@ class DBLister
 					paths.add(path)
 	
 	LocalFile*[] find(string dir)
-		if FileIsDirectory(dir)
+		if Filesystem.is_directory(dir)
 			return find_dir(dir)
 		return find_file(dir)
 		
@@ -42,7 +43,7 @@ class DBLister
 			// in DB?
 			return [db.find_by_path(path)]
 		except
-			if FileExists(path)
+			if Filesystem.exists(path)
 				LocalFile ff
 				ff.path = path
 				fake_files.add(ff)
@@ -87,14 +88,14 @@ void file_add(LocalFile* f)
 
 		// suddenly appearing?!?
 		if f.pure_remote()
-			if FileExists(f.path)
+			if Filesystem.exists(f.path)
 				f.unset(NONLOCAL)
 				if conf.verbosity >= 1
 					print("NON-NONLOCAL " + rel_path(f.path))
 				return
 		
 		// lost?
-		if !FileExists(f.path)
+		if !Filesystem.exists(f.path)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
 				if conf.verbosity >= 1
@@ -102,7 +103,7 @@ void file_add(LocalFile* f)
 			return
 		
 		// time
-		File* ff = FileOpen(f.path)
+		File* ff = Filesystem.open(f.path)
 		int mtime = ff.get_date().time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
@@ -110,7 +111,7 @@ void file_add(LocalFile* f)
 		else
 			// changed?
 			try
-				string hash = FileHash(f.path, "md5")
+				string hash = Filesystem.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
 						print("TOUCHED  " + rel_path(f.path))
@@ -133,14 +134,14 @@ void file_add(LocalFile* f)
 		// new file
 		string hash
 		try
-			hash = FileHash(f.path, "md5")
+			hash = Filesystem.hash(f.path, "md5")
 		except Exception as e
 			print(e.message())
 			return
 		try
 			LocalFile* ff = db.by_hash(hash)
 			// hash already in db?
-			if FileExists(ff.path)
+			if Filesystem.exists(ff.path)
 				if conf.verbosity >= 1
 					print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
 				file_add_new(f, hash)
@@ -160,7 +161,7 @@ void file_add_new(LocalFile* f, string hash)
 	//print(ext)
 	//print(l.name)
 	f.hash = hash
-	File* fff = FileOpen(f.path)
+	File* fff = Filesystem.open(f.path)
 	f.mtime = fff.get_date().time
 	f.size = fff.get_size()
 	delete fff
@@ -196,7 +197,7 @@ void action_rm(string path)
 	for f in files
 		if !f.pure_remote()
 			try
-				FileDelete(f.path)
+				Filesystem.delete(f.path)
 			except Exception as e
 				print("ERROR: " + e)
 		f.drop_me = true
@@ -206,17 +207,17 @@ void action_mv(string source, string _dest)
 	try
 		string dest = _dest
 		let f = db.find_by_path(source)
-		if FileIsDirectory(dest)
+		if Filesystem.is_directory(dest)
 			dest = dir_canonical(dest) + source.basename()
-		if FileExists(dest) or db.has_path(dest)
+		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
 		print("MOVE  " + rel_path(source) + " -> " + rel_path(dest))
 		f.path = dest
 		db.save()
 		
-		if FileExists(source)
+		if Filesystem.exists(source)
 			make_all_dirs(dest)
-			FileRename(source, dest)
+			Filesystem.rename(source, dest)
 	except Exception as e
 		error_out(e)
 
@@ -229,7 +230,7 @@ void structure_file(LocalFile* f, string structure, string root)
 	make_all_dirs(new_path)
 	try
 		if !f.pure_remote()
-			FileRename(f.path, new_path)
+			Filesystem.rename(f.path, new_path)
 		f.path = new_path
 		db.save()
 	except FileError as e
@@ -363,7 +364,7 @@ void action_get(string id)
 		let files = remote_find_by_id([id], "")
 		if len(files) > 0
 			LocalFile f = files[0]
-			f.path = GetCurDir() + f.id + "-" + f.name + "." + f.path.extension()
+			f.path = Filesystem.current_directory() + f.id + "-" + f.name + "." + f.path.extension()
 			db.files.add(f)
 			let ff = db.find_by_id(id)
 			remote_download(ff)

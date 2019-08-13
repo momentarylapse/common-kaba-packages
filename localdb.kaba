@@ -1,3 +1,4 @@
+use file
 use hui
 use config
 use tag
@@ -206,7 +207,7 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		//Timer tt
-		string ss = FileRead(AppDirectory + "sisyphos/db")
+		string ss = Filesystem.read(AppDirectory + "sisyphos/db")
 		string[] lines = ss.explode("\n")
 		int n = lines.num / 10
 		for i in 0:n
@@ -237,9 +238,9 @@ class LocalFileDB
 				print("EMPTY PATH ...")
 				f.show_info("    ")
 			if f.hash == ""
-				if FileExists(f.path)
+				if Filesystem.exists(f.path)
 					print("EMPTY HASH: " + f.path)
-					f.hash = FileHash(f.path, "md5")
+					f.hash = Filesystem.hash(f.path, "md5")
 					dirty = true
 				else if f.id == ""
 					print("GHOST: " + f.path)
@@ -274,7 +275,7 @@ class LocalFileDB
 				i --
 
 	void save()
-		File *f = FileCreateText(AppDirectory + "sisyphos/db")
+		File *f = Filesystem.create_text(AppDirectory + "sisyphos/db")
 		f << files.num
 		for ff in files
 			f << ff.id
@@ -363,7 +364,7 @@ class LocalFileDB
 		return list
 
 	LocalFile*[] get(string path, bool rec)
-		if FileIsDirectory(path)
+		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
 		LocalFile*[] files
 		try
@@ -378,7 +379,7 @@ class LocalFileDB
 				continue
 			print(f.path)
 			try
-				string h2 = FileHash(f.path, "md5")
+				string h2 = Filesystem.hash(f.path, "md5")
 				if h2 != f.hash
 					print(h2 + " != " + f.hash)
 					f.hash = h2
@@ -393,7 +394,7 @@ class LocalFileDB
 LocalFileDB db
 
 void auto_tag(LocalFile *f)
-	if !FileExists(f.path)
+	if !Filesystem.exists(f.path)
 		return
 	string ext = f.path.extension()
 	try
