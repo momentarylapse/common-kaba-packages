@@ -1,4 +1,5 @@
 use config
+use file
 
 
 class LangID
@@ -50,7 +51,7 @@ class Language
 		texts.add(t)
 		
 	void save()
-		File* f = FileCreateText(filename)
+		File* f = Filesystem.create_text(filename)
 		f << "// Language"
 		f << name
 		f << "// Num IDs"
@@ -93,7 +94,7 @@ Language load_prelang(string filename)
 	Language l
 	l.filename = filename
 	//try
-		File* f = FileOpenText(filename)
+		File* f = Filesystem.open_text(filename)
 		string t
 		int n
 		f >> t
@@ -128,7 +129,7 @@ Language load_prelang(string filename)
 
 Language[] load_prelangs()
 	Language[] langs
-	DirEntry[] files = DirSearch(conf.dir, "*.prelang", false)
+	let files = Filesystem.search(conf.dir, "*.prelang", false)
 	for f in files
 		Language l = load_prelang(conf.dir + f.name)
 		langs.add(l)
@@ -175,7 +176,7 @@ bool check_lang(Language l, Language own, bool create_file)
 	
 	File *f
 	if create_file
-		f = FileCreateText(conf.dir + "TRANS")
+		f = Filesystem.create_text(conf.dir + "TRANS")
 	
 	// check ids
 	for i in own.ids

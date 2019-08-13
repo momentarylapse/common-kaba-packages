@@ -1,4 +1,5 @@
 use hui
+use file
 
 /*string str_unescape(string s)
 	string r
@@ -28,7 +29,7 @@ class Config
 	
 	void load()
 		try
-			File* f = FileOpenText(dir + "export.txt")
+			File* f = Filesystem.open_text(dir + "export.txt")
 			string t
 			f >> t
 			f >> export_dir

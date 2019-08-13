@@ -1,3 +1,4 @@
+use file
 use config
 use language
 use resource
@@ -58,7 +59,7 @@ void action_export(string dir)
 
 void patch_language(Language l, Language own, string filename)
 	try
-		string ttt = FileRead(filename)
+		string ttt = Filesystem.read(filename)
 		string[] lines = ttt.explode("\n")
 		for i in 0:lines.num/3
 			string a = lines[i*3]
@@ -93,7 +94,7 @@ void action_translate(string filename)
 	except
 		pass
 	try
-		FileDelete(conf.dir + "TRANS")
+		Filesystem.delete(conf.dir + "TRANS")
 	except
 		pass
 
@@ -136,7 +137,7 @@ void swap_translate_guis(Language l)
 		print(r.str(0))
 		swap_translate_gui(r, l, r.id)
 		print(r.str(0))
-		File* f = FileCreate(resource_files[i])
+		File* f = Filesystem.create(resource_files[i])
 		f.write(r.str(0))
 		delete f
 

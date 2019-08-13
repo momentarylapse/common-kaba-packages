@@ -1,3 +1,4 @@
+use file
 use config
 use language
 
@@ -24,12 +25,12 @@ class SourceParser
 
 
 	void parse_source_code_dir(string dir)
-		DirEntry[] files = DirSearch(dir, "*.cpp", true)
+		DirEntry[] files = Filesystem.search(dir, "*.cpp", true)
 		for f in files
 			if f.is_dir
 				parse_source_code_dir(dir + f.name + "/")
 			else
-				source = FileRead(dir + f.name)
+				source = Filesystem.read(dir + f.name)
 				begin()
 				parse()
 				end(dir + f.name)
@@ -80,7 +81,7 @@ class SourceSwapper extends SourceParser
 		if !changed
 			return
 		//print(">>>>>>>>>>>")
-		File* f = FileCreate(filename)
+		File* f = Filesystem.create(filename)
 		f.write(source_new)
 		delete f
 				

@@ -1,3 +1,4 @@
+use file
 use hui
 use config
 use resource
@@ -28,7 +29,7 @@ void action_demo(string filename)
 	conf.set_dir(filename.dirname())
 	conf.load()
 	
-	string source = FileRead(filename)
+	string source = Filesystem.read(filename)
 	//print(source)
 	Resource r = ParseResource(source, true)
 	//r.show(0)

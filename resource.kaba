@@ -1,4 +1,5 @@
 use config
+use file
 
 class Resource
 	string type
@@ -7,6 +8,7 @@ class Resource
 	string tooltip
 	string[] options
 	int x, y
+	void __init__()
 	Resource[] children
 	//void reset()
 	extern void show(int indent)
@@ -20,9 +22,9 @@ string[] resource_files
 
 Resource[] load_all_huis(bool literally)
 	Resource[] res
-	DirEntry[] files = DirSearch(conf.dir, "*.hui", false)
+	DirEntry[] files = Filesystem.search(conf.dir, "*.hui", false)
 	for f in files
-		string source = FileRead(conf.dir + f.name)
+		string source = Filesystem.read(conf.dir + f.name)
 		Resource r = ParseResource(source, literally)
 		if r.type == "Dialog" or r.type == "Window" or r.type == "Menu" or r.type == "Toolbar"
 			resource_files.add(conf.dir + f.name)

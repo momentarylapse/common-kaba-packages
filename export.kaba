@@ -1,3 +1,4 @@
+use file
 use config
 use resource
 use language
@@ -37,7 +38,7 @@ void write_language(File *f, Language l)
 		f << t.trans.escape()
 
 void export_resources(Resource[] res, Language own, Language[] langs)
-	File *f = FileCreateText(conf.export_dir + "hui_resources.txt")
+	File *f = Filesystem.create_text(conf.export_dir + "hui_resources.txt")
 	f << "t7"
 	f << "// Number Of Resources"
 	f << res.num
