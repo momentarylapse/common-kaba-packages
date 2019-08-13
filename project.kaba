@@ -1,9 +1,10 @@
+use file
 
 string dir_absolute(string dir)
 	if dir.head(2) == "./"
-		return dir_absolute(GetCurDir() + dir.substr(2,-1))
+		return dir_absolute(Filesystem.current_directory() + dir.substr(2,-1))
 	if dir.head(3) == "../"
-		return dir_absolute(GetCurDir() + dir)
+		return dir_absolute(Filesystem.current_directory() + dir)
 		
 	string[] xx = dir.explode("/")
 	for x,i in xx
@@ -55,7 +56,7 @@ class Config
 		return false
 	
 	void load()
-		File* f = FileOpenText(conf.root + "xmake.conf")
+		File* f = Filesystem.open_text(conf.root + "xmake.conf")
 		string t
 		while !f.eof()
 			f >> t
@@ -98,7 +99,7 @@ class Config
 	
 	DirEntry[] needs_installing()
 		DirEntry[] r
-		let list = DirSearch("../static", "*.*", true)
+		let list = Filesystem.search("../static", "*.*", true)
 		let ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
@@ -108,7 +109,7 @@ class Config
 		for i in installs
 			DirEntry e
 			e.name = i
-			e.is_dir = FileIsDirectory("../" + i)
+			e.is_dir = Filesystem.is_directory("../" + i)
 			r.add(e)
 		return r
 
@@ -132,7 +133,7 @@ string rel(string filename)
 	return filename.substr(conf.root.num, -1)
 
 string canonical(string filename)
-	string[] p = filename.explode("/")
+	let p = filename.explode("/")
 	for i in 0:p.num
 		if p[i] == ".." and i > 0
 			p.remove(i)
@@ -144,10 +145,10 @@ string canonical(string filename)
 void find_dep(SourceFile f, string filename)
 	string s
 	try
-		s = FileRead(filename)
+		s = Filesystem.read(filename)
 	except
 		return
-	string[] lines = s.explode("\n")
+	let lines = s.explode("\n")
 	
 	for l in lines
 		int p = l.find("#include \"", 0)
@@ -155,7 +156,7 @@ void find_dep(SourceFile f, string filename)
 			int q = l.find("\"", p + 11)
 			string d = filename.dirname() + l.substr(p+10, q-p-10)
 			d = canonical(d)
-			if FileExists(d)
+			if Filesystem.exists(d)
 				if f.add_dep(d)
 					//print("  " + rel(d))
 					find_dep(f, d)
@@ -171,7 +172,7 @@ void parse_source(string filename)
 	sources.add(f)
 
 void parse_dir(string dir)
-	DirEntry[] files = DirSearch(dir, "*.cpp", true)
+	let files = Filesystem.search(dir, "*.cpp", true)
 	for f in files
 		if f.is_dir
 			parse_dir(dir + f.name + "/")

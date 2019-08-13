@@ -1,8 +1,9 @@
-use "project.kaba"
-use "library.kaba"
+use file
+use project
+use library
 
 void create_makefile()
-	File* f = FileCreateText(conf.root + "Makefile")
+	File* f = Filesystem.create_text(conf.root + "Makefile")
 	f << "BIN = ../" + conf.binary
 	f << "CPP = g++"
 	string cflags, lflags, defines

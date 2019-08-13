@@ -1,7 +1,7 @@
-use "library.kaba"
-use "project.kaba"
-use "makefile.kaba"
-use "meson.kaba"
+use library
+use project
+use makefile
+use meson
 
 
 void main(string[] arg)

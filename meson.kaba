@@ -1,8 +1,9 @@
-use "project.kaba"
-use "library.kaba"
+use file
+use project
+use library
 
 void create_meson()
-	File* f = FileCreateText(conf.root + "../meson.build")
+	File* f = Filesystem.create_text(conf.root + "../meson.build")
 	f << "project('" + conf.name + "', 'cpp', default_options : ['cpp_std=" + conf.language + "', 'warning_level=1'])"
 	f << "add_project_arguments('-O2', '-g', '-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])"
 	f << "
