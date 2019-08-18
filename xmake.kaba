@@ -7,6 +7,7 @@ use meson
 void main(string[] arg)
 	lib.init()
 	conf.verbose = false
+	conf.root = dir_canonical("./")
 	
 	string[] command
 	conf.ignore_libs
@@ -28,11 +29,12 @@ void main(string[] arg)
 				return
 			lib.test(command[1])
 			return
+		else if command[0] == "create"
+			conf.save()
+			return
 		else
 			print("???")
 			return
-	if conf.root.num == 0
-		conf.root = dir_canonical("./")
 	print(conf.root)
 	
 	conf.load()

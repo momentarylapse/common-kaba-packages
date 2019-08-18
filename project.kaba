@@ -96,6 +96,31 @@ class Config
 			else
 				raise(new Exception("unknown tag: " + t))
 		delete f
+	void save()
+		File* f = Filesystem.create_text(conf.root + "xmake.conf")
+		f << "# project name"
+		f << name
+		f << "# binary name"
+		f << binary
+		f << "# main file"
+		f << main_file
+		f << "# language"
+		f << language
+		f << "# flags"
+		f << flags_global
+		f << "# libraries"
+		f << libs.join(",")
+		f << "# libraries optional"
+		f << libs_optional.join(",")
+		f << "# icons"
+		f << icons.join(",")
+		f << "# desktop file"
+		f << desktop_file
+		f << "# mime files"
+		f << mime_files.join(",")
+		f << "# additional install"
+		f << installs.join(",")
+		delete f
 	
 	DirEntry[] needs_installing()
 		DirEntry[] r
