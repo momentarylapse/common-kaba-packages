@@ -18,7 +18,7 @@ void find_all_ids(Language lang, Resource[] res)
 	for r in res
 		get_ids(lang, r, r.id)
 	
-//	lang.show()
+#	lang.show()
 
 
 Language load_own_lang(bool literally)
@@ -51,7 +51,7 @@ void action_export(string dir)
 	conf.set_dir(dir)
 	conf.load()
 	
-	Language own = load_own_lang(true)//false)
+	Language own = load_own_lang(true)#false)
 	
 	Language[] langs = load_prelangs()
 	
@@ -110,8 +110,8 @@ void action_add(string filename, string name)
 
 
 void swap_translate_lang(Language own, Language l, string target)
-	// own.ids are ok
-	// own.texts need ...
+	# own.ids are ok
+	# own.texts need ...
 	for t in own.texts
 		t.trans = t.orig
 		t.orig = ""
@@ -158,7 +158,7 @@ void action_swap(string source, string target)
 	
 	swap_translate_source(conf.source_code_dir, l)
 	
-	// should also translate other languages... but... screw it
+	# should also translate other languages... but... screw it
 
 void show_help()
 	print("check <DIR>")

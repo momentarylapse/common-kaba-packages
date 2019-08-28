@@ -30,9 +30,9 @@ void action_demo(string filename)
 	conf.load()
 	
 	string source = Filesystem.read(filename)
-	//print(source)
+	#print(source)
 	Resource r = ParseResource(source, true)
-	//r.show(0)
+	#r.show(0)
 	print(r.str(0))
 	
 	if r.type == "Dialog" or r.type == "Window"

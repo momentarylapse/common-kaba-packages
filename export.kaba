@@ -21,18 +21,18 @@ void write_language(File *f, Language l)
 	LangID[] ids = l.get_useful_ids()
 	LangText[] texts = l.get_useful_texts()
 
-	f << "// Language"
+	f << "# Language"
 	f << l.name
-	f << "// Number Of IDs"
+	f << "# Number Of IDs"
 	f << ids.num
-	f << "// Text"
+	f << "# Text"
 	for i in ids
 		f << i.id
 		f << i.title.escape()
 		f << i.tooltip.escape()
-	f << "// Num Language Strings"
+	f << "# Num Language Strings"
 	f << texts.num
-	f << "// Text"
+	f << "# Text"
 	for t in texts
 		f << t.orig.escape()
 		f << t.trans.escape()
@@ -40,12 +40,12 @@ void write_language(File *f, Language l)
 void export_resources(Resource[] res, Language own, Language[] langs)
 	File *f = Filesystem.create_text(conf.export_dir + "hui_resources.txt")
 	f << "t7"
-	f << "// Number Of Resources"
+	f << "# Number Of Resources"
 	f << res.num
 	for r in res
-		f << "// Resource"
+		f << "# Resource"
 		write_resource(f, r)
-	f << "// Number Of Languages"
+	f << "# Number Of Languages"
 	f << (langs.num + 1)
 	write_language(f, own)
 	for l in langs

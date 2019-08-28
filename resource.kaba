@@ -10,7 +10,7 @@ class Resource
 	int x, y
 	void __init__()
 	Resource[] children
-	//void reset()
+	#void reset()
 	extern void show(int indent)
 	extern string str(int indent)
 	

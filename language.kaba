@@ -52,18 +52,18 @@ class Language
 		
 	void save()
 		File* f = Filesystem.create_text(filename)
-		f << "// Language"
+		f << "# Language"
 		f << name
-		f << "// Num IDs"
+		f << "# Num IDs"
 		f << ids.num
-		f << "// Data (ID,Text,Tooltip)"
+		f << "# Data (ID,Text,Tooltip)"
 		for i in ids
 			f << i.id
 			f << i.title.escape()
 			f << i.tooltip.escape()
-		f << "// Num Language Strings"
+		f << "# Num Language Strings"
 		f << texts.num
-		f << "// Data (ID,Text)"
+		f << "# Data (ID,Text)"
 		for t in texts
 			f << t.orig.escape()
 			f << t.trans.escape()
@@ -93,7 +93,7 @@ class Language
 Language load_prelang(string filename)
 	Language l
 	l.filename = filename
-	//try
+	#try
 		File* f = Filesystem.open_text(filename)
 		string t
 		int n
@@ -121,10 +121,10 @@ Language load_prelang(string filename)
 			tt.trans = t.unescape()
 			l.texts.add(tt)
 		delete f
-		//l.show()
+		#l.show()
 		return l
-	//except Exception as e
-	//	print("ERROR: " + e.message())
+	#except Exception as e
+	#	print("ERROR: " + e.message())
 
 
 Language[] load_prelangs()
@@ -140,7 +140,7 @@ void lang_id_add(LangID[] ids, string id, string title, string tooltip, string n
 		return
 	string cid = id
 	if cid.find("/", 0) < 0
-		//if ns != id
+		#if ns != id
 		cid = ns + "/" + id
 	for i in ids
 		if i.id == cid
@@ -178,7 +178,7 @@ bool check_lang(Language l, Language own, bool create_file)
 	if create_file
 		f = Filesystem.create_text(conf.dir + "TRANS")
 	
-	// check ids
+	# check ids
 	for i in own.ids
 		
 		bool found_title = false
@@ -193,17 +193,17 @@ bool check_lang(Language l, Language own, bool create_file)
 				f << "# id:" + i.id
 				f << i.title.escape()
 				f << ""
-			//print("    MISSING title for " + i.id)
+			#print("    MISSING title for " + i.id)
 			nerrors ++
 		if i.tooltip.num > 0 and !found_tooltip
 			if create_file
 				f << "# tooltip:" + i.id
 				f << i.tooltip.escape()
 				f << ""
-			//print("    MISSING tooltip for " + i.id)
+			#print("    MISSING tooltip for " + i.id)
 			nerrors ++
 	
-	// check texts
+	# check texts
 	for t in own.texts
 		bool found = false
 		for tt in l.texts
@@ -215,7 +215,7 @@ bool check_lang(Language l, Language own, bool create_file)
 				f << "# text"
 				f << t.orig.escape()
 				f << ""
-			//print("    MISSING text: " + t.orig)
+			#print("    MISSING text: " + t.orig)
 			nerrors ++
 	
 	if nerrors == 0

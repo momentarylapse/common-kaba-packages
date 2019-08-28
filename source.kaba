@@ -16,11 +16,11 @@ class SourceParser
 				if source[pos + i] == '\'
 					i ++
 					continue
-				if source[pos + i] == '"'     // "
+				if source[pos + i] == '"'     # "
 					length = i
 					break
 			handle(pos, length)
-			//print("    " + source.substr(pos, length))
+			#print("    " + source.substr(pos, length))
 			pos0 = pos + length
 
 
@@ -80,7 +80,7 @@ class SourceSwapper extends SourceParser
 	override void end(string filename)
 		if !changed
 			return
-		//print(">>>>>>>>>>>")
+		#print(">>>>>>>>>>>")
 		File* f = Filesystem.create(filename)
 		f.write(source_new)
 		delete f
