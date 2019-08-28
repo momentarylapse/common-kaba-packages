@@ -61,7 +61,7 @@ void* json_to_bson(string json)
 	return bson_new_from_json(&t[0], json.num, nil)
 
 string bson_to_json(void *bson)
-	//char[0]* x = bson_as_canonical_extended_json(bson, nil)
+	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
 	char[0]* x = bson_as_relaxed_extended_json(bson, nil)
 	string t = char_to_str(x)
 	bson_free(x)
@@ -127,7 +127,7 @@ class Result
 			_mongoc_cursor_destroy(cur)
 	bool has_more()
 		return _mongoc_cursor_next(cur, &doc)
-		// bson_to_json(doc)
+		# bson_to_json(doc)
 
 
 void* __mongo_client_new(string uri)
@@ -145,11 +145,11 @@ void* __mongoc_client_get_collection(void* client, string db, string col)
 
 
 
-/*void __main()
-	void* b = json_to_bson("{\"a\":1,\"b\":2}")
-	print(p2s(b))
-	print(bson_to_json(b))
-	bson_destroy(b)*/
+#void __main()
+#	void* b = json_to_bson("{\"a\":1,\"b\":2}")
+#	print(p2s(b))
+#	print(bson_to_json(b))
+#	bson_destroy(b)
 
 void main()
 	let m = new Mongo("localhost")
@@ -162,4 +162,3 @@ void main()
 	delete r
 	delete col
 	delete m
-

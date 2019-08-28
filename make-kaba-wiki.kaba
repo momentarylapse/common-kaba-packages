@@ -1,10 +1,11 @@
 use kaba
-//use "@/mongo"
+use file
+# use "@/mongo"
 
 const string SHIFT = "    "
 
-Package*[] external_packages
-Package*[] external_libs
+Script*[] external_packages
+Script*[] external_libs
 
 string func_params(Function* f)
 	string params
@@ -16,8 +17,8 @@ string func_params(Function* f)
 
 string show_func(string ns, Function* f)
 	string name = f.name
-	if f.class
-		name = f.class.name + "." + f.name
+	if f.namespace
+		name = f.namespace.name + "." + f.name
 	
 	string wiki = "== Kaba function " + name + " ==\n"
 	
@@ -54,16 +55,18 @@ string class_extension(Class *c)
 		return " extends " + c.parent.name
 	return ""
 
-Function*[] func_extract(ClassFunction[] ff)
+Function*[] func_extract(Class *c)
 	Function*[] r
-	for f in ff
-		r.add(f.func)
+	for f in c.functions
+		r.add(f)
+	for f in c.static_functions
+		r.add(f)
 	return r
 
-Function*[] filter_funcs(Function*[] ff, Class* _class)
+Function*[] filter_funcs(Function*[] ff, Class* namespace)
 	Function*[] r
 	for f in ff
-		if f.class != _class
+		if f.namespace != namespace
 			continue
 		else if f.name == "__init__"
 			r.add(f)
@@ -72,6 +75,7 @@ Function*[] filter_funcs(Function*[] ff, Class* _class)
 		else
 			r.add(f)
 	sort_list(&r, type(r), "name")
+	sort_list(&r, type(r), "is_static")
 	return r
 
 Constant*[] filter_consts(Constant*[] cc)
@@ -90,17 +94,12 @@ ClassElement[] filter_elements(ClassElement[] cc)
 	sort_list(&r, type(r), "name")
 	return r
 
-bool func_virtual(Function* f, Class* c)
-	for ff in c.functions
-		if ff.func == f
-			return ff.virtual_index >= 0
-	return false
-
 string show_class(string ns, Class* c)
 	string wiki = "== Kaba class " + c.name + " ==\n"
 	
-	let funcs = filter_funcs(func_extract(c.functions), c)
+	let funcs = filter_funcs(func_extract(c), c)
 	let elements = filter_elements(c.elements)
+	let consts = filter_consts(c.constants)
 	
 	sort_list(&elements, type(elements), "name")
 	
@@ -109,17 +108,28 @@ string show_class(string ns, Class* c)
 	wiki += "class " + c.name + class_extension(c) + "\n"
 	for e in elements
 		wiki += SHIFT + e.type.name + " " + e.name + "\n"
+	if len(funcs) > 0
+		wiki += "\n" + SHIFT + "# functions\n"
 	for f in funcs
 		string pre
-		if func_virtual(f, c)
-			pre = "virtual "
+		if f.is_static
+			pre += "static "
+		if f.virtual_index >= 0
+			pre += "virtual "
 		wiki += SHIFT + pre + f.return_type.name + " " + f.name + "(" + func_params(f) + ")\n"
+	if len(consts) > 0
+		wiki += "\n" + SHIFT + "# constants\n"
+	for cc in consts
+		wiki += SHIFT + "const " + cc.type.name + " " + cc.name + "\n"
 	wiki += "</syntaxhighlight>\n\n"
 	
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			wiki += "; <tt>" + f.return_type.name + " [[kaba." + ns + "." + c.name + "." + f.name + "|" + f.name + "]](" + func_params(f) + ")\n"
+			string pre
+			if f.is_static
+				pre += "static "
+			wiki += "; <tt>" + pre + f.return_type.name + " [[kaba." + ns + "." + c.name + "." + f.name + "|" + f.name + "]](" + func_params(f) + ")\n"
 			wiki += ": description\n\n"
 	
 	if len(elements) > 0	
@@ -127,6 +137,12 @@ string show_class(string ns, Class* c)
 		for e in elements
 			wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
 			wiki += ": description\n\n"
+
+	#if len(consts) > 0
+	#	wiki += "\n=== Constants ===\n\n"
+	#	for cc in consts
+	#		wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
+	#		wiki += ": description\n\n"
 	return wiki
 
 Class*[] filter_classes(Class*[] cc)
@@ -143,7 +159,7 @@ Class*[] filter_classes(Class*[] cc)
 	return r
 
 
-string show_package(Package *p)
+string show_package(Script *p)
 	string wiki = "== Kaba package " + p.name + " ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package " + p.name + " (default) ==\n"
@@ -153,7 +169,7 @@ string show_package(Package *p)
 		for c in classes
 			wiki += "* <tt>class '''[[kaba." + p.name + "." + c.name + "|" + c.name + "]]'''" + class_extension(c) + "</tt>\n"
 
-	let funcs = filter_funcs(p.functions(), nil)
+	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
@@ -202,21 +218,21 @@ string make_reference()
 	return wiki
 
 void wiki_upload(string name, string wiki)
-	let f = FileCreateText(name + ".txt")
+	let f = Filesystem.create_text(name + ".txt")
 	f << wiki
 	delete f
 
 void find_external()
-	let list = DirSearch("extern", "*.kaba", false)
+	let list = Filesystem.search("extern", "*.kaba", false)
 	for e in list
-		let p = load_script("extern/" + e.name, true)
+		let p = Script.load("extern/" + e.name, true)
 		p.name = e.name[:-5]
 		external_packages.add(p)
 
 void find_external_libs()
-	let list = DirSearch("lib", "*.kaba", false)
+	let list = Filesystem.search("lib", "*.kaba", false)
 	for e in list
-		let p = load_script("lib/" + e.name, true)
+		let p = Script.load("lib/" + e.name, true)
 		p.name = e.name[:-5]
 		external_libs.add(p)
 
@@ -232,14 +248,14 @@ void main()
 	for p in external_libs
 		make_package(p)
 
-void make_package(Package* p)	
+void make_package(Script* p)	
 	wiki_upload("kaba." + p.name, show_package(p))
 
 	let classes = filter_classes(p.classes())
 	for c in classes
 		wiki_upload("kaba." + p.name + "." + c.name, show_class(p.name, c))
 
-		let funcs = filter_funcs(func_extract(c.functions), c)
+		let funcs = filter_funcs(func_extract(c), c)
 		for f in funcs
 			wiki_upload("kaba." + p.name + "." + c.name + "." + f.name, show_func(p.name + "." + c.name + "." + c.name, f))
 
