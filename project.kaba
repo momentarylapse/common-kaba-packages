@@ -26,7 +26,7 @@ bool sa_has(string[] a, string val)
 			return true
 	return false
 
-// project
+# project
 class Config
 	string root
 	bool verbose
@@ -72,10 +72,10 @@ class Config
 				f >> language
 			else if t == "# flags"
 				f >> flags_global
-			/*else if t == "# compiler flags"
-				f >> flags_compiler
-			else if t == "# linker flags"
-				f >> flags_linker*/
+			#else if t == "# compiler flags"
+#				f >> flags_compiler
+#			else if t == "# linker flags"
+#				f >> flags_linker
 			else if t == "# libraries"
 				f >> t
 				libs = t.explode(",")
@@ -183,7 +183,7 @@ void find_dep(SourceFile f, string filename)
 			d = canonical(d)
 			if Filesystem.exists(d)
 				if f.add_dep(d)
-					//print("  " + rel(d))
+					#print("  " + rel(d))
 					find_dep(f, d)
 
 void parse_source(string filename)

@@ -124,7 +124,7 @@ class LibraryGLFW extends Library
 	override bool test()
 		return Filesystem.exists("/usr/include/GLFW/glfw3.h")
 
-// not really....argh
+# not really....argh
 class LibraryFfmpeg extends Library
 	void __init__()
 		super.__init__("ffmpeg", ["avutil", "avcodec"])

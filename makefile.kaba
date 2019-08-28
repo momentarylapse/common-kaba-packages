@@ -56,8 +56,8 @@ void create_makefile()
 			e += " --noupdate"
 		if len(xx) == 3
 			f << "	xdg-icon-resource install --context mimetypes --size " + xx[1] + " " + std + xx[0] + " " + xx[2] + e
-//	if conf.icon != ""
-//		f << "	cp -f " + conf.icon + " " + datadir
+#	if conf.icon != ""
+#		f << "	cp -f " + conf.icon + " " + datadir
 	let list = conf.needs_installing()
 	for e in list
 		if e.is_dir
