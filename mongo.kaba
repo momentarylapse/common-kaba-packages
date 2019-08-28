@@ -45,7 +45,7 @@ void* json_to_bson(string json)
 	return bson_new_from_json(&t[0], json.num, nil)
 
 string bson_to_json(void *bson)
-	//char[0]* x = bson_as_canonical_extended_json(bson, nil)
+	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
 	char[0]* x = bson_as_relaxed_extended_json(bson, nil)
 	string t = char_to_str(x)
 	bson_free(x)
@@ -74,7 +74,7 @@ void __main()
 
 void main()
 	mongoc_init()
-	void* client = mongo_client_new("mongodb://myu:27017/?appname=sisyphos")
+	void* client = mongo_client_new("mongodb:#myu:27017/?appname=sisyphos")
 	print("client: " + p2s(client))
 	void* col
 	col = mongoc_client_get_collection(client, "wiki", "articles")
