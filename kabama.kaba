@@ -6,13 +6,13 @@ use "diff.kaba"
 
 
 Term *Execute(Term *t)
-	// selbst
+	# selbst
 	if t.name == "expand"
 		return Expand(Execute(t.params[0]))
 	if t.name == "diff"
 		return Diff(Execute(t.params[0]))
 
-	// rekursiv
+	# rekursiv
 	Term* r = t.shallow_copy()
 	for pp,i in t.params
 		r.params[i] = Execute(pp)
@@ -23,12 +23,12 @@ Term *ExecuteComplete(Term *t)
 	t = SimplifyNumericals(t)
 	t = Execute(t)
 	t = Normalize(t)
-	//t = SimplifyNumericals(t)
+	#t = SimplifyNumericals(t)
 	return t
 
 void main(string[] arg)
 	if arg.num > 0
 		Term *t = Parse(arg[0])
-		//print ExprToStr(t)
+		#print ExprToStr(t)
 		t = ExecuteComplete(t)
 		print(ExprToStr(t))

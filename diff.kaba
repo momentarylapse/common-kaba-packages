@@ -20,8 +20,8 @@ Term *DiffFunction(string func, Term *param)
 	raise(new RuntimeError("Funktion '" + func + "' nicht ableitbar"))
 
 
-// d/dx
-// always copies...
+# d/dx
+# always copies...
 Term *Diff(Term *t)
 	if !t
 		return nil
@@ -31,7 +31,7 @@ Term *Diff(Term *t)
 	if t.params.num > 1
 		b = t.params[1]
 
-	// selbst
+	# selbst
 	if t.type == TYPE_NUMBER
 		return AddNumber("0")
 	if t.type == TYPE_VARIABLE
@@ -39,22 +39,22 @@ Term *Diff(Term *t)
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == TYPE_FUNCTION
-		// diff(f(a))  ->  f'(a) * diff(a)
+		# diff(f(a))  ->  f'(a) * diff(a)
 		return AddOperator("*", DiffFunction(t.name, a.copy()),
 		                        Diff(a))
 	if t.type == TYPE_OPERATOR
 		if (t.name == "+") or (t.name == "-")
-			// diff(a + b)  ->  diff(a) + diff(b)
+			# diff(a + b)  ->  diff(a) + diff(b)
 			return AddOperator(t.name, Diff(a),
 			                           Diff(b))
 		if t.name == "*"
-			// diff(a * b)  ->  diff(a) * b + a * diff(b)
+			# diff(a * b)  ->  diff(a) * b + a * diff(b)
 			return AddOperator("+", AddOperator("*", Diff(a),
 			                                         b.copy()),
 			                        AddOperator("*", a.copy(),
 			                                         Diff(b)))
 		if t.name == "/"
-			// diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
+			# diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
 			return AddOperator("-", AddOperator("/", Diff(a),
 			                                         b.copy()),
 			                        AddOperator("/", AddOperator("*", a.copy(),
@@ -63,12 +63,12 @@ Term *Diff(Term *t)
 			                                                          AddNumber("2"))))
 		if t.name == "^"
 			if b.type == TYPE_NUMBER
-				// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
+				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b.copy(),
 				                        AddOperator("*", AddOperator("^", a.copy(),
 				                                                          AddNumber((b.name.int() - 1).str())),
 				                                         Diff(a)))
-			// diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
+			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
 			return AddOperator("+", AddOperator("*", b.copy(),
 			                                         AddOperator("*", AddOperator("^", a.copy(),
 			                                                                           AddOperator("-", b.copy(),

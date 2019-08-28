@@ -55,10 +55,10 @@ Term *PermuteOperator(Term *t)
 	r.params[1] = t.params[0].copy()
 	return r
 
-// (a+b)+(c+d)
-// 0 -> ~
-// 1 -> (b + a) + (c + d)
-// 2 -> (c + d) + .....
+# (a+b)+(c+d)
+# 0 -> ~
+# 1 -> (b + a) + (c + d)
+# 2 -> (c + d) + .....
 Term *PermuteLiftOperator__(Term *t, int n)
 	Term *r = t.copy()
 	r.params[0] = t.params[1].copy()
@@ -69,7 +69,7 @@ Term *PermuteLiftOperator__(Term *t, int n)
 class RuntimeError extends Exception
 
 bool NeedsBrackets(Term *t, Term *sub)
-	//return sub.Type == TypeOperator
+	#return sub.Type == TypeOperator
 	if t.name == "^"
 		return sub.type == TYPE_OPERATOR
 	if t.name == "/"

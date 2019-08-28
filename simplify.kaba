@@ -2,25 +2,25 @@ use "common.kaba"
 use "parser.kaba"
 
 string add(string a, string b)
-	//return i2s(s2i(a) + s2i(b))
+	#return i2s(s2i(a) + s2i(b))
 	vli va = a, vb = b
 	return (va + vb).str()
 
 string sub(string a, string b)
-	//return i2s(s2i(a) - s2i(b))
+	#return i2s(s2i(a) - s2i(b))
 	vli va = a, vb = b
 	return (va - vb).str()
 
 string mul(string a, string b)
-	//return i2s(s2i(a) * s2i(b))
+	#return i2s(s2i(a) * s2i(b))
 	vli va = a, vb = b
 	return (va * vb).str()
 
-/*string mod(string a, string b)
-	//return i2s(s2i(a) * s2i(b))
-	vli va = a, vb = b, rem
-	va.div(b, rem)
-	return rem.str()*/
+#string mod(string a, string b)
+#	#return i2s(s2i(a) * s2i(b))
+#	vli va = a, vb = b, rem
+#	va.div(b, rem)
+#	return rem.str()
 
 string exponent(string a, string b)
 	vli va = a, vb = b
@@ -46,7 +46,7 @@ void GetEqualOps(Term* t, Term*[] l)
 		for i in 0:l2.num
 			l.add(l2[i])
 
-// a/b kürzen
+# a/b kürzen
 Term *SimplifyNumberDivision(Term *t, string a, string b)
 	vli va = a
 	vli vb = b
@@ -69,7 +69,7 @@ Term *SimplifyNumberDivision(Term *t, string a, string b)
 Term *SimplifyNumericals(Term *t)
 	if !t
 		return nil
-	// rekursiv
+	# rekursiv
 	bool need_new = false
 	Term*[8] p
 	for i in 0:t.params.num
@@ -81,19 +81,19 @@ Term *SimplifyNumericals(Term *t)
 		for i in 0:t.params.num
 			t.params[i] = p[i]
 		
-	// selbst
+	# selbst
 	if t.type == TYPE_OPERATOR
 		Term *p1 = t.params[0]
 		Term *p2 = t.params[1]
 		if (p1.type == TYPE_NUMBER) and (p2.type == TYPE_NUMBER)
 			string a = p1.name
 			string b = p2.name
-			/*if t.name == "+"
-				return AddNumber(add(a, b))*/
+			#if t.name == "+"
+#				return AddNumber(add(a, b))
 			if t.name == "-"
 				return AddNumber(sub(a, b))
-			/*if t.name == "*"
-				return AddNumber(mul(a, b))*/
+			#if t.name == "*"
+#				return AddNumber(mul(a, b))
 			if t.name == "/"
 				return SimplifyNumberDivision(t, a, b)
 			if t.name == "^"
@@ -109,13 +109,13 @@ bool LiterallyEqual(Term *a, Term *b)
 	return true
 
 void SortExprList(Term*[] l, int[] n, bool find_duplicate)
-	// alle Terme "rendern"...   besser eine comp(term, term)-Funktion
+	# alle Terme "rendern"...   besser eine comp(term, term)-Funktion
 	string[] s
 	for i in 0:l.num
 		string ss = ExprToStr(l[i])
 		s.add(ss)
 	
-	// sortieren
+	# sortieren
 	for i in 0:l.num-1
 		for j in i+1:l.num
 			if s[i].compare(s[j]) > 0
@@ -135,7 +135,7 @@ void SortExprList(Term*[] l, int[] n, bool find_duplicate)
 					break
 			n.add(num)
 	
-	// aufräumen
+	# aufräumen
 	for i in 0:s.num
 		s[i].clear()
 
@@ -153,9 +153,9 @@ Term *Potence(Term *t, int n)
 		return AddNumber("1")
 	return AddOperator("^", t, AddNumber(n.str()))
 
-// Zahlfaktoren zusammenfassen
-// TODO: gleiche Faktoren mit unterschiedlichen Potenzen... Potenzen addieren
-// TODO: Brüche... kürzen...
+# Zahlfaktoren zusammenfassen
+# TODO: gleiche Faktoren mit unterschiedlichen Potenzen... Potenzen addieren
+# TODO: Brüche... kürzen...
 Term* NormalizeProduct(Term* t)
 	if t.type != TYPE_OPERATOR
 		return t
@@ -189,8 +189,8 @@ Term* NormalizeProduct(Term* t)
 		t_r = t_mul
 	return t_r
 
-// Zahlterme zusammenfassen
-// TODO: gleiche Summanden...
+# Zahlterme zusammenfassen
+# TODO: gleiche Summanden...
 Term *NormalizeSum(Term *t)
 	Term*[] l
 	GetEqualOps(t, l)
@@ -230,7 +230,7 @@ Term *NormalizeExponent(Term *t)
 Term *NormalizeRec(Term *t, bool do_normalize)
 	if !t
 		return nil
-	// rekursiv
+	# rekursiv
 	bool need_new = false
 	Term*[8] p
 	for i in 0:t.params.num
@@ -249,7 +249,7 @@ Term *NormalizeRec(Term *t, bool do_normalize)
 		for i in 0:t.params.num
 			t.params[i] = p[i]
 		
-	// selbst
+	# selbst
 	if do_normalize
 		if t.name == "*"
 			return NormalizeProduct(t)
