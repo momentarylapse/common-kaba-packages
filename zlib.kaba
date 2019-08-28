@@ -1,17 +1,17 @@
 const string KABA_LINK = "/usr/lib64/libz.so
 	_deflate:deflate
-	compressBound:compressBound
+	_compressBound:compressBound
 	_compress:compress
 	_uncompress:uncompress
 "
 
-extern int64 compressBound(int l)
+extern int64 _compressBound(int l)
 extern int _deflate()
 extern int _compress(void* dest, int64 *dest_len, void* source, int source_len)
 extern int _uncompress(void* dest, int64 *dest_len, void* source, int source_len)
 
 string compress(string s)
-	int64 ll = compressBound(len(s)) + 1024
+	int64 ll = _compressBound(len(s)) + 1024
 	string o
 	o.resize(ll)
 	int r = _compress(&o[0], &ll, &s[0], len(s))
