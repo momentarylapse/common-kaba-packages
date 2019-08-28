@@ -167,7 +167,7 @@ DrawingArea area '' grab-focus")
 		w = p.width
 		h = p.height
 		
-		// bg
+		# bg
 		p.set_color(COLOR_BACKGROUND)
 		p.draw_rect(0, 0, w, h)
 		
