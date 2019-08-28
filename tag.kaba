@@ -98,8 +98,8 @@ void tags_diff(Tag[] a, Tag[] b)
 	for ta in a
 		if !tags_has(b, ta)
 			print("+  " + ta.str())
-//		else
-//			print("=  " + ta.str())
+#		else
+#			print("=  " + ta.str())
 	for tb in b
 		if !tags_has(a, tb)
 			print("-  " + tb.str())

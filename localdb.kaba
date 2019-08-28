@@ -10,14 +10,14 @@ const string CHANGED_META = "changed-meta"
 class LocalFile
 	bool drop_me
 
-	// remote
+	# remote
 	string id
 	string name
 	int remote_mtime
 	string remote_path
-	// local
+	# local
 	string path
-	string hash // can be "" if not local
+	string hash # can be "" if not local
 	int mtime
 	int size
 	string[] options
@@ -69,7 +69,7 @@ class LocalFile
 		for o in f.options
 			set(o)
 	void sync_tags(Tag[] rtags)
-		tags = rtags // TODO
+		tags = rtags # TODO
 		db.dirty = true
 	void set_name(string _name)
 		name = _name
@@ -131,15 +131,15 @@ class LocalFile
 		else
 			print(status_str() + rel_path(path))
 	void show_info(string l)
-		//print(l + "path: " + path)
+		#print(l + "path: " + path)
 		print(l + "name:    " + name)
 		print(l + "id:      " + id)
 		print(l + "hash:    " + hash)
-		//print(l + "mtime:   " + mtime)
-		//if remote_mtime != 0 and remote_mtime != mtime
-		//	s += "\nmtime: " + mtime + " (REMOTE)"
+		#print(l + "mtime:   " + mtime)
+		#if remote_mtime != 0 and remote_mtime != mtime
+		#	s += "\nmtime: " + mtime + " (REMOTE)"
 		print(l + "size:    " + size)
-		//print(l + "options: " + options)
+		#print(l + "options: " + options)
 		let _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   " + t.key + "=" + t.value)
@@ -191,7 +191,7 @@ class LocalFile
 				tag_match = hash.match(mt.value)
 			else
 				for t in tags
-					//if t.key == mt.key and t.value == tm.value
+					#if t.key == mt.key and t.value == tm.value
 					if t.key == mt.key and t.value.match(mt.value)
 						tag_match = true
 						break
@@ -206,7 +206,7 @@ class LocalFileDB
 	void load()
 		files.clear()
 		dirty = false
-		//Timer tt
+		#Timer tt
 		string ss = Filesystem.read(AppDirectory + "sisyphos/db")
 		string[] lines = ss.explode("\n")
 		int n = lines.num / 10
@@ -230,7 +230,7 @@ class LocalFileDB
 				ff.id = ""
 	
 			files.add(ff)
-		//print(tt.get())
+		#print(tt.get())
 
 	void self_check()
 		for f in files
@@ -246,9 +246,9 @@ class LocalFileDB
 					print("GHOST: " + f.path)
 					f.drop_me = true
 					dirty = true
-				//else
-					// hash='', id='', no file
-					//print("EMPTY HASH (REMOTE): " + ff.path)
+				#else
+					# hash='', id='', no file
+					#print("EMPTY HASH (REMOTE): " + ff.path)
 			if f.path.num > 0
 				LocalFile *l = by_hash(f.hash)
 				if l and l != &f
@@ -323,13 +323,13 @@ class LocalFileDB
 				return &f
 		raise(new Exception("not in db: hash=" + hash))
 
-	/*LocalFile *find_by_hash(string hash)
-		if hash == ""
-			raise(new Exception("invalid hash"))
-		for f in files
-			if hash == f.hash
-				return &f
-		raise(new Exception("not in db: hash=" + hash))*/
+	#LocalFile *find_by_hash(string hash)
+#		if hash == ""
+#			raise(new Exception("invalid hash"))
+#		for f in files
+#			if hash == f.hash
+#				return &f
+#		raise(new Exception("not in db: hash=" + hash))
 		
 	LocalFile*[] find_by_tags(string str)
 		Tag[] tags = str2tags(str)
@@ -402,7 +402,7 @@ void auto_tag(LocalFile *f)
 			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
 			if s.num > 0
 				f.tag_set(Tag("pages", s.int().str()))
-		else if /*ext == "jpg" or*/ ext == "png" or ext == "bmp"
+		else if ext == "png" or ext == "bmp" # or ext == "jpg"
 			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
 			if s.num >= 2
 				f.tag_set(Tag("width", s[0].int().str()))

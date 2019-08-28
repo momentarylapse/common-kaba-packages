@@ -47,7 +47,7 @@ string remote_interface(string action, string[] params)
 	cmd += " /home/michi/Tools/alex/if-" +  action + ".py"
 	for p in params
 		cmd += " \\\"" + ssh_escape(p) + "\\\""
-	//cmd += ""
+	#cmd += ""
 	if conf.verbosity >= 2
 		print(cmd)
 	return shell_exec(cmd).trim()
@@ -57,9 +57,9 @@ string yii(string action, string[] params)
 	
 	cmd += CMD + " " + action
 	for p in params
-		//cmd += " \\\"" + ssh_escape(p) + "\\\""
+		#cmd += " \\\"" + ssh_escape(p) + "\\\""
 		cmd += " " + ssh_escape(p)
-	//cmd += ""
+	#cmd += ""
 	if conf.verbosity >= 2
 		print(cmd)
 	return shell_exec(cmd).trim()
@@ -81,7 +81,7 @@ RemoteFile[] remote_parse(string r)
 		rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
-		rf.path = rf.name + "." + extension // temporary
+		rf.path = rf.name + "." + extension # temporary
 		for i in 8:parts.num
 			rf.tags.add(strh2tag(parts[i]))
 		if parts[7] == "m"
@@ -99,7 +99,7 @@ RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)	
-	string r = yii("by-id", ids)//[ids, quality])
+	string r = yii("by-id", ids)#[ids, quality])
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash(string[] hashes)
@@ -132,19 +132,19 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 
 void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 	if !db.has_id(rf.id)
-		//string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
+		#string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
 			LocalFile* lf = db.by_hash(rf.hash)
 			if lf.id.num > 0
 				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  " + "REMOTE...")
 			lf.id = rf.id
-			//if conf.verbose
-			print("RELINK  " + rel_path(lf.path))// + "  ->  " + rf.id)
+			#if conf.verbose
+			print("RELINK  " + rel_path(lf.path))# + "  ->  " + rf.id)
 			lf.sync_tags(rf.tags)
 			lf.name = rf.name
 			return
 		except
-			// new remote file
+			# new remote file
 			LocalFile ll = rf
 			ll.path = ll.apply_structure(root, structure)
 			ll.set(NONLOCAL)
@@ -217,26 +217,26 @@ void remote_upload(LocalFile* f)
 	f.id = r[3:].explode("\n")[0]
 	db.save()
 
-	//string tagsh = tags2strh(f.tags)
+	#string tagsh = tags2strh(f.tags)
 		
-	//string r = yii("upload", [f.remote_path, f.name.hex(false), f.hash, f.mtime.str(), tagsh])
-	//print("answer: " + r)
+	#string r = yii("upload", [f.remote_path, f.name.hex(false), f.hash, f.mtime.str(), tagsh])
+	#print("answer: " + r)
 	
-	/*string[] p = r.explode("\t")
-	if p.num >= 2
-		if p[0] == "ok"
-			f.id = p[1]
-			db.save()
-			return
-		if p[0] == "duplicate"
-			print("hash already in db  -> RELINK")
-			f.id = p[1]
-			db.save()
-			return
-		if p[0] == "bad hash"
-			print("ERROR: upload failed?")
-			return
-	print("ERROR: ????")*/
+	#string[] p = r.explode("\t")
+#	if p.num >= 2
+#		if p[0] == "ok"
+#			f.id = p[1]
+#			db.save()
+#			return
+#		if p[0] == "duplicate"
+#			print("hash already in db  -> RELINK")
+#			f.id = p[1]
+#			db.save()
+#			return
+#		if p[0] == "bad hash"
+#			print("ERROR: upload failed?")
+#			return
+#	print("ERROR: ????")
 
 
 void remote_upload_meta(LocalFile* f)
@@ -322,7 +322,7 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 		if conf.verbosity >= 1
 			print("RELINK  " + rel_path(lf.path))
 		lf.id = rf.id
-		//db.dirty = true
+		#db.dirty = true
 	if lf.hash != rf.hash
 		if conf.verbosity >= 1
 			print("CHANGED HASH  " + rel_path(lf.path))
@@ -330,14 +330,14 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 			print(lf.hash)
 			print(rf.hash)
 		lf.set(CHANGED_FILE)
-		//db.dirty = true
+		#db.dirty = true
 	if lf.name != rf.name
 		if conf.verbosity >= 1
 			print("CHANGED NAME  " + rel_path(lf.path))
 		if conf.verbosity >= 2
 			print(lf.name + " <-> " + rf.name)
 		lf.set(CHANGED_META)
-		//db.dirty = true
+		#db.dirty = true
 	if !tags_equal(lf.tags, rf.tags)
 		if conf.verbosity >= 1
 			print("CHANGED TAGS  " + rel_path(lf.path))
@@ -345,7 +345,7 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 			print(tags2str(tags_sort(lf.tags)))
 			print(tags2str(tags_sort(rf.tags)))
 		lf.set(CHANGED_META)
-		//db.dirty = true
+		#db.dirty = true
 
 
 void remote_sync_pure_locals_by_hash(LocalFile*[] files)

@@ -5,7 +5,7 @@ use remote
 use tag
 
 
-// mix db files with "real" files
+# mix db files with "real" files
 class DBLister
 	string[] paths
 	LocalFile[] fake_files
@@ -40,7 +40,7 @@ class DBLister
 		paths.clear()
 		
 		try
-			// in DB?
+			# in DB?
 			return [db.find_by_path(path)]
 		except
 			if Filesystem.exists(path)
@@ -82,11 +82,11 @@ DBLister lister
 
 
 
-// "add"
+# "add"
 void file_add(LocalFile* f)
 	if f.in_db()
 
-		// suddenly appearing?!?
+		# suddenly appearing?!?
 		if f.pure_remote()
 			if Filesystem.exists(f.path)
 				f.unset(NONLOCAL)
@@ -94,7 +94,7 @@ void file_add(LocalFile* f)
 					print("NON-NONLOCAL " + rel_path(f.path))
 				return
 		
-		// lost?
+		# lost?
 		if !Filesystem.exists(f.path)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
@@ -102,20 +102,20 @@ void file_add(LocalFile* f)
 					print("LOST  " + rel_path(f.path))
 			return
 		
-		// time
+		# time
 		File* ff = Filesystem.open(f.path)
 		int mtime = ff.get_date().time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
 				print("=  " + rel_path(f.path))
 		else
-			// changed?
+			# changed?
 			try
 				string hash = Filesystem.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
 						print("TOUCHED  " + rel_path(f.path))
-					// ok
+					# ok
 					f.mtime = mtime
 				else
 					if conf.verbosity >= 1
@@ -131,7 +131,7 @@ void file_add(LocalFile* f)
 				return
 		delete ff
 	else
-		// new file
+		# new file
 		string hash
 		try
 			hash = Filesystem.hash(f.path, "md5")
@@ -140,7 +140,7 @@ void file_add(LocalFile* f)
 			return
 		try
 			LocalFile* ff = db.by_hash(hash)
-			// hash already in db?
+			# hash already in db?
 			if Filesystem.exists(ff.path)
 				if conf.verbosity >= 1
 					print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
@@ -148,7 +148,7 @@ void file_add(LocalFile* f)
 			else
 				file_move(ff, f.path)
 		except
-			// new
+			# new
 			file_add_new(f, hash)
 
 
@@ -158,8 +158,8 @@ void file_add_new(LocalFile* f, string hash)
 	string ext = f.path.extension()
 	if ext.num > 0
 		f.name = f.name.head(f.name.num - ext.num - 1)
-	//print(ext)
-	//print(l.name)
+	#print(ext)
+	#print(l.name)
 	f.hash = hash
 	File* fff = Filesystem.open(f.path)
 	f.mtime = fff.get_date().time
@@ -181,7 +181,7 @@ void file_move(LocalFile *f, string new_path)
 
 
 
-// check for local changes
+# check for local changes
 void action_add(string path)
 	set_working_dir(path)
 	let files = lister.find(path)
@@ -345,7 +345,7 @@ void action_push(string path)
 	
 	let files = lister.find(path)
 	for f in files
-		if f.pure_local() //or f.is(CHANGED_FILE)
+		if f.pure_local() #or f.is(CHANGED_FILE)
 			print("UPLOADING " + rel_path(f.path))
 			remote_upload(f)
 		if f.is(CHANGED_META)
