@@ -69,8 +69,7 @@ class DBLister
 				fake_files.add(f)
 		for f in fake_files
 			files.add(&f)
-		sort_list(&files, type(files), "path")
-		return files
+		return sorted(files, "path")
 
 DBLister lister
 

@@ -337,8 +337,7 @@ class LocalFileDB
 		for f in files
 			if f.match(tags)
 				list.add(&f)
-		sort_list(&list, type(list), "path")
-		return list
+		return sorted(list, "path")
 
 	LocalFile*[] get_in_dir(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
@@ -360,8 +359,7 @@ class LocalFileDB
 					if !f.pure_remote() and conf.filter_pure_remote
 						continue
 					list.add(&f)
-		sort_list(&list, type(list), "path")
-		return list
+		return sorted(list, "path")
 
 	LocalFile*[] get(string path, bool rec)
 		if Filesystem.is_directory(path)
@@ -388,7 +386,7 @@ class LocalFileDB
 				pass
 	void optimize()
 		print("optimizing...")
-		sort_list(&files, type(files), "path")
+		files = sorted(files, "path")
 		dirty = true
 	
 LocalFileDB db
