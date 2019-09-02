@@ -65,12 +65,12 @@ Toolbar toolbar ''
 		if len(arg) > 0
 			c.import(Filesystem.read_text(arg[0]))
 		
-		event("new", &on_new)
-		event("open", &on_open)
-		event("save", &on_save)
-		event("simulate", &on_simulate)
-		event("add-type", &on_add_type)
-		event_x("params", "hui:change", &on_param)
+		event("new", on_new)
+		event("open", on_open)
+		event("save", on_save)
+		event("simulate", on_simulate)
+		event("add-type", on_add_type)
+		event_x("params", "hui:change", on_param)
 		load_from_part(nil)
 	
 	void on_new()
