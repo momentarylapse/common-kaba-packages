@@ -8,12 +8,7 @@ Script*[] external_packages
 Script*[] external_libs
 
 string func_params(Function* f)
-	string params
-	for p,i in f.param_type
-		if params.num > 0
-			params += ", "
-		params += p.name + " " + f.var[i].name
-	return params
+	return [for p,i in f.param_type p.name + " " + f.var[i].name].join(", ")
 
 string show_func(string ns, Function* f)
 	string name = f.name
@@ -23,9 +18,9 @@ string show_func(string ns, Function* f)
 	string wiki = "== Kaba function " + name + " ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<syntaxhighlight lang=\"kaba\">\n"
+	wiki += "<code lang=\"kaba\">\n"
 	wiki += f.return_type.name + " " + name + "(" + func_params(f) + ")\n"
-	wiki += "</syntaxhighlight>\n"
+	wiki += "</code>\n"
 	
 	if len(f.param_type) > 0
 		wiki += "\n=== Parameters ===\n\n"
@@ -43,15 +38,21 @@ string show_var(string ns, Variable *v)
 	string wiki = "== Kaba variable " + v.name + " ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<syntaxhighlight lang=\"kaba\">\n"
+	wiki += "<code lang=\"kaba\">\n"
 	wiki += v.type.name + " " + v.name + "\n"
-	wiki += "</syntaxhighlight>\n\n"
+	wiki += "</code>\n\n"
 	
 	return wiki
 
 
 string class_extension(Class *c)
 	if c.parent
+		# dirty hack...
+		if c == string
+			return " extends " + c.parent.name + "[]"
+		if c == cstring
+			return " extends " + c.parent.name + "[" + str(c.size) + "]"
+			
 		return " extends " + c.parent.name
 	return ""
 
@@ -74,8 +75,8 @@ Function*[] filter_funcs(Function*[] ff, Class* namespace)
 			continue
 		else
 			r.add(f)
-	sort_list(&r, type(r), "name")
-	sort_list(&r, type(r), "is_static")
+	r = sorted(r, "name")
+	r = sorted(r, "is_static")
 	return r
 
 Constant*[] filter_consts(Constant*[] cc)
@@ -83,16 +84,10 @@ Constant*[] filter_consts(Constant*[] cc)
 	for c in cc
 		if c.name[:1] != "-"
 			r.add(c)
-	sort_list(&r, type(r), "name")
-	return r
+	return sorted(r, "name")
 
 ClassElement[] filter_elements(ClassElement[] cc)
-	ClassElement[] r
-	for c in cc
-		if c.name[:1] != "-"
-			r.add(c)
-	sort_list(&r, type(r), "name")
-	return r
+	return sorted([for c in cc c if c.name[:1] != "-"], "name")
 
 string show_class(string ns, Class* c)
 	string wiki = "== Kaba class " + c.name + " ==\n"
@@ -101,10 +96,10 @@ string show_class(string ns, Class* c)
 	let elements = filter_elements(c.elements)
 	let consts = filter_consts(c.constants)
 	
-	sort_list(&elements, type(elements), "name")
+	elements = sorted(elements, "name")
 	
 	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<syntaxhighlight lang=\"kaba\">\n"
+	wiki += "<code lang=\"kaba\">\n"
 	wiki += "class " + c.name + class_extension(c) + "\n"
 	for e in elements
 		wiki += SHIFT + e.type.name + " " + e.name + "\n"
@@ -121,7 +116,7 @@ string show_class(string ns, Class* c)
 		wiki += "\n" + SHIFT + "# constants\n"
 	for cc in consts
 		wiki += SHIFT + "const " + cc.type.name + " " + cc.name + "\n"
-	wiki += "</syntaxhighlight>\n\n"
+	wiki += "</code>\n\n"
 	
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
@@ -138,11 +133,11 @@ string show_class(string ns, Class* c)
 			wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
 			wiki += ": description\n\n"
 
-	#if len(consts) > 0
-	#	wiki += "\n=== Constants ===\n\n"
-	#	for cc in consts
-	#		wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
-	#		wiki += ": description\n\n"
+	if len(consts) > 0
+		wiki += "\n=== Constants ===\n\n"
+		for cc in consts
+			wiki += "; <tt>" + cc.type.name + " " + cc.name + "</tt>\n"
+			wiki += ": description\n\n"
 	return wiki
 
 Class*[] filter_classes(Class*[] cc)
@@ -155,8 +150,7 @@ Class*[] filter_classes(Class*[] cc)
 		if c.name.find("[", 0) >= 0 or c.name.find("{", 0) >= 0
 			continue
 		r.add(c)
-	sort_list(&r, type(r), "name")
-	return r
+	return sorted(r, "name")
 
 
 string show_package(Script *p)
@@ -175,8 +169,7 @@ string show_package(Script *p)
 		for f in funcs
 			wiki += "* <tt>" + f.return_type.name + " '''[[kaba." + p.name + "." + f.name + "|" + f.name + "]]'''(" + func_params(f) + ")\n"
 
-	let vars = p.variables()
-	sort_list(&vars, type(vars), "name")
+	let vars = sorted(p.variables(), "name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
@@ -210,8 +203,7 @@ string make_reference()
 		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
-	let stats = statements
-	sort_list(&stats, type(stats), "name")
+	let stats = sorted(statements, "name")
 	for s in stats
 		if s.name[:1] != "-" and s.name.num > 0
 			wiki += "* '''<tt>" + s.name + "</tt>'''\n"
