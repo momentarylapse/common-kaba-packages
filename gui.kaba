@@ -6,7 +6,7 @@ use kabama
 
 class KabamaWindow extends Dialog
 
-	void onOk()
+	void on_ok()
 		string s = get_string("edit")
 		try
 			set_string("list", s + "\\" + ExprToStr(ExecuteComplete(Parse(s))))
@@ -24,7 +24,7 @@ class KabamaWindow extends Dialog
 		add_def_button("Ok", 1, 0, "ok")
 		set_image("ok", "hui:ok")
 	
-		event("ok", &onOk)
+		event("ok", on_ok)
 	
 void main()
 	Window *win = new KabamaWindow
