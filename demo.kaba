@@ -8,9 +8,9 @@ class DemoDialog extends Window
 		super.__init__("", 100, 100)
 		set_border_width(10)
 		from_source(source)
-		event("close", &on_close)
-		event("ok", &on_close)
-		event("cancel", &on_close)
+		event("close", on_close)
+		event("ok", on_close)
+		event("cancel", on_close)
 	void on_close()
 		destroy()
 
