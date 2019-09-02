@@ -1,3 +1,5 @@
+use file
+
 string tag_contents(string all, string tag)
 	int i0 = all.find("<" + tag + ">", 0)
 	if i0 < 0
@@ -11,9 +13,9 @@ string compile_stage(string code, string stage)
 	if code == ""
 		return ""
 	string cmd = "echo '" + code + "' | glslc -fshader-stage=" + stage + " - -o -"
-	//print(cmd)
+	# print(cmd)
 	string x = shell_execute(cmd)
-	//print(x.num)
+	# print(x.num)
 	return x
 
 class LayoutData
@@ -45,7 +47,7 @@ int extract_push_size(string layout)
 	return 0
 
 void compile(string filename)
-	string all = FileRead(filename)
+	string all = Filesystem.read(filename)
 	string layout = tag_contents(all, "Layout")
 	string code_vertex = tag_contents(all, "VertexShader")
 	string code_geometry = tag_contents(all, "GeometryShader")
@@ -57,7 +59,7 @@ void compile(string filename)
 	
 	LayoutData ld = parse_layout(layout)
 	
-	File *f = FileCreate(filename + ".compiled")
+	File *f = Filesystem.create(filename + ".compiled")
 	f << "Info"
 	f << "{version=0.1,shaders=SPIR-V}"
 	f << "Input"
@@ -75,7 +77,7 @@ void compile(string filename)
 		f << x_geometry
 	f << "FragmentShader"
 	f << x_fragment
-	delete f
+	del f
 
 void main(string[] arg)
 	for a in arg
