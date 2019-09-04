@@ -61,6 +61,24 @@ class Database
 		let q = query(sql)
 		q.step()
 		del q
+	
+	any load_doc(string table, any id)
+		let sql = "select * from " + table + " where id = " + str(id)
+		print(sql)
+		let q = query(sql)
+		if !q.has_more()
+			raise(new Exception(str(id) + " not found in " + table))
+		any r = q.get_column()
+		del q
+		return r
+	
+	#any save_doc(string table, any id)
+	#	let q = query("select * from " + table + " where id = " + str(id))
+	#	if !q.has_more()
+	#		raise(new Exception(str(id) + " not found in " + table))
+	#	any r = q.get_column()
+	#	del q
+	#	return r
 
 class Query
 	void *res
@@ -136,11 +154,15 @@ Database* sqlite_create(string filename)
 	return db
 
 
-void main()
-#	let db = sqlite_create("test.sqlite3")
-#	db.run("create table michi (a integer, b text)")
-#	db.run("insert into michi (a,b) values (13,'xxx')")
+void __main()
+	let db = sqlite_create("test.sqlite3")
+	db.run("create table michi (id text, a integer, b text)")
+	db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
+	db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
+	db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
+	del db
 
+void main()
 	let db = sqlite_open("test.sqlite3")
 	let q = db.query("select * from michi")
 #	let q = db.query("SELECT * FROM sqlite_master where type='table'")
@@ -148,5 +170,6 @@ void main()
 	while q.has_more()
 		print(q.get_column())
 	del q
+	#print(db.load_doc("michi", "1002"))
 	del db
 
