@@ -7,7 +7,11 @@ const string KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_finalize:sqlite3_finalize
 	_sqlite3_column_count:sqlite3_column_count
 	_sqlite3_column_text:sqlite3_column_text
+	_sqlite3_column_int:sqlite3_column_int
+	_sqlite3_column_double:sqlite3_column_double
 	_sqlite3_errmsg:sqlite3_errmsg
+	_sqlite3_column_name:sqlite3_column_name
+	_sqlite3_column_type:sqlite3_column_type
 "
 
 const int SQLITE_OPEN_READWRITE = 2
@@ -20,8 +24,12 @@ extern int _sqlite3_finalize(void *r)
 extern int _sqlite3_prepare(void *db, char *sql, int len, void *res, void *zzz)
 extern int _sqlite3_column_count(void *r)
 extern char[0]* _sqlite3_column_text(void *r, int c)
+extern int _sqlite3_column_int(void *r, int c)
+extern float64 _sqlite3_column_double(void *r, int c)
 extern int _sqlite3_step(void *r)
 extern char[0]* _sqlite3_errmsg(void *db)
+extern char[0]* _sqlite3_column_name(void* r, int c)
+extern int _sqlite3_column_type(void* r, int c)
 
 string cstr2str(char[0]* cs)
 	string s
@@ -73,7 +81,7 @@ class Query
 			needs_step = false
 		return step_result == 100
 	
-	string[] get_column()
+	string[] get_column_text()
 		string[] r
 		if !has_more()
 			return r
@@ -81,6 +89,31 @@ class Query
 		for i in 0:n
 			r.add(cstr2str(_sqlite3_column_text(res, i)))
 		needs_step = true
+		return r
+
+	any get_column()
+		any r
+		if !has_more()
+			return r
+		int n = _sqlite3_column_count(res)
+		for i in 0:n
+			string key = cstr2str(_sqlite3_column_name(res, i))
+			int t = _sqlite3_column_type(res, i)
+			if t == 1 # int
+				r.set(key, _sqlite3_column_int(res, i))
+			else if t == 2 # double
+				r.set(key, f642f(_sqlite3_column_double(res, i)))
+			else if t == 3 # text
+				r.set(key, cstr2str(_sqlite3_column_text(res, i)))
+		needs_step = true
+		return r
+
+
+	string[] column_names()
+		string[] r
+		int n = _sqlite3_column_count(res)
+		for i in 0:n
+			r.add(cstr2str(_sqlite3_column_name(res, i)))
 		return r
 		
 
@@ -111,6 +144,7 @@ void main()
 	let db = sqlite_open("test.sqlite3")
 	let q = db.query("select * from michi")
 #	let q = db.query("SELECT * FROM sqlite_master where type='table'")
+#	print(q.column_names())
 	while q.has_more()
 		print(q.get_column())
 	del q
