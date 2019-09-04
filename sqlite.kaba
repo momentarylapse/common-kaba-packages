@@ -1,5 +1,5 @@
 const string KABA_LINK = "/usr/lib64/libsqlite3.so
-	_sqlite3_open:sqlite3_open
+	_sqlite3_open_v2:sqlite3_open_v2
 	_sqlite3_close:sqlite3_close
 	sqlite3_libversion_number:sqlite3_libversion_number
 	_sqlite3_prepare:sqlite3_prepare
@@ -7,16 +7,29 @@ const string KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_finalize:sqlite3_finalize
 	_sqlite3_column_count:sqlite3_column_count
 	_sqlite3_column_text:sqlite3_column_text
+	_sqlite3_errmsg:sqlite3_errmsg
 "
 
+const int SQLITE_OPEN_READWRITE = 2
+const int SQLITE_OPEN_CREATE = 4
+
 extern int sqlite3_libversion_number()
-extern int _sqlite3_open(char *fn, void *db)
+extern int _sqlite3_open_v2(char *fn, void *db, int flags, void *zzz)
 extern int _sqlite3_close(void *db)
 extern int _sqlite3_finalize(void *r)
 extern int _sqlite3_prepare(void *db, char *sql, int len, void *res, void *zzz)
 extern int _sqlite3_column_count(void *r)
-extern char* _sqlite3_column_text(void *r, int c)
+extern char[0]* _sqlite3_column_text(void *r, int c)
 extern int _sqlite3_step(void *r)
+extern char[0]* _sqlite3_errmsg(void *db)
+
+string cstr2str(char[0]* cs)
+	string s
+	for j in 0:10000
+		if cs[j] == 0
+			break
+		s.add(cs[j])
+	return s
 
 class Database
 	void *db
@@ -24,15 +37,24 @@ class Database
 		db = nil
 	void __delete__()
 		_sqlite3_close(db)
+
+	string error()
+		return cstr2str(_sqlite3_errmsg(db))
 		
-	Result* prepare(string sql)
+	Query* query(string sql)
 		string s = sql
 		s.add(0)
-		Result *r = new Result
-		_sqlite3_prepare(db, &s[0], sql.num, &r.res, nil)
-		return r
+		let q = new Query
+		if _sqlite3_prepare(db, &s[0], sql.num, &q.res, nil) != 0
+			raise(new Exception("sql query failed: " + error()))
+		return q
 
-class Result
+	void run(string sql)
+		let q = query(sql)
+		q.step()
+		del q
+
+class Query
 	void *res
 	int step_result
 	bool needs_step
@@ -41,10 +63,13 @@ class Result
 		needs_step = true
 	void __delete__()
 		_sqlite3_finalize(res)
+
+	void step()
+		step_result = _sqlite3_step(res)
 	
 	bool has_more()
 		if needs_step
-			step_result = _sqlite3_step(res)
+			step()
 			needs_step = false
 		return step_result == 100
 	
@@ -54,13 +79,7 @@ class Result
 			return r
 		int n = _sqlite3_column_count(res)
 		for i in 0:n
-			string t
-			char[0]* tt = _sqlite3_column_text(res, i)
-			for j in 0:10000
-				if tt[j] == 0
-					break
-				t.add(tt[j])
-			r.add(t)
+			r.add(cstr2str(_sqlite3_column_text(res, i)))
 		needs_step = true
 		return r
 		
@@ -69,7 +88,31 @@ Database* sqlite_open(string filename)
 	string f = filename
 	f.add(0)
 	Database *db = new Database
-	_sqlite3_open(&f[0], &db.db)
+	_sqlite3_open_v2(&f[0], &db.db, SQLITE_OPEN_READWRITE, nil)
 	if !db.db
 		raise(new Exception("can't open database " + filename))
 	return db
+
+Database* sqlite_create(string filename)
+	string f = filename
+	f.add(0)
+	Database *db = new Database
+	_sqlite3_open_v2(&f[0], &db.db, SQLITE_OPEN_READWRITE + SQLITE_OPEN_CREATE, nil)
+	if !db.db
+		raise(new Exception("can't create database " + filename))
+	return db
+
+
+void main()
+#	let db = sqlite_create("test.sqlite3")
+#	db.run("create table michi (a integer, b text)")
+#	db.run("insert into michi (a,b) values (13,'xxx')")
+
+	let db = sqlite_open("test.sqlite3")
+	let q = db.query("select * from michi")
+#	let q = db.query("SELECT * FROM sqlite_master where type='table'")
+	while q.has_more()
+		print(q.get_column())
+	del q
+	del db
+

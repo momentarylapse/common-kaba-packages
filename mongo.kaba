@@ -74,7 +74,7 @@ string bson_iter_str(void* i)
 
 string[] bson_iter_str_array(void *i)
 	string[] r
-	int[16] itarray
+	int[160] itarray
 	int length = 0
 	char* array
 	bson_iter_array(i, &length, &array)
@@ -83,6 +83,44 @@ string[] bson_iter_str_array(void *i)
 	while bson_iter_next(&itarray)
 		r.add(bson_iter_str(&itarray))
 	return r
+
+
+
+any bson_iter_to_any(void *iter)
+	int t = bson_iter_type(iter)
+	if t == 2 # str
+		return bson_iter_str(iter)
+	else if t == 16 # int
+		return bson_iter_int32(iter)
+	else if t == 4 # array
+		any r
+		int[160] itarray
+		int length = 0
+		char* array
+		bson_iter_array(iter, &length, &array)
+		void* bson = bson_new_from_data(array, length)
+		bson_iter_init(&itarray, bson)
+		while bson_iter_next(&itarray)
+			r.add(bson_iter_to_any(&itarray))
+		return r
+	else if t == 7 # ID
+		pass
+	print("UNKNOWN TYPE: " + t)
+	return ""
+
+
+any bson_iter_map_to_any(void *iter)
+	any r
+	while bson_iter_next(iter)
+		string key = bson_iter_key(iter)
+		print(key)
+		r.set(key, bson_iter_to_any(iter))
+	return r
+
+any bson_to_any(void *doc)
+	int[160] iter
+	bson_iter_init(&iter, doc)
+	return bson_iter_map_to_any(&iter)
 
 class Mongo
 	void* client
@@ -128,6 +166,8 @@ class Result
 	bool has_more()
 		return _mongoc_cursor_next(cur, &doc)
 		# bson_to_json(doc)
+	string json()
+		return bson_to_json(doc)
 
 
 void* __mongo_client_new(string uri)
@@ -153,11 +193,14 @@ void* __mongoc_client_get_collection(void* client, string db, string col)
 
 void main()
 	let m = new Mongo("localhost")
-	let col = m.get_collection("wiki", "articles")
-	let r = col.find("{\"name\":\"Hauptseite\"}")
+	#let col = m.get_collection("wiki", "articles")
+	#let r = col.find("{\"name\":\"Hauptseite\"}")
+	let col = m.get_collection("alex", "files")
+	let r = col.find("{\"id\":\"900942014\"}")
 
 	while r.has_more()
-		print(bson_to_json(r.doc))
+		print(r.json())
+		print(bson_to_any(r.doc))
 
 	delete r
 	delete col
