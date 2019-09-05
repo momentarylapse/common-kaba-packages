@@ -391,16 +391,19 @@ class LocalFileDB
 	
 LocalFileDB db
 
+
+
 void auto_tag(LocalFile *f)
 	if !Filesystem.exists(f.path)
 		return
 	string ext = f.path.extension()
+	#print(ext)
 	try
 		if ext == "pdf"
 			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
 			if s.num > 0
 				f.tag_set(Tag("pages", s.int().str()))
-		else if ext == "png" or ext == "bmp" # or ext == "jpg"
+		else if ext in ["png", "bmp"] #, "jpg"]
 			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
 			if s.num >= 2
 				f.tag_set(Tag("width", s[0].int().str()))
@@ -437,5 +440,22 @@ void auto_tag(LocalFile *f)
 					f.tag_set(Tag("timeofday", xx[1][11:]))
 			if len(make) > 0 and len(model) > 0
 				f.tag_set(Tag("camera", make + " " + model))
+		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
+			string[] s = shell_exec("tsunami --info \"" + bash_escape(f.path) + "\"").explode("\n")
+			int samples = -1
+			int sample_rate = 44100
+			for l in s
+				if l[:9] == "samples: "
+					samples = l[9:].int()
+				else if l[:13] == "sample-rate: "
+					sample_rate = l[13:].int()
+				else if l[:13] == "tag: title = "
+					f.set_name(l[13:])
+				else if l[:14] == "tag: artist = "
+					f.tag_set(Tag("artist", l[14:]))
+				else if l[:13] == "tag: album = "
+					f.tag_set(Tag("album", l[13:]))
+			if samples >= 0
+				f.tag_set(Tag("length", samples / sample_rate))
 	except Exception as e
 		error_out(e)

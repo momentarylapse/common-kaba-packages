@@ -78,15 +78,7 @@ Tag[] str2tags(string s)
 	return tags
 
 bool tag_multi(string key)
-	if key == "artist"
-		return true
-	if key == "author"
-		return true
-	if key == "category"
-		return true
-	if key == "genre"
-		return true
-	return false
+	return key in ["artist", "author", "category", "genre"]
 
 bool tags_has(Tag[] tags, Tag t)
 	for tt in tags

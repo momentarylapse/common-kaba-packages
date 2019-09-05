@@ -158,12 +158,12 @@ void file_add_new(LocalFile* f, string hash)
 	if ext.num > 0
 		f.name = f.name.head(f.name.num - ext.num - 1)
 	#print(ext)
-	#print(l.name)
+	#print(f.name)
 	f.hash = hash
 	File* fff = Filesystem.open(f.path)
 	f.mtime = fff.get_date().time
 	f.size = fff.get_size()
-	delete fff
+	del fff
 	auto_tag(f)
 	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")
