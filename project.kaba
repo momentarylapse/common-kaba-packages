@@ -2,7 +2,7 @@ use file
 
 string dir_absolute(string dir)
 	if dir.head(2) == "./"
-		return dir_absolute(Filesystem.current_directory() + dir.substr(2,-1))
+		return dir_absolute(Filesystem.current_directory() + dir[2:])
 	if dir.head(3) == "../"
 		return dir_absolute(Filesystem.current_directory() + dir)
 		
@@ -155,7 +155,7 @@ class SourceFile
 SourceFile[] sources
 
 string rel(string filename)
-	return filename.substr(conf.root.num, -1)
+	return filename[conf.root.num:]
 
 string canonical(string filename)
 	let p = filename.explode("/")
@@ -179,7 +179,7 @@ void find_dep(SourceFile f, string filename)
 		int p = l.find("#include \"", 0)
 		if p >= 0
 			int q = l.find("\"", p + 11)
-			string d = filename.dirname() + l.substr(p+10, q-p-10)
+			string d = filename.dirname() + l[p+10:q]
 			d = canonical(d)
 			if Filesystem.exists(d)
 				if f.add_dep(d)
