@@ -84,8 +84,8 @@ void main(string[] arg)
 			conf.pull_tags_only_add = true
 		else if a == "--medium"
 			conf.default_quality = MEDIUM
-		else if a.head(12) == "--structure="
-			conf.default_structure = a.substr(12,-1)
+		else if a[:12] == "--structure="
+			conf.default_structure = a[12:]
 		else
 			arg2.add(a)
 	run_command(arg2)

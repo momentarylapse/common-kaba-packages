@@ -171,7 +171,7 @@ class LocalFile
 			p1 = structure.find("}", p0)
 			if p1 < 0
 				break
-			string kkey = structure.substr(p0+1,p1-p0-1)
+			string kkey = structure[p0+1:p1]
 			string[] xkey = kkey.explode(":")
 			string val = get_tag(xkey[0])
 			if xkey.num > 1

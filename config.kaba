@@ -47,7 +47,7 @@ void set_working_dir(string path)
 
 string rel_path(string path)
 	if path.head(working_dir.num) == working_dir
-		return path.substr(working_dir.num, -1)
+		return path[working_dir.num:]
 	return path
 
 
@@ -119,8 +119,8 @@ class ConfigDirSync
 	string[] get_structure()
 		string[] oo = options.explode(";")
 		for o in oo
-			if o.substr(0,10) == "structure="
-				return o.substr(10,-1).explode("/")
+			if o[:10] == "structure="
+				return o[10:].explode("/")
 	string quality()
 		if options.find("quality=medium", 0) >= 0
 			return MEDIUM
