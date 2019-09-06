@@ -68,9 +68,9 @@ void patch_language(Language l, Language own, string filename)
 			if c == ""
 				continue
 			if a.head(5) == "# id:"
-				l.add_id(a.substr(5, -1), c.unescape(), "")
+				l.add_id(a[5:], c.unescape(), "")
 			if a.head(10) == "# tooltip:"
-				l.add_id(a.substr(10, -1), "", c.unescape())
+				l.add_id(a[10:], "", c.unescape())
 			if a == "# text"
 				l.add_text(b.unescape(), c.unescape())
 	except

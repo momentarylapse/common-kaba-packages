@@ -43,7 +43,7 @@ class SourceLanguageFinder extends SourceParser
 	Language* l
 	override void handle(int pos, int length)
 		LangText t
-		t.orig = str_m2utf8(source.substr(pos, length)).unescape()
+		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		if t.orig.num > 0
 			bool found = false
@@ -64,7 +64,7 @@ class SourceSwapper extends SourceParser
 		changed = false
 		delta = 0
 	override void handle(int pos, int length)
-		string orig = str_m2utf8(source.substr(pos, length)).unescape()
+		string orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		for t in l.texts
 			if orig == t.orig
@@ -72,7 +72,7 @@ class SourceSwapper extends SourceParser
 				print("REPLACE " + orig + "    ->   " + r)
 				
 				int ppos = pos + delta
-				source_new = source_new.head(ppos) + r + source_new.substr(ppos+length,-1)
+				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
 				
 				delta += r.num - length
 				

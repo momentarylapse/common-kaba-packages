@@ -6,7 +6,7 @@ use language
 void write_resource(File *f, Resource r)
 	f << r.type
 	if r.id.head(1) == "/"
-		f << r.id.substr(1, -1)
+		f << r.id[1:]
 	else
 		f << r.id
 	f << r.options.join(",")
