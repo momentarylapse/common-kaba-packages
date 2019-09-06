@@ -540,7 +540,7 @@ class Function
 	#	vars.add(v)
 	#	return v
 	virtual void call(Interpreter *inter, Variable* ret, Variable*[] p)
-			inter.stack_push(self, ret)
+			inter.stack_push(&self, ret)
 			int n = min(p.num, params.num)
 			for i in 0:n
 				*inter.cur_context.vars[i].v = *p[i].v
@@ -653,7 +653,7 @@ class FunctionMap extends FunctionInternal
 					temp2.setReference(e)
 					Variable*[] pp
 					pp.add(&temp2)
-					inter.stack_push(self, &temp)
+					inter.stack_push(&self, &temp)
 					f._func.call(inter, &temp, pp)
 					inter.stack_pop()
 					ra.a.add(temp.v.copy())
@@ -778,6 +778,7 @@ class SyntaxNodeFor extends SyntaxNode
 		return "for"
 	override void showPost(int indent)
 		block.show(indent+1)
+
 		if block_else
 			block_else.show(indent+1)
 
@@ -1351,7 +1352,7 @@ class Interpreter
 			DynamicValueStateFunction* fs = v.v.s
 			Function *f = fs._func
 			stack_push(f, ret)
-			f.call(self, ret, params)
+			f.call(&self, ret, params)
 			#if f.block
 #				int n = min(sn.params.num,f.params.num)
 #				for i in 0:n
