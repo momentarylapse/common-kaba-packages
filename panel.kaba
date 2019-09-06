@@ -58,7 +58,7 @@ DrawingArea area '' grab-focus")
 		COLOR_BACKGROUND = color(1, 0.1, 0.1, 0.1)
 		COLOR_TEXT = White
 		COLOR_SELECTION = color(1.0, 0.4, 0.4, 1.0)
-		
+
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:left-button-down", on_left_button_down)
 		event_x("area", "hui:left-button-up", on_left_button_up)
