@@ -22,7 +22,7 @@ class ToolbarDemoDialog extends Dialog
 class MenuDemoDialog extends Window
 	void __init__(string source)
 		super.__init__("Menu demo", 800, 300)
-		Menu* m = HuiCreateMenuFromSource(source)
+		Menu* m = CreateMenuFromSource(source)
 		set_menu(m)
 
 void action_demo(string filename)
