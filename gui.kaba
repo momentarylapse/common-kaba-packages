@@ -79,15 +79,15 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	void on_save()
-		if HuiFileDialogSave(&self, "Save the circuit", "", "*.circuit", "*.circuit")
+		if FileDialogSave(&self, "Save the circuit", "", "*.circuit", "*.circuit")
 			Filesystem.write_text(HuiFilename, c.export())
 	
 	void on_open()
-		if HuiFileDialogOpen(&self, "Load the circuit", "", "*.circuit", "*.circuit")
+		if FileDialogOpen(&self, "Load the circuit", "", "*.circuit", "*.circuit")
 			c.import(Filesystem.read_text(HuiFilename))
 	
 	void on_param()
-		int row = HuiGetEvent().row
+		int row = GetEvent().row
 		string p = get_cell("params", row, 1)
 		if panel.sel.type == SEL_TYPE_EDGE
 			c.edges[panel.sel.index].param[row] = p.float()

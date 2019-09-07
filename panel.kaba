@@ -1,10 +1,10 @@
 use hui
 use circuit
 
-void draw_line(Painter* p, complex a, complex b)
+void draw_line(Painter p, complex a, complex b)
 	p.draw_line(a.x, a.y, b.x, b.y)
 
-void draw_circle(Painter* p, complex c, float r)
+void draw_circle(Painter p, complex c, float r)
 	p.draw_circle(c.x, c.y, r)
 
 enum
@@ -110,7 +110,7 @@ DrawingArea area '' grab-focus")
 	
 	void on_left_button_down()
 		sel.type = SEL_TYPE_NONE
-		complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+		complex m = complex(GetEvent().mouse_x, GetEvent().mouse_y)
 		for n,i in c.nodes
 			if (m - project(n.pos)).abs() < 20
 				sel.type = SEL_TYPE_NODE
@@ -150,12 +150,12 @@ DrawingArea area '' grab-focus")
 
 	void on_mouse_move()
 		if mode == MODE_MOVE_NODE
-			complex m = complex(HuiGetEvent().mouse_x, HuiGetEvent().mouse_y)
+			complex m = complex(GetEvent().mouse_x, GetEvent().mouse_y)
 			c.nodes[sel.index].pos = unproject(m)
 			redraw("area")
 	
 	void on_key_down()
-		if HuiGetEvent().key_code == KEY_DELETE
+		if GetEvent().key_code == KEY_DELETE
 			if sel.type == SEL_TYPE_EDGE
 				delete c.edges[sel.index]
 				c.edges.remove(sel.index)
@@ -163,7 +163,7 @@ DrawingArea area '' grab-focus")
 				res.clear()
 		redraw("area")
 
-	void on_draw(Painter* p)
+	void on_draw(Painter p)
 		w = p.width
 		h = p.height
 		
@@ -256,7 +256,7 @@ DrawingArea area '' grab-focus")
 		else if mode == MODE_MOVE_NODE
 			p.draw_str(0, 0, "move the node")
 			
-	void draw_res(Painter* p)
+	void draw_res(Painter p)
 		
 		NT = len(res.U)
 		if NT == 0
