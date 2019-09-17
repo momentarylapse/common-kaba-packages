@@ -16,7 +16,7 @@ def upload(name, wiki):
 		r = db.articles.update_one({'_id': r[0]['_id']}, {'$set': {'wiki': wiki}})
 		#print("updated")
 	except:
-		#print("new")
+		print("-------- new -----------")
 		article = new_article(name, wiki)
 		db.articles.insert_one(article)
 

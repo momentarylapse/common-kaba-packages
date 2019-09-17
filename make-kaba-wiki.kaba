@@ -13,19 +13,19 @@ string func_params(Function* f)
 string show_func(string ns, Function* f)
 	string name = f.name
 	if f.namespace
-		name = f.namespace.name + "." + f.name
+		name = "{{f.namespace.name}}.{{f.name}}"
 	
-	string wiki = "== Kaba function " + name + " ==\n"
+	string wiki = "== Kaba function {{name}} ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	wiki += f.return_type.name + " " + name + "(" + func_params(f) + ")\n"
+	wiki += "{{f.return_type.name}} {{name}}({{func_params(f)}})\n"
 	wiki += "</code>\n"
 	
 	if len(f.param_type) > 0
 		wiki += "\n=== Parameters ===\n\n"
 		for p,i in f.param_type
-			wiki += "; <tt>" + p.name + " " + f.var[i].name + "</tt>\n"
+			wiki += "; <tt>{{p.name}} {{f.var[i].name}}</tt>\n"
 			wiki += ": description\n\n"
 
 	if f.return_type.name != "void"
@@ -35,11 +35,11 @@ string show_func(string ns, Function* f)
 	return wiki
 
 string show_var(string ns, Variable *v)
-	string wiki = "== Kaba variable " + v.name + " ==\n"
+	string wiki = "== Kaba variable {{v.name}} ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	wiki += v.type.name + " " + v.name + "\n"
+	wiki += "{{v.type.name}} {{v.name}}\n"
 	wiki += "</code>\n\n"
 	
 	return wiki
@@ -49,9 +49,9 @@ string class_extension(Class *c)
 	if c.parent
 		# dirty hack...
 		if c == string
-			return " extends " + c.parent.name + "[]"
+			return " extends {{c.parent.name}}[]"
 		if c == cstring
-			return " extends " + c.parent.name + "[" + str(c.size) + "]"
+			return " extends {{c.parent.name}}[{{c.size}}]"
 			
 		return " extends " + c.parent.name
 	return ""
@@ -71,7 +71,7 @@ Function*[] filter_funcs(Function*[] ff, Class* namespace)
 			continue
 		else if f.name == "__init__"
 			r.add(f)
-		else if f.name[:1] == "@" or f.name[:1] == "_" or f.name[:1] == "-"
+		else if f.name[:1] in ["@", "_", "-"]
 			continue
 		else
 			r.add(f)
@@ -90,7 +90,7 @@ ClassElement[] filter_elements(ClassElement[] cc)
 	return sorted([for c in cc c if c.name[:1] != "-"], "name")
 
 string show_class(string ns, Class* c)
-	string wiki = "== Kaba class " + c.name + " ==\n"
+	string wiki = "== Kaba class {{c.name}} ==\n"
 	
 	let funcs = filter_funcs(func_extract(c), c)
 	let elements = filter_elements(c.elements)
@@ -100,22 +100,22 @@ string show_class(string ns, Class* c)
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	wiki += "class " + c.name + class_extension(c) + "\n"
+	wiki += "class {{c.name}}{{class_extension(c)}}\n"
 	for e in elements
-		wiki += SHIFT + e.type.name + " " + e.name + "\n"
+		wiki += "{{SHIFT}}{{e.type.name}} {{e.name}}\n"
 	if len(funcs) > 0
-		wiki += "\n" + SHIFT + "# functions\n"
+		wiki += "\n{{SHIFT}}# functions\n"
 	for f in funcs
 		string pre
 		if f.is_static
 			pre += "static "
 		if f.virtual_index >= 0
 			pre += "virtual "
-		wiki += SHIFT + pre + f.return_type.name + " " + f.name + "(" + func_params(f) + ")\n"
+		wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})\n"
 	if len(consts) > 0
-		wiki += "\n" + SHIFT + "# constants\n"
+		wiki += "\n{{SHIFT}}# constants\n"
 	for cc in consts
-		wiki += SHIFT + "const " + cc.type.name + " " + cc.name + "\n"
+		wiki += "{{SHIFT}}const {{cc.type.name}} {{cc.name}}\n"
 	wiki += "</code>\n\n"
 	
 	if len(funcs) > 0
@@ -124,19 +124,19 @@ string show_class(string ns, Class* c)
 			string pre
 			if f.is_static
 				pre += "static "
-			wiki += "; <tt>" + pre + f.return_type.name + " [[kaba." + ns + "." + c.name + "." + f.name + "|" + f.name + "]](" + func_params(f) + ")\n"
+			wiki += "; <tt>{{pre}}{{f.return_type.name}} [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}})\n"
 			wiki += ": description\n\n"
 	
 	if len(elements) > 0	
 		wiki += "\n=== Elements ===\n\n"
 		for e in elements
-			wiki += "; <tt>" + e.type.name + " " + e.name + "</tt>\n"
+			wiki += "; <tt>{{e.type.name}} {{e.name}}</tt>\n"
 			wiki += ": description\n\n"
 
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for cc in consts
-			wiki += "; <tt>" + cc.type.name + " " + cc.name + "</tt>\n"
+			wiki += "; <tt>{{cc.type.name}} {{cc.name}}</tt>\n"
 			wiki += ": description\n\n"
 	return wiki
 
@@ -154,59 +154,61 @@ Class*[] filter_classes(Class*[] cc)
 
 
 string show_package(Script *p)
-	string wiki = "== Kaba package " + p.name + " ==\n"
+	string wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
-		wiki = "== Kaba package " + p.name + " (default) ==\n"
+		wiki = "== Kaba package {{p.name}} (default) ==\n"
 	let classes = filter_classes(p.classes())
 	if len(classes) > 0
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
-			wiki += "* <tt>class '''[[kaba." + p.name + "." + c.name + "|" + c.name + "]]'''" + class_extension(c) + "</tt>\n"
+			wiki += "* <tt>class '''[[kaba.{{p.name}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
 
 	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			wiki += "* <tt>" + f.return_type.name + " '''[[kaba." + p.name + "." + f.name + "|" + f.name + "]]'''(" + func_params(f) + ")\n"
+			wiki += "* <tt>{{f.return_type.name}} '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}})\n"
 
 	let vars = sorted(p.variables(), "name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
-			wiki += "* <tt>" + v.type.name + " '''[[kaba." + p.name + "." + v.name + "|" + v.name + "]]'''</tt>\n"
+			wiki += "* <tt>{{v.type.name}} '''[[kaba.{{p.name}}.{{v.name}}|{{v.name}}]]'''</tt>\n"
 
 	let consts = filter_consts(p.constants())
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for c in consts
-			wiki += "* <tt>const " + c.type.name + " '''" + c.name + "'''</tt>\n"
+			wiki += "* <tt>const {{c.type.name}} '''{{c.name}}'''</tt>\n"
 	return wiki
 
 
 string make_reference()
 	string wiki = "== Kaba reference ==\n"
 
+	wiki += "\nLib version {{lib_version}} from " + Date.now().format("%F") + "\n"
+
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
 	for p in packages
-		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>"
+		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default
 			wiki += " (default)"
 		wiki += "\n"
 
 	wiki += "\n; external\n\n"
 	for p in external_packages
-		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>\n"
+		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n; external libs\n\n"
 	for p in external_libs
-		wiki += "* <tt>[[kaba." + p.name + "|" + p.name + "]]</tt>\n"
+		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
 	let stats = sorted(statements, "name")
 	for s in stats
 		if s.name[:1] != "-" and s.name.num > 0
-			wiki += "* '''<tt>" + s.name + "</tt>'''\n"
+			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
 	return wiki
 
 void wiki_upload(string name, string wiki)
@@ -245,16 +247,16 @@ void make_package(Script* p)
 
 	let classes = filter_classes(p.classes())
 	for c in classes
-		wiki_upload("kaba." + p.name + "." + c.name, show_class(p.name, c))
+		wiki_upload("kaba.{{p.name}}.{{c.name}}", show_class(p.name, c))
 
 		let funcs = filter_funcs(func_extract(c), c)
 		for f in funcs
-			wiki_upload("kaba." + p.name + "." + c.name + "." + f.name, show_func(p.name + "." + c.name + "." + c.name, f))
+			wiki_upload("kaba.{{p.name}}.{{c.name}}.{{f.name}}", show_func(p.name + "." + c.name + "." + c.name, f))
 
-	let funcs = filter_funcs(p.functions(), nil)
+	let funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
-		wiki_upload("kaba." + p.name + "." + f.name, show_func(p.name, f))
+		wiki_upload("kaba.{{p.name}}.{{f.name}}", show_func(p.name, f))
 
 	let vars = p.variables()
 	for v in vars
-		wiki_upload("kaba." + p.name + "." + v.name, show_var(p.name, v))
+		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
