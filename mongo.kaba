@@ -114,7 +114,7 @@ any bson_iter_to_any(void *iter)
 		_bson_oid_to_string(oid, &s[0])
 		s.resize(24)
 		return s
-	print("UNKNOWN TYPE: " + t)
+	print("UNKNOWN TYPE: {{t}}")
 	return ""
 
 
@@ -134,9 +134,9 @@ class Mongo
 	void* client
 	void __init__(string host)
 		_mongoc_init()
-		client = __mongo_client_new("mongodb://" + host + ":27017/?appname=kaba")
+		client = __mongo_client_new("mongodb://{{host}}:27017/?appname=kaba")
 		if !client
-			raise(new Exception("can not connect to " + host))
+			raise(new Exception("can not connect to {{host}}"))
 
 	void __delete__()
 		if client

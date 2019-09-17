@@ -63,11 +63,11 @@ class Database
 		del q
 	
 	any load_doc(string table, any id)
-		let sql = "select * from " + table + " where id = " + str(id)
+		let sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
 		let q = query(sql)
 		if !q.has_more()
-			raise(new Exception(str(id) + " not found in " + table))
+			raise(new Exception("{{id}} not found in {{table}}"))
 		any r = q.get_column()
 		del q
 		return r
@@ -141,7 +141,7 @@ Database* sqlite_open(string filename)
 	Database *db = new Database
 	_sqlite3_open_v2(&f[0], &db.db, SQLITE_OPEN_READWRITE, nil)
 	if !db.db
-		raise(new Exception("can't open database " + filename))
+		raise(new Exception("can't open database {{filename}}"))
 	return db
 
 Database* sqlite_create(string filename)
@@ -150,7 +150,7 @@ Database* sqlite_create(string filename)
 	Database *db = new Database
 	_sqlite3_open_v2(&f[0], &db.db, SQLITE_OPEN_READWRITE + SQLITE_OPEN_CREATE, nil)
 	if !db.db
-		raise(new Exception("can't create database " + filename))
+		raise(new Exception("can't create database {{filename}}"))
 	return db
 
 
