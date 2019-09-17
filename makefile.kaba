@@ -4,23 +4,23 @@ use library
 
 void create_makefile()
 	File* f = Filesystem.create_text(conf.root + "Makefile")
-	f << "BIN = ../" + conf.binary
+	f << "BIN = ../{{conf.binary}}"
 	f << "CPP = g++"
 	string cflags, lflags, defines
 	for l in conf.libs
 		cflags += lib.compiler_flags(l)
 		lflags += lib.linker_flags(l)
-		defines += " -D" + lib.define(l) + "=1"
+		defines += " -D{{lib.define(l)}}=1"
 	for l in conf.libs_optional
 		if lib.has(l) and !conf.ignored(l)
 			cflags += lib.compiler_flags(l)
 			lflags += lib.linker_flags(l)
-			defines += " -D" + lib.define(l) + "=1"
+			defines += " -D{{lib.define(l)}}=1"
 		else
-			defines += " -D" + lib.define(l) + "=0"
-	f << "GLOBALFLAGS = " + conf.flags_global + " -std=" + conf.language + " " + defines
-	f << "CXXFLAGS = " + conf.flags_compiler + cflags + " $(GLOBALFLAGS)"
-	f << "CXXFLAGSLINKING = " + conf.flags_linker + lflags + " $(GLOBALFLAGS)"
+			defines += " -D{{lib.define(l)}}=0"
+	f << "GLOBALFLAGS = {{conf.flags_global}} -std={{conf.language}} {{defines}}"
+	f << "CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)"
+	f << "CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)"
 	f << "prefix = /usr/local"
 	f << ""
 	string[] obj
@@ -29,8 +29,9 @@ void create_makefile()
 			obj.add(rel(s.object()))
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
-	f << "$(BIN) : $(OBJ) " + conf.main_file.replace(".cpp", ".o")
-	f << "\t$(CPP) $(OBJ) " + conf.main_file.replace(".cpp", ".o") + " -o $(BIN) $(CXXFLAGSLINKING)"
+	string main_ob = conf.main_file.replace(".cpp", ".o")
+	f << "$(BIN) : $(OBJ) {{main_ob}}"
+	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
 	f << ""
 	f << "all : $(BIN)"
 	f << ""
@@ -39,31 +40,31 @@ void create_makefile()
 		for d in s.dep
 			a += " " + rel(d)
 		f << a
-		f << "\t$(CPP) -c " + rel(s.filename) + " -o $@ $(CXXFLAGS)"
+		f << "\t$(CPP) -c {{rel(s.filename)}} -o $@ $(CXXFLAGS)"
 		f << ""
 	f << "install :"
-	let datadir = "$(prefix)/share/" + conf.name
+	let datadir = "$(prefix)/share/{{conf.name}}"
 	let std = "../static/"
-	f << "	mkdir -p " + datadir
+	f << "	mkdir -p {{datadir}}"
 	if conf.desktop_file != ""
-		f << "	xdg-desktop-menu install " + std + conf.desktop_file
+		f << "	xdg-desktop-menu install {{std}}{{conf.desktop_file}}"
 	for m in conf.mime_files
-		f << "	xdg-mime install " + std + m
+		f << "	xdg-mime install {{std}}{{m}}"
 	for icon,i in conf.icons
 		let xx = icon.explode(":")
 		string e
 		if i < len(conf.icons) - 1
 			e += " --noupdate"
 		if len(xx) == 3
-			f << "	xdg-icon-resource install --context mimetypes --size " + xx[1] + " " + std + xx[0] + " " + xx[2] + e
+			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} {{std}}{{xx[0]}} {{xx[2]}}{{e}}"
 #	if conf.icon != ""
 #		f << "	cp -f " + conf.icon + " " + datadir
 	let list = conf.needs_installing()
 	for e in list
 		if e.is_dir
-			f << "	cp -rf '../" + e.name + "' " + datadir
+			f << "	cp -rf '../{{e.name}}' {{datadir}}"
 		else
-			f << "	cp -f '../" + e.name + "' " + datadir
+			f << "	cp -f '../{{e.name}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 
 	f << ""

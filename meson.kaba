@@ -4,7 +4,7 @@ use library
 
 void create_meson()
 	File* f = Filesystem.create_text(conf.root + "../meson.build")
-	f << "project('" + conf.name + "', 'cpp', default_options : ['cpp_std=" + conf.language + "', 'warning_level=1'])"
+	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1'])"
 	f << "add_project_arguments('-O2', '-g', '-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])"
 	f << "
 #install_data
@@ -22,8 +22,8 @@ threaddep = dependency('threads')"
 		let ll = lib.get(l)
 		string var = l + "dep"
 		vars.add(var)
-		f << var + " = dependency('" + ll.meson_libs()[0] + "')"
-		f << "add_project_arguments('-D" + ll.define() + "=1', language : ['cpp'])"
+		f << var + " = dependency('{{ll.meson_libs()[0]}}')"
+		f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
 	f << "deps = " + str(vars).replace("\"", "")
 	
 	
@@ -38,17 +38,17 @@ threaddep = dependency('threads')"
 			let v = "d"
 			if len(mlibs) > 1
 				v += str(i+1)
-			f << v + " = cc.find_library('" + m + "', required : false)"
+			f << v + " = cc.find_library('{{m}}', required : false)"
 			if i > 0
 				ltest += " and "
 				deps += ","
 			ltest += v + ".found()"
 			deps += v
 		f << "if " + ltest
-		f << "	add_project_arguments('-D" + ll.define() + "=1', language : ['cpp'])"
+		f << "	add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
 		f << "	deps += [" + deps + "]"
 		f << "else"
-		f << "	add_project_arguments('-D" + ll.define() + "=0', language : ['cpp'])"
+		f << "	add_project_arguments('-D{{ll.define()}}=0', language : ['cpp'])"
 		f << "endif"
 
 	
@@ -59,12 +59,12 @@ sources = ["
 		string e
 		if i < len(sources) - 1
 			e = ","
-		f << "	'src/" + rel(s.filename) + "'" + e
+		f << "	'src/{{rel(s.filename)}}'{{e}}"
 	f << "]
 
 "
 
-	f << "executable('" + conf.binary + "', sources, dependencies : deps, install : true)"
+	f << "executable('{{conf.binary}}', sources, dependencies : deps, install : true)"
 	
 	f << ""
 	
@@ -72,11 +72,11 @@ sources = ["
 	let list = conf.needs_installing()
 	for e in list
 		if e.is_dir
-			f << "install_subdir('" + e.name + "', install_dir : join_paths(get_option('datadir'), '" + conf.name + "'))"
+			f << "install_subdir('{{e.name}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 		else
-			f << "install_data('" + e.name + "', install_dir : join_paths(get_option('datadir'), '" + conf.name + "'))"
+			f << "install_data('{{e.name}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 	
 	if conf.desktop_file != ""
-		f << "install_data('" + std + conf.desktop_file + "', install_dir : join_paths(get_option('datadir'), 'applications'))"
+		f << "install_data('{{std}}{{conf.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
 
 
