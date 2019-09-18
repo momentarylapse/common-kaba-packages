@@ -49,7 +49,7 @@ class DBLister
 				fake_files.add(ff)
 				return [&fake_files[0]]
 			else
-				print("ERROR: can't find '" + path + "'")
+				print("ERROR: can't find '{{path}}'")
 		return files
 		
 	LocalFile*[] find_dir(string dir)
@@ -90,7 +90,7 @@ void file_add(LocalFile* f)
 			if Filesystem.exists(f.path)
 				f.unset(NONLOCAL)
 				if conf.verbosity >= 1
-					print("NON-NONLOCAL " + rel_path(f.path))
+					print("NON-NONLOCAL {{rel_path(f.path)}}")
 				return
 		
 		# lost?
@@ -98,7 +98,7 @@ void file_add(LocalFile* f)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
 				if conf.verbosity >= 1
-					print("LOST  " + rel_path(f.path))
+					print("LOST  {{rel_path(f.path)}}")
 			return
 		
 		# time
@@ -106,19 +106,19 @@ void file_add(LocalFile* f)
 		int mtime = ff.get_date().time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
-				print("=  " + rel_path(f.path))
+				print("=  {{rel_path(f.path)}}")
 		else
 			# changed?
 			try
 				string hash = Filesystem.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
-						print("TOUCHED  " + rel_path(f.path))
+						print("TOUCHED  {{rel_path(f.path)}}")
 					# ok
 					f.mtime = mtime
 				else
 					if conf.verbosity >= 1
-						print("EDITED  " + rel_path(f.path))
+						print("EDITED  {{rel_path(f.path)}}")
 					f.set(CHANGED_FILE)
 					f.hash = hash
 					f.mtime = mtime
@@ -142,7 +142,7 @@ void file_add(LocalFile* f)
 			# hash already in db?
 			if Filesystem.exists(ff.path)
 				if conf.verbosity >= 1
-					print("DUPLICATE  " + rel_path(f.path) + " <-> " + rel_path(ff.path))
+					print("DUPLICATE  {{rel_path(f.path)}} <-> {{rel_path(ff.path)}}")
 				file_add_new(f, hash)
 			else
 				file_move(ff, f.path)
@@ -152,7 +152,7 @@ void file_add(LocalFile* f)
 
 
 void file_add_new(LocalFile* f, string hash)
-	print("ADD  " + rel_path(f.path))
+	print("ADD  {{rel_path(f.path)}}")
 	f.name = f.path.basename()
 	string ext = f.path.extension()
 	if ext.num > 0
@@ -172,7 +172,7 @@ void file_add_new(LocalFile* f, string hash)
 
 void file_move(LocalFile *f, string new_path)
 	if conf.verbosity >= 1
-		print("MOVED  " + rel_path(f.path) + " > " + rel_path(new_path))
+		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
 	db.dirty = true
 
@@ -198,7 +198,7 @@ void action_rm(string path)
 			try
 				Filesystem.delete(f.path)
 			except Exception as e
-				print("ERROR: " + e)
+				print("ERROR: {{e}}")
 		f.drop_me = true
 		db.save()
 	
@@ -210,7 +210,7 @@ void action_mv(string source, string _dest)
 			dest = dir_canonical(dest) + source.basename()
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
-		print("MOVE  " + rel_path(source) + " -> " + rel_path(dest))
+		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
 		f.path = dest
 		db.save()
 		
@@ -225,7 +225,7 @@ void structure_file(LocalFile* f, string structure, string root)
 	string new_path = f.apply_structure(root, structure)
 	if f.path == new_path
 		return
-	print("MOVE  " + rel_path(f.path) + " -> " + rel_path(new_path))
+	print("MOVE  {{rel_path(f.path)}} -> {{rel_path(new_path)}}")
 	make_all_dirs(new_path)
 	try
 		if !f.pure_remote()
@@ -264,6 +264,8 @@ void action_info(string path)
 void show_files(LocalFile*[] files)
 	for f in files
 		if f.perfectly_fine() and !conf.show_perfectly_fine
+			continue
+		if !f.in_db() and !conf.show_not_in_db
 			continue
 		f.show()
 		if conf.show_meta or conf.verbosity >= 2
@@ -312,13 +314,13 @@ void action_tag_get(string path, string key)
 		f.show()
 		for t in f.tags
 			if t.key == key
-				print("      " + str(t))
+				print("      {{t}}")
 		if key == "name"
-			print("      name=" + f.name)
+			print("      name={{f.name}}")
 		else if key == "hash"
-			print("      hash=" + f.hash)
+			print("      hash={{f.hash}}")
 		else if key == "id" and len(f.id) > 0
-			print("      id=" + f.id)
+			print("      id={{f.id}}")
 
 
 
@@ -345,10 +347,10 @@ void action_push(string path)
 	let files = lister.find(path)
 	for f in files
 		if f.pure_local() #or f.is(CHANGED_FILE)
-			print("UPLOADING " + rel_path(f.path))
+			print("UPLOADING {{rel_path(f.path)}}")
 			remote_upload(f)
 		if f.is(CHANGED_META)
-			print("UPLOADING META " + rel_path(f.path))
+			print("UPLOADING META {{rel_path(f.path)}}")
 			remote_upload_meta(f)
 
 
@@ -358,7 +360,7 @@ void action_get(string id)
 		if ff.pure_remote()
 			remote_download(ff)
 		else
-			print("id=" + id + " already local: " + ff.path)
+			print("id={{id}} already local: {{ff.path}}")
 	except
 		let files = remote_find_by_id([id], "")
 		if len(files) > 0
@@ -368,7 +370,7 @@ void action_get(string id)
 			let ff = db.find_by_id(id)
 			remote_download(ff)
 		else
-			print("not found: id=" + id)
+			print("not found: id={{id}}")
 			return
 		
 

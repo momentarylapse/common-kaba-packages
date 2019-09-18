@@ -145,6 +145,7 @@ class Config
 		filter_pure_remote = false
 		show_pure_local = false
 		show_perfectly_fine = true
+		show_not_in_db = false
 		drop_deleted = false
 		pull_tags = false
 		pull_tags_only_add = false
@@ -192,10 +193,10 @@ class Config
 	void show()
 		for e in conf.dirs
 			print(e.dir)
-			print("structure: " + e.structure)
+			print("structure: {{e.structure}}")
 			for s in e.syncs
-				print("  filter: " + s.filter)
-				print("    options: " + s.options)
+				print("  filter: {{s.filter}}")
+				print("    options: {{s.options}}")
 
 	void add_filter(string _dir, string filter, string options)
 		if default_quality == MEDIUM and options == ""
@@ -250,6 +251,7 @@ class Config
 	bool filter_pure_remote
 	bool show_pure_local
 	bool show_perfectly_fine
+	bool show_not_in_db
 	bool drop_deleted
 	bool pull_tags
 	bool pull_tags_only_add

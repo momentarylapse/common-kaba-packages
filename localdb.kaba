@@ -75,7 +75,7 @@ class LocalFile
 		name = _name
 		db.dirty = true
 		if conf.verbosity > 0
-			print("NAME  " + name)
+			print("NAME  {{name}}")
 		set(CHANGED_META)
 	void tag_add(Tag tt)
 		if tt.key == "name"
@@ -87,7 +87,7 @@ class LocalFile
 		tags.add(tt)
 		db.dirty = true
 		if conf.verbosity > 0
-			print("TAG ADD  " + tt.str())
+			print("TAG ADD  {{tt}}")
 		set(CHANGED_META)
 	void tag_set(Tag tt)
 		if tt.key == "name"
@@ -98,7 +98,7 @@ class LocalFile
 				if t.value == tt.value
 					return
 				if conf.verbosity > 0
-					print("TAG SET  " + t.str() + "  ->  " + tt.value)
+					print("TAG SET  {{t}}  ->  {{tt.value}}")
 				t.value = tt.value
 				db.dirty = true
 				set(CHANGED_META)
@@ -108,7 +108,7 @@ class LocalFile
 		for t,i in tags
 			if t.match(tt)
 				if conf.verbosity > 0
-					print("TAG RM  " + t.str())
+					print("TAG RM  {{t}}")
 				tags.remove(i)
 				db.dirty = true
 				set(CHANGED_META)
@@ -132,17 +132,17 @@ class LocalFile
 			print(status_str() + rel_path(path))
 	void show_info(string l)
 		#print(l + "path: " + path)
-		print(l + "name:    " + name)
-		print(l + "id:      " + id)
-		print(l + "hash:    " + hash)
-		#print(l + "mtime:   " + mtime)
+		print(l + "name:    {{name}}")
+		print(l + "id:      {{id}}")
+		print(l + "hash:    {{hash}}")
+		#print(l + "mtime:   {{mtime}}")
 		#if remote_mtime != 0 and remote_mtime != mtime
 		#	s += "\nmtime: " + mtime + " (REMOTE)"
-		print(l + "size:    " + size)
+		print(l + "size:    {{size}}")
 		#print(l + "options: " + options)
 		let _tags = tags_sort(tags)
 		for t in _tags
-			print(l + "  tag:   " + t.key + "=" + t.value)
+			print(l + "  tag:   {{t.key}}={{t.value}}")
 	string get_tag(string key)
 		if key == "name"
 			return name
@@ -239,11 +239,11 @@ class LocalFileDB
 				f.show_info("    ")
 			if f.hash == ""
 				if Filesystem.exists(f.path)
-					print("EMPTY HASH: " + f.path)
+					print("EMPTY HASH: {{f.path}}")
 					f.hash = Filesystem.hash(f.path, "md5")
 					dirty = true
 				else if f.id == ""
-					print("GHOST: " + f.path)
+					print("GHOST: {{f.path}}")
 					f.drop_me = true
 					dirty = true
 				#else
@@ -253,7 +253,7 @@ class LocalFileDB
 				LocalFile *l = by_hash(f.hash)
 				if l and l != &f
 					if f.path == l.path
-						print("DUPLICATE: " + f.path)
+						print("DUPLICATE: {{f.path}}")
 						if l.mergeable(&f)
 							l.merge(&f)
 							dirty = true
@@ -264,12 +264,12 @@ class LocalFileDB
 							l.show()
 							print("###################################")
 					else
-						print("HASH COLLISION: " + f.path + "  <->  " + l.path)
+						print("HASH COLLISION: {{f.path}}  <->  {{l.path}}")
 
 	void drop_selected()
 		for i in 0:files.num
 			if files[i].drop_me
-				print("DROP " + files[i].path)
+				print("DROP {{files[i].path}}")
 				files.remove(i)
 				db.dirty = true
 				i --
@@ -301,13 +301,13 @@ class LocalFileDB
 		for f in files
 			if id == f.id
 				return &f
-		raise(new Exception("not in db: id=" + id))
+		raise(new Exception("not in db: id={{id}}"))
 
 	LocalFile *find_by_path(string path)
 		for f in files
 			if path == f.path
 				return &f
-		raise(new Exception("not in db: '" + rel_path(path) + "'"))
+		raise(new Exception("not in db: '{{rel_path(path)}}'"))
 
 	bool has_path(string path)
 		for f in files
@@ -321,7 +321,7 @@ class LocalFileDB
 		for f in files
 			if hash == f.hash
 				return &f
-		raise(new Exception("not in db: hash=" + hash))
+		raise(new Exception("not in db: hash={{hash}}"))
 
 	#LocalFile *find_by_hash(string hash)
 #		if hash == ""
@@ -379,7 +379,7 @@ class LocalFileDB
 			try
 				string h2 = Filesystem.hash(f.path, "md5")
 				if h2 != f.hash
-					print(h2 + " != " + f.hash)
+					print("{{h2}} != {{f.hash}}")
 					f.hash = h2
 					save()
 			except
@@ -400,16 +400,16 @@ void auto_tag(LocalFile *f)
 	#print(ext)
 	try
 		if ext == "pdf"
-			string s = shell_exec("pdfinfo \"" + bash_escape(f.path) + "\" | awk '/Pages/{print $2}'")
+			string s = shell_exec("pdfinfo \"{{bash_escape(f.path)}}\" | awk '/Pages/{print $2}'")
 			if s.num > 0
 				f.tag_set(Tag("pages", s.int().str()))
 		else if ext in ["png", "bmp"] #, "jpg"]
-			string[] s = shell_exec("identify -format \"%w\n%h\" \"" + bash_escape(f.path) + "\"").explode("\n")
+			string[] s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(f.path)}}\"").explode("\n")
 			if s.num >= 2
 				f.tag_set(Tag("width", s[0].int().str()))
 				f.tag_set(Tag("height", s[1].int().str()))
 		else if ext == "jpg"
-			string[] s = shell_exec("exif -mi \"" + bash_escape(f.path) + "\"").explode("\n")
+			string[] s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\"").explode("\n")
 			string model, make
 			for l in s
 				string[] xx = l.explode("\t")
@@ -439,9 +439,9 @@ void auto_tag(LocalFile *f)
 					f.tag_set(Tag("day", xx[1][8:10].int()))
 					f.tag_set(Tag("timeofday", xx[1][11:]))
 			if len(make) > 0 and len(model) > 0
-				f.tag_set(Tag("camera", make + " " + model))
+				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
-			string[] s = shell_exec("tsunami --info \"" + bash_escape(f.path) + "\"").explode("\n")
+			string[] s = shell_exec("tsunami --info \"{{bash_escape(f.path)}}\"").explode("\n")
 			int samples = -1
 			int sample_rate = 44100
 			for l in s

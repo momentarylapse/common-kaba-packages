@@ -78,6 +78,8 @@ void main(string[] arg)
 			conf.filter_pure_local = true
 		else if a == "--pure-remote" or a == "--remote"
 			conf.filter_pure_remote = true
+		else if a == "--not-in-db"
+			conf.show_not_in_db = true
 		else if a == "--pull-tags"
 			conf.pull_tags = true
 		else if a == "--pull-tags-only-add"
