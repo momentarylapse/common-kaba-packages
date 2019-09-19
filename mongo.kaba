@@ -62,7 +62,10 @@ string char_to_str(char[0]* p)
 void* json_to_bson(string json)
 	string t = json
 	t.add(0)
-	return _bson_new_from_json(&t[0], json.num, nil)
+	let b = _bson_new_from_json(&t[0], json.num, nil)
+	if !b
+		raise(new Exception("invalid json: " + json))
+	return b
 
 string bson_to_json(void *bson)
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
@@ -159,8 +162,7 @@ class Collection
 		if col
 			_mongoc_collection_destroy(col)
 	Result* find(string json)
-		void* b = json_to_bson(json)
-
+		let b = json_to_bson(json)
 		let r = new Result
 		r.cur = _mongoc_collection_find_with_opts(col, b, nil, nil)
 		return r
