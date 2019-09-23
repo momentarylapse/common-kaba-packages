@@ -89,12 +89,53 @@ Constant*[] filter_consts(Constant*[] cc)
 ClassElement[] filter_elements(ClassElement[] cc)
 	return sorted([for c in cc c if c.name[:1] != "-"], "name")
 
+string opname(string f)
+	if f == "__add__"
+		return "+"
+	if f == "__sub__"
+		return "-"
+	if f == "__mul__"
+		return "*"
+	if f == "__div__"
+		return "/"
+	if f == "__exp__"
+		return "^"
+	if f == "__iadd__"
+		return "+="
+	if f == "__isub__"
+		return "-="
+	if f == "__imul__"
+		return "*="
+	if f == "__idiv__"
+		return "/="
+	if f == "__assign__"
+		return "="
+	if f == "__eq__"
+		return "=="
+	if f == "__ne__"
+		return "!="
+	if f == "__lt__"
+		return "<"
+	if f == "__le__"
+		return "<="
+	if f == "__gt__"
+		return ">"
+	if f == "__and__"
+		return "and"
+	if f == "__or__"
+		return "or"
+	return f
+
+bool is_list(Class *c)
+	return c.name[-2:] == "[]" or c == string
+
 string show_class(string ns, Class* c)
 	string wiki = "== Kaba class {{c.name}} ==\n"
 	
 	let funcs = filter_funcs(func_extract(c), c)
 	let elements = filter_elements(c.elements)
 	let consts = filter_consts(c.constants)
+	let ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
 	
 	elements = sorted(elements, "name")
 	
@@ -138,6 +179,16 @@ string show_class(string ns, Class* c)
 		for cc in consts
 			wiki += "; <tt>{{cc.type.name}} {{cc.name}}</tt>\n"
 			wiki += ": description\n\n"
+	
+	if len(ops) > 0 or is_list(c)
+		wiki += "\n=== Operators ===\n\n"
+		if is_list(c)
+			wiki += "; <tt>{{c.parent.name}} {{c.name}}[int]</tt>\n"
+		for f in ops
+			if f.name == "__subarray__"
+				wiki += "; <tt>{{f.return_type.name}} {{c.name}}[int:int]</tt>\n"
+			else if f.num_params == 1
+				wiki += "; <tt>{{f.return_type.name}} {{c.name}} {{opname(f.name)}} {{f.param_type[0].name}}</tt>\n"
 	return wiki
 
 Class*[] filter_classes(Class*[] cc)
@@ -148,7 +199,8 @@ Class*[] filter_classes(Class*[] cc)
 		if c.name.find("@", 0) >= 0 or c.name[0] == '-'
 			continue
 		if c.name.find("[", 0) >= 0 or c.name.find("{", 0) >= 0
-			continue
+			if !(c.name in ["int[]", "float[]", "bool[]"])
+				continue
 		r.add(c)
 	return sorted(r, "name")
 
