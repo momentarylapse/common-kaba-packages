@@ -147,7 +147,7 @@ class Mongo
 		_mongoc_cleanup()
 
 	Collection* collection(string db, string col)
-		let c = new Collection
+		let c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
 			raise(new Exception("can not open collection"))
@@ -163,13 +163,13 @@ class Collection
 			_mongoc_collection_destroy(col)
 	Result* find(string json)
 		let b = json_to_bson(json)
-		let r = new Result
-		r.cur = _mongoc_collection_find_with_opts(col, b, nil, nil)
-		return r
+		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
 
 class Result
 	void* cur
 	void* doc
+	void __init__(void *_cur)
+		cur = _cur
 	void __delete__()
 		if cur
 			_mongoc_cursor_destroy(cur)
