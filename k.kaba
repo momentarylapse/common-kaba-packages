@@ -135,7 +135,7 @@ class DynamicValue
 	int type
 	DynamicValueState* s
 	void __init__()
-		s = new DynamicValueState
+		s = new DynamicValueState()
 		type = TYPE_NONE
 	virtual void __delete__()
 		delete s
@@ -154,7 +154,7 @@ class DynamicValue
 	void add(DynamicValue* el)
 		s.add(el)
 	DynamicValue* copy()
-		DynamicValue* c = new DynamicValue
+		DynamicValue* c = new DynamicValue()
 		delete c.s
 		c.s = s.copy()
 		c.type = type
@@ -165,21 +165,21 @@ class DynamicValue
 			delete s
 			type = _type
 			if type == TYPE_BOOL
-				s = new DynamicValueStateBool
+				s = new DynamicValueStateBool()
 			else if type == TYPE_INT
-				s = new DynamicValueStateInt
+				s = new DynamicValueStateInt()
 			else if type == TYPE_FLOAT
-				s = new DynamicValueStateFloat
+				s = new DynamicValueStateFloat()
 			else if type == TYPE_STRING
-				s = new DynamicValueStateString
+				s = new DynamicValueStateString()
 			else if type == TYPE_ARRAY
-				s = new DynamicValueStateArray
+				s = new DynamicValueStateArray()
 			else if type == TYPE_DICT
-				s = new DynamicValueStateDict
+				s = new DynamicValueStateDict()
 			else if type == TYPE_FUNCTION
-				s = new DynamicValueStateFunction
+				s = new DynamicValueStateFunction()
 			else
-				s = new DynamicValueState
+				s = new DynamicValueState()
 	void setBool(bool b)
 		setType(TYPE_BOOL)
 		DynamicValueStateBool *sb = s
@@ -342,7 +342,7 @@ class DynamicValueStateInt extends DynamicValueState
 	override float float()
 		return v
 	override DynamicValueState* copy()
-		DynamicValueStateInt* c = new DynamicValueStateInt
+		let c = new DynamicValueStateInt()
 		c.v = v
 		return c
 
@@ -358,7 +358,7 @@ class DynamicValueStateBool extends DynamicValueState
 	override bool bool()
 		return v
 	override DynamicValueState* copy()
-		DynamicValueStateBool* c = new DynamicValueStateBool
+		let c = new DynamicValueStateBool()
 		c.v = v
 		return c
 
@@ -376,7 +376,7 @@ class DynamicValueStateFloat extends DynamicValueState
 	override float float()
 		return v
 	override DynamicValueState* copy()
-		DynamicValueStateFloat* c = new DynamicValueStateFloat
+		let c = new DynamicValueStateFloat()
 		c.v = v
 		return c
 
@@ -398,7 +398,7 @@ class DynamicValueStateString extends DynamicValueState
 	override bool bool()
 		return v.num > 0
 	override DynamicValueState* copy()
-		DynamicValueStateString* c = new DynamicValueStateString
+		let c = new DynamicValueStateString()
 		c.v = v
 		return c
 
@@ -428,7 +428,7 @@ class DynamicValueStateArray extends DynamicValueState
 	override void add(DynamicValue* el)
 		a.add(el.copy())
 	override DynamicValueState* copy()
-		DynamicValueStateArray* c = new DynamicValueStateArray
+		let c = new DynamicValueStateArray()
 		for el in a
 			c.add(el.copy())
 		return c
@@ -457,7 +457,7 @@ class DynamicValueStateDict extends DynamicValueState
 			if k.compare(*key) == 0
 				return values[j]
 		
-		DynamicValue* val = new DynamicValue
+		let val = new DynamicValue()
 		values.add(val)
 		keys.add(key.copy())
 		return val
@@ -468,7 +468,7 @@ class DynamicValueStateDict extends DynamicValueState
 		values.add(val.copy())
 		keys.add(key.copy())
 	override DynamicValueState* copy()
-		DynamicValueStateDict* c = new DynamicValueStateDict
+		let c = new DynamicValueStateDict()
 		for v,i in values
 			c.add(keys[i].copy(),v.copy())
 		return c
@@ -488,11 +488,11 @@ class Variable
 	bool writable
 	bool is_ref
 	void __init__()
-		v = new DynamicValue
+		v = new DynamicValue()
 		is_ref = false
 		writable = true
 	void __init__(string _name)
-		v = new DynamicValue
+		v = new DynamicValue()
 		name = _name
 		is_ref = false
 		writable = true
@@ -614,7 +614,7 @@ class FunctionRange extends FunctionInternal
 
 		int i = start
 		while i < end
-			DynamicValue* ii = new DynamicValue
+			let ii = new DynamicValue()
 			ii.setInt(i)
 			a.a.add(ii)
 			i += step
@@ -942,7 +942,7 @@ class SyntaxTree
 		next() # ")"
 		return sn
 	SyntaxNode* getOperandArrayBuilder()
-		SyntaxNodeArrayBuilder *sn = new SyntaxNodeArrayBuilder
+		let sn = new SyntaxNodeArrayBuilder()
 		next() # "["
 		while cur != "]"
 			SyntaxNode *sub = getOperandGreedy()
@@ -954,7 +954,7 @@ class SyntaxTree
 		next() # "]"
 		return sn
 	SyntaxNode* getOperandDictBuilder()
-		SyntaxNodeDictBuilder *sn = new SyntaxNodeDictBuilder
+		let sn = new SyntaxNodeDictBuilder()
 		next() # "{"
 		while cur != "}"
 			SyntaxNode *key = getOperandGreedy()
@@ -972,7 +972,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode* checkOperandExtensions(SyntaxNode* sn)
 		if cur == "["
-			SyntaxNodeArrayElement* el = new SyntaxNodeArrayElement
+			let el = new SyntaxNodeArrayElement()
 			el.params.add(sn)
 			next() # "["
 			SyntaxNode* index = getOperandGreedy()
@@ -1038,7 +1038,7 @@ class SyntaxTree
 			rank.remove(imin)
 		return sn[0]
 	SyntaxNode *getSpecialCommandReturn()
-		SyntaxNodeReturn *sn = new SyntaxNodeReturn
+		let sn = new SyntaxNodeReturn()
 		while !endOfLine()
 			next()
 			sn.params.add(getOperandGreedy())
@@ -1051,7 +1051,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode *getSpecialCommandIf()
 		int indent0 = cur_line.indent
-		SyntaxNodeIf *sn = new SyntaxNodeIf
+		let sn = new SyntaxNodeIf()
 		next() # "if"
 		sn.params.add(getOperandGreedy())
 		sn.block = parseBlock()
@@ -1065,7 +1065,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode *getSpecialCommandWhile()
 		int indent0 = cur_line.indent
-		SyntaxNodeWhile *sn = new SyntaxNodeWhile
+		SyntaxNodeWhile *sn = new SyntaxNodeWhile()
 		next() # "while"
 		sn.params.add(getOperandGreedy())
 		sn.block = parseBlock()
@@ -1079,7 +1079,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode *getSpecialCommandFor()
 		int indent0 = cur_line.indent
-		SyntaxNodeFor *sn = new SyntaxNodeFor
+		SyntaxNodeFor *sn = new SyntaxNodeFor()
 		next() # "for"
 		SyntaxNodeVariable* var = new SyntaxNodeVariable(cur)
 		next()
@@ -1099,10 +1099,10 @@ class SyntaxTree
 		sn.block_else = parseBlock()
 		return sn
 	SyntaxNode *getSpecialCommandBreak()
-		SyntaxNodeBreak *sn = new SyntaxNodeBreak
+		SyntaxNodeBreak *sn = new SyntaxNodeBreak()
 		return sn
 	SyntaxNode *getSpecialCommandContinue()
-		SyntaxNodeContinue *sn = new SyntaxNodeContinue
+		SyntaxNodeContinue *sn = new SyntaxNodeContinue()
 		return sn
 	void parseFunctionDef()
 		Function* prev_func = cur_func
@@ -1150,7 +1150,7 @@ class SyntaxTree
 			setError("end of line expected")
 		return sn
 	SyntaxNode *parseBlock()
-		SyntaxNodeBlock *sn = new SyntaxNodeBlock
+		SyntaxNodeBlock *sn = new SyntaxNodeBlock()
 		nextLine()
 		int indent0 = cur_line.indent
 		SyntaxNode *sub = parseLine()
@@ -1186,20 +1186,20 @@ class SyntaxTree
 		v = addGlobalVar("pi")
 		v.v.setFloat(3.141592654)
 		v.writable = false
-		
-		add_internal_func("sin", new FunctionSin)
-		add_internal_func("cos", new FunctionCos)
-		add_internal_func("tan", new FunctionTan)
-		add_internal_func("sqrt", new FunctionSqrt)
-		add_internal_func("abs", new FunctionAbs)
-		add_internal_func("len", new FunctionLen)
-		add_internal_func("range", new FunctionRange)
-		add_internal_func("print", new FunctionPrint)
-		add_internal_func("str", new FunctionStr)
-		add_internal_func("int", new FunctionInt)
-		add_internal_func("float", new FunctionFloat)
-		add_internal_func("bool", new FunctionBool)
-		add_internal_func("map", new FunctionMap)
+
+		add_internal_func("sin", new FunctionSin())
+		add_internal_func("cos", new FunctionCos())
+		add_internal_func("tan", new FunctionTan())
+		add_internal_func("sqrt", new FunctionSqrt())
+		add_internal_func("abs", new FunctionAbs())
+		add_internal_func("len", new FunctionLen())
+		add_internal_func("range", new FunctionRange())
+		add_internal_func("print", new FunctionPrint())
+		add_internal_func("str", new FunctionStr())
+		add_internal_func("int", new FunctionInt())
+		add_internal_func("float", new FunctionFloat())
+		add_internal_func("bool", new FunctionBool())
+		add_internal_func("map", new FunctionMap())
 		
 		lines = lp.parse(source)
 		
@@ -1291,7 +1291,7 @@ class Interpreter
 				params.add(vv.v)
 				is_temp.add(false)
 			else
-				Variable *temp = new Variable
+				Variable *temp = new Variable()
 				doNode(p, temp)
 				params.add(temp)
 				is_temp.add(true)
