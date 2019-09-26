@@ -27,5 +27,5 @@ class KabamaWindow extends Dialog
 		event("ok", on_ok)
 	
 void main()
-	Window *win = new KabamaWindow
+	Window *win = new KabamaWindow()
 	win.run()
