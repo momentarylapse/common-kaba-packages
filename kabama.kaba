@@ -20,9 +20,9 @@ Term *Execute(Term *t)
 	return t
 
 Term *ExecuteComplete(Term *t)
-	t = SimplifyNumericals(t)
+#	t = SimplifyNumericals(t)
 	t = Execute(t)
-	t = Normalize(t)
+	t = normalize(t)
 	#t = SimplifyNumericals(t)
 	return t
 
