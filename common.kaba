@@ -5,6 +5,7 @@ enum
 	TYPE_OPERATOR
 	TYPE_FUNCTION
 	TYPE_SPECIAL
+	TYPE_LIST
 
 enum
 	CHAR_LETTER
@@ -52,15 +53,11 @@ class Term
 		else if type == TYPE_VARIABLE
 			return name
 		else if type == TYPE_FUNCTION
-			r = name + "("
-			for p,i in params
-				if i > 0
-					r += ", "
-				r += p.str()
-			r += ")"
-			return r
+			return name + "(" + [for p in params p.str()].join(", ") + ")"
 		else if type == TYPE_SPECIAL
 			return "def " + params[0].str()
+		else if type == TYPE_LIST
+			return "[" + [for p in params p.str()].join(", ") + "]"
 		return r
 
 Term*[] copy_list(Term*[] list)
@@ -95,15 +92,20 @@ Term *AddSpecial(string s, Term*[] params)
 	t.params = params
 	return t
 
+Term *AddList(Term*[] params)
+	let t = new Term(TYPE_LIST, "-list-")
+	t.params = params
+	return t
+
 # (a+b)+(c+d)
 # 0 -> ~
 # 1 -> (b + a) + (c + d)
 # 2 -> (c + d) + .....
-Term *PermuteLiftOperator__(Term *t, int n)
-	Term *r = t.copy()
-	r.params[0] = t.params[1].copy()
-	r.params[1] = t.params[0].copy()
-	return r
+#Term *PermuteLiftOperator__(Term *t, int n)
+#	Term *r = t.copy()
+#	r.params[0] = t.params[1].copy()
+#	r.params[1] = t.params[0].copy()
+#	return r
 
 
 class RuntimeError extends Exception
@@ -113,6 +115,8 @@ bool NeedsBrackets(Term *t, Term *sub)
 	if t.name == "^"
 		return sub.type == TYPE_OPERATOR
 	if t.name == "/"
+		if sub.name == "^"
+			return false
 		return sub.type == TYPE_OPERATOR
 	if t.name == "-"
 		return sub.type == TYPE_OPERATOR

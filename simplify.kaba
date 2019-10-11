@@ -1,5 +1,5 @@
-use "common.kaba"
-use "parser.kaba"
+use common
+use parser
 
 string add(string a, string b)
 	#return i2s(s2i(a) + s2i(b))

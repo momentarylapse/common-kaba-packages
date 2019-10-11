@@ -1,0 +1,12 @@
+use common
+use subst
+use simplify
+
+Term* zeros(Term* t, string var)
+	Term*[] z
+	for i in -1000:1000
+		let r = normalize(subst(t, var, AddNumber(i)))
+		if r.type == TYPE_NUMBER
+			if r.name == "0"
+				z.add(AddNumber(i))
+	return AddList(z)

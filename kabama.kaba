@@ -4,6 +4,7 @@ use simplify
 use expand
 use diff
 use subst
+use zeros
 
 
 class Runtime
@@ -29,11 +30,13 @@ class Runtime
 		# self
 		if t.name == "expand"
 			return expand(execute_term(t.params[0]))
-		if t.name == "diff"
+		else if t.name == "diff"
 			return diff(execute_term(t.params[0]), t.params[1].name)
-		if t.name == "subst"
+		else if t.name == "subst"
 			return subst(execute_term(t.params[0]), t.params[1].name, execute_term(t.params[2]))
-		if t.type == TYPE_SPECIAL
+		else if t.name == "zeros"
+			return zeros(execute_term(t.params[0]), t.params[1].name)
+		else if t.type == TYPE_SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])
 				

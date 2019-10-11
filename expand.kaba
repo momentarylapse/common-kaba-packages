@@ -1,5 +1,5 @@
-use "common.kaba"
-use "parser.kaba"
+use common
+use parser
 
 Term *expand(Term *t)
 	if !t

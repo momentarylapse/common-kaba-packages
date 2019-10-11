@@ -1,4 +1,4 @@
-use "common.kaba"
+use common
 
 class SyntaxError extends Exception
 
@@ -51,7 +51,7 @@ void check_function_params(string f, Term*[] params)
 	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
 		if len(params) != 1
 			raise(new SyntaxError("function {{f}} expects 1 parameter, {{len(params)}} given"))
-	if f == "diff"
+	if f in ["diff", "zeros"]
 		if len(params) != 2
 			raise(new SyntaxError("function {{f}} expects 2 parameter, {{len(params)}} given"))
 		if params[1].type != TYPE_VARIABLE
