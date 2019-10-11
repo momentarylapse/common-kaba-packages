@@ -3,21 +3,21 @@ use parser
 use simplify
 
 
-Term *diff_function(string func, Term *param)
+Term *diff_function(string func, Term*[] params)
 	if func == "exp"
-		return AddFunction("exp", [param])
+		return AddFunction("exp", params)
 	if func == "sin"
-		return AddFunction("cos", [param])
+		return AddFunction("cos", params)
 	if func == "cos"
-		return AddOperator("-", AddNumber("0"), AddFunction("sin", [param]))
+		return AddOperator("-", AddNumber("0"), AddFunction("sin", params))
 	if func == "sinh"
-		return AddFunction("cosh", [param])
+		return AddFunction("cosh", params)
 	if func == "cosh"
-		return AddFunction("sinh", [param])
+		return AddFunction("sinh", params)
 	if func == "ln"
-		return AddOperator("/", AddNumber("1"), param)
+		return AddOperator("/", AddNumber("1"), params[0])
 	if func == "sqrt"
-		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", [param]))
+		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", params))
 	raise(new RuntimeError("can not differentiate function '{{func}}'"))
 
 
@@ -33,10 +33,11 @@ Term *diff(Term *t, string by)
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == TYPE_FUNCTION
-		Term* a = t.params[0]
+		let r = diff_function(t.name, copy_list(t.params))
+		for p in t.params
+			r = AddOperator("*", diff(p, by), r)
 		# diff(f(a))  ->  f'(a) * diff(a)
-		return AddOperator("*", diff_function(t.name, a.copy()),
-		                        diff(a, by))
+		return r
 	if t.type == TYPE_OPERATOR
 		Term* a, b
 		if t.params.num > 0

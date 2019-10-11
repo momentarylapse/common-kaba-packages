@@ -1,11 +1,29 @@
-use "common.kaba"
-use "parser.kaba"
-use "simplify.kaba"
-use "expand.kaba"
-use "diff.kaba"
+use common
+use parser
+use simplify
+use expand
+use diff
+use subst
 
 
 class Runtime
+	class Function
+		string name
+		string[] params
+		Term* value
+		string str()
+			let p = params.join(", ")
+			return "Function {{name}}({{p}}) := {{value.str()}}"
+	Function*[] functions
+	
+	void add_function(Term *t)
+		let f = new Function()
+		f.name = t.params[0].name
+		for p in t.params[0].params
+			f.params.add(p.name)
+		f.value = t.params[1].copy()
+		functions.add(f)
+		#print("added... " + str(*f))
 
 	Term *execute_term(Term *t)
 		# self
@@ -13,6 +31,13 @@ class Runtime
 			return expand(execute_term(t.params[0]))
 		if t.name == "diff"
 			return diff(execute_term(t.params[0]), t.params[1].name)
+		if t.name == "subst"
+			return subst(execute_term(t.params[0]), t.params[1].name, execute_term(t.params[2]))
+		if t.type == TYPE_SPECIAL
+			if t.name == "def"
+				add_function(t.params[0])
+				
+				
 
 		# recursive
 		let r = t.shallow_copy()

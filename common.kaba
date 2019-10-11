@@ -4,6 +4,7 @@ enum
 	TYPE_VARIABLE
 	TYPE_OPERATOR
 	TYPE_FUNCTION
+	TYPE_SPECIAL
 
 enum
 	CHAR_LETTER
@@ -47,9 +48,9 @@ class Term
 			else
 				r = a + " " + name + " " + b
 		else if type == TYPE_NUMBER
-			r = name
+			return name
 		else if type == TYPE_VARIABLE
-			r = name
+			return name
 		else if type == TYPE_FUNCTION
 			r = name + "("
 			for p,i in params
@@ -58,8 +59,12 @@ class Term
 				r += p.str()
 			r += ")"
 			return r
+		else if type == TYPE_SPECIAL
+			return "def " + params[0].str()
 		return r
 
+Term*[] copy_list(Term*[] list)
+	return [for t in list t.copy()]
 		
 
 Term *AddNumber(string s)
@@ -69,13 +74,13 @@ Term *AddVariable(string s)
 	return new Term(TYPE_VARIABLE, s)
 
 Term *AddOperator(string s, Term *p1, Term *p2)
-	Term *t = new Term(TYPE_OPERATOR, s)
+	let t = new Term(TYPE_OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return t
 
 Term *AddFunction(string s, Term*[] params)
-	Term *t = new Term(TYPE_FUNCTION, s)
+	let t = new Term(TYPE_FUNCTION, s)
 	t.params = params
 	return t
 
@@ -84,6 +89,11 @@ Term *PermuteOperator(Term *t)
 	r.params[0] = t.params[1].copy()
 	r.params[1] = t.params[0].copy()
 	return r
+
+Term *AddSpecial(string s, Term*[] params)
+	let t = new Term(TYPE_SPECIAL, s)
+	t.params = params
+	return t
 
 # (a+b)+(c+d)
 # 0 -> ~

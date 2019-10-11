@@ -1,0 +1,17 @@
+use common
+
+# always copy
+Term* subst(Term* t, string var, Term* by)
+	Term*[] params
+	for p in t.params
+		params.add(subst(p, var, by))
+	
+	if t.type == TYPE_VARIABLE
+		if t.name == var
+			return by.copy()
+	
+	else if t.type == TYPE_OPERATOR
+		return AddOperator(t.name, params[0], params[1])
+	else if t.type == TYPE_FUNCTION
+		return AddFunction(t.name, params)
+	return t.copy()

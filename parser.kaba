@@ -37,14 +37,14 @@ string[] analyze(string s)
 	return expr
 
 int operator_rank(string s)
-	if (s == "+") or (s == "-")
+	if s == "="
 		return 1
-	if (s == "*") or (s == "/")
+	if (s == "+") or (s == "-")
 		return 2
-	if (s == "^")
+	if (s == "*") or (s == "/")
 		return 3
-	if (s == "=")
-		return 10
+	if s == "^"
+		return 4
 	return -1
 
 void check_function_params(string f, Term*[] params)
@@ -55,7 +55,12 @@ void check_function_params(string f, Term*[] params)
 		if len(params) != 2
 			raise(new SyntaxError("function {{f}} expects 2 parameter, {{len(params)}} given"))
 		if params[1].type != TYPE_VARIABLE
-			raise(new SyntaxError("diff expects a variable as the second parameter"))
+			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
+	if f == "subst"
+		if len(params) != 3
+			raise(new SyntaxError("function {{f}} expects 3 parameter, {{len(params)}} given"))
+		if params[1].type != TYPE_VARIABLE
+			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
 
 
 class Parser
@@ -105,11 +110,14 @@ class Parser
 				return AddFunction(c, params)
 			else
 				return AddVariable(c)
+
 		raise(new SyntaxError("unknown operand '{{c}}'"))
 	
 	
 	Term* parse_operand() # complete
 		#print("operand {{cur_index}}")
+		if cur() == "def"
+			return parse_def()
 		Term*[] eid
 		while true
 			# operand
@@ -130,6 +138,17 @@ class Parser
 
 		return digest_operators(eid)
 
+	Term* parse_def()
+		next() # def
+		let op = parse_operand()
+		if op.name != "="
+			raise(new SyntaxError("def needs '='"))
+		if op.params[0].type != TYPE_FUNCTION
+			raise(new SyntaxError("def needs function name before '='"))
+		for p in op.params[0].params
+			if p.type != TYPE_VARIABLE
+				raise(new SyntaxError("only variables in function definition before '=' allowed"))
+		return AddSpecial("def", [op])
 
 Term *digest_operators(Term*[] eid)
 	if (eid.num % 2) != 1
