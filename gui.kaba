@@ -5,13 +5,15 @@ use simplify
 use kabama
 
 class KabamaWindow extends Dialog
+	Runtime r
 
 	void on_ok()
 		string s = get_string("edit")
 		try
-			set_string("list", s + "\\" + ExprToStr(ExecuteComplete(Parse(s))))
+			let t = r.execute(parse(s))
+			set_string("list", "{{s}}\\{{str(*t)}}")
 		except Exception as e
-			set_string("list", s + "\\Fehler: " + e.message())
+			set_string("list", "{{s}}\\Error: {{e.message()}}")
 
 	void __init__()
 		super.__init__("kabama", 800, 600, nil, false)

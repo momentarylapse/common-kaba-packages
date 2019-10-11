@@ -9,6 +9,7 @@ enum
 	CHAR_LETTER
 	CHAR_NUMBER
 	CHAR_SIGN
+	CHAR_WHITESPACE
 
 class Term
 	int type
@@ -30,6 +31,35 @@ class Term
 		for p in params
 			c.params.add(p.copy())
 		return c
+	string str()
+		string r = "?"
+		if type == TYPE_OPERATOR
+			string a = params[0].str()
+			string b = params[1].str()
+			if NeedsBrackets(&self, params[0])
+				a = "(" + a + ")"
+			if NeedsBrackets(&self, params[1])
+				b = "(" + b + ")"
+			if name == "*"
+				r = a + " " + b
+			else if name == "^"
+				r = a + name + b
+			else
+				r = a + " " + name + " " + b
+		else if type == TYPE_NUMBER
+			r = name
+		else if type == TYPE_VARIABLE
+			r = name
+		else if type == TYPE_FUNCTION
+			r = name + "("
+			for p,i in params
+				if i > 0
+					r += ", "
+				r += p.str()
+			r += ")"
+			return r
+		return r
+
 		
 
 Term *AddNumber(string s)
@@ -44,9 +74,9 @@ Term *AddOperator(string s, Term *p1, Term *p2)
 	t.params.add(p2)
 	return t
 
-Term *AddFunction(string s, Term *param)
+Term *AddFunction(string s, Term*[] params)
 	Term *t = new Term(TYPE_FUNCTION, s)
-	t.params.add(param)
+	t.params = params
 	return t
 
 Term *PermuteOperator(Term *t)
@@ -80,26 +110,3 @@ bool NeedsBrackets(Term *t, Term *sub)
 		if (sub.name == "+") or (sub.name == "-")
 			return true
 	return false
-
-string ExprToStr(Term *t)
-	if !t
-		return "-nil-"
-	string r = "?"
-	if t.type == TYPE_OPERATOR
-		string a = ExprToStr(t.params[0])
-		string b = ExprToStr(t.params[1])
-		if NeedsBrackets(t, t.params[0])
-			a = "(" + a + ")"
-		if NeedsBrackets(t, t.params[1])
-			b = "(" + b + ")"
-		if t.name == "*"
-			r = a + " " + b
-		else
-			r = a + " " + t.name + " " + b
-	else if t.type == TYPE_NUMBER
-		r = t.name
-	else if t.type == TYPE_VARIABLE
-		r = t.name
-	else if t.type == TYPE_FUNCTION
-		r = t.name + "(" + ExprToStr(t.params[0]) + ")"
-	return r

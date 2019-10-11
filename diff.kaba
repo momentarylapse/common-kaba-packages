@@ -1,81 +1,72 @@
-use "common.kaba"
-use "parser.kaba"
+use common
+use parser
+use simplify
 
 
-Term *DiffFunction(string func, Term *param)
+Term *diff_function(string func, Term *param)
 	if func == "exp"
-		return AddFunction("exp", param)
+		return AddFunction("exp", [param])
 	if func == "sin"
-		return AddFunction("cos", param)
+		return AddFunction("cos", [param])
 	if func == "cos"
-		return AddOperator("-", AddNumber("0"), AddFunction("sin", param))
+		return AddOperator("-", AddNumber("0"), AddFunction("sin", [param]))
 	if func == "sinh"
-		return AddFunction("cosh", param)
+		return AddFunction("cosh", [param])
 	if func == "cosh"
-		return AddFunction("sinh", param)
+		return AddFunction("sinh", [param])
 	if func == "ln"
 		return AddOperator("/", AddNumber("1"), param)
 	if func == "sqrt"
-		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", param))
-	raise(new RuntimeError("Funktion '" + func + "' nicht ableitbar"))
+		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", [param]))
+	raise(new RuntimeError("can not differentiate function '{{func}}'"))
 
 
 # d/dx
 # always copies...
-Term *Diff(Term *t)
-	if !t
-		return nil
-	Term* a, b
-	if t.params.num > 0
-		a = t.params[0]
-	if t.params.num > 1
-		b = t.params[1]
+Term *diff(Term *t, string by)
 
-	# selbst
+	# self
 	if t.type == TYPE_NUMBER
 		return AddNumber("0")
 	if t.type == TYPE_VARIABLE
-		if t.name == "x"
+		if t.name == by
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == TYPE_FUNCTION
+		Term* a = t.params[0]
 		# diff(f(a))  ->  f'(a) * diff(a)
-		return AddOperator("*", DiffFunction(t.name, a.copy()),
-		                        Diff(a))
+		return AddOperator("*", diff_function(t.name, a.copy()),
+		                        diff(a, by))
 	if t.type == TYPE_OPERATOR
+		Term* a, b
+		if t.params.num > 0
+			a = t.params[0]
+		if t.params.num > 1
+			b = t.params[1]
 		if (t.name == "+") or (t.name == "-")
 			# diff(a + b)  ->  diff(a) + diff(b)
-			return AddOperator(t.name, Diff(a),
-			                           Diff(b))
+			return AddOperator(t.name, diff(a.copy(), by), diff(b.copy(), by))
 		if t.name == "*"
 			# diff(a * b)  ->  diff(a) * b + a * diff(b)
-			return AddOperator("+", AddOperator("*", Diff(a),
-			                                         b.copy()),
-			                        AddOperator("*", a.copy(),
-			                                         Diff(b)))
+			return AddOperator("+", AddOperator("*", diff(a, by), b.copy()),
+			                        AddOperator("*", a.copy(), diff(b, by)))
 		if t.name == "/"
 			# diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
-			return AddOperator("-", AddOperator("/", Diff(a),
-			                                         b.copy()),
-			                        AddOperator("/", AddOperator("*", a.copy(),
-			                                                          Diff(b)),
-			                                         AddOperator("^", b.copy(),
-			                                                          AddNumber("2"))))
+			return AddOperator("-", AddOperator("/", diff(a, by), b.copy()),
+			                        AddOperator("/", AddOperator("*", a.copy(), diff(b, by)),
+			                                         AddOperator("^", b.copy(), AddNumber("2"))))
 		if t.name == "^"
 			if b.type == TYPE_NUMBER
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b.copy(),
-				                        AddOperator("*", AddOperator("^", a.copy(),
-				                                                          AddNumber((b.name.int() - 1).str())),
-				                                         Diff(a)))
+				                        AddOperator("*", AddOperator("^", a.copy(), AddNumber(sub(b.name, "1"))),
+				                                         diff(a, by)))
 			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
 			return AddOperator("+", AddOperator("*", b.copy(),
-			                                         AddOperator("*", AddOperator("^", a.copy(),
-			                                                                           AddOperator("-", b.copy(),
-			                                                                                            AddNumber("1"))),
-			                                                          Diff(a))),
-			                        AddOperator("*", AddFunction("ln", a.copy()),
+			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b.copy(), AddNumber("1"))),
+			                                                          diff(a, by))),
+			                        AddOperator("*", AddFunction("ln", [a]),
 			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
-			                                                          Diff(b))))
-	raise(new RuntimeError("unbekannte Ableitung..."))
+			                                                          diff(b, by))))
+	raise(new RuntimeError("unhandled differential..."))
 	return nil

@@ -2,116 +2,144 @@ use "common.kaba"
 
 class SyntaxError extends Exception
 
-int CharType(char c)
+int char_type(char c)
 	if (c >= 'a') and (c <= 'z')
 		return CHAR_LETTER
 	if (c >= 'A') and (c <= 'Z')
 		return CHAR_LETTER
 	if (c >= '0') and (c <= '9')
 		return CHAR_NUMBER
+	if c == ' ' or c == "\t"[0] or c == "\n"[0]
+		return CHAR_WHITESPACE
 	return CHAR_SIGN
 
-string GetExpr(string s, int p)
+string get_expr(string s, int p)
 	string r
 	char c = s[p]
-	int ct = CharType(c)
+	int ct = char_type(c)
 	r.add(c)
 	if ct != CHAR_SIGN
 		for i in p+1:s.num
-			if CharType(s[i]) == ct
+			if char_type(s[i]) == ct
 				r.add(s[i])
 			else
 				break
 	return r
 
-string[] expr
-void Analyze(string s)
-	expr.clear()
-	s.replace(" ", "")
-	s.replace("\t", "")
-	s.replace("\n", "")
-	#print s
+string[] analyze(string s)
+	string[] expr
 	for i in 0:s.num
-		string e = GetExpr(s, i)
+		if char_type(s[i]) == CHAR_WHITESPACE
+			continue
+		string e = get_expr(s, i)
 		expr.add(e)
 		i += e.num -1
+	return expr
 
-bool IsFunction(string s)
-	if (s == "sin") or (s == "cos") or (s == "exp") or (s == "ln") or (s == "sqrt") or (s == "sinh") or (s == "cosh")
-		return true
-	if (s == "expand") or (s == "simplify") or (s == "diff")
-		return true
-	return false
-
-int OperatorRank(string s)
+int operator_rank(string s)
 	if (s == "+") or (s == "-")
 		return 1
 	if (s == "*") or (s == "/")
 		return 2
 	if (s == "^")
 		return 3
+	if (s == "=")
+		return 10
 	return -1
 
-int GetBrackets(string[] e, int i0)
-	int np = 1
-	for j in i0+1:e.num
-		if e[j] == "("
-			np ++
-		if e[j] == ")"
-			np --
-			if np == 0
-				return j
-	raise(new SyntaxError("Klammer ) vermisst"))
-	
+void check_function_params(string f, Term*[] params)
+	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
+		if len(params) != 1
+			raise(new SyntaxError("function {{f}} expects 1 parameter, {{len(params)}} given"))
+	if f == "diff"
+		if len(params) != 2
+			raise(new SyntaxError("function {{f}} expects 2 parameter, {{len(params)}} given"))
+		if params[1].type != TYPE_VARIABLE
+			raise(new SyntaxError("diff expects a variable as the second parameter"))
 
-Term *ParsePart(string[] e)
-	#print e
 
-	if e.num == 0
-		raise(new SyntaxError("leerer Ausdruck"))
-	
-	Term*[] eid
-	
-	for i in 0:e.num
-		#print i
-		if e[i] == "("
-			int i_last = GetBrackets(e, i)
-			if i_last <= i + 2
-				raise(new SyntaxError("leere Klammer"))
-			eid.add(ParsePart(e[i+1 : i_last]))
-			i = i_last
-		else if e[i] == ")"
-			raise(new SyntaxError("überflüssige Klammer )"))
-		else if CharType(e[i][0]) == CHAR_NUMBER
-			eid.add(AddNumber(e[i]))
-		else if CharType(e[i][0]) == CHAR_LETTER
-			if IsFunction(e[i])
-				if e[i+1] != "("
-					raise(new SyntaxError("Klammer ( nach Funktion vermisst"))
-				int i_last = GetBrackets(e, i + 1)
-				if i_last <= i + 2
-					raise(new SyntaxError("fehlender Funktionsparameter"))
-				string[] ee
-				for j in i+2:i_last
-					ee.add(e[j])
-				Term *sub = ParsePart(ee)#e.subarray(i + 1, i_last))
-				eid.add(AddFunction(e[i], sub))
-				i = i_last
+class Parser
+	string[] e
+	int cur_index
+	string cur()
+		if cur_index >= e.num
+			return "-eol-"
+		return e[cur_index]
+	void next()
+		cur_index ++
+	string peak()
+		if cur_index >= e.num-1
+			return "-eol-"
+		return e[cur_index + 1]
+	bool end_of_line()
+		return cur_index >= e.num
+
+	Term *parse_operand_minimal()
+		let c = cur()
+		#print("min  {{c}} {{cur_index}}")
+		if c == "("
+			# recursion
+			next() # (
+			let o = parse_operand()
+			next() # )
+			return o
+		else if c == ")"
+			raise(new SyntaxError("unexpected )"))
+		else if char_type(c[0]) == CHAR_NUMBER
+			next()
+			return AddNumber(c)
+		else if char_type(c[0]) == CHAR_LETTER
+			next()
+			if cur() == "("
+				Term*[] params
+				next() # (
+				while cur() != ")"
+					params.add(parse_operand())
+					if cur() == ","
+						next()
+						continue
+					else if cur() != ")"
+						raise(new SyntaxError("',' or ')' expected after function parameter"))
+				next() # )
+				check_function_params(c, params)
+				return AddFunction(c, params)
 			else
-				eid.add(AddVariable(e[i]))
-		else if CharType(e[i][0]) == CHAR_SIGN
-			if OperatorRank(e[i]) < 0
-				raise(new SyntaxError("unbekannter Operator '" + e[i] + "'"))
-			eid.add(AddOperator(e[i], nil, nil))
+				return AddVariable(c)
+		raise(new SyntaxError("unknown operand '{{c}}'"))
 	
+	
+	Term* parse_operand() # complete
+		#print("operand {{cur_index}}")
+		Term*[] eid
+		while true
+			# operand
+			if end_of_line()
+				raise(new SyntaxError("unexpected end of line"))
+			eid.add(parse_operand_minimal())
+			
+			if end_of_line()
+				break
+			if cur() in [")", ","]
+				break
+			
+			# operator
+			if operator_rank(cur()) < 0
+				raise(new SyntaxError("unknown operator '{{cur()}}'"))
+			eid.add(AddOperator(cur(), nil, nil))
+			next()
+
+		return digest_operators(eid)
+
+
+Term *digest_operators(Term*[] eid)
 	if (eid.num % 2) != 1
-		raise(new SyntaxError("Operator/Operand kaputt"))
+		raise(new SyntaxError("missing operand after operator"))
 	
 	while eid.num > 2
 		int i_sig, sig = -1
 		for i in 0:eid.num
 			if (i % 2) == 1
-				int os = OperatorRank(eid[i].name)
+				int os = operator_rank(eid[i].name)
 				if os > sig
 					sig = os
 					i_sig = i
@@ -127,7 +155,9 @@ Term *ParsePart(string[] e)
 	
 	return eid[0]
 
-Term *Parse(string s)
-	Analyze(s)
-	return ParsePart(expr)
+Term *parse(string s)
+	Parser p
+	p.e = analyze(s)
+	p.cur_index = 0
+	return p.parse_operand()
 

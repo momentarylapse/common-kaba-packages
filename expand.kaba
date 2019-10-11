@@ -1,14 +1,14 @@
 use "common.kaba"
 use "parser.kaba"
 
-Term *Expand(Term *t)
+Term *expand(Term *t)
 	if !t
 		return nil
 	# rekursiv
 	bool need_new = false
 	Term*[8] p
 	for pp,i in t.params
-		p[i] = Expand(pp)
+		p[i] = expand(pp)
 		if p[i] != pp
 			need_new = true
 	if need_new
@@ -33,7 +33,7 @@ Term *Expand(Term *t)
 			t_sum.params[0] = t_l
 			t_sum.params[1] = t_r
 			#print ExprToStr(t_sum)
-			return Expand(t_sum)
+			return expand(t_sum)
 		else if (p2.name == "+") or (p2.name == "-")
 			# z * (x + y)  ->  z * x + z * y
 			Term* t_l = t.copy()
@@ -45,7 +45,7 @@ Term *Expand(Term *t)
 			Term* t_sum = p2.copy()
 			t_sum.params[0] = t_l
 			t_sum.params[1] = t_r
-			return Expand(t_sum)
+			return expand(t_sum)
 	else if t.name == "^"
 		Term* p1 = t.params[0]
 		Term* p2 = t.params[1]
@@ -61,7 +61,7 @@ Term *Expand(Term *t)
 				Term *t_mul = p1.copy()
 				t_mul.params[0] = t_l
 				t_mul.params[1] = t_r
-				return Expand(t_mul)
+				return expand(t_mul)
 			else if (p1.name == "+") or (p1.name == "-")
 				int e = p2.name.int()
 				Term* t_mul = p1.copy()
@@ -69,11 +69,11 @@ Term *Expand(Term *t)
 					Term* t_l = t_mul
 					Term* t_r = p1.copy()
 					t_mul = AddOperator("*", t_l, t_r)
-				return Expand(t_mul)
+				return expand(t_mul)
 		if p1.name == "^"
 			# (a ^ b) ^ c -> a ^ (b * c)
 			Term* t_mul = AddOperator("*", p1.params[1], p2)
 			t = AddOperator("^", p1.params[0], t_mul)
-			return Expand(t)
+			return expand(t)
 		
 	return t

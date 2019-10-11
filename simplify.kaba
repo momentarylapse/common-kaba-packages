@@ -4,17 +4,17 @@ use "parser.kaba"
 string add(string a, string b)
 	#return i2s(s2i(a) + s2i(b))
 	vli va = a, vb = b
-	return (va + vb).str()
+	return str(va + vb)
 
 string sub(string a, string b)
 	#return i2s(s2i(a) - s2i(b))
 	vli va = a, vb = b
-	return (va - vb).str()
+	return str(va - vb)
 
 string mul(string a, string b)
 	#return i2s(s2i(a) * s2i(b))
 	vli va = a, vb = b
-	return (va * vb).str()
+	return str(va * vb)
 
 #string mod(string a, string b)
 #	#return i2s(s2i(a) * s2i(b))
@@ -24,11 +24,11 @@ string mul(string a, string b)
 
 string exponent(string a, string b)
 	vli va = a, vb = b
-	return va.pow(vb).str()
+	return str(va.pow(vb))
 
 string gcd(string a, string b)
 	vli va = a, vb = b
-	return va.gcd(vb).str()
+	return str(va.gcd(vb))
 
 void append_terms(Term*[] a, Term*[] b)
 	for x in b
@@ -39,7 +39,7 @@ void append_neg(bool[] a, bool[] b)
 		a.add(x)
 
 void print_group(Term*[] gr)
-	print("[" + [for x in gr ExprToStr(x)].join(", ") + "]")
+	print("[" + [for x in gr str(*x)].join(", ") + "]")
 
 Term*[] GetEqualOps(Term* t)
 	Term*[] l
@@ -175,7 +175,7 @@ void sort_group(Term*[] l)
 	# alle Terme "rendern"...   besser eine comp(term, term)-Funktion
 	string[] s
 	for i in 0:l.num
-		string ss = ExprToStr(l[i])
+		string ss = str(*l[i])
 		s.add(ss)
 	
 	# sortieren
@@ -326,16 +326,18 @@ Term* normalize_exponent(Term* t)
 	return t
 
 Term* normalize_function(Term* t)
-	let p = t.params[0]
 	if t.name == "ln"
+		let p = t.params[0]
 		if p.name == "^"
-			return normalize(AddOperator("*", p.params[1], AddFunction("ln", p.params[0])))
+			return normalize(AddOperator("*", p.params[1], AddFunction("ln", [p.params[0]])))
 		if p.name == "e"
 			return AddNumber("1")
 	if t.name == "sin"
+		let p = t.params[0]
 		if p.name in ["0", "pi"]
 			return AddNumber("0")
 	if t.name == "cos"
+		let p = t.params[0]
 		if p.name == "0"
 			return AddNumber("1")
 		if p.name == "pi"

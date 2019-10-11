@@ -5,30 +5,27 @@ use "expand.kaba"
 use "diff.kaba"
 
 
-Term *Execute(Term *t)
-	# selbst
-	if t.name == "expand"
-		return Expand(Execute(t.params[0]))
-	if t.name == "diff"
-		return Diff(Execute(t.params[0]))
+class Runtime
 
-	# rekursiv
-	Term* r = t.shallow_copy()
-	for pp,i in t.params
-		r.params[i] = Execute(pp)
-		
-	return t
+	Term *execute_term(Term *t)
+		# self
+		if t.name == "expand"
+			return expand(execute_term(t.params[0]))
+		if t.name == "diff"
+			return diff(execute_term(t.params[0]), t.params[1].name)
 
-Term *ExecuteComplete(Term *t)
-#	t = SimplifyNumericals(t)
-	t = Execute(t)
-	t = normalize(t)
-	#t = SimplifyNumericals(t)
-	return t
+		# recursive
+		let r = t.shallow_copy()
+		for pp,i in t.params
+			r.params[i] = execute_term(pp)		
+		return t
+
+	Term *execute(Term *t)
+		return normalize(execute_term(t))
 
 void main(string[] arg)
-	if arg.num > 0
-		Term *t = Parse(arg[0])
-		#print ExprToStr(t)
-		t = ExecuteComplete(t)
-		print(ExprToStr(t))
+	Runtime r
+	for a in arg
+		let t = parse(a)
+		t = r.execute(t)
+		print(str(*t))
