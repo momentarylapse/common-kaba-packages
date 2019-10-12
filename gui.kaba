@@ -4,30 +4,39 @@ use parser
 use simplify
 use kabama
 
-class KabamaWindow extends Dialog
-	Runtime r
+void* pp
 
-	void on_ok()
-		string s = get_string("edit")
+class KabamaWindow extends Window
+	Runtime r
+	string log
+
+	void on_eval()
+		let input = get_string("input")
+		log += ">>> {{input}}\n"
 		try
-			let t = r.execute(parse(s))
-			set_string("list", "{{s}}\\{{str(*t)}}")
+			let t = r.eval(parse(input))
+			log += "{{str(*t)}}\n"
 		except Exception as e
-			set_string("list", "{{s}}\\Error: {{e.message()}}")
+			log += "Error: {{e.message()}}\n"
+		set_string("log", log)
 
 	void __init__()
-		super.__init__("kabama", 800, 600, nil, false)
+		super.__init__("kabama", 800, 600)
 		add_grid("", 0, 0, "table")
 		set_target("table")
-		add_list_view("in\\out", 0, 0, "list")
+		#add_list_view("in\\out", 0, 0, "list")
+		add_multiline_edit("", 0, 0, "log")
 		add_grid("", 0, 1, "table2")
 		set_target("table2")
-		add_edit("!expandx", 0, 0, "edit")
-		add_def_button("Ok", 1, 0, "ok")
-		set_image("ok", "hui:ok")
+		add_edit("!expandx", 0, 0, "input")
+		add_def_button("Eval", 1, 0, "eval")
+		set_image("eval", "hui:ok")
+		
+		enable("log", false)
+		#activate("input")
 	
-		event("ok", on_ok)
+		event("eval", on_eval)
 	
 void main()
-	Window *win = new KabamaWindow()
+	let win = new KabamaWindow()
 	win.run()

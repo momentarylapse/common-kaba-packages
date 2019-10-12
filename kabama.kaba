@@ -11,10 +11,10 @@ class Runtime
 	class Function
 		string name
 		string[] params
-		Term* value
+		Term* formula
 		string str()
 			let p = params.join(", ")
-			return "Function {{name}}({{p}}) := {{value.str()}}"
+			return "Function {{name}}({{p}}) := {{formula.str()}}"
 	Function*[] functions
 	
 	void add_function(Term *t)
@@ -22,38 +22,44 @@ class Runtime
 		f.name = t.params[0].name
 		for p in t.params[0].params
 			f.params.add(p.name)
-		f.value = t.params[1].copy()
+		f.formula = t.params[1].copy()
 		functions.add(f)
 		#print("added... " + str(*f))
 
-	Term *execute_term(Term *t)
+	Term *eval_term(Term *t)
+		# recursive
+		let params = [for p in t.params eval_term(p)]
+			
 		# self
 		if t.name == "expand"
-			return expand(execute_term(t.params[0]))
+			return expand(params[0])
 		else if t.name == "diff"
-			return diff(execute_term(t.params[0]), t.params[1].name)
+			return diff(params[0], t.params[1].name)
 		else if t.name == "subst"
-			return subst(execute_term(t.params[0]), t.params[1].name, execute_term(t.params[2]))
+			return subst(params[0], t.params[1].name, params[2])
 		else if t.name == "zeros"
-			return zeros(execute_term(t.params[0]), t.params[1].name)
+			return zeros(params[0], t.params[1].name)
 		else if t.type == TYPE_SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])
+		else if t.type == TYPE_FUNCTION
+			for f in functions
+				if f.name == t.name
+					return subst(f.formula, f.params[0], t.params[0])
 				
 				
 
 		# recursive
 		let r = t.shallow_copy()
-		for pp,i in t.params
-			r.params[i] = execute_term(pp)		
+		r.params = params
 		return t
 
-	Term *execute(Term *t)
-		return normalize(execute_term(t))
+	Term *eval(Term *t)
+		return normalize(eval_term(t))
 
 void main(string[] arg)
 	Runtime r
 	for a in arg
 		let t = parse(a)
-		t = r.execute(t)
+		t = r.eval(t)
 		print(str(*t))

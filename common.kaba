@@ -38,9 +38,9 @@ class Term
 		if type == TYPE_OPERATOR
 			string a = params[0].str()
 			string b = params[1].str()
-			if NeedsBrackets(&self, params[0])
+			if param_needs_paranthesis(0)
 				a = "(" + a + ")"
-			if NeedsBrackets(&self, params[1])
+			if param_needs_paranthesis(1)
 				b = "(" + b + ")"
 			if name == "*"
 				r = a + " " + b
@@ -59,6 +59,21 @@ class Term
 		else if type == TYPE_LIST
 			return "[" + [for p in params p.str()].join(", ") + "]"
 		return r
+	bool param_needs_paranthesis(int p)
+		if name == "^"
+			return params[p].type == TYPE_OPERATOR
+		if name == "/"
+			if params[p].name == "^"
+				return false
+			return params[p].type == TYPE_OPERATOR
+		if name == "-"
+			if params[p].name == "*"
+				return false
+			return params[p].type == TYPE_OPERATOR
+		if name == "*"
+			return params[p].name in ["+", "-"]
+		return false
+
 
 Term*[] copy_list(Term*[] list)
 	return [for t in list t.copy()]
@@ -110,17 +125,3 @@ Term *AddList(Term*[] params)
 
 class RuntimeError extends Exception
 
-bool NeedsBrackets(Term *t, Term *sub)
-	#return sub.Type == TypeOperator
-	if t.name == "^"
-		return sub.type == TYPE_OPERATOR
-	if t.name == "/"
-		if sub.name == "^"
-			return false
-		return sub.type == TYPE_OPERATOR
-	if t.name == "-"
-		return sub.type == TYPE_OPERATOR
-	if t.name == "*"
-		if (sub.name == "+") or (sub.name == "-")
-			return true
-	return false
