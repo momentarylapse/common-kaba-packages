@@ -46,23 +46,17 @@ string show_var(string ns, Variable *v)
 
 
 string class_extension(Class *c)
-	if c.parent
+	if c.param
 		# dirty hack...
 		if c == string
-			return " extends {{c.parent.name}}[]"
+			return " extends {{c.param.name}}[]"
 		if c == cstring
-			return " extends {{c.parent.name}}[{{c.size}}]"
-			
+			return " extends {{c.param.name}}[{{c.size}}]"
+		
+	if c.parent	
 		return " extends " + c.parent.name
 	return ""
 
-Function*[] func_extract(Class *c)
-	Function*[] r
-	for f in c.functions
-		r.add(f)
-	for f in c.static_functions
-		r.add(f)
-	return r
 
 Function*[] filter_funcs(Function*[] ff, Class* namespace)
 	Function*[] r
@@ -98,6 +92,8 @@ string opname(string f)
 		return "*"
 	if f == "__div__"
 		return "/"
+	if f == "__mod__"
+		return "%"
 	if f == "__exp__"
 		return "^"
 	if f == "__iadd__"
@@ -120,10 +116,26 @@ string opname(string f)
 		return "<="
 	if f == "__gt__"
 		return ">"
+	if f == "__ge__"
+		return ">="
 	if f == "__and__"
 		return "and"
 	if f == "__or__"
 		return "or"
+	if f == "__bitand__"
+		return "&"
+	if f == "__bitor__"
+		return "|"
+	if f == "__rshift__"
+		return ">>"
+	if f == "__lshift__"
+		return "<<"
+	if f == "__inc__"
+		return "++"
+	if f == "__dec__"
+		return "--"
+	if f == "__neg__"
+		return "-"
 	return f
 
 bool is_list(Class *c)
@@ -132,12 +144,13 @@ bool is_list(Class *c)
 string show_class(string ns, Class* c)
 	string wiki = "== Kaba class {{c.name}} ==\n"
 	
-	let funcs = filter_funcs(func_extract(c), c)
+	let funcs = filter_funcs(c.functions, c)
 	let elements = filter_elements(c.elements)
 	let consts = filter_consts(c.constants)
 	let ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
 	
 	elements = sorted(elements, "name")
+	let classes = filter_classes(c.classes)
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
@@ -146,18 +159,53 @@ string show_class(string ns, Class* c)
 		wiki += "{{SHIFT}}{{e.type.name}} {{e.name}}\n"
 	if len(funcs) > 0
 		wiki += "\n{{SHIFT}}# functions\n"
-	for f in funcs
-		string pre
-		if f.is_static
-			pre += "static "
-		if f.virtual_index >= 0
-			pre += "virtual "
-		wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})\n"
+		for f in funcs
+			string pre
+			if f.is_static
+				pre += "static "
+			if f.virtual_index >= 0
+				pre += "virtual "
+			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})\n"
+			
+	if len(ops) > 0 or is_list(c)
+		wiki += "\n{{SHIFT}}# operators\n"
+		if is_list(c)
+			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param.name}}\n"
+		for f in ops
+			string pre
+			if f.is_static
+				pre += "static "
+			if f.virtual_index >= 0
+				pre += "virtual "
+			Class* p = nil
+			if f.is_static
+				if f.num_params == 2
+					p = f.param_type[1]
+			else
+				if f.num_params == 1
+					p = f.param_type[0]
+			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})"
+			if f.name == "__subarray__"
+				wiki += "    # {{c.name}}[int:int]  -> {{f.return_type.name}}\n"
+			else if p
+				wiki += "    # {{c.name}} {{opname(f.name)}} {{p.name}}  -> {{f.return_type.name}}\n"
+			else
+				wiki += "    # {{opname(f.name)}} {{c.name}}  -> {{f.return_type.name}}\n"
+				
 	if len(consts) > 0
 		wiki += "\n{{SHIFT}}# constants\n"
-	for cc in consts
-		wiki += "{{SHIFT}}const {{cc.type.name}} {{cc.name}}\n"
+		for cc in consts
+			wiki += "{{SHIFT}}const {{cc.type.name}} {{cc.name}}\n"
+	if len(classes) > 0
+		wiki += "\n{{SHIFT}}# child classes\n"
+		for cc in classes
+			wiki += "{{SHIFT}} class {{cc.name}}\n"
 	wiki += "</code>\n\n"
+	
+	if len(classes) > 0
+		wiki += "\n=== Child classes ===\n\n"
+		for cc in classes
+			wiki += "* <tt>class [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]\n"
 	
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
@@ -174,21 +222,12 @@ string show_class(string ns, Class* c)
 			wiki += "; <tt>{{e.type.name}} {{e.name}}</tt>\n"
 			wiki += ": description\n\n"
 
-	if len(consts) > 0
-		wiki += "\n=== Constants ===\n\n"
-		for cc in consts
-			wiki += "; <tt>{{cc.type.name}} {{cc.name}}</tt>\n"
-			wiki += ": description\n\n"
+#	if len(consts) > 0
+#		wiki += "\n=== Constants ===\n\n"
+#		for cc in consts
+#			wiki += "; <tt>{{cc.type.name}} {{cc.name}}</tt>\n"
+#			wiki += ": description\n\n"
 	
-	if len(ops) > 0 or is_list(c)
-		wiki += "\n=== Operators ===\n\n"
-		if is_list(c)
-			wiki += "; <tt>{{c.parent.name}} {{c.name}}[int]</tt>\n"
-		for f in ops
-			if f.name == "__subarray__"
-				wiki += "; <tt>{{f.return_type.name}} {{c.name}}[int:int]</tt>\n"
-			else if f.num_params == 1
-				wiki += "; <tt>{{f.return_type.name}} {{c.name}} {{opname(f.name)}} {{f.param_type[0].name}}</tt>\n"
 	return wiki
 
 Class*[] filter_classes(Class*[] cc)
@@ -294,16 +333,22 @@ void main()
 	for p in external_libs
 		make_package(p)
 
+void make_class(Class* c, string ns)
+	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
+
+	let funcs = filter_funcs(c.functions, c)
+	for f in funcs
+		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", show_func("{{ns}}.{{c.name}}.{{f.name}}", f))
+	let classes = filter_classes(c.classes)
+	for cc in classes
+		make_class(cc, "{{ns}}.{{c.name}}")
+
 void make_package(Script* p)	
 	wiki_upload("kaba." + p.name, show_package(p))
 
 	let classes = filter_classes(p.classes())
 	for c in classes
-		wiki_upload("kaba.{{p.name}}.{{c.name}}", show_class(p.name, c))
-
-		let funcs = filter_funcs(func_extract(c), c)
-		for f in funcs
-			wiki_upload("kaba.{{p.name}}.{{c.name}}.{{f.name}}", show_func(p.name + "." + c.name + "." + c.name, f))
+		make_class(c, p.name)
 
 	let funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
