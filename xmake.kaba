@@ -4,6 +4,9 @@ use makefile
 use meson
 
 
+string blank(int n)
+	return [for i in 0:n " "].join("")
+
 void main(string[] arg)
 	lib.init()
 	conf.verbose = false
@@ -12,37 +15,38 @@ void main(string[] arg)
 	string[] command
 	conf.ignore_libs
 
-	for i in 0:arg.num
-		if arg[i] == "--verbose"
+	for a,i in arg
+		if a == "--verbose"
 			conf.verbose = true
-		else if arg[i] == "--ignore-lib"
+		else if a == "--ignore-lib"
 			conf.ignore_libs.add(arg[i+1])
 			i ++
-		else if arg[i].find("/", 0) >= 0
-			conf.root = dir_canonical(arg[0])
+		else if a.find("/", 0) >= 0
+			conf.root = dir_canonical(a)
 		else
-			command.add(arg[i])
-	if command.num > 0
+			command.add(a)
+	if len(command) > 0
 		if command[0] == "has"
 			if command.num < 2
 				print("library?")
 				return
 			lib.test(command[1])
 			return
-		else if command[0] == "create"
+		else if command[0] == "list"
+			for l in sorted(lib.libraries, "name")
+				print("{{l.name}} {{blank(12-len(l.name))}} {{l.test()}}")
+			return
+		else if command[0] == "init"
 			conf.save()
 			return
 		else
-			print("???")
+			print("???   try  init/has/list")
 			return
 	print(conf.root)
 	
 	conf.load()
 	
-	string[] missing
-	for l in conf.libs
-		if !lib.test(l)
-			missing.add(l)
+	let missing = [for l in conf.libs l if !lib.test(l)]
 	for l in conf.libs_optional
 		if !conf.ignored(l)
 			lib.test(l)

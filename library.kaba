@@ -12,13 +12,13 @@ class Library
 	virtual string linker_flags()
 		string r
 		for l in libs
-			if l.num > 0
-				r += " -l" + l
+			if len(l) > 0
+				r += " -l{{l}}"
 		return r
 	virtual string[] meson_libs()
 		return libs
 	string define()
-		return "HAS_LIB_" + name.upper()
+		return "HAS_LIB_{{name.upper()}}"
 
 class LibraryPulseaudio extends Library
 	void __init__()
@@ -181,14 +181,14 @@ class LibraryManager
 		for l in libraries
 			if l.name == name
 				return l
-		raise(new Exception("unknown library: " + name))
+		raise(new Exception("unknown library: {{name}}"))
 		return nil
 
 	bool has(string name)
 		return get(name).test()
 	
 	bool test(string name)
-		print("checking library: " + name)
+		print("checking library: {{name}}")
 		if has(name)
 			print("    ok")
 			return true
