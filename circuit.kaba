@@ -55,6 +55,7 @@ class Edge
 		b = n[1]
 		for pp,i in p
 			param[i] = pp
+		#print(str(self))
 	void __assign__(Edge o)
 		pass
 	virtual float g(float dt)
@@ -372,12 +373,15 @@ class Circuit
 
 void _main()
 	Circuit c
+	#c.edges.add(new Resistor([0,1], 1))
 	#c.nodes.add(Node(complex(0,0)))
 	#c.edges.add(new Diode([0, 2]))
 	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
+	print(str(c))
 	SimResult res
 	c.simulate(1, 1, 0.1, 1, 0, res)
+	print(str(c))
 
 void __main()
 	Diode* d = new Diode([0,0])

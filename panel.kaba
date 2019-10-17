@@ -70,9 +70,9 @@ DrawingArea area '' grab-focus")
 		
 
 	complex project_u(int i, float u)
-		return complex(i2f(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
+		return complex(float(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
 	complex project_i(int i, float v)
-		return complex(i2f(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
+		return complex(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
 	void on_simulate()
 		float duration = get_float("t")
