@@ -26,17 +26,22 @@ bool sa_has(string[] a, string val)
 			return true
 	return false
 
+class Profile
+	string name
+	string[] libs_optional
+
 # project
 class Config
 	string root
 	bool verbose
 	
 	string name
-	string binary
+	string binary_file
 	string main_file
 	string[] libs
 	string[] libs_optional
 	string[] ignore_libs
+	Profile[] profiles
 	string language
 	string flags_global
 	string flags_compiler
@@ -64,8 +69,8 @@ class Config
 				break
 			if t == "# project name"
 				f >> name
-			else if t == "# binary name"
-				f >> binary
+			else if t in ["# binary name", "# binary file"]
+				f >> binary_file
 			else if t == "# main file"
 				f >> main_file
 			else if t == "# language"
@@ -93,15 +98,21 @@ class Config
 			else if t == "# additional install"
 				f >> t
 				installs = t.explode(",")
+			else if t[:10] == "# profile "
+				Profile p
+				p.name = t[10:]
+				f >> t
+				p.libs_optional = t.explode(",")
+				profiles.add(p)
 			else
-				raise(new Exception("unknown tag: " + t))
+				raise(new Exception("unknown tag: {{t}}"))
 		delete f
 	void save()
 		File* f = Filesystem.create_text(conf.root + "xmake.conf")
 		f << "# project name"
 		f << name
 		f << "# binary name"
-		f << binary
+		f << binary_file
 		f << "# main file"
 		f << main_file
 		f << "# language"
@@ -112,6 +123,9 @@ class Config
 		f << libs.join(",")
 		f << "# libraries optional"
 		f << libs_optional.join(",")
+		for p in profiles
+			f << "# profile {{p.name}}"
+			f << p.libs_optional.join(",")
 		f << "# icons"
 		f << icons.join(",")
 		f << "# desktop file"
@@ -129,12 +143,12 @@ class Config
 		ignore.add(desktop_file)
 		for e in list
 			if !sa_has(ignore, e.name)
-				e.name = "static/" + e.name
+				e.name = "static/{{e.name}}"
 				r.add(e)
 		for i in installs
 			DirEntry e
 			e.name = i
-			e.is_dir = Filesystem.is_directory("../" + i)
+			e.is_dir = Filesystem.is_directory("../{{i}}")
 			r.add(e)
 		return r
 

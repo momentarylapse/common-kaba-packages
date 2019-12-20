@@ -64,7 +64,7 @@ sources = ["
 
 "
 
-	f << "executable('{{conf.binary}}', sources, dependencies : deps, install : true)"
+	f << "executable('{{conf.binary_file}}', sources, dependencies : deps, install : true)"
 	
 	f << ""
 	

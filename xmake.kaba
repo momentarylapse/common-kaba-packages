@@ -55,7 +55,7 @@ void main(string[] arg)
 	
 	parse_dir(conf.root)
 	
-	create_makefile()
+	create_all_makefiles()
 	
 	create_meson()
 	

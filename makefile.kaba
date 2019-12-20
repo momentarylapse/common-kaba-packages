@@ -2,9 +2,23 @@ use file
 use project
 use library
 
-void create_makefile()
-	File* f = Filesystem.create_text(conf.root + "Makefile")
-	f << "BIN = ../{{conf.binary}}"
+void create_all_makefiles()
+	# fixed profiles
+	for p in conf.profiles
+		create_makefile(p, "-{{p.name}}")
+	
+	# dynamic profile
+	Profile p
+	p.name = "default"
+	for l in conf.libs_optional
+		if lib.has(l) and !conf.ignored(l)
+			p.libs_optional.add(l)
+	create_makefile(p, "")
+
+void create_makefile(Profile p, string postfix)
+	print("-- makefile {{p.name}} --")
+	File* f = Filesystem.create_text(conf.root + "Makefile" + postfix)
+	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	string cflags, lflags, defines
 	for l in conf.libs
@@ -12,7 +26,7 @@ void create_makefile()
 		lflags += lib.linker_flags(l)
 		defines += " -D{{lib.define(l)}}=1"
 	for l in conf.libs_optional
-		if lib.has(l) and !conf.ignored(l)
+		if l in p.libs_optional
 			cflags += lib.compiler_flags(l)
 			lflags += lib.linker_flags(l)
 			defines += " -D{{lib.define(l)}}=1"
