@@ -1,21 +1,21 @@
 use file
 
 string tag_contents(string all, string tag)
-	int i0 = all.find("<" + tag + ">", 0)
+	int i0 = all.find("<{{tag}}>", 0)
 	if i0 < 0
 		return ""
-	int i1 = all.find("</" + tag + ">", i0)
+	int i1 = all.find("</{{tag}}>", i0)
 	if i1 < 0
 		return ""
-	return all[i0+tag.num+2:i1]
+	return all[i0+len(tag)+2:i1]
 
 string compile_stage(string code, string stage)
 	if code == ""
 		return ""
-	string cmd = "echo '" + code + "' | glslc -fshader-stage=" + stage + " - -o -"
+	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
 	# print(cmd)
 	string x = shell_execute(cmd)
-	# print(x.num)
+	# print(len(x))
 	return x
 
 class LayoutData
@@ -41,7 +41,7 @@ LayoutData parse_layout(string layout)
 		else if s.head(12) == "\ttopology = "
 			ld.topology = s[12:]
 		else
-			print("WARNING: layout info unknown: " + s)
+			print("WARNING: layout info unknown: {{s}}")
 	return ld
 int extract_push_size(string layout)
 	return 0
@@ -69,10 +69,10 @@ void compile(string filename)
 	f << "Bindings"
 	f << ld.bindings
 	f << "PushSize"
-	f << "" + ld.push_size
+	f << str(ld.push_size)
 	f << "VertexShader"
 	f << x_vertex
-	if x_geometry.num > 0
+	if len(x_geometry) > 0
 		f << "GeometryShader"
 		f << x_geometry
 	f << "FragmentShader"
@@ -82,3 +82,5 @@ void compile(string filename)
 void main(string[] arg)
 	for a in arg
 		compile(a)
+	if len(arg) == 0
+		print("input files?")
