@@ -7,10 +7,10 @@ const string SHIFT = "    "
 Script*[] external_packages
 Script*[] external_libs
 
-string func_params(Function* f)
+string func_params(Function f)
 	return [for p,i in f.param_type p.name + " " + f.var[i].name].join(", ")
 
-string show_func(string ns, Function* f)
+string show_func(string ns, Function f)
 	string name = f.name
 	if f.namespace
 		name = "{{f.namespace.name}}.{{f.name}}"
@@ -34,7 +34,7 @@ string show_func(string ns, Function* f)
 	
 	return wiki
 
-string show_var(string ns, Variable *v)
+string show_var(string ns, Variable v)
 	string wiki = "== Kaba variable {{v.name}} ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
@@ -45,23 +45,23 @@ string show_var(string ns, Variable *v)
 	return wiki
 
 
-string class_extension(Class *c)
+string class_extension(Class c)
 	if c.param
 		# dirty hack...
-		if c == string
+		if &c == string
 			return " extends {{c.param.name}}[]"
-		if c == cstring
+		if &c == cstring
 			return " extends {{c.param.name}}[{{c.size}}]"
 		
-	if c.parent	
+	if c.parent
 		return " extends " + c.parent.name
 	return ""
 
 
-Function*[] filter_funcs(Function*[] ff, Class* namespace)
+Function*[] filter_funcs(Function*[] ff, Class namespace)
 	Function*[] r
 	for f in ff
-		if f.namespace != namespace
+		if f.namespace != &namespace
 			continue
 		else if f.name == "__init__"
 			r.add(f)
@@ -138,10 +138,10 @@ string opname(string f)
 		return "-"
 	return f
 
-bool is_list(Class *c)
-	return c.name[-2:] == "[]" or c == string
+bool is_list(Class c)
+	return c.name[-2:] == "[]" or &c == string
 
-string show_class(string ns, Class* c)
+string show_class(string ns, Class c)
 	string wiki = "== Kaba class {{c.name}} ==\n"
 	
 	let funcs = filter_funcs(c.functions, c)
@@ -244,7 +244,7 @@ Class*[] filter_classes(Class*[] cc)
 	return sorted(r, "name")
 
 
-string show_package(Script *p)
+string show_package(Script p)
 	string wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package {{p.name}} (default) ==\n"
@@ -333,7 +333,7 @@ void main()
 	for p in external_libs
 		make_package(p)
 
-void make_class(Class* c, string ns)
+void make_class(Class c, string ns)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
 
 	let funcs = filter_funcs(c.functions, c)
@@ -343,7 +343,7 @@ void make_class(Class* c, string ns)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-void make_package(Script* p)	
+void make_package(Script p)	
 	wiki_upload("kaba." + p.name, show_package(p))
 
 	let classes = filter_classes(p.classes())
