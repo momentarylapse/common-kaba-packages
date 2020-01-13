@@ -1,0 +1,248 @@
+use vulkan
+use hui
+use image
+
+
+Vertex _v1(vector p, vector n, float u, float v)
+	Vertex r
+	r.pos = p
+	r.normal = n
+	r.u = u
+	r.v = v
+	return r
+
+
+VertexBuffer* create_quad(rect r)
+	let vb = new VertexBuffer()
+	Vertex[] vertices
+	vertices.add(_v1(vector(r.x1,r.y1,0), vector.EZ, 0, 0))
+	vertices.add(_v1(vector(r.x2,r.y1,0), vector.EZ, 1, 0))
+	vertices.add(_v1(vector(r.x1,r.y2,0), vector.EZ, 0, 1))
+	vertices.add(_v1(vector(r.x2,r.y2,0), vector.EZ, 1, 1))
+	vb.build(vertices, [0,1,3, 0,3,2])
+	return vb
+
+
+class Renderer
+	int width, height
+	Fence* in_flight_fence
+	Semaphore* image_available_semaphore, render_finished_semaphore
+	CommandBuffer* cb
+
+	void __init__()
+		width = 0
+		height = 0
+	
+		in_flight_fence = new Fence()
+		image_available_semaphore = new Semaphore()
+		render_finished_semaphore = new Semaphore()
+		cb = new CommandBuffer()
+	
+	virtual void __delete__()
+		del in_flight_fence
+		del image_available_semaphore
+		del render_finished_semaphore
+	
+	virtual RenderPass* default_render_pass()
+		return nil
+		
+	virtual FrameBuffer* current_frame_buffer()
+		return nil
+
+	virtual bool start_frame()
+		return false
+
+	virtual void end_frame()
+		pass
+	
+	rect area()
+		return rect(0, width, 0, height)
+
+
+class WindowRenderer extends Renderer
+	void* window
+	SwapChain* swap_chain
+	int image_index
+	bool framebuffer_resized
+	
+	void __init__(void *_window)
+		window = _window
+		framebuffer_resized = false
+
+
+		swap_chain = new SwapChain()
+		width = swap_chain.width
+		height = swap_chain.height
+
+		#main_renderer = this
+	#glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
+
+	override void __delete__()
+		del swap_chain
+
+
+#void WindowRenderer::framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
+#	main_renderer->on_resize(width, height);
+
+#void WindowRenderer::on_resize(int w, int h) {
+#	width = w;
+#	height = h;
+#	framebuffer_resized = true;
+
+	void rebuild_default_stuff()
+		print("recreate swap chain")
+
+		wait_device_idle()
+
+		swap_chain.rebuild()
+		width = swap_chain.width
+		height = swap_chain.height
+	
+	override RenderPass* default_render_pass()
+		return swap_chain.default_render_pass
+
+	override FrameBuffer* current_frame_buffer()
+		return swap_chain.frame_buffers[image_index]
+
+	override bool start_frame()
+		in_flight_fence.wait()
+
+		if !swap_chain.aquire_image(&image_index, image_available_semaphore)
+			rebuild_default_stuff()
+			return false
+		return true
+
+	override void end_frame()
+		queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
+
+		let signals2 = [render_finished_semaphore]
+		if !swap_chain.present(image_index, signals2) or framebuffer_resized
+			framebuffer_resized = false
+			rebuild_default_stuff()
+		wait_device_idle()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class TextureRenderer extends Renderer
+	Texture* tex
+	DepthBuffer* depth_buffer
+	FrameBuffer* frame_buffer
+	RenderPass* _default_render_pass
+
+
+	void __init__(Texture* t)
+		tex = t
+		width = tex.width
+		height = tex.height
+
+		#vulkan::next_compare_op = VK_COMPARE_OP_LESS;
+		depth_buffer = new DepthBuffer(width, height, "d:f32", true)
+		#vulkan::next_compare_op = VK_COMPARE_OP_ALWAYS;
+
+		_default_render_pass = new RenderPass([tex.format, depth_buffer.format], "clear")
+		frame_buffer = new FrameBuffer(width, height, _default_render_pass, [tex.view, depth_buffer.view])
+
+
+	override void __delete__()
+		del _default_render_pass
+		del depth_buffer
+		del frame_buffer
+		del tex
+
+	override bool start_frame()
+		cb.begin()
+		return true
+
+	override void end_frame()
+		#cb->barrier([tex, depth_buffer], 0);
+		cb.barrier([depth_buffer], 0)
+		cb.end()
+
+		queue_submit_command_buffer(cb, [], [], in_flight_fence)
+		in_flight_fence.wait()
+		wait_device_idle()
+
+
+	override FrameBuffer* current_frame_buffer()
+		return frame_buffer
+
+
+
+
+
+
+class UBO
+	matrix m,v,p
+
+class StatLayer
+	Texture* tex
+	UBOWrapper* ubo
+	DescriptorSet* dset
+	Timer* timer
+	Image* im
+	VertexBuffer* vb
+	Pipeline* pipeline
+	int frames
+	float time
+	
+	void __init__(Shader* shader, RenderPass* rp, int subpass)
+		timer = new Timer()
+		time = 0
+		frames = 0
+		im = new Image(256, 64, color(0,0,0,0))
+		tex = new Texture()
+		tex.override(im)
+		ubo = new UBOWrapper(64*3)
+		UBO u
+		u.p = matrix.ID
+		u.v = matrix.ID
+		u.m = matrix.ID
+		ubo.update(&u)
+		dset = new DescriptorSet([ubo], [tex])
+		vb = create_quad(rect(-1,-0.3,-1,-0.8))
+		pipeline = new Pipeline(shader, rp, subpass, 1)
+		pipeline.set_blend(6,7)
+		pipeline.set_z(false, false)
+		pipeline.rebuild()
+	void __delete__()
+		del timer
+		del ubo
+		del tex
+		del dset
+		del vb
+		del pipeline
+	void tick()
+		float dt = timer.get()
+		time += dt
+		frames ++
+		if time < 0.1
+			return
+		
+		im.create(256, 64, color(0,1,1,1))
+		let pp = im.start_draw()
+		pp.set_color(White)
+		pp.set_font_size(20)
+		pp.draw_str(5,5, (frames/time).str2(1))
+		del pp
+		tex.override(im)
+		dset.set([ubo], [tex])
+		frames = 0
+		time = 0
+	void draw(CommandBuffer* cb)
+		cb.set_pipeline(pipeline)
+		cb.bind_descriptor_set(0, dset)
+		cb.draw(vb)
+		
+		
+		
