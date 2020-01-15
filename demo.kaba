@@ -14,9 +14,9 @@ class DemoDialog extends Window
 	void on_close()
 		destroy()
 
-class ToolbarDemoDialog extends Dialog
+class ToolbarDemoDialog extends Window
 	void __init__(string source)
-		super.__init__("Toolbar demo", 800, 300, nil, false)
+		super.__init__("Toolbar demo", 800, 300)
 		toolbar(0).from_source(source)
 
 class MenuDemoDialog extends Window
