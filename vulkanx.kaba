@@ -115,8 +115,7 @@ class WindowRenderer extends Renderer
 	override void end_frame()
 		queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
 
-		let signals2 = [render_finished_semaphore]
-		if !swap_chain.present(image_index, signals2) or framebuffer_resized
+		if !swap_chain.present(image_index, [render_finished_semaphore]) or framebuffer_resized
 			framebuffer_resized = false
 			rebuild_default_stuff()
 		wait_device_idle()
