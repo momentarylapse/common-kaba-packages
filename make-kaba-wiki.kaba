@@ -76,7 +76,7 @@ Function*[] filter_funcs(Function*[] ff, Class namespace)
 Constant*[] filter_consts(Constant*[] cc)
 	Constant*[] r
 	for c in cc
-		if c.name[:1] != "-"
+		if c.name[:1] != "-" and c.name != "KABA_LINK"
 			r.add(c)
 	return sorted(r, "name")
 
@@ -236,6 +236,8 @@ Class*[] filter_classes(Class*[] cc)
 		if c.name.find("*", 0) >= 0 or c.name.find("&", 0) >= 0
 			continue
 		if c.name.find("@", 0) >= 0 or c.name[0] == '-'
+			continue
+		if c.name[0] == '_'
 			continue
 		if c.name.find("[", 0) >= 0 or c.name.find("{", 0) >= 0
 			if !(c.name in ["int[]", "float[]", "bool[]"])

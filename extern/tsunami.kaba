@@ -103,6 +103,8 @@ class Module extends Object
 	Session* session
 	extern void __init__(int type, string sub_type)
 	extern override void __delete__()
+	void __assign__(Module o)
+		pass
 	extern void reset_config()
 	extern virtual void reset_state()
 	extern void changed()
@@ -254,6 +256,8 @@ class PitchDetector extends MidiSource
 class PitchRenderer
 	extern void __init__(Synthesizer synth, int pitch)
 	extern virtual void __delete__()
+	void __assign__(PitchRenderer o)
+		pass
 	extern virtual bool render(AudioBuffer buf) # return: keep alive
 	#extern virtual void on_event(MidiEvent e)
 	extern virtual void on_start(float volume)
@@ -528,7 +532,7 @@ class SongRenderer extends AudioSource
 	extern void __init__(Song s)
 	extern override void __delete__()
 	extern void render(Range r, AudioBuffer buf)
-	extern void prepare(Range r, bool allow_loop)
+	extern void set_range(Range r, bool allow_loop)
 	extern override int read(AudioBuffer b)
 	#extern override void reset_state()
 	extern Range range()

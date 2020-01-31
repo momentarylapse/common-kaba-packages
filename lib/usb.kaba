@@ -1,0 +1,287 @@
+const string KABA_LINK = "/usr/lib64/libusb-1.0.so
+	_libusb_init:libusb_init
+	_libusb_exit:libusb_exit
+	_libusb_set_debug:libusb_set_debug
+	_libusb_get_device_list:libusb_get_device_list
+	_libusb_free_device_list:libusb_free_device_list
+	_libusb_get_bus_number:libusb_get_bus_number
+	_libusb_get_port_number:libusb_get_port_number
+	_libusb_get_port_numbers:libusb_get_port_numbers
+	_libusb_get_device_address:libusb_get_device_address
+	_libusb_get_device_descriptor:libusb_get_device_descriptor
+	_libusb_get_config_descriptor:libusb_get_config_descriptor
+	_libusb_free_config_descriptor:libusb_free_config_descriptor
+	_libusb_clear_halt:libusb_clear_halt
+	_libusb_open:libusb_open
+	_libusb_open_device_with_vid_pid:libusb_open_device_with_vid_pid
+	_libusb_close:libusb_close
+	_libusb_reset_device:libusb_reset_device
+	_libusb_get_device:libusb_get_device
+	_libusb_get_configuration:libusb_get_configuration
+	_libusb_set_configuration:libusb_set_configuration
+	_libusb_claim_interface:libusb_claim_interface
+	_libusb_release_interface:libusb_release_interface
+	_libusb_kernel_driver_active:libusb_kernel_driver_active
+	_libusb_detach_kernel_driver:libusb_detach_kernel_driver
+	_libusb_set_interface_alt_setting:libusb_set_interface_alt_setting
+	_libusb_interrupt_transfer:libusb_interrupt_transfer
+	_libusb_control_transfer:libusb_control_transfer
+"
+
+
+class _context
+class _device
+class _handle
+class _descriptor
+	int[8] i
+class _endpoint_descriptor
+	int[3] i
+	int address()
+		return (i[0] & 0x00ff0000) >> 16
+	int attributes()
+		return (i[0] & 0xff000000) >> 24
+	int max_packet_size()
+		return i[1] & 0x0000ffff
+class _interface_descriptor
+	int[4] i
+	_endpoint_descriptor[0]* endpoint
+	int num_endpoints()
+		return i[1] & 0x000000ff
+	int interface()
+		return (i[0] & 0x00ff0000) >> 16
+	int alt_setting()
+		return (i[0] & 0xff000000) >> 24
+class _interface
+	_interface_descriptor[0]* altsetting
+	int num_altsettings, xxx
+class _config_descriptor
+	int[4] i
+	_interface[0]* interface
+	int num_interfaces()
+		return i[1] & 0x000000ff
+	int config_value()
+		return (i[1] & 0x0000ff00) >> 8
+	#int config_index()
+	#	return (i[1] & 0x00ff0000) >> 16
+
+extern int _libusb_init(_context** c)
+extern void _libusb_exit(_context* c)
+extern void _libusb_set_debug(_context* c, int level)
+extern int _libusb_get_device_list(_context* c, void* list)#_device*** d)
+extern void _libusb_free_device_list(void* list, int unref)#_device** d, int unref)
+extern int _libusb_get_bus_number(_device* d)
+extern int _libusb_get_port_number(_device* d)
+extern int _libusb_get_port_numbers(_device* d, void* ports, int len)
+extern int _libusb_get_device_address(_device* d)
+#extern int _libusb_get_device_descriptor(_device* d, _descriptor *desc)
+extern int _libusb_get_device_descriptor(_device* d, void* desc)
+extern int _libusb_get_config_descriptor(_device* d, int conf, void* desc)
+extern void _libusb_free_config_descriptor(void* desc)
+
+extern int _libusb_open(_device* d, _handle** h)
+extern _handle* _libusb_open_device_with_vid_pid(_context* c, int vid, int pid)
+extern void _libusb_close(_handle* h)
+extern int _libusb_reset_device(_handle* h)
+extern _device* _libusb_get_device(_handle* h)
+extern int _libusb_get_configuration(_handle* h)
+extern int _libusb_set_configuration(_handle* h, int conf)
+extern int _libusb_claim_interface(_handle* h, int i)
+extern int _libusb_release_interface(_handle* h, int i)
+extern int _libusb_kernel_driver_active(_handle* h, int i)
+extern int _libusb_detach_kernel_driver(_handle* h, int i)
+extern int _libusb_clear_halt(_handle* h, int endpoint)
+extern int _libusb_set_interface_alt_setting(_handle* h, int i, int alt)
+
+extern int _libusb_interrupt_transfer(_handle* h, int entpoint, void* data, int length, int* transferred, int timeout)
+extern int _libusb_control_transfer(_handle* h, int req_type, int request, int value, int index, void* data, int length, int timeout)
+
+class DeviceInfo
+	int bus, port, address
+	int _class, sub_class, protocoll, max_package_size, num_configs
+	int vid, pid
+	string str()
+		string v = binary(&vid, 2).hex(true)
+		string p = binary(&pid, 2).hex(true)
+		return "{{bus}}:{{address}}  {{v}}:{{p}}  {{_class}}  {{sub_class}}"
+
+void REPORT_ERROR(int r, string msg)
+	string e = "????  {{r}}"
+	if r == -1
+		e = "IO ERROR"
+	else if r == -2
+		e = "INVALID PARAM"
+	else if r == -3
+		e = "ACCESS DENIED"
+	else if r == -4
+		e = "NO DEVICE"
+	else if r == -5
+		e = "NOT FOUND"
+	else if r == -6
+		e = "BUSY"
+	else if r == -7
+		e = "TIMEOUT"
+	else if r == -8
+		e = "OVERFLOW"
+	else if r == -9
+		e = "PIPE"
+	else if r == -10
+		e = "INTERRUPTED"
+	else if r == -11
+		e = "NO MEMORY"
+	else if r == -12
+		e = "NOT SUPPORTED"
+	raise(new Exception(msg + "  " + e))
+void CHECK(int r, string msg)
+	if r < 0
+		REPORT_ERROR(r, msg)
+
+class Device
+	_device* dev
+	void __init__(_device* d)
+		dev = d
+	DeviceInfo get_info()
+		DeviceInfo i
+		i.bus = _libusb_get_bus_number(dev)
+		i.port = _libusb_get_port_number(dev)
+		i.address = _libusb_get_device_address(dev)
+		
+		_descriptor desc
+		CHECK(_libusb_get_device_descriptor(dev, &desc), "can not get device descriptor")
+		i._class = desc.i[1] & 0x000000ff
+		i.sub_class = (desc.i[1] & 0x0000ff00) >> 8
+		i.protocoll = (desc.i[1] & 0x00ff0000) >> 16
+		i.max_package_size = (desc.i[1] & 0xff000000) >> 24
+		i.vid = desc.i[2] & 0x0000ffff
+		i.pid = (desc.i[2] & 0xffff0000) >> 16
+		i.num_configs = (desc.i[4] & 0x0000ff00) >> 8
+		return i
+	int[] path()
+		string s = "       "
+		int n = _libusb_get_port_numbers(dev, &s[0], len(s))
+		CHECK(n, "can not get port numbers")
+		return [for ch in s[:n] int(ch)]
+	void get_config_desc(int index)
+		_config_descriptor* desc
+		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
+		#let b = binary(desc, 36).hex(false)
+		#print(b)
+		print("[config]")
+		print("  value: {{desc.config_value()}}")
+		int num_if = desc.num_interfaces()
+		for i in 0:num_if
+			print("  [interface]")
+			let ii = &desc.interface[i]
+			for j in 0:ii.num_altsettings
+				print("    [alt]")
+				let a = &ii.altsetting[j]
+				print("      interface:   {{a.interface()}}")
+				print("      alt setting: {{a.alt_setting()}}")
+				#print(a)
+				for k in 0:a.num_endpoints()
+					let e = &a.endpoint[k]
+					#any ep
+					#ep.set("address", e.address())
+					#ep.set("attributes", e.attributes())
+					#ep.set("max_packet_size", e.max_packet_size())
+					print("      [endpoint]")
+					print("        address:         {{e.address()}}")
+					print("        attributes:      {{e.attributes()}}")
+					print("        max packet size: {{e.max_packet_size()}}")
+		_libusb_free_config_descriptor(desc)
+	Handle* open()
+		let h = new Handle()
+		h.dev = &self
+		CHECK(_libusb_open(dev, &h.h), "can not open device")
+		return h
+		
+
+class Context
+	_context* c
+	void __init__()
+		c = nil
+	void __delete__()
+		_libusb_exit(c)
+	Device*[] enumerate()
+		Device*[] r
+		_device*[0]* list
+		int n = _libusb_get_device_list(c, &list)
+		for i in 0:n
+			let dev = new Device(list[i])
+			r.add(dev)
+		_libusb_free_device_list(list, 1)
+		return r
+	Handle* open(int vid, int pid)
+		let h = new Handle()
+		#int v = vid << 16 + pid
+		h.h = _libusb_open_device_with_vid_pid(c, vid, pid)
+		if !h.h
+			raise(new Exception("device not found"))
+		h.dev = new Device(_libusb_get_device(h.h))
+		return h
+
+class Handle
+	_handle* h
+	Device* dev
+	void __init__()
+	void __delete__()
+		if h
+			_libusb_close(h)
+	void reset()
+		CHECK(_libusb_reset_device(h), "can not reset device")
+	int get_config()
+		return _libusb_get_configuration(h)
+	void set_config(int conf)
+		CHECK(_libusb_set_configuration(h, conf), "set config")
+	void claim_interface(int i)
+		CHECK(_libusb_claim_interface(h, i), "claim")
+	void release_interface(int i)
+		_libusb_release_interface(h, i)
+	bool kernel_driver_active(int i)
+		int r = _libusb_kernel_driver_active(h, i)
+		CHECK(r, "kernel driver?!?")
+		return r == 1
+	void detach_kernel_driver(int i)
+		CHECK(_libusb_detach_kernel_driver(h, i), "can not detach kernel driver")
+	void clear_halt(int endpoint)
+		CHECK(_libusb_clear_halt(h, endpoint), "can not clear halt")
+	void set_interface_alt_setting(int i, int alt)
+		CHECK(_libusb_set_interface_alt_setting(h, i, alt), "can not set alt")
+		
+	
+	int interrupt_transfer(int endpoint, string data, int timeout)
+		int transferred
+		CHECK(_libusb_interrupt_transfer(h, endpoint, &data[0], len(data), &transferred, timeout), "interrupt transfer")
+		return transferred
+	string interrupt_read(int endpoint, int max_size, int timeout)
+		string data
+		data.resize(max_size)
+		int transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
+		data.resize(transferred)
+		return data
+	
+	# endpoint = 0
+	int control_transfer(int[] req, string data, int timeout)
+		int r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
+		CHECK(r, "control transfer")
+		return r
+	int control_write(int[] req, string data)
+		return control_transfer(req, data, 1000)
+	string control_read(int[] req, int max_size)
+		string data
+		data.resize(max_size)
+		int r = control_transfer(req, data, 1000)
+		data.resize(r)
+		return r
+
+Context* init_usb()
+	let c = new Context()
+	CHECK(_libusb_init(&c.c), "can not init library")
+	return c
+
+
+void _main()
+	let c = init_usb()
+	let devs = c.enumerate()
+	for d in devs
+		print(str(d.get_info()))
+	del c
