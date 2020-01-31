@@ -11,6 +11,7 @@ const string KABA_LINK = "/usr/lib64/libusb-1.0.so
 	_libusb_get_device_descriptor:libusb_get_device_descriptor
 	_libusb_get_config_descriptor:libusb_get_config_descriptor
 	_libusb_free_config_descriptor:libusb_free_config_descriptor
+	_libusb_clear_halt:libusb_clear_halt
 	_libusb_open:libusb_open
 	_libusb_open_device_with_vid_pid:libusb_open_device_with_vid_pid
 	_libusb_close:libusb_close
@@ -22,7 +23,9 @@ const string KABA_LINK = "/usr/lib64/libusb-1.0.so
 	_libusb_release_interface:libusb_release_interface
 	_libusb_kernel_driver_active:libusb_kernel_driver_active
 	_libusb_detach_kernel_driver:libusb_detach_kernel_driver
+	_libusb_set_interface_alt_setting:libusb_set_interface_alt_setting
 	_libusb_interrupt_transfer:libusb_interrupt_transfer
+	_libusb_control_transfer:libusb_control_transfer
 "
 
 
@@ -86,14 +89,16 @@ extern int _libusb_claim_interface(_handle* h, int i)
 extern int _libusb_release_interface(_handle* h, int i)
 extern int _libusb_kernel_driver_active(_handle* h, int i)
 extern int _libusb_detach_kernel_driver(_handle* h, int i)
+extern int _libusb_clear_halt(_handle* h, int endpoint)
+extern int _libusb_set_interface_alt_setting(_handle* h, int i, int alt)
 
 extern int _libusb_interrupt_transfer(_handle* h, int entpoint, void* data, int length, int* transferred, int timeout)
+extern int _libusb_control_transfer(_handle* h, int req_type, int request, int value, int index, void* data, int length, int timeout)
 
 class DeviceInfo
 	int bus, port, address
 	int _class, sub_class, protocoll, max_package_size, num_configs
 	int vid, pid
-	int[] path
 	string str()
 		string v = binary(&vid, 2).hex(true)
 		string p = binary(&pid, 2).hex(true)
@@ -140,12 +145,6 @@ class Device
 		i.port = _libusb_get_port_number(dev)
 		i.address = _libusb_get_device_address(dev)
 		
-		string s = "       "
-		int n = _libusb_get_port_numbers(dev, &s[0], len(s))
-		CHECK(n, "can not get port numbers")
-		for ch in s[:n]
-			i.path.add(int(ch))
-		
 		_descriptor desc
 		CHECK(_libusb_get_device_descriptor(dev, &desc), "can not get device descriptor")
 		i._class = desc.i[1] & 0x000000ff
@@ -156,28 +155,38 @@ class Device
 		i.pid = (desc.i[2] & 0xffff0000) >> 16
 		i.num_configs = (desc.i[4] & 0x0000ff00) >> 8
 		return i
-	void get_config_desc(int conf)
+	int[] path()
+		string s = "       "
+		int n = _libusb_get_port_numbers(dev, &s[0], len(s))
+		CHECK(n, "can not get port numbers")
+		return [for ch in s[:n] int(ch)]
+	void get_config_desc(int index)
 		_config_descriptor* desc
-		CHECK(_libusb_get_config_descriptor(dev, conf, &desc), "can not get config descriptor")
+		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
 		#let b = binary(desc, 36).hex(false)
 		#print(b)
+		print("[config]")
+		print("  value: {{desc.config_value()}}")
 		int num_if = desc.num_interfaces()
-		print("config: {{desc.config_value()}}")
 		for i in 0:num_if
-			print("[interface]")
+			print("  [interface]")
 			let ii = &desc.interface[i]
 			for j in 0:ii.num_altsettings
-				print("  [alt]")
+				print("    [alt]")
 				let a = &ii.altsetting[j]
-				print("    interface:   {{a.interface()}}")
-				print("    alt setting: {{a.alt_setting()}}")
+				print("      interface:   {{a.interface()}}")
+				print("      alt setting: {{a.alt_setting()}}")
 				#print(a)
 				for k in 0:a.num_endpoints()
 					let e = &a.endpoint[k]
-					print("    [endpoint]")
-					print("      address:         {{e.address()}}")
-					print("      attributes:      {{e.attributes()}}")
-					print("      max packet size: {{e.max_packet_size()}}")
+					#any ep
+					#ep.set("address", e.address())
+					#ep.set("attributes", e.attributes())
+					#ep.set("max_packet_size", e.max_packet_size())
+					print("      [endpoint]")
+					print("        address:         {{e.address()}}")
+					print("        attributes:      {{e.attributes()}}")
+					print("        max packet size: {{e.max_packet_size()}}")
 		_libusb_free_config_descriptor(desc)
 	Handle* open()
 		let h = new Handle()
@@ -229,11 +238,40 @@ class Handle
 		_libusb_release_interface(h, i)
 	bool kernel_driver_active(int i)
 		int r = _libusb_kernel_driver_active(h, i)
-		if r < 0
-			CHECK(r, "kernel driver?!?")
+		CHECK(r, "kernel driver?!?")
 		return r == 1
 	void detach_kernel_driver(int i)
 		CHECK(_libusb_detach_kernel_driver(h, i), "can not detach kernel driver")
+	void clear_halt(int endpoint)
+		CHECK(_libusb_clear_halt(h, endpoint), "can not clear halt")
+	void set_interface_alt_setting(int i, int alt)
+		CHECK(_libusb_set_interface_alt_setting(h, i, alt), "can not set alt")
+		
+	
+	int interrupt_transfer(int endpoint, string data, int timeout)
+		int transferred
+		CHECK(_libusb_interrupt_transfer(h, endpoint, &data[0], len(data), &transferred, timeout), "interrupt transfer")
+		return transferred
+	string interrupt_read(int endpoint, int max_size, int timeout)
+		string data
+		data.resize(max_size)
+		int transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
+		data.resize(transferred)
+		return data
+	
+	# endpoint = 0
+	int control_transfer(int[] req, string data, int timeout)
+		int r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
+		CHECK(r, "control transfer")
+		return r
+	int control_write(int[] req, string data)
+		return control_transfer(req, data, 1000)
+	string control_read(int[] req, int max_size)
+		string data
+		data.resize(max_size)
+		int r = control_transfer(req, data, 1000)
+		data.resize(r)
+		return r
 
 Context* init_usb()
 	let c = new Context()
