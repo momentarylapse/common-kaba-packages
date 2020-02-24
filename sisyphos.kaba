@@ -6,7 +6,7 @@ use actions
 
 
 void main(string[] arg)
-	if arg.num == 0
+	if len(arg) == 0
 		print("commands")
 		print("  find <FILTER>              # local search")
 		print("  filter                     # list filters")
@@ -94,28 +94,28 @@ void main(string[] arg)
 
 void run_command(string[] arg)
 	if arg[0] == "filter"
-		if arg.num < 2
+		if len(arg) < 2
 			conf.show()
 			print("TRY: filter add/rm")
 			return
 		if arg[1] == "add"
-			if arg.num < 4
+			if len(arg) < 4
 				print("ERROR: filter add <DIR> <FILTER>")
 				return
 			conf.add_filter(absolute_path(arg[2]), arg[3], "")
 			conf.save()
 		else if arg[1] == "rm"
-			if arg.num == 4
+			if len(arg) == 4
 				conf.rm_filter(arg[2], arg[3])
 				conf.save()
-			else if arg.num == 3
+			else if len(arg) == 3
 				conf.rm_dir(arg[2])
 				conf.save()
 			else
 				print("ERROR: filter rm <DIR> [<FILTER>]")
 				return
 		if arg[1] == "sync"
-			if arg.num < 3
+			if len(arg) < 3
 				print("ERROR: filter sync <DIR>")
 				return
 			#remote_sync_by_filter(arg[2])
@@ -126,13 +126,13 @@ void run_command(string[] arg)
 			print("TRY: ignore add/rm <PATH>")
 			return
 		if arg[1] == "add"
-			if arg.num < 3
+			if len(arg) < 3
 				print("ERROR: ignore add <PATH>")
 				return
 			conf.ignore.add(absolute_path(arg[2]))
 			conf.save()
 		else if arg[1] == "rm"
-			if arg.num < 3
+			if len(arg) < 3
 				print("ERROR: ignore rm <PATH>")
 				return
 			for ig,i in conf.ignore
@@ -144,7 +144,7 @@ void run_command(string[] arg)
 			print("ERROR: ignore ?")
 			return
 	else if arg[0] == "tag"
-		if arg.num < 2
+		if len(arg) < 2
 			print("TRY: tag get/add/set/rm/auto/diff")
 			return
 		if arg[1] == "add"

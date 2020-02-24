@@ -26,7 +26,7 @@ string ssh_escape(string s)
 void scp_download(string source, string dest)
 	string cmd = "scp -p"
 	string rp = scp_escape(source)
-	cmd += " " + SERVER + ":" + rp
+	cmd += " {{SERVER}}:{{rp}}"
 	cmd += " \"" + bash_escape(dest) + "\""
 	if conf.verbosity >= 2
 		print(cmd)
@@ -36,15 +36,15 @@ void scp_upload(string source, string dest)
 	string cmd = "scp -p"
 	string rp = scp_escape(dest)
 	cmd += " \"" + bash_escape(source) + "\""
-	cmd += " " + SERVER + ":" + rp
+	cmd += " {{SERVER}}:{{rp}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 string remote_interface(string action, string[] params)
-	string cmd = "ssh " + SERVER + " python3 "
+	string cmd = "ssh {{SERVER}} python3 "
 	
-	cmd += " /home/michi/Tools/alex/if-" +  action + ".py"
+	cmd += " /home/michi/Tools/alex/if-{{action}}.py"
 	for p in params
 		cmd += " \\\"" + ssh_escape(p) + "\\\""
 	#cmd += ""
@@ -53,7 +53,7 @@ string remote_interface(string action, string[] params)
 	return shell_exec(cmd).trim()
 
 string yii(string action, string[] params)
-	string cmd = "ssh " + SERVER + " "
+	string cmd = "ssh {{SERVER}} "
 	
 	cmd += CMD + " " + action
 	for p in params
@@ -108,7 +108,7 @@ RemoteFile[] remote_find_by_hash(string[] hashes)
 	while done < hashes.num
 		int ee = min(done + CHUNK_SIZE, hashes.num)
 		if conf.verbosity >= 2
-			print("hash... " + done + ":" + ee + " of " + hashes.num)
+			print("hash... {{done}}:{{ee}} of {{len(hashes)}}")
 		let r = remote_find_by_hash_chunk(hashes[done:ee])
 		for x in r
 			rr.add(x)
@@ -119,9 +119,9 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 	RemoteFile[] rr
 	int done = 0
 	while done < ids.num
-		int ee = min(done + CHUNK_SIZE, ids.num)
+		int ee = min(done + CHUNK_SIZE, len(ids))
 		if conf.verbosity >= 2
-			print("ids... " + done + ":" + ee + " of " + ids.num)
+			print("ids... {{done}}:{{ee}} of {{len(ids)}}")
 		let r = remote_find_by_id_chunk(ids[done:ee], quality)
 		for x in r
 			rr.add(x)
@@ -136,7 +136,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 		try
 			LocalFile* lf = db.by_hash(rf.hash)
 			if lf.id.num > 0
-				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  " + "REMOTE...")
+				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  REMOTE...")
 			lf.id = rf.id
 			#if conf.verbose
 			print("RELINK  " + rel_path(lf.path))# + "  ->  " + rf.id)
@@ -215,6 +215,8 @@ void remote_upload(LocalFile* f)
 	if nnn >= 0
 		print("REMOTE WARNING: " + r[4+nnn:])
 	f.id = r[3:].explode("\n")[0]
+	if conf.verbosity >= 2
+		print("ID: {{f.id}}")
 	db.save()
 
 	#string tagsh = tags2strh(f.tags)
@@ -311,7 +313,7 @@ void remote_sync_by_id(LocalFile*[] files)
 
 void sync_file(RemoteFile rf, LocalFile* lf)
 	if conf.verbosity >= 2
-		print("sync " + lf.path)
+		print("sync {{lf.path}}")
 	lf.unset(CHANGED_FILE)
 	lf.unset(CHANGED_META)
 	lf.remote_path = rf.remote_path
@@ -327,15 +329,14 @@ void sync_file(RemoteFile rf, LocalFile* lf)
 		if conf.verbosity >= 1
 			print("CHANGED HASH  " + rel_path(lf.path))
 		if conf.verbosity >= 2
-			print(lf.hash)
-			print(rf.hash)
+			print("{{lf.hash}} <-> {{rf.hash}}")
 		lf.set(CHANGED_FILE)
 		#db.dirty = true
 	if lf.name != rf.name
 		if conf.verbosity >= 1
 			print("CHANGED NAME  " + rel_path(lf.path))
 		if conf.verbosity >= 2
-			print(lf.name + " <-> " + rf.name)
+			print("{{lf.name}} <-> {{rf.name}}")
 		lf.set(CHANGED_META)
 		#db.dirty = true
 	if !tags_equal(lf.tags, rf.tags)

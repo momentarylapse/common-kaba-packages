@@ -21,7 +21,7 @@ string dir_canonical(string dir)
 
 string canonify(string path)
 	string[] xx = path.explode("/")
-	for i in 0:xx.num
+	for i in 0:len(xx)
 		if xx[i] == "."
 			xx.remove(i)
 			i -= 1
@@ -46,8 +46,8 @@ void set_working_dir(string path)
 		working_dir = dir_canonical(path.dirname())
 
 string rel_path(string path)
-	if path.head(working_dir.num) == working_dir
-		return path[working_dir.num:]
+	if path.head(len(working_dir)) == working_dir
+		return path[len(working_dir):]
 	return path
 
 
@@ -63,7 +63,7 @@ void make_all_dirs(string path)
 	string[] parts = path.explode("/")
 	string dir
 	for p,i in parts
-		if i == parts.num - 1
+		if i == len(parts) - 1
 			break
 		if i > 0
 			dir += "/"
@@ -117,7 +117,7 @@ class ConfigDirSync
 
 
 	string[] get_structure()
-		string[] oo = options.explode(";")
+		let oo = options.explode(";")
 		for o in oo
 			if o[:10] == "structure="
 				return o[10:].explode("/")
@@ -127,11 +127,11 @@ class ConfigDirSync
 		return PERFECT
 
 	string guess_dir(string[] parts)
-		string[] structure = get_structure()
+		let structure = get_structure()
 		string dir
 		for s in structure
 			string v = get_tag(parts, s)
-			if v.num > 0
+			if len(v) > 0
 				dir += v + "/"
 		return dir
 
@@ -177,15 +177,15 @@ class Config
 		delete f
 	void save()
 		File *f = Filesystem.create_text(AppDirectory + "sisyphos/config")
-		f << dirs.num
+		f << len(dirs)
 		for e in dirs
 			f << e.dir
 			f << e.structure
-			f << e.syncs.num
+			f << len(e.syncs)
 			for s in e.syncs
 				f << s.filter
 				f << s.options
-		f << ignore.num
+		f << len(ignore)
 		for i in ignore
 			f << i
 		delete f
@@ -214,7 +214,7 @@ class Config
 	ConfigDir* get_cfg(string _dir)
 		string dir = dir_canonical(_dir)
 		for e in dirs
-			if e.dir == dir.head(e.dir.num)
+			if e.dir == dir.head(len(e.dir))
 				return &e
 		#raise(new Exception("not found"))
 		return nil
@@ -230,7 +230,7 @@ class Config
 					if s.filter == filter
 						e.syncs.remove(i)
 						return
-		print("not found...")
+		print("NOT FOUND...")
 
 	void rm_dir(string _dir)
 		string dir = dir_canonical(_dir)
@@ -238,7 +238,7 @@ class Config
 			if e.dir == dir
 				dirs.remove(i)
 				return
-		print("not found...")
+		print("NOT FOUND...")
 		
 	ConfigDir[] dirs
 	string[] ignore

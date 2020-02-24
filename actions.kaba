@@ -155,8 +155,8 @@ void file_add_new(LocalFile* f, string hash)
 	print("ADD  {{rel_path(f.path)}}")
 	f.name = f.path.basename()
 	string ext = f.path.extension()
-	if ext.num > 0
-		f.name = f.name.head(f.name.num - ext.num - 1)
+	if len(ext) > 0
+		f.name = f.name.head(len(f.name) - len(ext) - 1)
 	#print(ext)
 	#print(f.name)
 	f.hash = hash
@@ -335,7 +335,7 @@ void action_pull(string path)
 		if f.is(CHANGED_META)
 			need_meta.add(f)
 
-	if need_meta.num > 0
+	if len(need_meta) > 0
 		if conf.verbosity >= 2
 			print("downloading meta data")
 		remote_download_meta(need_meta)
@@ -346,6 +346,8 @@ void action_push(string path)
 	
 	let files = lister.find(path)
 	for f in files
+		if !f.in_db()
+			continue
 		if f.pure_local() #or f.is(CHANGED_FILE)
 			print("UPLOADING {{rel_path(f.path)}}")
 			remote_upload(f)
@@ -365,7 +367,7 @@ void action_get(string id)
 		let files = remote_find_by_id([id], "")
 		if len(files) > 0
 			LocalFile f = files[0]
-			f.path = Filesystem.current_directory() + f.id + "-" + f.name + "." + f.path.extension()
+			f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
 			db.files.add(f)
 			let ff = db.find_by_id(id)
 			remote_download(ff)
