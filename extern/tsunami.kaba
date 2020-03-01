@@ -23,12 +23,15 @@ class Range
 	void __init__(int _offset, int _length)
 		offset = _offset
 		length = _length
-	int end()
-		return offset + length
+	extern int start()
+	extern int end()
 	bool inside(int pos)
 		return pos >= offset and pos < offset + length
-	string str()
-		return "({{offset}}:{{end()}})"
+	extern bool overlaps(Range o)
+	extern bool covers(Range o)
+	extern Range __and__(Range o)
+	extern string str()
+	#	return "({{offset}}:{{end()}})"
 	#const Range ALL = Range(-1000000000, 2000000000)
 Range RangeTo(int start, int end)
 	return Range(start, end - start)
@@ -233,11 +236,16 @@ class AudioSource extends Module
 	extern virtual int read(AudioBuffer buf)
 	Module.Port *out
 
+class MidiProduceData
+	Bar* bar
+	int beat_no
+
 class MidiSource extends Module
 	extern void __init__()
 	extern override void __delete__()
 	extern virtual int read(MidiEventBuffer midi)
 	# crappy experimental note api:
+	extern virtual bool on_produce(MidiProduceData data)
 	extern void note(float pitch, float volume, int beats)
 	extern void skip(int beats)
 	extern void note_x(float pitch, float volume, int beats, int sub_beats, int beat_partition)
@@ -357,6 +365,11 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
+class BarCollection extends Bar*[]
+	extern Bar*[] get_bars(Range r)
+	extern Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
+	extern int get_next_beat(int pos)
+	extern int get_prev_beat(int pos)
 
 class TrackLayer
 	int type
@@ -459,7 +472,7 @@ class Song
 	Track*[] tracks
 	Sample*[] samples
 	
-	Bar*[] bars
+	BarCollection bars
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()
@@ -532,7 +545,8 @@ class SongRenderer extends AudioSource
 	extern void __init__(Song s)
 	extern override void __delete__()
 	extern void render(Range r, AudioBuffer buf)
-	extern void set_range(Range r, bool allow_loop)
+	extern void set_range(Range r)
+	extern void set_loop(bool l)
 	extern override int read(AudioBuffer b)
 	#extern override void reset_state()
 	extern Range range()
@@ -601,7 +615,8 @@ class Session extends Object
 	#PluginManager* plugin_manager
 	
 	extern Session* create_child()
-	extern SignalChain* add_signal_chain(string name)
+	extern SignalChain* create_signal_chain(string name)
+	extern SignalChain* load_signal_chain(string filename)
 
 	# logging
 	extern void i(string msg)

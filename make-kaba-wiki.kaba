@@ -8,7 +8,7 @@ Script*[] external_packages
 Script*[] external_libs
 
 string func_params(Function f)
-	return [for p,i in f.param_type p.name + " " + f.var[i].name].join(", ")
+	return [for p,i in f.param_type "{{p.name}} {{f.var[i].name}}"].join(", ")
 
 string show_func(string ns, Function f)
 	string name = f.name
