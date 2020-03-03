@@ -1,4 +1,4 @@
-use file
+use os
 const int CHAR_NL = 0x0a
 const int CHAR_TAB = 0x09
 
