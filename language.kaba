@@ -1,5 +1,5 @@
 use config
-use file
+use os
 
 
 class LangID
@@ -25,7 +25,7 @@ class Language
 			
 		for t in texts
 			print(t.orig)
-			print("\t" + t.trans)
+			print("\t{{t.trans}}")
 	void add_id(string id, string title, string tooltip)
 		for i in ids
 			if i.id == id
@@ -190,17 +190,17 @@ bool check_lang(Language l, Language own, bool create_file)
 				break
 		if i.title.num > 0 and !found_title
 			if create_file
-				f << "# id:" + i.id
+				f << "# id:{{i.id}}"
 				f << i.title.escape()
 				f << ""
 			#print("    MISSING title for " + i.id)
 			nerrors ++
 		if i.tooltip.num > 0 and !found_tooltip
 			if create_file
-				f << "# tooltip:" + i.id
+				f << "# tooltip:{{i.id}}"
 				f << i.tooltip.escape()
 				f << ""
-			#print("    MISSING tooltip for " + i.id)
+			#print("    MISSING tooltip for {{i.id}}")
 			nerrors ++
 	
 	# check texts
@@ -221,7 +221,7 @@ bool check_lang(Language l, Language own, bool create_file)
 	if nerrors == 0
 		print("    ok, good translation!")
 	else
-		print("    " + nerrors + " missing translations")
+		print("    {{nerrors}} missing translations")
 
 	if create_file
 		delete f

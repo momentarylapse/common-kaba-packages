@@ -1,4 +1,4 @@
-use file
+use os
 use config
 use language
 use resource
@@ -25,13 +25,13 @@ Language load_own_lang(bool literally)
 	Language own
 	own.name = conf.own_lang_name
 	
-	print("loading own language: " + own.name)
+	print("loading own language: {{own.name}}")
 	resources = load_all_huis(literally)
 	find_all_ids(own, resources)
 	
 	parse_source_code_dir(conf.source_code_dir, own)
 	own.sort()
-	print("    " + own.ids.num + " ids, " + own.texts.num + " texts")
+	print("    {{len(own.ids)}} ids, {{len(own.texts)}} texts")
 	
 	return own
 
@@ -87,7 +87,7 @@ void action_translate(string filename)
 		return
 	
 	try
-		shell_execute("sgribthmaker \"" + conf.dir + "TRANS\"")
+		shell_execute("sgribthmaker \"{{conf.dir}}TRANS\"")
 		patch_language(l, own, conf.dir + "TRANS")
 		check_lang(l, own, false)
 		l.save()

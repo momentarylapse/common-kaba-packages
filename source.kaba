@@ -1,4 +1,4 @@
-use file
+use os
 use config
 use language
 
@@ -69,7 +69,7 @@ class SourceSwapper extends SourceParser
 		for t in l.texts
 			if orig == t.orig
 				string r = t.trans.escape()
-				print("REPLACE " + orig + "    ->   " + r)
+				print("REPLACE {{orig}}    ->   {{r}}")
 				
 				int ppos = pos + delta
 				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
