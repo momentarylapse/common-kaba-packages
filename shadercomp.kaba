@@ -1,4 +1,4 @@
-use file
+use os
 
 string tag_contents(string all, string tag)
 	int i0 = all.find("<{{tag}}>", 0)
@@ -28,14 +28,14 @@ LayoutData parse_layout(string layout)
 	LayoutData ld
 	ld.push_size = 0
 	ld.topology = "triangles"
-	string[] ll = layout.explode("\n")
+	let ll = layout.explode("\n")
 	for s in ll
 		if s == ""
 			continue
 		if s.head(12) == "\tbindings = "
 			ld.bindings = s[12:]
 		else if s.head(12) == "\tpushsize = "
-			ld.push_size = s[12:].int()
+			ld.push_size = int(s[12:])
 		else if s.head(9) == "\tinput = "
 			ld.input = s[9:]
 		else if s.head(12) == "\ttopology = "
