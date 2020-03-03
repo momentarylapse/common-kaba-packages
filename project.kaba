@@ -1,4 +1,4 @@
-use file
+use os
 
 string dir_absolute(string dir)
 	if dir.head(2) == "./"
