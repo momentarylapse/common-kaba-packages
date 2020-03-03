@@ -120,7 +120,7 @@ class Query
 			if t == 1 # int
 				r.set(key, _sqlite3_column_int(res, i))
 			else if t == 2 # double
-				r.set(key, f642f(_sqlite3_column_double(res, i)))
+				r.set(key, float(_sqlite3_column_double(res, i)))
 			else if t == 3 # text
 				r.set(key, cstr2str(_sqlite3_column_text(res, i)))
 		needs_step = true
