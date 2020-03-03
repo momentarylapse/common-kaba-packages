@@ -42,11 +42,11 @@ class CircuitPanel extends Panel
 	color COLOR_TEXT
 	color COLOR_SELECTION
 	
-	void __init__(Circuit* _c)
+	void __init__(Circuit _c)
 		from_source("
 DrawingArea area '' grab-focus")
 		
-		c = _c
+		c = &_c
 		
 		mode = MODE_DEFAULT
 		
@@ -287,7 +287,7 @@ DrawingArea area '' grab-focus")
 			p.draw_lines(pp)
 		
 		p.set_color(COLOR_TEXT)
-		p.draw_str(20, h - 20, "Imax = " + imax + "    Umax = " + umax)
+		p.draw_str(20, h - 20, "Imax = {{imax}}    Umax = {{umax}}")
 	
 	virtual void on_selection_change()
 		pass
