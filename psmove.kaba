@@ -127,7 +127,7 @@ class MyPSMoveController
 
 		matrix *mat = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
 		let s = matrix.scale(1,  1,  -1)
-		let q = quaternion.rotation(s * *mat * s)
+		let q = quaternion(s * *mat * s)
 		dang = ang * q
 		ang = q.bar()
 		#ang = quaternion::rotation_m( *mat)
