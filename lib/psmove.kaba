@@ -126,11 +126,11 @@ class MyPSMoveController
 		pos_last = pos
 
 		matrix *mat = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
-		matrix s = matrix.scale( 1,  1,  -1)
-		let q = quaternion.rotation(s * *mat * s)
+		let s = matrix.scale(1,  1,  -1)
+		let q = quaternion(s * *mat * s)
 		dang = ang * q
 		ang = q.bar()
-		#ang = quaternion::rotation( *mat)
+		#ang = quaternion::rotation_m( *mat)
 
 		_psmove_set_rumble(psmove, int(rumble*255))
 		trigger = float(_psmove_get_trigger(psmove)) / 255.0
