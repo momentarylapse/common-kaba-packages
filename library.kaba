@@ -151,6 +151,16 @@ class LibraryDl extends Library
 	override bool test()
 		return Filesystem.exists("/usr/include/dlfcn.h")
 
+class LibraryBullet extends Library
+	void __init__()
+		super.__init__("bullet", ["BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath"])
+	override bool test()
+		return Filesystem.exists("/usr/include/bullet/btBulletDynamicsCommon.h")
+	override string compiler_flags()
+		return " `pkg-config --cflags bullet`"
+#	override string linker_flags()
+#		return " `pkg-config --cflags --libs bullet`"
+
 
 class LibraryManager
 	Library*[] libraries
@@ -176,6 +186,7 @@ class LibraryManager
 		libraries.add(new LibraryODE())
 		libraries.add(new LibraryPSMove())
 		libraries.add(new LibraryDl())
+		libraries.add(new LibraryBullet())
 
 	Library* get(string name)
 		for l in libraries
