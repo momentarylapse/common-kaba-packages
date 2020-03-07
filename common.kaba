@@ -22,7 +22,7 @@ class Term
 		name = _name
 	void __delete__()
 		for p in params
-			delete p
+			del p
 	Term* shallow_copy()
 		Term* c = new Term(type, name)
 		for p in params
@@ -39,15 +39,15 @@ class Term
 			string a = params[0].str()
 			string b = params[1].str()
 			if param_needs_paranthesis(0)
-				a = "(" + a + ")"
+				a = "({{a}})"
 			if param_needs_paranthesis(1)
-				b = "(" + b + ")"
+				b = "({{b}})"
 			if name == "*"
-				r = a + " " + b
+				r = "{{a}} {{b}}"
 			else if name == "^"
 				r = a + name + b
 			else
-				r = a + " " + name + " " + b
+				r = "{{a}} {{name}} {{b}}"
 		else if type == TYPE_NUMBER
 			return name
 		else if type == TYPE_VARIABLE

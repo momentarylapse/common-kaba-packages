@@ -3,17 +3,20 @@ use parser
 
 string add(string a, string b)
 	#return i2s(s2i(a) + s2i(b))
-	vli va = a, vb = b
+	vli va = a
+	vli vb = b
 	return str(va + vb)
 
 string sub(string a, string b)
 	#return i2s(s2i(a) - s2i(b))
-	vli va = a, vb = b
+	vli va = a
+	vli vb = b
 	return str(va - vb)
 
 string mul(string a, string b)
 	#return i2s(s2i(a) * s2i(b))
-	vli va = a, vb = b
+	vli va = a
+	vli vb = b
 	return str(va * vb)
 
 #string mod(string a, string b)
@@ -23,11 +26,13 @@ string mul(string a, string b)
 #	return rem.str()
 
 string exponent(string a, string b)
-	vli va = a, vb = b
+	vli va = a
+	vli vb = b
 	return str(va.pow(vb))
 
 string gcd(string a, string b)
-	vli va = a, vb = b
+	vli va = a
+	vli vb = b
 	return str(va.gcd(vb))
 
 void append_terms(Term*[] a, Term*[] b)
