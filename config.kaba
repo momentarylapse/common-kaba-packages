@@ -37,7 +37,7 @@ class Config
 			f >> source_code_dir
 			f >> t
 			f >> own_lang_name
-			delete f
+			del f
 			
 			source_code_dir = dir + source_code_dir
 			export_dir = dir + export_dir

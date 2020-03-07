@@ -83,7 +83,7 @@ class SourceSwapper extends SourceParser
 		#print(">>>>>>>>>>>")
 		File* f = Filesystem.create(filename)
 		f.write(source_new)
-		delete f
+		del f
 				
 
 

@@ -139,7 +139,7 @@ void swap_translate_guis(Language l)
 		print(r.str(0))
 		File* f = Filesystem.create(resource_files[i])
 		f.write(r.str(0))
-		delete f
+		del f
 
 void action_swap(string source, string target)
 	conf.set_dir(source.dirname())
