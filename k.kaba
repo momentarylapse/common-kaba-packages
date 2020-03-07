@@ -138,7 +138,7 @@ class DynamicValue
 		s = new DynamicValueState()
 		type = TYPE_NONE
 	virtual void __delete__()
-		delete s
+		del s
 	string str()
 		return s.str()
 	string render()
@@ -155,14 +155,14 @@ class DynamicValue
 		s.add(el)
 	DynamicValue* copy()
 		DynamicValue* c = new DynamicValue()
-		delete c.s
+		del c.s
 		c.s = s.copy()
 		c.type = type
 		return c
 	void setType(int _type)
 		if type != _type
 			#clear()
-			delete s
+			del s
 			type = _type
 			if type == TYPE_BOOL
 				s = new DynamicValueStateBool()
@@ -406,7 +406,7 @@ class DynamicValueStateArray extends DynamicValueState
 	DynamicValue*[] a
 	override void __delete__()
 		for e in a
-			delete e
+			del e
 	override string type()
 		return "array"
 	override string str()
@@ -438,9 +438,9 @@ class DynamicValueStateDict extends DynamicValueState
 	DynamicValue*[] values
 	override void __delete__()
 		for e in values
-			delete e
+			del e
 		for e in keys
-			delete e
+			del e
 	override string type()
 		return "dict"
 	override string str()
@@ -500,7 +500,7 @@ class Variable
 		clear()
 	void clear()
 		if !is_ref
-			delete v
+			del v
 		is_ref = false
 		v = nil
 	void show()
@@ -1026,7 +1026,8 @@ class SyntaxTree
 			SyntaxNodeOperator *op = sn[i*2+1]
 			rank.add(op.rank())
 		while sn.num > 2
-			int rmin = 100, imin = 0
+			int rmin = 100
+			int imin = 0
 			for r,i in rank
 				if r < rmin
 					rmin = r
@@ -1233,7 +1234,7 @@ class Context
 		flag_continue = false
 	void __delete__()
 		for v in vars
-			delete v
+			del v
 	Variable* get(string name)
 		for v in vars
 			if v.name == name
@@ -1265,7 +1266,7 @@ class Interpreter
 		contexts.add(cur_context)
 	void stack_pop()
 		int n = contexts.num - 1
-		delete cur_context
+		del cur_context
 		contexts.remove(n)
 		if n > 0
 			cur_context = contexts[n - 1]
@@ -1425,7 +1426,7 @@ class Interpreter
 			setError("unhandled node: " + sn.type)
 		for p,i in params
 			if is_temp[i]
-				delete p
+				del p
 				
 	void run(SyntaxTree _syntax)
 		syntax = &_syntax
