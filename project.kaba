@@ -106,7 +106,7 @@ class Config
 				profiles.add(p)
 			else
 				raise(new Exception("unknown tag: {{t}}"))
-		delete f
+		del f
 	void save()
 		File* f = Filesystem.create_text(conf.root + "xmake.conf")
 		f << "# project name"
@@ -134,7 +134,7 @@ class Config
 		f << mime_files.join(",")
 		f << "# additional install"
 		f << installs.join(",")
-		delete f
+		del f
 	
 	DirEntry[] needs_installing()
 		DirEntry[] r

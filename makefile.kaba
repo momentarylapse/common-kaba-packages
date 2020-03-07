@@ -88,4 +88,4 @@ void create_makefile(Profile p, string postfix)
 	f << "\tfind . -name \"*.a\" -exec rm -f {} \\;"
 	f << ""
 
-	delete f
+	del f
