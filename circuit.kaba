@@ -207,7 +207,7 @@ class Circuit
 		nodes.clear()
 		out = 1
 		for e in edges
-			delete e
+			del e
 		edges.clear()
 	
 	void reset_default()
