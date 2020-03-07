@@ -288,7 +288,7 @@ class LocalFileDB
 			f << ff.size
 			f << ff.options.join(",")
 			f << tags2strh(ff.tags)
-		delete(f)
+		del f
 		dirty = false
 	
 	bool has_id(string id)

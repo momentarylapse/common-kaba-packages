@@ -188,7 +188,7 @@ void remote_download(LocalFile* f)
 		f.unset(NONLOCAL)
 		f.unset(CHANGED_FILE)
 		db.save()
-		delete ff
+		del ff
 		return
 	print("---ERROR---")
 

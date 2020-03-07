@@ -128,7 +128,7 @@ void file_add(LocalFile* f)
 			except Exception as e
 				print(e.message())
 				return
-		delete ff
+		del ff
 	else
 		# new file
 		string hash

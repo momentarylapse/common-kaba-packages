@@ -174,7 +174,7 @@ class Config
 			string ig
 			f >> ig
 			ignore.add(ig)
-		delete f
+		del f
 	void save()
 		File *f = Filesystem.create_text(AppDirectory + "sisyphos/config")
 		f << len(dirs)
@@ -188,7 +188,7 @@ class Config
 		f << len(ignore)
 		for i in ignore
 			f << i
-		delete f
+		del f
 
 	void show()
 		for e in conf.dirs
