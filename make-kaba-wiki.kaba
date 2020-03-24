@@ -308,7 +308,7 @@ string make_reference()
 void wiki_upload(string name, string wiki)
 	let f = Filesystem.create_text(name + ".txt")
 	f << wiki
-	delete f
+	del f
 
 void find_external()
 	let list = Filesystem.search("extern", "*.kaba", false)
