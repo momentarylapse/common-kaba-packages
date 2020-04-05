@@ -8,7 +8,7 @@ class Tag
 		key = k
 		value = v
 	string str()
-		return key + "=" + value
+		return "{{key}}={{value}}"
 	string strh()
 		return key + "=" + value.hex(false)
 	bool __lt__(Tag o)
