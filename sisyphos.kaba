@@ -22,6 +22,7 @@ void main(string[] arg)
 		print("  tag auto <PATH>")
 		print("  tag diff <PATH>            # compare to remote")
 		print("  add <PATH>                 # add file/dir to local db")
+		print("  unadd <PATH>               # remove file/dir from local db")
 		print("  rm <PATH>                  # drop file/dir from local db")
 		print("  mv <SOURCE> <DEST>")
 		print("  list <DIR>                 # only show")
@@ -220,6 +221,11 @@ void run_command(string[] arg)
 			action_add(absolute_path("./"))
 		for i in 1:arg.num
 			action_add(absolute_path(arg[i]))
+	else if arg[0] == "unadd"
+		if arg.num < 2
+			action_unadd(absolute_path("./"))
+		for i in 1:arg.num
+			action_unadd(absolute_path(arg[i]))
 	else if arg[0] == "rm"
 		if arg.num < 2
 			print("ERROR: rm <PATH>")

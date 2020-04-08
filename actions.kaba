@@ -189,6 +189,16 @@ void action_add(string path)
 			
 	db.save()
 
+
+void action_unadd(string path)
+	set_working_dir(path)
+		
+	let files = lister.find(path)
+	for f in files
+		print("DROP  {{f.path}}")
+		f.drop_me = true
+		db.save()
+
 void action_rm(string path)
 	set_working_dir(path)
 		
