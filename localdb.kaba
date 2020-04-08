@@ -409,8 +409,42 @@ void auto_tag(LocalFile f)
 				f.tag_set(Tag("width", str(int(s[0]))))
 				f.tag_set(Tag("height", str(int(s[1]))))
 		else if ext == "jpg"
-			let s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\"").explode("\n")
-			string model, make
+			let s = shell_exec("exiv2 -pv \"{{bash_escape(f.path)}}\"").explode("\n")
+			string model, make, time
+			for l in s
+				for i in 0:20
+					l = l.replace("  ", " ")
+				let xx = l.explode(" ")
+				if len(xx) < 6
+					continue
+				if xx[0] == "0xa002" # PixelXDimension
+					f.tag_set(Tag("width", int(xx[5])))
+				if xx[0] == "0xa003" # PixelYDimension
+					f.tag_set(Tag("height", int(xx[5])))
+				if xx[0] == "0x0110" # Model
+					model = xx[5:].join(" ")
+				if xx[0] == "0x010f" # Make
+					make = xx[5:].join(" ")
+				if xx[0] == "0x829a" # ExposureTime
+					f.tag_set(Tag("exposuretime", xx[5]))
+				if xx[0] == "0x829d"
+					print(xx[2] + " " + xx[5])
+					#f.tag_set(Tag("fnumber", xx[5]))
+				if xx[0] == "0x8827" # ISOSpeedRatings
+					f.tag_set(Tag("iso", xx[5]))
+				if xx[0] in ["0x0132", "0x9003"] # DateTime
+					time = xx[5] + " " + xx[6]
+			if len(time) == 19
+				if time[4] == ':'
+					f.tag_set(Tag("year", time[:4]))
+					f.tag_set(Tag("month", str(int(time[5:7]))))
+					f.tag_set(Tag("day", str(int(time[8:10]))))
+					f.tag_set(Tag("timeofday", time[11:]))
+			if len(make) > 0 and len(model) > 0
+				f.tag_set(Tag("camera", "{{make}} {{model}}"))
+		else if ext == "jpg--"
+			let s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\" || echo --end--").explode("\n")
+			string model, make, time
 			for l in s
 				let xx = l.explode("\t")
 				if len(xx) < 2
@@ -430,14 +464,13 @@ void auto_tag(LocalFile f)
 				if xx[0] == "0x8827"
 					f.tag_set(Tag("iso", xx[1]))
 				if xx[0] in ["0x0132", "0x9003"]
-					if len(xx[1]) != 19
-						continue
-					if xx[1][4] != ':'
-						continue
-					f.tag_set(Tag("year", xx[1][:4]))
-					f.tag_set(Tag("month", str(int(xx[1][5:7]))))
-					f.tag_set(Tag("day", str(int(xx[1][8:10]))))
-					f.tag_set(Tag("timeofday", xx[1][11:]))
+					time = xx[1]
+			if len(time) == 19
+				if time[4] == ':'
+					f.tag_set(Tag("year", time[:4]))
+					f.tag_set(Tag("month", str(int(time[5:7]))))
+					f.tag_set(Tag("day", str(int(time[8:10]))))
+					f.tag_set(Tag("timeofday", time[11:]))
 			if len(make) > 0 and len(model) > 0
 				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
