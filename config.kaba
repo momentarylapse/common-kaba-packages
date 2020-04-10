@@ -198,7 +198,7 @@ class Config
 				print("  filter: {{s.filter}}")
 				print("    options: {{s.options}}")
 
-	void add_filter(string _dir, string filter, string options)
+	void add_filter(string _dir, string filter, out string options)
 		if default_quality == MEDIUM and options == ""
 			options = "quality=medium"
 		string dir = dir_canonical(_dir)

@@ -165,7 +165,7 @@ void remote_sync_by_filter(string filter, string quality, string structure, stri
 			sync_add_pure_remote(rf, dir, structure)
 	db.save()
 
-void remote_download(LocalFile* f)
+void remote_download(out LocalFile* f)
 	if !f.in_db()
 		print("ERROR: not in db")
 		return
@@ -193,7 +193,7 @@ void remote_download(LocalFile* f)
 	print("---ERROR---")
 
 
-void remote_upload(LocalFile* f)
+void remote_upload(out LocalFile* f)
 	
 	if !f.pure_local()
 		print("ERROR: not pure local")
@@ -311,7 +311,7 @@ void remote_sync_by_id(LocalFile*[] files)
 			if lf.id == rf.id
 				sync_file(rf, lf)
 
-void sync_file(RemoteFile rf, LocalFile* lf)
+void sync_file(RemoteFile rf, out LocalFile* lf)
 	if conf.verbosity >= 2
 		print("sync {{lf.path}}")
 	lf.unset(CHANGED_FILE)

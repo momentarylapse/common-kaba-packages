@@ -82,7 +82,7 @@ DBLister lister
 
 
 # "add"
-void file_add(LocalFile* f)
+void file_add(out LocalFile f)
 	if f.in_db()
 
 		# suddenly appearing?!?
@@ -151,7 +151,7 @@ void file_add(LocalFile* f)
 			file_add_new(f, hash)
 
 
-void file_add_new(LocalFile* f, string hash)
+void file_add_new(out LocalFile f, string hash)
 	print("ADD  {{rel_path(f.path)}}")
 	f.name = f.path.basename()
 	string ext = f.path.extension()
@@ -167,10 +167,10 @@ void file_add_new(LocalFile* f, string hash)
 	auto_tag(f)
 	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")
-	db.files.add(*f)
+	db.files.add(f)
 
 
-void file_move(LocalFile *f, string new_path)
+void file_move(out LocalFile f, string new_path)
 	if conf.verbosity >= 1
 		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
@@ -231,7 +231,7 @@ void action_mv(string source, string _dest)
 		error_out(e)
 
 
-void structure_file(LocalFile* f, string structure, string root)
+void structure_file(out LocalFile f, string structure, string root)
 	string new_path = f.apply_structure(root, structure)
 	if f.path == new_path
 		return
