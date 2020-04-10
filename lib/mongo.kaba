@@ -4,6 +4,11 @@ const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_mongoc_client_new:mongoc_client_new
 	_mongoc_client_get_collection:mongoc_client_get_collection
 	_mongoc_collection_find_with_opts:mongoc_collection_find_with_opts
+	_mongoc_collection_aggregate:mongoc_collection_aggregate
+	_mongoc_collection_insert_one:mongoc_collection_insert_one
+	_mongoc_collection_replace_one:mongoc_collection_replace_one
+	_mongoc_collection_delete_one:mongoc_collection_delete_one
+	_mongoc_collection_delete_many:mongoc_collection_delete_many
 	_mongoc_cursor_next:mongoc_cursor_next
 	_mongoc_cursor_destroy:mongoc_cursor_destroy
 	_mongoc_collection_destroy:mongoc_collection_destroy
@@ -19,6 +24,8 @@ const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_bson_iter_next:bson_iter_next
 	_bson_iter_key:bson_iter_key
 	_bson_iter_int32:bson_iter_int32
+	_bson_iter_int64:bson_iter_int64
+	_bson_iter_double:bson_iter_double
 	_bson_iter_utf8:bson_iter_utf8
 	_bson_iter_array:bson_iter_array
 	_bson_iter_oid:bson_iter_oid
@@ -29,7 +36,12 @@ extern void _mongoc_init()
 extern void _mongoc_cleanup()
 extern void* _mongoc_client_new(char* uri)
 extern void* _mongoc_client_get_collection(void* client, char* db, char* col)
-extern void* _mongoc_collection_find_with_opts(void* col, void* filter, void* x, void* y)
+extern void* _mongoc_collection_find_with_opts(void* col, void* filter, void* _opts, void* _prefs)
+extern void* _mongoc_collection_aggregate(void* col, int flags, void* pipeline, void* x, void* y)
+extern bool _mongoc_collection_insert_one(void* col, void* doc, void* _opts, void* _reply, void* _err)
+extern bool _mongoc_collection_replace_one(void* col, void* sel, void* doc, void* opts, void* reply, void* err)
+extern bool _mongoc_collection_delete_one(void* col, void* sel, void* opts, void* reply, void* err)
+extern bool _mongoc_collection_delete_many(void* col, void* sel, void* opts, void* reply, void* err)
 extern bool _mongoc_cursor_next(void* cur, void* bson)
 extern void _mongoc_cursor_destroy(void* cur)
 extern void _mongoc_collection_destroy(void* col)
@@ -45,6 +57,8 @@ extern bool _bson_iter_init(void* i, void* bson)
 extern bool _bson_iter_next(void* i)
 extern char[0]* _bson_iter_key(void* i)
 extern int _bson_iter_int32(void* i)
+extern int64 _bson_iter_int64(void* i)
+extern float64 _bson_iter_double(void* i)
 extern char[0]* _bson_iter_utf8(void* i, void* __len)
 extern void _bson_iter_array(void* i, int* len, void* a)
 extern void* _bson_iter_oid(void *i)
@@ -95,10 +109,14 @@ string[] bson_iter_str_array(void *i)
 
 any bson_iter_to_any(void *iter)
 	int t = _bson_iter_type(iter)
-	if t == 2 # str
+	if t == 2 # str utf8
 		return bson_iter_str(iter)
 	else if t == 16 # int
 		return _bson_iter_int32(iter)
+	else if t == 18 # int64
+		return int(_bson_iter_int64(iter))
+	else if t == 1 # double
+		return float(_bson_iter_double(iter))
 	else if t == 4 # array
 		any r
 		int[160] itarray
@@ -117,6 +135,9 @@ any bson_iter_to_any(void *iter)
 		_bson_oid_to_string(oid, &s[0])
 		s.resize(24)
 		return s
+	else if t == 10 # null
+		any r
+		return r
 	print("UNKNOWN TYPE: {{t}}")
 	return ""
 
@@ -164,6 +185,29 @@ class Collection
 	Result* find(string json)
 		let b = json_to_bson(json)
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
+	Result* aggregate(string json)
+		let b = json_to_bson(json)
+		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
+	void insert(string json)
+		let b = json_to_bson(json)
+		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
+			raise(new Exception("can not insert"))
+	void replace(string json, any doc)
+		let b = json_to_bson(json)
+		let d = json_to_bson(str(doc))
+		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
+			raise(new Exception("can not replace"))
+	void delete_one(string json)
+		let b = json_to_bson(json)
+		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
+			raise(new Exception("can not delete"))
+	void delete_many(string json)
+		let b = json_to_bson(json)
+		int[160] reply
+		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
+			raise(new Exception("can not delete"))
+		let r = bson_to_any(&reply)
+		print(str(r))
 
 class Result
 	void* cur
@@ -208,7 +252,8 @@ void main()
 	#let col = m.get_collection("wiki", "articles")
 	#let r = col.find("{\"name\":\"Hauptseite\"}")
 	let col = m.collection("alex", "files")
-	let r = col.find("{\"id\":\"100222175\"}") # 900942014
+#	let r = col.find("{\"id\":\"100222175\"}") # 900942014
+	let r = col.aggregate("[{\"$group\": {\"_id\": \"$artist\", \"num\": {\"$sum\": 1} } }]")
 
 	while r.has_more()
 		#print(r.json())
