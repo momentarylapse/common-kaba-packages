@@ -151,7 +151,7 @@ void lang_id_add(LangID[] ids, string id, string title, string tooltip, string n
 	a.tooltip = tooltip
 	ids.add(a)
 
-void sort_ids(LangID[] ids)
+void sort_ids(out LangID[] ids)
 	for i in 0:ids.num
 		for j in i+1:ids.num
 			if ids[i].id > ids[j].id
@@ -160,7 +160,7 @@ void sort_ids(LangID[] ids)
 				ids[j] = t
 
 
-void sort_texts(LangText[] texts)
+void sort_texts(out LangText[] texts)
 	for i in 0:texts.num
 		for j in i+1:texts.num
 			if texts[i].orig > texts[j].orig

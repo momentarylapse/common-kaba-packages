@@ -109,7 +109,7 @@ void action_add(string filename, string name)
 	l.save()
 
 
-void swap_translate_lang(Language own, Language l, string target)
+void swap_translate_lang(out Language own, Language l, string target)
 	# own.ids are ok
 	# own.texts need ...
 	for t in own.texts
@@ -122,7 +122,7 @@ void swap_translate_lang(Language own, Language l, string target)
 	own.filename = target
 	own.save()
 
-void swap_translate_gui(Resource r, Language l, string ns)
+void swap_translate_gui(out Resource r, Language l, string ns)
 	for i in l.ids
 		if i.id == r.id or i.id == ns + "/" + r.id
 			r.title = i.title
