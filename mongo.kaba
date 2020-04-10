@@ -8,6 +8,7 @@ const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_mongoc_collection_insert_one:mongoc_collection_insert_one
 	_mongoc_collection_replace_one:mongoc_collection_replace_one
 	_mongoc_collection_delete_one:mongoc_collection_delete_one
+	_mongoc_collection_delete_many:mongoc_collection_delete_many
 	_mongoc_cursor_next:mongoc_cursor_next
 	_mongoc_cursor_destroy:mongoc_cursor_destroy
 	_mongoc_collection_destroy:mongoc_collection_destroy
@@ -40,6 +41,7 @@ extern void* _mongoc_collection_aggregate(void* col, int flags, void* pipeline, 
 extern bool _mongoc_collection_insert_one(void* col, void* doc, void* _opts, void* _reply, void* _err)
 extern bool _mongoc_collection_replace_one(void* col, void* sel, void* doc, void* opts, void* reply, void* err)
 extern bool _mongoc_collection_delete_one(void* col, void* sel, void* opts, void* reply, void* err)
+extern bool _mongoc_collection_delete_many(void* col, void* sel, void* opts, void* reply, void* err)
 extern bool _mongoc_cursor_next(void* cur, void* bson)
 extern void _mongoc_cursor_destroy(void* cur)
 extern void _mongoc_collection_destroy(void* col)
@@ -195,10 +197,17 @@ class Collection
 		let d = json_to_bson(str(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
 			raise(new Exception("can not replace"))
-	void delete(string json)
+	void delete_one(string json)
 		let b = json_to_bson(json)
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
 			raise(new Exception("can not delete"))
+	void delete_many(string json)
+		let b = json_to_bson(json)
+		int[160] reply
+		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
+			raise(new Exception("can not delete"))
+		let r = bson_to_any(&reply)
+		print(str(r))
 
 class Result
 	void* cur
