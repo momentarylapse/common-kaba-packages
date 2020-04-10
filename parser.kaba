@@ -150,7 +150,7 @@ class Parser
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
 
-Term *digest_operators(Term*[] eid)
+Term *digest_operators(out Term*[] eid)
 	if (eid.num % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
 	

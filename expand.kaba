@@ -1,7 +1,8 @@
 use common
 use parser
 
-Term *expand(Term *t)
+# "out" because of copy().... :P
+Term *expand(out Term *t)
 	if !t
 		return nil
 	# rekursiv

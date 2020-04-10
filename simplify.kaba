@@ -98,7 +98,7 @@ Term*[] extract_product_group(Term* t, bool[] inverse)
 	return l
 
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
-string[] split_off_factor(Term*[] l)
+string[] split_off_factor(out Term*[] l)
 	string[] factor
 	for x,i in l
 		string f = "1"
@@ -153,7 +153,7 @@ void sort_group(Term*[] l)
 
 
 
-void make_unique_in_product(Term*[] l, bool[] inv)
+void make_unique_in_product(out Term*[] l, bool[] inv)
 	Term*[] exponents
 	
 	for x,i in l
@@ -215,7 +215,7 @@ Term* normalize_product(Term* t)
 
 
 
-void make_unique_in_sum(Term*[] l, bool[] negative)
+void make_unique_in_sum(out Term*[] l, bool[] negative)
 	string[] multiplicity
 	#print_group(l)
 	
@@ -331,7 +331,7 @@ Term* normalize_function(Term* t)
 	return t
 
 
-Term* normalize(Term* t)
+Term* normalize(out Term* t)
 	if !t
 		return nil
 
