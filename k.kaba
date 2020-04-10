@@ -539,7 +539,7 @@ class Function
 	#	Variable *v = new Variable(name)
 	#	vars.add(v)
 	#	return v
-	virtual void call(Interpreter *inter, Variable* ret, Variable*[] p)
+	virtual void call(out Interpreter *inter, out Variable* ret, Variable*[] p)
 			inter.stack_push(&self, ret)
 			int n = min(p.num, params.num)
 			for i in 0:n
@@ -893,7 +893,7 @@ class SyntaxTree
 		v.v.setFunction(f)
 		funcs.add(f)
 		return f
-	void add_internal_func(string name, Function *f)
+	void add_internal_func(string name, out Function *f)
 		f.name = name
 		Variable* v = addGlobalVar(name)
 		internal_funcs.add(f)
@@ -1270,7 +1270,7 @@ class Interpreter
 		contexts.remove(n)
 		if n > 0
 			cur_context = contexts[n - 1]
-	void doNode(SyntaxNode *sn, Variable *ret)
+	void doNode(SyntaxNode *sn, out Variable *ret)
 		Variable*[] params
 		bool[] is_temp
 		
