@@ -240,7 +240,7 @@ class Circuit
 			if b >= 0
 				G.add(b, b, g)
 	
-	void create_I(float[] I, float I_in, float dt)
+	void create_I(out float[] I, float I_in, float dt)
 		int n = nodes.num-1
 		I = [I_in]
 		I.resize(n)

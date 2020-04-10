@@ -26,7 +26,7 @@ class Matrix
 		for i in 0:n
 			s.add(e[i*m:(i+1)*m])
 		return s.join("\n")
-	void diagonalize(float[] b)
+	void diagonalize(out float[] b)
 		for i in 0:n
 			float f = get(i,i)
 			if f == 0
