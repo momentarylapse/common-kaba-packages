@@ -21,7 +21,7 @@ class DbFile
 	bool medium
 	void __init__()
 		medium = false
-	string str()
+	const string str()
 		string s = id + "\t" + mtime + "\t" + size + "\t" + hash + "\t" + path + "\t" + name + "\t" + path.extension()
 		if medium
 			s += "\tm"
@@ -31,7 +31,7 @@ class DbFile
 			s += "\t{{t.key}}={{t.value.hex(false)}}"
 			# s += "\t" + t.key + "=" + t.value.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n")
 		return s
-	void show()
+	const void show()
 		print(path)
 		if conf.show_meta
 			print("  id: " + id)
@@ -43,7 +43,7 @@ class DbFile
 			print("  size: " + size)
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
-	string medium_path()
+	const string medium_path()
 		if type.find("/audio/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
 		if type.find("/image/", 0) >= 0
@@ -159,7 +159,7 @@ class Database
 			return f
 		raise(new Exception("hash not found"))
 	
-	void mediumify(DbFile f)
+	void mediumify(out DbFile f)
 		Result* r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
 			DbMedium m = parse_bson_medium(r.doc)
