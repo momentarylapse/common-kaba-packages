@@ -241,7 +241,7 @@ void remote_upload(out LocalFile* f)
 #	print("ERROR: ????")
 
 
-void remote_upload_meta(LocalFile* f)
+void remote_upload_meta(out LocalFile f)
 	
 	if f.pure_local()
 		print("ERROR: pure local")
@@ -282,7 +282,7 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 		rfiles.add(rf)
 	return rfiles
 
-void remote_download_meta(LocalFile*[] files)
+void remote_download_meta(out LocalFile*[] files)
 	let rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
@@ -300,7 +300,7 @@ void remote_download_meta(LocalFile*[] files)
 					lf.unset(CHANGED_META)
 				db.dirty = true
 
-void remote_sync_by_id(LocalFile*[] files)
+void remote_sync_by_id(out LocalFile*[] files)
 	LocalFile*[] files_wanted
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
@@ -349,7 +349,7 @@ void sync_file(RemoteFile rf, out LocalFile* lf)
 		#db.dirty = true
 
 
-void remote_sync_pure_locals_by_hash(LocalFile*[] files)
+void remote_sync_pure_locals_by_hash(out LocalFile*[] files)
 	string[] hashes
 	for f in files
 		if f.pure_local()

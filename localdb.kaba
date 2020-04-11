@@ -26,7 +26,7 @@ class LocalFile
 	void __init__()
 		drop_me = false
 	
-	bool is(string option)
+	const bool is(string option)
 		for o in options
 			if o == option
 				return true
@@ -42,23 +42,23 @@ class LocalFile
 				options.remove(i)
 				db.dirty = true
 				return
-	bool pure_remote()
+	const bool pure_remote()
 		return is(NONLOCAL)
-	bool pure_local()
+	const bool pure_local()
 		return id.num == 0
-	bool perfectly_fine()
+	const bool perfectly_fine()
 		if pure_remote() or pure_local()
 			return false
 		if changed_meta() or changed_file()
 			return false
 		return true
-	bool in_db()
+	const bool in_db()
 		return hash.num > 0
-	bool changed_file()
+	const bool changed_file()
 		return is(CHANGED_FILE)
-	bool changed_meta()
+	const bool changed_meta()
 		return is(CHANGED_META)
-	bool mergeable(LocalFile* f)
+	const bool mergeable(LocalFile* f)
 		if size != f.size
 			return false
 		if id != f.size
@@ -113,7 +113,7 @@ class LocalFile
 				db.dirty = true
 				set(CHANGED_META)
 				return
-	string status_str()
+	const string status_str()
 		if !in_db()
 			return "?   "
 		if pure_local()
@@ -125,12 +125,12 @@ class LocalFile
 		if changed_meta()
 			return "*   "
 		return "    "
-	void show()
+	const void show()
 		if pure_remote()
 			print(status_str() + remote_path)
 		else
 			print(status_str() + rel_path(path))
-	void show_info(string l)
+	const void show_info(string l)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
 		print(l + "id:      {{id}}")
@@ -143,7 +143,7 @@ class LocalFile
 		let _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
-	string get_tag(string key)
+	const string get_tag(string key)
 		if key == "name"
 			return name
 		if key == "ext"
@@ -156,7 +156,7 @@ class LocalFile
 			if t.key == key
 				return t.value
 		return ""
-	string apply_structure(string root, string structure)
+	const string apply_structure(string root, string structure)
 		if structure == ""
 			if path.find(root, 0) == 0
 				return path
@@ -180,7 +180,7 @@ class LocalFile
 					val = "0" + val
 			spath = spath.replace("{" + kkey + "}", val)
 		return root + spath
-	bool match(Tag[] mtags)
+	const bool match(Tag[] mtags)
 		for mt in mtags
 			bool tag_match = false
 			if mt.key == "name"
@@ -291,31 +291,31 @@ class LocalFileDB
 		del f
 		dirty = false
 	
-	bool has_id(string id)
+	const bool has_id(string id)
 		for f in files
 			if id == f.id
 				return true
 		return false
 
-	LocalFile *find_by_id(string id)
+	const LocalFile *find_by_id(string id)
 		for f in files
 			if id == f.id
 				return &f
 		raise(new Exception("not in db: id={{id}}"))
 
-	LocalFile *find_by_path(string path)
+	const LocalFile *find_by_path(string path)
 		for f in files
 			if path == f.path
 				return &f
 		raise(new Exception("not in db: '{{rel_path(path)}}'"))
 
-	bool has_path(string path)
+	const bool has_path(string path)
 		for f in files
 			if path == f.path
 				return true
 		return false
 
-	LocalFile *by_hash(string hash)
+	const LocalFile *by_hash(string hash)
 		if hash == ""
 			raise(new Exception("invalid hash"))
 		for f in files
@@ -331,7 +331,7 @@ class LocalFileDB
 #				return &f
 #		raise(new Exception("not in db: hash=" + hash))
 		
-	LocalFile*[] find_by_tags(string str)
+	const LocalFile*[] find_by_tags(string str)
 		Tag[] tags = str2tags(str)
 		LocalFile*[] list
 		for f in files
@@ -339,7 +339,7 @@ class LocalFileDB
 				list.add(&f)
 		return sorted(list, "path")
 
-	LocalFile*[] get_in_dir(string _dir, bool recursive)
+	const LocalFile*[] get_in_dir(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
 			
 		LocalFile*[] list
@@ -361,7 +361,7 @@ class LocalFileDB
 					list.add(&f)
 		return sorted(list, "path")
 
-	LocalFile*[] get(string path, bool rec)
+	const LocalFile*[] get(string path, bool rec)
 		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
 		LocalFile*[] files
@@ -393,7 +393,7 @@ LocalFileDB db
 
 
 
-void auto_tag(LocalFile f)
+void auto_tag(out LocalFile f)
 	if !Filesystem.exists(f.path)
 		return
 	let ext = f.path.extension()
@@ -402,7 +402,7 @@ void auto_tag(LocalFile f)
 		if ext == "pdf"
 			let s = shell_exec("pdfinfo \"{{bash_escape(f.path)}}\" | awk '/Pages/{print $2}'")
 			if s.num > 0
-				f.tag_set(Tag("pages", s.int().str()))
+				f.tag_set(Tag("pages", str(int(s))))
 		else if ext in ["png", "bmp"] #, "jpg"]
 			let s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(f.path)}}\"").explode("\n")
 			if s.num >= 2

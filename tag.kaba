@@ -7,15 +7,15 @@ class Tag
 	void __init__(string k, string v)
 		key = k
 		value = v
-	string str()
+	const string str()
 		return "{{key}}={{value}}"
-	string strh()
+	const string strh()
 		return key + "=" + value.hex(false)
-	bool __lt__(Tag o)
+	const bool __lt__(Tag o)
 		if key == o.key
 			return value < o.value
 		return key < o.key
-	bool match(Tag filter)
+	const bool match(Tag filter)
 		return key == filter.key and value.match(filter.value)
 
 Tag[] tags_sort(Tag[] tags)
