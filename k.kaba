@@ -33,18 +33,18 @@ class Line
 	int indent
 	int physical_line_no
 	string[] words
-	void show()
+	const void show()
 		print(indent)
 		print(words)
 
 class Lines
 	Line[] lines
-	void show()
+	const void show()
 		for l in lines
 			l.show()
 
 class LiteralParser
-	string getWord(string source, int i0)
+	const string getWord(string source, int i0)
 		string r
 		for j in i0:source.num
 			if isWhitespace(source[j])
@@ -54,7 +54,7 @@ class LiteralParser
 			r.add(source[j])
 		return r
 
-	string getNumber(string source, int i0)
+	const string getNumber(string source, int i0)
 		string r
 		for j in i0:source.num
 			if !isNumber(source[j]) and (source[j] != '.')
@@ -62,7 +62,7 @@ class LiteralParser
 			r.add(source[j])
 		return r
 		
-	string getString(string source, int i0)
+	const string getString(string source, int i0)
 		string r
 		r.add(source[i0])
 		for j in i0+1:source.num
@@ -76,7 +76,7 @@ class LiteralParser
 					break
 		return r
 
-	string getOperator(string source, int i0)
+	const string getOperator(string source, int i0)
 		string r
 		r.add(source[i0])
 		if source.num > i0 + 1
@@ -139,21 +139,21 @@ class DynamicValue
 		type = TYPE_NONE
 	virtual void __delete__()
 		del s
-	string str()
+	const string str()
 		return s.str()
-	string render()
+	const string render()
 		return s.render()
-	int int()
+	const int int()
 		return s.int()
-	float float()
+	const float float()
 		return s.float()
-	bool bool()
+	const bool bool()
 		return s.bool()
-	DynamicValue* get_element(DynamicValue* i)
+	const DynamicValue* get_element(DynamicValue* i)
 		return s.get_element(i)
 	void add(DynamicValue* el)
 		s.add(el)
-	DynamicValue* copy()
+	const DynamicValue* copy()
 		DynamicValue* c = new DynamicValue()
 		del c.s
 		c.s = s.copy()
@@ -540,12 +540,12 @@ class Function
 	#	vars.add(v)
 	#	return v
 	virtual void call(out Interpreter *inter, out Variable* ret, Variable*[] p)
-			inter.stack_push(&self, ret)
-			int n = min(p.num, params.num)
-			for i in 0:n
-				*inter.cur_context.vars[i].v = *p[i].v
-			inter.doNode(block, ret)
-			inter.stack_pop()
+		inter.stack_push(&self, ret)
+		int n = min(p.num, params.num)
+		for i in 0:n
+			*inter.cur_context.vars[i].v = *p[i].v
+		inter.doNode(block, ret)
+		inter.stack_pop()
 
 
 class FunctionInternal extends Function
@@ -554,32 +554,32 @@ class FunctionInternal extends Function
 		is_internal = true
 
 class FunctionSin extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(sin(p[0].v.float()))
 
 class FunctionCos extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(cos(p[0].v.float()))
 
 class FunctionTan extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(tan(p[0].v.float()))
 
 class FunctionSqrt extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(sqrt(p[0].v.float()))
 
 class FunctionAbs extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(abs(p[0].v.float()))
 
 class FunctionPrint extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable *r, Variable*[] p)
 		string s
 		for pp in p
 			s += pp.v.str()
@@ -587,7 +587,7 @@ class FunctionPrint extends FunctionInternal
 		print(s)
 
 class FunctionLen extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		if p.num > 0
 			if p[0].v.type == TYPE_ARRAY
 				DynamicValueStateArray* a = p[0].v.s
@@ -597,7 +597,7 @@ class FunctionLen extends FunctionInternal
 				r.v.setInt(a.values.num)
 
 class FunctionRange extends FunctionInternal
-	override void call(Interpreter *inter, Variable* r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable* r, Variable*[] p)
 		r.v.setType(TYPE_ARRAY)
 		DynamicValueStateArray* a = r.v.s
 		int start = 0
@@ -620,27 +620,27 @@ class FunctionRange extends FunctionInternal
 			i += step
 
 class FunctionStr extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setString(p[0].v.str())
 
 class FunctionInt extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setInt(p[0].v.int())
 
 class FunctionFloat extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setFloat(p[0].v.float())
 
 class FunctionBool extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(Interpreter *inter, out Variable *r, Variable*[] p)
 		if p.num > 0
 			r.v.setBool(p[0].v.bool())
 
 class FunctionMap extends FunctionInternal
-	override void call(Interpreter *inter, Variable *r, Variable*[] p)
+	override void call(out Interpreter *inter, out Variable *r, Variable*[] p)
 		if p.num >= 2
 			if p[0].v.type == TYPE_FUNCTION and p[1].v.type == TYPE_ARRAY
 				r.v.setType(TYPE_ARRAY)
@@ -1020,7 +1020,7 @@ class SyntaxTree
 			sn.add(getOperator())
 			sn.add(getOperand())
 		return linkOperators(sn)
-	SyntaxNode* linkOperators(SyntaxNode*[] sn)
+	SyntaxNode* linkOperators(out SyntaxNode*[] sn)
 		int[] rank
 		for i in 0:(sn.num-1)/2
 			SyntaxNodeOperator *op = sn[i*2+1]
