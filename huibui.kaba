@@ -7,14 +7,14 @@ use demo
 use export
 	
 
-void get_ids(Language l, Resource r, string ns)
+void get_ids(out Language l, Resource r, string ns)
 	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
 	
 	for c in r.children
 		get_ids(l, c, ns)
 
 
-void find_all_ids(Language lang, Resource[] res)
+void find_all_ids(out Language lang, Resource[] res)
 	for r in res
 		get_ids(lang, r, r.id)
 	
@@ -57,7 +57,7 @@ void action_export(string dir)
 	
 	export_resources(resources, own, langs)
 
-void patch_language(Language l, Language own, string filename)
+void patch_language(out Language l, Language own, string filename)
 	try
 		string ttt = Filesystem.read(filename)
 		string[] lines = ttt.explode("\n")

@@ -16,7 +16,7 @@ class Language
 	string name
 	LangID[] ids
 	LangText[] texts
-	void show()
+	const void show()
 		print(name)
 		for i in ids
 			print(i.id)
@@ -73,14 +73,14 @@ class Language
 	void sort()
 		sort_ids(ids)
 		sort_texts(texts)
-	LangID[] get_useful_ids()
+	const LangID[] get_useful_ids()
 		LangID[] uids
 		for i in ids
 			if i.title.num > 0 or i.tooltip.num > 0
 				uids.add(i)
 		sort_ids(uids)
 		return uids
-	LangText[] get_useful_texts()
+	const LangText[] get_useful_texts()
 		LangText[] utexts
 		for t in texts
 			if t.trans.num > 0
@@ -135,7 +135,7 @@ Language[] load_prelangs()
 		langs.add(l)
 	return langs
 
-void lang_id_add(LangID[] ids, string id, string title, string tooltip, string ns)
+void lang_id_add(out LangID[] ids, string id, string title, string tooltip, string ns)
 	if id == "?" or id == ""
 		return
 	string cid = id
