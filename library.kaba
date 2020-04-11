@@ -6,18 +6,18 @@ class Library
 	void __init__(string _name, string[] _libs)
 		name = _name
 		libs = _libs
-	virtual bool test()
-	virtual string compiler_flags()
+	virtual const bool test()
+	virtual const string compiler_flags()
 		return ""
-	virtual string linker_flags()
+	virtual const string linker_flags()
 		string r
 		for l in libs
 			if len(l) > 0
 				r += " -l{{l}}"
 		return r
-	virtual string[] meson_libs()
+	virtual const string[] meson_libs()
 		return libs
-	string define()
+	const string define()
 		return "HAS_LIB_{{name.upper()}}"
 
 class LibraryPulseaudio extends Library
@@ -188,17 +188,17 @@ class LibraryManager
 		libraries.add(new LibraryDl())
 		libraries.add(new LibraryBullet())
 
-	Library* get(string name)
+	const Library* get(string name)
 		for l in libraries
 			if l.name == name
 				return l
 		raise(new Exception("unknown library: {{name}}"))
 		return nil
 
-	bool has(string name)
+	const bool has(string name)
 		return get(name).test()
 	
-	bool test(string name)
+	const bool test(string name)
 		print("checking library: {{name}}")
 		if has(name)
 			print("    ok")
@@ -207,13 +207,13 @@ class LibraryManager
 			print("   NOT FOUND")
 		return false
 
-	string compiler_flags(string name)
+	const string compiler_flags(string name)
 		return get(name).compiler_flags()
 
-	string linker_flags(string name)
+	const string linker_flags(string name)
 		return get(name).linker_flags()
 	
-	string define(string name)
+	const string define(string name)
 		return get(name).define()
 
 LibraryManager lib

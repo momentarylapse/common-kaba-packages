@@ -181,7 +181,7 @@ string canonical(string filename)
 	return p.join("/")
 			
 
-void find_dep(SourceFile f, string filename)
+void find_dep(out SourceFile f, string filename)
 	string s
 	try
 		s = Filesystem.read(filename)
