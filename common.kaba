@@ -23,17 +23,17 @@ class Term
 	void __delete__()
 		for p in params
 			del p
-	Term* shallow_copy()
+	const Term* shallow_copy()
 		Term* c = new Term(type, name)
 		for p in params
 			c.params.add(p)
 		return c
-	Term* copy()
+	const Term* copy()
 		Term* c = new Term(type, name)
 		for p in params
 			c.params.add(p.copy())
 		return c
-	string str()
+	const string str()
 		string r = "?"
 		if type == TYPE_OPERATOR
 			string a = params[0].str()
@@ -59,7 +59,7 @@ class Term
 		else if type == TYPE_LIST
 			return "[" + [for p in params p.str()].join(", ") + "]"
 		return r
-	bool param_needs_paranthesis(int p)
+	const bool param_needs_paranthesis(int p)
 		if name == "^"
 			return params[p].type == TYPE_OPERATOR
 		if name == "/"

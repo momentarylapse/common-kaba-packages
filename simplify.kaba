@@ -35,11 +35,11 @@ string gcd(string a, string b)
 	vli vb = b
 	return str(va.gcd(vb))
 
-void append_terms(Term*[] a, Term*[] b)
+void append_terms(out Term*[] a, Term*[] b)
 	for x in b
 		a.add(x)
 
-void append_neg(bool[] a, bool[] b, bool inv)
+void append_neg(out bool[] a, bool[] b, bool inv)
 	for x in b
 		if inv
 			a.add(!x)
@@ -50,7 +50,7 @@ void print_group(Term*[] gr)
 	print("[" + [for x in gr str(*x)].join(", ") + "]")
 
 
-Term*[] extract_add_group(Term* t, bool[] negative)
+Term*[] extract_add_group(Term* t, out bool[] negative)
 	Term*[] l
 
 	# shortcut (-1)*a  ->  -a
@@ -78,7 +78,7 @@ Term*[] extract_add_group(Term* t, bool[] negative)
 		l.add(t)
 	return l
 
-Term*[] extract_product_group(Term* t, bool[] inverse)
+Term*[] extract_product_group(Term* t, out bool[] inverse)
 	Term*[] l
 	if t.name == "*"
 		bool[] n0, n1
@@ -140,7 +140,7 @@ bool literally_equal(Term *a, Term *b)
 	
 			
 	
-void sort_group(Term*[] l)
+void sort_group(out Term*[] l)
 	# "render" all terms...   need a comp(term, term) function
 	let s = [for t in l str(*t)]
 	
@@ -215,7 +215,7 @@ Term* normalize_product(Term* t)
 
 
 
-void make_unique_in_sum(out Term*[] l, bool[] negative)
+void make_unique_in_sum(out Term*[] l, out bool[] negative)
 	string[] multiplicity
 	#print_group(l)
 	
@@ -311,7 +311,8 @@ Term* normalize_function(Term* t)
 	if t.name == "ln"
 		let p = t.params[0]
 		if p.name == "^"
-			return normalize(AddOperator("*", p.params[1], AddFunction("ln", [p.params[0]])))
+			let tt = AddOperator("*", p.params[1], AddFunction("ln", [p.params[0]]))
+			return normalize(tt)
 		if p.name == "e"
 			return AddNumber("1")
 	if t.name == "sin"
@@ -331,7 +332,8 @@ Term* normalize_function(Term* t)
 	return t
 
 
-Term* normalize(out Term* t)
+Term* normalize(Term* _t)
+	let t = _t
 	if !t
 		return nil
 
