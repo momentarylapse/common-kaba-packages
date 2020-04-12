@@ -24,19 +24,14 @@ string ssh_escape(string s)
 	return r
 
 void scp_download(string source, string dest)
-	string cmd = "scp -p"
-	string rp = scp_escape(source)
-	cmd += " {{SERVER}}:{{rp}}"
-	cmd += " \"" + bash_escape(dest) + "\""
+	string cmd = "scp -Tp"
+	cmd += " {{SERVER}}:\"'{{bash_escape2(source)}}'\" \"{{bash_escape(dest)}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 void scp_upload(string source, string dest)
-	string cmd = "scp -p"
-	string rp = scp_escape(dest)
-	cmd += " \"" + bash_escape(source) + "\""
-	cmd += " {{SERVER}}:{{rp}}"
+	string cmd = "scp -Tp \"{{bash_escape(source)}}\" {{SERVER}}:{{scp_escape(dest)}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
@@ -76,7 +71,7 @@ RemoteFile[] remote_parse(string r)
 		rf.mtime = int(parts[1])
 		rf.size = int(parts[2])
 		rf.hash = parts[3]
-		rf.remote_path = parts[4]
+		#rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
 		rf.path = rf.name + "." + extension # temporary
@@ -163,7 +158,8 @@ void remote_sync_by_filter(string filter, string quality, string structure, stri
 			sync_add_pure_remote(rf, dir, structure)
 	db.save()
 
-void remote_download(out LocalFile* f)
+void remote_download(out LocalFile f)
+	print("DOWNLOADING  {{rel_path(f.path)}}")
 	if !f.in_db()
 		print("ERROR: not in db")
 		return
@@ -171,12 +167,9 @@ void remote_download(out LocalFile* f)
 	if !f.pure_remote() and !f.is(CHANGED_FILE)
 		print("ERROR: neither pure remote nor changed")
 		return
-	if f.remote_path.num == 0
-		print("ERROR: no remote path")
-		return
 	
 	make_all_dirs(f.path)
-	scp_download(f.remote_path, f.path)
+	scp_download(f.remote_path(), f.path)
 
 	File *ff = Filesystem.open(f.path)
 	if ff
@@ -191,7 +184,8 @@ void remote_download(out LocalFile* f)
 	print("---ERROR---")
 
 
-void remote_upload(out LocalFile* f)
+void remote_upload(out LocalFile f)
+	print("UPLOADING  {{rel_path(f.path)}}")
 	
 	if !f.pure_local()
 		print("ERROR: not pure local")
@@ -201,9 +195,9 @@ void remote_upload(out LocalFile* f)
 		print("ERROR: remote does not like files without extension: " + rel_path(f.path))
 		return
 	
-	f.remote_path = ALEX_IN + f.hash + "." + f.path.extension()
+	string remote_path = ALEX_IN + f.hash + "." + f.path.extension()
 	
-	scp_upload(f.path, f.remote_path)
+	scp_upload(f.path, remote_path)
 	
 	string r = remote_interface("add", [f.remote_path])
 	if r[:2] != "ok"
@@ -263,7 +257,6 @@ void remote_upload_meta(out LocalFile f)
 
 
 RemoteFile[] remote_get_meta(LocalFile*[] files)
-
 	string[] ids_perfect
 	string[] ids_medium
 	for f in files
@@ -314,7 +307,6 @@ void sync_file(RemoteFile rf, out LocalFile* lf)
 		print("sync {{lf.path}}")
 	lf.unset(CHANGED_FILE)
 	lf.unset(CHANGED_META)
-	lf.remote_path = rf.remote_path
 	db.dirty = true
 	if rf.is("quality=medium")
 		lf.set("quality=medium")

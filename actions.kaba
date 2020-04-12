@@ -359,10 +359,9 @@ void action_push(string path)
 		if !f.in_db()
 			continue
 		if f.pure_local() #or f.is(CHANGED_FILE)
-			print("UPLOADING {{rel_path(f.path)}}")
 			remote_upload(f)
 		if f.is(CHANGED_META)
-			print("UPLOADING META {{rel_path(f.path)}}")
+			print("UPLOADING META  {{rel_path(f.path)}}")
 			remote_upload_meta(f)
 
 

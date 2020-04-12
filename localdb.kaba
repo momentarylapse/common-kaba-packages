@@ -14,7 +14,7 @@ class LocalFile
 	string id
 	string name
 	int remote_mtime
-	string remote_path
+#	string remote_path
 	# local
 	string path
 	string hash # can be "" if not local
@@ -58,14 +58,14 @@ class LocalFile
 		return is(CHANGED_FILE)
 	const bool changed_meta()
 		return is(CHANGED_META)
-	const bool mergeable(LocalFile* f)
+	const bool mergeable(LocalFile f)
 		if size != f.size
 			return false
 		if id != f.size
 			if id.num > 0 and f.id.num > 0
 				return false
 		return true
-	void merge(LocalFile* f)
+	void merge(LocalFile f)
 		for o in f.options
 			set(o)
 	void sync_tags(Tag[] rtags)
@@ -126,10 +126,7 @@ class LocalFile
 			return "*   "
 		return "    "
 	const void show()
-		if pure_remote()
-			print(status_str() + remote_path)
-		else
-			print(status_str() + rel_path(path))
+		print(status_str() + rel_path(path))
 	const void show_info(string l)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
@@ -143,6 +140,8 @@ class LocalFile
 		let _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
+	const string remote_path()
+		return ALEX_DIR + "links/" + id
 	const string get_tag(string key)
 		if key == "name"
 			return name
@@ -199,6 +198,10 @@ class LocalFile
 				return false
 		return true
 
+string unique_path(LocalFile f)
+	let ext = f.path.extension()
+	return "{{f.path.dirname()}}{{f.hash}} {{f.name}}.{{ext}}" 
+
 class LocalFileDB
 	LocalFile[] files
 	bool dirty
@@ -225,7 +228,7 @@ class LocalFileDB
 			int i0 = i*10+1
 			ff.id = lines[i0]
 			ff.path = lines[i0+1]
-			ff.remote_path = lines[i0+2]
+			#ff.remote_path = lines[i0+2]
 			ff.name = lines[i0+3]
 			ff.hash = lines[i0+4]
 			ff.mtime = int(lines[i0+5])
@@ -243,8 +246,13 @@ class LocalFileDB
 		#print(tt.get())
 
 	void self_check()
+		check_basic()
+		check_hash_collisions()
+		check_duplicate_paths()
+	
+	void check_basic()
 		for f in files
-			if f.path.num == 0
+			if f.path == ""
 				print("EMPTY PATH ...")
 				f.show_info("    ")
 			if f.hash == ""
@@ -259,22 +267,40 @@ class LocalFileDB
 				#else
 					# hash='', id='', no file
 					#print("EMPTY HASH (REMOTE): " + ff.path)
-			if f.path.num > 0
-				LocalFile *l = by_hash(f.hash)
-				if l and l != &f
-					if f.path == l.path
-						print("DUPLICATE: {{f.path}}")
-						if l.mergeable(&f)
-							l.merge(&f)
-							dirty = true
-							f.drop_me = true
-						else
-							f.show()
-							print("   <->")
-							l.show()
-							print("###################################")
-					else
-						print("HASH COLLISION: {{f.path}}  <->  {{l.path}}")
+	void check_hash_collisions()
+		for f in files
+			if f.path == ""
+				continue
+			let l = by_hash(f.hash)
+			if l == &f
+				continue
+			if f.path == l.path
+				print("DUPLICATE: {{f.path}}")
+				if l.mergeable(f)
+					l.merge(f)
+					dirty = true
+					f.drop_me = true
+				else
+					f.show()
+					print("   <->")
+					l.show()
+					print("###################################")
+			else
+				print("HASH COLLISION: {{f.path}}  <->  {{l.path}}")
+
+	void check_duplicate_paths()
+		for f in files
+			if f.path == ""
+				continue
+			let l = find_by_path(f.path)
+			if l == &f
+				continue
+			print("PATH COLLISION: {{f.path}}")
+			let new_path = unique_path(f)
+			
+			print("MOVE   {{rel_path(f.path)}} > {{rel_path(new_path)}}")
+			f.path = new_path
+			db.dirty = true
 
 	void drop_selected()
 		for i in 0:files.num
@@ -292,7 +318,7 @@ class LocalFileDB
 		for ff in files
 			f << ff.id
 			f << ff.path
-			f << ff.remote_path
+			f << "" # ff.remote_path
 			f << ff.name
 			f << ff.hash
 			f << ff.mtime

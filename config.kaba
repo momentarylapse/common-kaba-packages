@@ -4,7 +4,8 @@ use hui
 #const string SERVER = "michi.is-a-geek.org"
 const string SERVER = "myu"
 const string CMD = "kaba /home/michi/Projekte/small/alex/alex.kaba -S"
-const string ALEX_IN = "/media/300/temp/alexandria-cache/in/"
+const string ALEX_DIR = "/media/300/temp/alexandria-cache/"
+const string ALEX_IN = ALEX_DIR + "in/"
 
 const string MEDIUM = "medium"
 const string PERFECT = "perfect"
@@ -59,8 +60,17 @@ string bash_escape(string s)
 	r = r.replace("`", "\\`")
 	return r
 
+# needs to be surrounded by '...'
+string bash_escape2(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("'", "\\'")
+	r = r.replace("`", "\\`")
+	return r
+
 void make_all_dirs(string path)
-	string[] parts = path.explode("/")
+	let parts = path.explode("/")
 	string dir
 	for p,i in parts
 		if i == len(parts) - 1
