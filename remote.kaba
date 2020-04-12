@@ -52,10 +52,8 @@ string remote_interface(string action, string[] params)
 		print(cmd)
 	return shell_exec(cmd).trim()
 
-string yii(string action, string[] params)
-	string cmd = "ssh {{SERVER}} "
-	
-	cmd += CMD + " " + action
+string call_alex(string action, string[] params)
+	string cmd = "ssh {{SERVER}} {{CMD}} {{action}}"
 	for p in params
 		#cmd += " \\\"" + ssh_escape(p) + "\\\""
 		cmd += " " + ssh_escape(p)
@@ -75,15 +73,15 @@ RemoteFile[] remote_parse(string r)
 			continue
 		RemoteFile rf
 		rf.id = parts[0]
-		rf.mtime = parts[1].int()
-		rf.size = parts[2].int()
+		rf.mtime = int(parts[1])
+		rf.size = int(parts[2])
 		rf.hash = parts[3]
 		rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
 		rf.path = rf.name + "." + extension # temporary
-		for i in 8:parts.num
-			rf.tags.add(strh2tag(parts[i]))
+		for p in parts[8:]
+			rf.tags.add(alex2tag(p))
 		if parts[7] == "m"
 			rf.set("quality=medium")
 		rf.set(NONLOCAL)
@@ -91,15 +89,15 @@ RemoteFile[] remote_parse(string r)
 	return rfiles
 
 RemoteFile[] remote_find(string filter, string quality)
-	string r = yii("find", [filter, quality])
+	string r = call_alex("find", [filter, quality])
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
-	string r = yii("by-hash", hashes)
+	string r = call_alex("by-hash", hashes)
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)	
-	string r = yii("by-id", ids)#[ids, quality])
+	string r = call_alex("by-id", ids)#[ids, quality])
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash(string[] hashes)

@@ -209,6 +209,16 @@ class LocalFileDB
 		#Timer tt
 		let ss = Filesystem.read(AppDirectory + "sisyphos/db")
 		let lines = ss.explode("\n")
+		if lines[0] == "version=2"
+			load_v2(lines)
+		else if lines[0] == "version=1"
+			load_v1(lines[1:])
+		else
+			load_v1(lines)
+		
+	void load_v2(string[] lines)
+		
+	void load_v1(string[] lines)
 		int n = len(lines) / 10
 		for i in 0:n
 			LocalFile ff
@@ -218,9 +228,9 @@ class LocalFileDB
 			ff.remote_path = lines[i0+2]
 			ff.name = lines[i0+3]
 			ff.hash = lines[i0+4]
-			ff.mtime = lines[i0+5].int()
-			ff.remote_mtime = lines[i0+6].int()
-			ff.size = lines[i0+7].int()
+			ff.mtime = int(lines[i0+5])
+			ff.remote_mtime = int(lines[i0+6])
+			ff.size = int(lines[i0+7])
 			ff.options = lines[i0+8].explode(",")
 			ff.tags = strh2tags(lines[i0+9])
 			ff.unset("")
@@ -275,7 +285,9 @@ class LocalFileDB
 				i --
 
 	void save()
+		make_all_dirs(AppDirectory + "sisyphos/")
 		File *f = Filesystem.create_text(AppDirectory + "sisyphos/db")
+		f << "version=1"
 		f << files.num
 		for ff in files
 			f << ff.id
@@ -297,13 +309,13 @@ class LocalFileDB
 				return true
 		return false
 
-	const LocalFile *find_by_id(string id)
+	selfref LocalFile *find_by_id(string id)
 		for f in files
 			if id == f.id
 				return &f
 		raise(new Exception("not in db: id={{id}}"))
 
-	const LocalFile *find_by_path(string path)
+	selfref LocalFile *find_by_path(string path)
 		for f in files
 			if path == f.path
 				return &f
@@ -315,7 +327,7 @@ class LocalFileDB
 				return true
 		return false
 
-	const LocalFile *by_hash(string hash)
+	selfref LocalFile *by_hash(string hash)
 		if hash == ""
 			raise(new Exception("invalid hash"))
 		for f in files
@@ -331,7 +343,7 @@ class LocalFileDB
 #				return &f
 #		raise(new Exception("not in db: hash=" + hash))
 		
-	const LocalFile*[] find_by_tags(string str)
+	selfref LocalFile*[] find_by_tags(string str)
 		Tag[] tags = str2tags(str)
 		LocalFile*[] list
 		for f in files
@@ -339,7 +351,7 @@ class LocalFileDB
 				list.add(&f)
 		return sorted(list, "path")
 
-	const LocalFile*[] get_in_dir(string _dir, bool recursive)
+	selfref LocalFile*[] get_in_dir(string _dir, bool recursive)
 		string dir = dir_canonical(_dir)
 			
 		LocalFile*[] list
@@ -361,7 +373,7 @@ class LocalFileDB
 					list.add(&f)
 		return sorted(list, "path")
 
-	const LocalFile*[] get(string path, bool rec)
+	selfref LocalFile*[] get(string path, bool rec)
 		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
 		LocalFile*[] files
