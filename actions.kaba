@@ -431,7 +431,7 @@ void action_push(string[] arg)
 		_action_push(absolute_path(a))
 
 
-void _action_get(string id)
+void _action_get___old(string id)
 	try
 		let ff = db.find_by_id(id)
 		if ff.pure_remote()
@@ -449,6 +449,16 @@ void _action_get(string id)
 		else
 			print("not found: id={{id}}")
 			return
+
+void _action_get(string filter)
+	let files = remote_find(filter, conf.default_quality)
+	for f in files
+		if db.has_id(f.id)
+			continue
+		f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
+		print("ADD  {{rel_path(f.path)}}")
+		db.files.add(f)
+
 
 void action_get(string[] arg)
 	for a in arg
