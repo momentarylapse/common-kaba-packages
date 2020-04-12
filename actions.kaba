@@ -181,7 +181,7 @@ void file_move(out LocalFile f, string new_path)
 
 
 # check for local changes
-void action_add(string path)
+void _action_add(string path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
@@ -189,8 +189,14 @@ void action_add(string path)
 			
 	db.save()
 
+void action_add(string[] arg)
+	if len(arg) == 0
+		_action_add(absolute_path("./"))
+	for a in arg
+		_action_add(absolute_path(a))
 
-void action_unadd(string path)
+
+void _action_unadd(string path)
 	set_working_dir(path)
 		
 	let files = lister.find(path)
@@ -199,7 +205,14 @@ void action_unadd(string path)
 		f.drop_me = true
 		db.save()
 
-void action_rm(string path)
+void action_unadd(string[] arg)
+	if len(arg) == 0
+		_action_unadd(absolute_path("./"))
+	for a in arg
+		_action_unadd(absolute_path(a))
+
+
+void _action_rm(string path)
 	set_working_dir(path)
 		
 	let files = lister.find(path)
@@ -211,8 +224,13 @@ void action_rm(string path)
 				print("ERROR: {{e}}")
 		f.drop_me = true
 		db.save()
+
+void action_rm(string[] arg)
+	for a in arg
+		_action_rm(absolute_path(a))
+
 	
-void action_mv(string source, string _dest)
+void _action_mv(string source, string _dest)
 	try
 		string dest = _dest
 		let f = db.find_by_path(source)
@@ -229,6 +247,10 @@ void action_mv(string source, string _dest)
 			Filesystem.rename(source, dest)
 	except Exception as e
 		error_out(e)
+
+void action_mv(string[] arg)
+	for i in 0:arg.num-1
+		_action_mv(absolute_path(arg[i]), absolute_path(arg[len(arg)-1]))
 
 
 void structure_file(out LocalFile f, string structure, string root)
@@ -263,13 +285,6 @@ void action_structure_auto(string _dir)
 			continue
 		structure_file(f, e.structure, e.dir)
 
-void action_info(string path)
-	try
-		let f = db.find_by_path(path)
-		f.show()
-		f.show_info("      ")
-	except Exception as e
-		error_out(e)
 
 void show_files(LocalFile*[] files)
 	for f in files
@@ -281,43 +296,77 @@ void show_files(LocalFile*[] files)
 		if conf.show_meta or conf.verbosity >= 2
 			f.show_info("      ")
 
-void action_list(string path)
+void _action_list(string path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	show_files(lister.find(path))
 
-void action_status(string path)
+void action_list(string[] arg)
+	if len(arg) == 0
+		_action_list(absolute_path("./"))
+	for a in arg
+		_action_list(absolute_path(a))
+
+void _action_status(string path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	conf.show_perfectly_fine = false
 	show_files(lister.find(path))
 
+void action_status(string[] arg)
+	if len(arg) == 0
+		_action_status(absolute_path("./"))
+	for a in arg
+		_action_status(absolute_path(a))
 
-void action_find(string filter)
-	show_files(db.find_by_tags(filter))
+void action_find(string[] arg)
+	for filter in arg
+		show_files(db.find_by_tags(filter))
+
 	
-void action_tag_add(string path, string tag)
+void _action_tag_add(string path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_add(t)
 
-void action_tag_set(string path, string tag)
+void action_tag_add(string[] arg)
+	if len(arg) < 2
+		_action_tag_add(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_add(absolute_path(a), arg[0])
+
+
+void _action_tag_set(string path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_set(t)
 
-void action_tag_rm(string path, string tag)
+void action_tag_set(string[] arg)
+	if len(arg) < 2
+		_action_tag_set(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_set(absolute_path(a), arg[0])
+
+
+void _action_tag_rm(string path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
 	for f in files
 		f.tag_rm(t)
 
-void action_tag_get(string path, string key)
+void action_tag_rm(string[] arg)
+	if len(arg) < 2
+		_action_tag_rm(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_rm(absolute_path(a), arg[0])
+
+
+void _action_tag_get(string path, string key)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
@@ -332,9 +381,14 @@ void action_tag_get(string path, string key)
 		else if key == "id" and len(f.id) > 0
 			print("      id={{f.id}}")
 
+void action_tag_get(string[] arg)
+	if len(arg) < 2
+		_action_tag_get(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_get(absolute_path(a), arg[0])
 
 
-void action_pull(string path)
+void _action_pull(string path)
 	set_working_dir(path)
 	
 	let files = lister.find(path)
@@ -350,8 +404,14 @@ void action_pull(string path)
 			print("downloading meta data")
 		remote_download_meta(need_meta)
 
+void action_pull(string[] arg)
+	if len(arg) == 0
+		_action_pull(absolute_path("./"))
+	for a in arg
+		_action_pull(absolute_path(a))
 
-void action_push(string path)
+
+void _action_push(string path)
 	set_working_dir(path)
 	
 	let files = lister.find(path)
@@ -364,8 +424,14 @@ void action_push(string path)
 			print("UPLOADING META  {{rel_path(f.path)}}")
 			remote_upload_meta(f)
 
+void action_push(string[] arg)
+	if len(arg) == 0
+		_action_push(absolute_path("./"))
+	for a in arg
+		_action_push(absolute_path(a))
 
-void action_get(string id)
+
+void _action_get(string id)
 	try
 		let ff = db.find_by_id(id)
 		if ff.pure_remote()
@@ -383,7 +449,11 @@ void action_get(string id)
 		else
 			print("not found: id={{id}}")
 			return
-		
+
+void action_get(string[] arg)
+	for a in arg
+		_action_get(a)
+
 
 void show_rfile_list(RemoteFile[] rfiles)
 	for f in rfiles
@@ -392,19 +462,20 @@ void show_rfile_list(RemoteFile[] rfiles)
 			f.show_info("      ")
 
 
-void action_remote_find(string filter)
-	show_rfile_list(remote_find(filter, conf.default_quality))
+void action_remote_find(string[] arg)
+	for filter in arg
+		show_rfile_list(remote_find(filter, conf.default_quality))
 
-void action_remote_find_hash(string[] hashes)
-	show_rfile_list(remote_find_by_hash(hashes))
+#void action_remote_find_hash(string[] hashes)
+#	show_rfile_list(remote_find_by_hash(hashes))
 
-void action_remote_find_id(string[] ids)
-	show_rfile_list(remote_find_by_id(ids, ""))
+#void action_remote_find_id(string[] ids)
+#	show_rfile_list(remote_find_by_id(ids, ""))
 
-void action_remote_add(string filter, string dir)
-	remote_sync_by_filter(filter, conf.default_quality, conf.default_structure, dir)
+void action_remote_add(string[] arg) # filter, dir
+	remote_sync_by_filter(arg[0], conf.default_quality, conf.default_structure, absolute_path(arg[1]))
 
-void action_dsync(string dir)
+void _action_dsync(string dir)
 	set_working_dir(dir)
 	let e = conf.get_cfg(dir)
 	if e
@@ -416,19 +487,39 @@ void action_dsync(string dir)
 	print("matching pure local files by hash")
 	remote_sync_pure_locals_by_hash(files)
 
-void action_sync(string path)
+void action_dsync(string[] arg)
+	if len(arg) == 0
+		_action_dsync(absolute_path("./"))
+	for a in arg
+		_action_dsync(absolute_path(a))
+
+void _action_sync(string path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	remote_sync_pure_locals_by_hash(files)
 	remote_sync_by_id(files)
+
+void action_sync(string[] arg)
+	if len(arg) == 0
+		_action_sync(absolute_path("./"))
+	for a in arg
+		_action_sync(absolute_path(a))
+
 	
-void action_tag_auto(string path)
+void _action_tag_auto(string path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
 		auto_tag(f)
-	
-void action_tag_diff(string path)
+
+void action_tag_auto(string[] arg)
+	if len(arg) == 0
+		_action_tag_auto(absolute_path("./"))
+	for a in arg
+		_action_tag_auto(absolute_path(a))
+
+
+void _action_tag_diff(string path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let rfiles = remote_get_meta(files)
@@ -438,4 +529,9 @@ void action_tag_diff(string path)
 				if !tags_equal(lf.tags, rf.tags)
 					lf.show()
 					tags_diff(lf.tags, rf.tags)
-	
+
+void action_tag_diff(string[] arg)
+	if len(arg) == 0
+		_action_tag_diff(absolute_path("./"))
+	for a in arg
+		_action_tag_diff(absolute_path(a))

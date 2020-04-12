@@ -3,56 +3,54 @@ use config
 use remote
 use tag
 use actions
+use cli_parser
 
 
 void main(string[] arg)
-	if len(arg) == 0
-		print("commands")
-		print("  find <FILTER>              # local search")
-		print("  filter                     # list filters")
-		print("  filter add <DIR> <FILTER>")
-		print("  filter rm <DIR> [<FILTER>]")
-		print("  ignore                     # list ignores")
-		print("  ignore add <PATH>")
-		print("  ignore rm <PATH>")
-		print("  tag get <KEY> <PATH>")
-		print("  tag add <KEY>=<VALUE> <PATH>")
-		print("  tag set <KEY>=<VALUE> <PATH>")
-		print("  tag rm <KEY>=<VALUE> <PATH>")
-		print("  tag auto <PATH>")
-		print("  tag diff <PATH>            # compare to remote")
-		print("  add <PATH>                 # add file/dir to local db")
-		print("  unadd <PATH>               # remove file/dir from local db")
-		print("  rm <PATH>                  # drop file/dir from local db")
-		print("  mv <SOURCE> <DEST>")
-		print("  list <DIR>                 # only show")
-		print("  status <DIR>               # only show")
-		print("  dsync <DIR>                # sync db entries (not files)")
-		print("  sync <PATH>                # sync db entries (not files)")
-		print("  pull <PATH>                # download linked files/meta")
-		print("  get <ID>                   # link and download files")
-		print("  upload <PATH>")
-	#	print("  sync-pure-locals-by-hash <DIR>")
-		print("  remote find <FILTER>")
-		print("  remote id <IDS>")
-		print("  remote hash <HASHES>")
-		print("  remote add <FILTER> <DIR>")
-		print("  db rehash")
-		print("  db check")
-		print("  db init")
-		print("options")
-		print("  --verbose/-v")
-		print("  --drop-deleted")
-		print("  --show-meta/--meta/-m")
-		print("  --recursive/-r")
-		print("  --pure-local/--local")
-		print("  --pure-remote/--remote")
-		print("  --pull-tags")
-		print("  --pull-tags-only-add")
-		print("  --medium  (quality...)")
-		print("  --structure=<STRUCTURE>")
-		return
-
+	CLIParser p
+	p.info("sisyphos - synchronize your files")
+	
+	p.opt(["verbose", "v"], "", lambda() conf.verbosity = 5)
+	p.opt(["silent", "s"], "", lambda() conf.verbosity = 0)
+	p.opt(["drop-deleted", "..."], "", lambda() conf.drop_deleted = true)
+	p.opt(["show-meta", "m", "meta"], "", lambda() conf.show_meta = true)
+	p.opt(["recursive", "r"], "", lambda() conf.recursive = true)
+	p.opt(["pure-local", "local"], "", lambda() conf.filter_pure_local = true)
+	p.opt(["pure-remote", "remote"], "", lambda() conf.filter_pure_remote = true)
+#	p.opt(["not-in-db"], "", lambda() conf.show_not_in_db = true)
+#	p.opt(["pull-tags"], "", lambda() conf.pull_tags = true)
+#	p.opt(["pull-tags-only-add"], "", lambda() conf.pull_tags_only_add = true)
+	p.opt(["medium"], "", lambda() conf.default_quality = MEDIUM)
+	#p.opt(["structure="], "", lambda() conf.default_structure = a[12:])
+	
+	p.cmd("find", "<FILTER>", "find files by filter ('hash=...' or 'artist=The Beetles')", action_find)
+	p.cmd("ls", "[PATH] ...", "show files", action_list)
+	p.cmd("status", "[PATH] ...", "show files with issues", action_status)
+	p.cmd("add", "[PATH] ...", "update/add to local database", action_add)
+	p.cmd("unadd", "[PATH] ...", "remote from local database (without deleting)", action_unadd)
+	p.cmd("rm", "<PATH> ...", "delete files", action_rm)
+	p.cmd("mv", "<SOURCE> ... <DEST>", "move files", action_mv)
+	
+	p.cmd("pull", "<PATH> ...", "overwrite with changes from host", action_pull)
+	p.cmd("push", "<PATH> ...", "send changes to host", action_push)
+	p.cmd("sync", "<PATH> ...", "link files with remote db", action_sync)
+	p.cmd("dsync", "<PATH> ...", "also sync...", action_dsync)
+	p.cmd("get", "<ID> ...", "download by id", action_get)
+	p.cmd("tag get", "<KEY> [PATH] ...", "show tags", action_tag_get)
+	p.cmd("tag set", "<KEY>=<VALUE> [PATH] ...", "set tags", action_tag_set)
+	p.cmd("tag add", "<KEY>=<VALUE> [PATH] ...", "add tags (artist, genre, etc)", action_tag_add)
+	p.cmd("tag rm", "<KEY>=<VALUE> [PATH] ...", "remove tags", action_tag_rm)
+	p.cmd("tag auto", "<PATH> ...", "guess tags", action_tag_auto)
+	p.cmd("tag diff", "<PATH> ...", "show meta difference between local/remote", action_tag_diff)
+	
+	p.cmd("remote find", "<FILTER>", "find files on host", action_remote_find)
+	p.cmd("remote add", "<FILTER> <DIR>", "???", action_remote_add)
+	p.cmd("db check", "", "self test", lambda(string[] arg) db.self_check())
+	p.cmd("db rehash", "", "rebuild hashes", lambda(string[] arg) db.rehash())
+	p.cmd("db optimize", "", "", lambda(string[] arg) db.optimize())
+	
+	
+	
 	try
 		conf.load()
 	except Exception as e
@@ -62,42 +60,18 @@ void main(string[] arg)
 	except Exception as e
 		print("ERROR: " + e.message())
 	
+	p.run(arg)
+
+	db.drop_selected()	
+	if db.dirty
+		db.save()
+
 	
-	string[] arg2
-	for a in arg
-		if a == "--verbose" or a == "-v"
-			conf.verbosity = 5
-		else if a == "--silent" or a == "-s"
-			conf.verbosity = 0
-		else if a == "--drop-deleted"
-			conf.drop_deleted = true
-		else if a == "--show-meta" or a == "--meta" or a == "-m"
-			conf.show_meta = true
-		else if a == "--recursive" or a == "-r"
-			conf.recursive = true
-		else if a == "--pure-local" or a == "--local"
-			conf.filter_pure_local = true
-		else if a == "--pure-remote" or a == "--remote"
-			conf.filter_pure_remote = true
-		else if a == "--not-in-db"
-			conf.show_not_in_db = true
-		else if a == "--pull-tags"
-			conf.pull_tags = true
-		else if a == "--pull-tags-only-add"
-			conf.pull_tags_only_add = true
-		else if a == "--medium"
-			conf.default_quality = MEDIUM
-		else if a[:12] == "--structure="
-			conf.default_structure = a[12:]
-		else
-			arg2.add(a)
-	run_command(arg2)
 
 void run_command(string[] arg)
 	if arg[0] == "filter"
 		if len(arg) < 2
 			conf.show()
-			print("TRY: filter add/rm")
 			return
 		if arg[1] == "add"
 			if len(arg) < 4
@@ -124,8 +98,6 @@ void run_command(string[] arg)
 		if arg.num < 2
 			for i in conf.ignore
 				print(i)
-			print("TRY: ignore add/rm <PATH>")
-			return
 		if arg[1] == "add"
 			if len(arg) < 3
 				print("ERROR: ignore add <PATH>")
@@ -141,160 +113,7 @@ void run_command(string[] arg)
 					conf.ignore.remove(i)
 					break
 			conf.save()
-		else
-			print("ERROR: ignore ?")
-			return
-	else if arg[0] == "tag"
-		if len(arg) < 2
-			print("TRY: tag get/add/set/rm/auto/diff")
-			return
-		if arg[1] == "add"
-			if arg.num < 3
-				print("ERROR: tag add <KEY>=<VALUE> <PATH>")
-				return
-			if arg.num < 4
-				action_tag_add(absolute_path("./"), arg[2])
-			for i in 3:arg.num
-				action_tag_add(absolute_path(arg[i]), arg[2])
-		else if arg[1] == "set"
-			if arg.num < 3
-				print("ERROR: tag set <KEY>=<VALUE> <PATH>")
-				return
-			if arg.num < 4
-				action_tag_set(absolute_path("./"), arg[2])
-			for i in 3:arg.num
-				action_tag_set(absolute_path(arg[i]), arg[2])
-		else if arg[1] == "rm"
-			if arg.num < 3
-				print("ERROR: tag rm <KEY>=<VALUE> <PATH>")
-				return
-			if arg.num < 4
-				action_tag_rm(absolute_path("./"), arg[2])
-			for i in 3:arg.num
-				action_tag_rm(absolute_path(arg[i]), arg[2])
-		else if arg[1] == "auto"
-			if arg.num < 2
-				print("ERROR: tag auto <PATH>")
-				return
-			if arg.num < 3
-				action_tag_auto(absolute_path("./"))
-			for i in 2:arg.num
-				action_tag_auto(absolute_path(arg[i]))
-		else if arg[1] == "show" or arg[1] == "get"
-			if arg.num < 3
-				print("ERROR: tag get <KEY> <PATH>")
-				return
-			if arg.num < 4
-				action_tag_get(absolute_path("./"), arg[2])
-			for i in 3:arg.num
-				action_tag_get(absolute_path(arg[i]), arg[2])
-		else if arg[1] == "diff"
-			if arg.num < 3
-				action_tag_diff(absolute_path("./"))
-			for i in 2:arg.num
-				action_tag_diff(absolute_path(arg[i]))
-		else
-			print("ERROR: tag ?")
-			return
-	else if arg[0] == "find"
-		if arg.num < 2
-			print("ERROR: find <FILTER>")
-			return
-		action_find(arg[1])
-	else if arg[0] == "list" or arg[0] == "ls"
-		if arg.num < 2
-			action_list(absolute_path("./"))
-		for i in 1:arg.num
-			action_list(absolute_path(arg[i]))
-	else if arg[0] == "status"
-		if arg.num < 2
-			action_status(absolute_path("./"))
-		for i in 1:arg.num
-			action_status(absolute_path(arg[i]))
-	else if arg[0] == "info"
-		if arg.num < 2
-			action_info(absolute_path("./"))
-		for i in 1:arg.num
-			action_info(absolute_path(arg[i]))
-	else if arg[0] == "add"
-		if arg.num < 2
-			action_add(absolute_path("./"))
-		for i in 1:arg.num
-			action_add(absolute_path(arg[i]))
-	else if arg[0] == "unadd"
-		if arg.num < 2
-			action_unadd(absolute_path("./"))
-		for i in 1:arg.num
-			action_unadd(absolute_path(arg[i]))
-	else if arg[0] == "rm"
-		if arg.num < 2
-			print("ERROR: rm <PATH>")
-			return
-		for i in 1:arg.num
-			action_rm(absolute_path(arg[i]))
-	else if arg[0] == "mv"
-		if arg.num < 3
-			print("ERROR: rm <SOURCE1> ... <DEST>")
-			return
-		for i in 1:arg.num-1
-			action_mv(absolute_path(arg[i]), absolute_path(arg[arg.num-1]))
-	else if arg[0] == "remote"
-		if arg.num < 2
-			print("ERROR: remote ...")
-			return
-		if arg[1] == "find"
-			if arg.num < 3
-				print("ERROR: remote find <FILTER>")
-				return
-			action_remote_find(arg[2])
-		else if arg[1] == "hash"
-			if arg.num < 3
-				print("ERROR: remote hash <HASHES>")
-				return
-			action_remote_find_hash(arg[2:])
-		else if arg[1] == "id"
-			if arg.num < 3
-				print("ERROR: remote id <IDS>")
-				return
-			action_remote_find_id(arg[2:])
-		else if arg[1] == "add"
-			if arg.num < 3
-				print("ERROR: remote add <FILTER> <DIR>")
-				return
-			action_remote_add(arg[2], absolute_path(arg[3]))
-		else
-			print("ERROR: remote ...")
-			return
-	else if arg[0] == "dsync"
-		if arg.num < 2
-			action_dsync(absolute_path("./"))
-		for i in 1:arg.num
-			action_dsync(absolute_path(arg[i]))
-	else if arg[0] == "sync"
-		if arg.num < 2
-			action_sync(absolute_path("./"))
-		for i in 1:arg.num
-			action_sync(absolute_path(arg[i]))
-	else if arg[0] == "push"
-		if arg.num < 2
-			action_push(absolute_path("./"))
-		for i in 1:arg.num
-			action_push(absolute_path(arg[i]))
-	else if arg[0] == "pull"
-		if arg.num < 2
-			action_pull(absolute_path("./"))
-		for i in 1:arg.num
-			action_pull(absolute_path(arg[i]))
-	else if arg[0] == "get"
-		if arg.num < 2
-			print("ERROR: get <IDs>")
-			return
-		for i in 1:arg.num
-			action_get(arg[i])
 	else if arg[0] == "structure"
-		if arg.num < 2
-			print("TRY: structure apply/auto")
-			return
 		if arg[1] == "apply"
 			if arg.num < 4
 				print("ERROR: structure apply <STRUCTURE> <PATH>")
@@ -307,28 +126,7 @@ void run_command(string[] arg)
 				return
 			for i in 2:arg.num
 				action_structure_auto(absolute_path(arg[i]))
-		else
-			print("ERROR: structure ...")
-			return
 	else if arg[0] == "db"
-		if arg.num < 2
-			print("TRY: db rehash/check")
-			return
-		if arg[1] == "rehash"
-			db.rehash()
-		else if arg[1] == "check"
-			db.self_check()
-		else if arg[1] == "optimize"
-			db.optimize()
-		else if arg[1] == "init"
+		if arg[1] == "init"
 			conf.save()
 			db.dirty = true
-		else
-			print("ERROR: db...")
-			return
-	else
-		print(arg[0] + "  ???")
-	
-	db.drop_selected()
-	if db.dirty
-		db.save()

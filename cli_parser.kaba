@@ -1,0 +1,113 @@
+use kaba
+
+string spaces(int n)
+	return [for i in 0:n " "].join("")
+
+class CLIParser
+	class Command
+		string[] name
+		string[] params
+		Function* f
+		string comment
+
+		const bool match(string[] arg)
+			if len(arg) < len(name)
+				return false
+			for n,i in name
+				if arg[i] != n
+					return false
+			return true
+		
+		const int min_params()
+			int m = 0
+			for p in params
+				if p == "..."
+					continue
+				if p[0:1] == "<"
+					m ++
+			return m
+	class Option
+		string name
+		string short
+		Function* f
+		string comment
+		
+	Command[] commands
+	Option[] options
+	string _info
+	
+	void info(string i)
+		_info = i
+
+	void cmd(string name, string params, string comment, Function *f)
+		Command c
+		c.name = name.explode(" ")
+		c.params = params.explode(" ")
+		c.f = f
+		c.comment = comment
+		commands.add(c)
+
+	void opt(string[] name, string comment, Function *f)
+		Option c
+		c.name = name[0]
+		if len(name) > 0
+			c.short = name[1]
+		c.f = f
+		c.comment = comment
+		options.add(c)
+
+	const void run(string[] arg)
+		try
+			let arg2 = parse_options(arg)
+			if parse_commands(arg2)
+				return
+			if len(arg2) > 0
+				print("ERROR: unhandled command")
+			show_help()
+		except Exception as e
+			print("ERROR: " + e.message())
+	
+	const string[] parse_options(string[] arg)
+		string[] arg2
+		for a,i in arg
+			if a[:1] == "-"
+				do_option(a)
+			else
+				arg2.add(a)
+		return arg2
+
+	const void do_option(string name)
+		for o in options
+			if name == "--{{o.name}}" or name == "-{{o.short}}"
+				#print("option {{o.name}}")
+				call(o.f)
+				return
+		raise(new Exception("unknown option {{name}}"))
+	
+	const bool parse_commands(string[] arg)
+		for c in commands
+			if c.match(arg)
+				if len(arg) - len(c.name) < c.min_params()
+					raise(new Exception("missing parameters: " + c.name.join(" ") + " " + c.params.join(" ")))
+				#print("command {{c.name}}")
+				call(c.f, arg[len(c.name):])
+				return true
+		return false
+
+	const void show_help()
+		if _info != ""
+			print(_info)
+			print("")
+		print("commands:")
+		for c in commands
+			let s = c.name.join(" ") + " " + c.params.join(" ")
+			print("  {{s}} {{spaces(25-len(s))}} # {{c.comment}}")
+		
+		if len(options) > 0
+			print("")
+			print("options:")
+			for c in options
+				string s = "--{{c.name}}"
+				if c.short != ""
+					s += ",-{{c.short}}"
+				print("  {{s}} {{spaces(25-len(s))}} # {{c.comment}}")
