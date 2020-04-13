@@ -129,20 +129,20 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 		try
 			LocalFile* lf = db.by_hash(rf.hash)
 			if lf.id.num > 0
-				print("HASH COLLISION  " + rel_path(lf.path) + "  <->  REMOTE...")
+				print("HASH COLLISION  {{rel_path(lf.path)}}  <->  REMOTE...")
 			lf.id = rf.id
 			#if conf.verbose
-			print("RELINK  " + rel_path(lf.path))# + "  ->  " + rf.id)
+			print("RELINK  {{rel_path(lf.path)}}") # + "  ->  " + rf.id)
 			lf.sync_tags(rf.tags)
 			lf.name = rf.name
 			return
 		except
 			# new remote file
 			LocalFile ll = rf
-			ll.path = ll.apply_structure(root, structure)
+			ll.path = root + ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.files.add(ll)
-			print("ADD PURE REMOTE  " + rel_path(ll.path))
+			print("ADD PURE REMOTE  {{rel_path(ll.path)}}")
 		
 			if conf.show_meta or conf.verbosity >= 2
 				ll.show_info("      ")

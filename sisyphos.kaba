@@ -1,6 +1,5 @@
 use localdb
 use config
-use remote
 use tag
 use actions
 use cli_parser
@@ -22,7 +21,7 @@ void main(string[] arg)
 	p.opt(["--pull-tags-only-add"], "", lambda() conf.pull_tags_only_add = true)
 	p.opt(["--medium"], "", lambda() conf.default_quality = MEDIUM)
 	p.opt(["--dry"], "(some commands...)", lambda() conf.dry_run = true)
-	p.opta(["--structure"], "[STRUCTURE]", "a filename pattern with tags... ('{artist}-{year}.ogg')", lambda(string arg) conf.default_structure = arg)
+	p.opta(["--structure"], "[STRUCTURE]", "a filename pattern with tags... ('{artist} - {year}-{month|02}.ogg')", lambda(string arg) conf.default_structure = arg)
 	
 	p.cmd("find", "<FILTER>", "find files by filter ('hash=...' or 'artist=The Beetles')", action_find)
 	p.cmd("ls", "[PATH] ...", "show files", action_list)
@@ -30,7 +29,7 @@ void main(string[] arg)
 	p.cmd("add", "[PATH] ...", "update/add to local database", action_add)
 	p.cmd("unadd", "[PATH] ...", "remote from local database (without deleting)", action_unadd)
 	p.cmd("rm", "<PATH> ...", "delete files", action_rm)
-	p.cmd("mv", "<SOURCE> ... <DEST>", "move files", action_mv)
+	p.cmd("mv", "<SOURCE> ... <DEST>", "move files (dest can contain tags 'aa{artist}.ogg')", action_mv)
 	
 	p.cmd("pull", "<PATH> ...", "overwrite with changes from host", action_pull)
 	p.cmd("push", "<PATH> ...", "send changes to host", action_push)
@@ -43,9 +42,8 @@ void main(string[] arg)
 	p.cmd("tag rm", "<KEY>=<VALUE> [PATH] ...", "remove tags", action_tag_rm)
 	p.cmd("tag auto", "<PATH> ...", "guess tags", action_tag_auto)
 	p.cmd("tag diff", "<PATH> ...", "show meta difference between local/remote", action_tag_diff)
-	
-	p.cmd("structure apply", "<STRUCTURE> <PATH> ...", "rename files by tags", action_structure_apply)
-	p.cmd("structure auto", "<PATH> ...", "rename files by tags", action_structure_auto)
+
+	#p.cmd("structure auto", "<PATH> ...", "rename files by tags", action_structure_auto)
 	
 	p.cmd("remote find", "<FILTER>", "find files on host", action_remote_find)
 	p.cmd("remote add", "<FILTER> <DIR>", "???", action_remote_add)
@@ -58,11 +56,11 @@ void main(string[] arg)
 	try
 		conf.load()
 	except Exception as e
-		print("ERROR: " + e.message())
+		error_out(e)
 	try
 		db.load()
 	except Exception as e
-		print("ERROR: " + e.message())
+		error_out(e)
 	
 	p.run(arg)
 

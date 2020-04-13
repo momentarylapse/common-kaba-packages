@@ -96,8 +96,8 @@ string get_tag(string[] parts, string key)
 	return ""
 
 
-void error_out(Exception *e)
-	print("ERROR: " + e.message())
+void error_out(Exception e)
+	print("ERROR: {{e.message()}}")
 
 string shell_exec(string cmd)
 	#if conf.verbose
@@ -161,7 +161,7 @@ class Config
 		pull_tags_only_add = false
 		dry_run = false
 		default_quality = "perfect"
-		default_structure = "{name}.{ext}"
+		default_structure = "{id}-{name}.{ext}"
 
 	void load()
 		File *f = Filesystem.open_text(AppDirectory + "sisyphos/config")

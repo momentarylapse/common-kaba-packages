@@ -3,6 +3,7 @@ use localdb
 use config
 use remote
 use tag
+use autotag
 
 
 # mix db files with "real" files
@@ -126,7 +127,7 @@ void file_add(out LocalFile f)
 					if conf.verbosity >= 2 or conf.show_meta
 						f.show_info("      ")
 			except Exception as e
-				print(e.message())
+				error_out(e)
 				return
 		del ff
 	else
@@ -135,7 +136,7 @@ void file_add(out LocalFile f)
 		try
 			hash = Filesystem.hash(f.path, "md5")
 		except Exception as e
-			print(e.message())
+			error_out(e)
 			return
 		try
 			LocalFile* ff = db.by_hash(hash)
@@ -224,7 +225,7 @@ void _action_rm(string path)
 			try
 				Filesystem.delete(f.path)
 			except Exception as e
-				print("ERROR: {{e}}")
+				error_out(e)
 		f.drop_me = true
 		db.save()
 
@@ -235,16 +236,16 @@ void action_rm(string[] arg)
 	
 void _action_mv(string source, string _dest)
 	try
-		string dest = _dest
 		let f = db.find_by_path(source)
+		string dest = f.apply_structure(_dest)
 		if Filesystem.is_directory(dest)
 			dest = dir_canonical(dest) + source.basename()
+		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
-			
+
 		if conf.dry_run
 			return
-		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
 		f.path = dest
 		db.save()
 		
@@ -259,8 +260,8 @@ void action_mv(string[] arg)
 		_action_mv(absolute_path(arg[i]), absolute_path(arg[len(arg)-1]))
 
 
-void structure_file(out LocalFile f, string structure, string root)
-	string new_path = f.apply_structure(root, structure)
+void structure_file(out LocalFile f, string structure)
+	string new_path = f.apply_structure(structure)
 	if f.path == new_path
 		return
 	print("MOVE  {{rel_path(f.path)}} -> {{rel_path(new_path)}}")
@@ -275,18 +276,6 @@ void structure_file(out LocalFile f, string structure, string root)
 	except FileError as e
 		error_out(e)
 
-void _action_structure_apply(string _dir, string structure)
-	set_working_dir(_dir)
-	string dir = dir_canonical(_dir)
-	let files = db.get_in_dir(dir, conf.recursive)
-	for f in files
-		structure_file(f, structure, dir)
-
-void action_structure_apply(string[] arg)
-	for a in arg[1:]
-		_action_structure_apply(absolute_path(a), arg[0])
-
-
 void _action_structure_auto(string _dir)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
@@ -295,7 +284,7 @@ void _action_structure_auto(string _dir)
 		let e = conf.get_cfg(f.path)
 		if !e
 			continue
-		structure_file(f, e.structure, e.dir)
+		structure_file(f, e.dir + e.structure)
 
 void action_structure_auto(string[] arg)
 	for a in arg
@@ -469,13 +458,14 @@ void _action_get___old(string id)
 void _action_get(string filter)
 	let files = remote_find(filter, conf.default_quality)
 	for f in files
-		if db.has_id(f.id)
-			continue
-		f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
+		#if db.has_id(f.id)
+		#	continue
+		#f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
+		f.path = absolute_path(f.apply_structure(conf.default_structure))
 		print("ADD  {{rel_path(f.path)}}")
 		
 		if conf.dry_run
-			return
+			continue
 		db.files.add(f)
 
 

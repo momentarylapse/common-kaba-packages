@@ -107,7 +107,8 @@ class CLIParser
 				if len(arg) - len(c.name) < c.min_params()
 					raise(new Exception("missing parameters: {{c.sig()}}"))
 				#print("command {{c.name}}")
-				call(c.f, arg[len(c.name):])
+				let aa = arg[len(c.name):]
+				call(c.f, aa)
 				return true
 		return false
 
