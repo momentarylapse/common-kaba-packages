@@ -217,6 +217,9 @@ void _action_rm(string path)
 		
 	let files = lister.find(path)
 	for f in files
+		print("RM  {{rel_path(f.path)}}")
+		if conf.dry_run
+			return
 		if !f.pure_remote()
 			try
 				Filesystem.delete(f.path)
@@ -238,6 +241,9 @@ void _action_mv(string source, string _dest)
 			dest = dir_canonical(dest) + source.basename()
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
+			
+		if conf.dry_run
+			return
 		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
 		f.path = dest
 		db.save()
@@ -258,6 +264,8 @@ void structure_file(out LocalFile f, string structure, string root)
 	if f.path == new_path
 		return
 	print("MOVE  {{rel_path(f.path)}} -> {{rel_path(new_path)}}")
+	if conf.dry_run
+		return
 	make_all_dirs(new_path)
 	try
 		if !f.pure_remote()
@@ -267,23 +275,31 @@ void structure_file(out LocalFile f, string structure, string root)
 	except FileError as e
 		error_out(e)
 
-void action_structure_apply(string _dir, string structure)
+void _action_structure_apply(string _dir, string structure)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
 	let files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		structure_file(f, structure, dir)
 
+void action_structure_apply(string[] arg)
+	for a in arg[1:]
+		_action_structure_apply(absolute_path(a), arg[0])
 
-void action_structure_auto(string _dir)
+
+void _action_structure_auto(string _dir)
 	set_working_dir(_dir)
 	string dir = dir_canonical(_dir)
 	let files = db.get_in_dir(dir, conf.recursive)
 	for f in files
-		ConfigDir* e = conf.get_cfg(f.path)
+		let e = conf.get_cfg(f.path)
 		if !e
 			continue
 		structure_file(f, e.structure, e.dir)
+
+void action_structure_auto(string[] arg)
+	for a in arg
+		_action_structure_auto(absolute_path(a))
 
 
 void show_files(LocalFile*[] files)
@@ -457,6 +473,9 @@ void _action_get(string filter)
 			continue
 		f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
 		print("ADD  {{rel_path(f.path)}}")
+		
+		if conf.dry_run
+			return
 		db.files.add(f)
 
 

@@ -26,11 +26,20 @@ class CLIParser
 				if p[0:1] == "<"
 					m ++
 			return m
+
+		const string sig()
+			return name.join(" ") + " " + params.join(" ")
 	class Option
-		string name
-		string short
+		string[] name
+		string param
 		Function* f
 		string comment
+		
+		const string sig()
+			string s = name.join(", ")
+			if param != ""
+				s += " {{param}}"
+			return s
 		
 	Command[] commands
 	Option[] options
@@ -47,14 +56,16 @@ class CLIParser
 		c.comment = comment
 		commands.add(c)
 
-	void opt(string[] name, string comment, Function *f)
+	void opta(string[] name, string param, string comment, Function *f)
 		Option c
-		c.name = name[0]
-		if len(name) > 0
-			c.short = name[1]
-		c.f = f
+		c.name = name
+		c.param = param
 		c.comment = comment
+		c.f = f
 		options.add(c)
+		
+	void opt(string[] name, string comment, Function *f)
+		opta(name, "", comment, f)
 
 	const void run(string[] arg)
 		try
@@ -65,30 +76,36 @@ class CLIParser
 				print("ERROR: unhandled command")
 			show_help()
 		except Exception as e
-			print("ERROR: " + e.message())
+			print("ERROR: {{e.message()}}")
 	
 	const string[] parse_options(string[] arg)
 		string[] arg2
 		for a,i in arg
 			if a[:1] == "-"
-				do_option(a)
+				i += do_option(a, arg[i+1:])
 			else
 				arg2.add(a)
 		return arg2
 
-	const void do_option(string name)
+	const int do_option(string name, string[] arg_rest)
 		for o in options
-			if name == "--{{o.name}}" or name == "-{{o.short}}"
+			if name in o.name
 				#print("option {{o.name}}")
-				call(o.f)
-				return
+				if o.param == ""
+					call(o.f)
+					return 0
+				else
+					if len(arg_rest) == 0
+						raise(new Exception("missing parameter: {{o.sig()}}"))
+					call(o.f, arg_rest[0])
+					return 1
 		raise(new Exception("unknown option {{name}}"))
 	
 	const bool parse_commands(string[] arg)
 		for c in commands
 			if c.match(arg)
 				if len(arg) - len(c.name) < c.min_params()
-					raise(new Exception("missing parameters: " + c.name.join(" ") + " " + c.params.join(" ")))
+					raise(new Exception("missing parameters: {{c.sig()}}"))
 				#print("command {{c.name}}")
 				call(c.f, arg[len(c.name):])
 				return true
@@ -100,14 +117,12 @@ class CLIParser
 			print("")
 		print("commands:")
 		for c in commands
-			let s = c.name.join(" ") + " " + c.params.join(" ")
+			let s = c.sig()
 			print("  {{s}} {{spaces(25-len(s))}} # {{c.comment}}")
 		
 		if len(options) > 0
 			print("")
 			print("options:")
-			for c in options
-				string s = "--{{c.name}}"
-				if c.short != ""
-					s += ",-{{c.short}}"
-				print("  {{s}} {{spaces(25-len(s))}} # {{c.comment}}")
+			for o in options
+				let s = o.sig()
+				print("  {{s}} {{spaces(25-len(s))}} # {{o.comment}}")

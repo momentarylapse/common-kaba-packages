@@ -159,6 +159,7 @@ class Config
 		drop_deleted = false
 		pull_tags = false
 		pull_tags_only_add = false
+		dry_run = false
 		default_quality = "perfect"
 		default_structure = "{name}.{ext}"
 
@@ -267,6 +268,7 @@ class Config
 	bool drop_deleted
 	bool pull_tags
 	bool pull_tags_only_add
+	bool dry_run
 	string default_quality
 	string default_structure
 

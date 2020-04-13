@@ -10,18 +10,19 @@ void main(string[] arg)
 	CLIParser p
 	p.info("sisyphos - synchronize your files")
 	
-	p.opt(["verbose", "v"], "", lambda() conf.verbosity = 5)
-	p.opt(["silent", "s"], "", lambda() conf.verbosity = 0)
-	p.opt(["drop-deleted", "..."], "", lambda() conf.drop_deleted = true)
-	p.opt(["show-meta", "m", "meta"], "", lambda() conf.show_meta = true)
-	p.opt(["recursive", "r"], "", lambda() conf.recursive = true)
-	p.opt(["pure-local", "local"], "", lambda() conf.filter_pure_local = true)
-	p.opt(["pure-remote", "remote"], "", lambda() conf.filter_pure_remote = true)
-#	p.opt(["not-in-db"], "", lambda() conf.show_not_in_db = true)
-#	p.opt(["pull-tags"], "", lambda() conf.pull_tags = true)
-#	p.opt(["pull-tags-only-add"], "", lambda() conf.pull_tags_only_add = true)
-	p.opt(["medium"], "", lambda() conf.default_quality = MEDIUM)
-	#p.opt(["structure="], "", lambda() conf.default_structure = a[12:])
+	p.opt(["--verbose", "-v"], "", lambda() conf.verbosity = 5)
+	p.opt(["--silent", "-s"], "", lambda() conf.verbosity = 0)
+	p.opt(["--drop-deleted", "..."], "", lambda() conf.drop_deleted = true)
+	p.opt(["--show-meta", "--meta", "-m"], "", lambda() conf.show_meta = true)
+	p.opt(["--recursive", "-r"], "", lambda() conf.recursive = true)
+	p.opt(["--pure-local", "--local", "-l"], "", lambda() conf.filter_pure_local = true)
+	p.opt(["--pure-remote", "--remote", "-R"], "", lambda() conf.filter_pure_remote = true)
+	p.opt(["--not-in-db"], "", lambda() conf.show_not_in_db = true)
+	p.opt(["--pull-tags"], "", lambda() conf.pull_tags = true)
+	p.opt(["--pull-tags-only-add"], "", lambda() conf.pull_tags_only_add = true)
+	p.opt(["--medium"], "", lambda() conf.default_quality = MEDIUM)
+	p.opt(["--dry"], "(some commands...)", lambda() conf.dry_run = true)
+	p.opta(["--structure"], "[STRUCTURE]", "a filename pattern with tags... ('{artist}-{year}.ogg')", lambda(string arg) conf.default_structure = arg)
 	
 	p.cmd("find", "<FILTER>", "find files by filter ('hash=...' or 'artist=The Beetles')", action_find)
 	p.cmd("ls", "[PATH] ...", "show files", action_list)
@@ -42,6 +43,9 @@ void main(string[] arg)
 	p.cmd("tag rm", "<KEY>=<VALUE> [PATH] ...", "remove tags", action_tag_rm)
 	p.cmd("tag auto", "<PATH> ...", "guess tags", action_tag_auto)
 	p.cmd("tag diff", "<PATH> ...", "show meta difference between local/remote", action_tag_diff)
+	
+	p.cmd("structure apply", "<STRUCTURE> <PATH> ...", "rename files by tags", action_structure_apply)
+	p.cmd("structure auto", "<PATH> ...", "rename files by tags", action_structure_auto)
 	
 	p.cmd("remote find", "<FILTER>", "find files on host", action_remote_find)
 	p.cmd("remote add", "<FILTER> <DIR>", "???", action_remote_add)
@@ -113,19 +117,6 @@ void run_command(string[] arg)
 					conf.ignore.remove(i)
 					break
 			conf.save()
-	else if arg[0] == "structure"
-		if arg[1] == "apply"
-			if arg.num < 4
-				print("ERROR: structure apply <STRUCTURE> <PATH>")
-				return
-			for i in 3:arg.num
-				action_structure_apply(absolute_path(arg[i]), arg[2])
-		else if arg[1] == "auto"
-			if arg.num < 3
-				print("ERROR: structure auto <DIR>")
-				return
-			for i in 2:arg.num
-				action_structure_auto(absolute_path(arg[i]))
 	else if arg[0] == "db"
 		if arg[1] == "init"
 			conf.save()
