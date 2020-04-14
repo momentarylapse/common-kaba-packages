@@ -60,6 +60,8 @@ string call_alex(string action, string[] params)
 class RemoteFile extends LocalFile
 
 RemoteFile[] remote_parse(string r)
+	if conf.verbosity > 3
+		print(r)
 	RemoteFile[] rfiles
 	let list = r.explode("\n")
 	for l in list
@@ -75,6 +77,7 @@ RemoteFile[] remote_parse(string r)
 		rf.name = parts[5]
 		string extension = parts[6]
 		rf.path = rf.name + "." + extension # temporary
+		rf.path = absolute_path(rf.apply_structure(conf.default_structure))
 		for p in parts[8:]
 			rf.tags.add(alex2tag(p))
 		if parts[7] == "m"
@@ -84,7 +87,7 @@ RemoteFile[] remote_parse(string r)
 	return rfiles
 
 RemoteFile[] remote_find(string filter, string quality)
-	string r = call_alex("find", [filter, quality])
+	string r = call_alex("find", [filter, "--{{quality}}"])
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
@@ -172,16 +175,13 @@ void remote_download(out LocalFile f)
 	scp_download(f.remote_path(), f.path)
 
 	File *ff = Filesystem.open(f.path)
-	if ff
-		f.size = ff.get_size()
-		f.mtime = ff.get_date().time
-		f.hash = Filesystem.hash(f.path, "md5")
-		f.unset(NONLOCAL)
-		f.unset(CHANGED_FILE)
-		db.save()
-		del ff
-		return
-	print("---ERROR---")
+	f.size = ff.get_size()
+	f.mtime = ff.get_date().time
+	f.hash = Filesystem.hash(f.path, "md5")
+	f.unset(NONLOCAL)
+	f.unset(CHANGED_FILE)
+	db.save()
+	del ff
 
 
 void remote_upload(out LocalFile f)

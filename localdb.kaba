@@ -13,7 +13,24 @@ string str_format(string s, string fmt)
 		int n = int(fmt)
 		while len(r) < n
 			r = "0" + r
+	if len(fmt) >= 2 and fmt[:1] == " "
+		int n = int(fmt)
+		while len(r) < n
+			r = " " + r
 	return r
+
+string nice_size(int size)
+	if size > 1000000000
+		return "{{size / 1000000000.0|.1}}G"
+	if size > 10000000
+		return "{{size / 1000000}}M"
+	if size > 1000000
+		return "{{size / 1000000.0|.1}}M"
+	if size > 10000
+		return "{{size / 1000}}K"
+	if size > 1000
+		return "{{size / 1000.0|.1}}K"
+	return "{{size}}"
 
 class LocalFile
 	bool drop_me
@@ -123,18 +140,21 @@ class LocalFile
 				return
 	const string status_str()
 		if !in_db()
-			return "?   "
+			return "? "
 		if pure_local()
-			return "L   "
+			return "L "
 		if pure_remote()
-			return "R   "
+			return "R "
 		if changed_file()
-			return "**  "
+			return "**"
 		if changed_meta()
-			return "*   "
-		return "    "
+			return "* "
+		return "  "
 	const void show()
-		print(status_str() + rel_path(path))
+		string s
+		if conf.show_meta_small
+			s = str_format(nice_size(size), " 6")
+		print("{{status_str()}}  {{s}} {{rel_path(path)}}")
 	const void show_info(string l)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
@@ -149,7 +169,10 @@ class LocalFile
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
 	const string remote_path()
-		return ALEX_DIR + "links/" + id
+		let ext = path.extension()
+		if is("quality=medium")
+			return ALEX_DIR + "medium/{{id}}.{{ext}}"
+		return ALEX_DIR + "links/{{id}}"
 	const string get_tag(string key)
 		if key == "name"
 			return name
