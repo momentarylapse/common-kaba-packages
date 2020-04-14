@@ -154,7 +154,11 @@ class LocalFile
 		string s
 		if conf.show_meta_small
 			s = str_format(nice_size(size), " 6")
-		print("{{status_str()}}  {{s}} {{rel_path(path)}}")
+			if is("quality=medium")
+				s += " m"
+			else
+				s += "  "
+		print("{{status_str()}} {{s}}  {{rel_path(path)}}")
 	const void show_info(string l)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")

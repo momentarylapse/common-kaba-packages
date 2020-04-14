@@ -94,8 +94,11 @@ RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
 	string r = call_alex("by-hash", hashes)
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)	
-	string r = call_alex("by-id", ids)#[ids, quality])
+RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)
+	string cmd = "by-id"
+	if quality == MEDIUM
+		cmd = "by-id-medium"
+	string r = call_alex(cmd, ids)
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash(string[] hashes)
@@ -265,9 +268,9 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 		else
 			ids_perfect.add(f.id)
 	RemoteFile[] rfiles, rfiles_medium
-	if ids_perfect.num > 0
+	if len(ids_perfect) > 0
 		rfiles = remote_find_by_id(ids_perfect, PERFECT)
-	if ids_medium.num > 0
+	if len(ids_medium) > 0
 		rfiles_medium = remote_find_by_id(ids_medium, MEDIUM)
 	for rf in rfiles_medium
 		rfiles.add(rf)
