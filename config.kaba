@@ -83,8 +83,9 @@ void make_all_dirs(string path)
 				continue
 			try
 				Filesystem.create_directory(dir)
-			except
-				pass
+			except Exception as e
+				error_out(e)
+				return
 
 
 	
@@ -164,7 +165,7 @@ class Config
 		pull_tags_only_add = false
 		dry_run = false
 		default_quality = "perfect"
-		default_structure = "{id}-{name}.{ext}"
+		default_structure = "{name}.{ext}"
 
 	void load()
 		File *f = Filesystem.open_text(AppDirectory + "sisyphos/config")

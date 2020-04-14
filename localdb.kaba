@@ -182,6 +182,8 @@ class LocalFile
 			return id
 		if key == "hash"
 			return hash
+		if key == "size"
+			return str(size)
 		for t in tags
 			if t.key == key
 				return t.value
@@ -395,8 +397,8 @@ class LocalFileDB
 #				return &f
 #		raise(new Exception("not in db: hash=" + hash))
 		
-	selfref LocalFile*[] find_by_tags(string str)
-		Tag[] tags = str2tags(str)
+	selfref LocalFile*[] find_by_tags(string filter)
+		Tag[] tags = str2tags(filter)
 		LocalFile*[] list
 		for f in files
 			if f.match(tags)

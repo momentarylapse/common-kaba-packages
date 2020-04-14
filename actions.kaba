@@ -212,11 +212,7 @@ void action_unadd(string[] arg)
 	for a in arg
 		_action_unadd(absolute_path(a))
 
-
-void _action_rm(string path)
-	set_working_dir(path)
-		
-	let files = lister.find(path)
+void delete_files(out LocalFile*[] files)
 	for f in files
 		print("RM  {{rel_path(f.path)}}")
 		if conf.dry_run
@@ -229,9 +225,21 @@ void _action_rm(string path)
 		f.drop_me = true
 		db.save()
 
+LocalFile*[] find_by_path_or_filter(string arg)
+	if arg.find("=", 0) > 0
+		return db.find_by_tags(arg)
+	else
+		return lister.find(absolute_path(arg))
+
+void _action_rm(string arg)
+	if arg.find("=", 0) > 0
+		set_working_dir(arg)
+	let files = find_by_path_or_filter(arg)
+	delete_files(files)
+
 void action_rm(string[] arg)
 	for a in arg
-		_action_rm(absolute_path(a))
+		_action_rm(a)
 
 	
 void _action_mv(string source, string _dest)
@@ -325,6 +333,7 @@ void action_status(string[] arg)
 		_action_status(absolute_path(a))
 
 void action_find(string[] arg)
+	set_working_dir(absolute_path("./"))
 	for filter in arg
 		show_files(db.find_by_tags(filter))
 
@@ -436,40 +445,43 @@ void action_push(string[] arg)
 		_action_push(absolute_path(a))
 
 
-void _action_get___old(string id)
-	try
-		let ff = db.find_by_id(id)
-		if ff.pure_remote()
-			remote_download(ff)
-		else
-			print("id={{id}} already local: {{ff.path}}")
-	except
-		let files = remote_find_by_id([id], "")
-		if len(files) > 0
-			LocalFile f = files[0]
-			f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
-			db.files.add(f)
-			let ff = db.find_by_id(id)
-			remote_download(ff)
-		else
-			print("not found: id={{id}}")
-			return
+bool make_path_safe_for_download(out LocalFile f)
+	if db.has_path(f.path) or Filesystem.exists(f.path)
+		let ff = db.find_by_path(f.path)
+		if ff.id == f.id
+			# same path and id -> no need to download
+			return false
+	else
+		return true
+	
+	# try alternative
+	let ext = f.path.extension()
+	f.path = f.path[:-len(ext)] + "{{f.id}}.{{ext}}"
+	if db.has_path(f.path) or Filesystem.exists(f.path)
+		return false
+	return true
+
+void _get_file(out LocalFile f)
+	f.path = absolute_path(f.apply_structure(conf.default_structure))
+	if not make_path_safe_for_download(f)
+		print("EXISTS  {{rel_path(f.path)}}")
+		return
+		
+	print("ADD  {{rel_path(f.path)}}")
+	
+	if conf.dry_run
+		return
+	db.files.add(f)
+	make_all_dirs(f.path)
 
 void _action_get(string filter)
 	let files = remote_find(filter, conf.default_quality)
 	for f in files
-		#if db.has_id(f.id)
-		#	continue
-		#f.path = Filesystem.current_directory() + "{{f.id}}-{{f.name}}.{{f.path.extension()}}"
-		f.path = absolute_path(f.apply_structure(conf.default_structure))
-		print("ADD  {{rel_path(f.path)}}")
-		
-		if conf.dry_run
-			continue
-		db.files.add(f)
+		_get_file(f)
 
 
 void action_get(string[] arg)
+	set_working_dir(absolute_path("./"))
 	for a in arg
 		_action_get(a)
 
@@ -482,6 +494,7 @@ void show_rfile_list(RemoteFile[] rfiles)
 
 
 void action_remote_find(string[] arg)
+	set_working_dir(absolute_path("./"))
 	for filter in arg
 		show_rfile_list(remote_find(filter, conf.default_quality))
 
