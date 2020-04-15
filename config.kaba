@@ -3,7 +3,7 @@ use hui
 
 #const string SERVER = "michi.is-a-geek.org"
 const string SERVER = "myu"
-const string CMD = "kaba /home/michi/Projekte/small/alex/alex.kaba -S sp"
+const string CMD = "kaba kaba -S"
 const string ALEX_DIR = "/media/300/temp/alexandria-cache/"
 const string ALEX_IN = ALEX_DIR + "in/"
 

@@ -91,13 +91,13 @@ RemoteFile[] remote_find(string filter, string quality)
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
-	string r = call_alex("by-hash", hashes)
+	string r = call_alex("sp by-hash", hashes)
 	return remote_parse(r)
 
 RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)
-	string cmd = "by-id"
+	string cmd = "sp by-id"
 	if quality == MEDIUM
-		cmd = "by-id-medium"
+		cmd = "sp by-id-medium"
 	string r = call_alex(cmd, ids)
 	return remote_parse(r)
 
