@@ -1,0 +1,101 @@
+use config
+use tag
+use autotag
+use dblister
+use remote
+
+
+void _action_tag_add(string path, string tag)
+	set_working_dir(path)
+	let files = lister.find(path)
+	let t = str2tag(tag)
+	for f in files
+		f.tag_add(t)
+
+void action_tag_add(string[] arg)
+	if len(arg) < 2
+		_action_tag_add(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_add(absolute_path(a), arg[0])
+
+
+void _action_tag_set(string path, string tag)
+	set_working_dir(path)
+	let files = lister.find(path)
+	let t = str2tag(tag)
+	for f in files
+		f.tag_set(t)
+
+void action_tag_set(string[] arg)
+	if len(arg) < 2
+		_action_tag_set(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_set(absolute_path(a), arg[0])
+
+
+void _action_tag_rm(string path, string tag)
+	set_working_dir(path)
+	let files = lister.find(path)
+	let t = str2tag(tag)
+	for f in files
+		f.tag_rm(t)
+
+void action_tag_rm(string[] arg)
+	if len(arg) < 2
+		_action_tag_rm(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_rm(absolute_path(a), arg[0])
+
+
+void _action_tag_get(string path, string key)
+	set_working_dir(path)
+	let files = lister.find(path)
+	for f in files
+		f.show()
+		for t in f.tags
+			if t.key == key
+				print("      {{t}}")
+		if key == "name"
+			print("      name={{f.name}}")
+		else if key == "hash"
+			print("      hash={{f.hash}}")
+		else if key == "id" and len(f.id) > 0
+			print("      id={{f.id}}")
+
+void action_tag_get(string[] arg)
+	if len(arg) < 2
+		_action_tag_get(absolute_path("./"), arg[0])
+	for a in arg[1:]
+		_action_tag_get(absolute_path(a), arg[0])
+		
+			
+void _action_tag_auto(string path)
+	set_working_dir(path)
+	let files = lister.find(path)
+	for f in files
+		auto_tag(f)
+
+void action_tag_auto(string[] arg)
+	if len(arg) == 0
+		_action_tag_auto(absolute_path("./"))
+	for a in arg
+		_action_tag_auto(absolute_path(a))
+
+
+
+void _action_tag_diff(string path)
+	set_working_dir(path)
+	let files = lister.find(path)
+	let rfiles = remote_get_meta(files)
+	for rf in rfiles
+		for lf in files
+			if lf.id == rf.id
+				if !tags_equal(lf.tags, rf.tags)
+					lf.show()
+					tags_diff(lf.tags, rf.tags)
+
+void action_tag_diff(string[] arg)
+	if len(arg) == 0
+		_action_tag_diff(absolute_path("./"))
+	for a in arg
+		_action_tag_diff(absolute_path(a))

@@ -25,30 +25,30 @@ string ssh_escape(string s)
 
 void scp_download(string source, string dest)
 	string cmd = "scp -Tp"
-	cmd += " {{SERVER}}:\"'{{bash_escape2(source)}}'\" \"{{bash_escape(dest)}}\""
+	cmd += " {{conf.server}}:\"'{{bash_escape2(source)}}'\" \"{{bash_escape(dest)}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 void scp_upload(string source, string dest)
-	string cmd = "scp -Tp \"{{bash_escape(source)}}\" {{SERVER}}:{{scp_escape(dest)}}"
+	string cmd = "scp -Tp \"{{bash_escape(source)}}\" {{conf.server}}:{{scp_escape(dest)}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 string remote_interface(string action, string[] params)
-	string cmd = "ssh {{SERVER}} python3 "
+	string cmd = "ssh {{conf.server}} python3 "
 	
 	cmd += " /home/michi/Tools/alex/if-{{action}}.py"
 	for p in params
-		cmd += " \\\"" + ssh_escape(p) + "\\\""
+		cmd += " \\\"{{ssh_escape(p)}}\\\""
 	#cmd += ""
 	if conf.verbosity >= 2
 		print(cmd)
 	return shell_exec(cmd).trim()
 
 string call_alex(string action, string[] params)
-	string cmd = "ssh {{SERVER}} {{CMD}} {{action}}"
+	string cmd = "ssh {{conf.server}} {{CMD}} {{action}}"
 	for p in params
 		#cmd += " \\\"" + ssh_escape(p) + "\\\""
 		cmd += " " + ssh_escape(p)
@@ -76,7 +76,7 @@ RemoteFile[] remote_parse(string r)
 		#rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
-		rf.path = rf.name + "." + extension # temporary
+		rf.path = "{{rf.name}}.{{extension}}" # temporary
 		rf.path = absolute_path(rf.apply_structure(conf.default_structure))
 		for p in parts[8:]
 			rf.tags.add(alex2tag(p))
@@ -281,7 +281,7 @@ void remote_download_meta(out LocalFile*[] files)
 	for rf in rfiles
 		for lf in files
 			if rf.id == lf.id
-				print("META  " + rel_path(lf.path))
+				print("META  {{rel_path(lf.path)}}")
 				if conf.pull_tags_only_add
 					for t in rf.tags
 						if tag_multi(t.key)
@@ -315,26 +315,26 @@ void sync_file(RemoteFile rf, out LocalFile* lf)
 		lf.set("quality=medium")
 	if lf.pure_local()
 		if conf.verbosity >= 1
-			print("RELINK  " + rel_path(lf.path))
+			print("RELINK  {{rel_path(lf.path)}}")
 		lf.id = rf.id
 		#db.dirty = true
 	if lf.hash != rf.hash
 		if conf.verbosity >= 1
-			print("CHANGED HASH  " + rel_path(lf.path))
+			print("CHANGED HASH  {{rel_path(lf.path)}}")
 		if conf.verbosity >= 2
 			print("{{lf.hash}} <-> {{rf.hash}}")
 		lf.set(CHANGED_FILE)
 		#db.dirty = true
 	if lf.name != rf.name
 		if conf.verbosity >= 1
-			print("CHANGED NAME  " + rel_path(lf.path))
+			print("CHANGED NAME  {{rel_path(lf.path)}}")
 		if conf.verbosity >= 2
 			print("{{lf.name}} <-> {{rf.name}}")
 		lf.set(CHANGED_META)
 		#db.dirty = true
 	if !tags_equal(lf.tags, rf.tags)
 		if conf.verbosity >= 1
-			print("CHANGED TAGS  " + rel_path(lf.path))
+			print("CHANGED TAGS  {{rel_path(lf.path)}}")
 		if conf.verbosity >= 2
 			print(tags2str(tags_sort(lf.tags)))
 			print(tags2str(tags_sort(rf.tags)))

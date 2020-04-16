@@ -1,0 +1,48 @@
+use os
+use localdb
+use config
+use dblister
+
+
+void delete_files(out LocalFile*[] files)
+	for f in files
+		print("RM  {{rel_path(f.path)}}")
+		if conf.dry_run
+			return
+		if !f.pure_remote()
+			try
+				Filesystem.delete(f.path)
+			except Exception as e
+				error_out(e)
+		f.drop_me = true
+		db.save()
+
+
+void delete_path_or_filter(string arg)
+	if is_filter(arg)
+		set_working_dir(arg)
+	let files = find_by_path_or_filter(arg)
+	delete_files(files)
+
+void action_rm(string[] arg)
+	for a in arg
+		delete_path_or_filter(a)
+
+
+
+
+void unadd_path(string path)
+	set_working_dir(path)
+		
+	let files = lister.find(path)
+	for f in files
+		print("DROP  {{f.path}}")
+		f.drop_me = true
+		db.save()
+
+void action_unadd(string[] arg)
+	if len(arg) == 0
+		unadd_path(absolute_path("./"))
+	for a in arg
+		unadd_path(absolute_path(a))
+

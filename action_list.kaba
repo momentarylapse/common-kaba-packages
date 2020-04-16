@@ -1,0 +1,46 @@
+use config
+use localdb
+use tag
+use dblister
+
+
+void show_files(LocalFile*[] files)
+	for f in files
+		if f.perfectly_fine() and !conf.show_perfectly_fine
+			continue
+		if !f.in_db() and !conf.show_not_in_db
+			continue
+		f.show()
+		if conf.show_meta or conf.verbosity >= 2
+			f.show_info("      ")
+
+
+
+
+void list_path(string path)
+	set_working_dir(path)
+	conf.show_pure_local = true
+	show_files(lister.find(path))
+
+void action_list(string[] arg)
+	if len(arg) == 0
+		list_path(absolute_path("./"))
+	for a in arg
+		list_path(absolute_path(a))
+
+void _action_status(string path)
+	set_working_dir(path)
+	conf.show_pure_local = true
+	conf.show_perfectly_fine = false
+	show_files(lister.find(path))
+
+void action_status(string[] arg)
+	if len(arg) == 0
+		_action_status(absolute_path("./"))
+	for a in arg
+		_action_status(absolute_path(a))
+
+void action_find(string[] arg)
+	for filter in arg
+		show_files(db.find_by_tags(filter))
+

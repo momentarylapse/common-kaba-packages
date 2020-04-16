@@ -1,0 +1,93 @@
+use os
+use localdb
+use config
+use remote
+use dblister
+
+
+
+void _action_pull(string path)
+	set_working_dir(path)
+	
+	let files = lister.find(path)
+	LocalFile*[] need_meta
+	for f in files
+		if f.pure_remote() or f.is(CHANGED_FILE)
+			remote_download(f)
+		if f.is(CHANGED_META)
+			need_meta.add(f)
+
+	if len(need_meta) > 0
+		if conf.verbosity >= 2
+			print("downloading meta data")
+		remote_download_meta(need_meta)
+
+void action_pull(string[] arg)
+	if len(arg) == 0
+		_action_pull(absolute_path("./"))
+	for a in arg
+		_action_pull(absolute_path(a))
+
+
+
+void _action_push(string path)
+	set_working_dir(path)
+	
+	let files = lister.find(path)
+	for f in files
+		if !f.in_db()
+			continue
+		if f.pure_local() #or f.is(CHANGED_FILE)
+			remote_upload(f)
+		if f.is(CHANGED_META)
+			print("UPLOADING META  {{rel_path(f.path)}}")
+			remote_upload_meta(f)
+
+void action_push(string[] arg)
+	if len(arg) == 0
+		_action_push(absolute_path("./"))
+	for a in arg
+		_action_push(absolute_path(a))
+
+
+
+bool make_path_safe_for_download(out LocalFile f)
+	if db.has_path(f.path) or Filesystem.exists(f.path)
+		let ff = db.find_by_path(f.path)
+		if ff.id == f.id
+			# same path and id -> no need to download
+			return false
+	else
+		return true
+	
+	# try alternative
+	let ext = f.path.extension()
+	f.path = f.path[:-len(ext)] + "{{f.id}}.{{ext}}"
+	if db.has_path(f.path) or Filesystem.exists(f.path)
+		return false
+	return true
+
+void _get_file(out LocalFile f, string dest)
+	f.path = f.apply_structure(dest)
+	if not make_path_safe_for_download(f)
+		print("EXISTS  {{rel_path(f.path)}}")
+		return
+		
+	print("ADD  {{rel_path(f.path)}}")
+	
+	if conf.dry_run
+		return
+	db.files.add(f)
+	make_all_dirs(f.path)
+
+void _action_get(string filter, string dest)
+	let files = remote_find(filter, conf.default_quality)
+	for f in files
+		_get_file(f, dest)
+
+
+void action_get(string[] arg)
+	if len(arg) >= 2
+		_action_get(arg[0], absolute_path(arg[1]))
+	else
+		_action_get(arg[0], absolute_path(conf.default_structure))
