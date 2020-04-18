@@ -7,6 +7,7 @@ use action_delete
 use action_list
 use action_transmit
 use action_tag
+use action_remote
 use cli_parser
 
 
@@ -52,7 +53,9 @@ void main(string[] arg)
 	#p.cmd("structure auto", "<PATH> ...", "rename files by tags", action_structure_auto)
 	
 	p.cmd("remote find", "<FILTER>", "find files on host", action_remote_find)
+	p.cmd("remote tag list", "<KEY>", "list all values of a tag key", action_remote_tag_list)
 #	p.cmd("remote add", "<FILTER> <DIR>", "???", action_remote_add)
+
 	p.cmd("db check", "", "self test", lambda(string[] arg) db.self_check())
 	p.cmd("db rehash", "", "rebuild hashes", lambda(string[] arg) db.rehash())
 	p.cmd("db optimize", "", "", lambda(string[] arg) db.optimize())
