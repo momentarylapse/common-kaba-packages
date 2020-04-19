@@ -37,9 +37,7 @@ void scp_upload(string source, string dest)
 	shell_execute(cmd)
 
 string remote_interface(string action, string[] params)
-	string cmd = "ssh {{conf.server}} python3 "
-	
-	cmd += " /home/michi/Tools/alex/if-{{action}}.py"
+	string cmd = "ssh {{conf.server}} python3 /home/michi/Tools/alex/if-{{action}}.py"
 	for p in params
 		cmd += " \\\"{{ssh_escape(p)}}\\\""
 	#cmd += ""
@@ -195,20 +193,20 @@ void remote_upload(out LocalFile f)
 		return
 	
 	if f.path.extension() == ""
-		print("ERROR: remote does not like files without extension: " + rel_path(f.path))
+		print("ERROR: remote does not like files without extension: {{rel_path(f.path)}}")
 		return
 	
-	string remote_path = ALEX_IN + f.hash + "." + f.path.extension()
+	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
 	
-	scp_upload(f.path, remote_path)
+	scp_upload(f.path, _remote_path)
 	
-	string r = remote_interface("add", [f.remote_path])
+	string r = remote_interface("add", [_remote_path])
 	if r[:2] != "ok"
-		print("ERROR: upload..." + r)
+		print("ERROR: upload... {{r}}")
 		return
 	int nnn = r[3:].find("\n", 0)
 	if nnn >= 0
-		print("REMOTE WARNING: " + r[4+nnn:])
+		print("REMOTE WARNING: {{r[4+nnn:]}}")
 	f.id = r[3:].explode("\n")[0]
 	if conf.verbosity >= 2
 		print("ID: {{f.id}}")
