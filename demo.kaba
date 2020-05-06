@@ -22,29 +22,30 @@ class ToolbarDemoDialog extends Window
 class MenuDemoDialog extends Window
 	void __init__(string source)
 		super.__init__("Menu demo", 800, 300)
-		Menu* m = CreateMenuFromSource(source)
+		let m = CreateMenuFromSource(source)
 		set_menu(m)
 
-void action_demo(string filename)
+void action_demo(string[] arg)
+	string filename = arg[0]
 	conf.set_dir(filename.dirname())
 	conf.load()
 	
 	string source = Filesystem.read(filename)
 	#print(source)
-	Resource r = ParseResource(source, true)
+	let r = ParseResource(source, true)
 	#r.show(0)
-	print(r.str(0))
+	#print(r.str(0))
 	
-	if r.type == "Dialog" or r.type == "Window"
-		Window* dlg = new DemoDialog(source)
+	if r.type in ["Dialog", "Window"]
+		let dlg = new DemoDialog(source)
 		dlg.run()
 	else if r.type == "Toolbar"
-		Dialog* dlg = new ToolbarDemoDialog(source)
+		let dlg = new ToolbarDemoDialog(source)
 		dlg.run()
 	else if r.type == "Menu"
-		Window* dlg = new MenuDemoDialog(source)
+		let dlg = new MenuDemoDialog(source)
 		dlg.run()
 	else
-		print("don't know how to show a " + r.type)
+		print("don't know how to show a {{r.type}}")
 
 

@@ -5,6 +5,7 @@ use resource
 use source
 use demo
 use export
+use cli_parser
 	
 
 void get_ids(out Language l, Resource r, string ns)
@@ -36,7 +37,8 @@ Language load_own_lang(bool literally)
 	return own
 
 	
-void action_check(string dir)
+void action_check(string[] arg)
+	string dir = arg[0]
 	conf.set_dir(dir)
 	conf.load()
 	
@@ -47,21 +49,25 @@ void action_check(string dir)
 	for l in langs
 		check_lang(l, own, false)
 
-void action_export(string dir)
+void action_export(string[] arg)
+
+	string dir = "./"
+	if len(arg) >= 1
+		dir = arg[0]
 	conf.set_dir(dir)
 	conf.load()
 	
-	Language own = load_own_lang(true)#false)
+	let own = load_own_lang(true)#false)
 	
-	Language[] langs = load_prelangs()
+	let langs = load_prelangs()
 	
 	export_resources(resources, own, langs)
 
 void patch_language(out Language l, Language own, string filename)
 	try
 		string ttt = Filesystem.read(filename)
-		string[] lines = ttt.explode("\n")
-		for i in 0:lines.num/3
+		let lines = ttt.explode("\n")
+		for i in 0:len(lines)/3
 			string a = lines[i*3]
 			string b = lines[i*3+1]
 			string c = lines[i*3+2]
@@ -76,7 +82,8 @@ void patch_language(out Language l, Language own, string filename)
 	except
 		pass
 
-void action_translate(string filename)
+void action_translate(string[] arg)
+	string filename = arg[0]
 	conf.set_dir(filename.dirname())
 	conf.load()
 	
@@ -98,7 +105,9 @@ void action_translate(string filename)
 	except
 		pass
 
-void action_add(string filename, string name)
+void action_add(string[] arg)
+	string filename = arg[0]
+	string name = arg[1]
 	conf.set_dir(filename.dirname())
 	conf.load()
 	
@@ -124,7 +133,7 @@ void swap_translate_lang(out Language own, Language l, string target)
 
 void swap_translate_gui(out Resource r, Language l, string ns)
 	for i in l.ids
-		if i.id == r.id or i.id == ns + "/" + r.id
+		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
 			r.title = i.title
 			r.tooltip = i.tooltip
 	for c in r.children
@@ -141,11 +150,13 @@ void swap_translate_guis(Language l)
 		f.write(r.str(0))
 		del f
 
-void action_swap(string source, string target)
+void action_swap(string[] arg)
+	string source = arg[0]
+	string target = arg[1]
 	conf.set_dir(source.dirname())
 	conf.load()
 	
-	Language own = load_own_lang(true)
+	let own = load_own_lang(true)
 	
 	Language l = load_prelang(source)
 	if !check_lang(l, own, true)
@@ -160,35 +171,15 @@ void action_swap(string source, string target)
 	
 	# should also translate other languages... but... screw it
 
-void show_help()
-	print("check <DIR>")
-	print("export/x <DIR>")
-	print("translate/t <PRELANG-FILE>")
-	print("add <PRELANG-FILE> <LANGUAGE-NAME>")
-	print("swap <PRELANG-FILE> <NEW-PRELANG-FILE>")
-	print("demo <HUI-FILE>")
 	
 
 void main(string[] arg)
-
-	if arg.num > 0
-		if arg[0] == "check" and arg.num >= 2
-			action_check(arg[1])
-		else if arg[0] == "export" or arg[0] == "x"
-			if arg.num >= 2
-				action_export(arg[1])
-			else
-				action_export("./")
-		else if (arg[0] == "translate" or arg[0] == "t") and arg.num >= 2
-			action_translate(arg[1])
-		else if arg[0] == "add" and arg.num >= 3
-			action_add(arg[1], arg[2])
-		else if arg[0] == "swap" and arg.num >= 3
-			action_swap(arg[1], arg[2])
-		else if arg[0] == "demo" and arg.num >= 2
-			action_demo(arg[1])
-		else
-			print("???")
-			show_help()
-	else
-		show_help()
+	CLIParser p
+	p.info("hui gui builder...")
+	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
+	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)
+	p.cmd("x", "[DIR]", "export...", action_export)
+	p.cmd("t", "<PRELANG-FILE>", "translate...", action_translate)
+	p.cmd("add", "<PRELANG-FILE> <LANGUAGE-NAME>", "add", action_add)
+	p.cmd("swap", "<PRELANG-FILE> <LANGUAGE-NAME>", "swap languages", action_swap)
+	p.run(arg)

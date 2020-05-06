@@ -20,8 +20,8 @@ class Language
 		print(name)
 		for i in ids
 			print(i.id)
-			print("\t" + i.title)
-			print("\t" + i.tooltip)
+			print("\t{{i.title}}")
+			print("\t{{i.tooltip}}")
 			
 		for t in texts
 			print(t.orig)
@@ -29,9 +29,9 @@ class Language
 	void add_id(string id, string title, string tooltip)
 		for i in ids
 			if i.id == id
-				if title.num > 0
+				if len(title) > 0
 					i.title = title
-				if tooltip.num > 0
+				if len(tooltip) > 0
 					i.tooltip = tooltip
 				return
 		LangID i
@@ -42,7 +42,7 @@ class Language
 	void add_text(string orig, string trans)
 		for t in texts
 			if t.orig == orig
-				if trans.num > 0
+				if len(trans) > 0
 					t.trans = trans
 				return
 		LangText t
@@ -55,14 +55,14 @@ class Language
 		f << "# Language"
 		f << name
 		f << "# Num IDs"
-		f << ids.num
+		f << len(ids)
 		f << "# Data (ID,Text,Tooltip)"
 		for i in ids
 			f << i.id
 			f << i.title.escape()
 			f << i.tooltip.escape()
 		f << "# Num Language Strings"
-		f << texts.num
+		f << len(texts)
 		f << "# Data (ID,Text)"
 		for t in texts
 			f << t.orig.escape()
@@ -76,14 +76,14 @@ class Language
 	const LangID[] get_useful_ids()
 		LangID[] uids
 		for i in ids
-			if i.title.num > 0 or i.tooltip.num > 0
+			if len(i.title) > 0 or len(i.tooltip) > 0
 				uids.add(i)
 		sort_ids(uids)
 		return uids
 	const LangText[] get_useful_texts()
 		LangText[] utexts
 		for t in texts
-			if t.trans.num > 0
+			if len(t.trans) > 0
 				utexts.add(t)
 		sort_texts(utexts)
 		return utexts
@@ -141,7 +141,7 @@ void lang_id_add(out LangID[] ids, string id, string title, string tooltip, stri
 	string cid = id
 	if cid.find("/", 0) < 0
 		#if ns != id
-		cid = ns + "/" + id
+		cid = "{{ns}}/{{id}}"
 	for i in ids
 		if i.id == cid
 			return
@@ -152,8 +152,8 @@ void lang_id_add(out LangID[] ids, string id, string title, string tooltip, stri
 	ids.add(a)
 
 void sort_ids(out LangID[] ids)
-	for i in 0:ids.num
-		for j in i+1:ids.num
+	for i in 0:len(ids)
+		for j in i+1:len(ids)
 			if ids[i].id > ids[j].id
 				LangID t = ids[i]
 				ids[i] = ids[j]
@@ -161,8 +161,8 @@ void sort_ids(out LangID[] ids)
 
 
 void sort_texts(out LangText[] texts)
-	for i in 0:texts.num
-		for j in i+1:texts.num
+	for i in 0:len(texts)
+		for j in i+1:len(texts)
 			if texts[i].orig > texts[j].orig
 				LangText t = texts[i]
 				texts[i] = texts[j]
@@ -171,7 +171,7 @@ void sort_texts(out LangText[] texts)
 
 
 bool check_lang(Language l, Language own, bool create_file)
-	print("checking " + l.name)
+	print("checking {{l.name}}")
 	int nerrors = 0
 	
 	File *f
@@ -185,17 +185,17 @@ bool check_lang(Language l, Language own, bool create_file)
 		bool found_tooltip = false
 		for j in l.ids
 			if j.id == i.id
-				found_title = (j.title.num > 0)
-				found_tooltip = (j.tooltip.num > 0)
+				found_title = (len(j.title) > 0)
+				found_tooltip = (len(j.tooltip) > 0)
 				break
-		if i.title.num > 0 and !found_title
+		if len(i.title) > 0 and !found_title
 			if create_file
 				f << "# id:{{i.id}}"
 				f << i.title.escape()
 				f << ""
 			#print("    MISSING title for " + i.id)
 			nerrors ++
-		if i.tooltip.num > 0 and !found_tooltip
+		if len(i.tooltip) > 0 and !found_tooltip
 			if create_file
 				f << "# tooltip:{{i.id}}"
 				f << i.tooltip.escape()
@@ -208,7 +208,7 @@ bool check_lang(Language l, Language own, bool create_file)
 		bool found = false
 		for tt in l.texts
 			if t.orig == tt.orig
-				found = (tt.trans.num > 0)
+				found = (len(tt.trans) > 0)
 				break
 		if !found
 			if create_file
