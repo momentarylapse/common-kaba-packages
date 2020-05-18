@@ -4,8 +4,11 @@ use library
 
 void create_meson()
 	File* f = Filesystem.create_text(conf.root + "../meson.build")
-	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1'])"
-	f << "add_project_arguments('-O2', '-g', '-Wno-unused', '-Wstrict-aliasing=0', '-fno-omit-frame-pointer', language : ['cpp'])"
+	string debug = str(conf.build_type == "debug")
+	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
+	let opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
+	let opt = [for o in opts "'{{o}}'"].join(", ")
+	f << "add_project_arguments({{opt}}, language : ['cpp'])"
 	f << "
 #install_data
 #meson.add_install_script('')
@@ -17,7 +20,7 @@ cc = meson.get_compiler('cpp')
 mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')"
 
-	string[] vars = ["mdep", "threaddep"]
+	let vars = ["mdep", "threaddep"]
 	for l in conf.libs
 		let ll = lib.get(l)
 		string var = l + "dep"
@@ -44,9 +47,9 @@ threaddep = dependency('threads')"
 				deps += ","
 			ltest += v + ".found()"
 			deps += v
-		f << "if " + ltest
+		f << "if {{ltest}}"
 		f << "	add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
-		f << "	deps += [" + deps + "]"
+		f << "	deps += [{{deps}}]"
 		f << "else"
 		f << "	add_project_arguments('-D{{ll.define()}}=0', language : ['cpp'])"
 		f << "endif"

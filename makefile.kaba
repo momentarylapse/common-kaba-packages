@@ -32,7 +32,10 @@ void create_makefile(Profile p, string postfix)
 			defines += " -D{{lib.define(l)}}=1"
 		else
 			defines += " -D{{lib.define(l)}}=0"
-	f << "GLOBALFLAGS = {{conf.flags_global}} -std={{conf.language}} {{defines}}"
+	string x
+	if conf.build_type == "debug"
+		x = "-g"
+	f << "GLOBALFLAGS = {{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
 	f << "CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)"
 	f << "CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)"
 	f << "prefix = /usr/local"

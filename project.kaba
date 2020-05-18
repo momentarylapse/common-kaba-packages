@@ -43,6 +43,8 @@ class Config
 	string[] ignore_libs
 	Profile[] profiles
 	string language
+	string optimization
+	string build_type
 	string flags_global
 	string flags_compiler
 	string flags_linker
@@ -52,7 +54,9 @@ class Config
 	string[] installs
 	
 	void __init__()
-		language = "c++14"
+		language = "c++17"
+		optimization = "2"
+		build_type = "debug"
 	
 	bool ignored(string l)
 		for ig in ignore_libs
@@ -67,9 +71,9 @@ class Config
 			f >> t
 			if t.num == 0
 				break
-			if t == "# project name"
+			if t in ["# project", "# project name"]
 				f >> name
-			else if t in ["# binary name", "# binary file"]
+			else if t in ["# binary name", "# binary", "# binary file"]
 				f >> binary_file
 			else if t == "# main file"
 				f >> main_file
@@ -77,6 +81,10 @@ class Config
 				f >> language
 			else if t == "# flags"
 				f >> flags_global
+			else if t == "# optimization"
+				f >> optimization
+			else if t == "# build type"
+				f >> build_type
 			#else if t == "# compiler flags"
 #				f >> flags_compiler
 #			else if t == "# linker flags"
@@ -109,14 +117,18 @@ class Config
 		del f
 	void save()
 		File* f = Filesystem.create_text(conf.root + "xmake.conf")
-		f << "# project name"
+		f << "# project"
 		f << name
-		f << "# binary name"
+		f << "# binary"
 		f << binary_file
 		f << "# main file"
 		f << main_file
 		f << "# language"
 		f << language
+		f << "# optimization"
+		f << optimization
+		f << "# build type"
+		f << build_type
 		f << "# flags"
 		f << flags_global
 		f << "# libraries"

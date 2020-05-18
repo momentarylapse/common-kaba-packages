@@ -51,7 +51,7 @@ void main(string[] arg)
 		if !conf.ignored(l)
 			lib.test(l)
 	if missing.num > 0
-		print("ERROR: necessary libraries missing: " + missing)
+		print("ERROR: necessary libraries missing: {{missing}}")
 	
 	parse_dir(conf.root)
 	
