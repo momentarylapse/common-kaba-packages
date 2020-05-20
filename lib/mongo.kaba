@@ -167,7 +167,7 @@ class Mongo
 			_mongoc_client_destroy(client)
 		_mongoc_cleanup()
 
-	Collection* collection(string db, string col)
+	const Collection* collection(string db, string col)
 		let c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
@@ -182,10 +182,10 @@ class Collection
 	void __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	Result* find(string json)
+	const Result* find(string json)
 		let b = json_to_bson(json)
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	Result* aggregate(string json)
+	const Result* aggregate(string json)
 		let b = json_to_bson(json)
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	void insert(string json)
@@ -217,12 +217,12 @@ class Result
 	void __delete__()
 		if cur
 			_mongoc_cursor_destroy(cur)
-	bool has_more()
+	const bool has_more()
 		return _mongoc_cursor_next(cur, &doc)
 		# bson_to_json(doc)
-	string json()
+	const string json()
 		return bson_to_json(doc)
-	any get()
+	const any get()
 		return bson_to_any(doc)
 
 

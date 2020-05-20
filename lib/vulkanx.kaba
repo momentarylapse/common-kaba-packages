@@ -238,7 +238,7 @@ class StatLayer
 		dset.set([ubo], [tex])
 		frames = 0
 		time = 0
-	void draw(CommandBuffer* cb)
+	void draw(out CommandBuffer cb)
 		cb.set_pipeline(pipeline)
 		cb.bind_descriptor_set(0, dset)
 		cb.draw(vb)

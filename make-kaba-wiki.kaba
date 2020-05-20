@@ -8,8 +8,13 @@ const string SHIFT = "    "
 Script*[] external_packages
 Script*[] external_libs
 
+string param_pre(Variable v)
+	if not v.is_const
+		return "out "
+	return ""
+
 string func_params(Function f)
-	return [for p,i in f.param_type "{{p.name}} {{f.var[i].name}}"].join(", ")
+	return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{p.name}} {{f.var[i].name}}"].join(", ")
 
 string show_func(string ns, Function f)
 	string name = f.name
@@ -142,6 +147,19 @@ string opname(string f)
 bool is_list(Class c)
 	return c.name[-2:] == "[]" or &c == string
 
+string func_pre(Function f)
+	string pre
+	if f.is_static()
+		pre += "static "
+	if f.is_const()
+		pre += "const "
+	if f.is_selfref()
+		pre += "selfref "
+	if f.virtual_index >= 0
+		pre += "virtual "
+	return pre
+
+
 string show_class(string ns, Class c)
 	string wiki = "== Kaba class {{c.name}} ==\n"
 	
@@ -161,11 +179,7 @@ string show_class(string ns, Class c)
 	if len(funcs) > 0
 		wiki += "\n{{SHIFT}}# functions\n"
 		for f in funcs
-			string pre
-			if f.is_static
-				pre += "static "
-			if f.virtual_index >= 0
-				pre += "virtual "
+			string pre = func_pre(f)
 			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})\n"
 			
 	if len(ops) > 0 or is_list(c)
@@ -173,13 +187,9 @@ string show_class(string ns, Class c)
 		if is_list(c)
 			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param.name}}\n"
 		for f in ops
-			string pre
-			if f.is_static
-				pre += "static "
-			if f.virtual_index >= 0
-				pre += "virtual "
+			string pre = func_pre(f)
 			Class* p = nil
-			if f.is_static
+			if f.is_static()
 				if f.num_params == 2
 					p = f.param_type[1]
 			else
@@ -212,8 +222,10 @@ string show_class(string ns, Class c)
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
 			string pre
-			if f.is_static
+			if f.is_static()
 				pre += "static "
+			if f.is_const()
+				pre += "const "
 			wiki += "; <tt>{{pre}}{{f.return_type.name}} [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}})\n"
 			wiki += ": description\n\n"
 	
