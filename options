@@ -6,6 +6,11 @@ noexpandy
 indent
 noindent
 grabfocus
+ignorefocus
+big
+huge
+small
+disabled
 
 == key=value ==
 width=
@@ -17,11 +22,20 @@ marginright=
 margintop=
 marginbottom=
 padding=
+hgroup=
+vgroup=
 
+
+
+
+!!...: constructor
 
 
 Button
 	flat
+	link
+	default
+	danger
 ColorButton
 	alpha
 ComboBox
@@ -31,11 +45,14 @@ DrawingArea
 Edit
 	clear-placeholder
 	clear-completion
-	placeholder=
-	completion=
+	placeholder=...
+	completion=...
 Grid
 	buttonbar
+	actionbar
 	vertical
+	homogenousx
+	homogenousy
 Label
 	bold
 	italic
@@ -43,41 +60,67 @@ Label
 	wrap
 	center
 	right
-	angle=
+	angle=N
 ListView
-	multiline/select-multi
+	multiline|select-multi
 	select-single
-	nobar
-	bar=true/false
+	(nobar)
+	bar=[true]|false
 	reorderable
 	format=...
 MultilineEdit
 	!!noframe
 	handlekeys
 	monospace
+	tabsize=N
+Paned
+	!!vertical
 Revealer
-	slide=up/down/left/right
+	slide=up|down|left|right
 	cross-fade
 Scroller
-	scrollx=yes/no
-	scrolly=yes/no
+	scrollx=yes|no
+	scrolly=yes|no
 Separator
 	!!vertical
 Slider
 	!!vertical
 	range=min:max:step
-	origin=true/false
-	showvalue=true/false
+	origin=[true]|false
+	showvalue=[true]|false
 	mark=value:title
 	clearmarks
 SpinButton
 	range=min:max:step
-	wrap
-	nowrap
+	wrap=[yes]|no
+	(nowrap)
 TabControl
 	bar
+	bar=[yes]|no
+	(nobar)
 	nobar
-	left/right/top/bottom
+	left|right|top|bottom
+ToggleButton
+	flat
 TreeView
-	bar
-	nobar
+	bar=[yes]|no
+	(nobar)
+
+
+Toolbar
+	Item
+		important
+		!!checkable
+	style=text|icons|both
+	size=small|large
+
+
+
+Window
+	resizable=[yes]|no
+	closable
+	headerbar
+	statusbar
+	closebutton=yes|no
+	cursor=[yes]|no
+	borderwidth=N
