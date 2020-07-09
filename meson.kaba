@@ -74,7 +74,7 @@ sources = ["
 	let std = "static/"
 	let list = conf.needs_installing()
 	for e in list
-		if Filesystem.is_directory(e)
+		if Filesystem.is_directory("../" + e)
 			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 		else
 			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
