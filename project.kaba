@@ -148,20 +148,17 @@ class Config
 		f << installs.join(",")
 		del f
 	
-	DirEntry[] needs_installing()
-		DirEntry[] r
+	string[] needs_installing()
+		string[] r
 		let list = Filesystem.search("../static", "*.*", true)
 		let ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
-			if !sa_has(ignore, e.name)
-				e.name = "static/{{e.name}}"
-				r.add(e)
+			if !sa_has(ignore, e)
+				r.add("static/{{e}}")
 		for i in installs
-			DirEntry e
-			e.name = i
-			e.is_dir = Filesystem.is_directory("../{{i}}")
-			r.add(e)
+#			e.is_dir = Filesystem.is_directory("../{{i}}")
+			r.add(i)
 		return r
 
 Config conf
@@ -225,7 +222,7 @@ void parse_source(string filename)
 void parse_dir(string dir)
 	let files = Filesystem.search(dir, "*.cpp", true)
 	for f in files
-		if f.is_dir
-			parse_dir(dir + f.name + "/")
+		if Filesystem.is_directory(dir + f)
+			parse_dir(dir + f + "/")
 		else
-			parse_source(dir + f.name)
+			parse_source(dir + f)

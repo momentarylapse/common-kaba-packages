@@ -78,10 +78,10 @@ void create_makefile(Profile p, string postfix)
 #		f << "	cp -f " + conf.icon + " " + datadir
 	let list = conf.needs_installing()
 	for e in list
-		if e.is_dir
-			f << "	cp -rf '../{{e.name}}' {{datadir}}"
+		if Filesystem.is_directory("../{{e}}")
+			f << "	cp -rf '../{{e}}' {{datadir}}"
 		else
-			f << "	cp -f '../{{e.name}}' {{datadir}}"
+			f << "	cp -f '../{{e}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 
 	f << ""

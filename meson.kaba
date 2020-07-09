@@ -74,10 +74,10 @@ sources = ["
 	let std = "static/"
 	let list = conf.needs_installing()
 	for e in list
-		if e.is_dir
-			f << "install_subdir('{{e.name}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
+		if Filesystem.is_directory(e)
+			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 		else
-			f << "install_data('{{e.name}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
+			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 	
 	if conf.desktop_file != ""
 		f << "install_data('{{std}}{{conf.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
