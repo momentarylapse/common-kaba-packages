@@ -60,7 +60,8 @@ string class_extension(Class c)
 			return " extends {{c.param.name}}[{{c.size}}]"
 		
 	if c.parent
-		return " extends " + c.parent.name
+		if c.parent.name[:1] != "@"
+			return " extends {{c.parent.name}}"
 	return ""
 
 
@@ -325,15 +326,15 @@ void wiki_upload(string name, string wiki)
 void find_external()
 	let list = Filesystem.search("extern", "*.kaba", false)
 	for e in list
-		let p = Script.load("extern/" + e.name, true)
-		p.name = e.name[:-5]
+		let p = Script.load("extern/" + e, true)
+		p.name = e[:-5]
 		external_packages.add(p)
 
 void find_external_libs()
 	let list = Filesystem.search("lib", "*.kaba", false)
 	for e in list
-		let p = Script.load("lib/" + e.name, true)
-		p.name = e.name[:-5]
+		let p = Script.load("lib/" + e, true)
+		p.name = e[:-5]
 		external_libs.add(p)
 
 void main()
