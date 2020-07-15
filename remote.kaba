@@ -186,8 +186,8 @@ void remote_download(out LocalFile f)
 void remote_upload(out LocalFile f)
 	print("UPLOADING  {{rel_path(f.path)}}")
 	
-	if !f.pure_local()
-		print("ERROR: not pure local")
+	if !f.pure_local() and !f.is(CHANGED_FILE)
+		print("ERROR: no need to push")
 		return
 	
 	if f.path.extension() == ""
@@ -197,6 +197,10 @@ void remote_upload(out LocalFile f)
 	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
 	
 	scp_upload(f.path, _remote_path)
+	
+	if !f.pure_local()
+		print("TODO: upload edited file")
+		return
 	
 	string r = remote_interface("add", [_remote_path])
 	if r[:2] != "ok"
