@@ -10,7 +10,7 @@ class Tag
 	const string str()
 		return "{{key}}={{value}}"
 	const string strh()
-		return key + "=" + value.hex(false)
+		return key + "=" + value.hex()
 	const bool __lt__(Tag o)
 		if key == o.key
 			return value < o.value

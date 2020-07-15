@@ -175,14 +175,12 @@ void remote_download(out LocalFile f)
 	make_all_dirs(f.path)
 	scp_download(f.remote_path(), f.path)
 
-	File *ff = Filesystem.open(f.path)
-	f.size = ff.get_size()
-	f.mtime = ff.get_date().time
+	f.size = Filesystem.size(f.path)
+	f.mtime = Filesystem.mtime(f.path).time
 	f.hash = Filesystem.hash(f.path, "md5")
 	f.unset(NONLOCAL)
 	f.unset(CHANGED_FILE)
 	db.save()
-	del ff
 
 
 void remote_upload(out LocalFile f)
@@ -214,7 +212,7 @@ void remote_upload(out LocalFile f)
 
 	#string tagsh = tags2strh(f.tags)
 		
-	#string r = yii("upload", [f.remote_path, f.name.hex(false), f.hash, f.mtime.str(), tagsh])
+	#string r = yii("upload", [f.remote_path, f.name.hex(), f.hash, f.mtime.str(), tagsh])
 	#print("answer: " + r)
 	
 	#string[] p = r.explode("\t")
@@ -242,7 +240,7 @@ void remote_upload_meta(out LocalFile f)
 
 	string tags = tags2strh(f.tags)	
 	
-	string r = remote_interface("override-meta", [f.id, f.name.hex(false), tags])
+	string r = remote_interface("override-meta", [f.id, f.name.hex(), tags])
 	
 	if r.tail(2) == "ok"
 		if conf.verbosity >= 2

@@ -17,11 +17,11 @@ class DBLister
 		string dir = dir_canonical(_dir)
 		let list = Filesystem.search(dir, "*", true)
 		for e in list
-			if e.is_dir
-				if e.name.head(1) != "." and recursive
-					find_paths(dir + e.name, recursive)
+			if Filesystem.is_directory(dir + e)
+				if e.head(1) != "." and recursive
+					find_paths(dir + e, recursive)
 			else
-				string path = (dir + e.name)
+				string path = (dir + e)
 				if !is_ignored(path)
 					paths.add(path)
 	
