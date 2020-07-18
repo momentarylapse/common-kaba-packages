@@ -100,7 +100,7 @@ string get_tag(string[] parts, string key)
 
 
 void error_out(Exception e)
-	print("ERROR: {{e.message()}}")
+	print("ERROR: {{e}}")
 
 string shell_exec(string cmd)
 	#if conf.verbose

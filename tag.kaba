@@ -7,7 +7,7 @@ class Tag
 	void __init__(string k, string v)
 		key = k
 		value = v
-	const string str()
+	const string __str__()
 		return "{{key}}={{value}}"
 	const string strh()
 		return key + "=" + value.hex()
@@ -36,7 +36,7 @@ string tags2str(Tag[] tags)
 	for t,i in tags
 		if i > 0
 			r += ","
-		r += t.str()
+		r += str(t)
 	return r
 
 string tags2strh(Tag[] tags)
@@ -96,9 +96,9 @@ bool tags_has(Tag[] tags, Tag t)
 void tags_diff(Tag[] a, Tag[] b)
 	for ta in a
 		if !tags_has(b, ta)
-			print("+  " + ta.str())
+			print("+  {{ta}}")
 #		else
-#			print("=  " + ta.str())
+#			print("=  {{ta}}")
 	for tb in b
 		if !tags_has(a, tb)
-			print("-  " + tb.str())
+			print("-  {{tb}}")

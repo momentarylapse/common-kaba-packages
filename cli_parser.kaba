@@ -76,7 +76,7 @@ class CLIParser
 				print("ERROR: unhandled command")
 			show_help()
 		except Exception as e
-			print("ERROR: {{e.message()}}")
+			print("ERROR: {{*e}}")
 	
 	const string[] parse_options(string[] arg)
 		string[] arg2
