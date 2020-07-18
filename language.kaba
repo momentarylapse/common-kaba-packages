@@ -131,7 +131,7 @@ Language[] load_prelangs()
 	Language[] langs
 	let files = Filesystem.search(conf.dir, "*.prelang", false)
 	for f in files
-		Language l = load_prelang(conf.dir + f.name)
+		let l = load_prelang(conf.dir + f)
 		langs.add(l)
 	return langs
 

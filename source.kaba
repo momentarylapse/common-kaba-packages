@@ -13,7 +13,7 @@ class SourceParser
 			pos += 3
 			int length = 0
 			for i in 0:1024
-				if source[pos + i] == '\'
+				if source[pos + i] == '\\'
 					i ++
 					continue
 				if source[pos + i] == '"'     # "
@@ -25,15 +25,15 @@ class SourceParser
 
 
 	void parse_source_code_dir(string dir)
-		DirEntry[] files = Filesystem.search(dir, "*.cpp", true)
+		let files = Filesystem.search(dir, "*.cpp", true)
 		for f in files
-			if f.is_dir
-				parse_source_code_dir(dir + f.name + "/")
+			if Filesystem.is_directory(dir + f)
+				parse_source_code_dir(dir + f + "/")
 			else
-				source = Filesystem.read(dir + f.name)
+				source = Filesystem.read(dir + f)
 				begin()
 				parse()
-				end(dir + f.name)
+				end(dir + f)
 
 	virtual void handle(int pos, int length)
 	virtual void begin()
