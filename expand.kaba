@@ -64,7 +64,7 @@ Term *expand(out Term *t)
 				t_mul.params[1] = t_r
 				return expand(t_mul)
 			else if (p1.name == "+") or (p1.name == "-")
-				int e = p2.name.int()
+				int e = int(p2.name)
 				Term* t_mul = p1.copy()
 				for i in 1:e
 					Term* t_l = t_mul

@@ -12,9 +12,9 @@ class Runtime
 		string name
 		string[] params
 		Term* formula
-		string str()
+		string __str__()
 			let p = params.join(", ")
-			return "Function {{name}}({{p}}) := {{formula.str()}}"
+			return "Function {{name}}({{p}}) := {{formula}}"
 	Function*[] functions
 	
 	void add_function(Term *t)

@@ -117,7 +117,7 @@ Term *simplify_number_division(string a, string b)
 	vli tt = va.div(vb, rem)
 	vli vli0 = 0
 	if rem == vli0
-		return AddNumber(tt.str())
+		return AddNumber(str(tt))
 	string g = gcd(a, b)
 	if g != "1"
 		vli vg = g
@@ -126,7 +126,7 @@ Term *simplify_number_division(string a, string b)
 		if vb.sign
 			vb.sign = false
 			va.sign = !va.sign
-		return AddOperator("/", AddNumber(va.str()), AddNumber(vb.str()))
+		return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
 	return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
 
 

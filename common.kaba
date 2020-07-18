@@ -33,11 +33,11 @@ class Term
 		for p in params
 			c.params.add(p.copy())
 		return c
-	const string str()
+	const string __str__()
 		string r = "?"
 		if type == TYPE_OPERATOR
-			string a = params[0].str()
-			string b = params[1].str()
+			string a = str(params[0])
+			string b = str(params[1])
 			if param_needs_paranthesis(0)
 				a = "({{a}})"
 			if param_needs_paranthesis(1)
@@ -53,11 +53,11 @@ class Term
 		else if type == TYPE_VARIABLE
 			return name
 		else if type == TYPE_FUNCTION
-			return name + "(" + [for p in params p.str()].join(", ") + ")"
+			return name + "(" + [for p in params str(p)].join(", ") + ")"
 		else if type == TYPE_SPECIAL
-			return "def " + params[0].str()
+			return "def " + str(params[0])
 		else if type == TYPE_LIST
-			return "[" + [for p in params p.str()].join(", ") + "]"
+			return "[" + [for p in params str(p)].join(", ") + "]"
 		return r
 	const bool param_needs_paranthesis(int p)
 		if name == "^"
