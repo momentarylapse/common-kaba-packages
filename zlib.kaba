@@ -40,6 +40,6 @@ void __main()
 	
 	let oo = compress(a)
 	print(len(oo))
-	print(oo.hex(false))
+	print(oo.hex())
 	
 	print(uncompress(oo, 65536))

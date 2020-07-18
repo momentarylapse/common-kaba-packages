@@ -100,9 +100,7 @@ class DeviceInfo
 	int _class, sub_class, protocoll, max_package_size, num_configs
 	int vid, pid
 	string str()
-		string v = binary(&vid, 2).hex(true)
-		string p = binary(&pid, 2).hex(true)
-		return "{{bus}}:{{address}}  {{v}}:{{p}}  {{_class}}  {{sub_class}}"
+		return "{{bus}}:{{address}}  0x{{vid|4x}}:{{pid|4x}}  {{_class}}  {{sub_class}}"
 
 void REPORT_ERROR(int r, string msg)
 	string e = "????  {{r}}"
@@ -163,7 +161,7 @@ class Device
 	void get_config_desc(int index)
 		_config_descriptor* desc
 		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
-		#let b = binary(desc, 36).hex(false)
+		#let b = binary(desc, 36).hex()
 		#print(b)
 		print("[config]")
 		print("  value: {{desc.config_value()}}")

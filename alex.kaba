@@ -28,7 +28,7 @@ class DbFile
 		else
 			s += "\th"
 		for t in tags
-			s += "\t{{t.key}}={{t.value.hex(false)}}"
+			s += "\t{{t.key}}={{t.value.hex()}}"
 			# s += "\t" + t.key + "=" + t.value.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n")
 		return s
 	const void show()
