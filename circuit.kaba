@@ -324,14 +324,14 @@ class Circuit
 	string export()
 		string s
 		for n in nodes
-			s += "Node:" + n.pos.x + ":" + n.pos.y + "\n"
+			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
 		for e in edges
-			s += edge_name(e.type) + ":" + e.a + ":" + e.b
+			s += edge_name(e.type) + ":{{e.a}:{{e.b}}"
 			int n = len(e.param_names())
 			for i in 0:n
-				s += ":" + e.param[i]
+				s += ":{{e.param[i]}}"
 			s += "\n"
-		s += "Out:" + out + "\n"
+		s += "Out:{{out}}\n"
 		return s
 	
 	void import(string s)
@@ -342,15 +342,15 @@ class Circuit
 			if len(x) == 0
 				continue
 			if x[0] == "Node"
-				nodes.add(Node(complex(x[1].float(), x[2].float())))
+				nodes.add(Node(complex(float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
-				out = x[1].int()
+				out = int(x[1])
 			else
 				int t = edge_type(x[0])
-				int[] n = [x[1].int(), x[2].int()]
+				int[] n = [int(x[1]), int(x[2])]
 				Edge* e = add_default(n, t)
 				for i in 3:len(x)
-					e.param[i] = x[i].float()
+					e.param[i] = float(x[i])
 	
 	Edge* add_default(int[]n, int t)
 		Edge* e = nil

@@ -90,7 +90,7 @@ Toolbar toolbar ''
 		int row = GetEvent().row
 		string p = get_cell("params", row, 1)
 		if panel.sel.type == SEL_TYPE_EDGE
-			c.edges[panel.sel.index].param[row] = p.float()
+			c.edges[panel.sel.index].param[row] = float(p)
 	
 	void load_from_part(Edge *e)
 		reset("params")

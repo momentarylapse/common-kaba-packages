@@ -21,7 +21,7 @@ class Matrix
 		e[i * m + j] += f
 	float get(int i, int j)
 		return e[i * m + j]
-	string str()
+	string __str__()
 		string[] s
 		for i in 0:n
 			s.add(e[i*m:(i+1)*m])
