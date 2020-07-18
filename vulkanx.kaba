@@ -232,7 +232,7 @@ class StatLayer
 		let pp = im.start_draw()
 		pp.set_color(White)
 		pp.set_font_size(20)
-		pp.draw_str(5,5, (frames/time).str2(1))
+		pp.draw_str(5,5, "{{frames/time|1}}")
 		del pp
 		tex.override(im)
 		dset.set([ubo], [tex])

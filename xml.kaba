@@ -64,18 +64,18 @@ class xml
 					raise(new Exception("= expected after {{key}}"))
 				string value = _decode_str(_next(s, i0))
 				#print("VAL {{value}}")
-				tag.set(key, value)
+				tag[key] = value
 		return tag
 	
 	static void _doc_set(out any doc, string k, any c)
 		if k in doc.keys()
 			if doc[k].type != any[]
-				doc.set(k, dyn([doc[k]]))
+				doc[k] = dyn([doc[k]])
 				#print(doc)
 			doc[k].add(c)
 			#print(doc)
 		else
-			doc.set(k, c)
+			doc[k] = c
 	
 	static string _parse_inside_part(string s, string key, out int *i0, out any part)
 		#print(">> INSIDE {{key}}")
@@ -97,7 +97,7 @@ class xml
 					#part.set("_", "...")#k[8:-1])
 					#print("<< OUTSIDE {{key}}")
 					#return "..."
-					part.set("_", "....")
+					part["_"] = "...."
 				else
 					#print(">> SUB TAG {{k}} of {{key}}")
 					#print("BEFORE {{part}}")
@@ -109,7 +109,7 @@ class xml
 					if len(tag) > 0
 						if len(cc) > 0
 							#print("   ADD CONT")
-							tag.set("_", cc)
+							tag["_"] = cc
 						#print("   ADD SUBP")
 						_doc_set(part, k, tag)
 					else if len(cc) > 0
@@ -141,7 +141,7 @@ class xml
 		any root
 		any t = _parse_tag(key, s, &i)
 		_parse_inside_part(s, key, &i, t)
-		root.set(key, t)
+		root[key] = t
 		
 		#root.set("?xml", header)
 		
