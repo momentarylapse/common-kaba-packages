@@ -74,6 +74,8 @@ Function*[] filter_funcs(Function*[] ff, Class namespace)
 			r.add(f)
 		else if f.name[:1] in ["@", "_", "-"]
 			continue
+		else if f.name == "main"
+			continue
 		else
 			r.add(f)
 	r = sorted(r, "name")
@@ -199,6 +201,8 @@ string show_class(string ns, Class c)
 			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})"
 			if f.name == "__subarray__"
 				wiki += "    # {{c.name}}[int:int]  -> {{f.return_type.name}}\n"
+			else if f.name == "__get__"
+				wiki += "    # {{c.name}}[{{p.name}}]  -> {{f.return_type.name}}\n"
 			else if p
 				wiki += "    # {{c.name}} {{opname(f.name)}} {{p.name}}  -> {{f.return_type.name}}\n"
 			else
@@ -293,7 +297,7 @@ string show_package(Script p)
 string make_reference()
 	string wiki = "== Kaba reference ==\n"
 
-	wiki += "\nLib version {{lib_version}} from " + Date.now().format("%F") + "\n"
+	wiki += "\nVersion {{kaba_version}} from {{Date.now()|%F}}\n"
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
