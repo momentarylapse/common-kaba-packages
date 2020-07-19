@@ -76,9 +76,9 @@ string char_to_str(char[0]* p)
 void* json_to_bson(string json)
 	string t = json
 	t.add(0)
-	let b = _bson_new_from_json(&t[0], json.num, nil)
+	let b = _bson_new_from_json(&t[0], len(json), nil)
 	if !b
-		raise(new Exception("invalid json: " + json))
+		raise(new Exception("invalid json: {{json}}"))
 	return b
 
 string bson_to_json(void *bson)
@@ -188,8 +188,8 @@ class Collection
 	const Result* aggregate(string json)
 		let b = json_to_bson(json)
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
-	void insert(string json)
-		let b = json_to_bson(json)
+	void insert(any doc)
+		let b = json_to_bson(str(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
 			raise(new Exception("can not insert"))
 	void replace(string json, any doc)
@@ -253,7 +253,9 @@ void main()
 	#let r = col.find("{\"name\":\"Hauptseite\"}")
 	let col = m.collection("alex", "files")
 #	let r = col.find("{\"id\":\"100222175\"}") # 900942014
-	let r = col.aggregate("[{\"$group\": {\"_id\": \"$artist\", \"num\": {\"$sum\": 1} } }]")
+#	let r = col.aggregate("[{\"$group\": {\"_id\": \"$artist\", \"num\": {\"$sum\": 1} } }]")
+
+	let r = col.find("{\"author\":{\"$regex\":\".*einstein\", \"$options\":\"i\"}}") # 900942014
 
 	while r.has_more()
 		#print(r.json())

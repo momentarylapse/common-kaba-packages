@@ -182,7 +182,7 @@ string filter_to_json(string filter)
 # 900942014
 # bf5c0d14924b6e9d91202124badebd12
 void main(string[] _arg)
-	if _arg.num == 0
+	if len(_arg) == 0
 		print("find <filter>
 by-id <id1> <id2> ...
 by-hash <hash1> <hash2>")
@@ -196,22 +196,22 @@ by-hash <hash1> <hash2>")
 			arg.add(a)
 
 	let db = new Database()
-	if arg[0] == "find" and arg.num >= 2
+	if arg[0] == "find" and len(arg) >= 2
 		DbFile[] files = db.find(filter_to_json(arg[1]))
 		for f in files
-			if arg.num >= 3
+			if len(arg) >= 3
 				if arg[2] == "medium"
 					db.mediumify(f)
 			f.show()
 	if arg[0] == "by-id"
-		for i in 1:arg.num
+		for i in 1:len(arg)
 			try
 				let f = db.by_id(arg[i])
 				print(f.str())
 			except
 				print("-")
 	if arg[0] == "by-id-medium"
-		for i in 1:arg.num
+		for i in 1:len(arg)
 			try
 				let f = db.by_id(arg[i])
 				db.mediumify(f)
@@ -219,7 +219,7 @@ by-hash <hash1> <hash2>")
 			except
 				print("-")
 	if arg[0] == "by-hash"
-		for i in 1:arg.num
+		for i in 1:len(arg)
 			try
 				let f = db.by_hash(arg[i])
 				print(f.str())

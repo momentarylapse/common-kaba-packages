@@ -327,7 +327,7 @@ string make_reference()
 	wiki += "\n=== Statements ===\n\n"
 	let stats = sorted(statements, "name")
 	for s in stats
-		if s.name[:1] != "-" and s.name.num > 0
+		if s.name[:1] != "-" and len(s.name) > 0
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
 	return wiki
 
