@@ -108,7 +108,7 @@ void run_command(string[] arg)
 				return
 			#remote_sync_by_filter(arg[2])
 	else if arg[0] == "ignore"
-		if arg.num < 2
+		if len(arg) < 2
 			for i in conf.ignore
 				print(i)
 		if arg[1] == "add"

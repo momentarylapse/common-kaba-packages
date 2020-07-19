@@ -20,8 +20,8 @@ class Tag
 
 Tag[] tags_sort(Tag[] tags)
 	Tag[] r = tags
-	for i in 0:r.num
-		for j in i+1:r.num
+	for i in 0:len(r)
+		for j in i+1:len(r)
 			if r[j] < r[i]
 				Tag t = r[i]
 				r[i] = r[j]

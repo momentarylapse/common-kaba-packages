@@ -11,9 +11,9 @@ const string MEDIUM = "medium"
 const string PERFECT = "perfect"
 
 bool is_canonical_dir(string dir)
-	if dir.num == 0
+	if len(dir) == 0
 		return false
-	return dir[dir.num - 1] == '/'
+	return dir[len(dir) - 1] == '/'
 
 string dir_canonical(string dir)
 	if is_canonical_dir(dir)
@@ -33,7 +33,7 @@ string canonify(string path)
 	return xx.join("/")
 
 string absolute_path(string path)
-	if path.num == 0
+	if len(path) == 0
 		return path
 	if path[0] == '/'
 		return canonify(path)

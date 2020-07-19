@@ -64,7 +64,7 @@ RemoteFile[] remote_parse(string r)
 	let list = r.explode("\n")
 	for l in list
 		let parts = l.explode("\t")
-		if parts.num < 7
+		if len(parts) < 7
 			continue
 		RemoteFile rf
 		rf.id = parts[0]
@@ -102,8 +102,8 @@ RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)
 RemoteFile[] remote_find_by_hash(string[] hashes)
 	RemoteFile[] rr
 	int done = 0
-	while done < hashes.num
-		int ee = min(done + CHUNK_SIZE, hashes.num)
+	while done < len(hashes)
+		int ee = min(done + CHUNK_SIZE, len(hashes))
 		if conf.verbosity >= 2
 			print("hash... {{done}}:{{ee}} of {{len(hashes)}}")
 		let r = remote_find_by_hash_chunk(hashes[done:ee])
@@ -115,7 +115,7 @@ RemoteFile[] remote_find_by_hash(string[] hashes)
 RemoteFile[] remote_find_by_id(string[] ids, string quality)
 	RemoteFile[] rr
 	int done = 0
-	while done < ids.num
+	while done < len(ids)
 		int ee = min(done + CHUNK_SIZE, len(ids))
 		if conf.verbosity >= 2
 			print("ids... {{done}}:{{ee}} of {{len(ids)}}")
@@ -132,7 +132,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 		#string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
 			LocalFile* lf = db.by_hash(rf.hash)
-			if lf.id.num > 0
+			if len(lf.id) > 0
 				print("HASH COLLISION  {{rel_path(lf.path)}}  <->  REMOTE...")
 			lf.id = rf.id
 			#if conf.verbose
@@ -220,7 +220,7 @@ void remote_upload(out LocalFile f)
 	#print("answer: " + r)
 	
 	#string[] p = r.explode("\t")
-#	if p.num >= 2
+#	if len(p) >= 2
 #		if p[0] == "ok"
 #			f.id = p[1]
 #			db.save()
@@ -347,7 +347,7 @@ void remote_sync_pure_locals_by_hash(out LocalFile*[] files)
 	for f in files
 		if f.pure_local()
 			hashes.add(f.hash)
-	if hashes.num == 0
+	if len(hashes) == 0
 		return
 	let rfiles = remote_find_by_hash(hashes)
 	for rf in rfiles

@@ -70,7 +70,7 @@ class LocalFile
 	const bool pure_remote()
 		return is(NONLOCAL)
 	const bool pure_local()
-		return id.num == 0
+		return len(id) == 0
 	const bool perfectly_fine()
 		if pure_remote() or pure_local()
 			return false
@@ -78,7 +78,7 @@ class LocalFile
 			return false
 		return true
 	const bool in_db()
-		return hash.num > 0
+		return len(hash) > 0
 	const bool changed_file()
 		return is(CHANGED_FILE)
 	const bool changed_meta()
@@ -87,7 +87,7 @@ class LocalFile
 		if size != f.size
 			return false
 		if id != f.size
-			if id.num > 0 and f.id.num > 0
+			if len(id) > 0 and len(f.id) > 0
 				return false
 		return true
 	void merge(LocalFile f)
@@ -335,7 +335,7 @@ class LocalFileDB
 			db.dirty = true
 
 	void drop_selected()
-		for i in 0:files.num
+		for i in 0:len(files)
 			if files[i].drop_me
 				print("DROP {{files[i].path}}")
 				files.remove(i)
@@ -346,7 +346,7 @@ class LocalFileDB
 		make_all_dirs(AppDirectory + "sisyphos/")
 		File *f = Filesystem.create_text(AppDirectory + "sisyphos/db")
 		f << "version=1"
-		f << files.num
+		f << len(files)
 		for ff in files
 			f << ff.id
 			f << ff.path
@@ -415,7 +415,7 @@ class LocalFileDB
 		LocalFile*[] list
 		if recursive
 			for f in files
-				if f.path.head(dir.num) == dir
+				if f.path.head(len(dir)) == dir
 					if !f.pure_local() and conf.filter_pure_local
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote

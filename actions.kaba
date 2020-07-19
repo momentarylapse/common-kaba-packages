@@ -42,7 +42,7 @@ void move_path(string source, string _dest)
 		error_out(e)
 
 void action_mv(string[] arg)
-	for i in 0:arg.num-1
+	for i in 0:len(arg)-1
 		move_path(absolute_path(arg[i]), absolute_path(arg[len(arg)-1]))
 
 
