@@ -241,7 +241,7 @@ class Circuit
 				G.add(b, b, g)
 	
 	void create_I(out float[] I, float I_in, float dt)
-		int n = nodes.num-1
+		int n = len(nodes)-1
 		I = [I_in]
 		I.resize(n)
 		for e in edges
@@ -254,7 +254,7 @@ class Circuit
 				I[b] -= I_off
 
 	void optimizer_step(float I_in, float dt)
-		int n = nodes.num-1
+		int n = len(nodes)-1
 		Matrix G
 		create_G(G, dt)
 		#print("G")

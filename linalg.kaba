@@ -42,7 +42,7 @@ class Matrix
 					e[ii * m + j] -= e[i * m + j] * g
 				b[ii] -= b[i] * g
 	float[] solve(float[] b)
-		if n != m or b.num != n
+		if n != m or len(b) != n
 			raise(new Exception("size mismatch"))
 		Matrix mm = self
 		float[] x
