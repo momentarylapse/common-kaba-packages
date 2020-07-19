@@ -1,7 +1,7 @@
 use common
 
 # always copy
-Term* subst(Term* t, string var, Term* by)
+Term* subst(Term t, string var, Term by)
 	Term*[] params
 	for p in t.params
 		params.add(subst(p, var, by))

@@ -47,10 +47,10 @@ void append_neg(out bool[] a, bool[] b, bool inv)
 			a.add(x)
 
 void print_group(Term*[] gr)
-	print("[" + [for x in gr str(*x)].join(", ") + "]")
+	print("[" + [for x in gr str(x)].join(", ") + "]")
 
 
-Term*[] extract_add_group(Term* t, out bool[] negative)
+Term*[] extract_add_group(Term t, out bool[] negative)
 	Term*[] l
 
 	# shortcut (-1)*a  ->  -a
@@ -75,10 +75,10 @@ Term*[] extract_add_group(Term* t, out bool[] negative)
 		append_neg(negative, n1, true)
 	else
 		negative.add(false)
-		l.add(t)
+		l.add(&t)
 	return l
 
-Term*[] extract_product_group(Term* t, out bool[] inverse)
+Term*[] extract_product_group(Term t, out bool[] inverse)
 	Term*[] l
 	if t.name == "*"
 		bool[] n0, n1
@@ -94,7 +94,7 @@ Term*[] extract_product_group(Term* t, out bool[] inverse)
 		append_neg(inverse, n1, true)
 	else
 		inverse.add(false)
-		l.add(t)
+		l.add(&t)
 	return l
 
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
@@ -130,10 +130,10 @@ Term *simplify_number_division(string a, string b)
 	return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
 
 
-bool literally_equal(Term *a, Term *b)
+bool literally_equal(Term a, Term b)
 	if a.name != b.name
 		return false
-	for i in 0:a.params.num
+	for i in 0:len(a.params)
 		if !literally_equal(a.params[i], b.params[i])
 			return false
 	return true
@@ -142,11 +142,11 @@ bool literally_equal(Term *a, Term *b)
 	
 void sort_group(out Term*[] l)
 	# "render" all terms...   need a comp(term, term) function
-	let s = [for t in l str(*t)]
+	let s = [for t in l str(t)]
 	
 	# sorti
-	for i in 0:l.num-1
-		for j in i+1:l.num
+	for i in 0:len(l)-1
+		for j in i+1:len(l)
 			if s[i].compare(s[j]) > 0
 				l.swap(i, j)
 				s.swap(i, j)
@@ -178,7 +178,7 @@ void make_unique_in_product(out Term*[] l, bool[] inv)
 			l[i] = AddOperator("^", x, normalize(exponents[i]))
 
 
-Term* normalize_product(Term* t)
+Term* normalize_product(Term t)
 	bool[] inverse
 	let l = extract_product_group(t, inverse)
 	#print_group(l)
@@ -186,7 +186,7 @@ Term* normalize_product(Term* t)
 	
 	string num = "1"
 	string denum = "1"
-	for i in 0:l.num
+	for i in 0:len(l)
 		if l[i].type == TYPE_NUMBER
 			if inverse[i]
 				denum = mul(denum, l[i].name)
@@ -198,7 +198,7 @@ Term* normalize_product(Term* t)
 	
 	if num == "0"
 		return AddNumber("0")
-	if l.num == 0
+	if len(l) == 0
 		return simplify_number_division(num, denum)
 	
 	#print_group(l)
@@ -207,7 +207,7 @@ Term* normalize_product(Term* t)
 	sort_group(l)
 	
 	let r = l[0]
-	for i in 1:l.num
+	for i in 1:len(l)
 		r = AddOperator("*", r, l[i])
 	if num != "1" or denum != "1"
 		r = AddOperator("*", simplify_number_division(num, denum), r)
@@ -246,14 +246,14 @@ void make_unique_in_sum(out Term*[] l, out bool[] negative)
 			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
 
 
-Term* normalize_sum(Term* t)
+Term* normalize_sum(Term t)
 	bool[] negative
 	let l = extract_add_group(t, negative)
 	#print_group(l)
 	
 	# add constants
 	string num = "0"
-	for i in 0:l.num
+	for i in 0:len(l)
 		if l[i].type == TYPE_NUMBER
 			if negative[i]
 				num = sub(num, l[i].name)
@@ -270,13 +270,13 @@ Term* normalize_sum(Term* t)
 	#print_group(l)
 	
 	# all constant numbers
-	if l.num == 0
+	if len(l) == 0
 		return AddNumber(num)
 	
 	sort_group(l)
 	
 	let t_r = l[0]
-	for i in 1:l.num
+	for i in 1:len(l)
 		t_r = AddOperator("+", t_r, l[i])
 	if num != "0"
 		if num[:1] == "-"
@@ -285,7 +285,7 @@ Term* normalize_sum(Term* t)
 			return AddOperator("+", t_r, AddNumber(num))
 	return t_r
 
-Term* normalize_exponent(Term* t)
+Term* normalize_exponent(Term t)
 	let p0 = t.params[0]
 	let p1 = t.params[1]
 	if p1.type == TYPE_NUMBER
@@ -305,9 +305,9 @@ Term* normalize_exponent(Term* t)
 		return AddOperator("/", a, b)
 	else if p0.name == "^"
 		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
-	return t
+	return &t
 
-Term* normalize_function(Term* t)
+Term* normalize_function(Term t)
 	if t.name == "ln"
 		let p = t.params[0]
 		if p.name == "^"
@@ -329,16 +329,17 @@ Term* normalize_function(Term* t)
 		#if p.type == TYPE_NUMBER
 			# test... apply
 			#return AddNumber("...")
-	return t
+	return &t
 
 
-Term* normalize(Term* _t)
-	let t = _t
+# should be "out"?
+Term* normalize(Term _t)
+	let t = &_t
 	if !t
 		return nil
 
 	# recursion
-	for i in 0:t.params.num
+	for i in 0:len(t.params)
 		t.params[i] = normalize(t.params[i])
 		
 	# self

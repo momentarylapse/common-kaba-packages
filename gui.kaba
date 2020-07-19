@@ -15,9 +15,9 @@ class KabamaWindow extends Window
 		log += ">>> {{input}}\n"
 		try
 			let t = r.eval(parse(input))
-			log += "{{str(*t)}}\n"
+			log += "{{str(t)}}\n"
 		except Exception as e
-			log += "Error: {{*e}}\n"
+			log += "Error: {{e}}\n"
 		set_string("log", log)
 
 	void __init__()

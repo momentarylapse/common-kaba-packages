@@ -23,7 +23,7 @@ Term *diff_function(string func, Term*[] params)
 
 # d/dx
 # always copies...
-Term *diff(Term *t, string by)
+Term *diff(Term t, string by)
 
 	# self
 	if t.type == TYPE_NUMBER
@@ -40,9 +40,9 @@ Term *diff(Term *t, string by)
 		return r
 	if t.type == TYPE_OPERATOR
 		Term* a, b
-		if t.params.num > 0
+		if len(t.params) > 0
 			a = t.params[0]
-		if t.params.num > 1
+		if len(t.params) > 1
 			b = t.params[1]
 		if (t.name == "+") or (t.name == "-")
 			# diff(a + b)  ->  diff(a) + diff(b)

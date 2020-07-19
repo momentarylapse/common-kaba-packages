@@ -17,16 +17,16 @@ class Runtime
 			return "Function {{name}}({{p}}) := {{formula}}"
 	Function*[] functions
 	
-	void add_function(Term *t)
+	void add_function(Term t)
 		let f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
 			f.params.add(p.name)
 		f.formula = t.params[1].copy()
 		functions.add(f)
-		#print("added... " + str(*f))
+		#print("added... " + str(f))
 
-	Term *eval_term(Term *t)
+	Term *eval_term(Term t)
 		# recursive
 		let params = [for p in t.params eval_term(p)]
 			
@@ -52,9 +52,9 @@ class Runtime
 		# recursive
 		let r = t.shallow_copy()
 		r.params = params
-		return t
+		return &t
 
-	Term *eval(Term *t)
+	Term *eval(Term t)
 		return normalize(eval_term(t))
 
 void main(string[] arg)
@@ -62,4 +62,4 @@ void main(string[] arg)
 	for a in arg
 		let t = parse(a)
 		t = r.eval(t)
-		print(str(*t))
+		print(str(t))

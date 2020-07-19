@@ -19,7 +19,7 @@ string get_expr(string s, int p)
 	int ct = char_type(c)
 	r.add(c)
 	if ct != CHAR_SIGN
-		for i in p+1:s.num
+		for i in p+1:len(s)
 			if char_type(s[i]) == ct
 				r.add(s[i])
 			else
@@ -28,12 +28,12 @@ string get_expr(string s, int p)
 
 string[] analyze(string s)
 	string[] expr
-	for i in 0:s.num
+	for i in 0:len(s)
 		if char_type(s[i]) == CHAR_WHITESPACE
 			continue
 		string e = get_expr(s, i)
 		expr.add(e)
-		i += e.num -1
+		i += len(e) -1
 	return expr
 
 int operator_rank(string s)
@@ -67,17 +67,17 @@ class Parser
 	string[] e
 	int cur_index
 	string cur()
-		if cur_index >= e.num
+		if cur_index >= len(e)
 			return "-eol-"
 		return e[cur_index]
 	void next()
 		cur_index ++
 	string peak()
-		if cur_index >= e.num-1
+		if cur_index >= len(e)-1
 			return "-eol-"
 		return e[cur_index + 1]
 	bool end_of_line()
-		return cur_index >= e.num
+		return cur_index >= len(e)
 
 	Term *parse_operand_minimal()
 		let c = cur()
@@ -151,12 +151,12 @@ class Parser
 		return AddSpecial("def", [op])
 
 Term *digest_operators(out Term*[] eid)
-	if (eid.num % 2) != 1
+	if (len(eid) % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
 	
-	while eid.num > 2
+	while len(eid) > 2
 		int i_sig, sig = -1
-		for i in 0:eid.num
+		for i in 0:len(eid)
 			if (i % 2) == 1
 				int os = operator_rank(eid[i].name)
 				if os > sig

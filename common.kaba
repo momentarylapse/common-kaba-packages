@@ -96,7 +96,7 @@ Term *AddFunction(string s, Term*[] params)
 	t.params = params
 	return t
 
-Term *PermuteOperator(Term *t)
+Term *PermuteOperator(Term t)
 	Term *r = t.copy()
 	r.params[0] = t.params[1].copy()
 	r.params[1] = t.params[0].copy()
