@@ -118,11 +118,11 @@ class Query
 			string key = cstr2str(_sqlite3_column_name(res, i))
 			int t = _sqlite3_column_type(res, i)
 			if t == 1 # int
-				r.set(key, _sqlite3_column_int(res, i))
+				r[key] = _sqlite3_column_int(res, i)
 			else if t == 2 # double
-				r.set(key, float(_sqlite3_column_double(res, i)))
+				r[key] = float(_sqlite3_column_double(res, i))
 			else if t == 3 # text
-				r.set(key, cstr2str(_sqlite3_column_text(res, i)))
+				r[key] = cstr2str(_sqlite3_column_text(res, i))
 		needs_step = true
 		return r
 

@@ -193,20 +193,29 @@ string show_class(string ns, Class c)
 			string pre = func_pre(f)
 			Class* p = nil
 			if f.is_static()
-				if f.num_params == 2
+				if f.num_params >= 2
 					p = f.param_type[1]
 			else
-				if f.num_params == 1
+				if f.num_params >= 1
 					p = f.param_type[0]
-			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})"
+			let ll = "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})"
+			wiki += "{{ll|-40}}"
 			if f.name == "__subarray__"
-				wiki += "    # {{c.name}}[int:int]  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}}[int:int]  -> {{f.return_type.name}}\n"
 			else if f.name == "__get__"
-				wiki += "    # {{c.name}}[{{p.name}}]  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}}[{{p.name}}]  -> {{f.return_type.name}}\n"
+			else if f.name == "__set__"
+				wiki += " # {{c.name}}[{{p.name}}] = {{f.param_type[1].name}}\n"
+			else if f.name == "__length__"
+				wiki += " # len({{c.name}})  -> {{f.return_type.name}}\n"
+			else if f.name in ["__str__", "__repr__", "__int__", "__float__", "__bool__", "__int64__", "__float64__"]
+				wiki += " # {{f.name[2:-2]}}({{c.name}})  -> {{f.return_type.name}}\n"
+			else if f.name == "__contains__"
+				wiki += " # {{p.name}} in {{c.name}}  -> {{f.return_type.name}}\n"
 			else if p
-				wiki += "    # {{c.name}} {{opname(f.name)}} {{p.name}}  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}} {{opname(f.name)}} {{p.name}}  -> {{f.return_type.name}}\n"
 			else
-				wiki += "    # {{opname(f.name)}} {{c.name}}  -> {{f.return_type.name}}\n"
+				wiki += " # {{opname(f.name)}} {{c.name}}  -> {{f.return_type.name}}\n"
 				
 	if len(consts) > 0
 		wiki += "\n{{SHIFT}}# constants\n"

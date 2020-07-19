@@ -146,7 +146,7 @@ any bson_iter_map_to_any(void *iter)
 	any r
 	while _bson_iter_next(iter)
 		string key = bson_iter_key(iter)
-		r.set(key, bson_iter_to_any(iter))
+		r[key] = bson_iter_to_any(iter)
 	return r
 
 any bson_to_any(void *doc)
