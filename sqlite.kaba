@@ -53,7 +53,7 @@ class Database
 		string s = sql
 		s.add(0)
 		let q = new Query()
-		if _sqlite3_prepare(db, &s[0], sql.num, &q.res, nil) != 0
+		if _sqlite3_prepare(db, &s[0], len(sql), &q.res, nil) != 0
 			raise(new Exception("sql query failed: " + error()))
 		return q
 
