@@ -69,7 +69,7 @@ class Config
 		string t
 		while !f.eof()
 			f >> t
-			if t.num == 0
+			if len(t) == 0
 				break
 			if t in ["# project", "# project name"]
 				f >> name
@@ -178,11 +178,11 @@ class SourceFile
 SourceFile[] sources
 
 string rel(string filename)
-	return filename[conf.root.num:]
+	return filename[len(conf.root):]
 
 string canonical(string filename)
 	let p = filename.explode("/")
-	for i in 0:p.num
+	for i in 0:len(p)
 		if p[i] == ".." and i > 0
 			p.remove(i)
 			p.remove(i-1)

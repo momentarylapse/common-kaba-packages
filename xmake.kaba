@@ -27,7 +27,7 @@ void main(string[] arg)
 			command.add(a)
 	if len(command) > 0
 		if command[0] == "has"
-			if command.num < 2
+			if len(command) < 2
 				print("library?")
 				return
 			lib.test(command[1])
@@ -50,7 +50,7 @@ void main(string[] arg)
 	for l in conf.libs_optional
 		if !conf.ignored(l)
 			lib.test(l)
-	if missing.num > 0
+	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
 	parse_dir(conf.root)
