@@ -3,7 +3,7 @@ use os
 
 #string str_unescape(string s)
 #	string r
-#	for i in 0:s.num
+#	for i in 0:len(s)
 #	return s.replace("\\\"", "\"").replace("\\n", "\n").replace("\\t", "\t").replace("\\\\", "\\")
 #
 #string str_escape(string s)

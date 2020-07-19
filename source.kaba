@@ -45,7 +45,7 @@ class SourceLanguageFinder extends SourceParser
 		LangText t
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
-		if t.orig.num > 0
+		if len(t.orig) > 0
 			bool found = false
 			for tt in l.texts
 				if tt.orig == t.orig
@@ -74,7 +74,7 @@ class SourceSwapper extends SourceParser
 				int ppos = pos + delta
 				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
 				
-				delta += r.num - length
+				delta += len(r) - length
 				
 				changed = true
 	override void end(string filename)
