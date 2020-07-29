@@ -193,11 +193,11 @@ class StatLayer
 	VertexBuffer* vb
 	Pipeline* pipeline
 	int frames
-	float time
+	float _time
 	
 	void __init__(Shader* shader, RenderPass* rp, int subpass)
 		timer = new Timer()
-		time = 0
+		_time = 0
 		frames = 0
 		im = new Image(256, 64, color(0,0,0,0))
 		tex = new Texture()
@@ -223,21 +223,21 @@ class StatLayer
 		del pipeline
 	void tick()
 		float dt = timer.get()
-		time += dt
+		_time += dt
 		frames ++
-		if time < 0.1
+		if _time < 0.1
 			return
 		
 		im.create(256, 64, color(0,1,1,1))
 		let pp = im.start_draw()
 		pp.set_color(White)
 		pp.set_font_size(20)
-		pp.draw_str(5,5, "{{frames/time|1}}")
+		pp.draw_str(5,5, "{{frames/_time|1}}")
 		del pp
 		tex.override(im)
 		dset.set([ubo], [tex])
 		frames = 0
-		time = 0
+		_time = 0
 	void draw(out CommandBuffer cb)
 		cb.set_pipeline(pipeline)
 		cb.bind_descriptor_set(0, dset)
