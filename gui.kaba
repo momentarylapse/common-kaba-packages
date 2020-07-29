@@ -1,5 +1,5 @@
 use os
-use hui
+import hui
 use circuit
 use panel
 
@@ -13,7 +13,7 @@ class EditorPanel extends CircuitPanel
 		if sel.type == SEL_TYPE_EDGE
 			ed.load_from_part(ed.c.edges[sel.index])
 
-class CircuitEditor extends Window
+class CircuitEditor extends hui.Window
 	Circuit c
 	CircuitPanel* panel
 	
@@ -79,15 +79,15 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	void on_save()
-		if FileDialogSave(self, "Save the circuit", "", "*.circuit", "*.circuit")
-			Filesystem.write_text(HuiFilename, c.export())
+		if hui.file_dialog_save(self, "Save the circuit", "", "*.circuit", "*.circuit")
+			Filesystem.write_text(hui.filename, c.export())
 	
 	void on_open()
-		if FileDialogOpen(self, "Load the circuit", "", "*.circuit", "*.circuit")
-			c.import(Filesystem.read_text(HuiFilename))
+		if hui.file_dialog_open(self, "Load the circuit", "", "*.circuit", "*.circuit")
+			c.import(Filesystem.read_text(hui.filename))
 	
 	void on_param()
-		int row = GetEvent().row
+		int row = hui.get_event().row
 		string p = get_cell("params", row, 1)
 		if panel.sel.type == SEL_TYPE_EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
@@ -127,5 +127,5 @@ Toolbar toolbar ''
 		panel.redraw()
 
 void main(string[] arg)
-	Window* w = new CircuitEditor(arg)
+	hui.Window* w = new CircuitEditor(arg)
 	w.run()
