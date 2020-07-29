@@ -242,7 +242,7 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		#Timer tt
-		let ss = Filesystem.read(AppDirectory + "sisyphos/db")
+		let ss = Filesystem.read(hui.app_directory + "sisyphos/db")
 		let lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
@@ -343,8 +343,8 @@ class LocalFileDB
 				i --
 
 	void save()
-		make_all_dirs(AppDirectory + "sisyphos/")
-		File *f = Filesystem.create_text(AppDirectory + "sisyphos/db")
+		make_all_dirs(hui.app_directory + "sisyphos/")
+		File *f = Filesystem.create_text(hui.app_directory + "sisyphos/db")
 		f << "version=1"
 		f << len(files)
 		for ff in files

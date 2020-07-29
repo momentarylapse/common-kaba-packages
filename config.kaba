@@ -169,7 +169,7 @@ class Config
 		default_structure = "{name}.{ext}"
 
 	void load()
-		File *f = Filesystem.open_text(AppDirectory + "sisyphos/config")
+		File *f = Filesystem.open_text(hui.app_directory + "sisyphos/config")
 		int n, m
 		f >> n
 		for i in 0:n
@@ -192,8 +192,8 @@ class Config
 			ignore.add(ig)
 		del f
 	const void save()
-		make_all_dirs(AppDirectory + "sisyphos/")
-		File *f = Filesystem.create_text(AppDirectory + "sisyphos/config")
+		make_all_dirs(hui.app_directory + "sisyphos/")
+		File *f = Filesystem.create_text(hui.app_directory + "sisyphos/config")
 		f << len(dirs)
 		for e in dirs
 			f << e.dir
