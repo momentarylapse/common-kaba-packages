@@ -29,7 +29,7 @@ class Config
 	
 	void load()
 		try
-			File* f = Filesystem.open_text(dir + "export.txt")
+			let f = Filesystem.open_text(dir + "export.txt")
 			string t
 			f >> t
 			f >> export_dir
@@ -41,7 +41,7 @@ class Config
 			
 			source_code_dir = dir + source_code_dir
 			export_dir = dir + export_dir
-			AppDirectoryStatic = export_dir
+			hui.app_directory_static = export_dir
 		except
 			pass
 

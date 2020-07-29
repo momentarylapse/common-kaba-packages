@@ -3,7 +3,7 @@ use hui
 use config
 use resource
 
-class DemoDialog extends Window
+class DemoDialog extends hui.Window
 	void __init__(string source)
 		super.__init__("", 100, 100)
 		set_border_width(10)
@@ -14,15 +14,15 @@ class DemoDialog extends Window
 	void on_close()
 		destroy()
 
-class ToolbarDemoDialog extends Window
+class ToolbarDemoDialog extends hui.Window
 	void __init__(string source)
 		super.__init__("Toolbar demo", 800, 300)
 		toolbar(0).from_source(source)
 
-class MenuDemoDialog extends Window
+class MenuDemoDialog extends hui.Window
 	void __init__(string source)
 		super.__init__("Menu demo", 800, 300)
-		let m = CreateMenuFromSource(source)
+		let m = hui.create_menu_from_source(source)
 		set_menu(m)
 
 void action_demo(string[] arg)
