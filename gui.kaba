@@ -4,9 +4,7 @@ use parser
 use simplify
 use kabama
 
-void* pp
-
-class KabamaWindow extends Window
+class KabamaWindow extends hui.Window
 	Runtime r
 	string log
 
