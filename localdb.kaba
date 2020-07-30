@@ -173,7 +173,7 @@ class LocalFile
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
 	const string remote_path()
-		let ext = path.extension()
+		let ext = Filesystem.extension(path)
 		if is("quality=medium")
 			return ALEX_DIR + "medium/{{id}}.{{ext}}"
 		return ALEX_DIR + "links/{{id}}"
@@ -181,7 +181,7 @@ class LocalFile
 		if key == "name"
 			return name
 		if key == "ext"
-			return path.extension()
+			return Filesystem.extension(path)
 		if key == "id"
 			return id
 		if key == "hash"
@@ -231,8 +231,8 @@ class LocalFile
 		return true
 
 string unique_path(LocalFile f)
-	let ext = f.path.extension()
-	return "{{f.path.dirname()}}{{f.hash}} {{f.name}}.{{ext}}" 
+	let ext = Filesystem.extension(f.path)
+	return "{{Filesystem.dirname(f.path)}}{{f.hash}} {{f.name}}.{{ext}}" 
 
 class LocalFileDB
 	LocalFile[] files
@@ -423,7 +423,7 @@ class LocalFileDB
 					list.add(&f)
 		else
 			for f in files
-				if f.path.dirname() == dir
+				if Filesystem.dirname(f.path) == dir
 					if !f.pure_local() and conf.filter_pure_local
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote

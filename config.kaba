@@ -44,7 +44,7 @@ void set_working_dir(string path)
 	if Filesystem.is_directory(path)
 		working_dir = dir_canonical(path)
 	else
-		working_dir = dir_canonical(path.dirname())
+		working_dir = dir_canonical(Filesystem.dirname(path))
 
 string rel_path(string path)
 	if path.head(len(working_dir)) == working_dir

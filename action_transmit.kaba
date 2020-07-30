@@ -63,7 +63,7 @@ bool make_path_safe_for_download(out LocalFile f)
 		return true
 	
 	# try alternative
-	let ext = f.path.extension()
+	let ext = Filesystem.extension(f.path)
 	f.path = f.path[:-len(ext)] + "{{f.id}}.{{ext}}"
 	if db.has_path(f.path) or Filesystem.exists(f.path)
 		return false

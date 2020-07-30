@@ -190,11 +190,11 @@ void remote_upload(out LocalFile f)
 		print("ERROR: no need to push")
 		return
 	
-	if f.path.extension() == ""
+	if Filesystem.extension(f.path) == ""
 		print("ERROR: remote does not like files without extension: {{rel_path(f.path)}}")
 		return
 	
-	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
+	string _remote_path = ALEX_IN + "{{f.hash}}.{{Filesystem.extension(f.path)}}"
 	
 	scp_upload(f.path, _remote_path)
 	

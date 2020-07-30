@@ -80,8 +80,8 @@ void file_add(out LocalFile f)
 
 void file_add_new(out LocalFile f, string hash)
 	print("ADD  {{rel_path(f.path)}}")
-	f.name = f.path.basename()
-	string ext = f.path.extension()
+	f.name = Filesystem.basename(f.path)
+	string ext = Filesystem.extension(f.path)
 	if len(ext) > 0
 		f.name = f.name.head(len(f.name) - len(ext) - 1)
 	#print(ext)
