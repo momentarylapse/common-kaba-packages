@@ -84,7 +84,7 @@ void patch_language(out Language l, Language own, string filename)
 
 void action_translate(string[] arg)
 	string filename = arg[0]
-	conf.set_dir(filename.dirname())
+	conf.set_dir(Filesystem.dirname(filename))
 	conf.load()
 	
 	Language own = load_own_lang(true)
@@ -108,7 +108,7 @@ void action_translate(string[] arg)
 void action_add(string[] arg)
 	string filename = arg[0]
 	string name = arg[1]
-	conf.set_dir(filename.dirname())
+	conf.set_dir(Filesystem.dirname(filename))
 	conf.load()
 	
 	Language l
@@ -153,7 +153,7 @@ void swap_translate_guis(Language l)
 void action_swap(string[] arg)
 	string source = arg[0]
 	string target = arg[1]
-	conf.set_dir(source.dirname())
+	conf.set_dir(Filesystem.dirname(source))
 	conf.load()
 	
 	let own = load_own_lang(true)
