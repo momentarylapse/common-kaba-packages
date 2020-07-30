@@ -202,7 +202,7 @@ void find_dep(out SourceFile f, string filename)
 		int p = l.find("#include \"", 0)
 		if p >= 0
 			int q = l.find("\"", p + 11)
-			string d = filename.dirname() + l[p+10:q]
+			string d = Filesystem.dirname(filename) + l[p+10:q]
 			d = canonical(d)
 			if Filesystem.exists(d)
 				if f.add_dep(d)
