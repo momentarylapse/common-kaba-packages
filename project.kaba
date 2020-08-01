@@ -1,30 +1,5 @@
 use os
 
-string dir_absolute(string dir)
-	if dir.head(2) == "./"
-		return dir_absolute(Filesystem.current_directory() + dir[2:])
-	if dir.head(3) == "../"
-		return dir_absolute(Filesystem.current_directory() + dir)
-		
-	string[] xx = dir.explode("/")
-	for x,i in xx
-		if x == ".." and i > 0
-			xx.remove(i)
-			xx.remove(i-1)
-			i -= 2
-	return xx.join("/")
-
-string dir_canonical(string dir)
-	string d = dir_absolute(dir)
-	if d.tail(1) == "/"
-		return d
-	return d + "/"
-
-bool sa_has(string[] a, string val)
-	for e in a
-		if e == val
-			return true
-	return false
 
 class Profile
 	string name
@@ -32,8 +7,9 @@ class Profile
 
 # project
 class Config
-	string root
+	Path root
 	bool verbose
+	bool dry_run
 	
 	string name
 	string binary_file
@@ -57,6 +33,8 @@ class Config
 		language = "c++17"
 		optimization = "2"
 		build_type = "debug"
+		verbose = false
+		dry_run = false
 	
 	bool ignored(string l)
 		for ig in ignore_libs
@@ -65,7 +43,7 @@ class Config
 		return false
 	
 	void load()
-		File* f = Filesystem.open_text(conf.root + "xmake.conf")
+		File* f = Filesystem.open_text(conf.root << "xmake.conf")
 		string t
 		while !f.eof()
 			f >> t
@@ -116,7 +94,7 @@ class Config
 				raise(new Exception("unknown tag: {{t}}"))
 		del f
 	void save()
-		File* f = Filesystem.create_text(conf.root + "xmake.conf")
+		File* f = Filesystem.create_text(conf.root << "xmake.conf")
 		f << "# project"
 		f << name
 		f << "# binary"
@@ -150,11 +128,11 @@ class Config
 	
 	string[] needs_installing()
 		string[] r
-		let list = Filesystem.search("../static", "*.*", true)
+		let list = Filesystem.search(Path("../static"), "*.*", true)
 		let ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
-			if !sa_has(ignore, e)
+			if not (e in ignore)
 				r.add("static/{{e}}")
 		for i in installs
 #			e.is_dir = Filesystem.is_directory("../{{i}}")
@@ -164,11 +142,11 @@ class Config
 Config conf
 
 class SourceFile
-	string filename
-	string object()
-		return filename.replace(".cpp", ".o")
-	string[] dep
-	bool add_dep(string d)
+	Path filename
+	Path object()
+		return Path(str(filename).replace(".cpp", ".o"))
+	Path[] dep
+	bool add_dep(Path d)
 		for dd in dep
 			if dd == d
 				return false
@@ -177,20 +155,11 @@ class SourceFile
 
 SourceFile[] sources
 
-string rel(string filename)
-	return filename[len(conf.root):]
+Path rel(Path filename)
+	return filename.relative_to(conf.root)
 
-string canonical(string filename)
-	let p = filename.explode("/")
-	for i in 0:len(p)
-		if p[i] == ".." and i > 0
-			p.remove(i)
-			p.remove(i-1)
-			i -= 2
-	return p.join("/")
-			
 
-void find_dep(out SourceFile f, string filename)
+void find_dep(out SourceFile f, Path filename)
 	string s
 	try
 		s = Filesystem.read(filename)
@@ -202,14 +171,14 @@ void find_dep(out SourceFile f, string filename)
 		int p = l.find("#include \"", 0)
 		if p >= 0
 			int q = l.find("\"", p + 11)
-			string d = Filesystem.dirname(filename) + l[p+10:q]
-			d = canonical(d)
+			Path d = filename.parent() << l[p+10:q]
+			d = d.canonical()
 			if Filesystem.exists(d)
 				if f.add_dep(d)
 					#print("  " + rel(d))
 					find_dep(f, d)
 
-void parse_source(string filename)
+void parse_source(Path filename)
 	if conf.verbose
 		print(rel(filename))
 	SourceFile f
@@ -219,10 +188,10 @@ void parse_source(string filename)
 	
 	sources.add(f)
 
-void parse_dir(string dir)
+void parse_dir(Path dir)
 	let files = Filesystem.search(dir, "*.cpp", true)
 	for f in files
-		if Filesystem.is_directory(dir + f)
-			parse_dir(dir + f + "/")
+		if Filesystem.is_directory(dir << f)
+			parse_dir(dir << f)
 		else
-			parse_source(dir + f)
+			parse_source(dir << f)

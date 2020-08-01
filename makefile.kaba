@@ -17,7 +17,7 @@ void create_all_makefiles()
 
 void create_makefile(Profile p, string postfix)
 	print("-- makefile {{p.name}} --")
-	File* f = Filesystem.create_text(conf.root + "Makefile" + postfix)
+	File* f = Filesystem.create_text(conf.root << ("Makefile" + postfix))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	string cflags, lflags, defines
@@ -42,7 +42,7 @@ void create_makefile(Profile p, string postfix)
 	f << ""
 	string[] obj
 	for s in sources
-		if rel(s.filename) != conf.main_file
+		if str(rel(Path(s.filename))) != conf.main_file
 			obj.add(rel(s.object()))
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
@@ -53,9 +53,9 @@ void create_makefile(Profile p, string postfix)
 	f << "all : $(BIN)"
 	f << ""
 	for s in sources
-		string a = rel(s.object()) + " : " + rel(s.filename)
+		string a = "{{rel(s.object())}} : {{rel(s.filename)}}"
 		for d in s.dep
-			a += " " + rel(d)
+			a += " {{rel(d)}}"
 		f << a
 		f << "\t$(CPP) -c {{rel(s.filename)}} -o $@ $(CXXFLAGS)"
 		f << ""
@@ -78,10 +78,11 @@ void create_makefile(Profile p, string postfix)
 #		f << "	cp -f " + conf.icon + " " + datadir
 	let list = conf.needs_installing()
 	for e in list
-		if Filesystem.is_directory("../{{e}}")
-			f << "	cp -rf '../{{e}}' {{datadir}}"
+		let path = Path("..") << e
+		if Filesystem.is_directory(path)
+			f << "	cp -rf '{{path}}' {{datadir}}"
 		else
-			f << "	cp -f '../{{e}}' {{datadir}}"
+			f << "	cp -f '{{path}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 
 	f << ""

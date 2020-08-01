@@ -2,6 +2,7 @@ use library
 use project
 use makefile
 use meson
+use os
 
 
 string blank(int n)
@@ -10,7 +11,7 @@ string blank(int n)
 void main(string[] arg)
 	lib.init()
 	conf.verbose = false
-	conf.root = dir_canonical("./")
+	conf.root = Path("./").absolute()
 	
 	string[] command
 	conf.ignore_libs
@@ -18,11 +19,13 @@ void main(string[] arg)
 	for a,i in arg
 		if a == "--verbose"
 			conf.verbose = true
+		else if a == "--dry"
+			conf.dry_run = true
 		else if a == "--ignore-lib"
 			conf.ignore_libs.add(arg[i+1])
 			i ++
 		else if a.find("/", 0) >= 0
-			conf.root = dir_canonical(a)
+			conf.root = Path(a).absolute()
 		else
 			command.add(a)
 	if len(command) > 0
@@ -54,8 +57,9 @@ void main(string[] arg)
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
 	parse_dir(conf.root)
+
+	if not conf.dry_run
+		create_all_makefiles()
 	
-	create_all_makefiles()
-	
-	create_meson()
+		create_meson()
 	
