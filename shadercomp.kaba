@@ -46,7 +46,7 @@ LayoutData parse_layout(string layout)
 int extract_push_size(string layout)
 	return 0
 
-void compile(string filename)
+void compile(Path filename)
 	string all = Filesystem.read(filename)
 	string layout = tag_contents(all, "Layout")
 	string code_vertex = tag_contents(all, "VertexShader")
@@ -59,7 +59,7 @@ void compile(string filename)
 	
 	LayoutData ld = parse_layout(layout)
 	
-	File *f = Filesystem.create(filename + ".compiled")
+	File *f = Filesystem.create(Path(str(filename) + ".compiled"))
 	f << "Info"
 	f << "{version=0.1,shaders=SPIR-V}"
 	f << "Input"
@@ -81,6 +81,6 @@ void compile(string filename)
 
 void main(string[] arg)
 	for a in arg
-		compile(a)
+		compile(Path(a))
 	if len(arg) == 0
 		print("input files?")
