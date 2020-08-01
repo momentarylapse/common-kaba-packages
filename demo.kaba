@@ -26,8 +26,8 @@ class MenuDemoDialog extends hui.Window
 		set_menu(m)
 
 void action_demo(string[] arg)
-	string filename = arg[0]
-	conf.set_dir(Filesystem.dirname(filename))
+	Path filename = Path(arg[0])
+	conf.set_dir(filename.parent())
 	conf.load()
 	
 	string source = Filesystem.read(filename)

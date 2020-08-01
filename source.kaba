@@ -24,20 +24,20 @@ class SourceParser
 			pos0 = pos + length
 
 
-	void parse_source_code_dir(string dir)
+	void parse_source_code_dir(Path dir)
 		let files = Filesystem.search(dir, "*.cpp", true)
 		for f in files
-			if Filesystem.is_directory(dir + f)
-				parse_source_code_dir(dir + f + "/")
+			if Filesystem.is_directory(dir << f)
+				parse_source_code_dir(dir << f)
 			else
-				source = Filesystem.read(dir + f)
+				source = Filesystem.read(dir << f)
 				begin()
 				parse()
-				end(dir + f)
+				end(dir << f)
 
 	virtual void handle(int pos, int length)
 	virtual void begin()
-	virtual void end(string filename)
+	virtual void end(Path filename)
 
 class SourceLanguageFinder extends SourceParser
 	Language* l
@@ -77,7 +77,7 @@ class SourceSwapper extends SourceParser
 				delta += len(r) - length
 				
 				changed = true
-	override void end(string filename)
+	override void end(Path filename)
 		if !changed
 			return
 		#print(">>>>>>>>>>>")
@@ -87,13 +87,13 @@ class SourceSwapper extends SourceParser
 				
 
 
-void parse_source_code_dir(string dir, Language l)
+void parse_source_code_dir(Path dir, Language l)
 	SourceLanguageFinder p
 	p.l = &l
 	p.parse_source_code_dir(dir)
 
 
-void swap_translate_source(string dir, Language l)
+void swap_translate_source(Path dir, Language l)
 	SourceSwapper p
 	p.l = &l
 	p.parse_source_code_dir(dir)

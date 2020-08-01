@@ -12,7 +12,7 @@ class LangText
 	string trans
 
 class Language
-	string filename
+	Path filename
 	string name
 	LangID[] ids
 	LangText[] texts
@@ -90,7 +90,7 @@ class Language
 
 
 
-Language load_prelang(string filename)
+Language load_prelang(Path filename)
 	Language l
 	l.filename = filename
 	#try
@@ -131,7 +131,7 @@ Language[] load_prelangs()
 	Language[] langs
 	let files = Filesystem.search(conf.dir, "*.prelang", false)
 	for f in files
-		let l = load_prelang(conf.dir + f)
+		let l = load_prelang(conf.dir << f)
 		langs.add(l)
 	return langs
 
@@ -176,7 +176,7 @@ bool check_lang(Language l, Language own, bool create_file)
 	
 	File *f
 	if create_file
-		f = Filesystem.create_text(conf.dir + "TRANS")
+		f = Filesystem.create_text(conf.dir << "TRANS")
 	
 	# check ids
 	for i in own.ids

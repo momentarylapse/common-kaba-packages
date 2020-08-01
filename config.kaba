@@ -17,30 +17,30 @@ string str_m2utf8(string s)
 
 class Config
 	string own_lang_name
-	string source_code_dir
-	string export_dir
+	Path source_code_dir
+	Path export_dir
 	
-	string dir
+	Path dir
 	
-	void set_dir(string _dir)
+	void set_dir(Path _dir)
 		dir = _dir
-		if dir.tail(1) != "/"
-			dir += "/"
 	
 	void load()
 		try
-			let f = Filesystem.open_text(dir + "export.txt")
+			let f = Filesystem.open_text(dir << "export.txt")
 			string t
 			f >> t
-			f >> export_dir
 			f >> t
-			f >> source_code_dir
+			export_dir = Path(t)
+			f >> t
+			f >> t
+			source_code_dir = Path(t)
 			f >> t
 			f >> own_lang_name
 			del f
 			
-			source_code_dir = dir + source_code_dir
-			export_dir = dir + export_dir
+			source_code_dir = dir << source_code_dir
+			export_dir = dir << export_dir
 			hui.app_directory_static = export_dir
 		except
 			pass
