@@ -80,8 +80,8 @@ void file_add(out LocalFile f)
 
 void file_add_new(out LocalFile f, string hash)
 	print("ADD  {{rel_path(f.path)}}")
-	f.name = Filesystem.basename(f.path)
-	string ext = Filesystem.extension(f.path)
+	f.name = f.path.basename()
+	string ext = f.path.extension()
 	if len(ext) > 0
 		f.name = f.name.head(len(f.name) - len(ext) - 1)
 	#print(ext)
@@ -99,7 +99,7 @@ void file_add_new(out LocalFile f, string hash)
 
 
 # check for local changes
-void add_path(string path)
+void add_path(Path path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
@@ -109,7 +109,7 @@ void add_path(string path)
 
 void action_add(string[] arg)
 	if len(arg) == 0
-		add_path(absolute_path("./"))
+		add_path(make_path("./"))
 	for a in arg
-		add_path(absolute_path(a))
+		add_path(make_path(a))
 

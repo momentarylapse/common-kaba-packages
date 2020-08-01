@@ -10,7 +10,7 @@ use dblister
 
 
 
-void file_move(out LocalFile f, string new_path)
+void file_move(out LocalFile f, Path new_path)
 	if conf.verbosity >= 1
 		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
@@ -20,12 +20,12 @@ void file_move(out LocalFile f, string new_path)
 
 
 	
-void move_path(string source, string _dest)
+void move_path(Path source, Path _dest)
 	try
 		let f = db.find_by_path(source)
-		string dest = f.apply_structure(_dest)
+		let dest = Path(f.apply_structure(_dest))
 		if Filesystem.is_directory(dest)
-			dest = dir_canonical(dest) + Filesystem.basename(source)
+			dest = dest.canonical() << source.basename()
 		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
@@ -43,11 +43,11 @@ void move_path(string source, string _dest)
 
 void action_mv(string[] arg)
 	for i in 0:len(arg)-1
-		move_path(absolute_path(arg[i]), absolute_path(arg[len(arg)-1]))
+		move_path(make_path(arg[i]), make_path(arg[len(arg)-1]))
 
 
 void structure_file(out LocalFile f, string structure)
-	string new_path = f.apply_structure(structure)
+	let new_path = Path(f.apply_structure(structure))
 	if f.path == new_path
 		return
 	print("MOVE  {{rel_path(f.path)}} -> {{rel_path(new_path)}}")
@@ -62,24 +62,23 @@ void structure_file(out LocalFile f, string structure)
 	except FileError as e
 		error_out(e)
 
-void _action_structure_auto(string _dir)
-	set_working_dir(_dir)
-	string dir = dir_canonical(_dir)
+void _action_structure_auto(Path dir)
+	set_working_dir(dir)
 	let files = db.get_in_dir(dir, conf.recursive)
 	for f in files
 		let e = conf.get_cfg(f.path)
 		if !e
 			continue
-		structure_file(f, e.dir + e.structure)
+		structure_file(f, e.dir << e.structure)
 
 void action_structure_auto(string[] arg)
 	for a in arg
-		_action_structure_auto(absolute_path(a))
+		_action_structure_auto(make_path(a))
 
 
 
 
-void _action_dsync(string dir)
+void _action_dsync(Path dir)
 	set_working_dir(dir)
 	let e = conf.get_cfg(dir)
 	if e
@@ -93,11 +92,11 @@ void _action_dsync(string dir)
 
 void action_dsync(string[] arg)
 	if len(arg) == 0
-		_action_dsync(absolute_path("./"))
+		_action_dsync(make_path("./"))
 	for a in arg
-		_action_dsync(absolute_path(a))
+		_action_dsync(make_path(a))
 
-void _action_sync(string path)
+void _action_sync(Path path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	remote_sync_pure_locals_by_hash(files)
@@ -105,7 +104,7 @@ void _action_sync(string path)
 
 void action_sync(string[] arg)
 	if len(arg) == 0
-		_action_sync(absolute_path("./"))
+		_action_sync(make_path("./"))
 	for a in arg
-		_action_sync(absolute_path(a))
+		_action_sync(make_path(a))
 

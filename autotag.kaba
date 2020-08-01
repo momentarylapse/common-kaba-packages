@@ -7,7 +7,7 @@ use os
 void auto_tag(out LocalFile f)
 	if !Filesystem.exists(f.path)
 		return
-	let ext = Filesystem.extension(f.path)
+	let ext = f.path.extension()
 	#print(ext)
 	try
 		if ext == "pdf"

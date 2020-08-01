@@ -19,8 +19,8 @@ void delete_files(out LocalFile*[] files)
 
 
 void delete_path_or_filter(string arg)
-	if is_filter(arg)
-		set_working_dir(arg)
+	if not is_filter(arg)
+		set_working_dir(Path(arg))
 	let files = find_by_path_or_filter(arg)
 	delete_files(files)
 
@@ -31,7 +31,7 @@ void action_rm(string[] arg)
 
 
 
-void unadd_path(string path)
+void unadd_path(Path path)
 	set_working_dir(path)
 		
 	let files = lister.find(path)
@@ -42,7 +42,7 @@ void unadd_path(string path)
 
 void action_unadd(string[] arg)
 	if len(arg) == 0
-		unadd_path(absolute_path("./"))
+		unadd_path(make_path("./"))
 	for a in arg
-		unadd_path(absolute_path(a))
+		unadd_path(make_path(a))
 

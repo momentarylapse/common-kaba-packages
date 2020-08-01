@@ -2,6 +2,7 @@ use config
 use localdb
 use tag
 use dblister
+use os
 
 
 void show_files(LocalFile*[] files)
@@ -17,18 +18,18 @@ void show_files(LocalFile*[] files)
 
 
 
-void list_path(string path)
+void list_path(Path path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	show_files(lister.find(path))
 
 void action_list(string[] arg)
 	if len(arg) == 0
-		list_path(absolute_path("./"))
+		list_path(make_path("./"))
 	for a in arg
-		list_path(absolute_path(a))
+		list_path(make_path(a))
 
-void _action_status(string path)
+void _action_status(Path path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	conf.show_perfectly_fine = false
@@ -36,9 +37,9 @@ void _action_status(string path)
 
 void action_status(string[] arg)
 	if len(arg) == 0
-		_action_status(absolute_path("./"))
+		_action_status(make_path("./"))
 	for a in arg
-		_action_status(absolute_path(a))
+		_action_status(make_path(a))
 
 void action_find(string[] arg)
 	for filter in arg

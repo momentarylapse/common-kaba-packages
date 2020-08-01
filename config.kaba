@@ -10,17 +10,17 @@ const string ALEX_IN = ALEX_DIR + "in/"
 const string MEDIUM = "medium"
 const string PERFECT = "perfect"
 
-bool is_canonical_dir(string dir)
+bool _is_canonical_dir(string dir)
 	if len(dir) == 0
 		return false
 	return dir[len(dir) - 1] == '/'
 
-string dir_canonical(string dir)
-	if is_canonical_dir(dir)
+string _dir_canonical(string dir)
+	if _is_canonical_dir(dir)
 		return dir
 	return dir + "/"
 
-string canonify(string path)
+string _canonify(string path)
 	let xx = path.explode("/")
 	for i in 0:len(xx)
 		if xx[i] == "."
@@ -32,23 +32,28 @@ string canonify(string path)
 			i -= 2
 	return xx.join("/")
 
-string absolute_path(string path)
-	if len(path) == 0
-		return path
-	if path[0] == '/'
-		return canonify(path)
-	return canonify(Filesystem.current_directory() + path)
+Path absolute_path(Path path)
+	return path.absolute().canonical()
+	#if len(path) == 0
+	#	return path
+	#if path[0] == '/'
+	#	return canonify(path)
+	#return canonify(Filesystem.current_directory() << path)
 
-string working_dir
-void set_working_dir(string path)
+Path make_path(string p)
+	return Path(p).absolute().canonical()
+
+Path working_dir
+void set_working_dir(Path path)
 	if Filesystem.is_directory(path)
-		working_dir = dir_canonical(path)
+		working_dir = path.canonical()
 	else
-		working_dir = dir_canonical(Filesystem.dirname(path))
+		working_dir = path.parent().canonical()
 
-string rel_path(string path)
-	if path.head(len(working_dir)) == working_dir
-		return path[len(working_dir):]
+Path rel_path(Path path)
+	if path in working_dir
+		return path.relative_to(working_dir)
+#		return str(path)[len(str(working_dir)):]
 	return path
 
 
@@ -69,8 +74,9 @@ string bash_escape2(string s)
 	r = r.replace("`", "\\`")
 	return r
 
-void make_all_dirs(string path)
-	let parts = path.explode("/")
+void make_all_dirs(Path path)
+#	let parents = path.all_parents()
+	let parts = str(path).explode("/")
 	string dir
 	for p,i in parts
 		if i == len(parts) - 1
@@ -79,10 +85,10 @@ void make_all_dirs(string path)
 			dir += "/"
 		dir += p
 		if i > 0
-			if Filesystem.exists(dir)
+			if Filesystem.exists(Path(dir))
 				continue
 			try
-				Filesystem.create_directory(dir)
+				Filesystem.create_directory(Path(dir))
 			except Exception as e
 				error_out(e)
 				return
@@ -108,7 +114,7 @@ string shell_exec(string cmd)
 	return shell_execute(cmd).trim()
 
 class ConfigDir
-	string dir
+	Path dir
 	ConfigDirSync[] syncs
 	string structure
 	
@@ -121,7 +127,7 @@ class ConfigDir
 
 class ConfigDirSync
 	# from ConfigDir
-	string dir
+	Path dir
 	string structure
 	
 	string filter
@@ -139,13 +145,13 @@ class ConfigDirSync
 			return MEDIUM
 		return PERFECT
 
-	const string guess_dir(string[] parts)
+	const Path guess_dir(string[] parts)
 		let structure = get_structure()
-		string dir
+		Path dir
 		for s in structure
 			string v = get_tag(parts, s)
 			if len(v) > 0
-				dir += v + "/"
+				dir = dir << v
 		return dir
 
 
@@ -169,12 +175,14 @@ class Config
 		default_structure = "{name}.{ext}"
 
 	void load()
-		File *f = Filesystem.open_text(hui.app_directory + "sisyphos/config")
+		File *f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
 		int n, m
 		f >> n
 		for i in 0:n
+			string t
 			ConfigDir e
-			f >> e.dir
+			f >> t
+			e.dir = Path(t)
 			f >> e.structure
 			f >> m
 			for j in 0:m
@@ -192,11 +200,11 @@ class Config
 			ignore.add(ig)
 		del f
 	const void save()
-		make_all_dirs(hui.app_directory + "sisyphos/")
-		File *f = Filesystem.create_text(hui.app_directory + "sisyphos/config")
+		make_all_dirs(hui.app_directory << "sisyphos")
+		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
 		f << len(dirs)
 		for e in dirs
-			f << e.dir
+			f << str(e.dir)
 			f << e.structure
 			f << len(e.syncs)
 			for s in e.syncs
@@ -216,11 +224,10 @@ class Config
 				print("  filter: {{s.filter}}")
 				print("    options: {{s.options}}")
 
-	void add_filter(string _dir, string filter, string _options)
+	void add_filter(Path dir, string filter, string _options)
 		let options = _options
 		if default_quality == MEDIUM and options == ""
 			options = "quality=medium"
-		string dir = dir_canonical(_dir)
 		for e in dirs
 			if e.dir == dir
 				e.add_sync(filter, options)
@@ -230,19 +237,17 @@ class Config
 		e.add_sync(filter, options)
 		dirs.add(e)
 	
-	selfref ConfigDir* get_cfg(string _dir)
-		string dir = dir_canonical(_dir)
+	selfref ConfigDir* get_cfg(Path dir)
 		for e in dirs
-			if e.dir == dir.head(len(e.dir))
+			if e.dir == dir
 				return &e
 		#raise(new Exception("not found"))
 		return nil
 
-	const bool dir_is_in_db(string _dir)
+	const bool dir_is_in_db(Path _dir)
 		return get_cfg(_dir)
 
-	void rm_filter(string _dir, string filter)
-		string dir = dir_canonical(_dir)
+	void rm_filter(Path dir, string filter)
 		for e in dirs
 			if e.dir == dir
 				for s,i in e.syncs
@@ -251,8 +256,7 @@ class Config
 						return
 		print("NOT FOUND...")
 
-	void rm_dir(string _dir)
-		string dir = dir_canonical(_dir)
+	void rm_dir(Path dir)
 		for e,i in dirs
 			if e.dir == dir
 				dirs.remove(i)

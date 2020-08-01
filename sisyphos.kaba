@@ -71,7 +71,7 @@ void main(string[] arg)
 	except Exception as e
 		error_out(e)
 	
-	set_working_dir(absolute_path("./"))
+	set_working_dir(make_path("./"))
 	
 	p.run(arg)
 
@@ -90,14 +90,14 @@ void run_command(string[] arg)
 			if len(arg) < 4
 				print("ERROR: filter add <DIR> <FILTER>")
 				return
-			conf.add_filter(absolute_path(arg[2]), arg[3], "")
+			conf.add_filter(make_path(arg[2]), arg[3], "")
 			conf.save()
 		else if arg[1] == "rm"
 			if len(arg) == 4
-				conf.rm_filter(arg[2], arg[3])
+				conf.rm_filter(make_path(arg[2]), arg[3])
 				conf.save()
 			else if len(arg) == 3
-				conf.rm_dir(arg[2])
+				conf.rm_dir(make_path(arg[2]))
 				conf.save()
 			else
 				print("ERROR: filter rm <DIR> [<FILTER>]")
@@ -115,7 +115,7 @@ void run_command(string[] arg)
 			if len(arg) < 3
 				print("ERROR: ignore add <PATH>")
 				return
-			conf.ignore.add(absolute_path(arg[2]))
+			conf.ignore.add(make_path(arg[2]))
 			conf.save()
 		else if arg[1] == "rm"
 			if len(arg) < 3

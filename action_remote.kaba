@@ -22,7 +22,7 @@ void action_remote_find(string[] arg)
 #	show_rfile_list(remote_find_by_id(ids, ""))
 
 void action_remote_add(string[] arg) # filter, dir
-	remote_sync_by_filter(arg[0], conf.default_quality, conf.default_structure, absolute_path(arg[1]))
+	remote_sync_by_filter(arg[0], conf.default_quality, conf.default_structure, make_path(arg[1]))
 
 
 void action_remote_tag_list(string[] arg)

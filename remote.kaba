@@ -74,8 +74,8 @@ RemoteFile[] remote_parse(string r)
 		#rf.remote_path = parts[4]
 		rf.name = parts[5]
 		string extension = parts[6]
-		rf.path = "{{rf.name}}.{{extension}}" # temporary
-		rf.path = absolute_path(rf.apply_structure(conf.default_structure))
+		rf.path = Path("{{rf.name}}.{{extension}}") # temporary
+		rf.path = absolute_path(Path(rf.apply_structure(conf.default_structure)))
 		for p in parts[8:]
 			rf.tags.add(alex2tag(p))
 		if parts[7] == "m"
@@ -127,7 +127,7 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 
 
 
-void sync_add_pure_remote(RemoteFile rf, string root, string structure)
+void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
 	if !db.has_id(rf.id)
 		#string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
@@ -143,7 +143,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 		except
 			# new remote file
 			LocalFile ll = rf
-			ll.path = root + ll.apply_structure(structure)
+			ll.path = root << ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.files.add(ll)
 			print("ADD PURE REMOTE  {{rel_path(ll.path)}}")
@@ -152,7 +152,7 @@ void sync_add_pure_remote(RemoteFile rf, string root, string structure)
 				ll.show_info("      ")
 
 
-void remote_sync_by_filter(string filter, string quality, string structure, string dir)
+void remote_sync_by_filter(string filter, string quality, string structure, Path dir)
 	let rfiles = remote_find(filter, quality)
 	for rf in rfiles
 		try
@@ -190,11 +190,11 @@ void remote_upload(out LocalFile f)
 		print("ERROR: no need to push")
 		return
 	
-	if Filesystem.extension(f.path) == ""
+	if f.path.extension() == ""
 		print("ERROR: remote does not like files without extension: {{rel_path(f.path)}}")
 		return
 	
-	string _remote_path = ALEX_IN + "{{f.hash}}.{{Filesystem.extension(f.path)}}"
+	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
 	
 	scp_upload(f.path, _remote_path)
 	

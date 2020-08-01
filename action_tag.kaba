@@ -3,9 +3,10 @@ use tag
 use autotag
 use dblister
 use remote
+use os
 
 
-void _action_tag_add(string path, string tag)
+void _action_tag_add(Path path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
@@ -14,12 +15,12 @@ void _action_tag_add(string path, string tag)
 
 void action_tag_add(string[] arg)
 	if len(arg) < 2
-		_action_tag_add(absolute_path("./"), arg[0])
+		_action_tag_add(make_path("./"), arg[0])
 	for a in arg[1:]
-		_action_tag_add(absolute_path(a), arg[0])
+		_action_tag_add(make_path(a), arg[0])
 
 
-void _action_tag_set(string path, string tag)
+void _action_tag_set(Path path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
@@ -28,12 +29,12 @@ void _action_tag_set(string path, string tag)
 
 void action_tag_set(string[] arg)
 	if len(arg) < 2
-		_action_tag_set(absolute_path("./"), arg[0])
+		_action_tag_set(make_path("./"), arg[0])
 	for a in arg[1:]
-		_action_tag_set(absolute_path(a), arg[0])
+		_action_tag_set(make_path(a), arg[0])
 
 
-void _action_tag_rm(string path, string tag)
+void _action_tag_rm(Path path, string tag)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let t = str2tag(tag)
@@ -42,12 +43,12 @@ void _action_tag_rm(string path, string tag)
 
 void action_tag_rm(string[] arg)
 	if len(arg) < 2
-		_action_tag_rm(absolute_path("./"), arg[0])
+		_action_tag_rm(make_path("./"), arg[0])
 	for a in arg[1:]
-		_action_tag_rm(absolute_path(a), arg[0])
+		_action_tag_rm(make_path(a), arg[0])
 
 
-void _action_tag_get(string path, string key)
+void _action_tag_get(Path path, string key)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
@@ -64,12 +65,12 @@ void _action_tag_get(string path, string key)
 
 void action_tag_get(string[] arg)
 	if len(arg) < 2
-		_action_tag_get(absolute_path("./"), arg[0])
+		_action_tag_get(make_path("./"), arg[0])
 	for a in arg[1:]
-		_action_tag_get(absolute_path(a), arg[0])
+		_action_tag_get(make_path(a), arg[0])
 		
 			
-void _action_tag_auto(string path)
+void _action_tag_auto(Path path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	for f in files
@@ -77,13 +78,13 @@ void _action_tag_auto(string path)
 
 void action_tag_auto(string[] arg)
 	if len(arg) == 0
-		_action_tag_auto(absolute_path("./"))
+		_action_tag_auto(make_path("./"))
 	for a in arg
-		_action_tag_auto(absolute_path(a))
+		_action_tag_auto(make_path(a))
 
 
 
-void _action_tag_diff(string path)
+void _action_tag_diff(Path path)
 	set_working_dir(path)
 	let files = lister.find(path)
 	let rfiles = remote_get_meta(files)
@@ -96,6 +97,6 @@ void _action_tag_diff(string path)
 
 void action_tag_diff(string[] arg)
 	if len(arg) == 0
-		_action_tag_diff(absolute_path("./"))
+		_action_tag_diff(make_path("./"))
 	for a in arg
-		_action_tag_diff(absolute_path(a))
+		_action_tag_diff(make_path(a))

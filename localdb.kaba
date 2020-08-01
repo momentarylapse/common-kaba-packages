@@ -41,7 +41,7 @@ class LocalFile
 	int remote_mtime
 #	string remote_path
 	# local
-	string path
+	Path path
 	string hash # can be "" if not local
 	int mtime
 	int size
@@ -173,7 +173,7 @@ class LocalFile
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
 	const string remote_path()
-		let ext = Filesystem.extension(path)
+		let ext = path.extension()
 		if is("quality=medium")
 			return ALEX_DIR + "medium/{{id}}.{{ext}}"
 		return ALEX_DIR + "links/{{id}}"
@@ -181,7 +181,7 @@ class LocalFile
 		if key == "name"
 			return name
 		if key == "ext"
-			return Filesystem.extension(path)
+			return path.extension()
 		if key == "id"
 			return id
 		if key == "hash"
@@ -230,9 +230,9 @@ class LocalFile
 				return false
 		return true
 
-string unique_path(LocalFile f)
-	let ext = Filesystem.extension(f.path)
-	return "{{Filesystem.dirname(f.path)}}{{f.hash}} {{f.name}}.{{ext}}" 
+Path unique_path(LocalFile f)
+	let ext = f.path.extension()
+	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 
 
 class LocalFileDB
 	LocalFile[] files
@@ -242,7 +242,7 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		#Timer tt
-		let ss = Filesystem.read(hui.app_directory + "sisyphos/db")
+		let ss = Filesystem.read(hui.app_directory << "sisyphos/db")
 		let lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
@@ -259,7 +259,7 @@ class LocalFileDB
 			LocalFile ff
 			int i0 = i*10+1
 			ff.id = lines[i0]
-			ff.path = lines[i0+1]
+			ff.path = Path(lines[i0+1])
 			#ff.remote_path = lines[i0+2]
 			ff.name = lines[i0+3]
 			ff.hash = lines[i0+4]
@@ -284,7 +284,7 @@ class LocalFileDB
 	
 	void check_basic()
 		for f in files
-			if f.path == ""
+			if f.path.is_empty()
 				print("EMPTY PATH ...")
 				f.show_info("    ")
 			if f.hash == ""
@@ -301,7 +301,7 @@ class LocalFileDB
 					#print("EMPTY HASH (REMOTE): " + ff.path)
 	void check_hash_collisions()
 		for f in files
-			if f.path == ""
+			if f.path.is_empty()
 				continue
 			let l = by_hash(f.hash)
 			if l == &f
@@ -322,7 +322,7 @@ class LocalFileDB
 
 	void check_duplicate_paths()
 		for f in files
-			if f.path == ""
+			if f.path.is_empty()
 				continue
 			let l = find_by_path(f.path)
 			if l == &f
@@ -343,13 +343,13 @@ class LocalFileDB
 				i --
 
 	void save()
-		make_all_dirs(hui.app_directory + "sisyphos/")
-		File *f = Filesystem.create_text(hui.app_directory + "sisyphos/db")
+		make_all_dirs(hui.app_directory << "sisyphos")
+		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
 		f << "version=1"
 		f << len(files)
 		for ff in files
 			f << ff.id
-			f << ff.path
+			f << str(ff.path)
 			f << "" # ff.remote_path
 			f << ff.name
 			f << ff.hash
@@ -373,13 +373,13 @@ class LocalFileDB
 				return &f
 		raise(new Exception("not in db: id={{id}}"))
 
-	selfref LocalFile *find_by_path(string path)
+	selfref LocalFile *find_by_path(Path path)
 		for f in files
 			if path == f.path
 				return &f
 		raise(new Exception("not in db: '{{rel_path(path)}}'"))
 
-	const bool has_path(string path)
+	const bool has_path(Path path)
 		for f in files
 			if path == f.path
 				return true
@@ -409,13 +409,12 @@ class LocalFileDB
 				list.add(&f)
 		return sorted(list, "path")
 
-	selfref LocalFile*[] get_in_dir(string _dir, bool recursive)
-		string dir = dir_canonical(_dir)
+	selfref LocalFile*[] get_in_dir(Path dir, bool recursive)
 			
 		LocalFile*[] list
 		if recursive
 			for f in files
-				if f.path.head(len(dir)) == dir
+				if f.path in dir
 					if !f.pure_local() and conf.filter_pure_local
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote
@@ -423,7 +422,7 @@ class LocalFileDB
 					list.add(&f)
 		else
 			for f in files
-				if Filesystem.dirname(f.path) == dir
+				if f.path.parent() == dir
 					if !f.pure_local() and conf.filter_pure_local
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote
@@ -431,7 +430,7 @@ class LocalFileDB
 					list.add(&f)
 		return sorted(list, "path")
 
-	selfref LocalFile*[] get(string path, bool rec)
+	selfref LocalFile*[] get(Path path, bool rec)
 		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
 		LocalFile*[] files

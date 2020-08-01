@@ -4,34 +4,33 @@ use os
 
 # mix db files with "real" files
 class DBLister
-	string[] paths
+	Path[] paths
 	LocalFile[] fake_files
 	
-	bool is_ignored(string path)
+	bool is_ignored(Path path)
 		for i in conf.ignore
-			if path.match(i)
+			if str(path).match(i)
 				return true
 		return false
 
-	void find_paths(string _dir, bool recursive)
-		string dir = dir_canonical(_dir)
+	void find_paths(Path dir, bool recursive)
 		let list = Filesystem.search(dir, "*", true)
 		for e in list
-			if Filesystem.is_directory(dir + e)
+			if Filesystem.is_directory(dir << e)
 				if e.head(1) != "." and recursive
-					find_paths(dir + e, recursive)
+					find_paths(dir << e, recursive)
 			else
-				string path = (dir + e)
+				let path = dir << e
 				if !is_ignored(path)
 					paths.add(path)
 	
-	LocalFile*[] find(string dir)
+	LocalFile*[] find(Path dir)
 		if Filesystem.is_directory(dir)
 			return find_dir(dir)
 		return find_file(dir)
 		
 		
-	LocalFile*[] find_file(string path)
+	LocalFile*[] find_file(Path path)
 		LocalFile*[] files
 		fake_files.clear()
 		paths.clear()
@@ -49,7 +48,7 @@ class DBLister
 				print("ERROR: can't find '{{path}}'")
 		return files
 		
-	LocalFile*[] find_dir(string dir)
+	LocalFile*[] find_dir(Path dir)
 		LocalFile*[] files
 		fake_files.clear()
 		paths.clear()
@@ -80,4 +79,4 @@ LocalFile*[] find_by_path_or_filter(string arg)
 	if is_filter(arg)
 		return db.find_by_tags(arg)
 	else
-		return lister.find(absolute_path(arg))
+		return lister.find(Path(arg).absolute())
