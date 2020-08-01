@@ -63,7 +63,7 @@ Toolbar toolbar ''
 		set_string("add-type", "Node")
 		
 		if len(arg) > 0
-			c.import(Filesystem.read_text(arg[0]))
+			c.import(Filesystem.read_text(Path(arg[0])))
 		
 		event("new", on_new)
 		event("open", on_open)
@@ -79,11 +79,11 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	void on_save()
-		if hui.file_dialog_save(self, "Save the circuit", "", "*.circuit", "*.circuit")
+		if hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, "*.circuit", "*.circuit")
 			Filesystem.write_text(hui.filename, c.export())
 	
 	void on_open()
-		if hui.file_dialog_open(self, "Load the circuit", "", "*.circuit", "*.circuit")
+		if hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, "*.circuit", "*.circuit")
 			c.import(Filesystem.read_text(hui.filename))
 	
 	void on_param()
