@@ -1,5 +1,6 @@
 use "mongo.kaba"
 #use "file.kaba"
+use os
 
 class Config
 	bool show_meta
@@ -13,7 +14,7 @@ class Tag
 
 class DbFile
 	string id, hash, hash_medium, type
-	string path
+	Path path
 	string name
 	int size
 	int mtime
@@ -21,7 +22,7 @@ class DbFile
 	bool medium
 	void __init__()
 		medium = false
-	const string str()
+	const string __str__()
 		string s = id + "\t" + mtime + "\t" + size + "\t" + hash + "\t" + path + "\t" + name + "\t" + path.extension()
 		if medium
 			s += "\tm"
@@ -125,7 +126,7 @@ DbFile[] parse_result(Result *r)
 
 void print_files(DbFile[] files)
 	for f in files
-		print(f.str())
+		print(str(f))
 
 class Database
 	Mongo* m
@@ -207,7 +208,7 @@ by-hash <hash1> <hash2>")
 		for i in 1:len(arg)
 			try
 				let f = db.by_id(arg[i])
-				print(f.str())
+				print(str(f))
 			except
 				print("-")
 	if arg[0] == "by-id-medium"
@@ -215,14 +216,14 @@ by-hash <hash1> <hash2>")
 			try
 				let f = db.by_id(arg[i])
 				db.mediumify(f)
-				print(f.str())
+				print(str(f))
 			except
 				print("-")
 	if arg[0] == "by-hash"
 		for i in 1:len(arg)
 			try
 				let f = db.by_hash(arg[i])
-				print(f.str())
+				print(str(f))
 			except
 				print("-")
 	if arg[0] == "upload"
