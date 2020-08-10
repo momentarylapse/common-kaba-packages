@@ -1,4 +1,5 @@
 use os
+use hui
 
 
 class Profile
@@ -43,88 +44,66 @@ class Config
 		return false
 	
 	void load()
-		File* f = Filesystem.open_text(conf.root << "xmake.conf")
-		string t
-		while not f.end()
-			f >> t
-			if len(t) == 0
-				break
-			if t in ["# project", "# project name"]
-				f >> name
-			else if t in ["# binary name", "# binary", "# binary file"]
-				f >> binary_file
-			else if t == "# main file"
-				f >> main_file
-			else if t == "# language"
-				f >> language
-			else if t == "# flags"
-				f >> flags_global
-			else if t == "# optimization"
-				f >> optimization
-			else if t == "# build type"
-				f >> build_type
-			#else if t == "# compiler flags"
-#				f >> flags_compiler
-#			else if t == "# linker flags"
-#				f >> flags_linker
-			else if t == "# libraries"
-				f >> t
-				libs = t.explode(",")
-			else if t == "# libraries optional"
-				f >> t
-				libs_optional = t.explode(",")
-			else if t == "# icons"
-				f >> t
-				icons = t.explode(",")
-			else if t == "# desktop file"
-				f >> desktop_file
-			else if t == "# mime files"
-				f >> t
-				mime_files = t.explode(",")
-			else if t == "# additional install"
-				f >> t
-				installs = t.explode(",")
-			else if t[:10] == "# profile "
+		if not Filesystem.exists(conf.root << "xmake.conf")
+			raise(new Exception("no xmake.conf found"))
+		hui.Configuration c
+		c.load(conf.root << "xmake.conf")
+		for k in c.keys()
+			if k in ["project", "project-name"]
+				name = c[k]
+			else if k in ["binary-name", "binary", "binary-file"]
+				binary_file = c[k]
+			else if k == "main-file"
+				main_file = c[k]
+			else if k == "language"
+				language = c.get_str(k, "c++17")
+			else if k == "flags"
+				flags_global = c[k]
+			else if k == "optimization"
+				optimization = c.get_str(k, "2")
+			else if k == "build-type"
+				build_type = c.get_str(k, "debug")
+			#else if k == "compiler-flags"
+#				flags_compiler = c[k]
+#			else if k == "linker-flags"
+#				flags_linker = c[k]
+			else if k == "libraries"
+				libs = c[k].explode(",")
+			else if k == "libraries-optional"
+				libs_optional = c[k].explode(",")
+			else if k == "icons"
+				icons = c[k].explode(",")
+			else if k == "desktop-file"
+				desktop_file = c[k]
+			else if k == "mime-files"
+				mime_files = c[k].explode(",")
+			else if k == "additional-install"
+				installs = c[k].explode(",")
+			else if k[:10] == "profile "
 				Profile p
-				p.name = t[10:]
-				f >> t
-				p.libs_optional = t.explode(",")
+				p.name = k[8:]
+				p.libs_optional = c[k].explode(",")
 				profiles.add(p)
 			else
-				raise(new Exception("unknown tag: {{t}}"))
-		del f
+				raise(new Exception("unknown tag: {{k}}"))
 	void save()
-		File* f = Filesystem.create_text(conf.root << "xmake.conf")
-		f << "# project"
-		f << name
-		f << "# binary"
-		f << binary_file
-		f << "# main file"
-		f << main_file
-		f << "# language"
-		f << language
-		f << "# optimization"
-		f << optimization
-		f << "# build type"
-		f << build_type
-		f << "# flags"
-		f << flags_global
-		f << "# libraries"
-		f << libs.join(",")
-		f << "# libraries optional"
-		f << libs_optional.join(",")
+		hui.Configuration c
+		c["project"] = name
+		c["binary"] = binary_file
+		c["main-file"] = main_file
+		c["language"] = language
+		c["optimization"] = optimization
+		c["build-type"] = build_type
+		c["flags"] = flags_global
+		c["libraries"] = libs.join(",")
+		c["libraries-optional"] = libs_optional.join(",")
 		for p in profiles
-			f << "# profile {{p.name}}"
-			f << p.libs_optional.join(",")
-		f << "# icons"
-		f << icons.join(",")
-		f << "# desktop file"
-		f << desktop_file
-		f << "# mime files"
-		f << mime_files.join(",")
-		f << "# additional install"
-		f << installs.join(",")
-		del f
+			c["profile-{{p.name}}"] = p.libs_optional.join(",")
+		c["icons"] = icons.join(",")
+		c["desktop-file"] = desktop_file
+		c["mime-files"] = mime_files.join(",")
+		c["additional-install"] = installs.join(",")
+		c.save(conf.root << "xmake.conf")
 	
 	Path[] needs_installing()
 		Path[] r
