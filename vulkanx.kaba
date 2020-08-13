@@ -55,7 +55,7 @@ class Renderer
 	virtual void end_frame()
 		pass
 	
-	rect area()
+	const rect area()
 		return rect(0, width, 0, height)
 
 
