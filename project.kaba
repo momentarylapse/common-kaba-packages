@@ -79,7 +79,7 @@ class Config
 				mime_files = c[k].explode(",")
 			else if k == "additional-install"
 				installs = c[k].explode(",")
-			else if k[:10] == "profile "
+			else if k[:8] == "profile-"
 				Profile p
 				p.name = k[8:]
 				p.libs_optional = c[k].explode(",")
