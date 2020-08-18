@@ -230,7 +230,7 @@ class StatLayer
 		
 		im.create(256, 64, color(0,1,1,1))
 		let pp = im.start_draw()
-		pp.set_color(White)
+		pp.set_color(color.WHITE)
 		pp.set_font_size(20)
 		pp.draw_str(5,5, "{{frames/_time|1}}")
 		del pp
