@@ -72,7 +72,7 @@ class LiteralParser
 				j ++
 			else
 				r.add(source[j])
-				if source[j] == '"' or source[j] == 0x27 # " or '
+				if source[j] == '"' or source[j] == '\''
 					break
 		return r
 
@@ -1464,7 +1464,7 @@ void main(string[] arg)
 		string source = input
 		try
 			if from_file
-				source = Filesystem.read(input)
+				source = Filesystem.read(Path(input))
 			eval(source)
 		except Exception as e
 			print("------------------------------------------------")
