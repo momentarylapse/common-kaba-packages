@@ -55,9 +55,9 @@ DrawingArea area '' grab-focus")
 		imin = -2
 		imax = 2
 		
-		COLOR_BACKGROUND = color(1, 0.1, 0.1, 0.1)
-		COLOR_TEXT = White
-		COLOR_SELECTION = color(1.0, 0.4, 0.4, 1.0)
+		COLOR_BACKGROUND = color(0.1, 0.1, 0.1, 1)
+		COLOR_TEXT = color.WHITE
+		COLOR_SELECTION = color(0.4, 0.4, 1.0, 1)
 
 		event_x("area", "hui:draw", on_draw)
 		event_x("area", "hui:left-button-down", on_left_button_down)
@@ -263,11 +263,11 @@ DrawingArea area '' grab-focus")
 			return
 		
 		int e = sel.index
-		p.set_color(color(1,0.2,0.2,0.2))
+		p.set_color(color(0.2,0.2,0.2, 1))
 		p.set_line_width(1)
 		draw_line(p, project_i(0,0), project_i(NT,0))
 		if sel.type == SEL_TYPE_EDGE
-			p.set_color(color(1,0,0,0.8))
+			p.set_color(color(0,0,0.8, 1))
 			complex[] pp
 			for i in 0:NT
 				pp.add(project_i(i, res.I[i][e]))
@@ -275,12 +275,12 @@ DrawingArea area '' grab-focus")
 			p.draw_lines(pp)
 			p.set_line_width(1)
 			pp.clear()
-			p.set_color(color(1,0.8,0,0))
+			p.set_color(color(0.8,0,0, 1))
 			for i in 0:NT
 				pp.add(project_u(i, res.U[i][e]))
 			p.draw_lines(pp)
 		else if sel.type == SEL_TYPE_NODE
-			p.set_color(color(1,0,0.8,0))
+			p.set_color(color(0,0.8,0, 1))
 			complex[] pp
 			for i in 0:NT
 				pp.add(project_u(i, res.phi[i][e]))
