@@ -76,21 +76,27 @@ void unsetraw()
 
 	_tcsetattr(0, TCSANOW, &t)
 
-string ESC()
-	string s
-	s.add(0x1b)
-	return s
+const string ESC = "\x1b"
 
 void clear_scr()
-	print(ESC() + "[2J")
+	print(ESC + "[2J")
 
-#const string BACKSPACE = [0x1b, 0x5b, 0x44]
+class Key
+	#const string BACKSPACE = [0x1b, 0x5b, 0x44]
+	const string UP = [0x1b, 0x5b, 0x41]
+	const string DOWN = [0x1b, 0x5b, 0x42]
+	const string RIGHT = [0x1b, 0x5b, 0x43]
+	const string LEFT = [0x1b, 0x5b, 0x44]
+	const string END = [0x1b, 0x5b, 0x46]
+	const string HOME = [0x1b, 0x5b, 0x48]
+	const string DELETE = [0x1b, 0x5b, 0x33, 0x7e]
+	const string BACKSPACE = [0x7f]
 
 void move_cursor(int dx, int dy)
 	if dx > 0
-		print(ESC() + "[{{dx}}C")
+		print(ESC + "[{{dx}}C")
 	else if dx < 0
-		print(ESC() + "[{{-dx}}D")
+		print(ESC + "[{{-dx}}D")
 
 
 
@@ -123,8 +129,7 @@ string fancy_read_command(string prompt, out string[] history)
 			unsetraw()
 			_print_postfix = ppp
 			return current
-		else if s == [0x1b, 0x5b, 0x41]
-			# up
+		else if s == Key.UP
 			if hist_index > 0
 				move_cursor(-cursor_pos, 0)
 				for i in current
@@ -134,8 +139,7 @@ string fancy_read_command(string prompt, out string[] history)
 				current = history[hist_index]
 				print(current)
 				cursor_pos = len(current)
-		else if s == [0x1b, 0x5b, 0x42]
-			# down
+		else if s == Key.DOWN
 			move_cursor(-cursor_pos, 0)
 			for i in current
 				print(" ")
@@ -146,26 +150,21 @@ string fancy_read_command(string prompt, out string[] history)
 				current = history[hist_index]
 			print(current)
 			cursor_pos = len(current)
-		else if s == [0x1b, 0x5b, 0x43]
-			# right
+		else if s == Key.RIGHT
 			if cursor_pos < len(current)
 				move_cursor(1, 0)
 				cursor_pos ++
-		else if s == [0x1b, 0x5b, 0x44]
-			# left
+		else if s == Key.LEFT
 			if cursor_pos > 0
 				move_cursor(-1, 0)
 				cursor_pos --
-		else if s == [0x1b, 0x5b, 0x46]
-			# end
+		else if s == Key.END
 			move_cursor(len(current)-cursor_pos, 0)
 			cursor_pos = len(current)
-		else if s == [0x1b, 0x5b, 0x48]
-			# home
+		else if s == Key.HOME
 			move_cursor(-cursor_pos, 0)
 			cursor_pos = 0
-		else if s == [0x7f]
-			# backspace
+		else if s == Key.BACKSPACE
 			if cursor_pos > 0
 				#print(s)
 				move_cursor(-1, 0)
@@ -174,8 +173,7 @@ string fancy_read_command(string prompt, out string[] history)
 				current = current[:cursor_pos-1] + current[cursor_pos:]
 				cursor_pos --
 				#print(ESC + "[H")
-		else if s == [0x1b, 0x5b, 0x33, 0x7e]
-			# delete
+		else if s == Key.DELETE
 			if cursor_pos < len(current)
 				print(current[cursor_pos+1:] + " ")
 				move_cursor(-len(current[cursor_pos+1:])-1, 0)
