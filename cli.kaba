@@ -1,22 +1,17 @@
-use kaba
 use os
+use kaba
+use terminal
 
-#extern File* stdin
-#extern string print_postfix
 
 
 void main()
-	_print_postfix = ""
 	print("welcome to kaba {{kaba_version}}")
-	while true#!stdin.eof()
-		print("\n>>> ")
-	
-	
-		let s = stdin.read(1000)
-		if len(s) == 0
+	string[] history
+	while true
+		try
+			let s = fancy_read_command(">>> ", history)
+			if s != ""
+				Script.execute_single_command(s)
+		except Exception as e
+			print("EX")
 			break
-		s = s[:-1]
-		Script.execute_single_command(s)
-		#print("read: " + s)
-	print("\n")
-
