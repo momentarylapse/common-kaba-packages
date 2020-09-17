@@ -9,32 +9,9 @@ int char_type(char c)
 		return CHAR_LETTER
 	if (c >= '0') and (c <= '9')
 		return CHAR_NUMBER
-	if c == ' ' or c == "\t"[0] or c == "\n"[0]
+	if c == ' ' or c == '\t' or c == '\n'
 		return CHAR_WHITESPACE
 	return CHAR_SIGN
-
-string get_expr(string s, int p)
-	string r
-	char c = s[p]
-	int ct = char_type(c)
-	r.add(c)
-	if ct != CHAR_SIGN
-		for i in p+1:len(s)
-			if char_type(s[i]) == ct
-				r.add(s[i])
-			else
-				break
-	return r
-
-string[] analyze(string s)
-	string[] expr
-	for i in 0:len(s)
-		if char_type(s[i]) == CHAR_WHITESPACE
-			continue
-		string e = get_expr(s, i)
-		expr.add(e)
-		i += len(e) -1
-	return expr
 
 int operator_rank(string s)
 	if s == "="
@@ -176,7 +153,7 @@ Term *digest_operators(out Term*[] eid)
 
 Term *parse(string s)
 	Parser p
-	p.e = analyze(s)
+	p.e = s.parse_tokens("+-*/^=(),")
 	p.cur_index = 0
 	return p.parse_operand()
 
