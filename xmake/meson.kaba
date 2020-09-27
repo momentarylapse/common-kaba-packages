@@ -1,0 +1,85 @@
+use os
+use project
+use library
+
+void create_meson()
+	File* f = Filesystem.create_text(conf.root << "../meson.build")
+	string debug = str(conf.build_type == "debug")
+	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
+	let opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
+	let opt = [for o in opts "'{{o}}'"].join(", ")
+	f << "add_project_arguments({{opt}}, language : ['cpp'])"
+	f << "
+#install_data
+#meson.add_install_script('')
+#install_subdir
+
+cc = meson.get_compiler('cpp')
+
+# mandatory dependencies
+mdep = cc.find_library('m', required : false)
+threaddep = dependency('threads')"
+
+	let vars = ["mdep", "threaddep"]
+	for l in conf.libs
+		let ll = lib.get(l)
+		string var = l + "dep"
+		vars.add(var)
+		f << var + " = dependency('{{ll.meson_libs()[0]}}')"
+		f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
+	f << "deps = " + str(vars).replace("\"", "")
+	
+	
+	for l in conf.libs_optional
+		f << "
+# optional dependency: " + l
+		let ll = lib.get(l)
+		let mlibs = ll.meson_libs()
+		string ltest
+		string deps
+		for m,i in mlibs
+			let v = "d"
+			if len(mlibs) > 1
+				v += str(i+1)
+			f << v + " = cc.find_library('{{m}}', required : false)"
+			if i > 0
+				ltest += " and "
+				deps += ","
+			ltest += v + ".found()"
+			deps += v
+		f << "if {{ltest}}"
+		f << "	add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
+		f << "	deps += [{{deps}}]"
+		f << "else"
+		f << "	add_project_arguments('-D{{ll.define()}}=0', language : ['cpp'])"
+		f << "endif"
+
+	
+	f << "
+
+sources = ["
+	for s,i in sources
+		string e
+		if i < len(sources) - 1
+			e = ","
+		f << "	'src/{{rel(s.filename)}}'{{e}}"
+	f << "]
+
+"
+
+	f << "executable('{{conf.binary_file}}', sources, dependencies : deps, install : true)"
+	
+	f << ""
+	
+	let std = "static/"
+	let list = conf.needs_installing()
+	for e in list
+		if Filesystem.is_directory(Path("..") << e)
+			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
+		else
+			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
+	
+	if conf.desktop_file != ""
+		f << "install_data('{{std}}{{conf.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
+
+

@@ -1,0 +1,65 @@
+use library
+use project
+use makefile
+use meson
+use os
+
+
+string blank(int n)
+	return [for i in 0:n " "].join("")
+
+void main(string[] arg)
+	lib.init()
+	conf.verbose = false
+	conf.root = Path("./").absolute()
+	
+	string[] command
+	conf.ignore_libs
+
+	for a,i in arg
+		if a == "--verbose"
+			conf.verbose = true
+		else if a == "--dry"
+			conf.dry_run = true
+		else if a == "--ignore-lib"
+			conf.ignore_libs.add(arg[i+1])
+			i ++
+		else if a.find("/", 0) >= 0
+			conf.root = Path(a).absolute()
+		else
+			command.add(a)
+	if len(command) > 0
+		if command[0] == "has"
+			if len(command) < 2
+				print("library?")
+				return
+			lib.test(command[1])
+			return
+		else if command[0] == "list"
+			for l in sorted(lib.libraries, "name")
+				print("{{l.name}} {{blank(12-len(l.name))}} {{l.test()}}")
+			return
+		else if command[0] == "init"
+			conf.save()
+			return
+		else
+			print("???   try  init/has/list")
+			return
+	print(conf.root)
+	
+	conf.load()
+	
+	let missing = [for l in conf.libs l if !lib.test(l)]
+	for l in conf.libs_optional
+		if !conf.ignored(l)
+			lib.test(l)
+	if len(missing) > 0
+		print("ERROR: necessary libraries missing: {{missing}}")
+	
+	parse_dir(conf.root)
+
+	if not conf.dry_run
+		create_all_makefiles()
+	
+		create_meson()
+	
