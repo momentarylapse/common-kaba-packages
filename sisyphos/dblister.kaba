@@ -1,0 +1,82 @@
+use localdb
+use config
+use os
+
+# mix db files with "real" files
+class DBLister
+	Path[] paths
+	LocalFile[] fake_files
+	
+	bool is_ignored(Path path)
+		for i in conf.ignore
+			if str(path).match(i)
+				return true
+		return false
+
+	void find_paths(Path dir, bool recursive)
+		let list = Filesystem.search(dir, "*", true)
+		for e in list
+			if Filesystem.is_directory(dir << e)
+				if e.head(1) != "." and recursive
+					find_paths(dir << e, recursive)
+			else
+				let path = dir << e
+				if !is_ignored(path)
+					paths.add(path)
+	
+	LocalFile*[] find(Path dir)
+		if Filesystem.is_directory(dir)
+			return find_dir(dir)
+		return find_file(dir)
+		
+		
+	LocalFile*[] find_file(Path path)
+		LocalFile*[] files
+		fake_files.clear()
+		paths.clear()
+		
+		try
+			# in DB?
+			return [db.find_by_path(path)]
+		except
+			if Filesystem.exists(path)
+				LocalFile ff
+				ff.path = path
+				fake_files.add(ff)
+				return [&fake_files[0]]
+			else
+				print("ERROR: can't find '{{path}}'")
+		return files
+		
+	LocalFile*[] find_dir(Path dir)
+		LocalFile*[] files
+		fake_files.clear()
+		paths.clear()
+
+		files = db.get_in_dir(dir, conf.recursive)
+		
+		find_paths(dir, conf.recursive)
+		for p in paths
+			try
+				db.find_by_path(p)
+			except
+				LocalFile f
+				f.path = p
+				fake_files.add(f)
+		for f in fake_files
+			files.add(&f)
+		return sorted(files, "path")
+
+DBLister lister
+
+
+
+
+bool is_filter(string s)
+	return s.find("=", 0) > 0
+
+LocalFile*[] find_by_path_or_filter(string arg)
+	if is_filter(arg)
+		return db.find_by_tags(arg)
+	else
+		return lister.find(Path(arg).absolute())

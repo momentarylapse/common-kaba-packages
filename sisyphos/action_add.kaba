@@ -1,0 +1,115 @@
+use os
+use localdb
+use config
+use autotag
+use dblister
+
+
+
+
+
+
+
+# "add"
+void file_add(out LocalFile f)
+	if f.in_db()
+
+		# suddenly appearing?!?
+		if f.pure_remote()
+			if Filesystem.exists(f.path)
+				f.unset(NONLOCAL)
+				if conf.verbosity >= 1
+					print("NON-NONLOCAL {{rel_path(f.path)}}")
+				return
+		
+		# lost?
+		if !Filesystem.exists(f.path)
+			if !f.pure_remote()
+				f.set(NONLOCAL)
+				if conf.verbosity >= 1
+					print("LOST  {{rel_path(f.path)}}")
+			return
+		
+		# time
+		int mtime = Filesystem.mtime(f.path).time
+		if mtime == f.mtime
+			if conf.verbosity >= 2
+				print("=  {{rel_path(f.path)}}")
+		else
+			# changed?
+			try
+				string hash = Filesystem.hash(f.path, "md5")
+				if hash == f.hash
+					if conf.verbosity >= 1
+						print("TOUCHED  {{rel_path(f.path)}}")
+					# ok
+					f.mtime = mtime
+				else
+					if conf.verbosity >= 1
+						print("EDITED  {{rel_path(f.path)}}")
+					f.set(CHANGED_FILE)
+					f.hash = hash
+					f.mtime = mtime
+					f.size = Filesystem.size(f.path)
+					if conf.verbosity >= 2 or conf.show_meta
+						f.show_info("      ")
+			except Exception as e
+				error_out(e)
+				return
+	else
+		# new file
+		string hash
+		try
+			hash = Filesystem.hash(f.path, "md5")
+		except Exception as e
+			error_out(e)
+			return
+#		try
+#			LocalFile* ff = db.by_hash(hash)
+#			# hash already in db?
+#			if Filesystem.exists(ff.path)
+#				if conf.verbosity >= 1
+#					print("DUPLICATE  {{rel_path(f.path)}} <-> {{rel_path(ff.path)}}")
+#				file_add_new(f, hash)
+#			else
+#				file_move(ff, f.path)
+#		except
+			# new
+		file_add_new(f, hash)
+
+
+void file_add_new(out LocalFile f, string hash)
+	print("ADD  {{rel_path(f.path)}}")
+	f.name = f.path.basename()
+	string ext = f.path.extension()
+	if len(ext) > 0
+		f.name = f.name.head(len(f.name) - len(ext) - 1)
+	#print(ext)
+	#print(f.name)
+	f.hash = hash
+	f.mtime = Filesystem.mtime(f.path).time
+	f.size = Filesystem.size(f.path)
+	auto_tag(f)
+	if conf.show_meta or conf.verbosity >= 2
+		f.show_info("      ")
+	db.files.add(f)
+
+
+
+
+
+# check for local changes
+void add_path(Path path)
+	set_working_dir(path)
+	let files = lister.find(path)
+	for f in files
+		file_add(f)
+			
+	db.save()
+
+void action_add(string[] arg)
+	if len(arg) == 0
+		add_path(make_path("./"))
+	for a in arg
+		add_path(make_path(a))
+

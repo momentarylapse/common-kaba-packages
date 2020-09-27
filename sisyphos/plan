@@ -1,0 +1,37 @@
+== lokale Datenbank ==
+
+enthält alle (einzelnen) lokalen Dateien
+	* Größe
+	* Datum
+	* hash
+	* id (remote)
+
+zuerst nur sync mit lokalen Dateien (git commit)
+
+== remote ==
+
+push/pull
+
+
+
+
+
+
+
+
+Datei-Änderungen mit Zeitstempel in DB
+	(add, edit, delete, move)
+Arbeitsverzeichnis hat lokale DB mit Zeitstempeln und Hashs, um lokale Änderungen zu tracken
+und Zeit des letzten Syncens
+
+Netzerk-Schnittstelle mit Abfrage aller Änderungen seit Zeit
+
+(Änderungszeiten auf dem Server haben Zeitstempel des Syncens)
+
+
+
+== neu ==
+
+"status" listet nur Dateien auf
+"add" fügt lokal hinzu
+"push/pull" synct lokal mit remote...need new command

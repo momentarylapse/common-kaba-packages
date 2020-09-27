@@ -1,0 +1,463 @@
+use os
+use hui
+use config
+use tag
+
+const string NONLOCAL = "nonlocal"
+const string CHANGED_FILE = "changed"
+const string CHANGED_META = "changed-meta"
+
+string str_format(string s, string fmt)
+	string r = s
+	if len(fmt) >= 2 and fmt[:1] == "0"
+		int n = int(fmt)
+		while len(r) < n
+			r = "0" + r
+	if len(fmt) >= 2 and fmt[:1] == " "
+		int n = int(fmt)
+		while len(r) < n
+			r = " " + r
+	return r
+
+string nice_size(int size)
+	if size > 1000000000
+		return "{{size / 1000000000.0|.1}}G"
+	if size > 10000000
+		return "{{size / 1000000}}M"
+	if size > 1000000
+		return "{{size / 1000000.0|.1}}M"
+	if size > 10000
+		return "{{size / 1000}}K"
+	if size > 1000
+		return "{{size / 1000.0|.1}}K"
+	return "{{size}}"
+
+class LocalFile
+	bool drop_me
+
+	# remote
+	string id
+	string name
+	int remote_mtime
+#	string remote_path
+	# local
+	Path path
+	string hash # can be "" if not local
+	int mtime
+	int size
+	string[] options
+	Tag[] tags
+	
+	void __init__()
+		drop_me = false
+	
+	const bool is(string option)
+		for o in options
+			if o == option
+				return true
+		return false
+	void set(string option)
+		if is(option)
+			return
+		options.add(option)
+		db.dirty = true
+	void unset(string option)
+		for o,i in options
+			if o == option
+				options.remove(i)
+				db.dirty = true
+				return
+	const bool pure_remote()
+		return is(NONLOCAL)
+	const bool pure_local()
+		return len(id) == 0
+	const bool perfectly_fine()
+		if pure_remote() or pure_local()
+			return false
+		if changed_meta() or changed_file()
+			return false
+		return true
+	const bool in_db()
+		return len(hash) > 0
+	const bool changed_file()
+		return is(CHANGED_FILE)
+	const bool changed_meta()
+		return is(CHANGED_META)
+	const bool mergeable(LocalFile f)
+		if size != f.size
+			return false
+		if id != f.size
+			if len(id) > 0 and len(f.id) > 0
+				return false
+		return true
+	void merge(LocalFile f)
+		for o in f.options
+			set(o)
+	void sync_tags(Tag[] rtags)
+		tags = rtags # TODO
+		db.dirty = true
+	void set_name(string _name)
+		name = _name
+		db.dirty = true
+		if conf.verbosity > 0
+			print("NAME  {{name}}")
+		set(CHANGED_META)
+	void tag_add(Tag tt)
+		if tt.key == "name"
+			set_name(tt.value)
+			return
+		for t in tags
+			if t.key == tt.key and t.value == tt.value
+				return
+		tags.add(tt)
+		db.dirty = true
+		if conf.verbosity > 0
+			print("TAG ADD  {{tt}}")
+		set(CHANGED_META)
+	void tag_set(Tag tt)
+		if tt.key == "name"
+			set_name(tt.value)
+			return
+		for t in tags
+			if t.key == tt.key
+				if t.value == tt.value
+					return
+				if conf.verbosity > 0
+					print("TAG SET  {{t}}  ->  {{tt.value}}")
+				t.value = tt.value
+				db.dirty = true
+				set(CHANGED_META)
+				return
+		tag_add(tt)
+	void tag_rm(Tag tt)
+		for t,i in tags
+			if t.match(tt)
+				if conf.verbosity > 0
+					print("TAG RM  {{t}}")
+				tags.remove(i)
+				db.dirty = true
+				set(CHANGED_META)
+				return
+	const string status_str()
+		if !in_db()
+			return "? "
+		if pure_local()
+			return "L "
+		if pure_remote()
+			return "R "
+		if changed_file()
+			return "**"
+		if changed_meta()
+			return "* "
+		return "  "
+	const void show()
+		string s
+		if conf.show_meta_small
+			s = str_format(nice_size(size), " 6")
+			if is("quality=medium")
+				s += " m"
+			else
+				s += "  "
+		print("{{status_str()}} {{s}}  {{rel_path(path)}}")
+	const void show_info(string l)
+		#print(l + "path: " + path)
+		print(l + "name:    {{name}}")
+		print(l + "id:      {{id}}")
+		print(l + "hash:    {{hash}}")
+		#print(l + "mtime:   {{mtime}}")
+		#if remote_mtime != 0 and remote_mtime != mtime
+		#	s += "\nmtime: " + mtime + " (REMOTE)"
+		print(l + "size:    {{size}}")
+		#print(l + "options: " + options)
+		let _tags = tags_sort(tags)
+		for t in _tags
+			print(l + "  tag:   {{t.key}}={{t.value}}")
+	const string remote_path()
+		let ext = path.extension()
+		if is("quality=medium")
+			return ALEX_DIR + "medium/{{id}}.{{ext}}"
+		return ALEX_DIR + "links/{{id}}"
+	const string get_tag(string key)
+		if key == "name"
+			return name
+		if key == "ext"
+			return path.extension()
+		if key == "id"
+			return id
+		if key == "hash"
+			return hash
+		if key == "size"
+			return str(size)
+		for t in tags
+			if t.key == key
+				return t.value
+		return ""
+	const string apply_structure(string structure)
+		string r = structure
+		int p1 = 0
+		while true
+			int p0 = r.find("{", p1)
+			if p0 < 0
+				break
+			p1 = r.find("}", p0)
+			if p1 < 0
+				break
+			let kkey = r[p0+1:p1]
+			let xkey = kkey.explode("|")
+			let val = get_tag(xkey[0])
+			if len(xkey) >= 2
+				val = str_format(val, xkey[1])
+			
+			r = r[:p0] + val + r[p1+1:]
+			p1 = p0 + len(val)
+		return r
+	const bool match(Tag[] mtags)
+		for mt in mtags
+			bool tag_match = false
+			if mt.key == "name"
+				tag_match = name.match(mt.value)
+			else if mt.key == "id"
+				tag_match = id.match(mt.value)
+			else if mt.key == "hash"
+				tag_match = hash.match(mt.value)
+			else
+				for t in tags
+					#if t.key == mt.key and t.value == tm.value
+					if t.key == mt.key and t.value.match(mt.value)
+						tag_match = true
+						break
+			if !tag_match
+				return false
+		return true
+
+Path unique_path(LocalFile f)
+	let ext = f.path.extension()
+	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 
+
+class LocalFileDB
+	LocalFile[] files
+	bool dirty
+	
+	void load()
+		files.clear()
+		dirty = false
+		#Timer tt
+		let ss = Filesystem.read(hui.app_directory << "sisyphos/db")
+		let lines = ss.explode("\n")
+		if lines[0] == "version=2"
+			load_v2(lines)
+		else if lines[0] == "version=1"
+			load_v1(lines[1:])
+		else
+			load_v1(lines)
+		
+	void load_v2(string[] lines)
+		
+	void load_v1(string[] lines)
+		int n = len(lines) / 10
+		for i in 0:n
+			LocalFile ff
+			int i0 = i*10+1
+			ff.id = lines[i0]
+			ff.path = Path(lines[i0+1])
+			#ff.remote_path = lines[i0+2]
+			ff.name = lines[i0+3]
+			ff.hash = lines[i0+4]
+			ff.mtime = int(lines[i0+5])
+			ff.remote_mtime = int(lines[i0+6])
+			ff.size = int(lines[i0+7])
+			ff.options = lines[i0+8].explode(",")
+			ff.tags = strh2tags(lines[i0+9])
+			ff.unset("")
+			if ff.hash == "d41d8cd98f00b204e9800998ecf8427e"
+				ff.hash = ""
+			if ff.id == "-1"
+				ff.id = ""
+	
+			files.add(ff)
+		#print(tt.get())
+
+	void self_check()
+		check_basic()
+		check_hash_collisions()
+		check_duplicate_paths()
+	
+	void check_basic()
+		for f in files
+			if f.path.is_empty()
+				print("EMPTY PATH ...")
+				f.show_info("    ")
+			if f.hash == ""
+				if Filesystem.exists(f.path)
+					print("EMPTY HASH: {{f.path}}")
+					f.hash = Filesystem.hash(f.path, "md5")
+					dirty = true
+				else if f.id == ""
+					print("GHOST: {{f.path}}")
+					f.drop_me = true
+					dirty = true
+				#else
+					# hash='', id='', no file
+					#print("EMPTY HASH (REMOTE): " + ff.path)
+	void check_hash_collisions()
+		for f in files
+			if f.path.is_empty()
+				continue
+			let l = by_hash(f.hash)
+			if l == &f
+				continue
+			if f.path == l.path
+				print("DUPLICATE: {{f.path}}")
+				if l.mergeable(f)
+					l.merge(f)
+					dirty = true
+					f.drop_me = true
+				else
+					f.show()
+					print("   <->")
+					l.show()
+					print("###################################")
+			else
+				print("HASH COLLISION: {{f.path}}  <->  {{l.path}}")
+
+	void check_duplicate_paths()
+		for f in files
+			if f.path.is_empty()
+				continue
+			let l = find_by_path(f.path)
+			if l == &f
+				continue
+			print("PATH COLLISION: {{f.path}}")
+			let new_path = unique_path(f)
+			
+			print("MOVE   {{rel_path(f.path)}} > {{rel_path(new_path)}}")
+			f.path = new_path
+			db.dirty = true
+
+	void drop_selected()
+		for i in 0:len(files)
+			if files[i].drop_me
+				print("DROP {{files[i].path}}")
+				files.remove(i)
+				db.dirty = true
+				i --
+
+	void save()
+		make_all_dirs(hui.app_directory << "sisyphos")
+		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
+		f << "version=1"
+		f << len(files)
+		for ff in files
+			f << ff.id
+			f << str(ff.path)
+			f << "" # ff.remote_path
+			f << ff.name
+			f << ff.hash
+			f << ff.mtime
+			f << ff.remote_mtime
+			f << ff.size
+			f << ff.options.join(",")
+			f << tags2strh(ff.tags)
+		del f
+		dirty = false
+	
+	const bool has_id(string id)
+		for f in files
+			if id == f.id
+				return true
+		return false
+
+	selfref LocalFile *find_by_id(string id)
+		for f in files
+			if id == f.id
+				return &f
+		raise(new Exception("not in db: id={{id}}"))
+
+	selfref LocalFile *find_by_path(Path path)
+		for f in files
+			if path == f.path
+				return &f
+		raise(new Exception("not in db: '{{rel_path(path)}}'"))
+
+	const bool has_path(Path path)
+		for f in files
+			if path == f.path
+				return true
+		return false
+
+	selfref LocalFile *by_hash(string hash)
+		if hash == ""
+			raise(new Exception("invalid hash"))
+		for f in files
+			if hash == f.hash
+				return &f
+		raise(new Exception("not in db: hash={{hash}}"))
+
+	#LocalFile *find_by_hash(string hash)
+#		if hash == ""
+#			raise(new Exception("invalid hash"))
+#		for f in files
+#			if hash == f.hash
+#				return &f
+#		raise(new Exception("not in db: hash=" + hash))
+		
+	selfref LocalFile*[] find_by_tags(string filter)
+		Tag[] tags = str2tags(filter)
+		LocalFile*[] list
+		for f in files
+			if f.match(tags)
+				list.add(&f)
+		return sorted(list, "path")
+
+	selfref LocalFile*[] get_in_dir(Path dir, bool recursive)
+			
+		LocalFile*[] list
+		if recursive
+			for f in files
+				if f.path in dir
+					if !f.pure_local() and conf.filter_pure_local
+						continue
+					if !f.pure_remote() and conf.filter_pure_remote
+						continue
+					list.add(&f)
+		else
+			for f in files
+				if f.path.parent() == dir
+					if !f.pure_local() and conf.filter_pure_local
+						continue
+					if !f.pure_remote() and conf.filter_pure_remote
+						continue
+					list.add(&f)
+		return sorted(list, "path")
+
+	selfref LocalFile*[] get(Path path, bool rec)
+		if Filesystem.is_directory(path)
+			return get_in_dir(path, rec)
+		LocalFile*[] files
+		try
+			files.add(find_by_path(path))
+		except
+			pass
+		return files
+		
+	void rehash()
+		for f in files
+			if f.pure_remote()
+				continue
+			print(f.path)
+			try
+				string h2 = Filesystem.hash(f.path, "md5")
+				if h2 != f.hash
+					print("{{h2}} != {{f.hash}}")
+					f.hash = h2
+					save()
+			except
+				pass
+	void optimize()
+		print("optimizing...")
+		files = sorted(files, "path")
+		dirty = true
+	
+LocalFileDB db
+
+

@@ -1,0 +1,31 @@
+use localdb
+use config
+use remote
+
+
+
+void show_rfile_list(RemoteFile[] rfiles)
+	for f in rfiles
+		f.show()
+		if conf.show_meta
+			f.show_info("      ")
+
+
+void action_remote_find(string[] arg)
+	for filter in arg
+		show_rfile_list(remote_find(filter, conf.default_quality))
+
+#void action_remote_find_hash(string[] hashes)
+#	show_rfile_list(remote_find_by_hash(hashes))
+
+#void action_remote_find_id(string[] ids)
+#	show_rfile_list(remote_find_by_id(ids, ""))
+
+void action_remote_add(string[] arg) # filter, dir
+	remote_sync_by_filter(arg[0], conf.default_quality, conf.default_structure, make_path(arg[1]))
+
+
+void action_remote_tag_list(string[] arg)
+	let r = call_alex("tag list", [arg[0]]).explode("\n")
+	for t in r
+		print(t)

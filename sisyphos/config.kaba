@@ -1,0 +1,287 @@
+use os
+use hui
+
+#const string SERVER = "michi.is-a-geek.org"
+#const string SERVER = "myu"
+const string CMD = "kaba alex -S"
+const string ALEX_DIR = "/media/300/temp/alexandria-cache/"
+const string ALEX_IN = ALEX_DIR + "in/"
+
+const string MEDIUM = "medium"
+const string PERFECT = "perfect"
+
+bool _is_canonical_dir(string dir)
+	if len(dir) == 0
+		return false
+	return dir[len(dir) - 1] == '/'
+
+string _dir_canonical(string dir)
+	if _is_canonical_dir(dir)
+		return dir
+	return dir + "/"
+
+string _canonify(string path)
+	let xx = path.explode("/")
+	for i in 0:len(xx)
+		if xx[i] == "."
+			xx.remove(i)
+			i -= 1
+		else if xx[i] == ".." and i > 1
+			xx.remove(i-1)
+			xx.remove(i-1)
+			i -= 2
+	return xx.join("/")
+
+Path absolute_path(Path path)
+	return path.absolute().canonical()
+	#if len(path) == 0
+	#	return path
+	#if path[0] == '/'
+	#	return canonify(path)
+	#return canonify(Filesystem.current_directory() << path)
+
+Path make_path(string p)
+	return Path(p).absolute().canonical()
+
+Path working_dir
+void set_working_dir(Path path)
+	if Filesystem.is_directory(path)
+		working_dir = path.canonical()
+	else
+		working_dir = path.parent().canonical()
+
+Path rel_path(Path path)
+	if path in working_dir
+		return path.relative_to(working_dir)
+#		return str(path)[len(str(working_dir)):]
+	return path
+
+
+# needs to be surrounded by "..."
+string bash_escape(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("`", "\\`")
+	return r
+
+# needs to be surrounded by '...'
+string bash_escape2(string s)
+	string r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("'", "\\'")
+	r = r.replace("`", "\\`")
+	return r
+
+void make_all_dirs(Path path)
+#	let parents = path.all_parents()
+	let parts = str(path).explode("/")
+	string dir
+	for p,i in parts
+		if i == len(parts) - 1
+			break
+		if i > 0
+			dir += "/"
+		dir += p
+		if i > 0
+			if Filesystem.exists(Path(dir))
+				continue
+			try
+				Filesystem.create_directory(Path(dir))
+			except Exception as e
+				error_out(e)
+				return
+
+
+	
+string get_tag(string[] parts, string key)
+	for p in parts
+		if p.find("=", 0) < 0
+			continue
+		let kv = p.explode("=")
+		if kv[0] == key
+			return kv[1]
+	return ""
+
+
+void error_out(Exception e)
+	print("ERROR: {{e}}")
+
+string shell_exec(string cmd)
+	#if conf.verbose
+	#	print(cmd)
+	return shell_execute(cmd).trim()
+
+class ConfigDir
+	Path dir
+	ConfigDirSync[] syncs
+	string structure
+	
+	void add_sync(string filter, string options)
+		ConfigDirSync s
+		s.dir = dir
+		s.filter = filter
+		s.options = options
+		syncs.add(s)
+
+class ConfigDirSync
+	# from ConfigDir
+	Path dir
+	string structure
+	
+	string filter
+	string options
+	
+
+
+	const string[] get_structure()
+		let oo = options.explode(";")
+		for o in oo
+			if o[:10] == "structure="
+				return o[10:].explode("/")
+	const string quality()
+		if options.find("quality=medium", 0) >= 0
+			return MEDIUM
+		return PERFECT
+
+	const Path guess_dir(string[] parts)
+		let structure = get_structure()
+		Path dir
+		for s in structure
+			string v = get_tag(parts, s)
+			if len(v) > 0
+				dir = dir << v
+		return dir
+
+
+class Config
+	void __init__()
+		server = "myu"
+		verbosity = 1
+		show_meta = false
+		show_meta_small = false
+		recursive = false
+		filter_pure_local = false
+		filter_pure_remote = false
+		show_pure_local = false
+		show_perfectly_fine = true
+		show_not_in_db = false
+		drop_deleted = false
+		pull_tags = false
+		pull_tags_only_add = false
+		dry_run = false
+		default_quality = "perfect"
+		default_structure = "{name}.{ext}"
+
+	void load()
+		File *f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
+		int n, m
+		f >> n
+		for i in 0:n
+			string t
+			ConfigDir e
+			f >> t
+			e.dir = Path(t)
+			f >> e.structure
+			f >> m
+			for j in 0:m
+				ConfigDirSync s
+				s.dir = e.dir
+				s.structure = e.structure
+				f >> s.filter
+				f >> s.options
+				e.syncs.add(s)
+			dirs.add(e)
+		f >> n
+		for i in 0:n
+			string ig
+			f >> ig
+			ignore.add(ig)
+		del f
+	const void save()
+		make_all_dirs(hui.app_directory << "sisyphos")
+		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
+		f << len(dirs)
+		for e in dirs
+			f << str(e.dir)
+			f << e.structure
+			f << len(e.syncs)
+			for s in e.syncs
+				f << s.filter
+				f << s.options
+		f << len(ignore)
+		for i in ignore
+			f << i
+		f << server
+		del f
+
+	const void show()
+		for e in conf.dirs
+			print(e.dir)
+			print("structure: {{e.structure}}")
+			for s in e.syncs
+				print("  filter: {{s.filter}}")
+				print("    options: {{s.options}}")
+
+	void add_filter(Path dir, string filter, string _options)
+		let options = _options
+		if default_quality == MEDIUM and options == ""
+			options = "quality=medium"
+		for e in dirs
+			if e.dir == dir
+				e.add_sync(filter, options)
+				return
+		ConfigDir e
+		e.dir = dir
+		e.add_sync(filter, options)
+		dirs.add(e)
+	
+	selfref ConfigDir* get_cfg(Path dir)
+		for e in dirs
+			if e.dir == dir
+				return &e
+		#raise(new Exception("not found"))
+		return nil
+
+	const bool dir_is_in_db(Path _dir)
+		return get_cfg(_dir)
+
+	void rm_filter(Path dir, string filter)
+		for e in dirs
+			if e.dir == dir
+				for s,i in e.syncs
+					if s.filter == filter
+						e.syncs.remove(i)
+						return
+		print("NOT FOUND...")
+
+	void rm_dir(Path dir)
+		for e,i in dirs
+			if e.dir == dir
+				dirs.remove(i)
+				return
+		print("NOT FOUND...")
+		
+	ConfigDir[] dirs
+	string[] ignore
+	string server
+	
+	# runtime
+	int verbosity
+	bool show_meta
+	bool show_meta_small
+	bool recursive
+	bool filter_pure_local
+	bool filter_pure_remote
+	bool show_pure_local
+	bool show_perfectly_fine
+	bool show_not_in_db
+	bool drop_deleted
+	bool pull_tags
+	bool pull_tags_only_add
+	bool dry_run
+	string default_quality
+	string default_structure
+
+Config conf

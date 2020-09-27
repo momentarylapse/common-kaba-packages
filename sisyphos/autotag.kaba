@@ -1,0 +1,105 @@
+use localdb
+use config
+use tag
+use os
+
+
+void auto_tag(out LocalFile f)
+	if !Filesystem.exists(f.path)
+		return
+	let ext = f.path.extension()
+	#print(ext)
+	try
+		if ext == "pdf"
+			let s = shell_exec("pdfinfo \"{{bash_escape(f.path)}}\" | awk '/Pages/{print $2}'")
+			if len(s) > 0
+				f.tag_set(Tag("pages", int(s)))
+		else if ext in ["png", "bmp"] #, "jpg"]
+			let s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(f.path)}}\"").explode("\n")
+			if len(s) >= 2
+				f.tag_set(Tag("width", int(s[0])))
+				f.tag_set(Tag("height", int(s[1])))
+		else if ext == "jpg"
+			let s = shell_exec("exiv2 -pv \"{{bash_escape(f.path)}}\"").explode("\n")
+			string model, make, time
+			for l in s
+				for i in 0:20
+					l = l.replace("  ", " ")
+				let xx = l.explode(" ")
+				if len(xx) < 6
+					continue
+				if xx[0] == "0xa002" # PixelXDimension
+					f.tag_set(Tag("width", int(xx[5])))
+				if xx[0] == "0xa003" # PixelYDimension
+					f.tag_set(Tag("height", int(xx[5])))
+				if xx[0] == "0x0110" # Model
+					model = xx[5:].join(" ")
+				if xx[0] == "0x010f" # Make
+					make = xx[5:].join(" ")
+				if xx[0] == "0x829a" # ExposureTime
+					f.tag_set(Tag("exposuretime", xx[5]))
+				if xx[0] == "0x829d"
+					print(xx[2] + " " + xx[5])
+					#f.tag_set(Tag("fnumber", xx[5]))
+				if xx[0] == "0x8827" # ISOSpeedRatings
+					f.tag_set(Tag("iso", xx[5]))
+				if xx[0] in ["0x0132", "0x9003"] # DateTime
+					time = xx[5] + " " + xx[6]
+			if len(time) == 19
+				if time[4] == ':'
+					f.tag_set(Tag("year", time[:4]))
+					f.tag_set(Tag("month", int(time[5:7])))
+					f.tag_set(Tag("day", int(time[8:10])))
+					f.tag_set(Tag("timeofday", time[11:]))
+			if len(make) > 0 and len(model) > 0
+				f.tag_set(Tag("camera", "{{make}} {{model}}"))
+		else if ext == "jpg--"
+			let s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\" || echo --end--").explode("\n")
+			string model, make, time
+			for l in s
+				let xx = l.explode("\t")
+				if len(xx) < 2
+					continue
+				if xx[0] == "0xa002"
+					f.tag_set(Tag("width", int(xx[1])))
+				if xx[0] == "0xa003"
+					f.tag_set(Tag("height", int(xx[1])))
+				if xx[0] == "0x0110"
+					model = xx[1]
+				if xx[0] == "0x010f"
+					make = xx[1]
+				if xx[0] == "0x829a"
+					f.tag_set(Tag("exposuretime", xx[1]))
+				if xx[0] == "0x829d"
+					f.tag_set(Tag("fnumber", xx[1]))
+				if xx[0] == "0x8827"
+					f.tag_set(Tag("iso", xx[1]))
+				if xx[0] in ["0x0132", "0x9003"]
+					time = xx[1]
+			if len(time) == 19
+				if time[4] == ':'
+					f.tag_set(Tag("year", time[:4]))
+					f.tag_set(Tag("month", int(time[5:7])))
+					f.tag_set(Tag("day", int(time[8:10])))
+					f.tag_set(Tag("timeofday", time[11:]))
+			if len(make) > 0 and len(model) > 0
+				f.tag_set(Tag("camera", "{{make}} {{model}}"))
+		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
+			let s = shell_exec("tsunami --info \"{{bash_escape(f.path)}}\"").explode("\n")
+			int samples = -1
+			int sample_rate = 44100
+			for l in s
+				if l[:9] == "samples: "
+					samples = int(l[9:])
+				else if l[:13] == "sample-rate: "
+					sample_rate = int(l[13:])
+				else if l[:13] == "tag: title = "
+					f.set_name(l[13:])
+				else if l[:14] == "tag: artist = "
+					f.tag_set(Tag("artist", l[14:]))
+				else if l[:13] == "tag: album = "
+					f.tag_set(Tag("album", l[13:]))
+			if samples >= 0
+				f.tag_set(Tag("length", samples / sample_rate))
+	except Exception as e
+		error_out(e)
