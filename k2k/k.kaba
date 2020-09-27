@@ -1,0 +1,1472 @@
+use os
+const int CHAR_NL = 0x0a
+const int CHAR_TAB = 0x09
+
+bool verbose
+
+bool isWhitespace(char c)
+	return (c == ' ') or (c == CHAR_TAB) or (c == CHAR_NL)
+
+bool isNumber(char c)
+	return (c >= '0') and (c <= '9')
+
+bool isOperator(char c)
+	return (c == '(') or (c == ')') or (c == '=') or (c == '+') or (c == '-') or (c == '*') or (c == '/') or (c == '%') or (c == '.') or (c == ',') or (c == '[') or (c == ']') or (c == '{') or (c == '}') or (c == '!') or (c == '<') or (c == '>') or (c == ':')
+
+
+string unescape(string s)
+	string r
+	for j in 1:len(s)-1
+		if s[j] == '\\' and j < len(s) + 1
+			j ++
+			if s[j] == 'n'
+				r.add(CHAR_NL)
+			if s[j] == 't'
+				r.add(CHAR_TAB)
+			if s[j] == '\\'
+				r.add('\\')
+		else
+			r.add(s[j])
+	return r
+
+class Line
+	int indent
+	int physical_line_no
+	string[] words
+	const void show()
+		print(indent)
+		print(words)
+
+class Lines
+	Line[] lines
+	const void show()
+		for l in lines
+			l.show()
+
+class LiteralParser
+	const string getWord(string source, int i0)
+		string r
+		for j in i0:len(source)
+			if isWhitespace(source[j])
+				break
+			if isOperator(source[j])
+				break
+			r.add(source[j])
+		return r
+
+	const string getNumber(string source, int i0)
+		string r
+		for j in i0:len(source)
+			if !isNumber(source[j]) and (source[j] != '.')
+				break
+			r.add(source[j])
+		return r
+		
+	const string getString(string source, int i0)
+		string r
+		r.add(source[i0])
+		for j in i0+1:len(source)
+			if source[j] == '\\' and j < len(source) + 1
+				r.add(source[j])
+				r.add(source[j+1])
+				j ++
+			else
+				r.add(source[j])
+				if source[j] == '"' or source[j] == '\''
+					break
+		return r
+
+	const string getOperator(string source, int i0)
+		string r
+		r.add(source[i0])
+		if len(source) > i0 + 1
+			if source[i0 + 1] == '='
+				if source[i0] == '=' or source[i0] == '+' or source[i0] == '-' or source[i0] == '*' or source[i0] == '/' or source[i0] == '<' or source[i0] == '>'
+					r.add(source[i0 + 1])
+		return r
+	
+	Line parseLine(string source)
+		Line l
+		l.indent = 0
+		for i in 0:len(source)
+			l.indent = i
+			if source[i] != CHAR_TAB
+				break
+		string temp
+		for i in l.indent:len(source)
+			if isWhitespace(source[i])
+				continue
+			if source[i] == '"' or source[i] == 0x27 # " or '
+				temp = getString(source, i)
+			else if isNumber(source[i])
+				temp = getNumber(source, i)
+			else if isOperator(source[i])
+				temp = getOperator(source, i)
+			else
+				temp = getWord(source, i)
+			l.words.add(temp)
+			i += len(temp)-1
+		return l
+
+	Lines parse(string source)
+		Lines r
+		string[] lines = source.explode("\n")
+		int line_no = 0
+		for l in lines
+			Line ll = parseLine(l)
+			if len(ll.words) > 0
+				ll.physical_line_no = line_no
+				r.lines.add(ll)
+			line_no ++
+		return r
+
+enum
+	TYPE_NONE
+	TYPE_BOOL
+	TYPE_INT
+	TYPE_FLOAT
+	TYPE_STRING
+	TYPE_ARRAY
+	TYPE_DICT
+	TYPE_FUNCTION
+	TYPE_OBJECT
+
+class DynamicValue
+	int type
+	DynamicValueState* s
+	void __init__()
+		s = new DynamicValueState()
+		type = TYPE_NONE
+	virtual void __delete__()
+		del s
+	const string __str__()
+		return str(s)
+	const string render()
+		return s.render()
+	const int __int__()
+		return int(s)
+	const float __float__()
+		return float(s)
+	const bool __bool__()
+		return bool(s)
+	const DynamicValue* get_element(DynamicValue i)
+		return s.get_element(i)
+	void add(DynamicValue el)
+		s.add(el)
+	const DynamicValue* copy()
+		DynamicValue* c = new DynamicValue()
+		del c.s
+		c.s = s.copy()
+		c.type = type
+		return c
+	void setType(int _type)
+		if type != _type
+			#clear()
+			del s
+			type = _type
+			if type == TYPE_BOOL
+				s = new DynamicValueStateBool()
+			else if type == TYPE_INT
+				s = new DynamicValueStateInt()
+			else if type == TYPE_FLOAT
+				s = new DynamicValueStateFloat()
+			else if type == TYPE_STRING
+				s = new DynamicValueStateString()
+			else if type == TYPE_ARRAY
+				s = new DynamicValueStateArray()
+			else if type == TYPE_DICT
+				s = new DynamicValueStateDict()
+			else if type == TYPE_FUNCTION
+				s = new DynamicValueStateFunction()
+			else
+				s = new DynamicValueState()
+	void setBool(bool b)
+		setType(TYPE_BOOL)
+		DynamicValueStateBool *sb = s
+		sb.v = b
+	void setInt(int i)
+		setType(TYPE_INT)
+		DynamicValueStateInt *si = s
+		si.v = i
+	void setFloat(float f)
+		setType(TYPE_FLOAT)
+		DynamicValueStateFloat *sf = s
+		sf.v = f
+	void setString(string _s)
+		setType(TYPE_STRING)
+		DynamicValueStateString *ss = s
+		ss.v = _s
+	void setFunction(Function f)
+		setType(TYPE_FUNCTION)
+		DynamicValueStateFunction *sf = s
+		sf._func = &f
+	void __assign__(DynamicValue b)
+		if b.type == TYPE_BOOL
+			setBool(bool(b))
+		else if b.type == TYPE_INT
+			setInt(int(b))
+		else if b.type == TYPE_FLOAT
+			setFloat(float(b))
+		else if b.type == TYPE_STRING
+			setString(str(b))
+		else if b.type == TYPE_ARRAY
+			setType(TYPE_ARRAY)
+			DynamicValueStateArray* ba = b.s
+			for el in ba.a
+				s.add(el)
+		else if b.type == TYPE_DICT
+			setType(TYPE_DICT)
+			DynamicValueStateDict* bd = b.s
+			DynamicValueStateDict* ad = s
+			for el,i in bd.values
+				ad.add(bd.keys[i], el)
+		else if b.type == TYPE_FUNCTION
+			DynamicValueStateFunction* bf = b.s
+			setFunction(bf._func)
+
+	void __iadd__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(int(s) + int(b))
+			else if type == TYPE_FLOAT
+				setInt(int(s) + float(b))
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(float(s) + int(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) + float(b))
+		else if b.type == TYPE_STRING
+			if type == TYPE_STRING
+				setString(str(s) + str(b))
+		else if b.type == TYPE_ARRAY
+			if type == TYPE_ARRAY
+				DynamicValueStateArray* ba = b.s
+				for el in ba.a
+					s.add(el)
+		else if b.type == TYPE_DICT
+			if type == TYPE_DICT
+				DynamicValueStateDict* bd = b.s
+				DynamicValueStateDict* ad = s
+				for el,i in bd.values
+					ad.add(bd.keys[i], el)
+
+	void __isub__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(int(s) - int(b))
+			else if type == TYPE_FLOAT
+				setInt(int(s) - float(b))
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(float(s) - float(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) - float(b))
+
+	void __imul__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(int(s) * int(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) * int(b))
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(int(s) * float(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) * float(b))
+
+	void __idiv__(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				setInt(int(s) / int(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) / int(b))
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				setFloat(int(s) / float(b))
+			else if type == TYPE_FLOAT
+				setFloat(float(s) / float(b))
+
+	int compare(DynamicValue b)
+		if b.type == TYPE_INT
+			if type == TYPE_INT
+				return int(s) - int(b)
+			else if type == TYPE_FLOAT
+				return (float(s) - float(b)) * 1000.0
+		else if b.type == TYPE_FLOAT
+			if type == TYPE_INT
+				return (float(s) - float(b)) * 1000.0
+			else if type == TYPE_FLOAT
+				return (float(s) - float(b)) * 1000.0
+		else if b.type == TYPE_STRING
+			if type == TYPE_STRING
+				if str(s) < str(b)
+					return -1
+				if str(s) > str(b)
+					return 1
+				return 0
+				#return ai.v.compare(bf.v)
+		return -1
+
+
+class DynamicValueState
+	virtual void __delete__()
+	virtual string type()
+		return "???"
+	virtual string __str__()
+		return "nil"
+	virtual string render()
+		return str(self)
+	virtual int __int__()
+		return 0
+	virtual float __float__()
+		return 0.0
+	virtual bool __bool__()
+		return false
+	virtual DynamicValue* get_element(DynamicValue i)
+		return nil
+	virtual void add(DynamicValue el)
+	virtual DynamicValueState* copy()
+		
+
+class DynamicValueStateInt extends DynamicValueState
+	int v
+	override void __init__()
+		v = 0
+	override void __delete__()
+	override string type()
+		return "int"
+	override string __str__()
+		return str(v)
+	override int __int__()
+		return v
+	override float __float__()
+		return v
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateInt()
+		c.v = v
+		return c
+
+class DynamicValueStateBool extends DynamicValueState
+	bool v
+	override void __init__()
+		v = false
+	override void __delete__()
+	override string type()
+		return "bool"
+	override string __str__()
+		return str(v)
+	override bool __bool__()
+		return v
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateBool()
+		c.v = v
+		return c
+
+class DynamicValueStateFloat extends DynamicValueState
+	float v
+	override void __init__()
+		v = 0.0
+	override void __delete__()
+	override string type()
+		return "float"
+	override string __str__()
+		return str(v)
+	override int __int__()
+		return v
+	override float __float__()
+		return v
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateFloat()
+		c.v = v
+		return c
+
+class DynamicValueStateString extends DynamicValueState
+	string v
+	override void __init__()
+		v.__init__()
+	override void __delete__()
+	override string type()
+		return "str"
+	override string __str__()
+		return v
+	override string render()
+		return "'{{v}}'"
+	override int __int__()
+		return int(v)
+	override float __float__()
+		return float(v)
+	override bool __bool__()
+		return len(v) > 0
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateString()
+		c.v = v
+		return c
+
+class DynamicValueStateArray extends DynamicValueState
+	DynamicValue*[] a
+	override void __delete__()
+		for e in a
+			del e
+	override string type()
+		return "array"
+	override string __str__()
+		string s = "["
+		for e,i in a
+			if i > 0
+				s += ","
+			s += e.render()
+		return s + "]"
+	override bool __bool__()
+		return len(a) > 0
+	override DynamicValue* get_element(DynamicValue i)
+		if i.type != TYPE_INT
+			return nil
+		DynamicValueStateInt* ii = i.s
+		if ii.v < 0 or ii.v >= len(a)
+			return nil
+		return a[ii.v]
+	override void add(DynamicValue el)
+		a.add(el.copy())
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateArray()
+		for el in a
+			c.add(el.copy())
+		return c
+
+class DynamicValueStateDict extends DynamicValueState
+	DynamicValue*[] keys
+	DynamicValue*[] values
+	override void __delete__()
+		for e in values
+			del e
+		for e in keys
+			del e
+	override string type()
+		return "dict"
+	override string __str__()
+		string s = "{"
+		for e,i in values
+			if i > 0
+				s += ","
+			s += keys[i].render() + ":" + e.render()
+		return s + "}"
+	override bool __bool__()
+		return len(values) > 0
+	override DynamicValue* get_element(DynamicValue key)
+		for k,j in keys
+			if k.compare(key) == 0
+				return values[j]
+		
+		let val = new DynamicValue()
+		values.add(val)
+		keys.add(key.copy())
+		return val
+	void add(DynamicValue key, DynamicValue val)
+		for k,j in keys
+			if k.compare(key) == 0
+				return
+		values.add(val.copy())
+		keys.add(key.copy())
+	override DynamicValueState* copy()
+		let c = new DynamicValueStateDict()
+		for v,i in values
+			c.add(keys[i].copy(),v.copy())
+		return c
+
+class DynamicValueStateFunction extends DynamicValueState
+	Function* _func
+	override void __init__()
+		_func = nil
+	override string type()
+		return "func"
+	override string __str__()
+		return "<func>"
+
+class Variable
+	DynamicValue* v
+	string name
+	bool writable
+	bool is_ref
+	void __init__()
+		v = new DynamicValue()
+		is_ref = false
+		writable = true
+	void __init__(string _name)
+		v = new DynamicValue()
+		name = _name
+		is_ref = false
+		writable = true
+	void __delete__()
+		clear()
+	void clear()
+		if !is_ref
+			del v
+		is_ref = false
+		v = nil
+	void show()
+		string s
+		if writable
+			s += "variable "
+		else
+			s += "const "
+		
+		#s += v.s.type() + " "
+		if len(name) > 0
+			s += name + " = "
+		s += v.render()
+		print(s)
+	void setType(int _type)
+		v.setType(_type)
+	void setReference(DynamicValue r)
+		clear()
+		is_ref = true
+		v = &r
+		
+
+
+class Function
+	string name
+	string[] params
+	bool is_internal
+	#Variable*[] params
+	#Variable*[] vars
+	SyntaxNodeBlock* block
+	void __init__(string _name)
+		name = _name
+		block = nil
+		is_internal = false
+	#Variable* addVar(string name)
+	#	Variable *v = new Variable(name)
+	#	vars.add(v)
+	#	return v
+	virtual void call(out Interpreter inter, out Variable ret, Variable*[] p)
+		inter.stack_push(self, ret)
+		int n = min(len(p), len(params))
+		for i in 0:n
+			*inter.cur_context.vars[i].v = *p[i].v
+		inter.doNode(block, ret)
+		inter.stack_pop()
+
+
+class FunctionInternal extends Function
+	void __init__()
+		super.__init__("")
+		is_internal = true
+
+class FunctionSin extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(sin(float(p[0].v)))
+
+class FunctionCos extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(cos(float(p[0].v)))
+
+class FunctionTan extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(tan(float(p[0].v)))
+
+class FunctionSqrt extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(sqrt(float(p[0].v)))
+
+class FunctionAbs extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(abs(float(p[0].v)))
+
+class FunctionPrint extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		string s
+		for pp in p
+			s += str(pp.v)
+			s += " "
+		print(s)
+
+class FunctionLen extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			if p[0].v.type == TYPE_ARRAY
+				DynamicValueStateArray* a = p[0].v.s
+				r.v.setInt(len(a.a))
+			if p[0].v.type == TYPE_DICT
+				DynamicValueStateDict* a = p[0].v.s
+				r.v.setInt(len(a.values))
+
+class FunctionRange extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		r.v.setType(TYPE_ARRAY)
+		DynamicValueStateArray* a = r.v.s
+		int start = 0
+		int end = 0
+		int step = 1
+	
+		if len(p) == 1
+			end = int(p[0].v)
+		if len(p) >= 2
+			start = int(p[0].v)
+			end = int(p[1].v)
+		if len(p) >= 3
+			step = int(p[2].v)
+
+		int i = start
+		while i < end
+			let ii = new DynamicValue()
+			ii.setInt(i)
+			a.a.add(ii)
+			i += step
+
+class FunctionStr extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setString(str(p[0].v))
+
+class FunctionInt extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setInt(int(p[0].v))
+
+class FunctionFloat extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setFloat(float(p[0].v))
+
+class FunctionBool extends FunctionInternal
+	override void call(Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) > 0
+			r.v.setBool(bool(p[0].v))
+
+class FunctionMap extends FunctionInternal
+	override void call(out Interpreter inter, out Variable r, Variable*[] p)
+		if len(p) >= 2
+			if p[0].v.type == TYPE_FUNCTION and p[1].v.type == TYPE_ARRAY
+				r.v.setType(TYPE_ARRAY)
+				DynamicValueStateFunction *f = p[0].v.s
+				DynamicValueStateArray *pa = p[1].v.s
+				DynamicValueStateArray *ra = r.v.s
+				for e in pa.a
+					Variable temp
+					Variable temp2
+					temp2.setReference(e)
+					Variable*[] pp
+					pp.add(&temp2)
+					inter.stack_push(self, temp)
+					f._func.call(inter, temp, pp)
+					inter.stack_pop()
+					ra.a.add(temp.v.copy())
+
+enum
+	TYPE_OPERATOR
+	TYPE_VARIABLE
+	TYPE_CONST
+	TYPE_CALL
+	TYPE_BLOCK
+	TYPE_IF
+	TYPE_WHILE
+	TYPE_FOR
+	TYPE_BREAK
+	TYPE_CONTINUE
+	TYPE_RETURN
+	TYPE_ARRAY_BUILDER
+	TYPE_DICT_BUILDER
+	TYPE_ARRAY_ELEMENT
+
+class SyntaxNode
+	int type
+	SyntaxNode*[] params
+	virtual string str()
+		return "???"
+	virtual void showPost(int indent)
+	void show(int indent)
+		string s
+		for i in 0:indent
+			s += "    "
+		print(s + str())
+		for p in params
+			p.show(indent + 1)
+		showPost(indent)
+
+class SyntaxNodeVariable extends SyntaxNode
+	string name
+	bool allow_create
+	void __init__(string _name)
+		name = _name
+		allow_create = false
+		type = TYPE_VARIABLE
+	override string str()
+		return "variable " + name
+
+class SyntaxNodeConst extends SyntaxNode
+	Variable *v
+	void __init__(Variable *_v)
+		v = _v
+		type = TYPE_CONST
+	override string str()
+		return "const " + v.v.render()
+
+class SyntaxNodeOperator extends SyntaxNode
+	string op
+	void __init__(string _op)
+		op = _op
+		type = TYPE_OPERATOR
+	override string str()
+		return "operator " + op
+	int rank()
+		if op == "*"
+			return 1
+		if op == "/"
+			return 2
+		if op == "+"
+			return 3
+		if op == "-"
+			return 4
+		if op == "="
+			return 10
+		return 5
+
+class SyntaxNodeCall extends SyntaxNode
+	string name
+	
+	void __init__(string _name)
+		name = _name
+		type = TYPE_CALL
+	override string str()
+		return "call " + name
+
+class SyntaxNodeBlock extends SyntaxNode
+	override void __init__()
+		type = TYPE_BLOCK
+	override string str()
+		return "block"
+
+class SyntaxNodeIf extends SyntaxNode
+	SyntaxNode* block, block_else
+	override void __init__()
+		type = TYPE_IF
+		block = nil
+		block_else = nil
+	override string str()
+		return "if"
+	override void showPost(int indent)
+		block.show(indent+1)
+		if block_else
+			block_else.show(indent+1)
+
+class SyntaxNodeWhile extends SyntaxNode
+	SyntaxNode* block, block_else
+	override void __init__()
+		type = TYPE_WHILE
+		block = nil
+		block_else = nil
+	override string str()
+		return "while"
+	override void showPost(int indent)
+		block.show(indent+1)
+		if block_else
+			block_else.show(indent+1)
+
+class SyntaxNodeFor extends SyntaxNode
+	SyntaxNode* block, block_else
+	override void __init__()
+		type = TYPE_FOR
+		block = nil
+		block_else = nil
+	override string str()
+		return "for"
+	override void showPost(int indent)
+		block.show(indent+1)
+
+		if block_else
+			block_else.show(indent+1)
+
+class SyntaxNodeReturn extends SyntaxNode
+	override void __init__()
+		type = TYPE_RETURN
+	override string str()
+		return "return"
+
+class SyntaxNodeBreak extends SyntaxNode
+	override void __init__()
+		type = TYPE_BREAK
+	override string str()
+		return "break"
+
+class SyntaxNodeContinue extends SyntaxNode
+	override void __init__()
+		type = TYPE_CONTINUE
+	override string str()
+		return "continue"
+
+class SyntaxNodeArrayBuilder extends SyntaxNode
+	override void __init__()
+		type = TYPE_ARRAY_BUILDER
+	override string str()
+		return "new []"
+
+class SyntaxNodeDictBuilder extends SyntaxNode
+	override void __init__()
+		type = TYPE_DICT_BUILDER
+	override string str()
+		return "new {}"
+
+class SyntaxNodeArrayElement extends SyntaxNode
+	override void __init__()
+		type = TYPE_ARRAY_ELEMENT
+	override string str()
+		return "[]"
+
+class SyntaxError extends Exception
+
+class SyntaxTree
+	Context* vars
+	Variable*[] consts
+	Function* func_main
+	Function*[] funcs
+	Function*[] internal_funcs
+	
+	
+	Function* cur_func
+	
+	
+	Lines lines
+	int cur_line_no
+	Line cur_line
+	int cur_word
+	string cur
+	bool endOfFile()
+		return cur_line_no >= len(lines.lines) - 1
+	void nextLine()
+		if endOfFile()
+			setError("unexpected end of file")
+			return
+		cur_line_no ++
+		cur_line = lines.lines[cur_line_no]
+		cur_word = 0
+		cur = cur_line.words[0]
+	bool endOfLine()
+		return cur_word >= len(cur_line.words) - 1
+	void expect_more()
+		if endOfLine()
+			setError("unexpected end of line")
+	void next()
+		#if endOfLine()
+#			setError("unexpected end of line")
+#			return
+		cur = peek()
+		cur_word ++
+		#cur = cur_line.words[cur_word]
+	string peek()
+		if cur_word+1 < len(cur_line.words)
+			return cur_line.words[cur_word+1]
+		return ""
+	
+	void setError(string msg)
+		string c = "line {{cur_line.physical_line_no + 1}} at {{cur}}"
+		raise(new SyntaxError("Syntax error: {{msg}}\n{{c}}"))
+	
+	Variable* addGlobalVar(string name)
+		Variable* v = new Variable(name)
+		vars.add(v)
+		return v
+	Variable* addConst()
+		Variable* c = new Variable("")
+		c.writable = false
+		consts.add(c)
+		return c
+	Variable* addConstNumber(string s)
+		Variable* c = addConst()
+		if s.find(".", 0) >= 0
+			c.v.setFloat(float(s))
+		else
+			c.v.setInt(int(s))
+		return c
+	Variable* addConstString(string s)
+		Variable* c = addConst()
+		c.v.setString(s)
+		return c
+	Function* addFunc(string name)
+		Function* f = new Function(name)
+		Variable* v = addGlobalVar(name)
+		v.v.setFunction(f)
+		funcs.add(f)
+		return f
+	void add_internal_func(string name, out Function *f)
+		f.name = name
+		Variable* v = addGlobalVar(name)
+		internal_funcs.add(f)
+		v.v.setFunction(f)
+		
+	SyntaxNode* getNuclearOperand()
+		if isNumber(cur[0])
+			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstNumber(cur))
+			next()
+			return sn
+		if cur[0] == '"' or cur[0] == 0x27 # " or '
+			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstString(unescape(cur)))
+			next()
+			return sn
+		if isOperator(cur[0])
+			setError("variable name expected")
+		SyntaxNodeVariable* sn = new SyntaxNodeVariable(cur)
+		if cur_word == 0
+			if peek() == "="
+				sn.allow_create = true
+		next()
+		return sn
+	SyntaxNode* getOperator()
+		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
+			setError("operator expected")
+		SyntaxNode* sn = new SyntaxNodeOperator(cur)
+		next()
+		return sn
+	SyntaxNode* getOperandFunc()
+		SyntaxNode* sn = new SyntaxNodeCall(cur)
+		next() # name
+		if cur != "("
+			setError("( after function name expected")
+		next() # "("
+		if cur == ")"
+			return sn
+		while true
+			SyntaxNode *param = getOperandGreedy()
+			sn.params.add(param)
+			if cur != "," and cur != ")"
+				setError(", or ) after parameter expexted")
+				return nil
+			if cur == ")"
+				break
+			next()
+		next() # ")"
+		return sn
+	SyntaxNode* getOperandArrayBuilder()
+		let sn = new SyntaxNodeArrayBuilder()
+		next() # "["
+		while cur != "]"
+			SyntaxNode *sub = getOperandGreedy()
+			sn.params.add(sub)
+			if cur != "," and cur != "]"
+				setError(", or ] expected")
+			if cur == ","
+				next()
+		next() # "]"
+		return sn
+	SyntaxNode* getOperandDictBuilder()
+		let sn = new SyntaxNodeDictBuilder()
+		next() # "{"
+		while cur != "}"
+			SyntaxNode *key = getOperandGreedy()
+			sn.params.add(key)
+			if cur != ":"
+				setError(": expected")
+			next() # ":"
+			SyntaxNode *val = getOperandGreedy()
+			sn.params.add(val)
+			if cur != "," and cur != "}"
+				setError(", or } expected")
+			if cur == ","
+				next()
+		next() # "}"
+		return sn
+	SyntaxNode* checkOperandExtensions(SyntaxNode* sn)
+		if cur == "["
+			let el = new SyntaxNodeArrayElement()
+			el.params.add(sn)
+			next() # "["
+			SyntaxNode* index = getOperandGreedy()
+			el.params.add(index)
+			if cur != "]"
+				setError("] expected")
+			next() # "]"
+			return checkOperandExtensions(el)
+		
+		return sn
+	SyntaxNode* getOperand()
+		# bracket?
+		if cur == "("
+			next()
+			SyntaxNode *sn = getOperandGreedy()
+			if cur != ")"
+				setError(") expected")
+			next() # ")"
+			return checkOperandExtensions(sn)
+		
+		# [a,b,c]
+		if cur == "["
+			return getOperandArrayBuilder()
+		
+		# {a,b,c}
+		if cur == "{"
+			return getOperandDictBuilder()
+		
+		# function call?
+		if peek() == "("
+			return checkOperandExtensions(getOperandFunc())
+		
+		# basic
+		SyntaxNode* sn = getNuclearOperand()
+		return checkOperandExtensions(sn)
+	
+	
+	# sequence of [operand operator operand ...]
+	SyntaxNode* getOperandGreedy()
+		SyntaxNode*[] sn
+		sn.add(getOperand())
+		while !endOfLine()
+			if cur == "," or cur == ")" or cur == "]" or cur == "}" or cur == ":"
+				break
+			sn.add(getOperator())
+			sn.add(getOperand())
+		return linkOperators(sn)
+	SyntaxNode* linkOperators(out SyntaxNode*[] sn)
+		int[] rank
+		for i in 0:(len(sn)-1)/2
+			SyntaxNodeOperator *op = sn[i*2+1]
+			rank.add(op.rank())
+		while len(sn) > 2
+			int rmin = 100
+			int imin = 0
+			for r,i in rank
+				if r < rmin
+					rmin = r
+					imin = i
+			sn[imin*2+1].params.add(sn[imin*2])
+			sn[imin*2+1].params.add(sn[imin*2+2])
+			sn.remove(imin*2+2)
+			sn.remove(imin*2)
+			rank.remove(imin)
+		return sn[0]
+	SyntaxNode *getSpecialCommandReturn()
+		let sn = new SyntaxNodeReturn()
+		while !endOfLine()
+			next()
+			sn.params.add(getOperandGreedy())
+			if !endOfLine()
+				setError("multi return not supported")
+				next()
+				if cur != ","
+					setError(", or end of line expected")
+					return nil
+		return sn
+	SyntaxNode *getSpecialCommandIf()
+		int indent0 = cur_line.indent
+		let sn = new SyntaxNodeIf()
+		next() # "if"
+		sn.params.add(getOperandGreedy())
+		sn.block = parseBlock()
+		if endOfFile()
+			return sn
+		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
+			return sn
+		nextLine()
+		# else
+		sn.block_else = parseBlock()
+		return sn
+	SyntaxNode *getSpecialCommandWhile()
+		int indent0 = cur_line.indent
+		SyntaxNodeWhile *sn = new SyntaxNodeWhile()
+		next() # "while"
+		sn.params.add(getOperandGreedy())
+		sn.block = parseBlock()
+		if endOfFile()
+			return sn
+		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
+			return sn
+		nextLine()
+		# else
+		sn.block_else = parseBlock()
+		return sn
+	SyntaxNode *getSpecialCommandFor()
+		int indent0 = cur_line.indent
+		SyntaxNodeFor *sn = new SyntaxNodeFor()
+		next() # "for"
+		SyntaxNodeVariable* var = new SyntaxNodeVariable(cur)
+		next()
+		var.allow_create = true
+		sn.params.add(var)
+		if cur != "in"
+			setError("in extected")
+		next()
+		sn.params.add(getOperandGreedy())
+		sn.block = parseBlock()
+		if endOfFile()
+			return sn
+		if lines.lines[cur_line_no + 1].indent != indent0 or lines.lines[cur_line_no + 1].words[0] != "else"
+			return sn
+		nextLine()
+		# else
+		sn.block_else = parseBlock()
+		return sn
+	SyntaxNode *getSpecialCommandBreak()
+		SyntaxNodeBreak *sn = new SyntaxNodeBreak()
+		return sn
+	SyntaxNode *getSpecialCommandContinue()
+		SyntaxNodeContinue *sn = new SyntaxNodeContinue()
+		return sn
+	void parseFunctionDef()
+		Function* prev_func = cur_func
+		int indent0 = cur_line.indent
+		next()
+		Function *f = addFunc(cur)
+		cur_func = f
+		next()
+		if cur != "("
+			setError("( expected")
+		next()
+		while cur != ")"
+			#Variable* v = ad
+			f.params.add(cur)
+			next()
+			if cur == ")"
+				break
+			if cur != ","
+				setError(", or ) expected")
+			next()
+		if !endOfLine()
+			setError("end of line expexted")
+		
+		f.block = parseBlock()
+		cur_func = prev_func
+		
+	SyntaxNode *parseLine()
+		if cur == "if"
+			return getSpecialCommandIf()
+		if cur == "while"
+			return getSpecialCommandWhile()
+		if cur == "for"
+			return getSpecialCommandFor()
+		if cur == "return"
+			return getSpecialCommandReturn()
+		if cur == "break"
+			return getSpecialCommandBreak()
+		if cur == "continue"
+			return getSpecialCommandContinue()
+		if cur == "def"
+			parseFunctionDef()
+			return nil
+		SyntaxNode *sn = getOperandGreedy()
+		if !endOfLine()
+			setError("end of line expected")
+		return sn
+	SyntaxNode *parseBlock()
+		SyntaxNodeBlock *sn = new SyntaxNodeBlock()
+		nextLine()
+		int indent0 = cur_line.indent
+		SyntaxNode *sub = parseLine()
+		if sub
+			sn.params.add(sub)
+		while !endOfFile()
+			if lines.lines[cur_line_no + 1].indent < indent0
+				return sn
+			if lines.lines[cur_line_no + 1].indent > indent0
+				sn.params.add(parseBlock())
+			else
+				nextLine()
+				sub = parseLine()
+				if sub
+					sn.params.add(sub)
+		return sn
+	
+	void create(string source)
+		LiteralParser lp
+		
+		vars = new Context("-global-", nil)
+		
+		func_main = addFunc("main")
+		
+		Variable* v = addGlobalVar("true")
+		v.v.setBool(true)
+		v.writable = false
+		v = addGlobalVar("false")
+		v.writable = false
+		v.v.setBool(false)
+		v = addGlobalVar("nil")
+		v.writable = false
+		v = addGlobalVar("pi")
+		v.v.setFloat(3.141592654)
+		v.writable = false
+
+		add_internal_func("sin", new FunctionSin())
+		add_internal_func("cos", new FunctionCos())
+		add_internal_func("tan", new FunctionTan())
+		add_internal_func("sqrt", new FunctionSqrt())
+		add_internal_func("abs", new FunctionAbs())
+		add_internal_func("len", new FunctionLen())
+		add_internal_func("range", new FunctionRange())
+		add_internal_func("print", new FunctionPrint())
+		add_internal_func("str", new FunctionStr())
+		add_internal_func("int", new FunctionInt())
+		add_internal_func("float", new FunctionFloat())
+		add_internal_func("bool", new FunctionBool())
+		add_internal_func("map", new FunctionMap())
+		
+		lines = lp.parse(source)
+		
+		cur_line_no = -1
+		#lines.show()
+		cur_func = func_main
+		func_main.block = parseBlock()
+	void show()
+		print("--- syntax tree ---")
+		for f in funcs
+			print("function " + f.name)
+			f.block.show(1)
+		print("--- ---")
+
+class Context
+	string name
+	Context* parent
+	Variable*[] vars
+	Variable* ret
+	Function* _func
+	bool flag_return
+	bool flag_break
+	bool flag_continue
+	void __init__(string _name, Context* p)
+		name = _name
+		parent = p
+		ret = nil
+		_func = nil
+		flag_return = false
+		flag_break = false
+		flag_continue = false
+	void __delete__()
+		for v in vars
+			del v
+	Variable* get(string name)
+		for v in vars
+			if v.name == name
+				return v
+		if parent
+			return parent.get(name)
+		return nil
+	void add(Variable *v)
+		vars.add(v)
+	void show()
+		print(">>>  {{name}}")
+		for v in vars
+			v.show()
+
+class RuntimeError extends Exception
+
+class Interpreter
+	SyntaxTree* syntax
+	Context*[] contexts
+	Context* cur_context
+	void setError(string msg)
+		raise(new RuntimeError("Runtime error: {{msg}}"))
+	void stack_push(Function func, Variable ret)
+		cur_context = new Context(func.name, cur_context)
+		cur_context._func = &func
+		cur_context.ret = &ret
+		for n in func.params
+			cur_context.add(new Variable(n))
+		contexts.add(cur_context)
+	void stack_pop()
+		int n = len(contexts) - 1
+		del cur_context
+		contexts.remove(n)
+		if n > 0
+			cur_context = contexts[n - 1]
+	void doNode(SyntaxNode sn, out Variable ret)
+		Variable*[] params
+		bool[] is_temp
+		
+		# parameters
+		for p in sn.params
+			if p.type == TYPE_VARIABLE
+				SyntaxNodeVariable *vv = p
+				Variable* v = cur_context.get(vv.name)
+				if !v
+					if vv.allow_create
+						v = new Variable(vv.name)
+						cur_context.add(v)
+					else
+						setError("variable not found: {{vv.name}}")
+				params.add(v)
+				is_temp.add(false)
+			else if p.type == TYPE_CONST
+				SyntaxNodeConst *vv = p
+				params.add(vv.v)
+				is_temp.add(false)
+			else
+				Variable *temp = new Variable()
+				doNode(p, temp)
+				params.add(temp)
+				is_temp.add(true)
+				
+				if cur_context.flag_return or cur_context.flag_break or cur_context.flag_continue
+					break
+		
+		# execute
+		if sn.type == TYPE_OPERATOR
+			SyntaxNodeOperator *op = &sn
+			if op.op == "="
+				*params[0].v = *params[1].v
+			else if op.op == "+"
+				*ret.v = *params[0].v
+				*ret.v += *params[1].v
+			else if op.op == "+="
+				*params[0].v += *params[1].v
+			else if op.op == "-"
+				*ret.v = *params[0].v
+				*ret.v -= *params[1].v
+			else if op.op == "-="
+				*params[0].v -= *params[1].v
+			else if op.op == "*"
+				*ret.v = *params[0].v
+				*ret.v *= *params[1].v
+			else if op.op == "*="
+				*params[0].v *= *params[1].v
+			else if op.op == "/"
+				*ret.v = *params[0].v
+				*ret.v /= *params[1].v
+			else if op.op == "/="
+				*params[0].v /= *params[1].v
+			else if op.op == ">"
+				ret.v.setBool(params[0].v.compare(*params[1].v) > 0)
+			else if op.op == "<"
+				ret.v.setBool(params[0].v.compare(*params[1].v) < 0)
+			else if op.op == "=="
+				ret.v.setBool(params[0].v.compare(*params[1].v) == 0)
+			else if op.op == ">="
+				ret.v.setBool(params[0].v.compare(*params[1].v) >= 0)
+			else if op.op == "<="
+				ret.v.setBool(params[0].v.compare(*params[1].v) <= 0)
+			else if op.op == "and"
+				ret.v.setBool(bool(params[0].v) and bool(params[1].v))
+			else if op.op == "or"
+				ret.v.setBool(bool(params[0].v) or bool(params[1].v))
+			else if op.op == "not"
+				ret.v.setBool(bool(params[0].v))
+			else
+				setError("unhandled operator: {{op.op}}")
+		else if sn.type == TYPE_CALL
+			SyntaxNodeCall *call = &sn
+			Variable* v = cur_context.get(call.name)
+			if !v
+				setError("function not found: {{call.name}}")
+			if v.v.type != TYPE_FUNCTION
+				setError("is not a function: {{call.name}}")
+			DynamicValueStateFunction* fs = v.v.s
+			Function *f = fs._func
+			stack_push(f, ret)
+			f.call(self, ret, params)
+			#if f.block
+#				int n = min(len(sn.params), len(f.params))
+#				for i in 0:n
+#					*cur_context.vars[i].v = *params[i].v
+#			else
+			stack_pop()
+				
+		else if sn.type == TYPE_IF
+			Variable dummy
+			SyntaxNodeIf *_if = &sn
+			if bool(params[0].v)
+				doNode(_if.block, dummy)
+			else if _if.block_else
+				doNode(_if.block_else, dummy)
+		else if sn.type == TYPE_WHILE
+			SyntaxNodeWhile *_while = &sn
+			while bool(params[0].v)
+				cur_context.flag_continue = false
+				Variable dummy
+				doNode(_while.block, dummy)
+				
+				if cur_context.flag_return or cur_context.flag_break
+					break
+
+				# reevaluate
+				if sn.params[0].type != TYPE_VARIABLE
+					doNode(sn.params[0], params[0])
+			cur_context.flag_break = false
+		else if sn.type == TYPE_FOR
+			if params[1].v.type != TYPE_ARRAY
+				setError("for needs array")
+			DynamicValueStateArray* a = params[1].v.s
+			SyntaxNodeFor *_for = &sn
+			for el in a.a
+				params[0].setReference(el)
+				cur_context.flag_continue = false
+				
+				Variable dummy
+				doNode(_for.block, dummy)
+				
+				if cur_context.flag_return or cur_context.flag_break
+					break
+					
+			cur_context.flag_break = false
+		else if sn.type == TYPE_RETURN
+			if len(params) > 0
+				*cur_context.ret.v = *params[0].v
+			cur_context.flag_return = true
+		else if sn.type == TYPE_BREAK
+			cur_context.flag_break = true
+		else if sn.type == TYPE_CONTINUE
+			cur_context.flag_continue = true
+		else if sn.type == TYPE_BLOCK
+			pass
+		else if sn.type == TYPE_ARRAY_BUILDER
+			ret.setType(TYPE_ARRAY)
+			for c in params
+				ret.v.add(c.v)
+		else if sn.type == TYPE_DICT_BUILDER
+			ret.setType(TYPE_DICT)
+			DynamicValueStateDict *ds = ret.v.s
+			int n = len(params) / 2
+			for i in 0:n
+				ds.add(params[0].v, params[1].v)
+		else if sn.type == TYPE_ARRAY_ELEMENT
+			DynamicValue *dv = params[0].v.get_element(params[1].v)
+			if dv
+				ret.setReference(dv)
+		else
+			setError("unhandled node: {{sn.type}}")
+		for p,i in params
+			if is_temp[i]
+				del p
+				
+	void run(SyntaxTree _syntax)
+		syntax = &_syntax
+		Variable dummy
+		cur_context = syntax.vars
+		stack_push(syntax.func_main, dummy)
+		doNode(syntax.func_main.block, dummy)
+
+void eval(string source)
+	SyntaxTree syntax
+	syntax.create(source)
+	if verbose
+		syntax.show()
+	Interpreter inter
+	inter.run(syntax)
+	if verbose
+		print("--- variables ---")
+		syntax.vars.show()
+		for c in inter.contexts
+			c.show()
+		print("--- ---")
+
+void main(string[] arg)
+	verbose = false
+	string input
+	bool from_file = true
+	for a in arg
+		if a == "--verbose"
+			verbose = true
+		else if a == "-C" or a == "--command"
+			from_file = false
+		else
+			input = a
+	if len(input) > 0
+		string source = input
+		try
+			if from_file
+				source = Filesystem.read(Path(input))
+			eval(source)
+		except Exception as e
+			print("------------------------------------------------")
+			print(e)
+			print("------------------------------------------------")

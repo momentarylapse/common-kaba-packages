@@ -1,0 +1,5 @@
+a = [[1,0],[0,1]]
+for x in a
+	print(x)
+a[0] = "test"
+print(a)
