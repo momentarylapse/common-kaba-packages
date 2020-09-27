@@ -1,0 +1,125 @@
+use os
+use cli_parser
+
+int MAX_DIFF_SIZE
+int MIN_MATCH_SIZE
+int CONTEXT
+
+class Mapping
+	int a0, a1, b0, b1
+	const int la()
+		return a1 - a0
+	const int lb()
+		return b1 - b0
+	string __str__()
+		return "{{a0}}:{{a1}} / {{b0}}:{{b1}}"
+
+
+void expand_mapping(string a, string b, out Mapping m)
+	int d = m.b0 - m.a0
+	
+	# forward comp
+	for i in m.a0:len(a)
+		if a[i] != b[i+d]
+			m.a1 = i
+			m.b1 = m.a1 + d
+			return
+	m.a1 = len(a)
+	m.b1 = m.a1 + d
+
+Mapping try_match(string a, string b, int offset_a, int offset_b)
+	Mapping m
+	for i in 0:MAX_DIFF_SIZE
+		int oa = offset_a + i
+		for j in 0:MAX_DIFF_SIZE
+			int ob = offset_b + j
+			if a[oa:oa+MIN_MATCH_SIZE] == b[ob:ob+MIN_MATCH_SIZE]
+				m.a0 = oa
+				m.b0 = ob
+				return m
+	m.a0 = -1
+	return m
+
+bool is_printable_ascii(char c)
+	return c >= 0x20 and c <= 0x7e
+
+string hex(string s)
+	string r
+	bool in_printable = false
+	for i in 0:len(s)
+		if in_printable
+			if not is_printable_ascii(s[i])
+				in_printable = false
+				r += "» "
+		else if len(s[i:i+4]) == 4
+			in_printable = true
+			for c in s[i:i+4]
+				if not is_printable_ascii(c)
+					in_printable = false
+			if in_printable
+				r += "«"
+		
+		if in_printable
+			r += binary(&s[i], 1)
+		else
+			r += s[i:i+1].hex()
+			if i < len(s) -1
+				r += " "
+	if in_printable
+		r += "»"
+	return r
+
+void diff(string a, string b)
+	Mapping[] diffs
+	Mapping m
+	m.a0 = 0
+	m.b0 = 0
+	
+	while true
+		expand_mapping(a, b, m)
+		if m.a1 >= len(a) or m.b1 >= len(b)
+			break
+		print(str(m))
+		let m2 = try_match(a, b, m.a1, m.b1)
+		print(str(m2))
+		if m2.a0 < 0
+			break
+		expand_mapping(a, b, m2)
+	
+		Mapping d
+		d.a0 = m.a1
+		d.b0 = m.b1
+		d.a1 = m2.a0
+		d.b1 = m2.b0
+		diffs.add(d)
+		
+		string XRED, XGREEN, XYELLOW, X0
+		XRED.add(27)
+		XRED += "[0;31m"
+		XGREEN.add(27)
+		XGREEN += "[0;32m"
+		XYELLOW.add(27)
+		XYELLOW += "[0;33m"
+		X0.add(27)
+		X0 += "[0m"
+	
+		print("{{XYELLOW}}diff at {{d}}:{{X0}}")
+		int a000 = max(d.a0-CONTEXT, 0)
+		int b000 = max(d.b0-CONTEXT, 0)
+		print(hex(a[a000:d.a0]) + " {{XRED}}{{hex(a[d.a0:d.a1])}} {{XGREEN}}{{hex(b[d.b0:d.b1])}}{{X0}} " + hex(a[d.a1:d.a1+CONTEXT]))
+		m = m2
+
+void main(string[] arg)
+	CONTEXT = 4
+	MAX_DIFF_SIZE = 4096*2
+	MIN_MATCH_SIZE = 16
+
+	CLIParser p
+	p.info("find (small) differences between binary files")
+	p.opta(["--context"], "<BYTES>", "how many bytes of context are shown", lambda (string a) CONTEXT = int(a))
+	p.opta(["--max-diff"], "<BYTES>", "maximum size of a non-matching chunk", lambda (string a) MAX_DIFF_SIZE = int(a))
+	p.opta(["--min-match"], "<BYTES>", "minimum size to recognize a matching chunk", lambda (string a) MIN_MATCH_SIZE = int(a))
+	p.cmd("help", "", "show help", lambda (string[] a) CLIParser.current.show_help())
+	p.cmd("", "<FILE1> <FILE2>", "show diff", lambda (string[] a) diff(os.Filesystem.read(a[0]), os.Filesystem.read(a[1])))
+	p.run(arg)
+	#p.show_help()
