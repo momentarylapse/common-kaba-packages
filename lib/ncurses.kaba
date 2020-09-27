@@ -1,0 +1,175 @@
+use os
+
+const string KABA_LINK = "/usr/lib/libstdc++.so
+	_setlocale:setlocale
+/usr/lib/libncursesw.so
+	_initscr:initscr
+	has_colors:has_colors
+	start_color:start_color
+	use_default_colors:use_default_colors
+	curs_set:curs_set
+	init_pair:init_pair
+	_wprintw:wprintw
+	_waddnstr:waddnstr
+	_waddnwstr:waddnwstr
+	_getmaxx:getmaxx
+	_getmaxy:getmaxy
+	_wrefresh:wrefresh
+	_wmove:wmove
+	_wclear:wclear
+	_wgetch:wgetch
+	_newwin:newwin
+	_wattr_on:wattr_on
+	_wattr_off:wattr_off
+	_waddch:waddch
+	_wborder:wborder
+	_wbkgd:wbkgd
+	endwin:endwin
+	raw:raw
+	noraw:noraw
+	echo:echo
+	noecho:noecho
+	_keypad:keypad"
+
+extern void* _initscr()
+extern int curs_set(int mode)
+extern bool has_colors()
+extern int start_color()
+extern int use_default_colors()
+extern int init_pair(int i, int a, int b)
+extern int _waddnstr(void* w, char* p, int n)
+extern int _waddnwstr(void* w, int* p, int n)
+extern int _wrefresh(void* w)
+extern int _getmaxx(void* w)
+extern int _getmaxy(void* w)
+extern int _wmove(void* w, int y, int x)
+extern int _wgetch(void* w)
+extern int _wclear(void* w)
+extern void* _newwin(int h, int w, int y, int x)
+extern int _wborder(void* w, int ls, int rs, int ts, int bs, int tl, int tr, int bl, int br)
+extern int _wattr_on(void* w, int a, void* xxx)
+extern int _wattr_off(void* w, int a, void* xxx)
+extern int _wbkgd(void* w, int c)
+extern int _waddch(void* w, int c)
+extern int endwin()
+extern int raw()
+extern int noraw()
+extern int echo()
+extern int noecho()
+extern int _keypad(void* w, bool b)
+
+extern char* _setlocale(int category, char* locale)
+
+class Window
+	void* w
+	void __init__()
+		w = nil
+	void __init__(int width, int height, int x, int y)
+		w = _newwin(height, width, y, x)
+	void background(int c)
+		_wbkgd(w, c)
+	void print(string s)
+		_waddnstr(w, &s[0], s.num)
+	void printw(string s)
+		let ss = s.utf8_to_utf32()
+		_waddnwstr(w, &ss[0], ss.num)
+	void addch(int c)
+		_waddch(w, c)
+	void refresh()
+		_wrefresh(w)
+	void keypad(bool e)
+		_keypad(w, e)
+	void move(int x, int y)
+		_wmove(w, y, x)
+	void attron(int a)
+		_wattr_on(w, a, nil)
+	void attroff(int a)
+		_wattr_off(w, a, nil)
+	void border(string s)
+		_wborder(w, s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7])
+	void clear()
+		_wclear(w)
+	int width()
+		return _getmaxx(w)
+	int height()
+		return _getmaxy(w)
+	int getch()
+		return _wgetch(w)
+
+class Attr
+	const int NORMAL = 0
+	const int COLOR = 0x0000ff00
+	const int REVERSE = 1<<(10+8)
+	const int UNDERLINE = 1<<(10+9)
+	const int BLINK = 1<<(11+8)
+	const int BOLD = 1<<(13+8)
+
+class Color
+	enum
+		BLACK
+		RED
+		GREEN
+		YELLOW
+		BLUE
+		MAGENTA
+		CYAN
+		WHITE
+	static int pair(int n)
+		return (n<<8) & Attr.COLOR
+
+class Key
+	enum
+		DOWN = 258
+		UP = 259
+		LEFT = 260
+		RIGHT = 261
+		MOUSE = 409
+		RESIZE = 410
+
+Window stdwin
+
+void init()
+	stdwin.w = _initscr()
+	string s
+	s.add(0)
+	_setlocale(0, &s[0]) # LC_CTYPE
+
+void main()
+	init()
+	raw()
+	noecho()
+	start_color()
+	use_default_colors()
+	curs_set(0)
+	stdwin.keypad(true)
+	let w = stdwin.width()
+	let h = stdwin.height()
+	init_pair(1, Color.RED, Color.BLACK)
+	stdwin.print("hallo {{w}} {{h}} {{has_colors()}}")
+	stdwin.printw(" abc ö⼭ z")
+	stdwin.move(0, h-1)
+	stdwin.attron(Attr.REVERSE)
+	for x in 0:w
+		stdwin.print(" ")
+	stdwin.move(1, h-1)
+	stdwin.print("test")
+	stdwin.attroff(Attr.REVERSE)
+	stdwin.refresh()
+	#let p = _stdscr
+	
+	let ww = new Window(40, 8, 10, 10)
+	ww.border("||--++++")
+	ww.background('~')
+	ww.move(1,1)
+	ww.attron(Attr.BOLD)
+	#ww.attron(1<<8)
+	#ww.attron(1<<11)
+	ww.print("hi test")
+	ww.attron(Color.pair(1))
+	ww.print("red")
+	#ww.addch('A' | Color.pair(1))
+	ww.refresh()
+	
+	int r = stdwin.getch()
+	endwin()
+	print(r)
