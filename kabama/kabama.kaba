@@ -1,0 +1,65 @@
+use common
+use parser
+use simplify
+use expand
+use diff
+use subst
+use zeros
+
+
+class Runtime
+	class Function
+		string name
+		string[] params
+		Term* formula
+		string __str__()
+			let p = params.join(", ")
+			return "Function {{name}}({{p}}) := {{formula}}"
+	Function*[] functions
+	
+	void add_function(Term t)
+		let f = new Function()
+		f.name = t.params[0].name
+		for p in t.params[0].params
+			f.params.add(p.name)
+		f.formula = t.params[1].copy()
+		functions.add(f)
+		#print("added... " + str(f))
+
+	Term *eval_term(Term t)
+		# recursive
+		let params = [for p in t.params eval_term(p)]
+			
+		# self
+		if t.name == "expand"
+			return expand(params[0])
+		else if t.name == "diff"
+			return diff(params[0], t.params[1].name)
+		else if t.name == "subst"
+			return subst(params[0], t.params[1].name, params[2])
+		else if t.name == "zeros"
+			return zeros(params[0], t.params[1].name)
+		else if t.type == TYPE_SPECIAL
+			if t.name == "def"
+				add_function(t.params[0])
+		else if t.type == TYPE_FUNCTION
+			for f in functions
+				if f.name == t.name
+					return subst(f.formula, f.params[0], t.params[0])
+				
+				
+
+		# recursive
+		let r = t.shallow_copy()
+		r.params = params
+		return &t
+
+	Term *eval(Term t)
+		return normalize(eval_term(t))
+
+void main(string[] arg)
+	Runtime r
+	for a in arg
+		let t = parse(a)
+		t = r.eval(t)
+		print(str(t))

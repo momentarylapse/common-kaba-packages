@@ -1,0 +1,159 @@
+use common
+
+class SyntaxError extends Exception
+
+int char_type(char c)
+	if (c >= 'a') and (c <= 'z')
+		return CHAR_LETTER
+	if (c >= 'A') and (c <= 'Z')
+		return CHAR_LETTER
+	if (c >= '0') and (c <= '9')
+		return CHAR_NUMBER
+	if c == ' ' or c == '\t' or c == '\n'
+		return CHAR_WHITESPACE
+	return CHAR_SIGN
+
+int operator_rank(string s)
+	if s == "="
+		return 1
+	if (s == "+") or (s == "-")
+		return 2
+	if (s == "*") or (s == "/")
+		return 3
+	if s == "^"
+		return 4
+	return -1
+
+void check_function_params(string f, Term*[] params)
+	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
+		if len(params) != 1
+			raise(new SyntaxError("function {{f}} expects 1 parameter, {{len(params)}} given"))
+	if f in ["diff", "zeros"]
+		if len(params) != 2
+			raise(new SyntaxError("function {{f}} expects 2 parameter, {{len(params)}} given"))
+		if params[1].type != TYPE_VARIABLE
+			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
+	if f == "subst"
+		if len(params) != 3
+			raise(new SyntaxError("function {{f}} expects 3 parameter, {{len(params)}} given"))
+		if params[1].type != TYPE_VARIABLE
+			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
+
+
+class Parser
+	string[] e
+	int cur_index
+	string cur()
+		if cur_index >= len(e)
+			return "-eol-"
+		return e[cur_index]
+	void next()
+		cur_index ++
+	string peak()
+		if cur_index >= len(e)-1
+			return "-eol-"
+		return e[cur_index + 1]
+	bool end_of_line()
+		return cur_index >= len(e)
+
+	Term *parse_operand_minimal()
+		let c = cur()
+		#print("min  {{c}} {{cur_index}}")
+		if c == "("
+			# recursion
+			next() # (
+			let o = parse_operand()
+			next() # )
+			return o
+		else if c == ")"
+			raise(new SyntaxError("unexpected )"))
+		else if char_type(c[0]) == CHAR_NUMBER
+			next()
+			return AddNumber(c)
+		else if char_type(c[0]) == CHAR_LETTER
+			next()
+			if cur() == "("
+				Term*[] params
+				next() # (
+				while cur() != ")"
+					params.add(parse_operand())
+					if cur() == ","
+						next()
+						continue
+					else if cur() != ")"
+						raise(new SyntaxError("',' or ')' expected after function parameter"))
+				next() # )
+				check_function_params(c, params)
+				return AddFunction(c, params)
+			else
+				return AddVariable(c)
+
+		raise(new SyntaxError("unknown operand '{{c}}'"))
+	
+	
+	Term* parse_operand() # complete
+		#print("operand {{cur_index}}")
+		if cur() == "def"
+			return parse_def()
+		Term*[] eid
+		while true
+			# operand
+			if end_of_line()
+				raise(new SyntaxError("unexpected end of line"))
+			eid.add(parse_operand_minimal())
+			
+			if end_of_line()
+				break
+			if cur() in [")", ","]
+				break
+			
+			# operator
+			if operator_rank(cur()) < 0
+				raise(new SyntaxError("unknown operator '{{cur()}}'"))
+			eid.add(AddOperator(cur(), nil, nil))
+			next()
+
+		return digest_operators(eid)
+
+	Term* parse_def()
+		next() # def
+		let op = parse_operand()
+		if op.name != "="
+			raise(new SyntaxError("def needs '='"))
+		if op.params[0].type != TYPE_FUNCTION
+			raise(new SyntaxError("def needs function name before '='"))
+		for p in op.params[0].params
+			if p.type != TYPE_VARIABLE
+				raise(new SyntaxError("only variables in function definition before '=' allowed"))
+		return AddSpecial("def", [op])
+
+Term *digest_operators(out Term*[] eid)
+	if (len(eid) % 2) != 1
+		raise(new SyntaxError("missing operand after operator"))
+	
+	while len(eid) > 2
+		int i_sig, sig = -1
+		for i in 0:len(eid)
+			if (i % 2) == 1
+				int os = operator_rank(eid[i].name)
+				if os > sig
+					sig = os
+					i_sig = i
+		if eid[i_sig].type != TYPE_OPERATOR
+			raise(new SyntaxError("Operator vermisst"))
+		eid[i_sig].params[0] = eid[i_sig - 1]
+		eid[i_sig].params[1] = eid[i_sig + 1]
+		eid[i_sig - 1] = eid[i_sig]
+		eid.remove(i_sig)
+		eid.remove(i_sig)
+	#print eid
+	
+	
+	return eid[0]
+
+Term *parse(string s)
+	Parser p
+	p.e = s.parse_tokens("+-*/^=(),")
+	p.cur_index = 0
+	return p.parse_operand()
+

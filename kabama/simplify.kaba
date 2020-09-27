@@ -1,0 +1,354 @@
+use common
+use parser
+
+string add(string a, string b)
+	#return i2s(s2i(a) + s2i(b))
+	vli va = a
+	vli vb = b
+	return str(va + vb)
+
+string sub(string a, string b)
+	#return i2s(s2i(a) - s2i(b))
+	vli va = a
+	vli vb = b
+	return str(va - vb)
+
+string mul(string a, string b)
+	#return i2s(s2i(a) * s2i(b))
+	vli va = a
+	vli vb = b
+	return str(va * vb)
+
+#string mod(string a, string b)
+#	#return i2s(s2i(a) * s2i(b))
+#	vli va = a, vb = b, rem
+#	va.div(b, rem)
+#	return rem.str()
+
+string exponent(string a, string b)
+	vli va = a
+	vli vb = b
+	return str(va.pow(vb))
+
+string gcd(string a, string b)
+	vli va = a
+	vli vb = b
+	return str(va.gcd(vb))
+
+void append_terms(out Term*[] a, Term*[] b)
+	for x in b
+		a.add(x)
+
+void append_neg(out bool[] a, bool[] b, bool inv)
+	for x in b
+		if inv
+			a.add(!x)
+		else
+			a.add(x)
+
+void print_group(Term*[] gr)
+	print("[" + [for x in gr str(x)].join(", ") + "]")
+
+
+Term*[] extract_add_group(Term t, out bool[] negative)
+	Term*[] l
+
+	# shortcut (-1)*a  ->  -a
+	if t.name == "*"
+		if t.params[0].name == "-1"
+			bool[] n1
+			append_terms(l, extract_add_group(t.params[1], n1))
+			append_neg(negative, n1, true)
+			return l
+
+	if t.name == "+"
+		bool[] n0, n1
+		append_terms(l, extract_add_group(t.params[0], n0))
+		append_terms(l, extract_add_group(t.params[1], n1))
+		append_neg(negative, n0, false)
+		append_neg(negative, n1, false)
+	else if t.name == "-"
+		bool[] n0, n1
+		append_terms(l, extract_add_group(t.params[0], n0))
+		append_terms(l, extract_add_group(t.params[1], n1))
+		append_neg(negative, n0, false)
+		append_neg(negative, n1, true)
+	else
+		negative.add(false)
+		l.add(&t)
+	return l
+
+Term*[] extract_product_group(Term t, out bool[] inverse)
+	Term*[] l
+	if t.name == "*"
+		bool[] n0, n1
+		append_terms(l, extract_product_group(t.params[0], n0))
+		append_terms(l, extract_product_group(t.params[1], n1))
+		append_neg(inverse, n0, false)
+		append_neg(inverse, n1, false)
+	else if t.name == "/"
+		bool[] n0, n1
+		append_terms(l, extract_product_group(t.params[0], n0))
+		append_terms(l, extract_product_group(t.params[1], n1))
+		append_neg(inverse, n0, false)
+		append_neg(inverse, n1, true)
+	else
+		inverse.add(false)
+		l.add(&t)
+	return l
+
+# [2x, 3y, z] -> [2,3,1], [x,y,z]
+string[] split_off_factor(out Term*[] l)
+	string[] factor
+	for x,i in l
+		string f = "1"
+		if x.name == "*"
+			if x.params[0].type == TYPE_NUMBER
+				f = x.params[0].name
+				l[i] = x.params[1]
+		factor.add(f)
+	return factor
+
+# a/b kürzen
+Term *simplify_number_division(string a, string b)
+	vli va = a
+	vli vb = b
+	vli rem
+	vli tt = va.div(vb, rem)
+	vli vli0 = 0
+	if rem == vli0
+		return AddNumber(str(tt))
+	string g = gcd(a, b)
+	if g != "1"
+		vli vg = g
+		va.idiv(vg, tt)
+		vb.idiv(vg, tt)
+		if vb.sign
+			vb.sign = false
+			va.sign = !va.sign
+		return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
+	return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
+
+
+bool literally_equal(Term a, Term b)
+	if a.name != b.name
+		return false
+	for i in 0:len(a.params)
+		if !literally_equal(a.params[i], b.params[i])
+			return false
+	return true
+	
+			
+	
+void sort_group(out Term*[] l)
+	# "render" all terms...   need a comp(term, term) function
+	let s = [for t in l str(t)]
+	
+	# sorti
+	for i in 0:len(l)-1
+		for j in i+1:len(l)
+			if s[i].compare(s[j]) > 0
+				l.swap(i, j)
+				s.swap(i, j)
+
+
+
+void make_unique_in_product(out Term*[] l, bool[] inv)
+	Term*[] exponents
+	
+	for x,i in l
+		Term* e = nil
+		if x.name == "^"
+			e = x.params[1]
+			l[i] = x.params[0]
+		if !e
+			e = AddNumber("1")
+		if inv[i]
+			e = AddOperator("*", AddNumber("-1"), e)
+		exponents.add(e)
+	for i in 0:len(l)
+		for j in i+1:len(l)
+			if literally_equal(l[i], l[j])
+				exponents[i] = AddOperator("+", exponents[i], exponents[j])
+				exponents.remove(j)
+				l.remove(j)
+				j --
+	for x,i in l
+		if exponents[i].name != "1"
+			l[i] = AddOperator("^", x, normalize(exponents[i]))
+
+
+Term* normalize_product(Term t)
+	bool[] inverse
+	let l = extract_product_group(t, inverse)
+	#print_group(l)
+	
+	
+	string num = "1"
+	string denum = "1"
+	for i in 0:len(l)
+		if l[i].type == TYPE_NUMBER
+			if inverse[i]
+				denum = mul(denum, l[i].name)
+			else
+				num = mul(num, l[i].name)
+			l.remove(i)
+			inverse.remove(i)
+			i --
+	
+	if num == "0"
+		return AddNumber("0")
+	if len(l) == 0
+		return simplify_number_division(num, denum)
+	
+	#print_group(l)
+	make_unique_in_product(l, inverse)
+	#print_group(l)
+	sort_group(l)
+	
+	let r = l[0]
+	for i in 1:len(l)
+		r = AddOperator("*", r, l[i])
+	if num != "1" or denum != "1"
+		r = AddOperator("*", simplify_number_division(num, denum), r)
+	return r
+
+
+
+void make_unique_in_sum(out Term*[] l, out bool[] negative)
+	string[] multiplicity
+	#print_group(l)
+	
+	for x,i in l
+		string m = "1"
+		if x.name == "*"
+			if x.params[0].type == TYPE_NUMBER
+				m = x.params[0].name
+				l[i] = x.params[1]
+		if negative[i]
+			m = mul(m, "-1")
+		multiplicity.add(m)
+	for i in 0:len(l)
+		for j in i+1:len(l)
+			if literally_equal(l[i], l[j])
+				multiplicity[i] = add(multiplicity[i], multiplicity[j])
+				multiplicity.remove(j)
+				l.remove(j)
+				j --
+	for x,i in l
+		if multiplicity[i] == "0"
+			l.remove(i)
+			negative.remove(i)
+			multiplicity.remove(i)
+			i --
+	for x,i in l
+		if multiplicity[i] != "1"
+			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
+
+
+Term* normalize_sum(Term t)
+	bool[] negative
+	let l = extract_add_group(t, negative)
+	#print_group(l)
+	
+	# add constants
+	string num = "0"
+	for i in 0:len(l)
+		if l[i].type == TYPE_NUMBER
+			if negative[i]
+				num = sub(num, l[i].name)
+			else
+				num = add(num, l[i].name)
+			l.remove(i)
+			negative.remove(i)
+			i --
+	
+	
+
+	#print_group(l)
+	make_unique_in_sum(l, negative)
+	#print_group(l)
+	
+	# all constant numbers
+	if len(l) == 0
+		return AddNumber(num)
+	
+	sort_group(l)
+	
+	let t_r = l[0]
+	for i in 1:len(l)
+		t_r = AddOperator("+", t_r, l[i])
+	if num != "0"
+		if num[:1] == "-"
+			return AddOperator("-", t_r, AddNumber(num[1:]))
+		else
+			return AddOperator("+", t_r, AddNumber(num))
+	return t_r
+
+Term* normalize_exponent(Term t)
+	let p0 = t.params[0]
+	let p1 = t.params[1]
+	if p1.type == TYPE_NUMBER
+		if p1.name == "1"
+			return p0
+		if p1.name == "0"
+			return AddNumber("1")
+		if p0.type == TYPE_NUMBER
+			return AddNumber(exponent(p0.name, p1.name))
+	if p0.name == "*"
+		let a = normalize_exponent(AddOperator("^", p0.params[0], p1.copy()))
+		let b = normalize_exponent(AddOperator("^", p0.params[1], p1.copy()))
+		return AddOperator("*", a, b)
+	else if p0.name == "/"
+		let a = normalize_exponent(AddOperator("^", p0.params[0], p1.copy()))
+		let b = normalize_exponent(AddOperator("^", p0.params[1], p1.copy()))
+		return AddOperator("/", a, b)
+	else if p0.name == "^"
+		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
+	return &t
+
+Term* normalize_function(Term t)
+	if t.name == "ln"
+		let p = t.params[0]
+		if p.name == "^"
+			let tt = AddOperator("*", p.params[1], AddFunction("ln", [p.params[0]]))
+			return normalize(tt)
+		if p.name == "e"
+			return AddNumber("1")
+	if t.name == "sin"
+		let p = t.params[0]
+		if p.name in ["0", "pi"]
+			return AddNumber("0")
+	if t.name == "cos"
+		let p = t.params[0]
+		if p.name == "0"
+			return AddNumber("1")
+		if p.name == "pi"
+			return AddNumber("-1")
+	#if t.name == "sqrt"
+		#if p.type == TYPE_NUMBER
+			# test... apply
+			#return AddNumber("...")
+	return &t
+
+
+# should be "out"?
+Term* normalize(Term _t)
+	let t = &_t
+	if !t
+		return nil
+
+	# recursion
+	for i in 0:len(t.params)
+		t.params[i] = normalize(t.params[i])
+		
+	# self
+	if t.type == TYPE_FUNCTION
+		return normalize_function(t)
+	if t.name in ["*", "/"]
+		return normalize_product(t)
+	if t.name in ["+", "-"]
+		return normalize_sum(t)
+	if t.name == "^"
+		return normalize_exponent(t)
+	return t

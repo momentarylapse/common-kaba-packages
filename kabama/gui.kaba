@@ -1,0 +1,37 @@
+use hui
+use common
+use parser
+use simplify
+use kabama
+
+class KabamaWindow extends hui.Window
+	Runtime r
+	string log
+
+	void on_eval()
+		let input = get_string("input")
+		log += ">>> {{input}}\n"
+		try
+			let t = r.eval(parse(input))
+			log += "{{t}}\n"
+		except Exception as e
+			log += "Error: {{e}}\n"
+		set_string("log", log)
+
+	void __init__()
+		super.__init__("kabama", 800, 600)
+		from_source("Grid table ''
+	MultilineEdit log ''
+	---|
+	Grid ? ''
+		Edit input '' expandx
+		Button eval 'Eval' default image=hui:ok")
+		
+		enable("log", false)
+		activate("input")
+	
+		event("eval", on_eval)
+	
+void main()
+	let win = new KabamaWindow()
+	win.run()

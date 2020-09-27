@@ -1,0 +1,73 @@
+use common
+use parser
+use simplify
+
+
+Term *diff_function(string func, Term*[] params)
+	if func == "exp"
+		return AddFunction("exp", params)
+	if func == "sin"
+		return AddFunction("cos", params)
+	if func == "cos"
+		return AddOperator("-", AddNumber("0"), AddFunction("sin", params))
+	if func == "sinh"
+		return AddFunction("cosh", params)
+	if func == "cosh"
+		return AddFunction("sinh", params)
+	if func == "ln"
+		return AddOperator("/", AddNumber("1"), params[0])
+	if func == "sqrt"
+		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", params))
+	raise(new RuntimeError("can not differentiate function '{{func}}'"))
+
+
+# d/dx
+# always copies...
+Term *diff(Term t, string by)
+
+	# self
+	if t.type == TYPE_NUMBER
+		return AddNumber("0")
+	if t.type == TYPE_VARIABLE
+		if t.name == by
+			return AddNumber("1")
+		return AddNumber("0")
+	if t.type == TYPE_FUNCTION
+		let r = diff_function(t.name, copy_list(t.params))
+		for p in t.params
+			r = AddOperator("*", diff(p, by), r)
+		# diff(f(a))  ->  f'(a) * diff(a)
+		return r
+	if t.type == TYPE_OPERATOR
+		Term* a, b
+		if len(t.params) > 0
+			a = t.params[0]
+		if len(t.params) > 1
+			b = t.params[1]
+		if (t.name == "+") or (t.name == "-")
+			# diff(a + b)  ->  diff(a) + diff(b)
+			return AddOperator(t.name, diff(a.copy(), by), diff(b.copy(), by))
+		if t.name == "*"
+			# diff(a * b)  ->  diff(a) * b + a * diff(b)
+			return AddOperator("+", AddOperator("*", diff(a, by), b.copy()),
+			                        AddOperator("*", a.copy(), diff(b, by)))
+		if t.name == "/"
+			# diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
+			return AddOperator("-", AddOperator("/", diff(a, by), b.copy()),
+			                        AddOperator("/", AddOperator("*", a.copy(), diff(b, by)),
+			                                         AddOperator("^", b.copy(), AddNumber("2"))))
+		if t.name == "^"
+			if b.type == TYPE_NUMBER
+				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
+				return AddOperator("*", b.copy(),
+				                        AddOperator("*", AddOperator("^", a.copy(), AddNumber(sub(b.name, "1"))),
+				                                         diff(a, by)))
+			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
+			return AddOperator("+", AddOperator("*", b.copy(),
+			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b.copy(), AddNumber("1"))),
+			                                                          diff(a, by))),
+			                        AddOperator("*", AddFunction("ln", [a]),
+			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
+			                                                          diff(b, by))))
+	raise(new RuntimeError("unhandled differential..."))
+	return nil
