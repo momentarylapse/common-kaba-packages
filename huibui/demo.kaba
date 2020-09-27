@@ -1,0 +1,51 @@
+use os
+use hui
+use config
+use resource
+
+class DemoDialog extends hui.Window
+	void __init__(string source)
+		super.__init__("", 100, 100)
+		set_border_width(10)
+		from_source(source)
+		event("close", on_close)
+		event("ok", on_close)
+		event("cancel", on_close)
+	void on_close()
+		destroy()
+
+class ToolbarDemoDialog extends hui.Window
+	void __init__(string source)
+		super.__init__("Toolbar demo", 800, 300)
+		toolbar(0).from_source(source)
+
+class MenuDemoDialog extends hui.Window
+	void __init__(string source)
+		super.__init__("Menu demo", 800, 300)
+		let m = hui.create_menu_from_source(source)
+		set_menu(m)
+
+void action_demo(string[] arg)
+	Path filename = Path(arg[0])
+	conf.set_dir(filename.parent())
+	conf.load()
+	
+	string source = Filesystem.read(filename)
+	#print(source)
+	let r = ParseResource(source, true)
+	#r.show(0)
+	#print(r.str(0))
+	
+	if r.type in ["Dialog", "Window"]
+		let dlg = new DemoDialog(source)
+		dlg.run()
+	else if r.type == "Toolbar"
+		let dlg = new ToolbarDemoDialog(source)
+		dlg.run()
+	else if r.type == "Menu"
+		let dlg = new MenuDemoDialog(source)
+		dlg.run()
+	else
+		print("don't know how to show a {{r.type}}")
+
+

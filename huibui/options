@@ -1,0 +1,126 @@
+== tags ==
+expandx
+noexpandx
+expandy
+noexpandy
+indent
+noindent
+grabfocus
+ignorefocus
+big
+huge
+small
+disabled
+
+== key=value ==
+width=
+height=
+min-width=    (same as width...)
+min-height=
+marginleft=
+marginright=
+margintop=
+marginbottom=
+padding=
+hgroup=
+vgroup=
+
+
+
+
+!!...: constructor
+
+
+Button
+	flat
+	link
+	default
+	danger
+ColorButton
+	alpha
+ComboBox
+	!!editable
+DrawingArea
+	!!opengl
+Edit
+	clear-placeholder
+	clear-completion
+	placeholder=...
+	completion=...
+Grid
+	buttonbar
+	actionbar
+	vertical
+	homogenousx
+	homogenousy
+Label
+	bold
+	italic
+	big
+	wrap
+	center
+	right
+	angle=N
+ListView
+	multiline|select-multi
+	select-single
+	(nobar)
+	bar=[true]|false
+	reorderable
+	format=...
+MultilineEdit
+	!!noframe
+	handlekeys
+	monospace
+	tabsize=N
+Paned
+	!!vertical
+Revealer
+	slide=up|down|left|right
+	cross-fade
+Scroller
+	scrollx=yes|no
+	scrolly=yes|no
+Separator
+	!!vertical
+Slider
+	!!vertical
+	range=min:max:step
+	origin=[true]|false
+	showvalue=[true]|false
+	mark=value:title
+	clearmarks
+SpinButton
+	range=min:max:step
+	wrap=[yes]|no
+	(nowrap)
+TabControl
+	bar
+	bar=[yes]|no
+	(nobar)
+	nobar
+	left|right|top|bottom
+ToggleButton
+	flat
+TreeView
+	bar=[yes]|no
+	(nobar)
+
+
+Toolbar
+	Item
+		important
+		!!checkable
+	style=text|icons|both
+	size=small|large
+
+
+
+Window
+	resizable=[yes]|no
+	closable
+	headerbar
+	statusbar
+	closebutton=yes|no
+	cursor=[yes]|no
+	borderwidth=N

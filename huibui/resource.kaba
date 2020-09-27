@@ -1,0 +1,35 @@
+use config
+use os
+
+class Resource
+	string type
+	string id
+	string title
+	string tooltip
+	string[] options
+	int x, y
+	void __init__()
+	Resource[] children
+	#void reset()
+	extern void show(int indent)
+	extern string str(int indent)
+	
+extern Resource ParseResource(string buffer, bool literally)
+
+Resource[] resources
+Path[] resource_files
+
+
+Resource[] load_all_huis(bool literally)
+	Resource[] res
+	let files = Filesystem.search(conf.dir, "*.hui", false)
+	for f in files
+		string source = Filesystem.read(conf.dir << f)
+		Resource r = ParseResource(source, literally)
+		if r.type == "Dialog" or r.type == "Window" or r.type == "Menu" or r.type == "Toolbar"
+			resource_files.add(conf.dir << f)
+			res.add(r)
+		else
+			print(" UNKNOWN TYPE {{f}}: {{r.type}}")
+	return res
+		

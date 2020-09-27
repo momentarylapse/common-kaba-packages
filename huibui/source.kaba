@@ -1,0 +1,100 @@
+use os
+use config
+use language
+
+class SourceParser
+	string source
+	void parse()
+		int pos0 = 0
+		while true
+			int pos = source.find("_(\"", pos0)
+			if pos < 0
+				break
+			pos += 3
+			int length = 0
+			for i in 0:1024
+				if source[pos + i] == '\\'
+					i ++
+					continue
+				if source[pos + i] == '"'     # "
+					length = i
+					break
+			handle(pos, length)
+			#print("    " + source.substr(pos, length))
+			pos0 = pos + length
+
+
+	void parse_source_code_dir(Path dir)
+		let files = Filesystem.search(dir, "*.cpp", true)
+		for f in files
+			if Filesystem.is_directory(dir << f)
+				parse_source_code_dir(dir << f)
+			else
+				source = Filesystem.read(dir << f)
+				begin()
+				parse()
+				end(dir << f)
+
+	virtual void handle(int pos, int length)
+	virtual void begin()
+	virtual void end(Path filename)
+
+class SourceLanguageFinder extends SourceParser
+	Language* l
+	override void handle(int pos, int length)
+		LangText t
+		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
+		
+		if len(t.orig) > 0
+			bool found = false
+			for tt in l.texts
+				if tt.orig == t.orig
+					found = true
+					break
+			if !found
+				l.texts.add(t)
+
+class SourceSwapper extends SourceParser
+	Language* l
+	string source_new
+	bool changed
+	int delta
+	override void begin()
+		source_new = source
+		changed = false
+		delta = 0
+	override void handle(int pos, int length)
+		string orig = str_m2utf8(source[pos:pos+length]).unescape()
+		
+		for t in l.texts
+			if orig == t.orig
+				string r = t.trans.escape()
+				print("REPLACE {{orig}}    ->   {{r}}")
+				
+				int ppos = pos + delta
+				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
+				
+				delta += len(r) - length
+				
+				changed = true
+	override void end(Path filename)
+		if !changed
+			return
+		#print(">>>>>>>>>>>")
+		File* f = Filesystem.create(filename)
+		f.write(source_new)
+		del f
+				
+
+
+void parse_source_code_dir(Path dir, Language l)
+	SourceLanguageFinder p
+	p.l = &l
+	p.parse_source_code_dir(dir)
+
+
+void swap_translate_source(Path dir, Language l)
+	SourceSwapper p
+	p.l = &l
+	p.parse_source_code_dir(dir)
+

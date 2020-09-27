@@ -1,0 +1,230 @@
+use config
+use os
+
+
+class LangID
+	string id
+	string title
+	string tooltip
+
+class LangText
+	string orig
+	string trans
+
+class Language
+	Path filename
+	string name
+	LangID[] ids
+	LangText[] texts
+	const void show()
+		print(name)
+		for i in ids
+			print(i.id)
+			print("\t{{i.title}}")
+			print("\t{{i.tooltip}}")
+			
+		for t in texts
+			print(t.orig)
+			print("\t{{t.trans}}")
+	void add_id(string id, string title, string tooltip)
+		for i in ids
+			if i.id == id
+				if len(title) > 0
+					i.title = title
+				if len(tooltip) > 0
+					i.tooltip = tooltip
+				return
+		LangID i
+		i.id = id
+		i.title = title
+		i.tooltip = tooltip
+		ids.add(i)
+	void add_text(string orig, string trans)
+		for t in texts
+			if t.orig == orig
+				if len(trans) > 0
+					t.trans = trans
+				return
+		LangText t
+		t.orig = orig
+		t.trans = trans
+		texts.add(t)
+		
+	void save()
+		File* f = Filesystem.create_text(filename)
+		f << "# Language"
+		f << name
+		f << "# Num IDs"
+		f << len(ids)
+		f << "# Data (ID,Text,Tooltip)"
+		for i in ids
+			f << i.id
+			f << i.title.escape()
+			f << i.tooltip.escape()
+		f << "# Num Language Strings"
+		f << len(texts)
+		f << "# Data (ID,Text)"
+		for t in texts
+			f << t.orig.escape()
+			f << t.trans.escape()
+		del f
+
+
+	void sort()
+		sort_ids(ids)
+		sort_texts(texts)
+	const LangID[] get_useful_ids()
+		LangID[] uids
+		for i in ids
+			if len(i.title) > 0 or len(i.tooltip) > 0
+				uids.add(i)
+		sort_ids(uids)
+		return uids
+	const LangText[] get_useful_texts()
+		LangText[] utexts
+		for t in texts
+			if len(t.trans) > 0
+				utexts.add(t)
+		sort_texts(utexts)
+		return utexts
+
+
+
+Language load_prelang(Path filename)
+	Language l
+	l.filename = filename
+	#try
+		File* f = Filesystem.open_text(filename)
+		string t
+		int n
+		f >> t
+		f >> l.name
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangID id
+			f >> id.id
+			f >> t
+			id.title = t.unescape()
+			f >> t
+			id.tooltip = t.unescape()
+			l.ids.add(id)
+		f >> t
+		f >> n
+		f >> t
+		for i in 0:n
+			LangText tt
+			f >> t
+			tt.orig = t.unescape()
+			f >> t
+			tt.trans = t.unescape()
+			l.texts.add(tt)
+		del f
+		#l.show()
+		return l
+	#except Exception as e
+	#	print("ERROR: " + e.message())
+
+
+Language[] load_prelangs()
+	Language[] langs
+	let files = Filesystem.search(conf.dir, "*.prelang", false)
+	for f in files
+		let l = load_prelang(conf.dir << f)
+		langs.add(l)
+	return langs
+
+void lang_id_add(out LangID[] ids, string id, string title, string tooltip, string ns)
+	if id == "?" or id == ""
+		return
+	string cid = id
+	if cid.find("/", 0) < 0
+		#if ns != id
+		cid = "{{ns}}/{{id}}"
+	for i in ids
+		if i.id == cid
+			return
+	LangID a
+	a.id = cid
+	a.title = title
+	a.tooltip = tooltip
+	ids.add(a)
+
+void sort_ids(out LangID[] ids)
+	for i in 0:len(ids)
+		for j in i+1:len(ids)
+			if ids[i].id > ids[j].id
+				LangID t = ids[i]
+				ids[i] = ids[j]
+				ids[j] = t
+
+
+void sort_texts(out LangText[] texts)
+	for i in 0:len(texts)
+		for j in i+1:len(texts)
+			if texts[i].orig > texts[j].orig
+				LangText t = texts[i]
+				texts[i] = texts[j]
+				texts[j] = t
+
+
+
+bool check_lang(Language l, Language own, bool create_file)
+	print("checking {{l.name}}")
+	int nerrors = 0
+	
+	File *f
+	if create_file
+		f = Filesystem.create_text(conf.dir << "TRANS")
+	
+	# check ids
+	for i in own.ids
+		
+		bool found_title = false
+		bool found_tooltip = false
+		for j in l.ids
+			if j.id == i.id
+				found_title = (len(j.title) > 0)
+				found_tooltip = (len(j.tooltip) > 0)
+				break
+		if len(i.title) > 0 and !found_title
+			if create_file
+				f << "# id:{{i.id}}"
+				f << i.title.escape()
+				f << ""
+			#print("    MISSING title for " + i.id)
+			nerrors ++
+		if len(i.tooltip) > 0 and !found_tooltip
+			if create_file
+				f << "# tooltip:{{i.id}}"
+				f << i.tooltip.escape()
+				f << ""
+			#print("    MISSING tooltip for {{i.id}}")
+			nerrors ++
+	
+	# check texts
+	for t in own.texts
+		bool found = false
+		for tt in l.texts
+			if t.orig == tt.orig
+				found = (len(tt.trans) > 0)
+				break
+		if !found
+			if create_file
+				f << "# text"
+				f << t.orig.escape()
+				f << ""
+			#print("    MISSING text: " + t.orig)
+			nerrors ++
+	
+	if nerrors == 0
+		print("    ok, good translation!")
+	else
+		print("    {{nerrors}} missing translations")
+
+	if create_file
+		del f
+	return nerrors == 0
+
+

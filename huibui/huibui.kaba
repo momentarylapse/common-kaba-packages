@@ -1,0 +1,186 @@
+use os
+use config
+use language
+use resource
+use source
+use demo
+use export
+use cli_parser
+	
+
+void get_ids(out Language l, Resource r, string ns)
+	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
+	
+	for c in r.children
+		get_ids(l, c, ns)
+
+
+void find_all_ids(out Language lang, Resource[] res)
+	for r in res
+		get_ids(lang, r, r.id)
+	
+#	lang.show()
+
+
+Language load_own_lang(bool literally)
+	Language own
+	own.name = conf.own_lang_name
+	
+	print("loading own language: {{own.name}}")
+	resources = load_all_huis(literally)
+	find_all_ids(own, resources)
+	
+	parse_source_code_dir(conf.source_code_dir, own)
+	own.sort()
+	print("    {{len(own.ids)}} ids, {{len(own.texts)}} texts")
+	
+	return own
+
+	
+void action_check(string[] arg)
+	Path dir = Path(arg[0])
+	conf.set_dir(dir)
+	conf.load()
+	
+	Language own = load_own_lang(true)
+	
+	Language[] langs = load_prelangs()
+	
+	for l in langs
+		check_lang(l, own, false)
+
+void action_export(string[] arg)
+
+	let dir = Path("./")
+	if len(arg) >= 1
+		dir = Path(arg[0])
+	conf.set_dir(dir)
+	conf.load()
+	
+	let own = load_own_lang(true)#false)
+	
+	let langs = load_prelangs()
+	
+	export_resources(resources, own, langs)
+
+void patch_language(out Language l, Language own, Path filename)
+	try
+		string ttt = Filesystem.read(filename)
+		let lines = ttt.explode("\n")
+		for i in 0:len(lines)/3
+			string a = lines[i*3]
+			string b = lines[i*3+1]
+			string c = lines[i*3+2]
+			if c == ""
+				continue
+			if a.head(5) == "# id:"
+				l.add_id(a[5:], c.unescape(), "")
+			if a.head(10) == "# tooltip:"
+				l.add_id(a[10:], "", c.unescape())
+			if a == "# text"
+				l.add_text(b.unescape(), c.unescape())
+	except
+		pass
+
+void action_translate(string[] arg)
+	let filename = Path(arg[0])
+	conf.set_dir(filename.parent())
+	conf.load()
+	
+	Language own = load_own_lang(true)
+	
+	Language l = load_prelang(filename)
+	if check_lang(l, own, true)
+		return
+	
+	let path = conf.dir << "TRANS"
+	try
+		shell_execute("sgribthmaker \"{{path}}\"")
+		patch_language(l, own, path)
+		check_lang(l, own, false)
+		l.save()
+	except
+		pass
+	try
+		Filesystem.delete(path)
+	except
+		pass
+
+void action_add(string[] arg)
+	let filename = Path(arg[0])
+	string name = arg[1]
+	conf.set_dir(filename.parent())
+	conf.load()
+	
+	Language l
+	l.name = name
+	l.filename = filename
+	
+	l.save()
+
+
+void swap_translate_lang(out Language own, Language l, Path target)
+	# own.ids are ok
+	# own.texts need ...
+	for t in own.texts
+		t.trans = t.orig
+		t.orig = ""
+		for tt in l.texts
+			if tt.orig == t.trans
+				t.orig = tt.trans
+				break
+	own.filename = target
+	own.save()
+
+void swap_translate_gui(out Resource r, Language l, string ns)
+	for i in l.ids
+		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
+			r.title = i.title
+			r.tooltip = i.tooltip
+	for c in r.children
+		swap_translate_gui(c, l, ns)
+
+void swap_translate_guis(Language l)
+	for r,i in resources
+		print("----------")
+		print(resource_files[i])
+		print(r.str(0))
+		swap_translate_gui(r, l, r.id)
+		print(r.str(0))
+		File* f = Filesystem.create(resource_files[i])
+		f.write(r.str(0))
+		del f
+
+void action_swap(string[] arg)
+	let source = Path(arg[0])
+	let target = Path(arg[1])
+	conf.set_dir(source.parent())
+	conf.load()
+	
+	let own = load_own_lang(true)
+	
+	Language l = load_prelang(source)
+	if !check_lang(l, own, true)
+		print("ERROR: missing translations")
+		return
+	
+	swap_translate_lang(own, l, target)
+	
+	swap_translate_guis(l)
+	
+	swap_translate_source(conf.source_code_dir, l)
+	
+	# should also translate other languages... but... screw it
+
+	
+
+void main(string[] arg)
+	CLIParser p
+	p.info("hui gui builder...")
+	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
+	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)
+	p.cmd("x", "[DIR]", "export...", action_export)
+	p.cmd("t", "<PRELANG-FILE>", "translate...", action_translate)
+	p.cmd("add", "<PRELANG-FILE> <LANGUAGE-NAME>", "add", action_add)
+	p.cmd("swap", "<PRELANG-FILE> <LANGUAGE-NAME>", "swap languages", action_swap)
+	p.run(arg)

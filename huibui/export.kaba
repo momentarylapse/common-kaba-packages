@@ -1,0 +1,53 @@
+use os
+use config
+use resource
+use language
+
+void write_resource(File *f, Resource r)
+	f << r.type
+	if r.id.head(1) == "/"
+		f << r.id[1:]
+	else
+		f << r.id
+	f << r.options.join(",")
+	f << r.x
+	f << r.y
+	f << len(r.children)
+	for c in r.children
+		write_resource(f, c)
+
+
+void write_language(File *f, Language l)
+	let ids = l.get_useful_ids()
+	let texts = l.get_useful_texts()
+
+	f << "# Language"
+	f << l.name
+	f << "# Number Of IDs"
+	f << len(ids)
+	f << "# Text"
+	for i in ids
+		f << i.id
+		f << i.title.escape()
+		f << i.tooltip.escape()
+	f << "# Num Language Strings"
+	f << len(texts)
+	f << "# Text"
+	for t in texts
+		f << t.orig.escape()
+		f << t.trans.escape()
+
+void export_resources(Resource[] res, Language own, Language[] langs)
+	File *f = Filesystem.create_text(conf.export_dir << "hui_resources.txt")
+	f << "t7"
+	f << "# Number Of Resources"
+	f << len(res)
+	for r in res
+		f << "# Resource"
+		write_resource(f, r)
+	f << "# Number Of Languages"
+	f << (len(langs) + 1)
+	write_language(f, own)
+	for l in langs
+		write_language(f, l)
+
