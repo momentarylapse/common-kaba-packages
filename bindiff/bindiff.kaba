@@ -12,7 +12,7 @@ class Mapping
 	const int lb()
 		return b1 - b0
 	string __str__()
-		return "{{a0}}:{{a1}} / {{b0}}:{{b1}}"
+		return "{{a0}}:+{{la()}} / {{b0}}:+{{lb()}}"
 
 
 void expand_mapping(string a, string b, out Mapping m)
@@ -79,9 +79,7 @@ void diff(string a, string b)
 		expand_mapping(a, b, m)
 		if m.a1 >= len(a) or m.b1 >= len(b)
 			break
-		print(str(m))
 		let m2 = try_match(a, b, m.a1, m.b1)
-		print(str(m2))
 		if m2.a0 < 0
 			break
 		expand_mapping(a, b, m2)
@@ -104,9 +102,9 @@ void diff(string a, string b)
 		X0 += "[0m"
 	
 		print("{{XYELLOW}}diff at {{d}}:{{X0}}")
-		int a000 = max(d.a0-CONTEXT, 0)
-		int b000 = max(d.b0-CONTEXT, 0)
-		print(hex(a[a000:d.a0]) + " {{XRED}}{{hex(a[d.a0:d.a1])}} {{XGREEN}}{{hex(b[d.b0:d.b1])}}{{X0}} " + hex(a[d.a1:d.a1+CONTEXT]))
+		int a000 = clampi(d.a0-CONTEXT, 0, len(a))
+		int a111 = clampi(d.a1+CONTEXT, 0, len(a))
+		print(hex(a[a000:d.a0]) + " {{XRED}}{{hex(a[d.a0:d.a1])}} {{XGREEN}}{{hex(b[d.b0:d.b1])}}{{X0}} " + hex(a[d.a1:a111]))
 		m = m2
 
 void main(string[] arg)
