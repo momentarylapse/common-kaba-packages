@@ -5,6 +5,14 @@ int MAX_DIFF_SIZE
 int MIN_MATCH_SIZE
 int CONTEXT
 
+
+class Term
+	const string RED = "\x1b[0;31m"
+	const string GREEN = "\x1b[0;32m"
+	const string YELLOW = "\x1b[0;33m"
+	const string END = "\x1b[0m"
+
+
 class Mapping
 	int a0, a1, b0, b1
 	const int la()
@@ -90,21 +98,11 @@ void diff(string a, string b)
 		d.a1 = m2.a0
 		d.b1 = m2.b0
 		diffs.add(d)
-		
-		string XRED, XGREEN, XYELLOW, X0
-		XRED.add(27)
-		XRED += "[0;31m"
-		XGREEN.add(27)
-		XGREEN += "[0;32m"
-		XYELLOW.add(27)
-		XYELLOW += "[0;33m"
-		X0.add(27)
-		X0 += "[0m"
 	
-		print("{{XYELLOW}}diff at {{d}}:{{X0}}")
+		print("{{Term.YELLOW}}diff at {{d}}:{{Term.END}}")
 		int a000 = clampi(d.a0-CONTEXT, 0, len(a))
 		int a111 = clampi(d.a1+CONTEXT, 0, len(a))
-		print(hex(a[a000:d.a0]) + " {{XRED}}{{hex(a[d.a0:d.a1])}} {{XGREEN}}{{hex(b[d.b0:d.b1])}}{{X0}} " + hex(a[d.a1:a111]))
+		print(hex(a[a000:d.a0]) + " {{Term.RED}}{{hex(a[d.a0:d.a1])}} {{Term.GREEN}}{{hex(b[d.b0:d.b1])}}{{Term.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
 void main(string[] arg)
