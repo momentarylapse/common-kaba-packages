@@ -155,7 +155,7 @@ DrawingArea area '' grab-focus")
 			redraw("area")
 	
 	void on_key_down()
-		if hui.get_event().key_code == hui.KEY_DELETE
+		if hui.get_event().key == hui.KEY_DELETE
 			if sel.type == SEL_TYPE_EDGE
 				del c.edges[sel.index]
 				c.edges.remove(sel.index)

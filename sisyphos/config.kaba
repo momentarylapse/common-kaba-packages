@@ -157,7 +157,7 @@ class ConfigDirSync
 
 class Config
 	void __init__()
-		server = "myu"
+		server = "michi.is-a-geek.org"
 		verbosity = 1
 		show_meta = false
 		show_meta_small = false
