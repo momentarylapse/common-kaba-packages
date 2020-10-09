@@ -12,9 +12,21 @@ string tag_contents(string all, string tag)
 string compile_stage(string code, string stage)
 	if code == ""
 		return ""
-	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
+	let itmp = "/tmp/shadercomp.glsl"
+	let otmp = "/tmp/shadercomp.bin"
+	try
+		shell_execute("echo '{{code}}' > {{itmp}}")
+#		print("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}}")
+		shell_execute("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}} &> /tmp/shader-error")
+	except Exception as e
+		string x = shell_execute("cat /tmp/shader-error")
+		print("  ----  ERROR ({{stage}})  ----\n{{x}}")
+		return ""
+	string x = shell_execute("cat {{otmp}}")
+	
+#	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
 	# print(cmd)
-	string x = shell_execute(cmd)
+#	string x = shell_execute(cmd)
 	# print(len(x))
 	return x
 
@@ -52,10 +64,16 @@ void compile(Path filename)
 	string code_vertex = tag_contents(all, "VertexShader")
 	string code_geometry = tag_contents(all, "GeometryShader")
 	string code_fragment = tag_contents(all, "FragmentShader")
+	string code_ray_gen = tag_contents(all, "RayGenShader")
+	string code_ray_miss = tag_contents(all, "RayMissShader")
+	string code_ray_closest_hit = tag_contents(all, "RayClosestHitShader")
 	
-	string x_vertex = compile_stage(code_vertex, "vertex")
-	string x_geometry = compile_stage(code_geometry, "geometry")
-	string x_fragment = compile_stage(code_fragment, "fragment")
+	string x_vertex = compile_stage(code_vertex, "vert")
+	string x_geometry = compile_stage(code_geometry, "geom")
+	string x_fragment = compile_stage(code_fragment, "frag")
+	string x_ray_gen = compile_stage(code_ray_gen, "rgen")
+	string x_ray_miss = compile_stage(code_ray_miss, "rmiss")
+	string x_ray_closest_hit = compile_stage(code_ray_closest_hit, "rchit")
 	
 	LayoutData ld = parse_layout(layout)
 	
@@ -70,17 +88,28 @@ void compile(Path filename)
 	f << ld.bindings
 	f << "PushSize"
 	f << str(ld.push_size)
-	f << "VertexShader"
-	f << x_vertex
+	if len(x_vertex) > 0
+		f << "VertexShader"
+		f << x_vertex
 	if len(x_geometry) > 0
 		f << "GeometryShader"
 		f << x_geometry
-	f << "FragmentShader"
-	f << x_fragment
+	if len(x_fragment) > 0
+		f << "FragmentShader"
+		f << x_fragment
+	if len(x_ray_gen) > 0
+		f << "RayGenShader"
+		f << x_ray_gen
+	if len(x_ray_miss) > 0
+		f << "RayMissShader"
+		f << x_ray_miss
+	if len(x_ray_closest_hit) > 0
+		f << "RayClosestHitShader"
+		f << x_ray_closest_hit
 	del f
 
 void main(string[] arg)
 	for a in arg
-		compile(Path(a))
+		compile(a)
 	if len(arg) == 0
 		print("input files?")
