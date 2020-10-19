@@ -208,7 +208,10 @@ class StatLayer
 		u.v = matrix.ID
 		u.m = matrix.ID
 		ubo.update(&u)
-		dset = new DescriptorSet([ubo], [tex])
+		dset = new DescriptorSet("buffer,sampler")
+		dset.set_buffer(0, ubo)
+		dset.set_texture(1, tex)
+		dset.update()
 		vb = create_quad(rect(-1,-0.3,-1,-0.8))
 		pipeline = new Pipeline(shader, rp, subpass, 1)
 		pipeline.set_blend(6,7)
@@ -235,7 +238,7 @@ class StatLayer
 		pp.draw_str(5,5, "{{frames/_time|1}}")
 		del pp
 		tex.override(im)
-		dset.set([ubo], [tex])
+		dset.update()
 		frames = 0
 		_time = 0
 	void draw(out CommandBuffer cb)
