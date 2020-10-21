@@ -28,10 +28,12 @@ class Renderer
 	Fence* in_flight_fence
 	Semaphore* image_available_semaphore, render_finished_semaphore
 	CommandBuffer* cb
+	DescriptorPool* pool
 
 	void __init__()
 		width = 0
 		height = 0
+		pool = nil
 	
 		in_flight_fence = new Fence()
 		image_available_semaphore = new Semaphore()
@@ -42,6 +44,8 @@ class Renderer
 		del in_flight_fence
 		del image_available_semaphore
 		del render_finished_semaphore
+		if pool
+			del pool
 	
 	virtual RenderPass* default_render_pass()
 		return nil
@@ -68,6 +72,7 @@ class WindowRenderer extends Renderer
 	void __init__(void *_window)
 		window = _window
 		framebuffer_resized = false
+		pool = new DescriptorPool("buffer:16,sampler:16", 16)
 
 
 		swap_chain = new SwapChain()
@@ -195,7 +200,7 @@ class StatLayer
 	int frames
 	float _time
 	
-	void __init__(Shader* shader, RenderPass* rp, int subpass)
+	void __init__(Shader* shader, RenderPass* rp, int subpass, DescriptorPool* pool)
 		timer = new Timer()
 		_time = 0
 		frames = 0
@@ -208,9 +213,9 @@ class StatLayer
 		u.v = matrix.ID
 		u.m = matrix.ID
 		ubo.update(&u)
-		dset = new DescriptorSet("buffer,sampler")
-		dset.set_buffer(0, ubo)
-		dset.set_texture(1, tex)
+		dset = pool.create_set("buffer,sampler")
+		dset.set(0, ubo)
+		dset.set(1, tex)
 		dset.update()
 		vb = create_quad(rect(-1,-0.3,-1,-0.8))
 		pipeline = new Pipeline(shader, rp, subpass, 1)
@@ -238,6 +243,7 @@ class StatLayer
 		pp.draw_str(5,5, "{{frames/_time|1}}")
 		del pp
 		tex.override(im)
+		dset.set(1, tex)
 		dset.update()
 		frames = 0
 		_time = 0
