@@ -66,25 +66,39 @@ class Renderer
 class WindowRenderer extends Renderer
 	void* window
 	SwapChain* swap_chain
+	RenderPass* _default_render_pass
+	DepthBuffer* depth_buffer
+	FrameBuffer*[] frame_buffers
 	int image_index
 	bool framebuffer_resized
 	
 	void __init__(void *_window)
 		window = _window
 		framebuffer_resized = false
-		pool = new DescriptorPool("buffer:16,sampler:16", 16)
+		pool = new DescriptorPool("buffer:1024,sampler:1024", 1024)
 
-
-		swap_chain = new SwapChain()
-		width = swap_chain.width
-		height = swap_chain.height
+		_create_swap_chain_and_stuff()
 
 		#main_renderer = this
 	#glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
 
 	override void __delete__()
-		del swap_chain
+		_delete_swap_chain_and_stuff()
 
+	void _create_swap_chain_and_stuff()
+		swap_chain = new SwapChain(window)
+		depth_buffer = swap_chain.create_depth_buffer()
+		_default_render_pass = swap_chain.create_render_pass(depth_buffer)
+		frame_buffers = swap_chain.create_frame_buffers(_default_render_pass, depth_buffer)
+		width = swap_chain.width
+		height = swap_chain.height
+	
+	void _delete_swap_chain_and_stuff()
+		for fb in frame_buffers
+			del fb
+		del _default_render_pass
+		del depth_buffer
+		del swap_chain
 
 #void WindowRenderer::framebuffer_resize_callback(GLFWwindow* window, int width, int height) {
 #	main_renderer->on_resize(width, height);
@@ -99,15 +113,14 @@ class WindowRenderer extends Renderer
 
 		wait_device_idle()
 
-		swap_chain.rebuild()
-		width = swap_chain.width
-		height = swap_chain.height
+		_delete_swap_chain_and_stuff()
+		_create_swap_chain_and_stuff()
 	
 	override RenderPass* default_render_pass()
-		return swap_chain.default_render_pass
+		return _default_render_pass
 
 	override FrameBuffer* current_frame_buffer()
-		return swap_chain.frame_buffers[image_index]
+		return frame_buffers[image_index]
 
 	override bool start_frame()
 		in_flight_fence.wait()
