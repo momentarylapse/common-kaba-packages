@@ -1,0 +1,19 @@
+use terminal
+use parser
+use runtime
+
+
+
+void main()
+	print("welcome to kabama")
+	Runtime r
+	string[] history
+	while true
+		try
+			let s = fancy_read_command(">>> ", history)
+			if s != ""
+				let t = r.eval(s)
+				print(str(t))
+		except Exception as e
+			print("exit")
+			break
