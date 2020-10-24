@@ -14,6 +14,11 @@ void main()
 			if s != ""
 				let t = r.eval(s)
 				print(str(t))
+		#except SyntaxError as e
+		#	print("Syntax error: {{e}}")
 		except Exception as e
-			print("exit")
-			break
+			if str(e) in ["end", "break"]
+				print("exit")
+				break
+			else
+				print("Error: {{e}}")

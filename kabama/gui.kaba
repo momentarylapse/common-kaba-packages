@@ -1,8 +1,5 @@
 use hui
-use common
-use parser
-use simplify
-use kabama
+use runtime
 
 class KabamaWindow extends hui.Window
 	Runtime r
@@ -12,7 +9,7 @@ class KabamaWindow extends hui.Window
 		let input = get_string("input")
 		log += ">>> {{input}}\n"
 		try
-			let t = r.eval(parse(input))
+			let t = r.eval(input)
 			log += "{{t}}\n"
 		except Exception as e
 			log += "Error: {{e}}\n"

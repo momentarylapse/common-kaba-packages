@@ -67,6 +67,9 @@ class Parser
 			return o
 		else if c == ")"
 			raise(new SyntaxError("unexpected )"))
+		else if cur() == "$"
+			next()
+			return AddVariable("$")
 		else if char_type(c[0]) == CHAR_NUMBER
 			next()
 			return AddNumber(c)

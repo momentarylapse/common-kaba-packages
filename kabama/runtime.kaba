@@ -16,6 +16,9 @@ class Runtime
 			let p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
 	Function*[] functions
+	Term*[] history
+	
+	class Error extends Exception
 	
 	void add_function(Term t)
 		let f = new Function()
@@ -26,19 +29,24 @@ class Runtime
 		functions.add(f)
 		#print("added... " + str(f))
 
-	Term *eval_term(Term t)
+	Term *eval_term(Term _t)
 		# recursive
-		let params = [for p in t.params eval_term(p)]
+		let t = _t.shallow_copy()
+		t.params = [for p in t.params eval_term(p)]
 			
 		# self
-		if t.name == "expand"
-			return expand(params[0])
+		if t.name == "$"
+			if len(history) == 0
+				raise(new Error("no previous command yet"))
+			return history[len(history)-1].copy()
+		else if t.name == "expand"
+			return expand(t.params[0])
 		else if t.name == "diff"
-			return diff(params[0], t.params[1].name)
+			return diff(t.params[0], t.params[1].name)
 		else if t.name == "subst"
-			return subst(params[0], t.params[1].name, params[2])
+			return subst(t.params[0], t.params[1].name, t.params[2])
 		else if t.name == "zeros"
-			return zeros(params[0], t.params[1].name)
+			return zeros(t.params[0], t.params[1].name)
 		else if t.type == TYPE_SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])
@@ -47,13 +55,10 @@ class Runtime
 				if f.name == t.name
 					return subst(f.formula, f.params[0], t.params[0])
 				
-				
-
-		# recursive
-		let r = t.shallow_copy()
-		r.params = params
-		return &t
+		return t
 
 	Term *eval(string s)
 		let t = parse(s)
-		return normalize(eval_term(t))
+		let r = normalize(eval_term(t))
+		history.add(r.copy())
+		return r
