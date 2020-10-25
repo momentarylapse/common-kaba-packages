@@ -31,11 +31,11 @@ shared class Term
 		for p in params
 			c.params.add(p)
 		return c
-	const shared Term copy()
-		let c = new Term(type, name)
-		for p in params
-			c.params.add(p.copy())
-		return c
+#	const shared Term copy()
+#		let c = new Term(type, name)
+#		for p in params
+#			c.params.add(p.copy())
+#		return c
 	const string __str__()
 		string r = "?"
 		if type == TYPE_OPERATOR
@@ -77,8 +77,8 @@ shared class Term
 			return params[p].name in ["+", "-"]
 		return false
 
-shared Term[] copy_list(shared Term[] list)
-	return [for t in list t.copy()]
+#shared Term[] copy_list(shared Term[] list)
+#	return [for t in list t.copy()]
 		
 
 shared Term AddNumber(string s)
@@ -99,9 +99,9 @@ shared Term AddFunction(string s, shared Term[] params)
 	return t
 
 shared Term PermuteOperator(shared Term t)
-	let r = t.copy()
-	r.params[0] = t.params[1].copy()
-	r.params[1] = t.params[0].copy()
+	let r = t.shallow_copy()
+	r.params[0] = t.params[1]
+	r.params[1] = t.params[0]
 	return r
 
 shared Term AddSpecial(string s, shared Term[] params)

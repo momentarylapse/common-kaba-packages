@@ -70,6 +70,11 @@ class Parser
 		else if cur() == "$"
 			next()
 			return AddVariable("$")
+		else if cur() == "@"
+			next()
+			let name = "@" + cur()
+			next()
+			return AddVariable(name)
 		else if char_type(c[0]) == CHAR_NUMBER
 			next()
 			return AddNumber(c)
@@ -156,7 +161,7 @@ shared Term digest_operators(out shared Term[] eid)
 
 shared Term parse(string s)
 	Parser p
-	p.e = s.parse_tokens("+-*/^<=>(),")
+	p.e = s.parse_tokens("+-*/^<=>(),@:|")
 	p.cur_index = 0
 	return p.parse_operand()
 

@@ -1,0 +1,1 @@
+apply(2*ln(x*y*c),ln(@A*@B),ln(@A)+ln(@B))

@@ -78,7 +78,7 @@ shared Term[] extract_add_group(shared Term t, out bool[] negative)
 		append_neg(negative, n1, true)
 	else
 		negative.add(false)
-		l.add(&t)
+		l.add(t)
 	return l
 
 shared Term[] extract_product_group(shared Term t, out bool[] inverse)
@@ -293,18 +293,18 @@ shared Term normalize_exponent(shared Term t)
 	let p1 = t.params[1]
 	if p1.type == TYPE_NUMBER
 		if p1.name == "1"
-			return p0
+			return normalize(p0)
 		if p1.name == "0"
 			return AddNumber("1")
 		if p0.type == TYPE_NUMBER
 			return AddNumber(exponent(p0.name, p1.name))
 	if p0.name == "*"
-		let a = normalize_exponent(AddOperator("^", p0.params[0], p1.copy()))
-		let b = normalize_exponent(AddOperator("^", p0.params[1], p1.copy()))
+		let a = normalize_exponent(AddOperator("^", p0.params[0], p1))
+		let b = normalize_exponent(AddOperator("^", p0.params[1], p1))
 		return AddOperator("*", a, b)
 	else if p0.name == "/"
-		let a = normalize_exponent(AddOperator("^", p0.params[0], p1.copy()))
-		let b = normalize_exponent(AddOperator("^", p0.params[1], p1.copy()))
+		let a = normalize_exponent(AddOperator("^", p0.params[0], p1))
+		let b = normalize_exponent(AddOperator("^", p0.params[1], p1))
 		return AddOperator("/", a, b)
 	else if p0.name == "^"
 		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
@@ -347,7 +347,13 @@ shared Term normalize_function(shared Term t)
 			return AddNumber("1")
 		if p.name == "1"
 			return AddVariable("e")
-	#if t.name == "sqrt"
+	if t.name == "sqrt"
+		let p = t.params[0]
+		if p.name == "^"
+			if p.params[1].name == "2"
+				return normalize(p.params[0])
+		if p.name in ["1", "0"]
+			return normalize(p)
 		#if p.type == TYPE_NUMBER
 			# test... apply
 			#return AddNumber("...")

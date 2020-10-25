@@ -33,7 +33,7 @@ shared Term diff(shared Term t, string by)
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == TYPE_FUNCTION
-		let r = diff_function(t.name, copy_list(t.params))
+		let r = diff_function(t.name, t.params)
 		for p in t.params
 			r = AddOperator("*", diff(p, by), r)
 		# diff(f(a))  ->  f'(a) * diff(a)
@@ -44,29 +44,29 @@ shared Term diff(shared Term t, string by)
 			a = t.params[0]
 		if len(t.params) > 1
 			b = t.params[1]
-		if (t.name == "+") or (t.name == "-")
+		if t.name in ["+", "-", "="]
 			# diff(a + b)  ->  diff(a) + diff(b)
-			return AddOperator(t.name, diff(a.copy(), by), diff(b.copy(), by))
+			return AddOperator(t.name, diff(a, by), diff(b, by))
 		if t.name == "*"
 			# diff(a * b)  ->  diff(a) * b + a * diff(b)
-			return AddOperator("+", AddOperator("*", diff(a, by), b.copy()),
-			                        AddOperator("*", a.copy(), diff(b, by)))
+			return AddOperator("+", AddOperator("*", diff(a, by), b),
+			                        AddOperator("*", a, diff(b, by)))
 		if t.name == "/"
 			# diff(a / b)  ->  diff(a) / b - a * diff(b) / b^2
-			return AddOperator("-", AddOperator("/", diff(a, by), b.copy()),
-			                        AddOperator("/", AddOperator("*", a.copy(), diff(b, by)),
-			                                         AddOperator("^", b.copy(), AddNumber("2"))))
+			return AddOperator("-", AddOperator("/", diff(a, by), b),
+			                        AddOperator("/", AddOperator("*", a, diff(b, by)),
+			                                         AddOperator("^", b, AddNumber("2"))))
 		if t.name == "^"
 			if b.type == TYPE_NUMBER
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
-				return AddOperator("*", b.copy(),
-				                        AddOperator("*", AddOperator("^", a.copy(), AddNumber(sub(b.name, "1"))),
+				return AddOperator("*", b,
+				                        AddOperator("*", AddOperator("^", a, AddNumber(sub(b.name, "1"))),
 				                                         diff(a, by)))
 			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
-			return AddOperator("+", AddOperator("*", b.copy(),
-			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b.copy(), AddNumber("1"))),
+			return AddOperator("+", AddOperator("*", b,
+			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b, AddNumber("1"))),
 			                                                          diff(a, by))),
 			                        AddOperator("*", AddFunction("ln", [a]),
-			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
+			                                         AddOperator("*", AddOperator("^", a, b),
 			                                                          diff(b, by))))
 	raise(new RuntimeError("unhandled differential..."))
