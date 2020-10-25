@@ -36,8 +36,6 @@ void check_function_params(string f, shared Term[] params)
 	if f == "subst"
 		if len(params) != 3
 			raise(new SyntaxError("function '{{f}}' expects 3 parameter, {{len(params)}} given"))
-		if params[1].type != TYPE_VARIABLE
-			raise(new SyntaxError("function '{{f}}' expects a variable as the second parameter"))
 
 
 class Parser

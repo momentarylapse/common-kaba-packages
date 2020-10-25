@@ -5,7 +5,6 @@ use expand
 use diff
 use subst
 use zeros
-use apply
 
 
 class Runtime
@@ -48,9 +47,7 @@ class Runtime
 			except
 				return t
 		else if t.name == "subst"
-			return subst(t.params[0], t.params[1].name, t.params[2])
-		else if t.name == "apply"
-			return apply(t.params[0], t.params[1], t.params[2], 50)
+			return subst(t.params[0], t.params[1], t.params[2], 50)
 		else if t.name == "zeros"
 			return zeros(t.params[0], t.params[1].name)
 		else if t.name == "="
@@ -64,7 +61,7 @@ class Runtime
 		else if t.type == TYPE_FUNCTION
 			for f in functions
 				if f.name == t.name
-					return subst(f.formula, f.params[0], t.params[0])
+					return subst_variable(f.formula, f.params[0], t.params[0])
 				
 		return t
 

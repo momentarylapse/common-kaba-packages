@@ -1,12 +1,65 @@
 use common
 
 # always copy
-shared Term subst(shared Term _t, string var, shared Term by)
+shared Term subst_variable(shared Term _t, string var, shared Term by)
 	let t = _t.shallow_copy()
 	for p in t.params
-		p = subst(p, var, by)
+		p = subst_variable(p, var, by)
 	
 	if t.type == TYPE_VARIABLE
 		if t.name == var
 			return by
+	return t
+
+
+
+class MatchingTerm
+	shared Term t
+	string name
+	const string __str__()
+		return "{{name}} -> {{t}}"
+
+class Matching
+	MatchingTerm[] terms
+	bool add(shared Term t, string name)
+		#print("add: {{t}} <<< {{name}}")
+		MatchingTerm mt
+		mt.t = t
+		mt.name = name
+		terms.add(mt)
+		return true
+	const string __str__()
+		return [for t in terms str(t)]
+	
+
+bool rule_match(shared Term t, shared Term m, out Matching mm)
+	if m.name[:1] == "@"
+		mm.add(t, m.name)
+		return true
+	if t.name != m.name
+		return false
+	if len(t.params) != len(m.params)
+		return false
+	for p,i in t.params
+		if !rule_match(p, m.params[i], mm)
+			return false
+	return true
+
+shared Term subst(shared Term _t, shared Term pattern, shared Term substitution, int max_recursion)
+	Matching mm
+	let t = _t.shallow_copy()
+	for p in t.params
+		p = subst(p, pattern, substitution, max_recursion)
+		
+	if rule_match(t, pattern, mm)
+		#print("MATCH!!!!")
+		#print(str(mm))
+		
+		let r = substitution
+		for x in mm.terms
+			r = subst_variable(r, x.name, x.t)
+		if max_recursion > 0
+			return subst(r, pattern, substitution, max_recursion-1)
+		return r
+	
 	return t
