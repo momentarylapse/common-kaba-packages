@@ -38,7 +38,7 @@ string gcd(string a, string b)
 bool number_is_even(string n)
 	return (int(n[-1:]) % 2) == 0
 
-void append_terms(out Term*[] a, Term*[] b)
+void append_terms(out shared Term[] a, shared Term[] b)
 	for x in b
 		a.add(x)
 
@@ -49,12 +49,12 @@ void append_neg(out bool[] a, bool[] b, bool inv)
 		else
 			a.add(x)
 
-void print_group(Term*[] gr)
+void print_group(shared Term[] gr)
 	print("[" + [for x in gr str(x)].join(", ") + "]")
 
 
-Term*[] extract_add_group(Term t, out bool[] negative)
-	Term*[] l
+shared Term[] extract_add_group(shared Term t, out bool[] negative)
+	shared Term[] l
 
 	# shortcut (-1)*a  ->  -a
 	if t.name == "*"
@@ -81,8 +81,8 @@ Term*[] extract_add_group(Term t, out bool[] negative)
 		l.add(&t)
 	return l
 
-Term*[] extract_product_group(Term t, out bool[] inverse)
-	Term*[] l
+shared Term[] extract_product_group(shared Term t, out bool[] inverse)
+	shared Term[] l
 	if t.name == "*"
 		bool[] n0, n1
 		append_terms(l, extract_product_group(t.params[0], n0))
@@ -97,11 +97,11 @@ Term*[] extract_product_group(Term t, out bool[] inverse)
 		append_neg(inverse, n1, true)
 	else
 		inverse.add(false)
-		l.add(&t)
+		l.add(t)
 	return l
 
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
-string[] split_off_factor(out Term*[] l)
+string[] split_off_factor(out shared Term[] l)
 	string[] factor
 	for x,i in l
 		string f = "1"
@@ -113,7 +113,7 @@ string[] split_off_factor(out Term*[] l)
 	return factor
 
 # a/b kürzen
-Term *simplify_number_division(string a, string b)
+shared Term simplify_number_division(string a, string b)
 	vli va = a
 	vli vb = b
 	vli rem
@@ -133,7 +133,7 @@ Term *simplify_number_division(string a, string b)
 	return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
 
 
-bool literally_equal(Term a, Term b)
+bool literally_equal(shared Term a, shared Term b)
 	if a.name != b.name
 		return false
 	for i in 0:len(a.params)
@@ -143,7 +143,7 @@ bool literally_equal(Term a, Term b)
 	
 			
 	
-void sort_group(out Term*[] l)
+void sort_group(out shared Term[] l)
 	# "render" all terms...   need a comp(term, term) function
 	let s = [for t in l str(t)]
 	
@@ -156,15 +156,15 @@ void sort_group(out Term*[] l)
 
 
 
-void make_unique_in_product(out Term*[] l, bool[] inv)
-	Term*[] exponents
+void make_unique_in_product(out shared Term[] l, bool[] inv)
+	shared Term[] exponents
 	
 	for x,i in l
-		Term* e = nil
+		shared Term e
 		if x.name == "^"
 			e = x.params[1]
 			l[i] = x.params[0]
-		if !e
+		else
 			e = AddNumber("1")
 		if inv[i]
 			e = AddOperator("*", AddNumber("-1"), e)
@@ -181,7 +181,7 @@ void make_unique_in_product(out Term*[] l, bool[] inv)
 			l[i] = AddOperator("^", x, normalize(exponents[i]))
 
 
-Term* normalize_product(Term t)
+shared Term normalize_product(shared Term t)
 	bool[] inverse
 	let l = extract_product_group(t, inverse)
 	#print_group(l)
@@ -218,7 +218,7 @@ Term* normalize_product(Term t)
 
 
 
-void make_unique_in_sum(out Term*[] l, out bool[] negative)
+void make_unique_in_sum(out shared Term[] l, out bool[] negative)
 	string[] multiplicity
 	#print_group(l)
 	
@@ -249,7 +249,7 @@ void make_unique_in_sum(out Term*[] l, out bool[] negative)
 			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
 
 
-Term* normalize_sum(Term t)
+shared Term normalize_sum(shared Term t)
 	bool[] negative
 	let l = extract_add_group(t, negative)
 	#print_group(l)
@@ -288,7 +288,7 @@ Term* normalize_sum(Term t)
 			return AddOperator("+", t_r, AddNumber(num))
 	return t_r
 
-Term* normalize_exponent(Term t)
+shared Term normalize_exponent(shared Term t)
 	let p0 = t.params[0]
 	let p1 = t.params[1]
 	if p1.type == TYPE_NUMBER
@@ -308,11 +308,11 @@ Term* normalize_exponent(Term t)
 		return AddOperator("/", a, b)
 	else if p0.name == "^"
 		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
-	return &t
+	return t
 
 
 
-Term* normalize_function(Term t)
+shared Term normalize_function(shared Term t)
 	if t.name == "ln"
 		let p = t.params[0]
 		if p.name == "^"
@@ -351,14 +351,11 @@ Term* normalize_function(Term t)
 		#if p.type == TYPE_NUMBER
 			# test... apply
 			#return AddNumber("...")
-	return &t
+	return t
 
 
-# should be "out"?
-Term* normalize(Term _t)
-	let t = &_t
-	if !t
-		return nil
+shared Term normalize(shared Term _t)
+	let t = _t.shallow_copy()
 
 	# recursion
 	for i in 0:len(t.params)
@@ -374,3 +371,11 @@ Term* normalize(Term _t)
 	if t.name == "^"
 		return normalize_exponent(t)
 	return t
+
+
+void main()
+	let e = parse("1+1")
+	print("n")
+	let t = normalize(e)
+	print(str(t))
+	

@@ -3,7 +3,7 @@ use parser
 use simplify
 
 
-Term *diff_function(string func, Term*[] params)
+shared Term diff_function(string func, shared Term[] params)
 	if func == "exp"
 		return AddFunction("exp", params)
 	if func == "sin"
@@ -23,7 +23,7 @@ Term *diff_function(string func, Term*[] params)
 
 # d/dx
 # always copies...
-Term *diff(Term t, string by)
+shared Term diff(shared Term t, string by)
 
 	# self
 	if t.type == TYPE_NUMBER
@@ -39,7 +39,7 @@ Term *diff(Term t, string by)
 		# diff(f(a))  ->  f'(a) * diff(a)
 		return r
 	if t.type == TYPE_OPERATOR
-		Term* a, b
+		shared Term a, b
 		if len(t.params) > 0
 			a = t.params[0]
 		if len(t.params) > 1
@@ -70,4 +70,3 @@ Term *diff(Term t, string by)
 			                                         AddOperator("*", AddOperator("^", a.copy(), b.copy()),
 			                                                          diff(b, by))))
 	raise(new RuntimeError("unhandled differential..."))
-	return nil

@@ -1,8 +1,8 @@
 use common
 
 # always copy
-Term* subst(Term t, string var, Term by)
-	Term*[] params
+shared Term subst(shared Term t, string var, shared Term by)
+	shared Term[] params
 	for p in t.params
 		params.add(subst(p, var, by))
 	

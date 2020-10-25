@@ -2,78 +2,69 @@ use common
 use parser
 
 # "out" because of copy().... :P
-Term *expand(out Term *t)
-	if !t
-		return nil
+shared Term expand(shared Term _t)
 	# rekursiv
-	bool need_new = false
-	Term*[8] p
-	for pp,i in t.params
-		p[i] = expand(pp)
-		if p[i] != pp
-			need_new = true
-	if need_new
-		t = t.copy()
-		for i in 0:len(t.params)
-			t.params[i] = p[i]
+	let t = _t.shallow_copy()
+	for p in t.params
+		p = expand(p)
 
 	# selbst
 	if t.name == "*"
-		Term *p1 = t.params[0]
-		Term *p2 = t.params[1]
+		let p1 = t.params[0]
+		let p2 = t.params[1]
 		
 		if (p1.name == "+") or (p1.name == "-")
 			# (x + y) * z  ->  x * z + y * z
-			Term* t_l = t.copy()
+			let t_l = t.shallow_copy()
 			t_l.params[0] = p1.params[0]
 			t_l.params[1] = p2
-			Term* t_r = t.copy()
+			let t_r = t.shallow_copy()
 			t_r.params[0] = p1.params[1]
 			t_r.params[1] = p2
-			Term* t_sum = p1.copy()
+			let t_sum = p1.shallow_copy()
 			t_sum.params[0] = t_l
 			t_sum.params[1] = t_r
 			#print ExprToStr(t_sum)
 			return expand(t_sum)
 		else if (p2.name == "+") or (p2.name == "-")
 			# z * (x + y)  ->  z * x + z * y
-			Term* t_l = t.copy()
+			let t_l = t.shallow_copy()
 			t_l.params[0] = p1
 			t_l.params[1] = p2.params[0]
-			Term* t_r = t.copy()
+			let t_r = t.shallow_copy()
 			t_r.params[0] = p1
 			t_r.params[1] = p2.params[1]
-			Term* t_sum = p2.copy()
+			let t_sum = p2.shallow_copy()
 			t_sum.params[0] = t_l
 			t_sum.params[1] = t_r
 			return expand(t_sum)
 	else if t.name == "^"
-		Term* p1 = t.params[0]
-		Term* p2 = t.params[1]
+		let p1 = t.params[0]
+		let p2 = t.params[1]
 		if p2.type == TYPE_NUMBER
 			if p1.name == "*"
 				# (a * b)^c  ->  a^c * b^c
-				Term* t_l = t.copy()
+				let t_l = t.shallow_copy()
 				t_l.params[0] = p1.params[0]
 				t_l.params[1] = p2
-				Term* t_r = t.copy()
+				let t_r = t.shallow_copy()
 				t_r.params[0] = p1.params[1]
 				t_r.params[1] = p2
-				Term *t_mul = p1.copy()
+				let t_mul = p1.shallow_copy()
 				t_mul.params[0] = t_l
 				t_mul.params[1] = t_r
 				return expand(t_mul)
 			else if (p1.name == "+") or (p1.name == "-")
 				int e = int(p2.name)
-				Term* t_mul = p1.copy()
+				let t_mul = p1.copy()
 				for i in 1:e
-					Term* t_l = t_mul
-					Term* t_r = p1.copy()
+					let t_l = t_mul
+					let t_r = p1.copy()
 					t_mul = AddOperator("*", t_l, t_r)
 				return expand(t_mul)
 		if p1.name == "^"
 			# (a ^ b) ^ c -> a ^ (b * c)
-			Term* t_mul = AddOperator("*", p1.params[1], p2)
+			let t_mul = AddOperator("*", p1.params[1], p2)
 			t = AddOperator("^", p1.params[0], t_mul)
 			return expand(t)
 		

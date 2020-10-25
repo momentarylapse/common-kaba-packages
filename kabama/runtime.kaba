@@ -11,16 +11,16 @@ class Runtime
 	class Function
 		string name
 		string[] params
-		Term* formula
+		shared Term formula
 		string __str__()
 			let p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
 	Function*[] functions
-	Term*[] history
+	shared Term[] history
 	
 	class Error extends Exception
 	
-	void add_function(Term t)
+	void add_function(shared Term t)
 		let f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
@@ -29,7 +29,7 @@ class Runtime
 		functions.add(f)
 		#print("added... " + str(f))
 
-	Term *eval_term(Term _t)
+	shared Term eval_term(shared Term _t)
 		# recursive
 		let t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
@@ -47,6 +47,11 @@ class Runtime
 			return subst(t.params[0], t.params[1].name, t.params[2])
 		else if t.name == "zeros"
 			return zeros(t.params[0], t.params[1].name)
+		else if t.name == "="
+			if literally_equal(normalize(t.params[0]), normalize(t.params[1]))
+				return AddVariable("true")
+			else if t.params[0].type == TYPE_NUMBER and t.params[1].type == TYPE_NUMBER
+				return AddVariable("false")
 		else if t.type == TYPE_SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])
@@ -57,7 +62,7 @@ class Runtime
 				
 		return t
 
-	Term *eval(string s)
+	shared Term eval(string s)
 		let t = parse(s)
 		let r = normalize(eval_term(t))
 		history.add(r.copy())

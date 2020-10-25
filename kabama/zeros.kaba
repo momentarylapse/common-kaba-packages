@@ -2,8 +2,8 @@ use common
 use subst
 use simplify
 
-Term* zeros(Term* t, string var)
-	Term*[] z
+shared Term zeros(shared Term t, string var)
+	shared Term[] z
 	for i in -1000:1000
 		let r = subst(t, var, AddNumber(i))
 		r = normalize(r)

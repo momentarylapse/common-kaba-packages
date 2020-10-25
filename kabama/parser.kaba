@@ -24,7 +24,7 @@ int operator_rank(string s)
 		return 4
 	return -1
 
-void check_function_params(string f, Term*[] params)
+void check_function_params(string f, shared Term[] params)
 	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
 		if len(params) != 1
 			raise(new SyntaxError("function '{{f}}' expects 1 parameter, {{len(params)}} given"))
@@ -56,7 +56,7 @@ class Parser
 	bool end_of_line()
 		return cur_index >= len(e)
 
-	Term *parse_operand_minimal()
+	shared Term parse_operand_minimal()
 		let c = cur()
 		#print("min  {{c}} {{cur_index}}")
 		if c == "("
@@ -76,7 +76,7 @@ class Parser
 		else if char_type(c[0]) == CHAR_LETTER
 			next()
 			if cur() == "("
-				Term*[] params
+				shared Term[] params
 				next() # (
 				while cur() != ")"
 					params.add(parse_operand())
@@ -94,11 +94,11 @@ class Parser
 		raise(new SyntaxError("unknown operand '{{c}}'"))
 	
 	
-	Term* parse_operand() # complete
+	shared Term parse_operand() # complete
 		#print("operand {{cur_index}}")
 		if cur() == "def"
 			return parse_def()
-		Term*[] eid
+		shared Term[] eid
 		while true
 			# operand
 			if end_of_line()
@@ -113,12 +113,12 @@ class Parser
 			# operator
 			if operator_rank(cur()) < 0
 				raise(new SyntaxError("unknown operator '{{cur()}}'"))
-			eid.add(AddOperator(cur(), nil, nil))
+			eid.add(AddOperator(cur(), new Term(TYPE_DUMMY, ""), new Term(TYPE_DUMMY, "")))
 			next()
 
 		return digest_operators(eid)
 
-	Term* parse_def()
+	shared Term parse_def()
 		next() # def
 		let op = parse_operand()
 		if op.name != "="
@@ -130,7 +130,7 @@ class Parser
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
 
-Term *digest_operators(out Term*[] eid)
+shared Term digest_operators(out shared Term[] eid)
 	if (len(eid) % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
 	
@@ -154,9 +154,18 @@ Term *digest_operators(out Term*[] eid)
 	
 	return eid[0]
 
-Term *parse(string s)
+shared Term parse(string s)
 	Parser p
-	p.e = s.parse_tokens("+-*/^=(),")
+	p.e = s.parse_tokens("+-*/^<=>(),")
 	p.cur_index = 0
 	return p.parse_operand()
 
+shared Term f()
+	return new Term(TYPE_NUMBER, "1")
+
+void main()
+	#shared Term t = f()
+	let t = parse("x+1")
+	print(str(t))
+	
+	
