@@ -1,10 +1,31 @@
 use parser
 use runtime
+use terminal
 
 
 
 void main(string[] arg)
 	Runtime r
-	for a in arg
-		let t = r.eval(a)
-		print(str(t))
+	
+	if len(arg) > 0
+		for a in arg
+			let t = r.eval(a)
+			print(str(t))
+		return
+	
+	print("welcome to kabama")
+	string[] history
+	while true
+		try
+			let s = fancy_read_command(">>> ", history)
+			if s != ""
+				let t = r.eval(s)
+				print(str(t))
+		#except SyntaxError as e
+		#	print("Syntax error: {{e}}")
+		except Exception as e
+			if str(e) in ["end", "break"]
+				print("exit")
+				break
+			else
+				print("Error: {{e}}")
