@@ -98,7 +98,7 @@ void move_cursor(int dx, int dy)
 	else if dx < 0
 		print(ESC + "[{{-dx}}D")
 
-
+class BreakSignal extends Exception
 
 string fancy_read_command(string prompt, out string[] history)
 	let ppp = _print_postfix
@@ -116,11 +116,11 @@ string fancy_read_command(string prompt, out string[] history)
 		if s == [0x03]
 			unsetraw()
 			_print_postfix = ppp
-			raise(new Exception("break"))
+			raise(new BreakSignal("break"))
 		if s == [0x04]
 			unsetraw()
 			_print_postfix = ppp
-			raise(new Exception("end"))
+			raise(new BreakSignal("end"))
 		else if s == [0x0d]#"\n"
 			print("\n")
 			if current != ""

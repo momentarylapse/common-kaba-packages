@@ -357,8 +357,43 @@ shared Term normalize_function(shared Term t)
 		#if p.type == TYPE_NUMBER
 			# test... apply
 			#return AddNumber("...")
+	if t.name == "deg"
+		let p = t.params[0]
+		if p.type == TYPE_NUMBER
+			return AddNumber("0")
+		if p.name == "∧"
+			return normalize(AddOperator("+", AddFunction("deg", [p.params[0]]),
+			                                  AddFunction("deg", [p.params[1]])))
+		
 	return t
 
+shared Term normalize_wedge(shared Term _t)
+	let t = _t.shallow_copy()
+
+	# recursion
+	for i in 0:len(t.params)
+		t.params[i] = normalize(t.params[i])
+
+	if str(t.params[0]).compare(str(t.params[1])) > 0
+		t.params.swap(0, 1)
+		                                         #AddOperator("*", AddFunction("deg", [t.params[0]]),
+		                                         #                 AddFunction("deg", [t.params[1]])))
+		return normalize(AddOperator("*",
+		                             AddOperator("^",
+		                                         AddNumber("-1"),
+		                                         AddOperator("*",
+		                                                     AddFunction("deg", [t.params[0]]),
+		                                                     AddFunction("deg", [t.params[1]]))),
+		                             t))
+		
+	return t
+
+shared Term normalize_equal(shared Term t)
+	if literally_equal(normalize(t.params[0]), normalize(t.params[1]))
+		return AddVariable("true")
+	else if t.params[0].type == TYPE_NUMBER and t.params[1].type == TYPE_NUMBER
+		return AddVariable("false")
+	return t
 
 shared Term normalize(shared Term _t)
 	let t = _t.shallow_copy()
@@ -374,8 +409,12 @@ shared Term normalize(shared Term _t)
 		return normalize_product(t)
 	if t.name in ["+", "-"]
 		return normalize_sum(t)
+	if t.name == "∧"
+		return normalize_wedge(t)
 	if t.name == "^"
 		return normalize_exponent(t)
+	if t.name == "="
+		return normalize_equal(t)
 	return t
 
 

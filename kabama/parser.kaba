@@ -16,9 +16,9 @@ int char_type(char c)
 int operator_rank(string s)
 	if s == "="
 		return 1
-	if (s == "+") or (s == "-")
+	if s in ["+", "-"]
 		return 2
-	if (s == "*") or (s == "/")
+	if s in ["*", "/", "∧"]
 		return 3
 	if s == "^"
 		return 4

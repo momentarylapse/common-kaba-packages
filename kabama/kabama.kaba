@@ -1,6 +1,7 @@
+use common
 use parser
 use runtime
-use terminal
+import terminal
 
 
 
@@ -17,15 +18,16 @@ void main(string[] arg)
 	string[] history
 	while true
 		try
-			let s = fancy_read_command(">>> ", history)
+			let s = terminal.fancy_read_command(">>> ", history)
 			if s != ""
 				let t = r.eval(s)
 				print(str(t))
-		#except SyntaxError as e
-		#	print("Syntax error: {{e}}")
+		except SyntaxError as e
+			print("Syntax error: {{e}}")
+		except RuntimeError as e
+			print("Runtime error: {{e}}")
+		except terminal.BreakSignal as e
+			print("exit")
+			break
 		except Exception as e
-			if str(e) in ["end", "break"]
-				print("exit")
-				break
-			else
-				print("Error: {{e}}")
+			print("Error: {{e}}")
