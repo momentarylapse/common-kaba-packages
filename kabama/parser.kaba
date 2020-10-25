@@ -27,17 +27,17 @@ int operator_rank(string s)
 void check_function_params(string f, Term*[] params)
 	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
 		if len(params) != 1
-			raise(new SyntaxError("function {{f}} expects 1 parameter, {{len(params)}} given"))
+			raise(new SyntaxError("function '{{f}}' expects 1 parameter, {{len(params)}} given"))
 	if f in ["diff", "zeros"]
 		if len(params) != 2
-			raise(new SyntaxError("function {{f}} expects 2 parameter, {{len(params)}} given"))
+			raise(new SyntaxError("function '{{f}}' expects 2 parameter, {{len(params)}} given"))
 		if params[1].type != TYPE_VARIABLE
-			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
+			raise(new SyntaxError("function '{{f}}' expects a variable as the second parameter"))
 	if f == "subst"
 		if len(params) != 3
-			raise(new SyntaxError("function {{f}} expects 3 parameter, {{len(params)}} given"))
+			raise(new SyntaxError("function '{{f}}' expects 3 parameter, {{len(params)}} given"))
 		if params[1].type != TYPE_VARIABLE
-			raise(new SyntaxError("function {{f}} expects a variable as the second parameter"))
+			raise(new SyntaxError("function '{{f}}' expects a variable as the second parameter"))
 
 
 class Parser
@@ -143,7 +143,7 @@ Term *digest_operators(out Term*[] eid)
 					sig = os
 					i_sig = i
 		if eid[i_sig].type != TYPE_OPERATOR
-			raise(new SyntaxError("Operator vermisst"))
+			raise(new SyntaxError("missing operator"))
 		eid[i_sig].params[0] = eid[i_sig - 1]
 		eid[i_sig].params[1] = eid[i_sig + 1]
 		eid[i_sig - 1] = eid[i_sig]

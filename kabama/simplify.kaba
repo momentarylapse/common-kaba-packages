@@ -35,6 +35,9 @@ string gcd(string a, string b)
 	vli vb = b
 	return str(va.gcd(vb))
 
+bool number_is_even(string n)
+	return (int(n[-1:]) % 2) == 0
+
 void append_terms(out Term*[] a, Term*[] b)
 	for x in b
 		a.add(x)
@@ -307,6 +310,8 @@ Term* normalize_exponent(Term t)
 		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
 	return &t
 
+
+
 Term* normalize_function(Term t)
 	if t.name == "ln"
 		let p = t.params[0]
@@ -315,16 +320,33 @@ Term* normalize_function(Term t)
 			return normalize(tt)
 		if p.name == "e"
 			return AddNumber("1")
+		if p.name == "exp"
+			return p.params[0]
 	if t.name == "sin"
 		let p = t.params[0]
 		if p.name in ["0", "pi"]
 			return AddNumber("0")
+		if p.name == "*"
+			if p.params[0].type == TYPE_NUMBER and p.params[1].name == "pi"
+				return AddNumber("0")
 	if t.name == "cos"
 		let p = t.params[0]
 		if p.name == "0"
 			return AddNumber("1")
 		if p.name == "pi"
 			return AddNumber("-1")
+		if p.name == "*"
+			if p.params[0].type == TYPE_NUMBER and p.params[1].name == "pi"
+				if number_is_even(p.params[0].name)
+					return AddNumber("1")
+				else
+					return AddNumber("-1")
+	if t.name == "exp"
+		let p = t.params[0]
+		if p.name == "0"
+			return AddNumber("1")
+		if p.name == "1"
+			return AddVariable("e")
 	#if t.name == "sqrt"
 		#if p.type == TYPE_NUMBER
 			# test... apply
