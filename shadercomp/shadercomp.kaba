@@ -1,5 +1,15 @@
 use os
 
+enum Type
+	VERTEX
+	FRAGMENT
+	GEOMETRY
+	COMPUTE
+	RAYGEN
+	RAYMISS
+	CLOSESTHIT
+	ANYHIT
+
 string tag_contents(string all, string tag)
 	int i0 = all.find("<{{tag}}>", 0)
 	if i0 < 0
@@ -9,11 +19,13 @@ string tag_contents(string all, string tag)
 		return ""
 	return all[i0+len(tag)+2:i1]
 
+Path cur_dir
+
 string compile_stage(string code, string stage)
 	if code == ""
 		return ""
-	let itmp = "/tmp/shadercomp.glsl"
-	let otmp = "/tmp/shadercomp.bin"
+	let itmp = cur_dir << "shadercomp.glsl"
+	let otmp = cur_dir << "shadercomp.bin"
 	try
 		shell_execute("echo '{{code}}' > {{itmp}}")
 #		print("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}}")
@@ -23,6 +35,8 @@ string compile_stage(string code, string stage)
 		print("  ----  ERROR ({{stage}})  ----\n{{x}}")
 		return ""
 	string x = shell_execute("cat {{otmp}}")
+	os.Filesystem.delete(itmp)
+	os.Filesystem.delete(otmp)
 	
 #	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
 	# print(cmd)
@@ -59,6 +73,7 @@ int extract_push_size(string layout)
 	return 0
 
 void compile(Path filename)
+	cur_dir = filename.parent()
 	string all = Filesystem.read(filename)
 	string layout = tag_contents(all, "Layout")
 	string code_vertex = tag_contents(all, "VertexShader")
@@ -77,7 +92,7 @@ void compile(Path filename)
 	
 	LayoutData ld = parse_layout(layout)
 	
-	File *f = Filesystem.create(Path(str(filename) + ".compiled"))
+	let f = Filesystem.create(Path(str(filename) + ".compiled"))
 	f << "Info"
 	f << "{version=0.1,shaders=SPIR-V}"
 	f << "Input"
