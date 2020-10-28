@@ -16,7 +16,7 @@ enum
 
 int num_terms
 
-shared class Term
+class Term as shared
 	int type
 	string name
 	shared Term[] params
