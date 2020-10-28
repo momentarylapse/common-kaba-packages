@@ -204,7 +204,7 @@ class UBO
 
 class StatLayer
 	Texture* tex
-	UBOWrapper* ubo
+	UniformBuffer* ubo
 	DescriptorSet* dset
 	Timer* timer
 	Image* im
@@ -220,15 +220,15 @@ class StatLayer
 		im = new Image(256, 64, color(0,0,0,0))
 		tex = new Texture()
 		tex.override(im)
-		ubo = new UBOWrapper(64*3)
+		ubo = new UniformBuffer(64*3)
 		UBO u
 		u.p = matrix.ID
 		u.v = matrix.ID
 		u.m = matrix.ID
 		ubo.update(&u)
 		dset = pool.create_set("buffer,sampler")
-		dset.set(0, ubo)
-		dset.set(1, tex)
+		dset.set_buffer(0, ubo)
+		dset.set_texture(1, tex)
 		dset.update()
 		vb = create_quad(rect(-1,-0.3,-1,-0.8))
 		pipeline = new Pipeline(shader, rp, subpass, 1)
@@ -256,12 +256,12 @@ class StatLayer
 		pp.draw_str(5,5, "{{frames/_time|1}}")
 		del pp
 		tex.override(im)
-		dset.set(1, tex)
+		dset.set_texture(1, tex)
 		dset.update()
 		frames = 0
 		_time = 0
 	void draw(out CommandBuffer cb)
-		cb.set_pipeline(pipeline)
+		cb.bind_pipeline(pipeline)
 		cb.bind_descriptor_set(0, dset)
 		cb.draw(vb)
 		
