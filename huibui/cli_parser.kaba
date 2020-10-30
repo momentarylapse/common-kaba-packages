@@ -1,13 +1,12 @@
 use kaba
 
-string spaces(int n)
-	return [for i in 0:n " "].join("")
-
 class CLIParser
+	static CLIParser* current
+	
 	class Command
 		string[] name
 		string[] params
-		Function* f
+		string[]->void f
 		string comment
 
 		const bool match(string[] arg)
@@ -32,7 +31,8 @@ class CLIParser
 	class Option
 		string[] name
 		string param
-		Function* f
+		string->void f1
+		void->void f0
 		string comment
 		
 		const string sig()
@@ -48,7 +48,9 @@ class CLIParser
 	void info(string i)
 		_info = i
 
-	void cmd(string name, string params, string comment, Function *f)
+	# "example", "<P1> <P2> [OPT] ...", "comment", lambda(string[] a) ...
+	#  name = "" -> default
+	void cmd(string name, string params, string comment, string[]->void f)
 		Command c
 		c.name = name.explode(" ")
 		c.params = params.explode(" ")
@@ -56,18 +58,25 @@ class CLIParser
 		c.comment = comment
 		commands.add(c)
 
-	void opta(string[] name, string param, string comment, Function *f)
+	# ["--example", "-e"], "<P1> <P2> [OPT] ...", "comment", lambda(string a) ...
+	void optx(string[] name, string param, string comment, string->void f1, void->void f0)
 		Option c
 		c.name = name
 		c.param = param
 		c.comment = comment
-		c.f = f
+		c.f1 = f1
+		c.f0 = f0
 		options.add(c)
 		
-	void opt(string[] name, string comment, Function *f)
-		opta(name, "", comment, f)
+	# ["--example", "-e"], "comment", lambda() ...
+	void opta(string[] name, string param, string comment, string->void f)
+		optx(name, param, comment, f, nil)
+
+	void opt(string[] name, string comment, void->void f)
+		optx(name, "", comment, nil, f)
 
 	const void run(string[] arg)
+		current = &self
 		try
 			let arg2 = parse_options(arg)
 			if parse_commands(arg2)
@@ -92,12 +101,12 @@ class CLIParser
 			if name in o.name
 				#print("option {{o.name}}")
 				if o.param == ""
-					call(o.f)
+					call(o.f0)
 					return 0
 				else
 					if len(arg_rest) == 0
 						raise(new Exception("missing parameter: {{o.sig()}}"))
-					call(o.f, arg_rest[0])
+					call(o.f1, arg_rest[0])
 					return 1
 		raise(new Exception("unknown option {{name}}"))
 	
@@ -119,11 +128,11 @@ class CLIParser
 		print("commands:")
 		for c in commands
 			let s = c.sig()
-			print("  {{s}} {{spaces(25-len(s))}} # {{c.comment}}")
+			print("  {{s|-30}} # {{c.comment}}")
 		
 		if len(options) > 0
 			print("")
 			print("options:")
 			for o in options
 				let s = o.sig()
-				print("  {{s}} {{spaces(25-len(s))}} # {{o.comment}}")
+				print("  {{s|-30}} # {{o.comment}}")
