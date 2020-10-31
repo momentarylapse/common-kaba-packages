@@ -1,0 +1,35 @@
+use os
+use kaba
+use os
+
+void test_replace(Path filename, string what, string by, bool allow)
+	string s = Filesystem.read_text(filename)
+	int n = 0
+	while true
+		int p = s.find(what, 0)
+		if p < 0
+			break
+		if n == 0
+			print(filename)
+		print("    " + s[p-5:p+len(what) + 5])
+		s = s[:p] + by + s[p + len(what):]
+		print(">>  " + s[p-5:p+len(by) + 5])
+		n ++
+	if n > 0 and allow
+		Filesystem.write_text(filename, s)
+
+void test_rec(Path dir, string what, string by, bool allow)
+	let list = Filesystem.search(dir, "*.kaba", true)
+	for e in list
+		if Filesystem.is_directory(dir << e)
+			test_rec(dir << e, what, by, allow)
+		else
+			test_replace(dir << e, what, by, allow)
+
+void main(string[] arg)
+	if len(arg) < 3
+		raise(new Exception("[WHAT] [BY] [DIR]"))
+	bool allow = true
+	if len(arg) >= 4
+		allow = (arg[3] != "--dry")
+	test_rec(Path(arg[2]), arg[0], arg[1], allow)

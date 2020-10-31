@@ -100,8 +100,8 @@ void diff(string a, string b)
 		diffs.add(d)
 	
 		print("{{Term.YELLOW}}diff at {{d}}:{{Term.END}}")
-		int a000 = clampi(d.a0-CONTEXT, 0, len(a))
-		int a111 = clampi(d.a1+CONTEXT, 0, len(a))
+		int a000 = clamp(d.a0-CONTEXT, 0, len(a))
+		int a111 = clamp(d.a1+CONTEXT, 0, len(a))
 		print(hex(a[a000:d.a0]) + " {{Term.RED}}{{hex(a[d.a0:d.a1])}} {{Term.GREEN}}{{hex(b[d.b0:d.b1])}}{{Term.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
