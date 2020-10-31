@@ -1,0 +1,18 @@
+// Description
+Die Farb- und Licht-Eigenschaften beim Rendern mit [[f:NixDraw3D]] einstellen.
+// Parameter ambient
+in
+Die ambient-Farbe (ungerichtetes Licht).
+// Parameter diffuse
+in
+Die diffuse-Farbe (gerichtetes Licht, Kamera unabhängig).
+// Parameter specular
+in
+Die specular-Farbe (gerichtet, Kamera abhängig).
+// Parameter shininess
+in
+Der Glanz-Faktor für die specular-Farbe.
+// Parameter emission
+in
+Die emission-Farbe (ungerichtet, selbstleuchtend).
+#

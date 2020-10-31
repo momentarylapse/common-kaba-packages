@@ -1,0 +1,5 @@
+// Description
+Die Auswahl von [[f:HuiFileDialogOpen]], [[f:HuiFileDialogSave]] oder [[f:HuiFileDialogDir]]:\nDer komplette Name der Auswahl (Verzeichnis + Datei).
+// Synopsis
+
+#

@@ -1,0 +1,13 @@
+// Description
+Ein Rechteck.
+// Element x1
+Die linke Kante.
+// Element x2
+Die rechte Kante.
+// Element y1
+Die obere Kante.
+// Element y2
+Die untere Kante.
+// Synopsis
+f:rect,v:Target
+#

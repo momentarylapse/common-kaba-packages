@@ -1,0 +1,5 @@
+// Description
+Erzeugt Binärdaten aus einer Hexadezimaldarstellung.
+// Return
+Die Binärdaten.
+#

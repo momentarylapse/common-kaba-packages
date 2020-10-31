@@ -1,0 +1,10 @@
+// Description
+Initialisiert den Zufallsgenerator.
+// Parameter seed
+in
+Der Keim des Zufallsgenerators.\nDieser Wert bestimmt die Abfolge aller danach berechneten Werte von [[randi]] und [[randf]].
+// Remark
+Beim Programmstart wird der Zufallsgenerator automatisch "zufällig" initialisiert (durch die Systemzeit).
+// Synopsis
+rand,randi
+#

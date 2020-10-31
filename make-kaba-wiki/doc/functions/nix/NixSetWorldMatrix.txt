@@ -1,0 +1,6 @@
+// Description
+Legt fest, wie Koordinaten in nachfolgenden Zeichen-Befehlen in Welt-Koordinaten transformiert werden sollen.
+// Parameter m
+in
+Die Transformationsmatrix.
+#

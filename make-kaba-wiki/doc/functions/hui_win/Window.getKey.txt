@@ -1,0 +1,8 @@
+// Description
+Frägt ab, ob eine bestimmte Taste gerade gedrückt ist.
+// Parameter key
+in
+Die abzufragende Taste.
+// Return
+<c>true</c>, falls die Taste gedrückt ist.
+#

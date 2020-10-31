@@ -1,0 +1,8 @@
+// Description
+Konvertiert einen <t>float</t>-Wert in einen <t>int</t>-Wert.
+// Parameter f
+in
+Der <t>float</t>-Wert.
+// Return
+Der <t>int</t>-Wert.
+#

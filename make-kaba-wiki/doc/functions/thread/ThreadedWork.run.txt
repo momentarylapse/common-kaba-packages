@@ -1,0 +1,13 @@
+// Description
+Lässt eine Funktion von mehreren Threads gleichzeitig ausführen.
+// Parameter total_size
+in
+Die gesamte Anzahl der Aufgaben (die Aufgaben sind durchnummeriert von 0 bis <tt>total_size - 1</tt>).
+// Parameter partition_size
+in
+Die Anzahl der Aufgaben, die (intern) pro Thread in einem Packet abgearbeitet werden soll. Diese Zahl sollte aus Performance-Gründen so gewählt werden, dass die Arbeitspackete nicht in deutlich unter einer Sekunde abgearbeitet werden.
+// Return
+Gibt an, ob die Arbeit komplett beendet (<c>true</c>) oder durch <v>onStatus</v> abgebrochen wurde (<c>false</c>).
+// Synopsis
+s:ThreadedWork
+#

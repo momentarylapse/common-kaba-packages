@@ -1,0 +1,3 @@
+// Description
+Schlie&st eine Netzwerk-Verbindung.
+#

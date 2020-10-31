@@ -1,0 +1,8 @@
+// Description
+Erstellt eine Datei und öffnet sie zum Schreiben.
+// Parameter filename
+in
+Der Dateiname.
+// Return
+Eine Referenz auf die Datei.
+#

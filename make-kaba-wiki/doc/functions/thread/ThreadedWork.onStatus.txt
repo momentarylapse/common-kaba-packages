@@ -1,0 +1,5 @@
+// Description
+Überschreibbare Funktion, die regelmäßig aufgerufen wird, um z.B. Statusinformationen anzuzeigen.
+// Return
+Gibt an, ob die Arbeit beendet (<c>false</c>) oder fortgesetzt (<c>true</c>) werden soll.
+#

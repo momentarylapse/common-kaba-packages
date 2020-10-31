@@ -1,0 +1,12 @@
+// Description
+Zeichnet ein texturiertes Rechteck.
+// Parameter source
+in
+Der Bereich der Textur (Koordinaten in (0,1) ), der auf das Rechteck gezerrt werden soll (<c>r_id</c> = komplett).
+// Parameter dest
+in
+Der Bereich des Bildschirms (Koordinaten in Pixel), auf den das Rechteck gezerrt werden soll (<c>Target</c> = komplett).
+// Parameter z
+in
+Die Tiefe im Z-Buffer (0 = ganz nah, 1 = maximal weit entfernt).
+#

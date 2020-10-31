@@ -1,0 +1,7 @@
+// Description
+Relative Bewegung des Mauszeigers.\nX- und Y-Komponente geben die Strecke (relativ zur Bildschirmgröße) an, um die sich der Mauszeiger bewegt hat. Die Z-Komponente entspricht der Drehung des Mausrades.
+// Remarks
+Dies ist nicht immer die Differenz von [[MouseRel]] zweier aufeinander folgender Frames!\nAm Bildschirmrand zählt [[MouseDRel]] im Gegensatz zu [[MouseRel]] weiter.
+// Synopsis
+Mouse,MouseRel,MouseD,MouseDRel,f:GetButton,f:GetButtonUp,f:GetButtonDown,f:GetKey,f:GetKeyDown,f:GetKeyUp,f:GetKeyDownRep,f:GetKeyName
+#

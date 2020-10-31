@@ -1,0 +1,9 @@
+// Description
+Falls die <t>any</t>-Variable ein Array ist, so wird der zum Index gehörige Eintrag gesetzt.
+// Parameter index
+in
+Der Array-Index.
+// Parameter value
+in
+Der zu setzende Wert.
+#

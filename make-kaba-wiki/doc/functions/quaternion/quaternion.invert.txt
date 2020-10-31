@@ -1,0 +1,3 @@
+// Description
+Invertiert eine Quaternionen.\nDas Resultat entspricht der Rotation in umgekehrter Richtung.
+#

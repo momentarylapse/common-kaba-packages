@@ -1,0 +1,12 @@
+// Description
+Setzt einen Pixel in dem Bild.
+// Parameter x
+in
+Die X-Position des Pixels (von links).
+// Parameter y
+in
+Die Y-Position des Pixels (von oben).
+// Parameter c
+in
+Die Farbe des Pixels.
+#

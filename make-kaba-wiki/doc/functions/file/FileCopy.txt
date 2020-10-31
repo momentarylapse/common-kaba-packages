@@ -1,0 +1,11 @@
+// Description
+Erstellt eine Kopie einer Datei.
+// Parameter source
+in
+Der Quell-Dateiname.
+// Parameter dest
+in
+Der Ziel-Dateiname.
+// Return
+<c>true</c>, falls das Kopieren erfolgreich war.
+#

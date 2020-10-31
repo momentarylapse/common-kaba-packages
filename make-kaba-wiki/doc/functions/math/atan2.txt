@@ -1,0 +1,11 @@
+// Description
+Berechnet den Arcus-Tangens von y/x. Dies ist die Umkehrung des Tangens, also von [[f:tan]].
+// Parameter x
+in
+(keine Einschr&ankung)
+// Parameter y
+in
+(keine Einschr&ankung)
+// Return
+Ein Wert aus (-<c>pi</c>/2,<c>pi</c>/2).
+#

@@ -1,0 +1,9 @@
+// Description
+Prüft, ob der Haken einer Schaltfläche aktiviert ist.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Return
+Der Status des Hakens.
+#
+

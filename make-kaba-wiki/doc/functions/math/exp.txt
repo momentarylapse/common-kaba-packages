@@ -1,0 +1,8 @@
+// Description
+Berechnet die Exponentialfunktion von x.
+// Parameter x
+in
+Parameter, dessen Exponentialfunktion berechnet werden soll.
+// Return
+<math>e^x</math>
+#

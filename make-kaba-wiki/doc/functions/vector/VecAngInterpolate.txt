@@ -1,0 +1,14 @@
+// Description
+Interpoliert zwischen Winkeln.\nDies geschieht mit Hilfe der Quaternionen-Rechnung.
+// Parameter ang1
+in
+Ein Winkel
+// Parameter ang2
+in
+Noch ein Winkel
+// Parameter t
+in
+Der Mischungsparameter
+// Return
+Der interpolierte Winkel.\n<math>= ( t - 1 ) \cdot \mathrm{ang1} + t \cdot \mathrm{ang2}</math> (zumindest gedanklich)
+#

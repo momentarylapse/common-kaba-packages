@@ -1,0 +1,12 @@
+// Description
+Erzeugt eine komplexe Zahl aus Real- und Imaginärteil.
+// Parameter x
+in
+Der Realtail.
+// Parameter y
+in
+Der Imaginärteil.
+// Return
+Die Komplexe Zahl.
+#
+

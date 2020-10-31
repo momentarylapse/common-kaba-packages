@@ -1,0 +1,6 @@
+// Description
+Schränkt die Grafikausgabe auf einen rechteckigen Bereich ein.
+// Parameter r
+in
+Der eingeschränkte Bereich.
+#

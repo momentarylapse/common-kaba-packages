@@ -1,0 +1,6 @@
+// Description
+Erstellt einen Screenshot und speichert ihn als [[s:Image]].
+// Parameter im
+out
+Das Bild.
+#

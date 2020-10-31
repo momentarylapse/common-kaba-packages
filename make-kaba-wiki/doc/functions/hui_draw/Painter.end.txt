@@ -1,0 +1,5 @@
+// Description
+Beendet den Zeichen-Vorgang.
+// Remark
+Muss am Ende der Zeichenoperationen aufgerufen werden!
+#

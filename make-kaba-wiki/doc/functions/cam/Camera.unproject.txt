@@ -1,0 +1,8 @@
+// Description
+Ermittelt für einen Punkt auf dem Bildschirm den zugehörigen Punkt im 3d-Raum.
+// Parameter v
+in
+Der Punkt auf dem Bildschirm in relativen Koordinaten <tt>[0..1] x [0..1]</tt>.
+// Return
+Der Punkt im 3d-Raum.
+#

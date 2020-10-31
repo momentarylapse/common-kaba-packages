@@ -1,0 +1,5 @@
+// Description
+Berechnet das Konjugierte einer komplexen Zahl: \n<tt>(+x, -y)</tt>.
+// Return
+Das Konjugierte.
+#

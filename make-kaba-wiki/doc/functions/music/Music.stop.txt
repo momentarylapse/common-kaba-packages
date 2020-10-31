@@ -1,0 +1,3 @@
+// Description
+Stoppt die Musik-Datei und "spuhlt" sie wieder zum Anfang zurück.
+#

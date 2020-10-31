@@ -1,0 +1,12 @@
+// Description
+Eine Lichtquelle.
+// Element enabled
+Die Aktivität der Quelle.
+// Element directional
+Steuert, ob die Quelle homogen (<c>true</c>) oder punktförmig (<c>false</c>) ist.
+// Element pos
+Die Position, falls es eine punktförimge Quelle ist.
+// Element dir
+Die Richtung, falls es eine homogene Quelle ist.
+#
+

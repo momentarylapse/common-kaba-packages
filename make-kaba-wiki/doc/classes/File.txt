@@ -1,0 +1,5 @@
+// Description
+Variablen diesen Typs Repräsentieren Dateien.\nMit [[f:FileOpen]] kann eine Datei zum Lesen geöfnet werden, mit [[f:FileCreate]] zum Schreiben und mit <tt>delete</tt> wieder geschlossen.
+// Synopsis
+f:FileOpen,f:FileCreate,f:FileExists
+#

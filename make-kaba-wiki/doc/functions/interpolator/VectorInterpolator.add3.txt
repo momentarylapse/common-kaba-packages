@@ -1,0 +1,15 @@
+// Description
+Fügt einen Punkt mit expliziter Tangente und Gewicht hinzu.
+// Parameter p
+in
+Der Wert.
+// Parameter v
+in
+Die Tangente.
+// Parameter w
+in
+Das Gewicht.
+// Parameter dt
+in
+Der Parameter-Abstand zum vorherigen Punkt.\nWird ignoriert, falls es der erste Punkt ist.
+#

@@ -1,0 +1,5 @@
+// Description
+Bestimmt die Anzahl der Prozessor-Kerne.
+// Return
+Die Anzahl der Kerne.
+#

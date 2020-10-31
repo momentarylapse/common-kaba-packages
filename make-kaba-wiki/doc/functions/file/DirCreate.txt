@@ -1,0 +1,8 @@
+// Description
+Erstellt ein Verzeichnis.
+// Parameter dir
+in
+Der Verzeichnisname.
+// Return
+<c>true</c>, falls der Erstellen erfolgreich war.
+#

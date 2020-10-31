@@ -1,0 +1,10 @@
+// Description
+Konfiguriert eine Lichtquelle als punktförmige Lichtquelle.
+// Parameter pos
+in
+Die Position der Lichtquelle.
+// Parameter radius
+in
+Die Reichweite der Lichtquelle.
+#
+

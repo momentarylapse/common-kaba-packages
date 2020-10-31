@@ -1,0 +1,5 @@
+// Description
+Leert einen VertexBuffer.
+// Synopsis
+s:VertexBuffer,VertexBuffer.clear,VertexBuffer.addTrias,VertexBuffer.addTria
+#

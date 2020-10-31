@@ -1,0 +1,7 @@
+// Description
+Konfiguriert eine Lichtquelle für paralleles Licht (aus dem "Unendlichen").
+// Parameter dir
+in
+Der Richtungsvektor.
+#
+

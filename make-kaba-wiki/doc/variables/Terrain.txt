@@ -1,0 +1,5 @@
+// Description
+Eine Liste, die alle im Spiel vorhandenen Terrains enthält.
+// Synopsis
+s:Terrain
+#

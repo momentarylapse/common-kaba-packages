@@ -1,0 +1,6 @@
+// Description
+Steuert die Drahtgitter-Darstellung ("wire frame").
+// Parameter enabled
+in
+Für <c>true</c> wird im Drahtgitter-Modus gerendert, für <c>false</c> werden Flächen voll dargestellt.
+#

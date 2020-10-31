@@ -1,0 +1,3 @@
+// Description
+Die aktuelle horizontale Aufl&osung des Bildschirmes.
+#

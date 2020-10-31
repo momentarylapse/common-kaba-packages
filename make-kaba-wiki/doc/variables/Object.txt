@@ -1,0 +1,7 @@
+// Description
+Die Liste aller Objekte in der Welt.
+// Remarks
+Wird ein Objekt gelöscht, so werden die nachfolgenden Objekte im Array nicht nachgerückt, um die Eindeutigkeit der Indizes zu garantieren. Somit kann der Array "Lücken" haben!
+// Synopsis
+s:Model
+#

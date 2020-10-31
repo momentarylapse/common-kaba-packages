@@ -1,0 +1,11 @@
+// Description
+Liest einen Pixel aus dem Bild.
+// Parameter x
+in
+Die X-Position des Pixels (von links).
+// Parameter y
+in
+Die Y-Position des Pixels (von oben).
+// Return
+Die Farbe des Pixels.
+#

@@ -1,0 +1,183 @@
+use os
+
+
+class xml
+	static bool _is_whitespace(char c)
+		return (c == ' ' or c == 9 or c == 10 or c == 13)
+	static bool _is_special(char c)
+		return (c == '<' or c == '>' or c == '?' or c == '=')
+	static int _skip_ws(string s, int i0)
+		for i in i0:len(s)
+			if not _is_whitespace(s[i])
+				return i
+		return len(s)
+	static string _decode_str(string s)
+		if s[:1] == "\""
+			return s[1:-1]
+		if s[:1] == "'"
+			return s[1:-1]
+		return s
+	static string _next(string s, out int *i0)
+		*i0 = _skip_ws(s, i0)
+		string r = _peek(s, *i0)
+		*i0 += len(r)
+		return r
+	static string _peek(string s, int i0)
+		int i = i0
+		i = _skip_ws(s, i)
+		string r
+		if _is_special(s[i])
+			return s[i:i+1]
+		if s[i] == '"'
+			for j in i+1:len(s)
+				if s[j] == '"'
+					return s[i:j+1]
+		if s[i] == '''
+			for j in i+1:len(s)
+				if s[j] == '''
+					return s[i:j+1]
+		for j in i:len(s)
+			if _is_whitespace(s[j]) or _is_special(s[j])
+				return s[i:j]
+		return ""
+			
+	static any _parse_tag(out string tag_key, string s, out int *i0)
+		if _next(s, i0) != "<"
+			raise(new Exception("< expected"))
+
+		tag_key = _next(s, i0)
+		if tag_key == "?"
+			tag_key = _next(s, i0)
+		#print("TAG: " + tag_key[:20])
+		
+		any tag
+		while true
+			string n = _next(s, i0)
+			if n == ">"
+				return tag
+			else if n == "?"
+				continue
+			else
+				string key = n
+				#print("KEY {{key}}")
+				if _next(s, i0) != "="
+					raise(new Exception("= expected after {{key}}"))
+				string value = _decode_str(_next(s, i0))
+				#print("VAL {{value}}")
+				tag[key] = value
+		return tag
+	
+	static void _doc_set(out any doc, string k, any c)
+		if k in doc.keys()
+			if doc[k].type != any[]
+				doc[k] = dyn([doc[k]])
+				#print(doc)
+			doc[k].add(c)
+			#print(doc)
+		else
+			doc[k] = c
+	
+	static string _parse_inside_part(string s, string key, out int *i0, out any part)
+		#print(">> INSIDE {{key}}")
+		#print(part)
+		string content
+		while true
+			string p = _peek(s, *i0)
+			if p == "<"
+				string k
+				any tag = _parse_tag(k, s, i0)
+				#print("---------------" + k[:20])
+				#print(tag)
+				if k[:1] == "/"
+					#print("<< END TAG")
+					#print("<< OUTSIDE {{key}}")
+					return ""
+				else if k[:7] == "![CDATA"
+					#print("  CDATA!!")
+					#part.set("_", "...")#k[8:-1])
+					#print("<< OUTSIDE {{key}}")
+					#return "..."
+					part["_"] = "...."
+				else
+					#print(">> SUB TAG {{k}} of {{key}}")
+					#print("BEFORE {{part}}")
+					#any subpart
+					string cc = _parse_inside_part(s, k, i0, tag)
+					#print("...add... " + subpart + " into " + part + " at " + k)
+					#print("{{len(tag)}}  {{len(cc)}}")
+					#print("BEFORE' {{part}}")
+					if len(tag) > 0
+						if len(cc) > 0
+							#print("   ADD CONT")
+							tag["_"] = cc
+						#print("   ADD SUBP")
+						_doc_set(part, k, tag)
+					else if len(cc) > 0
+						#print("   ADD CONT " + k)
+						_doc_set(part, k, cc)
+					#return ""
+			else
+				for i in *i0:len(s)
+					if s[i] == '<'
+						break
+					content.add(s[i])
+				*i0 += len(content)
+				#print("CONTENTS " + content)
+				string k
+				any tag = _parse_tag(k, s, i0)
+				if k != "/" + key
+					raise(new Exception("end tag expected"))
+				#print("<< OUTSIDE {{key}}")
+				return content
+			#print("AGAIN! in {{key}}")
+		#print("<< OUTSIDE {{key}}")
+		
+	static any parse(string s)
+		int i = 0
+		
+		string key
+		any header = _parse_tag(key, s, &i)
+		
+		any root
+		any t = _parse_tag(key, s, &i)
+		_parse_inside_part(s, key, &i, t)
+		root[key] = t
+		
+		#root.set("?xml", header)
+		
+		return root
+
+	static string _encode_part(string key, any doc, string pre)
+		if doc.type in [int, float, string]
+			# string
+			return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
+		else if doc.type == any{}
+			# dict
+			string s
+			s += "{{pre}}<{{key}}>\n"
+			for k in doc.keys()
+				s += _encode_part(k, doc[k], pre + "\t")
+			s += "{{pre}}</{{key}}>\n"
+			return s
+		else if doc.type == any[]
+			# array
+			string s
+			for i in 0:len(doc)
+				s += _encode_part(key, doc[i], pre)
+			return s
+		else
+			return "???{{doc.type}}\n"
+
+	static string encode(any doc)
+		string s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		if doc.type != any{}
+			raise(new Exception("doc must be a dict"))
+		for k in doc.keys()
+			s += _encode_part(k, doc[k], "")
+		return s
+
+void main()
+	let d = dyn({"a":{"b":[{"x":2, "y":1.1}, "c"], "d":{"a":"4"}}})
+	print(d)
+	print(xml.encode(d))
+	print(xml.parse(xml.encode(d)))

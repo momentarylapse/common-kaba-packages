@@ -1,0 +1,12 @@
+// Description
+Ein Dialog mit Textnachricht.
+// Parameter root
+in
+Das übergeordnete Fenster (kann <c>nil</c> sein).
+// Parameter title
+in
+Der Titel des Fenster.
+// Parameter text
+in
+Der eigentliche Nachrichten-Text, der ausgegeben werden soll.
+#

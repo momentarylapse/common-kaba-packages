@@ -1,0 +1,13 @@
+// Description
+Sucht und ersetzt einen Teilstring durch einen anderen.
+// Parameter sub
+in
+Der zu suchende Teilstring.
+// Parameter by
+in
+Der einzufügende Text.
+// Return
+Der durch Ersetzen entstandene Text.
+// Remark
+Diese Operation erzeugt eine Kopie, ändert also nicht den ursprünglichen Text.
+#

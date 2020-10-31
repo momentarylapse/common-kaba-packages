@@ -1,0 +1,3 @@
+// Description
+Gibt das Ende einer Nachricht über das Netzwerk an, die mit [[Controller.startNetMsg]] begonnen wurde.
+#

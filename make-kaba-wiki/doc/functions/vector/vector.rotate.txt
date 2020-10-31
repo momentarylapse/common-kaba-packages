@@ -1,0 +1,8 @@
+// Description
+Dreht einen Vektor.
+// Parameter ang
+in
+Die Drehung.
+// Return
+Der gedrehte Vektor.
+#

@@ -1,0 +1,3 @@
+// Description
+Eine Textur, in die hinein gerendert werden kann.
+#

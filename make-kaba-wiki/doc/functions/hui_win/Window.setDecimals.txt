@@ -1,0 +1,7 @@
+// Description
+Legt fest, wie viele Dezimalstellen für <t>float</t>-Werte angezeigt werden sollen.
+// Parameter decimals
+in
+Anzahl der Dezimalstellen.
+#
+

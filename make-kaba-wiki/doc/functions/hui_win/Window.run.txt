@@ -1,0 +1,6 @@
+// Description
+Zeigt ein Fenster und wartet, bis es geschlossen wird.
+// Return
+Die zuletzt aktive ID.
+#
+

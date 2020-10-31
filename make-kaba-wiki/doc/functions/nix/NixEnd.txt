@@ -1,0 +1,5 @@
+// Description
+Beendet den durch [[NixStart]] gestarteten Darstellungs-Modus und erneuert die Bildschirmansicht (falls auf den Bildschirm gerendert wird).
+// Synopsis
+NixStart
+#

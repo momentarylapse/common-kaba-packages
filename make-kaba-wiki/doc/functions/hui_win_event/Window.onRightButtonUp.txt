@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, wenn der rechte Mausknopf im Standardfeld losgelassen wird.
+#

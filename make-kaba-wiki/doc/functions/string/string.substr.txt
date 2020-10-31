@@ -1,0 +1,11 @@
+// Description
+Liefert eine Teilabschnitt eines <t>string</t>s.
+// Parameter start
+in
+Die Anfangsposition des Abschnitts.\nIst <v>start</v> negativ, so wird es vom Ende des <t>string</t> gezählt.
+// Parameter length
+in
+Die Länge des Abschnitts.\nIst <v>length</v> negativ, so wird es ebenfalls vom Ende gezählt, allerdings um 1 verschoben. D.h. <tt>length = -1</tt> geht bis zum Ende.
+// Return
+Der Teilstring.
+#

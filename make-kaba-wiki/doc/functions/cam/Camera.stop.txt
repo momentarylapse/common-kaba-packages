@@ -1,0 +1,3 @@
+// Description
+Beendet eine mit [[Camera.start]] gestartete Kamerafahrt, bevor sie von selbst zu Ende ist.
+#

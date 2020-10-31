@@ -1,0 +1,10 @@
+// Description
+Setzt ein Icon für eine Schaltfläche.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter image
+in
+Das Icon...
+#
+

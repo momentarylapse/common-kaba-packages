@@ -1,0 +1,9 @@
+// Description
+L&asst einen Frame lang eine Kraft auf ein Objekt einwirken.
+// Parameter force
+in
+Die Kraft. (in globalen Welt-Koordinaten)
+// Parameter rho
+in
+Der Einwirk-Punkt auf dem Objekt. (in globalen Koordinaten, aber relativ zur Objektposition)
+#

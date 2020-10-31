@@ -1,0 +1,12 @@
+// Description
+Transformiert die Ebene durch eine Matrix.
+// Parameter pl_out
+out
+Die transformierte Ebene.
+// Parameter m
+in
+Die Transformationsmatrix.
+// Parameter pl_in
+in
+Die urspr&ungliche Ebene.
+#

@@ -1,0 +1,5 @@
+// Description
+Wartet, bis der Thread beendet ist.
+// Synopsis
+s:Thread,Thread.run,Thread.kill,Thread.isDone,Thread.join,ThreadExit,ThreadSelf
+#

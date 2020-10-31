@@ -1,0 +1,6 @@
+// Description
+Setzt die Linienbreite, die zum weiteren Zeichnen zu verwendet werden soll.
+// Parameter w
+in
+Die Linienbreite.
+#

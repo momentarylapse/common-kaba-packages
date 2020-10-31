@@ -1,0 +1,9 @@
+// Description
+Projeziert einen Richtungs-Vektor von Bildschirmkoordinaten zur&uck nach Weltkoordinaten.
+// Parameter v_out
+out
+Der projezierte Vektor
+// Parameter v_in
+in
+Der zu projezierende Vektor
+#

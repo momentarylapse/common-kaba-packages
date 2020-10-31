@@ -1,0 +1,5 @@
+// Description
+Berechnet das Betragsquadrat einer komplexen Zahl: \n<tt> x² + y² </tt>.
+// Return
+Das Betragsquadrat.
+#

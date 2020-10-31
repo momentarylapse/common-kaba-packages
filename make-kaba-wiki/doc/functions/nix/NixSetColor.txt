@@ -1,0 +1,8 @@
+// Description
+Wählt eine Farbe für nachfolgende Zeichen-Befehle.
+// Parameter c
+in
+Die Farbe (<c>White</c> = weiß ist die natürliche Farbe, falls eine Textur benutzt wird).
+// Synopsis
+s:color
+#

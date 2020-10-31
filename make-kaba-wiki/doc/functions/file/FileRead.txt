@@ -1,0 +1,8 @@
+// Description
+Liest den kompletten Inhalt einer Datei.
+// Parameter filename
+in
+Der Dateiname der zu lesenden Datei.
+// Return
+Der Inhalt der Datei.
+#

@@ -1,0 +1,15 @@
+// Description
+Rendert ein einzelnes Modell.
+// Parameter m
+in
+Das darzustellende Modell.
+// Parameter skin
+in
+Die Detailstufe, die dargestellt werden soll.\n'''SkinView0''': hohe Detailstufe\n'''SkinView1''': mittlere Detailstufe\n'''SkinView2''': niedere Detailstufe
+// Parameter mat
+in
+Eine Matrix zur Transformation von Modell- nach Welt-Koordinaten.
+// Parameter fx
+in
+Effekte erlauben.... ---alt---
+#

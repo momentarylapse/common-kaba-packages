@@ -1,0 +1,3 @@
+// Description
+Sammelt und aktualisiert die Daten der Benutzereingabe (Maus/Tastatur).
+#

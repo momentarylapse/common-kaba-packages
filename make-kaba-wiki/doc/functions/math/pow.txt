@@ -1,0 +1,11 @@
+// Description
+Berechnet die <v>exp</v>-te Potenz von <v>x</v>. (<math>x^{exp}</math>)
+// Parameter x
+in
+Die Basis.
+// Parameter exp
+in
+Der Exponent.
+// Return
+<math>x^{exp}</math>.
+#

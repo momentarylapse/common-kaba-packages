@@ -1,0 +1,22 @@
+// Description
+Fügt dem Fenster eine Icon-Liste hinzu.
+// Parameter title
+in
+Die Aufschrift (durch "\\" werden die einzelnen Listenelemente getrennt).
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die Y-Position.
+// Parameter width
+in
+Die Breite.
+// Parameter height
+in
+Die Höhe.
+// Parameter id
+in
+Die ID, sie diehnt zur Idendifizierung der Schaltfläche und als Nachricht, das dem Fenster von der Schaltfläche geschickt wird (wenn ein Element per Doppelklick ausgewählt wird).
+#
+

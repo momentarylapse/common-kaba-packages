@@ -1,0 +1,9 @@
+// Description
+Repräsentiert einen kryptographischen Schlüssel.
+// Element n
+Interner Zustand...
+// Element k
+Interner Zustand...
+// Synopsis
+f:CryptoCreateKeys
+#

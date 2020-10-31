@@ -1,0 +1,6 @@
+// Description
+Wählt eine Textur für nachfolgende Zeichen-Befehle aus.
+// Parameter t
+in
+Die zu verwendende Textur. Wird <tt>nil</tt> übergeben, so wird keine Textur verwendet, was denselben Effekt hat, als würde eine komplett weiße Textur verwendet werden.
+#

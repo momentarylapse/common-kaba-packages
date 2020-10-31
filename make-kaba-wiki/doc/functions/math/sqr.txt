@@ -1,0 +1,8 @@
+// Description
+Berechnet das Quadrat von x.
+// Parameter x
+in
+Ein beliebiger Wert.
+// Return
+Ein positiver Wert.
+#

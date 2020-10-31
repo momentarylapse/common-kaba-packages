@@ -1,0 +1,14 @@
+// Description
+Erzeugt eine Liste mit <t>float</t>-Werten aus einem Intervall.
+// Parameter start
+in
+Der Erste Wert in der Liste
+// Parameter end
+in
+Die obere Grenze (erster Wert, der nicht mehr in der liste ist).
+// Parameter step
+in
+Die Schrittweite von einem Element zum nächsten.
+// Return
+Die Liste.
+#

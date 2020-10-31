@@ -1,0 +1,3 @@
+// Description
+Die '''heilige''' Render-Funktion, die die komplette Welt darstellt.\nWar praktisch, um die Ansicht in eine dynamische Textur zu rendern (''inzwischen kann eine Kamera das von sich aus'').
+#

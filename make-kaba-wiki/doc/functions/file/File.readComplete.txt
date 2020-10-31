@@ -1,0 +1,5 @@
+// Description
+Liest den kompletten Inhalt einer Datei (ab der aktuellen Position).
+// Return
+Der Inhalt der Datei.
+#

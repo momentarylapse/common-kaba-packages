@@ -1,0 +1,6 @@
+// Description
+Lädt eine Bilddatei.
+// Parameter filename
+in
+Der zu ladende Dateiname.
+#

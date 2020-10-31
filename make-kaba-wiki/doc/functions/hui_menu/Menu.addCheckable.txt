@@ -1,0 +1,10 @@
+// Description
+Fügt dem Menü ein neues Element mit Kontrollkästchen hinzu.
+// Parameter name
+in
+Der Text im Element.
+// Parameter id
+in
+Der dem Element zugeordnete Index.\nDamit auch die Nachricht, die das Fenster erhalten soll, wenn dieses Menüelement ausgewählt wurde.
+#
+

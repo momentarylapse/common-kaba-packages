@@ -1,0 +1,8 @@
+// Description
+Berechnet den natürlichen Logarithmus von x.
+// Parameter x
+in
+Parameter, dessen Logarithmus berechnet werden soll.
+// Return
+<math>ln x</math>
+#

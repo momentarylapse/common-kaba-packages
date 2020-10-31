@@ -1,0 +1,5 @@
+// Description
+Beendet das durch [[f:HuiRun]] gestartete Programm.
+// Synopsis
+HuiRun,HuiEnd
+#

@@ -1,0 +1,8 @@
+// Description
+Schreibt Daten direkt in einer Netzwerkverbindung.
+// Parameter buf
+in
+Der Puffer, der die Daten enthält.
+// Return
+<c>true</c> falls erfolgreich, ansonsten <c>false</c>.
+#

@@ -1,0 +1,6 @@
+// Description
+Zeichnet eine Kette von geraden Linien als Verbindung von Punkten.
+// Parameter p
+in
+Ein Array der Punkte.
+#

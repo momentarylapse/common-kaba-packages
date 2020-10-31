@@ -1,0 +1,7 @@
+s:Menu,
+Menu.popup,
+Menu.add,
+Menu.addWithImage,
+Menu.addCheckable,
+Menu.addSeparator,
+Menu.addSubMenu

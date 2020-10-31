@@ -1,0 +1,18 @@
+// Description
+Erstellt ein Dialog-Fenster fester Größe.
+// Parameter title
+in
+Der Text in der Titelleiste.
+// Parameter width
+in
+Die Fensterbreite.
+// Parameter height
+in
+Die Fensterhöhe.
+// Parameter root
+in
+Das übergeordnete Eltern-Fenster.
+// Parameter allow_root
+in
+Das Elternfenster soll weiterhin benutzbar sein, obwohl der Dialog ausgeführt wird.
+#

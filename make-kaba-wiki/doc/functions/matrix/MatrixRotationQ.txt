@@ -1,0 +1,11 @@
+// Description
+Erstellt eine Matrix, die einen Vektor entsprechend eines Quaternions um den Ursprung dreht.
+// Parameter m_out
+out
+Die Rotations-Matrix.
+// Parameter ang
+in
+Das Rotations-Quaternion.
+// Synopsis
+s:quaternion
+#

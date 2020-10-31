@@ -1,0 +1,6 @@
+// Description
+Wählt eine orthogonale Transformation von Kamera-Koordinaten auf das Fenster (bzw. das aktive Ziel).
+// Parameter relative
+in
+Legt fest, ob ein relatives Koordinatensystem (<tt>[0..1] x [0..1]</tt>) oder Pixelkoordinaten verwendet werden sollen.
+#

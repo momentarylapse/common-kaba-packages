@@ -1,0 +1,3 @@
+// Description
+Repräsentiert einen Thread (d.h. einen Teil des Programms, der parallel zum Rest ausgeführt werden soll).
+#

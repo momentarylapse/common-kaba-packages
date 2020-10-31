@@ -1,0 +1,3 @@
+// Description
+Sorgt dafür, dass ein Modell editierbar ist.\nDie geometrischen Daten werden beim Laden des Modells oft nur als Referenz auf die Daten eines schon vorhandenen Modells erzeugt. Diese Funktion erstellt, falls nötig, eigene Kopien dieser Daten.
+#

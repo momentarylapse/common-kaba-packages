@@ -1,0 +1,6 @@
+s:complex,
+complex,
+complex.abs,
+complex.absSqr,
+complex.bar,
+complex.str

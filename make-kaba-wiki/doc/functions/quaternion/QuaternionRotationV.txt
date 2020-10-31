@@ -1,0 +1,9 @@
+// Description
+Erstellt eine Quaternion, das eine Rotation verk&orpert.\nEs wird um die Achsen gedreht in der Reihenfolge (Z,X,Y), wobei die Drehachsen nicht mitgedreht werden.
+// Parameter q_out
+out
+Die Rotations-Quaternion.
+// Parameter ang
+in
+Die Drehwinkel um die jeweiligen Achsen sind die Komponenten des Vektors (im Bogenma&s).
+#

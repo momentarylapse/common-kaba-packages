@@ -1,0 +1,6 @@
+// Description
+Legt ein Menü für das Fenster fest.
+// Parameter menu
+in
+Das zu verwendende Menü.
+#

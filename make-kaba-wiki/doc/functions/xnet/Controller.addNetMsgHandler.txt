@@ -1,0 +1,9 @@
+// Description
+Registriert eine Callback-Funktion für eine Nachricht über das Netzwerk.\nDie Callback-Funktion ist vom Typ <tt>void func()</tt> und benutzt die Leseoperatoren von [[s:Socket]] um die Nachricht zu lesen.
+// Parameter name
+in
+Der Name der Nachricht.
+// Parameter func
+in
+Die Callback-Funktion.
+#

@@ -1,0 +1,10 @@
+// Description
+Durchsucht die Welt nach einem Objekt mit einem bestimmten Namen.\nFalls es mehrere mit dem angegebenen Namen gibt, wird immer dasjenige mit dem niedersten Index angegeben.
+// Parameter name
+in
+Name, nach dem gesucht werden soll.
+// Return
+Die Referenz auf das gefundene Objekt. <c>nil</c>, falls keines gefunden werden kann.
+// Synopsis
+s:Model,CreateObject,GetObjectByName,FindObjects,NextObject
+#

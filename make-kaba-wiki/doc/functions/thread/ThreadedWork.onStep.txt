@@ -1,0 +1,9 @@
+// Description
+Überschreibbare Funktion, die die eigentliche Arbeit erledigen soll.
+// Parameter index
+in
+Die Arbeits-Nummer.
+// Parameter worker_id
+in
+Identifiziert den Thread.
+#

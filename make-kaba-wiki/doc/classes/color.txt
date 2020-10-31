@@ -1,0 +1,13 @@
+// Description
+Farbangaben. Alle Komponenten reichen von 0 bis 1.
+// Element a
+Der Alpha-Wert. Er ist die Umkehrung der Transparenz, ein Wert von 0 bedeutet komplette Transparenz, 1 ist die komplette Sichtbarkeit.
+// Element r
+Rot.
+// Element g
+Grün.
+// Element b
+Blau.
+// Synopsis
+f:color,f:ColorSetHSB,f:ColorInterpolate
+#

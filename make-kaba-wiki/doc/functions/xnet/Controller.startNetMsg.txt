@@ -1,0 +1,11 @@
+// Description
+Startet eine Nachricht über das Netzwerk.\nDie Nachricht kann dann durch [[v:Net]]<tt>.cur_sock</tt> gesandt werden und muss mit [[Controller.endNetMsg]] abgeschlossen werden.
+// Parameter name
+in
+Der Name der Nachricht.
+// Parameter target
+in
+Das Ziel im Netzwerk in Form der Socket.\n<c>-1</c> sendet an alle außer dem Sender.\n<c>-2</c> sendet an alle, auch den Sender selbst.
+// Remark
+Ziel wird noch ignoriert.... TODO...
+#

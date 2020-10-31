@@ -1,0 +1,9 @@
+// Description
+Fügt einen Text hinzu, der zur automatische Vervollständigung dienen kann.
+// Parameter id
+in
+Die Schaltfläche.
+// Parameter text
+in
+Der Text.
+#

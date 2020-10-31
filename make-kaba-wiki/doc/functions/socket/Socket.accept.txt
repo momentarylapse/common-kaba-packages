@@ -1,0 +1,5 @@
+// Description
+Wartet auf eine eingehende Netzwerk-Verbindung.\nVorher muss mit [[SocketListen]] ein Port reserviert werden.
+// Return
+Im Erfolgsfall die Verbindung, ansonsten <c>nil</c>.
+#

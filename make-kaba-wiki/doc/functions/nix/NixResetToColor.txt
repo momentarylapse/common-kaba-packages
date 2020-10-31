@@ -1,0 +1,6 @@
+// Description
+Setzt das komplette Bild auf eine konstante Farbe.
+// Parameter c
+in
+Die neue Farbe.
+#

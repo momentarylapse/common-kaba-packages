@@ -1,0 +1,8 @@
+// Description
+Erzeugt eine Hexadezimaldarstellung von Binärdaten.
+// Parameter inverted
+in
+<c>true</c>: <tt>0x1234</tt>\n<c>false</c>: <tt>34.12</tt>
+// Return
+Die Hexadezimaldarstellung.
+#

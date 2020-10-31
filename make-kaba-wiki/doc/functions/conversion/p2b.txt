@@ -1,0 +1,8 @@
+// Description
+Konvertiert einen Pointer in einen <t>bool</t>-Wert.
+// Parameter p
+in
+Der Pointer.
+// Return
+Der <t>bool</t>-Wert. <c>false</c> f&ur <v>p</v> = <c>nil</c>, ansonsten <c>true</c>.
+#

@@ -1,0 +1,22 @@
+// Description
+Muss nach Änderungen der Daten eines Terrains aufgerufen werden, um diese sichtbar zu machen.\nUm nicht bei jeder Kleinigkeit das komplette Terrain erneuet berechnen zu müussen, kann der Erneuerungs-Bereich auf eine rechteckige Fläche eingeschränkt werden.
+// Parameter x1
+in
+Der links Rand des erneut zu berechnenden Bereiches.
+// Parameter x2
+in
+Der rechte Rand.
+// Parameter z1
+in
+Der vordere Rand.
+// Parameter z2
+in
+Der hintere Rand.
+// Parameter mode
+in
+Legt fest, was neu berechnet werden soll:\n1: Normalenvektoren\n2: Vertexpunkte\n4: Kollisionsebenen\n-1: alles.
+// Remark
+Wird ein Parameter für den Rand auf -1 gesetzt, so wird in dieser Richtung nicht begrenzt. [[Terrain.update]]<tt>( -1, -1, -1, -1, -1 )</tt> berechnet somit das komplette Terrain neu.
+// Synopsis
+s:Terrain,Terrain.update,Terrain.getHeight
+#

@@ -1,0 +1,15 @@
+// Description
+&Andert die aktuellen Bildschirm/Aufl&osungs-Einstellungen.
+// Parameter api
+in
+Die Grafik-API s(<c>"OpenGL"</c> oder <c>"None"</c>).
+// Parameter xres
+in
+Die Bildschirmaufl&osungs-Breite in Pixeln.
+// Parameter yres
+in
+Die Bildschirmaufl&osungs-H&ohe in Pixeln.
+// Parameter fullscreen
+in
+Vollbildmodus. <c>true<c> startet den Vollbildmodus, <c>false<c> lässt die Engine im Fenster laufen.
+#

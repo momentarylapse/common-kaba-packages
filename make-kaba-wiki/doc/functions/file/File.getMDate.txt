@@ -1,0 +1,5 @@
+// Description
+Liefert den Zeitpunkt, wann eine Datei zuletzt geändert wurde.
+// Return
+Der Zeitpunkt der Änderung.
+#

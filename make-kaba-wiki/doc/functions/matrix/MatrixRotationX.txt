@@ -1,0 +1,9 @@
+// Description
+Erstellt eine Matrix, die einen Vektor um den Ursprung dreht.\nDer Vektor wird nur um die X-Achse gedreht.
+// Parameter m_out
+out
+Die Rotations-Matrix.
+// Parameter ang
+in
+Der Drehwinkel (im Bogenma&s).
+#

@@ -1,0 +1,21 @@
+// Description
+Eine Text-Anzeige auf dem Bildschirm.
+// Element enabled
+Erlaubt die Darstellung auf dem Bildschirm.
+// Element centric
+Hierdurch kann der Text so nach links verschoben, dass <v>pos</v> seine Mitte ist. ('''default''': <c>false</c>)
+// Element vertical
+Die Buchstaben werden von oben nach unten, anstatt von links nach rechts gesetzt, sie haben dabei immer den selben Abstand. ('''default''': <c>false</c>)
+// Element font
+Ein durch [[f:LoadFont]] geladener Font. ('''default''': Standart-Font aus der Datei game.ini)
+// Element pos
+Die Position auf dem Bildschirm, in relativen Koordinaten ( [0..1]x[0..1] )!
+// Element size
+Die Schriftgröße. Die ist der Quotient aus Schrifthöhe und Bildschirmhöhe.
+// Element color
+Die Farbe des Textes.
+// Element text
+Der anzuzeigende Text.
+// Synopsis
+Font,f:LoadFont
+#

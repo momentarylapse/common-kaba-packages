@@ -1,0 +1,19 @@
+// Description
+Fasst die 4 einzelnen Farbkomponenten zu einer Farb-Daten-Srtuktur zusammen.
+// Parameter a
+in
+Alpha.
+// Parameter r
+in
+Rot.
+// Parameter g
+in
+Gr&un.
+// Parameter b
+in
+Blau.
+// Return
+Die zusammenfassende Farbe.
+// Synopsis
+s:color,color,ColorInterpolate,ColorSetHSB
+#

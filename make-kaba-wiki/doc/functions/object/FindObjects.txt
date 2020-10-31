@@ -1,0 +1,19 @@
+// Description
+Erstellt eine Liste aller Objekte in einem bestimmten Raumgebiet (würfelförmig).
+// Parameter pos
+in
+Der Mittelpunkt des Gebiets.
+// Parameter radius
+in
+Der Radius des Gebiets.
+// Parameter mode
+in
+Suchmodus...?
+// Parameter o
+out
+Die Liste der Objekte.
+// Return
+Die Anzahl der gefundenen Objekte.
+// Synopsis
+s:Model,CreateObject,GetObjectByName,FindObjects,NextObject
+#

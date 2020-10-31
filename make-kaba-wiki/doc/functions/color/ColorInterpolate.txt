@@ -1,0 +1,17 @@
+// Description
+Mischt zwei Farben.
+// Parameter c1
+in
+Eine Farbe.
+// Parameter c2
+in
+Noch eine Farbe.
+// Parameter t
+in
+Der Mischungsparameter.
+// Return
+Die Mischung.\n''= ( t - 1 ) * <c>c1</c> + t * <c>c2</c>''
+// Synopsis
+s:color,color,ColorInterpolate,ColorSetHSB
+#
+

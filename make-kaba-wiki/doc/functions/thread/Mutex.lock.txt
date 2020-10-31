@@ -1,0 +1,5 @@
+// Description
+Beansprucht die alleinigen Nutzungsrechte einer Resource.\nEin zweiter Thread, der denselben Mutex beanspruchen will, wird warten gelassen, bis der erste Thread ihn mit [[Mutex.unlock]] wieder freigibt.
+// Synopsis
+s:Mutex,Mutex.lock,Mutex.unlock
+#

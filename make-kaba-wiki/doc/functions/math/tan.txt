@@ -1,0 +1,8 @@
+// Description
+Berechnet den Tangens von x.
+// Parameter x
+in
+Winkel  (im Bogenma&s), dessen Tangens berechnet werden soll.
+// Return
+Ja, was wohl?
+#

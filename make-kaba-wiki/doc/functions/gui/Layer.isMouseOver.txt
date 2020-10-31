@@ -1,0 +1,5 @@
+// Description
+Ermittelt, ob sich der Cursor über einem GUI-Element befindet.
+// Return
+<c>true</c>, falls sich der Cursor darüber befindet, ansonsten <c>false</c>.
+#

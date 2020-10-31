@@ -1,0 +1,26 @@
+// Description
+Lädt eine Sounddatei und lässt sie einmalig abspielen.
+// Parameter filename
+in
+Der Dateiname (relativ zum "Sounds/"-Verzeichnis, mit Endung).
+// Parameter pos
+in
+Die Position, an der die Soundquelle erstellt werden soll.
+// Parameter r_min
+in
+Die Reichweite, in der der Sound mit maximaler Lautstärke hörbar ist.
+// Parameter r_max
+in
+Die Reichweite, in der der Sound gerade noch hörbar ist.
+// Parameter speed
+in
+Die Abspielgeschwindigkeit. 1 ist natürlich.
+// Parameter volume
+in
+Die Lautstärke (aus [0..1]).
+// Parameter loop
+in
+Soll als Endlosschleife abgespielt werden?
+// Return
+Die Referenz auf den Sound.
+#

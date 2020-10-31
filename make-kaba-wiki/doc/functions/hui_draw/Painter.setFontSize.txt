@@ -1,0 +1,6 @@
+// Description
+Setzt die Schriftgröße, in der der weitere Text gerendert werden soll.
+// Parameter size
+in
+Die Schrift-Höhe.
+#

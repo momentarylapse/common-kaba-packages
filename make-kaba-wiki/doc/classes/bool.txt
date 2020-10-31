@@ -1,0 +1,3 @@
+// Description
+Speichert einen Wahrheitswert (<c>true</c> oder <c>false</c>).
+#

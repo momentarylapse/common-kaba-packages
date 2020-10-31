@@ -1,0 +1,10 @@
+// Description
+Legt fest, in welcher Tab-Seite die weiteren Kontrollflächen erzeugt werden sollen.
+// Parameter id
+in
+Die ID des Tab-Feldes.
+// Parameter page
+in
+Die Tab-Seite.
+#
+

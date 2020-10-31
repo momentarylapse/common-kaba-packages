@@ -1,0 +1,8 @@
+// Description
+Berechnet eine Liste interpolierter Werte.
+// Parameter t
+in
+Der Liste von Parametern, für die interpoliert werden soll.\nDer Parameterraum wird auf <tt>[0..1]</tt> skaliert. Parameterwerte außerhalb dieses Intervalls werden abgeschnitten (d.h. auf 0 bzw. 1 gesetzt).
+// Return
+Die interpolierten Werte.
+#

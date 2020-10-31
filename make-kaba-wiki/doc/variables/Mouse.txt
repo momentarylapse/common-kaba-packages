@@ -1,0 +1,5 @@
+// Description
+Absolute Position des Mauszeigers.\nX- und Y-Komponente geben die Pixelzahl von der linken oberen Ecke an. Die Z-Komponente ist 0.
+// Synopsis
+Mouse,MouseRel,MouseD,MouseDRel,f:GetButton,f:GetButtonUp,f:GetButtonDown,f:GetKey,f:GetKeyDown,f:GetKeyUp,f:GetKeyDownRep,f:GetKeyName
+#

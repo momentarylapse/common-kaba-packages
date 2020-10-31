@@ -1,0 +1,7 @@
+// Description
+Repräsentiert einen gefundenen Netzwerk Host.
+// Element host
+Der Host-Name.
+// Element session
+Der Name der Spiele-Session.
+#

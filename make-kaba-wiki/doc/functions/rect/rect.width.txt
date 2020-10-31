@@ -1,0 +1,5 @@
+// Description
+Berechnet die Breite des Rechtecks.
+// Return
+Die Breite.
+#

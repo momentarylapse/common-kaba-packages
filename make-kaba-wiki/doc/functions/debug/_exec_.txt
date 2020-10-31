@@ -1,0 +1,8 @@
+// Description
+Führt einen Befehl in der Konsole aus (System-abhängig).
+// Parameter cmd
+in
+Der auszuführende Befehl.
+// Return
+Die Ausgabe des Befehls (bisher noch nicht...).
+#

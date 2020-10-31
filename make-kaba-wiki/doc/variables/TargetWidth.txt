@@ -1,0 +1,3 @@
+// Description
+Die aktuelle Bild-Breite in Pixeln. Im Vollbildmodus ist das die horizontale Bildschirm-Aufl&osung ([[ScreenWidth]]), im Fenstermodus die Breite des benutzbaren Bereiches des Fensters und beim Rendern in eine Textur die Breite der Textur in Pixeln.
+#

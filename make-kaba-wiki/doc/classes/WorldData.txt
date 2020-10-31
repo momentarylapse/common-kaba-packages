@@ -1,0 +1,28 @@
+// Description
+Speichert aktuelle Einstellungen der Welt.
+// Element filename
+Der (Datei-) Name der aktuell geladenen Welt.
+// Element gravity
+Der globale Nebel der Welt.
+// Element skybox
+Ein Modell, dass den Himmel abdeckt.\nDurch <tt>Model.Ang</tt> wird die Ausrichtung beeinflusst.
+// Element background
+Die Hintergrundfarbe. Zusammen mit der <tt>skybox</tt> kann mit ihr ein einfacher Himmel gestaltet werden.
+// Element fog
+Der globale Nebel der Welt.
+// Element var
+Die globalen Scriptvariablen der Welt.\nSie sind zus&atzliche, von Scripten frei benutzbare Variablen, die im Editor vor-definiert werden k&onnen.
+// Element ambient
+Der globale Ambient-Wert der Beleuchtung.<br>"Ambientes" Licht ist richtungsunabhägig, erhellt somit alle Oberfläche in der Welt gleich.
+// Element sun
+Lichtquelle, die als Sonne genutzt werden kann.\nSie wird beim Laden der Karte automatisch als parallele Lichquelle mit den im Editor einstellbaren Werten erstellt.
+// Element speed_of_sound
+Die Schallgeschwindigkeit in Längeneinheiten/Sekunde.\nWird für Dopplereffekte von Sounds benutzt.
+// Remarks
+Die Skybox Modelle werden immer an der Position der Kamera gehalten und vor der Welt dargestellt, weswegen die realen Abmessungen des Modells keine Rolle spielen.
+// Remarks
+Die Skybox wird nach der Hintergrundfarbe dargestellt, weswegen eine Überlagerung von beidem durch Transparenz-Einstellungen des Modells möglich sind.
+// Synopsis
+v:World,s:color,s:Model,s:Fog
+#
+

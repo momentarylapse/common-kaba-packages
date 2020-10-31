@@ -1,0 +1,9 @@
+// Description
+Falls die <t>any</t>-Variable eine Hashmap ist, so wird der zum Schlüssel gehörige Eintrag gesetzt.
+// Parameter key
+in
+Der Schlüssel.
+// Parameter value
+in
+Der zu setzende Wert.
+#

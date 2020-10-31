@@ -1,0 +1,8 @@
+// Description
+Konvertiert einen <t>char</t>-Wert in einen <t>int</t>-Wert.
+// Parameter c
+in
+Der <t>char</t>-Wert.
+// Return
+Der <t>int</t>-Wert.
+#

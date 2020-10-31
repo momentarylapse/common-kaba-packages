@@ -1,0 +1,20 @@
+// Description
+Erstellt ein für die Grafik-Bibliothek (Nix) optimiertes Fenster.
+// Parameter title
+in
+Der Text in der Titelleiste.
+// Parameter x
+in
+Die X-Koordinate der Position.
+// Parameter y
+in
+Die Y-Koordinate der Position.
+// Parameter width
+in
+Die Fensterbreite.
+// Parameter height
+in
+Die Fensterhöhe.
+// Return
+Eine Referenz auf das neue Fenster.
+#

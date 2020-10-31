@@ -1,0 +1,11 @@
+// Description
+Sucht das erste Vorkommen eines Teilstrings.
+// Parameter str
+in
+Der zu suchende Teilstring.
+// Parameter start
+in
+Die Anfangsposition im <t>string</t>, vor der nicht gesucht werden soll.
+// Return
+Die Position des Teilstrings.\nDies ist der Index des ersten Zeichens des Teilstrings.\nWird der Teilstring nicht gefunden, so wird -1 zurückgegeben.
+#

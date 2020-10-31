@@ -1,0 +1,5 @@
+// Description
+Die aktuellen Einstellungen der Spielewelt.
+// Synopsis
+s:WorldData
+#

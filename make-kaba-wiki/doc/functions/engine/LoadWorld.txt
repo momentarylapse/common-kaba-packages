@@ -1,0 +1,8 @@
+// Description
+L&adt eine Welt (ein 3d-Level). Alle bisherigen Spiele-Daten (Objekte, Scripte, Effekte, 2d-Anzeigen) gehen verloren!
+// Parameter filename
+in
+Der Dateiname der Welt (relativ zum "Maps/"-Verzeichnis, ohne Endung).
+// Synopsis
+LoadGameState,SaveGameState,LoadGameFromHost
+#

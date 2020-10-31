@@ -1,0 +1,7 @@
+// Description
+Legt fest, wie groß die Ränder von Kontrollfeldern (deren Abstand) sein sollen.
+// Parameter width
+in
+Die Rahmendicke in Pixeln.
+#
+

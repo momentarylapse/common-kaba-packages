@@ -1,0 +1,10 @@
+// Description
+Ändert den Text/Wert einer Schaltfläche.\nF&ur Slider und ProgressBar setzt dies den Wert zwischen 0 und 1. Ansonsten wird der Titel gesetzt.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter f
+in
+Der neue Wert.
+#
+

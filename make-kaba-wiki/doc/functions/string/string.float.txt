@@ -1,0 +1,7 @@
+// Description
+Konvertiert <t>string</t> in einen <t>float</t>-Wert. Z.B. <tt>"123,4"</tt> -> <tt>123.4</tt>.
+// Remark
+Um die Nachkommastellen abzutrennen kann entweder ein Komma oder ein Punkt verwendet werden.
+// Return
+Der <t>float</t>-Wert.
+#

@@ -1,0 +1,3 @@
+// Description
+Die aktuelle Grafik-API der Engine.\nSie kann die Werte <c>NIX_API_OPENGL</c> oder <c>NIX_API_DIRECTX9</c> haben.
+#

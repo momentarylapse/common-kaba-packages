@@ -1,0 +1,23 @@
+// Description
+Ein Partikeleffekt - eine programmierbare Quelle für Partikel.
+// Element enabled
+Zum Aktivieren/Deaktivieren des Effektes.
+// Element suicidal
+Lässt die Lebenszeit des Effektes herabzählen und es automatisch löschen, sobald sie negativ wird. ('''default''': <c>true</c>)
+// Element pos
+Die Position der Quelle im Raum.\nVon hier aus werden die Partikel emittiert.
+// Element vel
+Die Geschwindigkeit. Sie veranlasst die Quelle, sich zu bewegen.
+// Element time_to_live
+Die (automatisch herabzählende) Rest-Lebenszeit.
+// Element func_delta_t
+Die Wartezeit (in Spielzeit), die zwischen den Aufrufen der Callback-Funktion gewartet werden soll. ('''default''': 0.1)
+// Element elapsed
+Die Zeit (in Spielzeit), die seit dem letzten Aufruf von <v>OnIterate</v> vergangen ist.
+// Element model
+Falls der Effekt einem Modell zugewiesen wurde, ist dies die Referenz auf das Modell.
+// Element vertex
+Der zugewiesene Vertex-Punkt des Modells (hohe Detailstufe).
+// Synopsis
+Particle,Beam
+#

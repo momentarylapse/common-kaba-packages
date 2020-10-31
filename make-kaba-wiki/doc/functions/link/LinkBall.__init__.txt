@@ -1,0 +1,12 @@
+// Description
+Generiert eine Kugelgelenk-Verbindung zwischen zwei Objekten.
+// Parameter o1
+in
+Das eine Objekt.
+// Parameter o2
+in
+Das andere Objekt.
+// Parameter p
+in
+Der Verbindungspunkt (globale Koordinaten).
+#

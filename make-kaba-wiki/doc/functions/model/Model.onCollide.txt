@@ -1,0 +1,9 @@
+// Description
+Überschreibbare Funktion, die bei einer Kollision aufgerufen wird.
+// Parameter m
+in
+Der Kollisionspartner.
+// Parameter t
+in
+Der Kollisionspartner.
+#

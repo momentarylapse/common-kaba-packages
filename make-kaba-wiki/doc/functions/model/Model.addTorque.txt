@@ -1,0 +1,6 @@
+// Description
+L&asst einen Frame lang ein Drehmoment auf ein Objekt einwirken.
+// Parameter torque
+in
+Das Drehmoment (in globalen Koordinaten)
+#

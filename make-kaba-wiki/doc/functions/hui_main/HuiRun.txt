@@ -1,0 +1,7 @@
+// Description
+Führt die Hauptschleife der grafischen Oberfläche aus.
+// Remark
+Kehrt erst beim Programmende ([[f:HuiEnd]]) zurück!
+// Synopsis
+HuiRun,HuiEnd
+#

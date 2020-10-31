@@ -1,0 +1,9 @@
+// Description
+Prüft, ob eine Schaltfläche aktiviert ist.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Return
+Der Status der Schaltfläche.
+#
+

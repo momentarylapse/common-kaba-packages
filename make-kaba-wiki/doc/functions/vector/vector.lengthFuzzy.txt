@@ -1,0 +1,5 @@
+// Description
+Berechnet die grobe L&ange eines Vektors. (den Betrag der größten Komponente, "Unendlich-Norm")
+// Return
+Betrag der größten Komponente.
+#

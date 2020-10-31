@@ -1,0 +1,9 @@
+// Description
+Aktiviert oder deaktiviert eine Lichtquelle.
+// Parameter light
+in
+Das Licht.
+// Parameter enabled
+in
+Licht aktivieren?
+#

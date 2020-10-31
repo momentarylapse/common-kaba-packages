@@ -1,0 +1,9 @@
+// Description
+Fügt eine Sprungstelle hinzu.\nDiese hat denselben Parameterwert wie der letzte hinzugefügte Punkt, aber einen neuen Wert.
+// Parameter p
+in
+Der Wert.
+// Parameter v
+in
+Die Tangente.
+#

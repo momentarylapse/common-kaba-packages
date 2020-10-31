@@ -1,0 +1,7 @@
+// Description
+Ändert den Text in der Titelleiste eines Fensters.
+// Parameter title
+in
+Der Titel.
+#
+

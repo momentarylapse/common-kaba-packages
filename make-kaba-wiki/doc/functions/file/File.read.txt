@@ -1,0 +1,8 @@
+// Description
+Liest einen <t>string</t> aus einer Datei.
+// Parameter size
+in
+Die Anzahl der zu lesenden bytes.
+// Return
+Der <t>string</t>.
+#

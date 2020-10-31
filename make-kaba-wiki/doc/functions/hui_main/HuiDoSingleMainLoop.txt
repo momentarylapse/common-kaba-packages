@@ -1,0 +1,3 @@
+// Description
+F&uhrt einen einzelnen Durchlauf der Hauptprogramms-Schleife aus.\nDies kann n&utzlich sein, wenn eine Funktion f&ur l&angere Zeit ausgef&uhrt wird und die grafische Oberfl&ache ver&anderliche Ausgaben anzeigen soll.
+#

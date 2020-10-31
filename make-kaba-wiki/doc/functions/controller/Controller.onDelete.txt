@@ -1,0 +1,4 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, bevor der Controller gelöscht wird.
+#
+

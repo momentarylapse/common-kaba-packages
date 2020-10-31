@@ -1,0 +1,8 @@
+// Description
+Löscht eine Datei
+// Parameter filename
+in
+Der Dateiname.
+// Return
+<c>true</c>, falls das Löschen erfolgreich war.
+#

@@ -1,0 +1,20 @@
+// Description
+Erschafft ein Partikel, ein quadratisches Objekt, das herumfliegen und (in größerer Zahl) für optische Effekte genutzt werden kann.\nDie Ausrichtung in der Welt kann bei dieser Art bestimmt werden.
+// Parameter pos
+in
+Position, an der das Partikel entstehen soll.
+// Parameter ang
+in
+Winkel, um die das Partikel um die Koordinaten-Achsen verdreht wird.
+// Parameter texture
+in
+Die Textur.
+// Parameter ttl
+in
+Zeit (in Sekunden Spielzeit), die dem Partikel bleibt, bis es automatisch gelöscht wird.
+// Parameter radius
+in
+Der Radius. (= halbe Kantenbreite des Quadrates)
+// Synopsis
+s:ParticleRot,s:Particle,s:Beam
+#

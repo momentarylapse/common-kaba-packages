@@ -1,0 +1,8 @@
+// Description
+Berechnet die Potenz einer <t>vli</t>-Variablen.
+// Parameter exp
+in
+Der Exponent.
+// Return
+Die Potenz <tt>self ^ exp</tt>.
+#

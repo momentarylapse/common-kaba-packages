@@ -1,0 +1,11 @@
+// Description
+Reserviert eine Leitung, die mit [[Socket.accept]] dazu verwendet werden kann, auf eingehende Netzwerk-Verbindungen zu warten.
+// Parameter port
+in
+Die Port-Nummer. Sie muss mit derjenigen übereinstimmen, die vom fremden Programm als Parameter an [[SocketConnect]] übergeben wurde.
+// Parameter block
+in
+Konfiguriert, ob die Verbindung blockieren soll.
+// Return
+Die Referenz auf die Leitung. <c>nil</c>, falls die Reservierung fehl schlug.
+#

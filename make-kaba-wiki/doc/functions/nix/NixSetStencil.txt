@@ -1,0 +1,9 @@
+// Description
+Den Stencil-Buffer konfigurieren.
+// Parameter mode
+in
+<c>StencilNone</c>: nichts tun,\n<c>StencilIncrease</c>: Wert im Puffer beim Rendern erhöhen,\n<c>StencilDecrease</c>: Wert im Puffer beim Rendern erniedrigen,\n<c>StencilSet</c>: Wert im Puffer beim Rendern setzen,\n<c>StencilMaskEqual</c>: nur Rendern, wenn Wert im Puffer gleich ist,\n<c>StencilMaskNotEqual</c>: nur Rendern, wenn Wert im Puffer ungleich ist,\n<c>StencilMaskLess</c>: nur Rendern, wenn Wert im Puffer kleiner ist,\n<c>StencilMaskLessEqual</c>: nur Rendern, wenn Wert im Puffer kleiner/gleich ist,\n<c>StencilMaskGreater</c>: nur Rendern, wenn Wert im Puffer größer ist,\n<c>StencilMaskGreaterEqual</c>: nur Rendern, wenn Wert im Puffer größer/gleich ist,\n<c>StencilReset</c>: Puffer zurücksetzen
+// Parameter param
+in
+Der Parameter der Stencil-Operation.
+#

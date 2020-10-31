@@ -1,0 +1,9 @@
+// Description
+Invertiert eine Matrix. Jeder Vektor, der durch die urspr&ungliche Matrix transformiert wurde, wird durch die inverse wieder auf zum Ausgangsvektor transformiert.\nProdukt aus einer Matrix und ihrer inversen ist die Einheitsmatrix (egal in welcher Reihenfolge multipliziert wurde).
+// Parameter m_out
+out
+Die inverse Matrix.
+// Parameter m_in
+in
+Die zu invertierende Martix.
+#

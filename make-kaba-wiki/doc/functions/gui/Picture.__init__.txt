@@ -1,0 +1,17 @@
+// Description
+Erschafft ein 2d-Bild auf dem Bildschirm.
+// Parameter pos
+in
+Bildschirmposition der linken oberen Ecke des Bildes (in relativen Koordinaten).
+// Parameter width
+in
+Die Breite des Bildes.
+// Parameter height
+in
+Die H&ohe des Bildes.
+// Parameter texture
+in
+Eine Textur f&ur das Bild.\nWird keine Textur angegeben (Parameter = -1), entspricht das einer komplett weisen Textur.
+// Synopsis
+s:Picture
+#

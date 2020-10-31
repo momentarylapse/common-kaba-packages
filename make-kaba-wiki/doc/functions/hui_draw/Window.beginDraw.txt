@@ -1,0 +1,10 @@
+// Description
+Startet das Zeichnen in einen Zeichenbereich ("DrawingArea").
+// Parameter id
+in
+Die ID des Zeichenbereiches.
+// Return
+Der Zeichen-Kontext, mit dem gezeichnet werden kann.
+// Remark
+Sollte nur als Antwort auf eine "hui:draw" Nachricht geschehen.
+#

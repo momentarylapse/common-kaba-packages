@@ -1,0 +1,8 @@
+// Description
+Erstellt einen VertexBuffer.
+// Parameter num_textures
+in
+Die Anzahl der zu überlagernden Textur-Schichten.
+// Synopsis
+s:VertexBuffer,VertexBuffer.clear,VertexBuffer.addTrias,VertexBuffer.addTria
+#

@@ -1,0 +1,5 @@
+// Description
+Die Standart-Kamera der Welt. Sie wird automatisch von der Engine beim Laden einer Welt generiert.
+// Synopsis
+s:Camera
+#

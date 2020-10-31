@@ -1,0 +1,12 @@
+// Description
+Setzt einen Event-Handler, also eine Callback-Funktion, die bei einem bestimmten Ereignis aufgerufen werden soll.
+// Parameter id
+in
+Die ID der Schaltfläche, auf deren Standard-Ereignis reagiert werden soll (z.B. Knopf-Drücken), bzw. eine Nachricht (z.B. "hui:key-down").
+// Parameter handler
+in
+Das Objekt, dessen Callback-Funktion aufgerufen werden soll.
+// Parameter func
+in
+Die Callback-Funktion.
+#

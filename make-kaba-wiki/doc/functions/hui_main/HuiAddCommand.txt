@@ -1,0 +1,15 @@
+// Description
+Registriert einen Befehl.
+// Parameter id
+in
+Die ID des Befehls.
+// Parameter image
+in
+Ein Icon für den Befehl (z.B. "hui:ok").
+// Parameter key_code
+in
+Das Tastenkürzel (z.B. <tt>KeyControl + KeyS</tt>).
+// Parameter func
+in
+Eine Callback-Funktion die bei diesem Befehl aufgerufen werden soll.
+#

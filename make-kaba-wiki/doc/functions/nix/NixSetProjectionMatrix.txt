@@ -1,0 +1,6 @@
+// Description
+Wählt die Transformation von Kamera-Koordinaten auf das Fenster (bzw. das aktive Ziel).
+// Parameter m
+in
+Die Projektionsmatrix.
+#

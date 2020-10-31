@@ -1,0 +1,7 @@
+// Description
+Liest Text aus der systemweiten Zwischenablage.
+// Return
+Der gelesene Text.
+// Synopsis
+HuiCopyToClipboard,HuiPasteFromClipboard
+#

@@ -1,0 +1,10 @@
+c2i,
+f2i,
+p2s,
+i2c,
+i2f,
+int.str,
+float.str,
+p2b,
+string.float,
+string.int

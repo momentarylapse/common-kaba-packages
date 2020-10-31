@@ -1,0 +1,5 @@
+// Description
+Liefert den Dateinamen des Modells.
+// Return
+Der Dateiname.
+#

@@ -1,0 +1,8 @@
+// Description
+L&adt eine Modell-Datei.\nBei jedem Aufruf (auch mit gleichem Dateinamen) wird ein neues Modell erschaffen.
+// Parameter filename
+in
+Der Dateiname (relativ zum "Models/"-Verzeichnis; ohne Endung)
+// Return
+Die Referenz auf das Modell.
+#

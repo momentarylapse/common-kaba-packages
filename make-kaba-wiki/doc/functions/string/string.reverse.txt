@@ -1,0 +1,5 @@
+// Description
+Liefert einen Text in umgekehrter Reihenfolge.
+// Return
+Der verdrehte Text.
+#

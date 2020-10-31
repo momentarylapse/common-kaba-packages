@@ -1,0 +1,6 @@
+// Description
+Setzt die Farbe, die zum weiteren Zeichnen zu verwendet werden soll.
+// Parameter c
+in
+Die Farbe.
+#

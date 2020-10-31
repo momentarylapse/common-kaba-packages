@@ -1,0 +1,8 @@
+// Description
+Berechnet den Arcus-Sinus von x.
+// Parameter x
+in
+Parameter, dessen Arcus-Sinus berechnet werden soll, muss aus (-1,1) sein.
+// Return
+Die Ausgabewerte sind in (-<c>pi</c>/2,<c>pi</c>/2).
+#

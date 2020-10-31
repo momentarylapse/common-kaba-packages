@@ -1,0 +1,10 @@
+// Description
+Zeichnet eine Linie zwischen zwei Punkten im 3d-Raum.
+// Parameter l1
+in
+Der Anfangspunkt.
+// Parameter l2
+in
+Der Endpunkt.
+#
+

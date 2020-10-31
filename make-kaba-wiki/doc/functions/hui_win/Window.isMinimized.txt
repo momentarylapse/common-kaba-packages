@@ -1,0 +1,6 @@
+// Description
+Prüft, ob ein Fenster Minimiert ist.
+// Return
+<c>true</c>, falls das Fenster minimiert ist.
+#
+

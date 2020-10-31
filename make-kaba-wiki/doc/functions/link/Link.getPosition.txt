@@ -1,0 +1,5 @@
+// Description
+Gibt die interne Position einer Verbindung aus.\nBei Gelenken ist dies der Drehwinkel zwischen den Objekten, bei einem Schieber die Verschiebung.
+// Return
+Die Position.
+#

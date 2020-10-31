@@ -1,0 +1,8 @@
+// Description
+&Uberpr&uft, ob eine Datei vorhanden ist.
+// Parameter filename
+in
+Der Name der zu &uberpr&ufenden Datei.
+// Return
+<c>true</c>, falls die Datei existiert, ansonsten <c>false</c>.
+#

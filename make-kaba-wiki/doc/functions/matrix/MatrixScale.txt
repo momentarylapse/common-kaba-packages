@@ -1,0 +1,15 @@
+// Description
+Erstellt eine Matrix, die einen Vektor in X- Y- und Z-Richtung jeweils um den angegebenen Faktor streckt.
+// Parameter m_out
+out
+Die Skalierungs-Matrix.
+// Parameter s_x
+in
+Skalierungs-Faktor in X-Richtung
+// Parameter s_y
+in
+Skalierungs-Faktor in Y-Richtung
+// Parameter s_z
+in
+Skalierungs-Faktor in Z-Richtung
+#

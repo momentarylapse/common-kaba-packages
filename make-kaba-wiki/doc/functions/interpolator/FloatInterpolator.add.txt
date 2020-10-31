@@ -1,0 +1,9 @@
+// Description
+Fügt einen Punkt hinzu.\nDie Tangente wird je nach Typ der Interpolation geraten oder auf 0 gesetzt.\nDas Gewicht des Punktes ist 1.
+// Parameter p
+in
+Der Wert.
+// Parameter dt
+in
+Der Parameter-Abstand zum vorherigen Punkt.\nWird ignoriert, falls es der erste Punkt ist.
+#

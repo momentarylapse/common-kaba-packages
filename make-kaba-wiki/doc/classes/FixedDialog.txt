@@ -1,0 +1,5 @@
+// Description
+Repräsentiert ein Dialog-Fenster der grafischen Oberfläche mit fester Größe.
+// Synopsis
+s:Window,s:Menu
+#

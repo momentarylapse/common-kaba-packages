@@ -1,0 +1,3 @@
+// Description
+Ein Würfel aus 6 Texturen. Hauptsächlich für Spiegeleffekte.
+#

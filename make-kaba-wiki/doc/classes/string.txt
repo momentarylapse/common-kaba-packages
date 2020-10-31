@@ -1,0 +1,5 @@
+// Description
+Eine Zeichenkette, also Text.
+// Element num
+Die Anzahl der Zeichen.
+#

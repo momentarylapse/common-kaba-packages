@@ -1,0 +1,11 @@
+// Description
+Erstellt eine Matrix, die einen Vektor um die angegebenen Distanz verschiebt.
+// Parameter m_out
+out
+Die Translations-Matrix.
+// Parameter trans
+in
+Die Strecke, um die verschoben werden soll.
+// Synopsis
+s:vector
+#

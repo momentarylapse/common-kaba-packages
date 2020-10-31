@@ -1,0 +1,5 @@
+// Description
+Gibt den Inhalt als <t>string</t> zurück.
+// Return
+Der formatierte <t>string</t>.
+#

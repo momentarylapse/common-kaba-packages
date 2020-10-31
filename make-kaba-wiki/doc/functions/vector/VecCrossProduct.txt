@@ -1,0 +1,11 @@
+// Description
+Berechnet das Kreuzprodukt zweier Vektoren, es ist ein Vektor <\math> v1 \times v2 </math>, der senkrecht auf <v>v1</v> und <v>v2</v> steht und die L&ange <math> \operatorname{L&ange}(v1) \cdot \operatorname{L&ange}(v2) \cdot \sin ( \operatorname{WinkelZwischen}(v1,v2) ) </math> hat, ist also <math>=0</math> f&uer parallele Vektoren.\nEs gilt <math> (a \times b) = - (b \times a) </math>.
+// Parameter v1
+in
+Erster Vektor
+// Parameter v2
+in
+Zweiter Vektor.
+// Return
+Das Kreuzprodukt.
+#

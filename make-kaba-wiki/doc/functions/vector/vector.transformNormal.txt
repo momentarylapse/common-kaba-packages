@@ -1,0 +1,10 @@
+// Description
+Transformiert einen Vektor durch eine Matrix. (in Matrixschreibwei&se: <v>v_out</v> = <v>m</v> * <v>v_in</v> )\n'''Translationen''' werden hierbei '''nicht''' ber&ucksichtigt. Die Matrix hat zwar die Gr&o&se 4x4, aber die 4. (zus&atzliche) Komponente des Vektors ist bei dieser Rechnung '''=0'''!\nDiese Operation eignet sich somit f&ur Richtungs- und Normalen-Vektoren, nicht aber f&ur Vertexpunkte (siehe [[f:vector.transform]]).
+// Parameter m
+in
+Transformations-Matrix
+// Return
+Ergebnis der Transformation
+// Synopsis
+s:matrix
+#

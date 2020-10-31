@@ -1,0 +1,5 @@
+// Description
+Erstellt einen Screenshot des aktuellen Bildschirm-Inhaltes (bzw. des Fenster-Inhaltes im Fenstermodus).\nGespeichert wird es im Verzeichnis "Screenshots/" als Bitmap (*.bmp) mit Datum, Uhrzeit und einer zus&atzlichen Nummer als '''eindeutigen''' Dateiname.
+// Synopsis
+ScreenShotExt
+#

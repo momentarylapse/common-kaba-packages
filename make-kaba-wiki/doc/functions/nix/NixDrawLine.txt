@@ -1,0 +1,20 @@
+// Description
+Zeichnet eine Linie.
+// Parameter x1
+in
+Die Anfangs-X-Position.
+// Parameter y1
+in
+Die Anfangs-Y-Position.
+// Parameter x2
+in
+Die End-X-Position.
+// Parameter y2
+in
+Die End-Y-Position.
+// Parameter z
+in
+Die Tiefe im Z-Buffer (0..1).
+// Synopsis
+NixDrawLineH,NixDrawLineV,NixDrawLine
+#

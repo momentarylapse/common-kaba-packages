@@ -1,0 +1,11 @@
+// Description
+Dividiert eine <t>vli</t>-Variable mit einer zweiten.\n<tt>self / div,   rem = self mod div</tt>
+// Parameter div
+in
+Der Divisor.
+// Parameter rem
+out
+Der Rest.
+// Return
+Der (abgerundete) Quotient.
+#

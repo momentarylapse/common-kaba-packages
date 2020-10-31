@@ -1,0 +1,7 @@
+// Description
+Dieser Befehl startet den Render-Modus und <b>muss</b> vor den darstellenden Funktionen ausgeführt werden. Mit [[NixEnd]] muss der Modus danach wieder beendet werden.
+// Return
+<c>true</c>, falls gerendert werden kann.
+// Synopsis
+NixEnd
+#

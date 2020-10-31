@@ -1,0 +1,9 @@
+// Description
+Setzt ein Untermodell auf einem Knochen eines Modells.
+// Parameter index
+in
+Welcher Knochen?
+// Parameter bone
+in
+Das Untermodell.
+#

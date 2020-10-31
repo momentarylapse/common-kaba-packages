@@ -1,0 +1,5 @@
+// Description
+Gibt an, ob eine Verbindung besteht.
+// Return
+<c>true</c>, falls eine Verbindung besteht, ansonsten <c>false</c>.
+#

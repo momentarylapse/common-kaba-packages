@@ -1,0 +1,12 @@
+// Description
+Multipliziert zwei Matrizen.\nDie Transformationen, die durch 2 Matrizen auf einen Vektor wirken, werden zu einer einzelnen Transformation (Matrix) zusammengefasst.\nDie Reihenfolge der Matrizen ist meistens '''wichtig'''!
+// Parameter m_out
+out
+Das Produkt der Matrizen
+// Parameter m2
+in
+Die Matrix, die die zweite auszuf&uhrende Transformation verk&orpert.
+// Parameter m1
+in
+Die Matrix, die die zuerst auszuf&uhrende Transformation verk&orpert.
+#

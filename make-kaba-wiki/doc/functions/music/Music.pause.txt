@@ -1,0 +1,6 @@
+// Description
+Pausiert eine Musik-Datei, oder nimmt das Abspielen wieder auf.
+// Parameter pause
+in
+<c>true</c> zum Pausieren, <c>false</c> um weiter abzuspielen.
+#

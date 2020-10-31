@@ -1,0 +1,8 @@
+// Description
+Liefert eine menschlich lesbare Repräsentation als <t>string</t>.
+// Parameter decimals
+in
+Die Anzahl der Nachkommastellen.
+// Return
+Die Text-Repräsentation.
+#

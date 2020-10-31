@@ -1,0 +1,15 @@
+// Description
+Erzeugt ein Schlüssel-Paar zum Ver- und Entschlüsseln von Nachrichten.\nDiese Funktion sollte vom Empfänger von Nachrichten aufgerufen werden. Einer der beiden Schlüssel kann dem Sender geschickt (oder gar veröffentlicht) werden, damit dieser seine Nachrichten damit verschlüsselt. Der andere Schlüssel sollte geheim gehalten werden und dient zum Entschlüsseln der empfangenen Nachrichten. Auf diese Weise können die geschickten Nachrichten nicht von dritten gelesen werden.
+// Parameter c1
+in
+Der erste Schlüssel.
+// Parameter c2
+in
+Der zweite Schlüssel.
+// Parameter type
+in
+Die Art des Verschlüsselungsalgorithmus. Bisher nur "rsa".
+// Parameter bits
+in
+Die Länge der Schlüssel in Bits.
+#

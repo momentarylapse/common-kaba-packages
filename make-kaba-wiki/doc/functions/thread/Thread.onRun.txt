@@ -1,0 +1,5 @@
+// Description
+Überschreibbare Funktion, die im Thread aufgerufen wird.
+// Synopsis
+s:Thread,Thread.run,Thread.kill,Thread.isDone,Thread.join,ThreadExit,ThreadSelf
+#

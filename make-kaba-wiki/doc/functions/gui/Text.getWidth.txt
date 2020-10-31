@@ -1,0 +1,7 @@
+// Description
+Ermittelt die Breite des Textes auf dem Bildschirm. (relative Koordinaten!)
+// Return
+Die Breite.
+// Synopsis
+s:Text
+#

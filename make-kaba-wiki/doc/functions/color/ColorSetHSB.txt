@@ -1,0 +1,19 @@
+// Description
+Berechnet eine Farbe aus Farbwert, S&attigung und Helligkeit.\nAlle Parameter sind aus dem Intervall [0..1].
+// Parameter a
+in
+Alpha. ("inverse Transparenz")
+// Parameter h
+in
+Farbwert. Gibt den Punkt im Farbspektrum ab.
+// Parameter s
+in
+S&attigung. 0 entspricht einem Grauton, 1 der maximalen Farbintensit&at.
+// Parameter b
+in
+Helligkeit. 0 entspricht schwarz, 1 der hellstm&oglichen Farbe.
+// Return
+Der errechnete Farbwert.
+// Synopsis
+s:color,color,ColorInterpolate,ColorSetHSB
+#

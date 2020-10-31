@@ -1,0 +1,14 @@
+// Description
+Erstellt einen Screenshot des aktuellen Bildschirm-Inhaltes (bzw. des Fenster-Inhaltes im Fenstermodus).
+// Parameter filename
+in
+Der Dateinamen unter dem der Screenshot gespeichert werden soll.
+// Parameter width
+in
+Die zu skalierende Bildbreite.
+// Parameter height
+in
+Die zu skalierende Bildhöhe.
+// Synopsis
+ScreenShot
+#

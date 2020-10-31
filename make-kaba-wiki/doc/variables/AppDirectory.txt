@@ -1,0 +1,5 @@
+// Description
+Das Verzeichnis, in dem das Programm liegt, das das Script ausführt.
+// Synopsis
+AppFilename,AppDirectoryStatic
+#

@@ -1,0 +1,6 @@
+// Description
+Liefert das aktuelle Datum.
+// Return
+Das Datum.
+#
+

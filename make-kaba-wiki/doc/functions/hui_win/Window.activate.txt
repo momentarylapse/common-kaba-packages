@@ -1,0 +1,7 @@
+// Description
+Aktiviert ein Fenster, holt es in den Vordergrund.
+// Parameter id
+in
+Die ID eines Kontrollelementes, das die Eingabe bekommen soll.
+#
+

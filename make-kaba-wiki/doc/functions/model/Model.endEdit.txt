@@ -1,0 +1,7 @@
+// Description
+Zum Editieren eines Modells.\nSiehe [[Model.beginEdit]].
+// Parameter skin
+in
+Die Oberfläche.
+#
+

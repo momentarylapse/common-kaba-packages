@@ -1,0 +1,13 @@
+// Description
+Ein Vektor ist eine 3-dimensionale Größe, die eine Länge und eine Richtung haben kann.\nZum Beispiel sind Position und Geschwindigkeit im Raum Vektoren.
+// Element x
+Die X-Komponente.
+// Element y
+Die Y-Komponente.
+// Element z
+Die Z-Komponente. Was sonst?
+// Element e
+Array aller Elemente.
+// Synopsis
+f:vector,f:VecAngAdd,f:VecAngInterpolate,f:VecDotProduct,f:VecCrossProduct,f:VecProject,f:VecProjectRel,f:VecUnproject,f:VecUnprojectRel
+#

@@ -1,0 +1,4 @@
+// Description
+Eine Scharnier-Verbindung.
+#
+

@@ -1,0 +1,5 @@
+// Description
+Berechnet aus Winkel-Angaben relativ zur Z-Achse einen Richtungs-Einheitsvektor, aus den Winkeln (0,0,0) wird dabei wieder die Z-Achse (0,0,1).
+// Return
+Der Richtungs-Vektor.
+#

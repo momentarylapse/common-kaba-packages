@@ -1,0 +1,8 @@
+// Description
+Berechnet die Wurzel x.
+// Parameter x
+in
+Ein positiver Wert.
+// Return
+Ebenfalls positiv.
+#

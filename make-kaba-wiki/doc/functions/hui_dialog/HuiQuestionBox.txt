@@ -1,0 +1,17 @@
+// Description
+Ein Dialog mit einer Ja/Nein Frage.
+// Parameter root
+in
+Das übergeordnete Fenster (kann <c>nil</c> sein).
+// Parameter title
+in
+Der Titel des Fenster.
+// Parameter text
+in
+Der eigentliche Text, der ausgegeben werden soll.
+// Parameter allow_cancel
+in
+Auch einen Abbrechen-Knopf erlaufen
+// Return
+Ja: <c>hui:yes</c>\nNein: <c>hui:no</c>\nAbbrechen: <c>hui:cancel</c>
+#

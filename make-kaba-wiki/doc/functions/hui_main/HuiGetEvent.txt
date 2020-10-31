@@ -1,0 +1,5 @@
+// Description
+Liefert die genauen Daten zum zuletzt eingetretenen Ereignis (z.B. Mausklick).
+// Return
+Eine Referenz auf die Ereignis-Struktur.
+#

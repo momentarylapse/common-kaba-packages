@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, bevor der Effekt gelöscht wird.\nHierin können vom Effekt erzeugte Resourcen gelöscht werden, da die Funktion beim Löschen einer Welt nicht aufgerufen wird.
+#

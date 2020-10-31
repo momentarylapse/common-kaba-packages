@@ -1,0 +1,9 @@
+// Description
+Unbegrenzt große <t>int</t>-Variablen.
+// Element sign
+Das Vorzeichen.
+// Element data
+Die Liste von 32-bit "Ziffern".
+// Synopsis
+f:vli.str,f:vli.compare,f:vli.div,f:vli.pow,f:vli.powMod
+#

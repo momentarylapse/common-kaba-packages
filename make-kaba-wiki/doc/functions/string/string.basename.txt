@@ -1,0 +1,5 @@
+// Description
+Liefert zu einem kompletten Pfad den "innersten" Dateinamen.\nZ.B. "/langer/pfad/datei.txt" -> "datei.txt".
+// Return
+Der Dateiname.
+#

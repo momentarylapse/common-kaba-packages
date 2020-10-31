@@ -1,0 +1,21 @@
+// Description
+Speichert Wave-Daten als Audio-Datei.
+// Parameter filename
+in
+Der Dateiname.
+// Parameter buf_r
+in
+Der rechte Audio-Puffer.
+// Parameter buf_l
+in
+Der linke Audio-Puffer.
+// Parameter freq
+in
+Die Sample-Rate in Hertz.
+// Parameter channels
+in
+Die Anzahl der Kanäle (nur 1 für mono und 2 für stereo erlaubt).
+// Parameter bits
+in
+Die Anzahl der Bits pro Audio-Sample (bisher nur 16 erlaubt).
+#

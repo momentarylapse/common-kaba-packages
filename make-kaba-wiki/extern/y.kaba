@@ -1,0 +1,113 @@
+use vulkan
+
+class Controller
+
+	extern virtual void __delete__()
+	extern virtual void on_init()
+	extern virtual void on_delete()
+	extern virtual void on_iterate(float dt)
+	extern virtual void on_key_down(int key)
+	extern virtual void on_key_up(int key)
+	extern virtual void on_left_button_down()
+	extern virtual void on_left_button_up()
+	extern virtual void on_middle_button_down()
+	extern virtual void on_middle_button_up()
+	extern virtual void on_right_button_down()
+	extern virtual void on_right_button_up()
+
+class Camera
+	vector pos
+	quaternion ang
+	rect dest
+	matrix m_view
+	
+	float zoom
+	float min_depth, max_depth
+	
+	bool show, enabled
+
+	extern virtual void __delete__()
+	extern virtual void on_init()
+	extern virtual void on_delete()
+	extern virtual void on_iterate(float dt)
+
+class Material
+	color ambient
+	color diffuse
+	color specular
+	color emission
+	float shininess
+	Texture*[] textures
+	Shader* shader
+
+class Model
+	vector pos
+	vector vel
+	quaternion ang
+	vector rot
+	
+	Material*[] materials
+
+	extern virtual void __delete__()
+	extern virtual void on_init()
+	extern virtual void on_delete()
+	extern virtual void on_iterate(float dt)
+
+class Terrain
+	# ...
+
+class Light
+	vector pos
+	vector dir
+	color color
+	float radius
+	float theta
+	float harshness
+	bool enabled
+
+class LightParallel extends Light
+	extern void __init__(vector dir, color c)
+
+class LightSpherical extends Light
+	extern void __init__(vector pos, color c, float radius)
+
+class LightCone extends Light
+	extern void __init__(vector pos, vector dir, color c, float radius, float theta)
+
+class Particle
+	vector pos
+	float radius
+	Texture* texture
+	color color
+	extern void __init__(vector p, float r, Texture* t)
+
+class Fog
+	color color
+	float distance
+	bool enabled
+
+class World
+	Model*[] objects
+	Terrain*[] terrains
+	
+	Model* ego
+	
+	Light* sun
+	color background
+	
+	Fog fog
+	
+	extern void add_light(Light* l)
+	extern void add_particle(Particle* p)
+	extern Model* create_object(string filename, string name, vector pos, quaternion ang, int overwrite_index)
+	extern Terrain* create_terrain(string filename, vector pos)
+
+extern bool get_key(int k)
+extern bool get_key_down(int k)
+extern bool get_key_up(int k)
+
+extern vector mouse, dmouse, scroll
+
+
+extern World world
+extern Camera* cam

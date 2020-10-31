@@ -1,0 +1,6 @@
+// Description
+Die Standard-Konfigurationsdatei.
+// Synopsis
+s:Configuration
+#
+

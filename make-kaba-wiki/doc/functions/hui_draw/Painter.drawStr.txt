@@ -1,0 +1,12 @@
+// Description
+Rendert einen Text.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die Y-Position.
+// Parameter str
+in
+Der Text.
+#

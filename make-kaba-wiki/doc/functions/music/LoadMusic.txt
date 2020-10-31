@@ -1,0 +1,8 @@
+// Description
+Lädt eine Musikdatei, die die Welt "erfüllt". Als Formate sind erlaubt Wave und Ogg.
+// Parameter filename
+in
+Der Dateiname (erlativ zum "Sound/"-Verzeichnis, mit Endung).
+// Return
+Die Referenz auf die Musik.
+#

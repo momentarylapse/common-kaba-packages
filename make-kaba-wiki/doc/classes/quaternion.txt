@@ -1,0 +1,13 @@
+// Description
+Ein Quaternion repräsentiert eine Rotation.\nEs begründet sich in den sogenannten "Hyperkomplexen Zahlen".\nDie Elemente werden kaum direkt angesprochen.
+// Element x
+Ein imagin&arer Anteil.
+// Element y
+Ein imagin&arer Anteil.
+// Element z
+Ein imagin&arer Anteil.
+// Element w
+Der Realteil.
+// Synopsis
+f:QuaternionRotationV,f:QuaternionRotationA,f:QuaternionDrag,f:quaternion.getAngles,f:QuaternionInterpolate,f:quaternion.bar,f:quaternion.invert,f:quaternion.normalize
+#

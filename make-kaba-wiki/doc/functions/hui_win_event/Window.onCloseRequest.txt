@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, wenn der Schließen-Knopf des Fensters gedrückt wird.\nDurch Überschreiben wird das Standard-Verhalten deaktiviert, das das Fenster automatisch schließt.
+#

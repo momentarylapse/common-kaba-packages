@@ -1,0 +1,235 @@
+use "mongo.kaba"
+#use "file.kaba"
+use os
+
+class Config
+	bool show_meta
+	void __init__()
+		show_meta = false
+
+Config conf
+
+class Tag
+	string key, value
+
+class DbFile
+	string id, hash, hash_medium, type
+	Path path
+	string name
+	int size
+	int mtime
+	Tag[] tags
+	bool medium
+	void __init__()
+		medium = false
+	const string __str__()
+		string s = id + "\t" + mtime + "\t" + size + "\t" + hash + "\t" + path + "\t" + name + "\t" + path.extension()
+		if medium
+			s += "\tm"
+		else
+			s += "\th"
+		for t in tags
+			s += "\t{{t.key}}={{t.value.hex()}}"
+			# s += "\t" + t.key + "=" + t.value.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n")
+		return s
+	const void show()
+		print(path)
+		if conf.show_meta
+			print("  id: " + id)
+			print("  hash: " + hash)
+			print("  type: " + type)
+			# print("  path: " + path)
+			print("  name: " + name)
+			print("  mtime: " + mtime)
+			print("  size: " + size)
+			for t in tags
+				print("  {{t.key}}: {{t.value}}")
+	const string medium_path()
+		if type.find("/audio/", 0) >= 0
+			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
+		if type.find("/image/", 0) >= 0
+			return "/media/300/temp/alexandria-cache/images/{{id}}.jpg"
+		return path
+	void make_medium(DbMedium m)
+		hash = m.hash
+		size = m.size
+		path = medium_path()
+		medium = true
+
+class DbMedium
+	string id, hash
+	int size
+
+DbFile parse_bson(void* b)
+	DbFile f
+	# print(bson_to_json(b))
+	int[16] iter
+	_bson_iter_init(&iter, b)
+	while _bson_iter_next(&iter)
+		string key = bson_iter_key(&iter)
+		if key == "path"
+			f.path = bson_iter_str(&iter)
+		else if key == "name"
+			f.name = bson_iter_str(&iter)
+		else if key == "type"
+			f.type = bson_iter_str(&iter)
+		else if key == "hash"
+			f.hash = bson_iter_str(&iter)
+		else if key == "hash_medium"
+			f.hash_medium = bson_iter_str(&iter)
+		else if key == "id"
+			f.id = bson_iter_str(&iter)
+		else if key == "size"
+			f.size = _bson_iter_int32(&iter)
+		else if key == "mtime"
+			f.mtime = _bson_iter_int32(&iter)
+		else if key == "_id" or key == "status" or key == "privilege"
+			pass
+		else # tags
+			if _bson_iter_type(&iter) == 2 # str
+				Tag t
+				t.key = key
+				t.value = bson_iter_str(&iter)
+				f.tags.add(t)
+			else if _bson_iter_type(&iter) == 4 # array
+				let values = bson_iter_str_array(&iter)
+				for v in values
+					Tag t
+					t.key = key
+					t.value = v
+					f.tags.add(t)
+	# f.show()
+	return f
+
+DbMedium parse_bson_medium(void* b)
+	DbMedium f
+	# print(bson_to_json(b))
+	int[16] iter
+	_bson_iter_init(&iter, b)
+	while _bson_iter_next(&iter)
+		string key = bson_iter_key(&iter)
+		if key == "hash"
+			f.hash = bson_iter_str(&iter)
+		else if key == "id"
+			f.id = bson_iter_str(&iter)
+		else if key == "size"
+			f.size = _bson_iter_int32(&iter)
+	# f.show()
+	return f
+
+DbFile[] parse_result(Result *r)
+	DbFile[] files
+	while r.has_more()
+		files.add(parse_bson(r.doc))
+	del r
+	return files
+
+void print_files(DbFile[] files)
+	for f in files
+		print(str(f))
+
+class Database
+	Mongo* m
+	Collection* files
+	Collection* medium
+	void __init__()
+		m = new Mongo("localhost")
+		files = m.collection("alex", "files")
+		medium = m.collection("alex", "medium")
+	void __delete__()
+		del files
+		del medium
+		del m
+	DbFile[] find(string json)
+		let r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
+		return parse_result(r)
+	DbFile by_id(string id)
+		let r = files.find("{\"id\":\"{{id}}\"}")
+		if r.has_more()
+			return parse_bson(r.doc)
+		raise(new Exception("id not found"))
+	DbFile by_hash(string hash)
+		let r = files.find("{\"hash\":\"{{hash}}\"}")
+		if r.has_more()
+			return parse_bson(r.doc)
+		r = medium.find("{\"hash\":\"{{hash}}\"}")
+		if r.has_more()
+			DbMedium m = parse_bson_medium(r.doc)
+			DbFile f = by_id(m.id)
+			f.make_medium(m)
+			return f
+		raise(new Exception("hash not found"))
+	
+	void mediumify(out DbFile f)
+		Result* r = medium.find("{\"id\":\"{{f.id}}\"}")
+		if r.has_more()
+			DbMedium m = parse_bson_medium(r.doc)
+			f.make_medium(m)
+		del r
+
+string filter_to_json(string filter)
+	string json = "{"
+	string[] xx = filter.explode(",")
+	for x,i in xx
+		if i > 0
+			json += ","
+		int p = x.find("=", 0)
+		if p >= 0
+			json += "\"{{x[:p]}}\":\"{{x[p+1:]}}\""
+	json += "}"
+	return json
+
+
+# 900942014
+# bf5c0d14924b6e9d91202124badebd12
+void main(string[] _arg)
+	if len(_arg) == 0
+		print("find <filter>
+by-id <id1> <id2> ...
+by-hash <hash1> <hash2>")
+		return
+
+	string[] arg
+	for a in _arg
+		if a == "--meta"
+			conf.show_meta = true
+		else
+			arg.add(a)
+
+	let db = new Database()
+	if arg[0] == "find" and len(arg) >= 2
+		DbFile[] files = db.find(filter_to_json(arg[1]))
+		for f in files
+			if len(arg) >= 3
+				if arg[2] == "medium"
+					db.mediumify(f)
+			f.show()
+	if arg[0] == "by-id"
+		for i in 1:len(arg)
+			try
+				let f = db.by_id(arg[i])
+				print(str(f))
+			except
+				print("-")
+	if arg[0] == "by-id-medium"
+		for i in 1:len(arg)
+			try
+				let f = db.by_id(arg[i])
+				db.mediumify(f)
+				print(str(f))
+			except
+				print("-")
+	if arg[0] == "by-hash"
+		for i in 1:len(arg)
+			try
+				let f = db.by_hash(arg[i])
+				print(str(f))
+			except
+				print("-")
+	if arg[0] == "upload"
+		print(arg[1]) # path
+		print(arg[2]) # name hex
+		print(arg[3]) # hash
+		print(arg[4]) # mtime
+		print(arg[5]) # tags hex
+	del db

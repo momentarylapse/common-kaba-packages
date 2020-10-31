@@ -1,0 +1,19 @@
+// Description
+Erstellt eine Rechteck-Daten-Srtuktur aus den 4 einzelnen Komponenten.
+// Parameter x1
+in
+Die linke Kante.
+// Parameter x2
+in
+Die rechte Kante.
+// Parameter y1
+in
+Die obere Kante.
+// Parameter y2
+in
+Die untere Kante.
+// Return
+Das zusammenfassende Rechteck.
+// Synopsis
+s:rect
+#

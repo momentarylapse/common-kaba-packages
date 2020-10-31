@@ -1,0 +1,5 @@
+// Description
+Gibt einen mit [[Mutex.lock]] angeforderten Mutex wieder frei.
+// Synopsis
+s:Mutex,Mutex.lock,Mutex.unlock
+#

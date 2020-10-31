@@ -1,0 +1,6 @@
+// Description
+Steuert, ob Glanzlichter ("specular") berechnet werden sollen.\nDazu muss auch die Lichtquelle und das Material Glanzlichter besitzen.
+// Parameter enabled
+in
+Glanzlichter aktivieren?
+#

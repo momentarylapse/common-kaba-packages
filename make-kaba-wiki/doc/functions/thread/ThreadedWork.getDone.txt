@@ -1,0 +1,7 @@
+// Description
+Gibt an, wieviele der Arbeitsschritte schon abgearbeitet sind.
+// Return
+Die Zahl der abgearbeiteten Schritte.
+// Synopsis
+s:ThreadedWork
+#

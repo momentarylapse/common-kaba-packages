@@ -1,0 +1,8 @@
+// Description
+Konvertiert einen Pointer in einen <t>string</t>. Z.B. <tt>"0x1234"</tt>.
+// Parameter p
+in
+Der Pointer.
+// Return
+Der <t>string</t>.
+#

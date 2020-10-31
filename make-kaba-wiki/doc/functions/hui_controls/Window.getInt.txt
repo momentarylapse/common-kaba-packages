@@ -1,0 +1,9 @@
+// Description
+Gibt die Auswahl einer Schaltfläche zurück.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Return
+Die Auswahl.
+#
+

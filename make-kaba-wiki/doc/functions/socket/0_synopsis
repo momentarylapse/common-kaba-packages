@@ -1,0 +1,11 @@
+s:Socket,
+SocketConnect,
+SocketListen,
+Socket.accept,
+Socket.close,
+Socket.writeBuffer,
+Socket.read,
+Socket.write,
+Socket.canWrite,
+Socket.canRead,
+Socket.isConnected

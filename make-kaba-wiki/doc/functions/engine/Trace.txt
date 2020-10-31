@@ -1,0 +1,20 @@
+// Description
+Führt einen Kollisionstest aus. Entlang einer Geraden wird der Schnittpunkt mit dem ersten Objekt/Terrain bestimmt, das die Gerade kreuzt.\nGetestet wird die physikalische Oberfläche.
+// Parameter p1
+in
+Startpunkt der Geraden.
+// Parameter p2
+in
+Endpunkt der Geraden.
+// Parameter d
+out
+Die ermittelten Kollisionsdaten.
+// Parameter simple_test
+in
+Für <c>true</c> wird nur auf Kollision getestet, kein genauer Schnittpunkt errechnet.
+// Parameter o_ignore
+in
+Der Index eines Objektes, das beim Kollisionstest nicht berücksichtigt werden soll. -1, falls alle Objekte getestet werden sollen.
+// Return
+<c>true</c>, falls es einen Schnittpunkt gibt. <c>false</c> ansonsten.
+#

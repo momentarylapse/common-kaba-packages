@@ -1,0 +1,21 @@
+// Description
+Wählt eine perspektivische Transformation von Kamera-Koordinaten auf das Fenster (bzw. das aktive Ziel).
+// Parameter centerx
+in
+Die X-Position des Fluchtpunktes.
+// Parameter centery
+in
+Die Y-Position des Fluchtpunktes.
+// Parameter width_1
+in
+...
+// Parameter height_1
+in
+...
+// Parameter zmin
+in
+Die minimal darstellbare Tiefe.
+// Parameter zmax
+in
+Die maximal darstellbare Tiefe.
+#

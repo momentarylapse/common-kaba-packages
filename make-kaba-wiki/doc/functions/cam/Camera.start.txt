@@ -1,0 +1,9 @@
+// Description
+L&adt und startet ein Kamera-Script, also eine im Editor geplante Kamerafahrt.
+// Parameter filename
+in
+Der Dateiname des Kamera-Scriptes (relativ zum "Scripts/"-Verzeichnis; ohne Endung).
+// Parameter dpos
+in
+Eine zus&atzliche Verschiebung der Kamerafahrt, um z.B. die Kamera um ein Objekt kreisen zu lassen, wird im Editor die Kamerafahrt um den Ursprung geplant und beim Aufruf der Funktion die Position des zu umkreisenden Objektes mitgegeben.
+#

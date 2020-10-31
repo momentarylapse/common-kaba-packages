@@ -1,0 +1,8 @@
+// Description
+Speichert einen Spielstand in einer Datei.
+// Parameter filename
+in
+Die Datei des Spielstandes (relativ zum "Save/"-Verzeichnis, ohne Endung).
+// Synopsis
+LoadGameState,LoadGameFromHost,LoadWorld
+#

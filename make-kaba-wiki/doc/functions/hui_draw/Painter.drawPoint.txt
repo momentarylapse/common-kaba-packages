@@ -1,0 +1,9 @@
+// Description
+Zeichnet einen einzelnen Punkt.
+// Parameter x
+in
+Die X-Position.
+// Parameter y
+in
+Die y-Position.
+#

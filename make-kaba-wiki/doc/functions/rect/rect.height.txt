@@ -1,0 +1,5 @@
+// Description
+Berechnet die Höhe des Rechtecks.
+// Return
+Die Höhe.
+#

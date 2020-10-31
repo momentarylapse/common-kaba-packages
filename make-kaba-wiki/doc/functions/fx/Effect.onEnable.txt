@@ -1,0 +1,3 @@
+// Description
+Überschreibbare Funktion, die aufgerufen wird, wenn sich der Aktivierungszustand des Effektes ändert.
+#

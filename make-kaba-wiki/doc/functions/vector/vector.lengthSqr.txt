@@ -1,0 +1,5 @@
+// Description
+Berechnet das Quadrat der L&ange eines Vektors. (Wegen der fehlenden Wurzel, deutlich schneller, als [[vector.length]])
+// Return
+Quadrat der L&ange. (<math> = x^2 + y^2 + z^2 </math>)
+#

@@ -1,0 +1,10 @@
+// Description
+Aktiviert oder Deaktiviert den Haken eines Schaltfläche.
+// Parameter id
+in
+Die ID der Schaltfläche.
+// Parameter checked
+in
+Der neue Status des Hakens der Schaltfläche.
+#
+

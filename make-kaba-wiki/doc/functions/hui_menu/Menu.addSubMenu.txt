@@ -1,0 +1,13 @@
+// Description
+Fügt dem Menü ein neues Untermenü hinzu.
+// Parameter name
+in
+Der Text im Element.
+// Parameter id
+in
+Der dem Element zugeordnete Index.
+// Parameter sub_menu
+in
+Das Untermenü.
+#
+

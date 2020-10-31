@@ -1,0 +1,9 @@
+// Description
+Den Z-Buffer konfigurieren.
+// Parameter write
+in
+Beim Rendern den Z-Buffer beschreiben?
+// Parameter test
+in
+Rendern nur erlauben, wenn der Z-Buffer noch keine näheren Objekte enthält?
+#

@@ -1,0 +1,15 @@
+// Description
+Erzeugt eine Ebene aus 3 Punkten.
+// Parameter pl
+out
+Die Ebene.
+// Parameter a
+in
+Punkt 1.
+// Parameter b
+in
+Punkt 2.
+// Parameter c
+in
+Punkt 3.
+#

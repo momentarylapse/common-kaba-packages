@@ -1,0 +1,12 @@
+// Description
+Generiert eine Schieber-Verbindung zwischen zwei Objekten.
+// Parameter o1
+in
+Das eine Objekt.
+// Parameter o2
+in
+Das andere Objekt.
+// Parameter ax
+in
+Der Einheits-Richtungsvektor der Achse, entlang der sich die Objekte bewegen dürfen.
+#

@@ -1,0 +1,5 @@
+// Description
+Vereinfacht das Gruppieren von Anzeigen, indem alle neuen [[s:Picture]], [[s:Picture3d]], [[s:Text]] automatisch der Gruppe zugeordnet werden, auf den diese Variable zeigt. Hat sie den Wert <c>nil</c>, so sind die Anzeigen "frei".
+// Synopsis
+s:Layer
+#

@@ -1,0 +1,5 @@
+// Description
+Liefert zu einem Dateinamen die Endung.\nZ.B. "/langer/pfad/datei.txt" -> "txt".
+// Return
+Die Endung.
+#

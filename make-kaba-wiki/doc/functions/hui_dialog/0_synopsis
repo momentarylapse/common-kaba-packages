@@ -1,0 +1,7 @@
+s:Window,
+HuiInfoBox,
+HuiErrorBox,
+HuiQuestionBox,
+HuiFileDialogOpen,
+HuiFileDialogSave,
+HuiFileDialogDir

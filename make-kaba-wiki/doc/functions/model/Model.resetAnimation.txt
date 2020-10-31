@@ -1,0 +1,3 @@
+// Description
+L&oscht alle bisherigen Animationsdaten eines Modells.
+#

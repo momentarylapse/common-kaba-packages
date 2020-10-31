@@ -1,0 +1,5 @@
+// Description
+Liefert einen Vektor, der senkrecht zu einem gegebenem steht.
+// Return
+Der senkrechte Vektor.
+#

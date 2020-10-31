@@ -1,0 +1,9 @@
+// Description
+Variablentyp, der verschiedene andere Typen speichern kann.
+// Element type
+Dynamische Typen-Information.
+// Element data
+Dynamischer Speicher, in dem der eigentliche Inhalt liegt.
+// Remark
+Noch sehr experimentell!
+#

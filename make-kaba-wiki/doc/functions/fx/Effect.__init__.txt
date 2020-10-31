@@ -1,0 +1,11 @@
+// Description
+Erzeugt eine Partikel-Quelle ([[s:Effect]]).
+// Parameter pos
+in
+Die Position der Partikel-Quelle.
+// Parameter ttl
+in
+Die Lebensdauer (in Spielzeit).
+// Synopsis
+s:Effect,s:Particle,s:Beam
+#

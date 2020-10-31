@@ -1,0 +1,5 @@
+// Description
+Findet das erste Glied in einer Kette verschachtelter Skelett-Modelle.
+// Return
+Das oberste Modell.
+#

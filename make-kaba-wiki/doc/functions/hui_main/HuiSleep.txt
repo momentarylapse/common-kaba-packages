@@ -1,0 +1,6 @@
+// Description
+Unterbricht das Programm für eine bestimmte Zeit.
+// Parameter duration
+in
+Die zu schlafende Zeit in Sekunden.
+#

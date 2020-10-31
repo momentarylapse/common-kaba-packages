@@ -1,0 +1,6 @@
+// Description
+Startet eine Musikdatei.
+// Parameter loop
+in
+Gibt an, ob die Musik als Schleife wiedergegeben werden soll.
+#

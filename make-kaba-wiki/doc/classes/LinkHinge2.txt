@@ -1,0 +1,4 @@
+// Description
+Eine "doppelte" Scharnier-Verbindung zwischen zwei Objekten.\nFunktioniert wie eine Radaufhängung am Auto: Am ersten Objekt ist ein Scharnier angebracht, an dem eine freie Drehachse zum zweiten Objekt führt.
+#
+

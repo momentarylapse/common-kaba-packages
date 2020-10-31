@@ -1,0 +1,41 @@
+// Description
+Fügt ein einzelnes Dreieck zu einem VertexBuffer hinzu.\nDieses wird durch 3 Vertex-Punkte, 3 Normalen-Vektoren und 6 Textur-Koordinaten beschrieben.
+// Parameter p1
+in
+Vertex-Punkt 1.
+// Parameter n1
+in
+Normalen-Vektor 1.
+// Parameter u1
+in
+Textur-u-Koordinate 1.
+// Parameter v1
+in
+Textur-v-Koordinate 1.
+// Parameter p2
+in
+Vertex-Punkt 2.
+// Parameter n2
+in
+Normalen-Vektor 2.
+// Parameter u2
+in
+Textur-u-Koordinate 2.
+// Parameter v2
+in
+Textur-v-Koordinate 2.
+// Parameter p3
+in
+Vertex-Punkt 3.
+// Parameter n3
+in
+Normalen-Vektor 3.
+// Parameter u3
+in
+Textur-u-Koordinate 3.
+// Parameter v3
+in
+Textur-v-Koordinate 3.
+// Synopsis
+s:VertexBuffer,VertexBuffer.clear,VertexBuffer.addTrias,VertexBuffer.addTria
+#

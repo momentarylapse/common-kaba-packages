@@ -1,0 +1,3 @@
+// Description
+Gibt an, ob die Grafikengine im Vollbildmodus läuft.
+#

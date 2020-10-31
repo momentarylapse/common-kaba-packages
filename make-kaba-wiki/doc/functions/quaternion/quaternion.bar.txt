@@ -1,0 +1,5 @@
+// Description
+Liefert das konjugierte einer Quaternion, d.h. <tt>(-x, -y, -z, +w)</tt>.\nFür normierte Quaternionen entspricht das Resultat der Inversen, also der Rotation in umgekehrter Richtung.
+// Return
+Das Konjugierte der Quaternion.
+#

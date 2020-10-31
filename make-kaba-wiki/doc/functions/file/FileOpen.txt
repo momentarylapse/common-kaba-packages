@@ -1,0 +1,8 @@
+// Description
+Öffnet eine Datei zum Lesen.
+// Parameter filename
+in
+Der Dateiname.
+// Return
+Eine Referenz auf die Datei.
+#

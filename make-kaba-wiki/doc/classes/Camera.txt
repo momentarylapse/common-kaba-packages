@@ -1,0 +1,41 @@
+// Description
+Eine Instanz der Kamera. Jede neu erschaffene Instanz ist eine eigene Ansicht der Welt, die auf dem Bildschirm dargestellt wird.\nEs ist möglich, in Texturen zu rendern und Effekte anzugeben.
+// Element enabled
+Aktiviert/Deaktiviert die Kamera '''komplett'''. Ist <v>enabled</v> = <c>false</c>, so wird sie absolut garnichts mehr tun, bis sie wieder aktiviert wurde.
+// Element show
+Lässt die Kamera auf dem Bildschirm angezeigt werden.\nIst <v>enabled</v> = <c>true</c> und <v>show</v> = <c>false</c>, wird weiterhin die Ausgabe in <v>texture_out</v> gerendert (falls die Textur existiert).
+// Element output
+Wird dieses Element auf eine dynamische Textur ([[s:DynamicTexture]]) gesetzt, wird die Ansicht in diese Textur gerendert.\nEs wird pro Kamera immer nur '''einmal''' pro Frame gerendert! Somit wird für <v>show</v> = <c>true</c> nurnoch die gerenderte Textur auf den Bildschirm kopiert, die Bildqualität hängt somit von der Texturgröße ab! ('''default''': -1)
+// Element input
+Ist diese Textur gesetzt, so wird nicht die 3D-Szene gerendert, sondern die Textur <v>texture_in</v> in die Ausgabe kopiert.\nDies macht hauptsächlich Sinn, wenn über <v>shader</v> ein Effekt dazwischen geschalten ist. Man kann dann mit mehreren verschalteter Kameras kompliziertere Effekte erzeugen. ('''default''': -1)
+// Element shader
+Ist <v>output</v> gesetzt, so kann die Textur zusätzlich mit einem '''Shader-Effekt''' belegt werden.\nWir nur verwendet, wenn <v>input</v> '''und/oder''' <v>output</v> gesetzt ist.
+// Element shaded_displays
+Um zu verhindern, dass die 2d-Anzeigen von dem Shader beeinflusst werden, kann dieses Element auf <c>false</c> gesetzt werden.
+// Element pos
+Die Position der Kamera in der 3D-Szene.
+// Element ang
+Die Ausrichtung der Kamera.
+// Element vel
+Die Geschwindigkeit der Kamera. ('''Ausgabe der Kamera''' bei Scripten!)
+// Element rot
+Die Rotations-Geschwindigkeit der Kamera. ('''Ausgabe der Kamera''' bei Scripten!)
+// Element zoom
+Die Vergrößerung der Ansicht. Ein Wert von 1 ist normal, darüber wird vergrößert, darunter verkleinert.
+// Element dest
+Die Fläche auf dem Bildschirm, auf dem die Ansicht dargestellt werden soll.
+// Element z
+Wird für die Reihenfolge der Anzeigen auf dem Bildschirm genutzt. (zwischen 0 und 1)
+// Element clipping_plane
+Ein Array von Ebenen, an denen die Welt beim Rendern abgeschnitten wird. Diese sind in Welt-Koordinaten.
+// Element ignore
+Ein Array von Objekten, die beim Rendern ignoriert werden sollen.
+// Element min_depth
+Der minimale Abstand zur Kamera. Alles näher an der Kamera wird abgeschnitten.
+// Element max_depth
+Der maximale Abstand zur Kamera. Alles weiter entfernte wird abgeschnitten.
+// Element scale_x
+Ein vertikaler Skalierungsfaktor.
+// Synopsis
+DynamicTexture,f:NixLoadShader,v:Cam
+#

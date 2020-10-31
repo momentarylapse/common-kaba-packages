@@ -1,0 +1,14 @@
+// Description
+Ein Dialog zum Auswählen eines Verzeichnises.
+// Parameter root
+in
+Das übergeordnete Fenster (kann <c>nil</c> sein).
+// Parameter title
+in
+Der Titel des Fenster.
+// Parameter dir
+in
+Das anfangs angezeigte Verzeichnis.
+// Return
+<c>true</c>, falls ein Verzeichnis ausgegählt wurde, ansonsten <c>false</c>.
+#

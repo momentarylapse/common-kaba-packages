@@ -1,0 +1,3 @@
+// Description
+Ein "leerer" Typ.\nWird nur als Rückgabetyp für Funktionen benutzt, die keinen Wert zurückgeben.
+#

@@ -1,0 +1,25 @@
+// Description
+Zeit- und Datumsangaben.
+// Element time
+Die Zeit in Sekunden seit dem 1. Januar 1970. ("Unix-Zeit")
+// Element year
+Jahr. (komplette Zahl (2001 etc))
+// Element month
+Monat. (0 = Januar)
+// Element day
+Tag des Monats. (0 = 1. Tag)
+// Element hour
+Stunde.
+// Element minute
+Minute.
+// Element second
+Sekunde.
+// Element milli_second
+Millisekunde.
+// Element day_of_week
+Tag der Woche. (0 = Montag)
+// Element day_of_year
+Tag des Jahres. (0 = 1. Tag)
+// Synopsis
+File,f:File.getCDate,f:File.getMDate,f:File.getADate
+#
