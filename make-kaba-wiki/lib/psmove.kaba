@@ -106,7 +106,7 @@ class MyPSMoveController
 			print(" ERROR: no orientation")
 		while _psmove_tracker_enable(manager.tracker, m) != 2 # Tracker_CALIBRATED
 			pass
-		col = Black
+		col = color.BLACK
 		rumble = 0
 		trigger = 0
 		ang = quaternion.ID

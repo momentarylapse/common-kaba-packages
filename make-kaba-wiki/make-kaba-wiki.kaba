@@ -52,12 +52,12 @@ string show_var(string ns, Variable v)
 
 
 string class_extension(Class c)
-	if c.param
+	if len(c.param) > 0
 		# dirty hack...
 		if &c == string
-			return " extends {{c.param.name}}[]"
+			return " extends {{c.param[0].name}}[]"
 		if &c == cstring
-			return " extends {{c.param.name}}[{{c.size}}]"
+			return " extends {{c.param[0].name}}[{{c.size}}]"
 		
 	if c.parent
 		if c.parent.name[:1] != "@"
@@ -190,7 +190,7 @@ string show_class(string ns, Class c)
 	if len(ops) > 0 or is_list(c)
 		wiki += "\n{{SHIFT}}# operators\n"
 		if is_list(c)
-			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param.name}}\n"
+			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param[0].name}}\n"
 		for f in ops
 			string pre = func_pre(f)
 			Class* p = nil
@@ -262,6 +262,10 @@ string show_class(string ns, Class c)
 Class*[] filter_classes(Class*[] cc)
 	Class*[] r
 	for c in cc
+		if c.name.find("shared ", 0) >= 0
+			continue
+		if c.name.find("->", 0) >= 0
+			continue
 		if c.name.find("*", 0) >= 0 or c.name.find("&", 0) >= 0
 			continue
 		if c.name.find("@", 0) >= 0 or c.name[0] == '-'
@@ -341,14 +345,14 @@ void wiki_upload(string name, string wiki)
 void find_external()
 	let list = Filesystem.search("extern", "*.kaba", false)
 	for e in list
-		let p = Script.load("extern/" + e, true)
+		let p = weak(Script.load("extern/" + e, true))
 		p.name = e[:-5]
 		external_packages.add(p)
 
 void find_external_libs()
 	let list = Filesystem.search("lib", "*.kaba", false)
 	for e in list
-		let p = Script.load("lib/" + e, true)
+		let p = weak(Script.load("lib/" + e, true))
 		p.name = e[:-5]
 		external_libs.add(p)
 
@@ -357,7 +361,7 @@ void main()
 	find_external_libs()
 	wiki_upload("kaba.reference", make_reference())
 
-	for p in packages
+	for p in weak(packages)
 		make_package(p)
 	for p in external_packages
 		make_package(p)

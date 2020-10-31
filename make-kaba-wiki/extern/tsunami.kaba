@@ -38,7 +38,7 @@ const Range RangeTo(int start, int end)
 	return Range(start, end - start)
 
 
-class MidiNote
+class MidiNote as shared
 	Range range
 	float pitch
 	float volume
@@ -76,7 +76,7 @@ class MidiEvent
 class MidiEventBuffer extends MidiEvent[]
 	int samples
 	extern override void __init__()
-	extern const MidiNote[] get_notes(Range r)
+	extern const MidiNoteBuffer get_notes(Range r)
 	extern const MidiEvent[] get_events(Range r)
 	extern const Range get_range()
 	void add_note(MidiNote n)
@@ -84,11 +84,11 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	extern void add_metronome_click(int pos, int level, float volume)
 
-class MidiNoteBuffer extends MidiNote*[]
+class MidiNoteBuffer extends shared MidiNote[]
 	int samples
 	extern override void __init__()
 	extern override void __delete__()
-	extern void deep_clear()
+	#extern selfref MidiNoteBuffer get_notes(Range r)
 	extern selfref MidiNote*[] get_notes(Range r)
 	extern selfref MidiEvent[] get_events(Range r)
 	extern const Range get_range()
@@ -102,7 +102,7 @@ class ConfigPanel extends Panel
 	extern void changed()
 	Module *c
 
-class Module extends Object
+class Module as shared extends Object
 	string name
 	Session* session
 	extern void __init__(int type, string sub_type)
@@ -115,7 +115,7 @@ class Module extends Object
 	extern virtual int command(int cmd, int param)
 	extern void plug_in(int in_port, Module source, int out_port)
 	extern void unplug_in(int in_port)
-	extern void subscribe(Object handler, Function f, string message)
+	extern void subscribe(Object handler, Object->void f, string message)
 	extern void unsubscribe(Object handler)
 	extern const Module* copy()
 	
@@ -130,28 +130,32 @@ class Module extends Object
 		extern void __init__()
 		extern virtual void __delete__()
 		extern virtual void reset()
-		extern virtual const string to_string()
-		extern virtual void from_string(string s, Session session)
+		extern const string to_string()
+		extern void from_string(string s, Session session)
 		extern virtual string auto_conf(string name)
 
 	extern virtual ConfigPanel *create_panel()
 	extern virtual void on_config()
 	extern virtual Module.Config* get_config()
 	extern const string config_to_string()
-	extern void config_from_string(string s)
+	extern const any config_to_any()
+	extern void config_from_string(int version, string s)
+	extern void config_from_any(int version, any a)
 
+	const int VERSION_LATEST = -1
+	const int VERSION_LEGACY = -2
 
-	enum
-		COMMAND_START
-		COMMAND_STOP
-		COMMAND_PREPARE_START
-		COMMAND_ACCUMULATION_START
-		COMMAND_ACCUMULATION_STOP
-		COMMAND_ACCUMULATION_CLEAR
-		COMMAND_ACCUMULATION_GET_SIZE
-		COMMAND_SUCK
+	enum Command
+		START
+		STOP
+		PREPARE_START
+		ACCUMULATION_START
+		ACCUMULATION_STOP
+		ACCUMULATION_CLEAR
+		ACCUMULATION_GET_SIZE
+		SUCK
 
-	enum
+	enum Type
 		AUDIO_SOURCE
 		AUDIO_EFFECT
 		MIDI_SOURCE
@@ -207,6 +211,10 @@ class AudioBuffer
 		l *= factor
 		if channels > 1
 			r *= factor
+	void __imul__(float[] f)
+		l *= f
+		if channels > 1
+			r *= f
 	void auto_generate_channels()
 		if channels > 1
 			r = l
@@ -283,6 +291,7 @@ class Synthesizer extends Module
 	float[MAX_PITCH] delta_phi
 	int[] active_pitch
 	bool auto_generate_stereo
+	bool render_by_ref
 	MidiEventBuffer events
 	Module.Port *out
 	extern void __init__()
@@ -336,12 +345,12 @@ class MidiRecorder extends Module
 class TrackRenderBuffer
 	int dummy
 
-class TrackMarker
+class TrackMarker as shared
 	Range range
 	string text
-	AudioEffect*[] fx
+	shared AudioEffect[] fx
 	
-class Bar
+class Bar as shared
 	int[] beats
 	int divisor
 	int index
@@ -366,19 +375,19 @@ class Beat
 		bar_no = 0
 		beat_no = 0
 
-class BarCollection extends Bar*[]
+class BarCollection extends shared Bar[]
 	extern selfref Bar*[] get_bars(Range r)
 	extern selfref Beat[] get_beats(Range r, bool include_hidden, bool include_sub_beats, int sub_beat_partition)
 	extern const int get_next_beat(int pos)
 	extern const int get_prev_beat(int pos)
 
-class TrackLayer
+class TrackLayer as shared
 	int type
 	Track *track
 	AudioBuffer[] buffers
 	MidiNoteBuffer midi
-	SampleRef*[] samples
-	TrackMarker*[] markers
+	shared SampleRef[] samples
+	shared TrackMarker[] markers
 	
 	extern void get_buffers(out AudioBuffer buf, Range r)
 	extern void read_buffers(out AudioBuffer buf, Range r, bool allow_ref)
@@ -395,48 +404,50 @@ class TrackLayer
 	extern void delete_marker(TrackMarker *marker)
 	extern void edit_marker(TrackMarker *marker, Range range, string text)
 
-class Sample # TODO
+class Sample as shared # TODO
 	string name
 	int type
 	AudioBuffer* buf
 	MidiNoteBuffer midi
 	float volume
 	int uid
+	int ref_count
 	Tag[] tags
+	extern void __init__(string name, AudioBuffer buf)
 	extern SampleRef* create_ref()
 	extern const string get_value(string key)
 	extern void set_value(string key, string value)
 
-class SampleRef # TODO
-	Sample* origin
-	extern void __init__(Sample* sam)
+class SampleRef as shared
+	shared Sample origin
+	extern void __init__(shared Sample sam)
 	extern virtual void __delete__()
 
 
-enum
-	TYPE_AUDIO
-	TYPE_TIME
-	TYPE_MIDI
-	TYPE_AUDIO_MONO
-	TYPE_AUDIO_STEREO
-	TYPE_GROUP
+enum SignalType
+	AUDIO
+	TIME
+	MIDI
+	AUDIO_MONO
+	AUDIO_STEREO
+	GROUP
 
 class Instrument
 	int type
 	int[] string_pitch
 
-class Track
+class Track as shared
 	int type
 	string name
-	TrackLayer*[] layers
+	shared TrackLayer[] layers
 
 	float volume, panning
 	bool muted
 	
-	AudioEffect*[] fx
-	MidiEffect*[] midi_fx
+	shared AudioEffect[] fx
+	shared MidiEffect[] midi_fx
 	
-	Synthesizer *synth
+	shared Synthesizer synth
 	Instrument instrument
 
 	# editing
@@ -463,17 +474,19 @@ class Tag
 		key = _key
 		value = _value
 
-class Song
+class Song as shared
 	Path filename
 	Tag[] tags
 	int sample_rate
 
 	float volume
 	
-	Track*[] tracks
-	Sample*[] samples
+	shared Track[] tracks
+	shared Sample[] samples
 	
 	BarCollection bars
+
+	any secret_data
 	
 	extern void __init__(Session session, int sample_rate)
 	extern virtual void __delete__()
@@ -488,7 +501,7 @@ class Song
 	extern void add_pause(int index, float time, bool affect_midi)
 	#extern void edit_bar(int index, BarPattern p, bool affect_midi)
 	extern void delete_bar(int index, bool affect_midi)
-	extern Sample* add_sample(string name, AudioBuffer buf)
+	extern void add_sample(Sample s)
 	extern void delete_sample(Sample sample)
 	
 	extern void begin_action_group()
@@ -523,24 +536,36 @@ class ColorScheme
 	color blob_bg_hidden
 	extern const color hoverify(color c)
 
-class ViewPort
-	extern void __init__(AudioView* view)
-	extern const Range range()
-	extern void set_range(Range r)
-	rect area
-	
+class SceneGraph
+	class Node as shared
+		rect area
 
 class AudioView extends Object
+	class ViewPort
+		extern void __init__(AudioView* view)
+		extern const Range range()
+		extern void set_range(Range r)
+		extern float64 sample2screen64(float64 s)
+		extern float sample2screen(float s)
+		extern float64 screen2sample64(float64 s)
+		extern float screen2sample(float s)
+		rect area
+	
+	class Layer extends SceneGraph.Node
+		TrackLayer* layer
+		
 	SongSelection sel
 	SongRenderer* renderer
 	SignalChain* signal_chain
 	AudioOutput* output_stream
-	ViewPort* cam
-	extern void subscribe(Object handler, Function f, string message)
+	ViewPort cam
+	extern void subscribe(Object handler, Object->void f, string message)
 	extern void unsubscribe(Object handler)
 	extern void play()
 	extern void set_playback_loop(bool loop)
 	extern void optimize_view()
+	extern Layer* cur_vlayer()
+	extern void* cur_vtrack()
 
 class SongRenderer extends AudioSource
 	extern void __init__(Song s)
@@ -588,6 +613,7 @@ class Storage
 class SignalChain extends Module
 	extern void __init__(Session session, string name)
 	extern override void __delete__()
+	extern void __del_override__()
 	extern override int command(int cmd, int param)
 	extern override void reset_state()
 	extern Module* add(int type, string name)
@@ -602,7 +628,7 @@ class SignalChain extends Module
 	extern void set_update_dt(float dt)
 	extern void set_buffer_size(int size)
 
-class Session extends Object
+class Session as shared extends Object
 	int id
 	#TsunamiWindow* win
 	Window* win
@@ -633,7 +659,7 @@ class Session extends Object
 #	Range range
 
 class Slider
-	extern void __init__(Panel panel, string id_slider, string id_edit, float v_min, float v_max, float factor, Function func, float value)
+	extern void __init__(Panel panel, string id_slider, string id_edit, float v_min, float v_max, float factor, Object->void func, float value)
 	extern virtual void __delete__()
 	extern float get()
 	extern void set(float f)
@@ -643,6 +669,7 @@ class TsunamiPlugin extends Module
 	extern override void __delete__()
 	extern virtual void on_start()
 	extern virtual void on_stop()
+	extern virtual void on_draw_post(Painter p)
 	extern void stop()
 	string[] args
 
@@ -670,31 +697,31 @@ class Clipboard
 	extern bool prepare_layer_map(AudioView view, out TrackLayer*[] sources, out TrackLayer*[] targets)
 
 
-class MidiMode
-	enum
-		MIDI_LINEAR
-		TAB
-		CLASSICAL
-		DRUM
-		DONT_CARE
+enum MidiMode
+	MIDI_LINEAR
+	TAB
+	CLASSICAL
+	DRUM
+	DONT_CARE
 
 class HoverData
 	
 
 class MidiPainter
 	#extern void __init__(AudioView* view)
-	extern void __init__(Song song, ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
 	extern void set_context(rect area, Instrument i, bool playable, int mode)
 	extern void draw(Painter p, MidiNoteBuffer midi)
 	extern void draw_background(Painter c)
-	ViewPort* cam
+	extern static color pitch_color(int p)
+	AudioView.ViewPort* cam
 
 class GridColors
 	color bg, bg_sel
 	color fg, fg_sel
 
 class GridPainter
-	extern void __init__(Song song, ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
+	extern void __init__(Song song, AudioView.ViewPort cam, SongSelection* sel, HoverData* hover, ColorScheme colors)
 	extern void set_context(rect area, GridColors col)
 	extern void draw_empty_background(Painter p)
 	extern void draw_bars(Painter p, int partition)

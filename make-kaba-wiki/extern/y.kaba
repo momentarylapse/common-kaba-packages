@@ -1,11 +1,39 @@
-use vulkan
+use nix
+use os
 
-class Controller
+class EngineData
+	bool debug
+	bool show_timings
+	bool console_enabled
+	#bool wire_mode
+	bool resetting_game, game_running, first_frame
+	float physical_aspect_ratio
+	
+	bool physics_enabled, collisions_enabled
+	float detail_level
+	
+	float elapsed
+	float elapsed_rt
+	float time_scale
+	
+	float fps_min, fps_max
+	
+	Path initial_world_file, second_world_file
+	#Font* default_font
 
+class Entity
+#	extern void __init__()
 	extern virtual void __delete__()
+	extern void __del_override__()
 	extern virtual void on_init()
 	extern virtual void on_delete()
 	extern virtual void on_iterate(float dt)
+
+class Controller extends Entity
+	extern override void __delete__()
+	
+	# common
+#	extern virtual void on_iterate(float dt)
 	extern virtual void on_key_down(int key)
 	extern virtual void on_key_up(int key)
 	extern virtual void on_left_button_down()
@@ -14,49 +42,119 @@ class Controller
 	extern virtual void on_middle_button_up()
 	extern virtual void on_right_button_down()
 	extern virtual void on_right_button_up()
+	extern virtual void on_input()
+	
+	# rare
+	extern virtual void on_iterate_pre(float dt)
+	extern virtual void on_draw_pre()
+	extern virtual void on_render_inject()
 
-class Camera
+class Camera extends Entity
 	vector pos
 	quaternion ang
 	rect dest
 	matrix m_view
+	float exposure
+	float bloom_radius
+	float bloom_factor
 	
-	float zoom
+	bool focus_enabled
+	float focal_length
+	float focal_blur
+	
+	float fov
 	float min_depth, max_depth
 	
 	bool show, enabled
 
-	extern virtual void __delete__()
-	extern virtual void on_init()
-	extern virtual void on_delete()
-	extern virtual void on_iterate(float dt)
+	extern override void __delete__()
+	extern vector project(vector p)
+	extern vector unproject(vector p)
+	extern void update_matrices(float aspect_ratio)
 
 class Material
-	color ambient
+	float ambient
 	color diffuse
-	color specular
+	float specular
 	color emission
 	float shininess
-	Texture*[] textures
-	Shader* shader
+	nix.Texture*[] textures
+	nix.Shader* shader
+	extern void add_uniform(string name, float* p, int size)
+	extern static Material* load(Path filename)
 
-class Model
+class CollisionData
+	Model* m, sub
+	Terrain* t
+	vector p, n
+
+class Model extends Entity
+	class Mesh
+		class Sub
+			int num_triangles
+			int[] triangle_index
+			float[] skin_vertex
+			vector[] normal
+		int[] bone_index
+		vector[] vertex
+		Sub[] sub
+	class Bone
+		int parent
+		vector pos
+		Model* model
+		matrix dmatrix
+		quaternion cur_ang
+		vector cur_pos
 	vector pos
 	vector vel
 	quaternion ang
 	vector rot
+	matrix matrix
+	float mass
+	matrix3 theta
 	
 	Material*[] materials
+	
+	Mesh*[3] mesh
+	Bone[] bones
+	
+	float[] var
+	int[] var_i
 
-	extern virtual void __delete__()
-	extern virtual void on_init()
-	extern virtual void on_delete()
-	extern virtual void on_iterate(float dt)
+	extern override void __init__()
+	extern override void __delete__()
+	extern virtual void on_collide(CollisionData c)
+	
+	extern void make_editable()
+	extern void begin_edit(int detail)
+	extern void end_edit(int detail)
+	
+	extern vector get_vertex(int index)
+	
+	extern void add_force(vector f, vector rho)
+	extern void add_impulse(vector p, vector rho)
+	extern void add_torque(vector t)
+	extern void add_torque_impulse(vector l)
+	extern void update_mass()
+	extern void update_motion()
+	
+	extern void reset_animation()
+	extern void begin_edit_animation()
+	extern bool animate_x(int op, float p1, float p2, int move, float *t, float dt, float vel_param, bool loop)
+	extern bool animate(int op, int move, float *t, float dt, bool loop)
+	extern bool is_animation_done(int op_no)
+	enum
+		MOVE_OP_SET           # overwrite
+		MOVE_OP_SET_NEW_KEYED # overwrite, if current doesn't equal 0
+		MOVE_OP_SET_OLD_KEYED # overwrite, if last equals 0
+		MOVE_OP_ADD_1_FACTOR  # w = w_old         + w_new * f
+		MOVE_OP_MIX_1_FACTOR  # w = w_old * (1-f) + w_new * f
+		MOVE_OP_MIX_2_FACTOR  # w = w_old * a     + w_new * b
 
-class Terrain
+class Terrain extends Entity
 	# ...
 
-class Light
+class Light extends Entity
 	vector pos
 	vector dir
 	color color
@@ -65,26 +163,45 @@ class Light
 	float harshness
 	bool enabled
 
-class LightParallel extends Light
-	extern void __init__(vector dir, color c)
+	class Spherical extends Light
+		extern void __init__(vector pos, color c, float radius)
 
-class LightSpherical extends Light
-	extern void __init__(vector pos, color c, float radius)
+	class Parallel extends Light
+		extern void __init__(vector dir, color c)
 
-class LightCone extends Light
-	extern void __init__(vector pos, vector dir, color c, float radius, float theta)
+	class Cone extends Light
+		extern void __init__(vector pos, vector dir, color c, float radius, float theta)
 
-class Particle
-	vector pos
+class Particle extends Entity
+	vector pos, vel
 	float radius
-	Texture* texture
+	float time_to_live
+	bool suicidal
+	nix.Texture* texture
 	color color
-	extern void __init__(vector p, float r, Texture* t)
+	rect source
+	bool enabled
+	extern void __init__(vector p, float r, nix.Texture t, float ttl)
+	extern override void __delete__()
+
+class Beam extends Particle
+	vector length
+	extern void __init__(vector p, vector l, float r, nix.Texture t, float ttl)
 
 class Fog
 	color color
 	float distance
 	bool enabled
+
+class Link extends Entity
+	Model* a, b
+	extern void set_motor(float v, float max)
+#	extern void set_axis(vector v)
+	extern void set_frame(int n, quaternion q)
+
+#	class Socket extends Link
+#		extern void __init__(Model* a, Model* b, vector pos)
+#	...
 
 class World
 	Model*[] objects
@@ -92,22 +209,145 @@ class World
 	
 	Model* ego
 	
-	Light* sun
+	Light*[] lights
+	
 	color background
+	Model*[] skyboxes
 	
 	Fog fog
+	vector gravity
 	
-	extern void add_light(Light* l)
-	extern void add_particle(Particle* p)
-	extern Model* create_object(string filename, string name, vector pos, quaternion ang, int overwrite_index)
-	extern Terrain* create_terrain(string filename, vector pos)
+	Link*[] links
+	
+	enum
+		PHYSICS_NONE
+		PHYSICS_SIMPLE
+		PHYSICS_FULL_INTERNAL
+		PHYSICS_FULL_EXTERNAL
+	int physics_mode
+	
+	extern void add_light(Light l)
+	extern void add_particle(Particle p)
+	extern Model* create_object(Path filename, string name, vector pos, quaternion ang, int overwrite_index)
+	extern Terrain* create_terrain(Path filename, vector pos)
+	extern void shift_all(vector dpos)
+	extern vector get_g(vector pos)
+	extern bool trace(vector p1, vector p2, out CollisionData d, bool simple_test, Model* ignore)
+	
+#	extern void unregister(void* o) # Model, Link, Light, Particle, Beam
+	extern void delete(void* o)
 
-extern bool get_key(int k)
-extern bool get_key_down(int k)
-extern bool get_key_up(int k)
 
-extern vector mouse, dmouse, scroll
+class ui
+	class Node
+		extern void __init__(rect r)
+		extern virtual void __delete__()
+		
+		extern void add(Node n)
+		
+		extern virtual void on_iterate(float dt)
+		extern virtual void on_enter()
+		extern virtual void on_leave()
+		extern virtual bool on_left_button_down()
+		extern virtual bool on_left_button_up()
+		extern virtual bool on_middle_button_down()
+		extern virtual bool on_middle_button_up()
+		extern virtual bool on_right_button_down()
+		extern virtual bool on_right_button_up()
+		rect area
+		rect _eff_area
+		rect margin
+		float dz
+		color color
+		int align
+		bool visible
+		
+		enum
+			ALIGN_NONE
+			ALIGN_FILL_X = 1
+			ALIGN_FILL_Y = 2
+			ALIGN_TOP = 4
+			ALIGN_BOTTOM = 8
+			ALIGN_LEFT = 16
+			ALIGN_RIGHT = 32
+			ALIGN_OFFSET = 64 # 2^6
+			ALIGN_NONSQUARE = 128
+			ALIGN_CENTER_H = 256
+			ALIGN_CENTER_V = 512
+	
+	class HBox extends Node
+		extern void __init__()
+	
+	class VBox extends Node
+		extern void __init__()
+		
+	class Picture extends Node
+		extern void __init__(rect r, Texture tex)
+		extern void __init__(rect r, Texture tex, rect source)
+		extern override void __delete__()
+		rect source
+		Texture* texture
+		float blur
+
+	class Text extends Picture
+		extern void __init__(string t, float font_size)
+		extern void __init__(string t, float font_size, float x, float y)
+		extern override void __delete__()
+		string text
+		float font_size
+		extern void set_text(string t)
+	
+	class Picture3d extends Node
+		Model* model
+		matrix matrix
+		bool world_3d
+		bool lighting
+		void __init__(Model* m, matrix mat, float z)
+			super.__init__(rect.ID)
+			model = m
+			self.matrix = mat
+
+	extern static Node* toplevel
+	extern static bool key(int k)
+	extern static bool key_down(int k)
+	extern static bool key_up(int k)
+
+	extern static vector mouse, dmouse, scroll
+
+class PerformanceMonitor
+	class Average
+		float frame_time
+		float[16] location
+	int frames
+	Average avg
 
 
+# TODO
+class sound
+	class Sound
+		void pause(bool pause)
+		void play(bool loop)
+		void set(vector pos, vector vel, float r_min, float r_max, float speed, float volume)
+		void stop()
+	class Music
+		void pause(bool pause)
+		void play(bool loop)
+		void set_rate(float rate)
+		void stop()
+	Sound* emit(Path filename, vector pos, float r_min, float r_max, float speed, float volume, bool loop)
+	Music* load_music(Path filename)
+	Sound* load_sound(Path filename)
+	#void save_sound(Path filename, float[] buf_r, float[] buf_l, int freq, int channels, int bits)
+	float volume_music
+	float volume_sounds
+
+
+extern Model* load_model(Path filename)
+
+
+extern nix.Texture* tex_white
+extern EngineData engine
 extern World world
 extern Camera* cam
+extern PerformanceMonitor *perf_mon
+extern Material*[] post_processors
