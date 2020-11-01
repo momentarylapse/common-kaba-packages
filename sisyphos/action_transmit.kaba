@@ -1,4 +1,5 @@
 use os
+use config
 use localdb
 use config
 use remote
@@ -42,7 +43,7 @@ void _action_push(Path path)
 		#else if f.is(CHANGED_FILE)
 		#	print("ERROR  can't push edited files yet")
 		if f.is(CHANGED_META)
-			print("UPLOADING META  {{rel_path(f.path)}}")
+			log_ok("uploading meta", rel_path(f.path))
 			remote_upload_meta(f)
 
 void action_push(string[] arg)
@@ -72,10 +73,10 @@ bool make_path_safe_for_download(out LocalFile f)
 void _get_file(out LocalFile f, string dest)
 	f.path = Path(f.apply_structure(dest))
 	if not make_path_safe_for_download(f)
-		print("EXISTS  {{rel_path(f.path)}}")
+		log_warn("exists", rel_path(f.path))
 		return
 		
-	print("ADD  {{rel_path(f.path)}}")
+	log_ok("add", rel_path(f.path))
 	
 	if conf.dry_run
 		return

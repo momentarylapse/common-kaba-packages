@@ -6,7 +6,7 @@ use dblister
 
 void delete_files(out LocalFile*[] files)
 	for f in files
-		print("RM  {{rel_path(f.path)}}")
+		log_warn("rm", rel_path(f.path))
 		if conf.dry_run
 			return
 		if !f.pure_remote()
@@ -36,7 +36,7 @@ void unadd_path(Path path)
 		
 	let files = lister.find(path)
 	for f in files
-		print("DROP  {{f.path}}")
+		log_warn("drop", f.path)
 		f.drop_me = true
 		db.save()
 

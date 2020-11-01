@@ -88,7 +88,7 @@ void run_command(string[] arg)
 			return
 		if arg[1] == "add"
 			if len(arg) < 4
-				print("ERROR: filter add <DIR> <FILTER>")
+				log_error("error", "filter add <DIR> <FILTER>")
 				return
 			conf.add_filter(make_path(arg[2]), arg[3], "")
 			conf.save()
@@ -100,11 +100,11 @@ void run_command(string[] arg)
 				conf.rm_dir(make_path(arg[2]))
 				conf.save()
 			else
-				print("ERROR: filter rm <DIR> [<FILTER>]")
+				log_error("error", "filter rm <DIR> [<FILTER>]")
 				return
 		if arg[1] == "sync"
 			if len(arg) < 3
-				print("ERROR: filter sync <DIR>")
+				log_error("error", "filter sync <DIR>")
 				return
 			#remote_sync_by_filter(arg[2])
 	else if arg[0] == "ignore"
@@ -113,13 +113,13 @@ void run_command(string[] arg)
 				print(i)
 		if arg[1] == "add"
 			if len(arg) < 3
-				print("ERROR: ignore add <PATH>")
+				log_error("error", "ignore add <PATH>")
 				return
 			conf.ignore.add(make_path(arg[2]))
 			conf.save()
 		else if arg[1] == "rm"
 			if len(arg) < 3
-				print("ERROR: ignore rm <PATH>")
+				log_error("error", "ignore rm <PATH>")
 				return
 			for ig,i in conf.ignore
 				if ig == arg[2]

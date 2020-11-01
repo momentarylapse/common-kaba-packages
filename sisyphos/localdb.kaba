@@ -100,7 +100,7 @@ class LocalFile
 		name = _name
 		db.dirty = true
 		if conf.verbosity > 0
-			print("NAME  {{name}}")
+			log_ok("name", name)
 		set(CHANGED_META)
 	void tag_add(Tag tt)
 		if tt.key == "name"
@@ -112,7 +112,7 @@ class LocalFile
 		tags.add(tt)
 		db.dirty = true
 		if conf.verbosity > 0
-			print("TAG ADD  {{tt}}")
+			log_ok("tag add", "{{tt}}")
 		set(CHANGED_META)
 	void tag_set(Tag tt)
 		if tt.key == "name"
@@ -123,7 +123,7 @@ class LocalFile
 				if t.value == tt.value
 					return
 				if conf.verbosity > 0
-					print("TAG SET  {{t}}  ->  {{tt.value}}")
+					log_ok("tag set", "{{t}}  ->  {{tt.value}}")
 				t.value = tt.value
 				db.dirty = true
 				set(CHANGED_META)
@@ -133,7 +133,7 @@ class LocalFile
 		for t,i in tags
 			if t.match(tt)
 				if conf.verbosity > 0
-					print("TAG RM  {{t}}")
+					log_ok("tag rm", "{{t}}")
 				tags.remove(i)
 				db.dirty = true
 				set(CHANGED_META)
@@ -285,15 +285,15 @@ class LocalFileDB
 	void check_basic()
 		for f in files
 			if f.path.is_empty()
-				print("EMPTY PATH ...")
+				log_error("empty hash", "...")
 				f.show_info("    ")
 			if f.hash == ""
 				if Filesystem.exists(f.path)
-					print("EMPTY HASH: {{f.path}}")
+					log_error("empty hash", f.path)
 					f.hash = Filesystem.hash(f.path, "md5")
 					dirty = true
 				else if f.id == ""
-					print("GHOST: {{f.path}}")
+					log_error("ghost", f.path)
 					f.drop_me = true
 					dirty = true
 				#else
@@ -307,7 +307,7 @@ class LocalFileDB
 			if l == &f
 				continue
 			if f.path == l.path
-				print("DUPLICATE: {{f.path}}")
+				log_error("duplicate", f.path)
 				if l.mergeable(f)
 					l.merge(f)
 					dirty = true
@@ -318,7 +318,7 @@ class LocalFileDB
 					l.show()
 					print("###################################")
 			else
-				print("HASH COLLISION: {{f.path}}  <->  {{l.path}}")
+				log_error("hash collision", "{{f.path}}  <->  {{l.path}}")
 
 	void check_duplicate_paths()
 		for f in files
@@ -327,17 +327,17 @@ class LocalFileDB
 			let l = find_by_path(f.path)
 			if l == &f
 				continue
-			print("PATH COLLISION: {{f.path}}")
+			log_error("path collision", f.path)
 			let new_path = unique_path(f)
 			
-			print("MOVE   {{rel_path(f.path)}} > {{rel_path(new_path)}}")
+			log_warn("move", "{{rel_path(f.path)}} > {{rel_path(new_path)}}")
 			f.path = new_path
 			db.dirty = true
 
 	void drop_selected()
 		for i in 0:len(files)
 			if files[i].drop_me
-				print("DROP {{files[i].path}}")
+				log_warn("drop", files[i].path)
 				files.remove(i)
 				db.dirty = true
 				i --

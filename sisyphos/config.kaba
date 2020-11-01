@@ -105,8 +105,27 @@ string get_tag(string[] parts, string key)
 	return ""
 
 
+class Term
+	const string RED = "\x1b[0;31m"
+	const string GREEN = "\x1b[0;32m"
+	const string YELLOW = "\x1b[0;33m"
+	const string BLUE = "\x1b[0;34m"
+	const string BLUE2 = "\x1b[0;36m"
+	const string VIOLET = "\x1b[0;35m"
+	const string BOLD = "\x1b[1m"
+	const string END = "\x1b[0m"
+
+void log_ok(string op, string msg)
+	print("{{Term.YELLOW}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
+
+void log_warn(string op, string msg)
+	print("{{Term.BLUE2}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
+
+void log_error(string op, string msg)
+	print("{{Term.RED}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
+
 void error_out(Exception e)
-	print("ERROR: {{e}}")
+	log_error("error", str(e))
 
 string shell_exec(string cmd)
 	#if conf.verbose

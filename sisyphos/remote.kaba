@@ -133,10 +133,10 @@ void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
 		try
 			LocalFile* lf = db.by_hash(rf.hash)
 			if len(lf.id) > 0
-				print("HASH COLLISION  {{rel_path(lf.path)}}  <->  REMOTE...")
+				log_error("hash collision", "{{rel_path(lf.path)}}  <->  REMOTE...")
 			lf.id = rf.id
 			#if conf.verbose
-			print("RELINK  {{rel_path(lf.path)}}") # + "  ->  " + rf.id)
+			log_warn("relink", "{{rel_path(lf.path)}}") # + "  ->  " + rf.id)
 			lf.sync_tags(rf.tags)
 			lf.name = rf.name
 			return
@@ -146,7 +146,7 @@ void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
 			ll.path = root << ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.files.add(ll)
-			print("ADD PURE REMOTE  {{rel_path(ll.path)}}")
+			log_ok("add pure remote", rel_path(ll.path))
 		
 			if conf.show_meta or conf.verbosity >= 2
 				ll.show_info("      ")
@@ -163,13 +163,13 @@ void remote_sync_by_filter(string filter, string quality, string structure, Path
 	db.save()
 
 void remote_download(out LocalFile f)
-	print("DOWNLOADING  {{rel_path(f.path)}}")
+	log_ok("downloading", rel_path(f.path))
 	if !f.in_db()
-		print("ERROR: not in db")
+		log_error("error", "not in db")
 		return
 
 	if !f.pure_remote() and !f.is(CHANGED_FILE)
-		print("ERROR: neither pure remote nor changed")
+		log_error("error", "neither pure remote nor changed")
 		return
 	
 	make_all_dirs(f.path)
@@ -184,14 +184,14 @@ void remote_download(out LocalFile f)
 
 
 void remote_upload(out LocalFile f)
-	print("UPLOADING  {{rel_path(f.path)}}")
+	log_ok("uploading", rel_path(f.path))
 	
 	if !f.pure_local() and !f.is(CHANGED_FILE)
-		print("ERROR: no need to push")
+		log_error("error", "no need to push")
 		return
 	
 	if f.path.extension() == ""
-		print("ERROR: remote does not like files without extension: {{rel_path(f.path)}}")
+		log_error("error", "remote does not like files without extension: {{rel_path(f.path)}}")
 		return
 	
 	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
@@ -199,16 +199,16 @@ void remote_upload(out LocalFile f)
 	scp_upload(f.path, _remote_path)
 	
 	if !f.pure_local()
-		print("TODO: upload edited file")
+		log_error("todo", "upload edited file")
 		return
 	
 	string r = remote_interface("add", [_remote_path])
 	if r[:2] != "ok"
-		print("ERROR: upload... {{r}}")
+		log_error("error", "upload... {{r}}")
 		return
 	int nnn = r[3:].find("\n", 0)
 	if nnn >= 0
-		print("REMOTE WARNING: {{r[4+nnn:]}}")
+		log_warn("remote warning", "{{r[4+nnn:]}}")
 	f.id = r[3:].explode("\n")[0]
 	if conf.verbosity >= 2
 		print("ID: {{f.id}}")
@@ -239,7 +239,7 @@ void remote_upload(out LocalFile f)
 void remote_upload_meta(out LocalFile f)
 	
 	if f.pure_local()
-		print("ERROR: pure local")
+		log_error("error", "pure local")
 		return
 
 	string tags = tags2strh(f.tags)	
@@ -253,10 +253,10 @@ void remote_upload_meta(out LocalFile f)
 		db.save()
 		return
 	if r == "not found"
-		print("ERROR: remote did not find")
+		log_error("error", "remote did not find")
 		return
 	print(r)
-	print("ERROR: ????")
+	log_error("error", "????")
 
 
 RemoteFile[] remote_get_meta(LocalFile*[] files)
@@ -281,7 +281,7 @@ void remote_download_meta(out LocalFile*[] files)
 	for rf in rfiles
 		for lf in files
 			if rf.id == lf.id
-				print("META  {{rel_path(lf.path)}}")
+				log_ok("meta", rel_path(lf.path))
 				if conf.pull_tags_only_add
 					for t in rf.tags
 						if tag_multi(t.key)
@@ -315,26 +315,26 @@ void sync_file(RemoteFile rf, out LocalFile* lf)
 		lf.set("quality=medium")
 	if lf.pure_local()
 		if conf.verbosity >= 1
-			print("RELINK  {{rel_path(lf.path)}}")
+			log_warn("relink", rel_path(lf.path))
 		lf.id = rf.id
 		#db.dirty = true
 	if lf.hash != rf.hash
 		if conf.verbosity >= 1
-			print("CHANGED HASH  {{rel_path(lf.path)}}")
+			log_warn("changed hash", rel_path(lf.path))
 		if conf.verbosity >= 2
 			print("{{lf.hash}} <-> {{rf.hash}}")
 		lf.set(CHANGED_FILE)
 		#db.dirty = true
 	if lf.name != rf.name
 		if conf.verbosity >= 1
-			print("CHANGED NAME  {{rel_path(lf.path)}}")
+			log_warn("changed name", rel_path(lf.path))
 		if conf.verbosity >= 2
 			print("{{lf.name}} <-> {{rf.name}}")
 		lf.set(CHANGED_META)
 		#db.dirty = true
 	if !tags_equal(lf.tags, rf.tags)
 		if conf.verbosity >= 1
-			print("CHANGED TAGS  {{rel_path(lf.path)}}")
+			log_warn("changed tags", rel_path(lf.path))
 		if conf.verbosity >= 2
 			print(tags2str(tags_sort(lf.tags)))
 			print(tags2str(tags_sort(rf.tags)))

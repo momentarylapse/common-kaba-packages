@@ -45,7 +45,7 @@ class DBLister
 				fake_files.add(ff)
 				return [&fake_files[0]]
 			else
-				print("ERROR: can't find '{{path}}'")
+				log_error("error", "can't find '{{path}}'")
 		return files
 		
 	LocalFile*[] find_dir(Path dir)

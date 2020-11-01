@@ -19,7 +19,7 @@ void file_add(out LocalFile f)
 			if Filesystem.exists(f.path)
 				f.unset(NONLOCAL)
 				if conf.verbosity >= 1
-					print("NON-NONLOCAL {{rel_path(f.path)}}")
+					log_warn("non-nonlocal", rel_path(f.path))
 				return
 		
 		# lost?
@@ -27,26 +27,26 @@ void file_add(out LocalFile f)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
 				if conf.verbosity >= 1
-					print("LOST  {{rel_path(f.path)}}")
+					log_error("lost", rel_path(f.path))
 			return
 		
 		# time
 		int mtime = Filesystem.mtime(f.path).time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
-				print("=  {{rel_path(f.path)}}")
+				log_ok("=", rel_path(f.path))
 		else
 			# changed?
 			try
 				string hash = Filesystem.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
-						print("TOUCHED  {{rel_path(f.path)}}")
+						log_warn("touched", rel_path(f.path))
 					# ok
 					f.mtime = mtime
 				else
 					if conf.verbosity >= 1
-						print("EDITED  {{rel_path(f.path)}}")
+						log_warn("edited", rel_path(f.path))
 					f.set(CHANGED_FILE)
 					f.hash = hash
 					f.mtime = mtime
@@ -79,7 +79,7 @@ void file_add(out LocalFile f)
 
 
 void file_add_new(out LocalFile f, string hash)
-	print("ADD  {{rel_path(f.path)}}")
+	log_ok("add", rel_path(f.path))
 	f.name = f.path.basename()
 	string ext = f.path.extension()
 	if len(ext) > 0
