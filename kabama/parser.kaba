@@ -14,7 +14,7 @@ int char_type(char c)
 	return CHAR_SIGN
 
 int operator_rank(string s)
-	if s == "="
+	if s in ["=", ":"]
 		return 1
 	if s in ["+", "-"]
 		return 2
@@ -101,12 +101,15 @@ class Parser
 		#print("operand {{cur_index}}")
 		if cur() == "def"
 			return parse_def()
+		if cur() == "ass"
+			return parse_ass()
 		shared Term[] eid
 		while true
 			# operand
 			if end_of_line()
 				raise(new SyntaxError("unexpected end of line"))
-			eid.add(parse_operand_minimal())
+			let xx = parse_operand_minimal()
+			eid.add(xx)
 			
 			if end_of_line()
 				break
@@ -132,6 +135,13 @@ class Parser
 			if p.type != TYPE_VARIABLE
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
+
+	shared Term parse_ass()
+		next() # ass
+		let op = parse_operand()
+	#	if op.name != ":"
+	#		raise(new SyntaxError("ass needs ':'"))
+		return AddSpecial("ass", [op])
 
 shared Term digest_operators(out shared Term[] eid)
 	if (len(eid) % 2) != 1

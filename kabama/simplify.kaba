@@ -113,7 +113,7 @@ string[] split_off_factor(out shared Term[] l)
 	return factor
 
 # a/b kürzen
-shared Term simplify_number_division(string a, string b)
+shared Term eval_number_division(string a, string b)
 	vli va = a
 	vli vb = b
 	vli rem
@@ -181,7 +181,7 @@ void make_unique_in_product(out shared Term[] l, bool[] inv)
 			l[i] = AddOperator("^", x, normalize(exponents[i]))
 
 
-shared Term normalize_product(shared Term t)
+shared Term eval_product(shared Term t)
 	bool[] inverse
 	let l = extract_product_group(t, inverse)
 	#print_group(l)
@@ -202,7 +202,7 @@ shared Term normalize_product(shared Term t)
 	if num == "0"
 		return AddNumber("0")
 	if len(l) == 0
-		return simplify_number_division(num, denum)
+		return eval_number_division(num, denum)
 	
 	#print_group(l)
 	make_unique_in_product(l, inverse)
@@ -213,7 +213,7 @@ shared Term normalize_product(shared Term t)
 	for i in 1:len(l)
 		r = AddOperator("*", r, l[i])
 	if num != "1" or denum != "1"
-		r = AddOperator("*", simplify_number_division(num, denum), r)
+		r = AddOperator("*", eval_number_division(num, denum), r)
 	return r
 
 
@@ -249,7 +249,7 @@ void make_unique_in_sum(out shared Term[] l, out bool[] negative)
 			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
 
 
-shared Term normalize_sum(shared Term t)
+shared Term eval_sum(shared Term t)
 	bool[] negative
 	let l = extract_add_group(t, negative)
 	#print_group(l)
@@ -288,7 +288,7 @@ shared Term normalize_sum(shared Term t)
 			return AddOperator("+", t_r, AddNumber(num))
 	return t_r
 
-shared Term normalize_exponent(shared Term t)
+shared Term eval_exponent(shared Term t)
 	let p0 = t.params[0]
 	let p1 = t.params[1]
 	if p1.type == TYPE_NUMBER
@@ -299,20 +299,20 @@ shared Term normalize_exponent(shared Term t)
 		if p0.type == TYPE_NUMBER
 			return AddNumber(exponent(p0.name, p1.name))
 	if p0.name == "*"
-		let a = normalize_exponent(AddOperator("^", p0.params[0], p1))
-		let b = normalize_exponent(AddOperator("^", p0.params[1], p1))
+		let a = eval_exponent(AddOperator("^", p0.params[0], p1))
+		let b = eval_exponent(AddOperator("^", p0.params[1], p1))
 		return AddOperator("*", a, b)
 	else if p0.name == "/"
-		let a = normalize_exponent(AddOperator("^", p0.params[0], p1))
-		let b = normalize_exponent(AddOperator("^", p0.params[1], p1))
+		let a = eval_exponent(AddOperator("^", p0.params[0], p1))
+		let b = eval_exponent(AddOperator("^", p0.params[1], p1))
 		return AddOperator("/", a, b)
 	else if p0.name == "^"
-		return AddOperator("^", p0.params[0], normalize_product(AddOperator("*", p0.params[1], p1)))
+		return AddOperator("^", p0.params[0], eval_product(AddOperator("*", p0.params[1], p1)))
 	return t
 
 
 
-shared Term normalize_function(shared Term t)
+shared Term eval_function(shared Term t)
 	if t.name == "ln"
 		let p = t.params[0]
 		if p.name == "^"
@@ -367,7 +367,7 @@ shared Term normalize_function(shared Term t)
 		
 	return t
 
-shared Term normalize_wedge(shared Term _t)
+shared Term eval_wedge(shared Term _t)
 	let t = _t.shallow_copy()
 
 	# recursion
@@ -388,11 +388,16 @@ shared Term normalize_wedge(shared Term _t)
 		
 	return t
 
-shared Term normalize_equal(shared Term t)
+shared Term eval_equal(shared Term t)
 	if literally_equal(normalize(t.params[0]), normalize(t.params[1]))
 		return AddVariable("true")
 	else if t.params[0].type == TYPE_NUMBER and t.params[1].type == TYPE_NUMBER
 		return AddVariable("false")
+	return t
+
+shared Term eval_in(shared Term t)
+	if t.params[0].type == TYPE_NUMBER and t.params[1].name in ["N", "Z"]
+		return AddVariable("true")
 	return t
 
 shared Term normalize(shared Term _t)
@@ -404,17 +409,19 @@ shared Term normalize(shared Term _t)
 		
 	# self
 	if t.type == TYPE_FUNCTION
-		return normalize_function(t)
+		return eval_function(t)
 	if t.name in ["*", "/"]
-		return normalize_product(t)
+		return eval_product(t)
 	if t.name in ["+", "-"]
-		return normalize_sum(t)
+		return eval_sum(t)
 	if t.name == "∧"
-		return normalize_wedge(t)
+		return eval_wedge(t)
 	if t.name == "^"
-		return normalize_exponent(t)
+		return eval_exponent(t)
 	if t.name == "="
-		return normalize_equal(t)
+		return eval_equal(t)
+	if t.name == ":"
+		return eval_in(t)
 	return t
 
 

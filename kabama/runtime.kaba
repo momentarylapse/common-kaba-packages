@@ -8,6 +8,8 @@ use zeros
 
 
 class Runtime
+	#class Assumption
+	#	shared Term term
 	class Function
 		string name
 		string[] params
@@ -15,6 +17,7 @@ class Runtime
 		string __str__()
 			let p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
+	shared Term[] assumptions
 	Function*[] functions
 	shared Term[] history
 	

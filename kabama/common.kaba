@@ -7,6 +7,7 @@ enum
 	TYPE_FUNCTION
 	TYPE_SPECIAL
 	TYPE_LIST
+#	TYPE_SET
 
 enum
 	CHAR_LETTER
@@ -37,7 +38,6 @@ class Term as shared
 #			c.params.add(p.copy())
 #		return c
 	const string __str__()
-		string r = "?"
 		if type == TYPE_OPERATOR
 			string a = str(params[0])
 			string b = str(params[1])
@@ -46,11 +46,11 @@ class Term as shared
 			if param_needs_paranthesis(1)
 				b = "({{b}})"
 			if name == "*"
-				r = "{{a}} {{b}}"
+				return "{{a}} {{b}}"
 			else if name == "^"
-				r = a + name + b
+				return a + name + b
 			else
-				r = "{{a}} {{name}} {{b}}"
+				return "{{a}} {{name}} {{b}}"
 		else if type == TYPE_NUMBER
 			return name
 		else if type == TYPE_VARIABLE
@@ -58,11 +58,14 @@ class Term as shared
 		else if type == TYPE_FUNCTION
 			return name + "(" + [for p in params str(p)].join(", ") + ")"
 		else if type == TYPE_SPECIAL
-			return "def " + str(params[0])
+			return "{{name}} " + str(params[0])
 		else if type == TYPE_LIST
 			return "[" + [for p in params str(p)].join(", ") + "]"
-		return r
+		return "?"
 	const bool param_needs_paranthesis(int p)
+		if params[p].type == TYPE_NUMBER
+			if params[p].name[:1] == "-"
+				return true
 		if name == "^"
 			return params[p].type == TYPE_OPERATOR
 		if name == "/"
@@ -127,3 +130,6 @@ shared Term AddList(shared Term[] params)
 
 class RuntimeError extends Exception
 
+
+void main()
+	let v = AddVariable("x")
