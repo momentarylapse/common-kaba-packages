@@ -117,11 +117,10 @@ DbMedium parse_bson_medium(void* b)
 	# f.show()
 	return f
 
-DbFile[] parse_result(Result *r)
+DbFile[] parse_result(shared Result r)
 	DbFile[] files
 	while r.has_more()
 		files.add(parse_bson(r.doc))
-	del r
 	return files
 
 void print_files(DbFile[] files)
@@ -129,17 +128,13 @@ void print_files(DbFile[] files)
 		print(str(f))
 
 class Database
-	Mongo* m
-	Collection* files
-	Collection* medium
+	shared Mongo m
+	shared Collection files
+	shared Collection medium
 	void __init__()
 		m = new Mongo("localhost")
 		files = m.collection("alex", "files")
 		medium = m.collection("alex", "medium")
-	void __delete__()
-		del files
-		del medium
-		del m
 	DbFile[] find(string json)
 		let r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
 		return parse_result(r)
@@ -161,11 +156,10 @@ class Database
 		raise(new Exception("hash not found"))
 	
 	void mediumify(out DbFile f)
-		Result* r = medium.find("{\"id\":\"{{f.id}}\"}")
+		let r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
 			DbMedium m = parse_bson_medium(r.doc)
 			f.make_medium(m)
-		del r
 
 string filter_to_json(string filter)
 	string json = "{"

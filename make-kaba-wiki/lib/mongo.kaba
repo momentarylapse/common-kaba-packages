@@ -138,8 +138,7 @@ any bson_iter_to_any(void *iter)
 	else if t == 10 # null
 		any r
 		return r
-	print("UNKNOWN TYPE: {{t}}")
-	return ""
+	raise(new Exception("UNKNOWN TYPE: {{t}}"))
 
 
 any bson_iter_map_to_any(void *iter)
@@ -154,9 +153,10 @@ any bson_to_any(void *doc)
 	_bson_iter_init(&iter, doc)
 	return bson_iter_map_to_any(&iter)
 
-class Mongo
+class Mongo as shared
 	void* client
 	void __init__(string host)
+		_any_allow_simple_output = false
 		_mongoc_init()
 		client = __mongo_client_new("mongodb://{{host}}:27017/?appname=kaba")
 		if !client
@@ -175,41 +175,41 @@ class Mongo
 		return c
 
 
-class Collection
+class Collection as shared
 	void* col
 	void __init__()
 		col = nil
 	void __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	const Result* find(string json)
-		let b = json_to_bson(json)
+	const shared Result find(any filter)
+		let b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	const Result* aggregate(string json)
-		let b = json_to_bson(json)
+	const shared Result aggregate(any pattern)
+		let b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	void insert(any doc)
-		let b = json_to_bson(str(doc))
+		let b = json_to_bson(repr(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
 			raise(new Exception("can not insert"))
-	void replace(string json, any doc)
-		let b = json_to_bson(json)
-		let d = json_to_bson(str(doc))
+	void replace(any filter, any doc)
+		let b = json_to_bson(repr(filter))
+		let d = json_to_bson(repr(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
 			raise(new Exception("can not replace"))
-	void delete_one(string json)
-		let b = json_to_bson(json)
+	void delete_one(any filter)
+		let b = json_to_bson(repr(filter))
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
 			raise(new Exception("can not delete"))
-	void delete_many(string json)
-		let b = json_to_bson(json)
+	void delete_many(any filter)
+		let b = json_to_bson(repr(filter))
 		int[160] reply
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
 			raise(new Exception("can not delete"))
 		let r = bson_to_any(&reply)
-		print(str(r))
+		print(repr(r))
 
-class Result
+class Result as shared
 	void* cur
 	void* doc
 	void __init__(void *_cur)
@@ -252,15 +252,12 @@ void main()
 	#let col = m.get_collection("wiki", "articles")
 	#let r = col.find("{\"name\":\"Hauptseite\"}")
 	let col = m.collection("alex", "files")
-#	let r = col.find("{\"id\":\"100222175\"}") # 900942014
-#	let r = col.aggregate("[{\"$group\": {\"_id\": \"$artist\", \"num\": {\"$sum\": 1} } }]")
+#	let r = col.find(dyn({"id":"100222175"})) # 900942014
+#	let r = col.aggregate(dyn([{"$group": {"_id": "$artist", "num": {"$sum": 1} } }]))
 
-	let r = col.find("{\"author\":{\"$regex\":\".*einstein\", \"$options\":\"i\"}}") # 900942014
+	let r = col.find(dyn({"author":{"$regex":".*einstein", "$options":"i"}})) # 900942014
 
 	while r.has_more()
 		#print(r.json())
 		print(r.get())
 
-	del r
-	del col
-	del m

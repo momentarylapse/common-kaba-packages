@@ -1,0 +1,254 @@
+const string KABA_LINK = "/usr/lib64/libglfw.so
+	_glfwInit:glfwInit
+	_glfwVulkanSupported:glfwVulkanSupported
+	_glfwWindowHint:glfwWindowHint
+	_glfwCreateWindow:glfwCreateWindow
+	_glfwWindowShouldClose:glfwWindowShouldClose
+	_glfwSetWindowUserPointer:glfwSetWindowUserPointer
+	_glfwGetWindowUserPointer:glfwGetWindowUserPointer
+	_glfwSetKeyCallback:glfwSetKeyCallback
+	_glfwSetCursorPosCallback:glfwSetCursorPosCallback
+	_glfwSetMouseButtonCallback:glfwSetMouseButtonCallback
+	_glfwGetCursorPos:glfwGetCursorPos
+	_glfwPollEvents:glfwPollEvents
+	_glfwTerminate:glfwTerminate
+	_glfwJoystickPresent:glfwJoystickPresent
+	_glfwGetJoystickName:glfwGetJoystickName
+	_glfwJoystickIsGamepad:glfwJoystickIsGamepad
+	_glfwGetGamepadName:glfwGetGamepadName
+	_glfwGetGamepadState:glfwGetGamepadState
+"
+
+import hui
+import time
+
+extern int _glfwInit()
+extern int _glfwVulkanSupported()
+extern void* _glfwCreateWindow(int width, int height, const char* title, void* monitor, void* share)
+extern int _glfwWindowShouldClose(void* window)
+extern void _glfwSetWindowUserPointer(void *window, void *p)
+extern void* _glfwGetWindowUserPointer(void *window)
+extern void* _glfwSetKeyCallback(void *window, void *f)
+extern void* _glfwSetCursorPosCallback(void *window, void *f)
+extern void* _glfwSetMouseButtonCallback(void *window, void *f)
+extern void _glfwGetCursorPos(void *window, float64* x, float64* y)
+extern void _glfwWindowHint(int hint, int value)
+extern void _glfwPollEvents()
+extern void _glfwTerminate()
+extern int _glfwJoystickPresent(int j)
+extern int _glfwJoystickIsGamepad(int j)
+extern char[0]* _glfwGetJoystickName(int j)
+extern char[0]* _glfwGetGamepadName(int j)
+extern int _glfwGetGamepadState(int j, void* p)
+
+const int GLFW_CLIENT_API = 0x00022001
+const int GLFW_NO_API = 0
+const int GLFW_RESIZABLE = 0x00020003
+
+void init(string[] opts)
+	_glfwInit()
+	if "vulkan" in opts
+		print("VULKAN!!!!")
+		if _glfwVulkanSupported() == 0
+			raise(new Exception("glfw: vulkan not supported"))
+		_glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API)
+		_glfwWindowHint(GLFW_RESIZABLE, 0)
+
+void end()
+	_glfwTerminate()
+
+string cp2s(char[0]* p)
+	if p == nil
+		return ""
+	string s
+	for i in 0:256
+		if p[i] == 0
+			break
+		s.add(p[i])
+	return s
+
+int _get_key(int k)
+	if k >= 65 and k < 91
+		return k - 65 + hui.KEY_A
+	if k == 32
+		return hui.KEY_SPACE
+	if k == 256
+		return hui.KEY_ESCAPE
+	if k == 257
+		return hui.KEY_RETURN
+	if k == 258
+		return hui.KEY_TAB
+	if k == 259
+		return hui.KEY_BACKSPACE
+	if k == 262
+		return hui.KEY_RIGHT
+	if k == 263
+		return hui.KEY_LEFT
+	if k == 264
+		return hui.KEY_DOWN
+	if k == 265
+		return hui.KEY_UP
+	return -1
+	
+
+void _on_key(void *w, int a, int b, int c, int d)
+	#print("ON KEY   {{a}} {{b}} {{c}} {{d}}")
+	Window* win = _glfwGetWindowUserPointer(w)
+	int k = _get_key(a)
+	if k < 0
+		return
+	win.input.key[k] = (c > 0)
+	if c > 0
+		win.on_key_down(k)
+
+void _on_button(void *w, int a, int action, int c)
+	#print("ON BUTTON   {{a}} {{action}} {{c}}")
+	Window* win = _glfwGetWindowUserPointer(w)
+	if action == 1
+		if a == 0
+			win.input.button[0] = true
+			win.on_left_button_down()
+		else if a == 1
+			win.input.button[1] = true
+			win.on_right_button_down()
+	else if action == 0
+		if a == 0
+			win.input.button[0] = false
+			win.on_left_button_up()
+		else if a == 1
+			win.input.button[1] = false
+			win.on_right_button_up()
+
+void _on_cursor(void *w, float64 xx, float64 yy)
+	float x = float(xx)
+	float y = float(yy)
+	Window* win = _glfwGetWindowUserPointer(w)
+	win.input.dx = x - win.input.x
+	win.input.dy = y - win.input.y
+	win.input.x = x
+	win.input.y = y
+	win.on_mouse_move()#x, y)
+
+
+class Window
+	void *win
+	class Input
+		bool[3] button
+		bool[256] key
+		float x, y, dx, dy
+		void __init__()
+			for b in button
+				b = false
+			for k in key
+				k = false
+	Input input
+	void __init__(string title, int w, int h)
+		let _title = title + "\x00"
+		win = _glfwCreateWindow(w, h, &_title[0], nil, nil)
+		_glfwSetWindowUserPointer(win, &self)
+		_glfwSetKeyCallback(win, _on_key.code)
+		_glfwSetCursorPosCallback(win, _on_cursor.code)
+		_glfwSetMouseButtonCallback(win, _on_button.code)
+	void __init__(void *ww)
+		win = ww
+		_glfwSetWindowUserPointer(win, &self)
+		_glfwSetKeyCallback(win, _on_key.code)
+		_glfwSetCursorPosCallback(win, _on_cursor.code)
+		_glfwSetMouseButtonCallback(win, _on_button.code)
+	void run()
+		while _glfwWindowShouldClose(win) == 0
+			_glfwPollEvents()
+			on_idle()
+	virtual void on_idle()
+	complex get_mouse()
+		float64 xx, yy
+		_glfwGetCursorPos(win, &xx, &yy)
+		return complex(float(xx), float(yy))
+	virtual void on_key_down(int key)
+		#print("key {{key}}")
+	virtual void on_mouse_move()
+		#print("ON CURSOR   {{get_mouse()}}")
+	virtual void on_left_button_down()
+		#print("LBD")
+	virtual void on_left_button_up()
+		#print("LBU")
+	virtual void on_right_button_down()
+		#print("RBD")
+	virtual void on_right_button_up()
+		#print("RBU")
+	bool key(int k)
+		if k < 0 or k >= 256
+			return false
+		return input.key[k]
+
+
+void _main()
+	init([])
+	let w = new Window("test", 800, 600)
+	w.run()
+	print("done")
+	end()
+
+class GamepadState
+	bool[16] buttons
+	float[6] axes
+	void __init__()
+		for b in buttons
+			b = false
+		for a in axes
+			a = 0
+
+class Gamepad as shared extends GamepadState
+	enum
+		CROSS
+		CIRCLE
+		SQUARE
+		TRIANGLE
+		L1
+		R1
+		OPTIONS
+		SHARE
+		PS
+		L3
+		R3
+		UP
+		RIGHT
+		DOWN
+		LEFT
+		
+	GamepadState state_prev
+	int index
+	float deadzone
+	void __init__(int i)
+		index = i
+		deadzone = 0.03
+	
+	bool present()
+		return _glfwJoystickIsGamepad(index) == 1
+	
+	void update()
+		state_prev = self
+		_glfwGetGamepadState(index, &self)
+		for a in axes
+			if abs(a) < deadzone
+				a = 0
+	
+	bool click(int b)
+		return buttons[b] and not state_prev.buttons[b]
+		
+	
+	static shared Gamepad get(int index)
+		return new Gamepad(index)
+
+void main()
+	init([])
+	for j in 0:8
+		print("{{_glfwJoystickPresent(j)}}  {{_glfwJoystickIsGamepad(j)}} {{cp2s(_glfwGetGamepadName(j))}}")
+		
+		
+	GamepadState state
+	while true
+		time.sleep(0.1)
+		_glfwGetGamepadState(0, &state)
+		print(str(state))
+	#end()
