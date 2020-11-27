@@ -192,7 +192,53 @@ void _main()
 class GamepadState
 	bool[16] buttons
 	float[6] axes
+	void __init__()
+		for b in buttons
+			b = false
+		for a in axes
+			a = 0
 
+class Gamepad as shared extends GamepadState
+	enum
+		CROSS
+		CIRCLE
+		SQUARE
+		TRIANGLE
+		L1
+		R1
+		OPTIONS
+		SHARE
+		PS
+		L3
+		R3
+		UP
+		RIGHT
+		DOWN
+		LEFT
+		
+	GamepadState state_prev
+	int index
+	float deadzone
+	void __init__(int i)
+		index = i
+		deadzone = 0.03
+	
+	bool present()
+		return _glfwJoystickIsGamepad(index) == 1
+	
+	void update()
+		state_prev = self
+		_glfwGetGamepadState(index, &self)
+		for a in axes
+			if abs(a) < deadzone
+				a = 0
+	
+	bool click(int b)
+		return buttons[b] and not state_prev.buttons[b]
+		
+	
+	static shared Gamepad get(int index)
+		return new Gamepad(index)
 
 void main()
 	init([])
