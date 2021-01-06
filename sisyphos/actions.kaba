@@ -26,7 +26,7 @@ void move_path(Path source, Path _dest)
 		let dest = Path(f.apply_structure(_dest))
 		if Filesystem.is_directory(dest)
 			dest = dest.canonical() << source.basename()
-		print("MOVE  {{rel_path(source)}} -> {{rel_path(dest)}}")
+		log_warn("move", "{{rel_path(source)}} -> {{rel_path(dest)}}")
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
 
@@ -50,7 +50,7 @@ void structure_file(out LocalFile f, string structure)
 	let new_path = Path(f.apply_structure(structure))
 	if f.path == new_path
 		return
-	print("MOVE  {{rel_path(f.path)}} -> {{rel_path(new_path)}}")
+	log_warn("move", "{{rel_path(f.path)}} -> {{rel_path(new_path)}}")
 	if conf.dry_run
 		return
 	make_all_dirs(new_path)

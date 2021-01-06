@@ -100,6 +100,36 @@ class LibraryGtk3 extends Library
 	override string linker_flags()
 		return " `pkg-config --cflags --libs gtk+-3.0`"
 
+class LibraryCairo extends Library
+	void __init__()
+		super.__init__("cairo", ["cairo"])
+	override bool test()
+		return Filesystem.exists(Path("/usr/include/cairo/cairo.h"))
+	override string compiler_flags()
+		return " `pkg-config --cflags cairo`"
+	override string linker_flags()
+		return " `pkg-config --cflags --libs cairo`"
+
+class LibraryPango extends Library
+	void __init__()
+		super.__init__("pango", ["pango"])
+	override bool test()
+		return Filesystem.exists(Path("/usr/include/pango-1.0/pango/pango.h"))
+	override string compiler_flags()
+		return " `pkg-config --cflags pango`"
+	override string linker_flags()
+		return " `pkg-config --cflags --libs pango`"
+
+class LibraryPangoCairo extends Library
+	void __init__()
+		super.__init__("pangocairo", ["pangocairo"])
+	override bool test()
+		return Filesystem.exists(Path("/usr/include/pango-1.0/pango/pango.h"))
+	override string compiler_flags()
+		return " `pkg-config --cflags pangocairo pango cairo`"
+	override string linker_flags()
+		return " `pkg-config --cflags --libs pangocairo pango cairo`"
+
 class LibraryGL extends Library
 	void __init__()
 		super.__init__("gl", ["GL"])
@@ -174,6 +204,9 @@ class LibraryManager
 		libraries.add(new LibraryUnwind())
 		libraries.add(new LibraryXlib())
 		libraries.add(new LibraryGtk3())
+		libraries.add(new LibraryCairo())
+		libraries.add(new LibraryPango())
+		libraries.add(new LibraryPangoCairo())
 		libraries.add(new LibraryZlib())
 		libraries.add(new LibraryFftw3())
 		libraries.add(new LibraryGL())
