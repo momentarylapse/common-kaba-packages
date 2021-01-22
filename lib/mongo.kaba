@@ -176,9 +176,7 @@ class Mongo as shared
 
 
 class Collection as shared
-	void* col
-	void __init__()
-		col = nil
+	void* col = nil
 	void __delete__()
 		if col
 			_mongoc_collection_destroy(col)

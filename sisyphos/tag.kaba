@@ -3,10 +3,6 @@
 class Tag
 	string key
 	string value
-	void __init__()
-	void __init__(string k, string v)
-		key = k
-		value = v
 	const string __str__()
 		return "{{key}}={{value}}"
 	const string strh()
@@ -49,17 +45,11 @@ string tags2strh(Tag[] tags)
 
 Tag str2tag(string s)
 	let a = s.explode("=")
-	Tag t
-	t.key = a[0]
-	t.value = a[1]
-	return t
+	return Tag(a[0], a[1])
 
 Tag strh2tag(string s)
 	let a = s.explode("=")
-	Tag t
-	t.key = a[0]
-	t.value = a[1].unhex()
-	return t
+	return Tag(a[0], a[1].unhex())
 
 Tag alex2tag(string s)
 	let a = s.explode("=")

@@ -13,10 +13,8 @@ enum
 	SEL_TYPE_EDGE
 
 class Selection
-	int type
-	int index
-	void __init__()
-		type = SEL_TYPE_NONE
+	int type = SEL_TYPE_NONE
+	int index = -1
 
 enum
 	MODE_DEFAULT

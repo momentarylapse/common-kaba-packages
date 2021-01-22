@@ -1,10 +1,9 @@
 
 class Matrix
 	float[] e
-	int n, m
+	int n = 0
+	int m = 0
 	void __init__()
-		n = 0
-		m = 0
 	void __init__(float[][] el)
 		n = len(el) # rows
 		m = len(el[0]) # columns

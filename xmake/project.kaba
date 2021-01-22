@@ -9,8 +9,8 @@ class Profile
 # project
 class Config
 	Path root
-	bool verbose
-	bool dry_run
+	bool verbose = false
+	bool dry_run = false
 	
 	string name
 	string binary_file
@@ -19,9 +19,9 @@ class Config
 	string[] libs_optional
 	string[] ignore_libs
 	Profile[] profiles
-	string language
-	string optimization
-	string build_type
+	string language = "c++17"
+	string optimization = "2"
+	string build_type = "debug"
 	string flags_global
 	string flags_compiler
 	string flags_linker
@@ -29,13 +29,6 @@ class Config
 	string desktop_file
 	string[] mime_files
 	string[] installs
-	
-	void __init__()
-		language = "c++17"
-		optimization = "2"
-		build_type = "debug"
-		verbose = false
-		dry_run = false
 	
 	bool ignored(string l)
 		for ig in ignore_libs

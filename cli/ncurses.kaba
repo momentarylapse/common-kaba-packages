@@ -61,9 +61,8 @@ extern int _keypad(void* w, bool b)
 extern char* _setlocale(int category, char* locale)
 
 class Window
-	void* w
+	void* w = nil
 	void __init__()
-		w = nil
 	void __init__(int width, int height, int x, int y)
 		w = _newwin(height, width, y, x)
 	void background(int c)

@@ -33,7 +33,7 @@ string nice_size(int size)
 	return "{{size}}"
 
 class LocalFile
-	bool drop_me
+	bool drop_me = false
 
 	# remote
 	string id
@@ -47,9 +47,6 @@ class LocalFile
 	int size
 	string[] options
 	Tag[] tags
-	
-	void __init__()
-		drop_me = false
 	
 	const bool is(string option)
 		for o in options

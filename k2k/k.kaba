@@ -132,11 +132,10 @@ enum
 	TYPE_OBJECT
 
 class DynamicValue
-	int type
+	int type = TYPE_NONE
 	DynamicValueState* s
 	void __init__()
 		s = new DynamicValueState()
-		type = TYPE_NONE
 	virtual void __delete__()
 		del s
 	const string __str__()
@@ -329,10 +328,7 @@ class DynamicValueState
 		
 
 class DynamicValueStateInt extends DynamicValueState
-	int v
-	override void __init__()
-		v = 0
-	override void __delete__()
+	int v = 0
 	override string type()
 		return "int"
 	override string __str__()
@@ -347,10 +343,7 @@ class DynamicValueStateInt extends DynamicValueState
 		return c
 
 class DynamicValueStateBool extends DynamicValueState
-	bool v
-	override void __init__()
-		v = false
-	override void __delete__()
+	bool v = false
 	override string type()
 		return "bool"
 	override string __str__()
@@ -363,10 +356,7 @@ class DynamicValueStateBool extends DynamicValueState
 		return c
 
 class DynamicValueStateFloat extends DynamicValueState
-	float v
-	override void __init__()
-		v = 0.0
-	override void __delete__()
+	float v = 0
 	override string type()
 		return "float"
 	override string __str__()
@@ -382,9 +372,6 @@ class DynamicValueStateFloat extends DynamicValueState
 
 class DynamicValueStateString extends DynamicValueState
 	string v
-	override void __init__()
-		v.__init__()
-	override void __delete__()
 	override string type()
 		return "str"
 	override string __str__()
@@ -474,9 +461,7 @@ class DynamicValueStateDict extends DynamicValueState
 		return c
 
 class DynamicValueStateFunction extends DynamicValueState
-	Function* _func
-	override void __init__()
-		_func = nil
+	Function* _func = nil
 	override string type()
 		return "func"
 	override string __str__()
@@ -485,17 +470,13 @@ class DynamicValueStateFunction extends DynamicValueState
 class Variable
 	DynamicValue* v
 	string name
-	bool writable
-	bool is_ref
+	bool writable = true
+	bool is_ref = false
 	void __init__()
 		v = new DynamicValue()
-		is_ref = false
-		writable = true
 	void __init__(string _name)
 		v = new DynamicValue()
 		name = _name
-		is_ref = false
-		writable = true
 	void __delete__()
 		clear()
 	void clear()
@@ -527,14 +508,12 @@ class Variable
 class Function
 	string name
 	string[] params
-	bool is_internal
+	bool is_internal = false
 	#Variable*[] params
 	#Variable*[] vars
-	SyntaxNodeBlock* block
+	SyntaxNodeBlock* block = nil
 	void __init__(string _name)
 		name = _name
-		block = nil
-		is_internal = false
 	#Variable* addVar(string name)
 	#	Variable *v = new Variable(name)
 	#	vars.add(v)
@@ -691,10 +670,9 @@ class SyntaxNode
 
 class SyntaxNodeVariable extends SyntaxNode
 	string name
-	bool allow_create
+	bool allow_create = false
 	void __init__(string _name)
 		name = _name
-		allow_create = false
 		type = TYPE_VARIABLE
 	override string str()
 		return "variable " + name
@@ -743,11 +721,10 @@ class SyntaxNodeBlock extends SyntaxNode
 		return "block"
 
 class SyntaxNodeIf extends SyntaxNode
-	SyntaxNode* block, block_else
+	SyntaxNode* block = nil
+	SyntaxNode* block_else = nil
 	override void __init__()
 		type = TYPE_IF
-		block = nil
-		block_else = nil
 	override string str()
 		return "if"
 	override void showPost(int indent)
@@ -756,11 +733,10 @@ class SyntaxNodeIf extends SyntaxNode
 			block_else.show(indent+1)
 
 class SyntaxNodeWhile extends SyntaxNode
-	SyntaxNode* block, block_else
+	SyntaxNode* block = nil
+	SyntaxNode* block_else = nil
 	override void __init__()
 		type = TYPE_WHILE
-		block = nil
-		block_else = nil
 	override string str()
 		return "while"
 	override void showPost(int indent)
@@ -769,11 +745,10 @@ class SyntaxNodeWhile extends SyntaxNode
 			block_else.show(indent+1)
 
 class SyntaxNodeFor extends SyntaxNode
-	SyntaxNode* block, block_else
+	SyntaxNode* block = nil
+	SyntaxNode* block_else = nil
 	override void __init__()
 		type = TYPE_FOR
-		block = nil
-		block_else = nil
 	override string str()
 		return "for"
 	override void showPost(int indent)
@@ -1219,19 +1194,14 @@ class Context
 	string name
 	Context* parent
 	Variable*[] vars
-	Variable* ret
-	Function* _func
-	bool flag_return
-	bool flag_break
-	bool flag_continue
+	Variable* ret = nil
+	Function* _func = nil
+	bool flag_return = false
+	bool flag_break = false
+	bool flag_continue = false
 	void __init__(string _name, Context* p)
 		name = _name
 		parent = p
-		ret = nil
-		_func = nil
-		flag_return = false
-		flag_break = false
-		flag_continue = false
 	void __delete__()
 		for v in vars
 			del v
