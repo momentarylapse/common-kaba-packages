@@ -1,4 +1,4 @@
-use "mongo.kaba"
+use mongo
 #use "file.kaba"
 use os
 
@@ -142,7 +142,7 @@ class Database
 		del m
 	DbFile[] find(string json)
 		let r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
-		return parse_result(r)
+		return parse_result(weak(r))
 	DbFile by_id(string id)
 		let r = files.find("{\"id\":\"{{id}}\"}")
 		if r.has_more()
@@ -161,11 +161,10 @@ class Database
 		raise(new Exception("hash not found"))
 	
 	void mediumify(out DbFile f)
-		Result* r = medium.find("{\"id\":\"{{f.id}}\"}")
+		let r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
 			DbMedium m = parse_bson_medium(r.doc)
 			f.make_medium(m)
-		del r
 
 string filter_to_json(string filter)
 	string json = "{"

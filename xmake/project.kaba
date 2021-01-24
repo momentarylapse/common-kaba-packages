@@ -100,12 +100,12 @@ class Config
 	
 	Path[] needs_installing()
 		Path[] r
-		let list = Filesystem.search(Path("../static"), "*.*", true)
+		let list = Filesystem.search(Path("../static"), "*.*", "fd")
 		let ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
-			if not (e in ignore)
-				r.add("static/{{e}}")
+			if not (str(e) in ignore)
+				r.add(Path("static") << e)
 		for i in installs
 			r.add(i)
 		return r
@@ -118,9 +118,8 @@ class SourceFile
 		return Path(str(filename).replace(".cpp", ".o"))
 	Path[] dep
 	bool add_dep(Path d)
-		for dd in dep
-			if dd == d
-				return false
+		if d in dep
+			return false
 		dep.add(d)
 		return true
 
@@ -146,7 +145,7 @@ void find_dep(out SourceFile f, Path filename)
 			d = d.canonical()
 			if Filesystem.exists(d)
 				if f.add_dep(d)
-					#print("  " + rel(d))
+				#	print("  <" + rel(d) + ">")
 					find_dep(f, d)
 
 void parse_source(Path filename)
@@ -160,9 +159,6 @@ void parse_source(Path filename)
 	sources.add(f)
 
 void parse_dir(Path dir)
-	let files = Filesystem.search(dir, "*.cpp", true)
+	let files = Filesystem.search(dir, "*.cpp", "fr")
 	for f in files
-		if Filesystem.is_directory(dir << f)
-			parse_dir(dir << f)
-		else
-			parse_source(dir << f)
+		parse_source(dir << f)

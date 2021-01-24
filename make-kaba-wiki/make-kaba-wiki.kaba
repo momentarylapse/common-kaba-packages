@@ -343,17 +343,17 @@ void wiki_upload(string name, string wiki)
 	del f
 
 void find_external()
-	let list = Filesystem.search("extern", "*.kaba", false)
+	let list = Filesystem.search("extern", "*.kaba", "f")
 	for e in list
 		let p = weak(Script.load("extern/" + e, true))
-		p.name = e[:-5]
+		p.name = str(e)[:-5]
 		external_packages.add(p)
 
 void find_external_libs()
-	let list = Filesystem.search("lib", "*.kaba", false)
+	let list = Filesystem.search("lib", "*.kaba", "f")
 	for e in list
 		let p = weak(Script.load("lib/" + e, true))
-		p.name = e[:-5]
+		p.name = str(e)[:-5]
 		external_libs.add(p)
 
 void main()
