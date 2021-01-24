@@ -18,14 +18,13 @@ void test_compile(Path filename)
 		error_count ++
 
 void test_rec(Path dir)
-	let list = Filesystem.search(dir, "*.kaba", "fd")
-	if len([for e in list e if str(e)[-4:] == "kaba"]) > 0
-		print("{{Term.YELLOW}}{{dir}}{{Term.END}}")
-	for e in list
-		if Filesystem.is_directory(dir << e)
-			test_rec(dir << e)
-		else
-			test_compile(dir << e)
+	let subdirs = Filesystem.search(dir, "", "dr0")
+	for s in subdirs
+		let list = Filesystem.search(dir << s, "*.kaba", "f")
+		if len(list) > 0
+			print("{{Term.YELLOW}}{{dir << s}}{{Term.END}}")
+		for e in list
+			test_compile(dir << s << e)
 
 void main(string[] arg)
 	if len(arg) == 0
