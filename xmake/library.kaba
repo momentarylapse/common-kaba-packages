@@ -130,6 +130,16 @@ class LibraryPangoCairo extends Library
 	override string linker_flags()
 		return " `pkg-config --cflags --libs pangocairo pango cairo`"
 
+class LibraryFreetype2 extends Library
+	void __init__()
+		super.__init__("freetype2", ["freetype2"])
+	override bool test()
+		return Filesystem.exists(Path("/usr/include/freetype2/ft2build.h"))
+	override string compiler_flags()
+		return " `pkg-config --cflags freetype2`"
+	override string linker_flags()
+		return " `pkg-config --cflags --libs freetype2`"
+
 class LibraryGL extends Library
 	void __init__()
 		super.__init__("gl", ["GL"])
@@ -207,6 +217,7 @@ class LibraryManager
 		libraries.add(new LibraryCairo())
 		libraries.add(new LibraryPango())
 		libraries.add(new LibraryPangoCairo())
+		libraries.add(new LibraryFreetype2())
 		libraries.add(new LibraryZlib())
 		libraries.add(new LibraryFftw3())
 		libraries.add(new LibraryGL())
