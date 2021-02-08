@@ -3,22 +3,22 @@ use parser
 use simplify
 
 
-shared Term diff_function(string func, shared Term[] params)
-	if func == "exp"
+shared Term diff_function(string f, shared Term[] params)
+	if f == "exp"
 		return AddFunction("exp", params)
-	if func == "sin"
+	if f == "sin"
 		return AddFunction("cos", params)
-	if func == "cos"
+	if f == "cos"
 		return AddOperator("-", AddNumber("0"), AddFunction("sin", params))
-	if func == "sinh"
+	if f == "sinh"
 		return AddFunction("cosh", params)
-	if func == "cosh"
+	if f == "cosh"
 		return AddFunction("sinh", params)
-	if func == "ln"
+	if f == "ln"
 		return AddOperator("/", AddNumber("1"), params[0])
-	if func == "sqrt"
+	if f == "sqrt"
 		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", params))
-	raise(new RuntimeError("can not differentiate function '{{func}}'"))
+	raise(new RuntimeError("can not differentiate function '{{f}}'"))
 
 
 # d/dx

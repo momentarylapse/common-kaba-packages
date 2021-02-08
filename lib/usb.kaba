@@ -265,7 +265,7 @@ class Handle
 		data.resize(max_size)
 		int r = control_transfer(req, data, 1000)
 		data.resize(r)
-		return r
+		return str(r)
 
 Context* init_usb()
 	let c = new Context()

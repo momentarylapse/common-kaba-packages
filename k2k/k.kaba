@@ -1227,11 +1227,11 @@ class Interpreter
 	Context* cur_context
 	void setError(string msg)
 		raise(new RuntimeError("Runtime error: {{msg}}"))
-	void stack_push(Function func, Variable ret)
-		cur_context = new Context(func.name, cur_context)
-		cur_context._func = &func
+	void stack_push(Function f, Variable ret)
+		cur_context = new Context(f.name, cur_context)
+		cur_context._func = &f
 		cur_context.ret = &ret
-		for n in func.params
+		for n in f.params
 			cur_context.add(new Variable(n))
 		contexts.add(cur_context)
 	void stack_pop()

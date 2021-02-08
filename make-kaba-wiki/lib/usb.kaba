@@ -135,8 +135,7 @@ void CHECK(int r, string msg)
 
 class Device
 	_device* dev
-	void __init__(_device* d)
-		dev = d
+	
 	DeviceInfo get_info()
 		DeviceInfo i
 		i.bus = _libusb_get_bus_number(dev)
@@ -194,9 +193,7 @@ class Device
 		
 
 class Context
-	_context* c
-	void __init__()
-		c = nil
+	_context* c = nil
 	void __delete__()
 		_libusb_exit(c)
 	Device*[] enumerate()
@@ -218,9 +215,8 @@ class Context
 		return h
 
 class Handle
-	_handle* h
-	Device* dev
-	void __init__()
+	_handle* h = nil
+	Device* dev = nil
 	void __delete__()
 		if h
 			_libusb_close(h)
@@ -269,7 +265,7 @@ class Handle
 		data.resize(max_size)
 		int r = control_transfer(req, data, 1000)
 		data.resize(r)
-		return r
+		return str(r)
 
 Context* init_usb()
 	let c = new Context()

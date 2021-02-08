@@ -22,7 +22,7 @@ Path[] resource_files
 
 Resource[] load_all_huis(bool literally)
 	Resource[] res
-	let files = Filesystem.search(conf.dir, "*.hui", false)
+	let files = Filesystem.search(conf.dir, "*.hui", "f")
 	for f in files
 		string source = Filesystem.read(conf.dir << f)
 		Resource r = ParseResource(source, literally)

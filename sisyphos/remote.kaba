@@ -146,7 +146,7 @@ void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
 			ll.path = root << ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.files.add(ll)
-			log_ok("add pure remote", rel_path(ll.path))
+			log_ok("add pure remote", str(rel_path(ll.path)))
 		
 			if conf.show_meta or conf.verbosity >= 2
 				ll.show_info("      ")
@@ -163,7 +163,7 @@ void remote_sync_by_filter(string filter, string quality, string structure, Path
 	db.save()
 
 void remote_download(out LocalFile f)
-	log_ok("downloading", rel_path(f.path))
+	log_ok("downloading", str(rel_path(f.path)))
 	if !f.in_db()
 		log_error("error", "not in db")
 		return
@@ -173,7 +173,7 @@ void remote_download(out LocalFile f)
 		return
 	
 	make_all_dirs(f.path)
-	scp_download(f.remote_path(), f.path)
+	scp_download(f.remote_path(), str(f.path))
 
 	f.size = Filesystem.size(f.path)
 	f.mtime = Filesystem.mtime(f.path).time
@@ -184,7 +184,7 @@ void remote_download(out LocalFile f)
 
 
 void remote_upload(out LocalFile f)
-	log_ok("uploading", rel_path(f.path))
+	log_ok("uploading", str(rel_path(f.path)))
 	
 	if !f.pure_local() and !f.is(CHANGED_FILE)
 		log_error("error", "no need to push")
@@ -196,7 +196,7 @@ void remote_upload(out LocalFile f)
 	
 	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
 	
-	scp_upload(f.path, _remote_path)
+	scp_upload(f.path, Path(_remote_path))
 	
 	if !f.pure_local()
 		log_error("todo", "upload edited file")

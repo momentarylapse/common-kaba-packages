@@ -83,7 +83,7 @@ class LocalFile
 	const bool mergeable(LocalFile f)
 		if size != f.size
 			return false
-		if id != f.size
+		if id != f.id
 			if len(id) > 0 and len(f.id) > 0
 				return false
 		return true

@@ -365,7 +365,7 @@ class Circuit
 		else if t == TYPE_DIODE
 			e = new Diode(n)
 		else
-			raise(new Exception("unknown type: " + t))
+			raise(new Exception("unknown type: {{t}}"))
 		edges.add(e)
 		return e
 

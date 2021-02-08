@@ -19,7 +19,7 @@ void test_replace(Path filename, string what, string by, bool allow)
 		Filesystem.write_text(filename, s)
 
 void test_rec(Path dir, string what, string by, bool allow)
-	let list = Filesystem.search(dir, "*.*", true)
+	let list = Filesystem.search(dir, "*.*", "fd")
 	for e in list
 		if Filesystem.is_directory(dir << e)
 			test_rec(dir << e, what, by, allow)

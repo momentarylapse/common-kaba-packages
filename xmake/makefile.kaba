@@ -42,8 +42,8 @@ void create_makefile(Profile p, string postfix)
 	f << ""
 	string[] obj
 	for s in sources
-		if str(rel(Path(s.filename))) != conf.main_file
-			obj.add(rel(s.object()))
+		if str(rel(s.filename)) != conf.main_file
+			obj.add(str(rel(s.object())))
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
 	string main_ob = conf.main_file.replace(".cpp", ".o")

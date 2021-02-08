@@ -61,9 +61,8 @@ extern int _keypad(void* w, bool b)
 extern char* _setlocale(int category, char* locale)
 
 class Window
-	void* w
+	void* w = nil
 	void __init__()
-		w = nil
 	void __init__(int width, int height, int x, int y)
 		w = _newwin(height, width, y, x)
 	void background(int c)
@@ -169,6 +168,28 @@ void main()
 	ww.print("red")
 	#ww.addch('A' | Color.pair(1))
 	ww.refresh()
+	
+	int r = stdwin.getch()
+	endwin()
+	print(r)
+
+
+void _main()
+	init()
+	raw()
+	noecho()
+	start_color()
+	use_default_colors()
+	curs_set(0)
+	stdwin.keypad(true)
+	let w = stdwin.width()
+	let h = stdwin.height()
+	stdwin.printw("█▀▄▌▐∴∵∌∮")
+	for i in 0:256
+		init_pair(i+1, i, i)
+		stdwin.attron(Color.pair(i+1))
+		stdwin.print("M")
+	stdwin.refresh()
 	
 	int r = stdwin.getch()
 	endwin()

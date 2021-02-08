@@ -29,7 +29,7 @@ class Matching
 		terms.add(mt)
 		return true
 	const string __str__()
-		return [for t in terms str(t)]
+		return str([for t in terms str(t)])
 	
 
 bool rule_match(shared Term t, shared Term m, out Matching mm)

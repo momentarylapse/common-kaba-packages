@@ -40,9 +40,7 @@ string cstr2str(char[0]* cs)
 	return s
 
 class Database
-	void *db
-	void __init__()
-		db = nil
+	void *db = nil
 	void __delete__()
 		_sqlite3_close(db)
 
@@ -81,12 +79,9 @@ class Database
 	#	return r
 
 class Query
-	void *res
+	void* res = nil
 	int step_result
-	bool needs_step
-	void __init__()
-		res = nil
-		needs_step = true
+	bool needs_step = true
 	void __delete__()
 		_sqlite3_finalize(res)
 

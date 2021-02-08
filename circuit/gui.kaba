@@ -98,7 +98,7 @@ Toolbar toolbar ''
 			return
 		let names = e.param_names()
 		for n,i in names
-			add_string("params", n + "\\" + e.param[i])
+			add_string("params", "{{n}}\\{{e.param[i]}}")
 			
 		
 

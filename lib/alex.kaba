@@ -23,7 +23,7 @@ class DbFile
 	void __init__()
 		medium = false
 	const string __str__()
-		string s = id + "\t" + mtime + "\t" + size + "\t" + hash + "\t" + path + "\t" + name + "\t" + path.extension()
+		string s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
 		if medium
 			s += "\tm"
 		else
@@ -35,13 +35,13 @@ class DbFile
 	const void show()
 		print(path)
 		if conf.show_meta
-			print("  id: " + id)
-			print("  hash: " + hash)
-			print("  type: " + type)
-			# print("  path: " + path)
-			print("  name: " + name)
-			print("  mtime: " + mtime)
-			print("  size: " + size)
+			print("  id: {{id}}")
+			print("  hash: {{hash}}")
+			print("  type: {{type}}")
+			# print("  path: {{path}}")
+			print("  name: {{name}}")
+			print("  mtime: {{mtime}}")
+			print("  size: {{size}}")
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
 	const string medium_path()

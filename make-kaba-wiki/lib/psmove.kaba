@@ -155,12 +155,10 @@ class MyPSMoveController
 		ang = quaternion.ID
 
 class PsMoveManager
-	PSMoveTracker* tracker
-	PSMoveFusion* fusion
+	PSMoveTracker* tracker = nil
+	PSMoveFusion* fusion = nil
 	MyPSMoveController*[] psmoves
 	void __init__()
-		tracker = nil
-		fusion = nil
 		int vv = 262152 #4<<16 + 0<<8 + 8
 		if _psmove_init(vv) != 1
 			print("VERSION MISMATCH!")

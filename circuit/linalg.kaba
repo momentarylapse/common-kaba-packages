@@ -23,7 +23,7 @@ class Matrix
 	string __str__()
 		string[] s
 		for i in 0:n
-			s.add(e[i*m:(i+1)*m])
+			s.add(str(e[i*m:(i+1)*m]))
 		return s.join("\n")
 	void diagonalize(out float[] b)
 		for i in 0:n
