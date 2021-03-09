@@ -1,4 +1,4 @@
-BASE=/usr/local/share/kaba
+BASE=~/.kaba
 NAME=shadercomp
 if [ ! -d $BASE/apps ]
 then

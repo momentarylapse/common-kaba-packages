@@ -221,7 +221,7 @@ class Gamepad as shared extends GamepadState
 	float deadzone
 	void __init__(int i)
 		index = i
-		deadzone = 0.03
+		deadzone = 0.05
 	
 	bool present()
 		return _glfwJoystickIsGamepad(index) == 1
@@ -232,6 +232,10 @@ class Gamepad as shared extends GamepadState
 		for a in axes
 			if abs(a) < deadzone
 				a = 0
+			else if a > 0
+				a = (a - deadzone) / (1 - deadzone)
+			else
+				a = (a + deadzone) / (1 - deadzone)
 	
 	bool click(int b)
 		return buttons[b] and not state_prev.buttons[b]

@@ -1,4 +1,4 @@
-BASE=/usr/local/share/kaba
+BASE=~/.kaba
 NAME=bindiff
 if [ ! -d $BASE/apps ]
 then

@@ -1,4 +1,4 @@
-BASE=/usr/local/share/kaba
+BASE=~/.kaba
 NAME=kabama
 if [ ! -d $BASE/apps ]
 then
