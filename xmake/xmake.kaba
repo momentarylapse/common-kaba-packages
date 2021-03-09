@@ -24,6 +24,8 @@ void main(string[] arg)
 		else if a == "--ignore-lib"
 			conf.ignore_libs.add(arg[i+1])
 			i ++
+		else if a == "--all"
+			conf.force_all_libraries = true
 		else if a.find("/", 0) >= 0
 			conf.root = Path(a).absolute()
 		else

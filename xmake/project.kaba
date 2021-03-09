@@ -11,6 +11,7 @@ class Config
 	Path root
 	bool verbose = false
 	bool dry_run = false
+	bool force_all_libraries = false
 	
 	string name
 	string binary_file
@@ -109,6 +110,12 @@ class Config
 		for i in installs
 			r.add(i)
 		return r
+		
+	bool has_explicit_default_profile()
+		for p in conf.profiles
+			if p.name == "default"
+				return true
+		return false
 
 Config conf
 

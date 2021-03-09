@@ -5,13 +5,18 @@ use library
 void create_all_makefiles()
 	# fixed profiles
 	for p in conf.profiles
-		create_makefile(p, "-{{p.name}}")
+		if p.name == "default"
+			create_makefile(p, "")
+		else
+			create_makefile(p, "-{{p.name}}")
 	
 	# dynamic profile
+	if conf.has_explicit_default_profile()
+		return
 	Profile p
 	p.name = "default"
 	for l in conf.libs_optional
-		if lib.has(l) and !conf.ignored(l)
+		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
 			p.libs_optional.add(l)
 	create_makefile(p, "")
 
