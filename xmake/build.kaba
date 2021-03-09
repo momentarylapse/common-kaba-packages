@@ -2,6 +2,8 @@ use project
 use makefile
 use library
 use os
+use thread
+use time
 
 
 
@@ -19,12 +21,34 @@ bool is_completely_built(SourceFile s)
 			return false
 	return true
 
+func compile(SourceFile s, string cxx_flags) -> bool
+	let command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
+	if conf.verbose
+		print(command)
+	try
+		let r = shell_execute(command)
+	except Exception as e
+		#print("ERROR:")
+		#print(e)
+		return false
+	return true
+
+class T extends Thread
+	SourceFile s
+	string cxx_flags
+	override void on_run()
+		#print("COMPILE  {{s.filename}}")
+		compile(s, cxx_flags)
+		#time.sleep(1)
+
 func build()
 	Profile p
 	p.name = "local"
 	for l in conf.libs_optional
 		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
 			p.libs_optional.add(l)
+	
+	let binary_file = Path("..") << conf.binary_file
 			
 	string cflags, lflags, defines
 	collect_global_flags(p, cflags, lflags, defines)
@@ -38,26 +62,64 @@ func build()
 	let needs_building = [for s in sources s if not is_completely_built(s)]
 	#print("total {{len(sources)}}, build {{len(needs_building)}}")
 	
-	for s,i in needs_building
-		print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
-		let command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
-		if conf.verbose
-			print(command)
-		try
-			let r = shell_execute(command)
-		except Exception as e
-			#print("ERROR:")
-			#print(e)
-			return
+	
+	int num_threads = Thread.get_num_cores()
+	
+	if num_threads > 1
 
-	if len(needs_building) == 0 and os.Filesystem.exists("../{{conf.binary_file}}")
+		T*[] threads
+		for i in 0:num_threads
+			threads.add(new T())
+	
+		for s,i in needs_building
+			T* t = nil
+			if i < num_threads
+				#print("{{i}} -> direct")
+				t = new T()
+				threads.add(t)
+			else
+				#print("{{i}} -> pool")
+				while not t
+					for tt in threads
+						if tt.is_done()
+							tt.join()
+							# TODO allow multiple run()s
+							del tt
+							tt = new T()
+							t = tt
+							break
+			print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
+			t.s = s
+			t.cxx_flags = cxx_flags
+			t.run()
+		
+		for t in threads
+			t.join()
+			del t
+	
+#	for t in threads
+#		t.run()
+#	for t in threads
+#		t.join()
+	##CompilerPool cp
+	#cp.run(100,1)
+	#time.sleep(10)
+	
+	else
+		for s,i in needs_building
+			print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
+			if not compile(s, cxx_flags)
+				return
+
+
+	if len(needs_building) == 0 and os.Filesystem.exists(binary_file)
 		print("  up to date")
 		return
 			
-	print("Link  {{Term.YELLOW}}{{conf.binary_file}}{{Term.END}}")
+	print("Link  {{Term.YELLOW}}{{binary_file}}{{Term.END}}")
 	let main_ob = conf.main_file.replace(".cpp", ".o")
 	let obj = collect_objects().join(" ")
-	let command = "g++ {{obj}} {{main_ob}} -o ../{{conf.binary_file}} {{cxx_flags_linking}}"
+	let command = "g++ {{obj}} {{main_ob}} -o {{binary_file}} {{cxx_flags_linking}}"
 	if conf.verbose
 		print(command)
 	try
@@ -76,8 +138,9 @@ func build_clear()
 			#print(s.object())
 		except
 			pass
+	let binary_file = Path("..") << conf.binary_file
 	try
-		os.Filesystem.delete("../{{conf.binary_file}}")
+		os.Filesystem.delete(binary_file)
 	except
 		pass
 	
