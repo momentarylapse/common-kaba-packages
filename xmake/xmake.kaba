@@ -2,52 +2,29 @@ use library
 use project
 use makefile
 use meson
+use build
+use cli_parser
 use os
 
 
 string blank(int n)
 	return [for i in 0:n " "].join("")
 
-void main(string[] arg)
-	lib.init()
-	conf.verbose = false
-	conf.root = Path("./").absolute()
-	
-	string[] command
-	conf.ignore_libs
+void action_has(string[] a)
+	lib.test(a[0])
 
-	for a,i in arg
-		if a == "--verbose"
-			conf.verbose = true
-		else if a == "--dry"
-			conf.dry_run = true
-		else if a == "--ignore-lib"
-			conf.ignore_libs.add(arg[i+1])
-			i ++
-		else if a == "--all"
-			conf.force_all_libraries = true
-		else if a.find("/", 0) >= 0
-			conf.root = Path(a).absolute()
+void action_list(string[] a)
+	for l in sorted(lib.libraries, "name")
+		if l.test()
+			print("{{l.name|14}} {{Term.GREEN}}found{{Term.END}}")
 		else
-			command.add(a)
-	if len(command) > 0
-		if command[0] == "has"
-			if len(command) < 2
-				print("library?")
-				return
-			lib.test(command[1])
-			return
-		else if command[0] == "list"
-			for l in sorted(lib.libraries, "name")
-				print("{{l.name}} {{blank(12-len(l.name))}} {{l.test()}}")
-			return
-		else if command[0] == "init"
-			conf.save()
-			return
-		else
-			print("???   try  init/has/list")
-			return
-	print(conf.root)
+			print("{{l.name|14}} {{Term.RED}}not found{{Term.END}}")
+
+void action_init(string[] a)
+	conf.save()
+
+void action_update(string[] a)
+	print("updating {{conf.root}}")
 	
 	conf.load()
 	
@@ -64,4 +41,40 @@ void main(string[] arg)
 		create_all_makefiles()
 	
 		create_meson()
+
+void action_build(string[] a)
+	#print("building {{conf.root}}")
+	conf.load()
+	parse_dir(conf.root)
+	build()
+
+void action_clear(string[] a)
+	#print("clearing {{conf.root}}")
+	conf.load()
+	parse_dir(conf.root)
+	build_clear()
+
+
+void main(string[] arg)
+	lib.init()
+	conf.verbose = false
+	conf.root = Path("./").absolute()
 	
+	string[] command
+	conf.ignore_libs
+	
+	#bool build
+	
+	CLIParser p
+	p.opt(["-v", "--verbose"], "verbose output", lambda() conf.verbose = true)
+	p.opt(["--dry"], "dry run", lambda() conf.dry_run = true)
+	p.opta(["--ignore-lib"], "LIB", "", lambda(string o) conf.ignore_libs.add(o))
+	p.opt(["--all"], "enable all libraries", lambda() conf.force_all_libraries = true)
+	
+	p.cmd("has", "<LIBRARY>", "check if available", action_has)
+	p.cmd("list", "", "list available libs", action_list)
+	p.cmd("init", "", "create new project", action_init)
+	p.cmd("build", "", "build project", action_build)
+	p.cmd("clear", "", "clear build files", action_clear)
+	p.cmd("update", "", "update build files", action_update)
+	p.run(arg)

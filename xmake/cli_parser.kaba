@@ -1,0 +1,138 @@
+use kaba
+
+class CLIParser
+	static CLIParser* current
+	
+	class Command
+		string[] name
+		string[] params
+		string[]->void f
+		string comment
+
+		const bool match(string[] arg)
+			if len(arg) < len(name)
+				return false
+			for n,i in name
+				if arg[i] != n
+					return false
+			return true
+		
+		const int min_params()
+			int m = 0
+			for p in params
+				if p == "..."
+					continue
+				if p[0:1] == "<"
+					m ++
+			return m
+
+		const string sig()
+			return name.join(" ") + " " + params.join(" ")
+	class Option
+		string[] name
+		string param
+		string->void f1
+		void->void f0
+		string comment
+		
+		const string sig()
+			string s = name.join(", ")
+			if param != ""
+				s += " {{param}}"
+			return s
+		
+	Command[] commands
+	Option[] options
+	string _info
+	
+	void info(string i)
+		_info = i
+
+	# "example", "<P1> <P2> [OPT] ...", "comment", lambda(string[] a) ...
+	#  name = "" -> default
+	void cmd(string name, string params, string comment, string[]->void f)
+		Command c
+		c.name = name.explode(" ")
+		c.params = params.explode(" ")
+		c.f = f
+		c.comment = comment
+		commands.add(c)
+
+	# ["--example", "-e"], "<P1> <P2> [OPT] ...", "comment", lambda(string a) ...
+	void optx(string[] name, string param, string comment, string->void f1, void->void f0)
+		Option c
+		c.name = name
+		c.param = param
+		c.comment = comment
+		c.f1 = f1
+		c.f0 = f0
+		options.add(c)
+		
+	# ["--example", "-e"], "comment", lambda() ...
+	void opta(string[] name, string param, string comment, string->void f)
+		optx(name, param, comment, f, nil)
+
+	void opt(string[] name, string comment, void->void f)
+		optx(name, "", comment, nil, f)
+
+	const void run(string[] arg)
+		current = &self
+		try
+			let arg2 = parse_options(arg)
+			if parse_commands(arg2)
+				return
+			if len(arg2) > 0
+				print("ERROR: unhandled command")
+			show_help()
+		except Exception as e
+			print("ERROR: {{e}}")
+	
+	const string[] parse_options(string[] arg)
+		string[] arg2
+		for a,i in arg
+			if a[:1] == "-"
+				i += do_option(a, arg[i+1:])
+			else
+				arg2.add(a)
+		return arg2
+
+	const int do_option(string name, string[] arg_rest)
+		for o in options
+			if name in o.name
+				#print("option {{o.name}}")
+				if o.param == ""
+					call(o.f0)
+					return 0
+				else
+					if len(arg_rest) == 0
+						raise(new Exception("missing parameter: {{o.sig()}}"))
+					call(o.f1, arg_rest[0])
+					return 1
+		raise(new Exception("unknown option {{name}}"))
+	
+	const bool parse_commands(string[] arg)
+		for c in commands
+			if c.match(arg)
+				if len(arg) - len(c.name) < c.min_params()
+					raise(new Exception("missing parameters: {{c.sig()}}"))
+				#print("command {{c.name}}")
+				let aa = arg[len(c.name):]
+				call(c.f, aa)
+				return true
+		return false
+
+	const void show_help()
+		if _info != ""
+			print(_info)
+			print("")
+		print("commands:")
+		for c in commands
+			let s = c.sig()
+			print("  {{s|-30}} # {{c.comment}}")
+		
+		if len(options) > 0
+			print("")
+			print("options:")
+			for o in options
+				let s = o.sig()
+				print("  {{s|-30}} # {{o.comment}}")

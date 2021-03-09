@@ -2,6 +2,17 @@ use os
 use hui
 
 
+class Term
+	const string RED = "\x1b[0;31m"
+	const string GREEN = "\x1b[0;32m"
+	const string YELLOW = "\x1b[0;33m"
+	const string BLUE = "\x1b[0;34m"
+	const string BLUE2 = "\x1b[0;36m"
+	const string VIOLET = "\x1b[0;35m"
+	const string BOLD = "\x1b[1m"
+	const string END = "\x1b[0m"
+
+
 class Profile
 	string name
 	string[] libs_optional
@@ -121,7 +132,7 @@ Config conf
 
 class SourceFile
 	Path filename
-	Path object()
+	const Path object()
 		return Path(str(filename).replace(".cpp", ".o"))
 	Path[] dep
 	bool add_dep(Path d)

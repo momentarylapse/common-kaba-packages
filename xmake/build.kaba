@@ -1,0 +1,84 @@
+use project
+use makefile
+use library
+use os
+
+
+
+
+bool is_completely_built(SourceFile s)
+	if not os.Filesystem.exists(s.object())
+		return false
+	let ts = os.Filesystem.mtime(s.filename)
+	let to = os.Filesystem.mtime(s.object())
+	if to.time < ts.time
+		return false
+	for d in s.dep
+		let td = os.Filesystem.mtime(d)
+		if to.time < td.time
+			return false
+	return true
+
+func build()
+	Profile p
+	p.name = "local"
+	for l in conf.libs_optional
+		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
+			p.libs_optional.add(l)
+			
+	string cflags, lflags, defines
+	collect_global_flags(p, cflags, lflags, defines)
+	string x
+	if conf.build_type == "debug"
+		x = "-g"
+	let global_flags = "{{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
+	let cxx_flags = "{{conf.flags_compiler}} {{cflags}} {{global_flags}}"
+	let cxx_flags_linking = "{{conf.flags_linker}} {{lflags}} {{global_flags}}"
+	
+	let needs_building = [for s in sources s if not is_completely_built(s)]
+	#print("total {{len(sources)}}, build {{len(needs_building)}}")
+	
+	for s,i in needs_building
+		print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
+		let command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
+		if conf.verbose
+			print(command)
+		try
+			let r = shell_execute(command)
+		except Exception as e
+			#print("ERROR:")
+			#print(e)
+			return
+
+	if len(needs_building) == 0 and os.Filesystem.exists("../{{conf.binary_file}}")
+		print("  up to date")
+		return
+			
+	print("Link  {{Term.YELLOW}}{{conf.binary_file}}{{Term.END}}")
+	let main_ob = conf.main_file.replace(".cpp", ".o")
+	let obj = collect_objects().join(" ")
+	let command = "g++ {{obj}} {{main_ob}} -o ../{{conf.binary_file}} {{cxx_flags_linking}}"
+	if conf.verbose
+		print(command)
+	try
+		let r = shell_execute(command)
+	except Exception as e
+		#print("ERROR:")
+		#print(e)
+		return
+
+
+
+func build_clear()
+	for s in sources
+		try
+			os.Filesystem.delete(s.object())
+			#print(s.object())
+		except
+			pass
+	try
+		os.Filesystem.delete("../{{conf.binary_file}}")
+	except
+		pass
+	
+	
