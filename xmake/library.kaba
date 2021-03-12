@@ -1,241 +1,70 @@
 use os
+use hui
+use project
 
 class Library
 	string name
 	string[] libs
-	void __init__(string _name, string[] _libs)
-		name = _name
-		libs = _libs
-	virtual const bool test()
-	virtual const string compiler_flags()
+	string[] pkg
+	string[] meson
+	string[] includes
+	string dir_override
+	#void __init__(string _name, string[] _libs)
+	#	name = _name
+	#	libs = _libs
+	const bool test()
+		for i in includes
+			if not os.Filesystem.exists(Path("/usr/include") << i)
+				return false
+		return true
+	const string compiler_flags()
+		if len(pkg) > 0
+			return "`pkg-config --cflags --libs {{pkg.join(" ")}}`"
+		if len(dir_override) > 0
+			return "-I{{dir_override}}"
 		return ""
-	virtual const string linker_flags()
+	const string linker_flags()
+		if len(pkg) > 0
+			return "`pkg-config --cflags {{pkg.join(" ")}}`"
 		string r
 		for l in libs
 			if len(l) > 0
 				r += " -l{{l}}"
 		return r
-	virtual const string[] meson_libs()
+	const string[] meson_libs()
+		if len(meson) > 0
+			return meson
 		return libs
 	const string define()
 		return "HAS_LIB_{{name.upper()}}"
 
-class LibraryPulseaudio extends Library
-	void __init__()
-		super.__init__("pulseaudio", ["pulse"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/pulse/pulseaudio.h"))
-
-class LibraryPortaudio extends Library
-	void __init__()
-		super.__init__("portaudio", ["portaudio"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/portaudio.h"))
-
-class LibraryAlsa extends Library
-	void __init__()
-		super.__init__("alsa", ["asound"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/alsa/asoundlib.h"))
-
-class LibraryOpenAL extends Library
-	void __init__()
-		super.__init__("openal", ["openal"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/AL/al.h"))
-	override string compiler_flags()
-		return " -I/usr/include/AL"
-
-class LibraryOgg extends Library
-	void __init__()
-		super.__init__("ogg", ["ogg", "vorbis", "vorbisfile", "vorbisenc"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/vorbis/vorbisfile.h")) and Filesystem.exists(Path("/usr/include/vorbis/vorbisenc.h")) and Filesystem.exists(Path("/usr/include/ogg/ogg.h"))
-
-class LibraryFlac extends Library
-	void __init__()
-		super.__init__("flac", ["FLAC"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/FLAC/all.h"))
-
-class LibraryUnwind extends Library
-	void __init__()
-		super.__init__("unwind", ["unwind"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/unwind.h"))
-
-class LibraryZlib extends Library
-	void __init__()
-		super.__init__("zlib", ["z"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/zlib.h"))
-	override string[] meson_libs()
-		return ["zlib"]
-
-class LibraryXlib extends Library
-	void __init__()
-		super.__init__("xlib", ["X11"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/X11/Xlib.h"))
-
-class LibraryFftw3 extends Library
-	void __init__()
-		super.__init__("fftw3", ["fftw3f"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/fftw3.h"))
-
-class LibraryVulkan extends Library
-	void __init__()
-		super.__init__("vulkan", ["vulkan"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/vulkan/vulkan.h"))
-
-class LibraryGtk3 extends Library
-	void __init__()
-		super.__init__("gtk3", ["gtk+-3.0"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/gtk-3.0/gtk/gtk.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags gtk+-3.0`"
-	override string linker_flags()
-		return " `pkg-config --cflags --libs gtk+-3.0`"
-
-class LibraryCairo extends Library
-	void __init__()
-		super.__init__("cairo", ["cairo"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/cairo/cairo.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags cairo`"
-	override string linker_flags()
-		return " `pkg-config --cflags --libs cairo`"
-
-class LibraryPango extends Library
-	void __init__()
-		super.__init__("pango", ["pango"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/pango-1.0/pango/pango.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags pango`"
-	override string linker_flags()
-		return " `pkg-config --cflags --libs pango`"
-
-class LibraryPangoCairo extends Library
-	void __init__()
-		super.__init__("pangocairo", ["pangocairo"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/pango-1.0/pango/pango.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags pangocairo pango cairo`"
-	override string linker_flags()
-		return " `pkg-config --cflags --libs pangocairo pango cairo`"
-
-class LibraryFreetype2 extends Library
-	void __init__()
-		super.__init__("freetype2", ["freetype2"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/freetype2/ft2build.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags freetype2`"
-	override string linker_flags()
-		return " `pkg-config --cflags --libs freetype2`"
-
-class LibraryGL extends Library
-	void __init__()
-		super.__init__("gl", ["GL"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/GL/gl.h"))
-
-class LibraryGLU extends Library
-	void __init__()
-		super.__init__("glu", ["GLU"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/GL/glu.h"))
-
-class LibraryGLEW extends Library
-	void __init__()
-		super.__init__("glew", ["GLEW"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/GL/glew.h"))
-
-class LibraryGLFW extends Library
-	void __init__()
-		super.__init__("glfw", ["glfw"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/GLFW/glfw3.h"))
-
-# not really....argh
-class LibraryFfmpeg extends Library
-	void __init__()
-		super.__init__("ffmpeg", ["avutil", "avcodec"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/ffmpeg/libavcodec/avcodec.h"))
-	override string compiler_flags()
-		return " -I/usr/include/ffmpeg/"
-
-class LibraryODE extends Library
-	void __init__()
-		super.__init__("ode", ["ode"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/local/include/ode/ode.h"))
-
-class LibraryPSMove extends Library
-	void __init__()
-		super.__init__("psmove", ["psmoveapi", "psmoveapi_tracker"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/local/include/psmoveapi/psmove.h"))
-
-class LibraryDl extends Library
-	void __init__()
-		super.__init__("dl", ["dl"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/dlfcn.h"))
-
-class LibraryBullet extends Library
-	void __init__()
-		super.__init__("bullet", ["BulletSoftBody", "BulletDynamics", "BulletCollision", "LinearMath"])
-	override bool test()
-		return Filesystem.exists(Path("/usr/include/bullet/btBulletDynamicsCommon.h"))
-	override string compiler_flags()
-		return " `pkg-config --cflags bullet`"
-#	override string linker_flags()
-#		return " `pkg-config --cflags --libs bullet`"
-
 
 class LibraryManager
-	Library*[] libraries
+	Library[] libraries
 
 	void init()
-		libraries.add(new LibraryPulseaudio())
-		libraries.add(new LibraryPortaudio())
-		libraries.add(new LibraryAlsa())
-		libraries.add(new LibraryOgg())
-		libraries.add(new LibraryFlac())
-		libraries.add(new LibraryUnwind())
-		libraries.add(new LibraryXlib())
-		libraries.add(new LibraryGtk3())
-		libraries.add(new LibraryCairo())
-		libraries.add(new LibraryPango())
-		libraries.add(new LibraryPangoCairo())
-		libraries.add(new LibraryFreetype2())
-		libraries.add(new LibraryZlib())
-		libraries.add(new LibraryFftw3())
-		libraries.add(new LibraryGL())
-		libraries.add(new LibraryGLU())
-		libraries.add(new LibraryGLEW())
-		libraries.add(new LibraryGLFW())
-		libraries.add(new LibraryVulkan())
-		libraries.add(new LibraryFfmpeg())
-		libraries.add(new LibraryOpenAL())
-		libraries.add(new LibraryODE())
-		libraries.add(new LibraryPSMove())
-		libraries.add(new LibraryDl())
-		libraries.add(new LibraryBullet())
+		Path lib_dir = hui.app_directory << "apps/xmake/libs"
+		let list = os.Filesystem.search(lib_dir, "*.txt", "f")
+		for e in list
+			hui.Configuration c
+			c.load(lib_dir << e)
+			Library l
+			l.name = e.basename()[:-4]
+			if len(c["link"]) > 0
+				l.libs = c["link"].explode(",")
+			if len(c["include"]) > 0
+				l.includes = c["include"].explode(",")
+			if len(c["pkg"]) > 0
+				l.pkg = c["pkg"].explode(",")
+			if len(c["meson"]) > 0
+				l.meson = c["meson"].explode(",")
+			l.dir_override = c["dir"]
+			libraries.add(l)
 
 	const Library* get(string name)
 		for l in libraries
 			if l.name == name
-				return l
+				return &l
 		raise(new Exception("unknown library: {{name}}"))
 		return nil
 
@@ -243,12 +72,11 @@ class LibraryManager
 		return get(name).test()
 	
 	const bool test(string name)
-		print("checking library: {{name}}")
 		if has(name)
-			print("    ok")
+			print("{{name|14}} {{Term.GREEN}}found{{Term.END}}")
 			return true
 		else
-			print("   NOT FOUND")
+			print("{{name|14}} {{Term.RED}}not found{{Term.END}}")
 		return false
 
 	const string compiler_flags(string name)
@@ -259,5 +87,8 @@ class LibraryManager
 	
 	const string define(string name)
 		return get(name).define()
+	
+	const string[] pkg(string name)
+		return get(name).pkg
 
 LibraryManager lib

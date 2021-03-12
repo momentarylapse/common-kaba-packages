@@ -1,0 +1,5 @@
+link = pangocairo
+include = cairo/cairo.h,pango-1.0/pango/pango.h
+pkg = cairo,pango,pangocairo
+dependency = pango,cairo
+

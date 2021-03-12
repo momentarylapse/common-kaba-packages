@@ -21,18 +21,32 @@ void create_all_makefiles()
 	create_makefile(p, "")
 
 
+void append(out string[] a, string[] b)
+	for t in b
+		a.add(t)
+
 func collect_global_flags(Profile p, out string cflags, out string lflags, out string defines)
+	string[] pkg
 	for l in conf.libs
-		cflags += lib.compiler_flags(l)
-		lflags += lib.linker_flags(l)
+		if len(lib.pkg(l)) > 0
+			append(pkg, lib.pkg(l))
+		else
+			cflags += " " + lib.compiler_flags(l)
+			lflags += " " + lib.linker_flags(l)
 		defines += " -D{{lib.define(l)}}=1"
 	for l in conf.libs_optional
 		if l in p.libs_optional
-			cflags += lib.compiler_flags(l)
-			lflags += lib.linker_flags(l)
+			if len(lib.pkg(l)) > 0
+				append(pkg, lib.pkg(l))
+			else
+				cflags += " " + lib.compiler_flags(l)
+				lflags += " " + lib.linker_flags(l)
 			defines += " -D{{lib.define(l)}}=1"
 		else
 			defines += " -D{{lib.define(l)}}=0"
+	if len(pkg) > 0
+		cflags += " `pkg-config --cflags {{pkg.join(" ")}}`"
+		lflags += " `pkg-config --cflags --libs {{pkg.join(" ")}}`"
 
 func collect_objects() -> string[]
 	string[] obj
@@ -40,6 +54,10 @@ func collect_objects() -> string[]
 		if str(rel(s.filename)) != conf.main_file
 			obj.add(str(rel(s.object())))
 	return obj
+
+# clean line
+string cl(string s)
+	return s.replace("  ", " ").replace("  ", " ")
 
 void create_makefile(Profile p, string postfix)
 	print("-- makefile {{p.name}} --")
@@ -51,9 +69,9 @@ void create_makefile(Profile p, string postfix)
 	string x
 	if conf.build_type == "debug"
 		x = "-g"
-	f << "GLOBALFLAGS = {{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
-	f << "CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)"
-	f << "CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)"
+	f << cl("GLOBALFLAGS = {{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}")
+	f << cl("CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)")
+	f << cl("CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)")
 	f << "prefix = /usr/local"
 	f << ""
 	let obj = collect_objects()
@@ -72,6 +90,8 @@ void create_makefile(Profile p, string postfix)
 		f << a
 		f << "\t$(CPP) -c {{rel(s.filename)}} -o $@ $(CXXFLAGS)"
 		f << ""
+
+	# install
 	f << "install :"
 	let datadir = "$(prefix)/share/{{conf.name}}"
 	let std = "../static/"
@@ -97,8 +117,9 @@ void create_makefile(Profile p, string postfix)
 		else
 			f << "	cp -f '{{path}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
-
 	f << ""
+
+	# clean
 	f << "clean :"
 	f << "\trm -f $(BIN)"
 	f << "\tfind . -name \"*.o\" -exec rm -f {} \\;"

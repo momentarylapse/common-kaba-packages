@@ -1,0 +1,4 @@
+link = ode
+include = ode/ode.h
+dir = /usr/local/include
+

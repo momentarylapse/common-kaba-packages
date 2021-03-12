@@ -1,0 +1,4 @@
+link = fftw3f
+include = fftw3.h
+pkg = fftw3f
+

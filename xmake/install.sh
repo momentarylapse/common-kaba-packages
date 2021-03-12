@@ -9,3 +9,4 @@ then
 	mkdir $BASE/apps/$NAME
 fi
 cp *.kaba $BASE/apps/$NAME
+cp -r libs $BASE/apps/$NAME

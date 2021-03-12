@@ -1,0 +1,4 @@
+link = cairo
+include = cairo/cairo.h
+pkg = cairo
+

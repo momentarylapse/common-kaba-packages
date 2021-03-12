@@ -1,0 +1,3 @@
+link = avutil,avcodec
+include = libavcodec/avcodec.h
+dir = /usr/include/ffmpeg

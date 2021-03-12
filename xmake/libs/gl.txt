@@ -1,0 +1,4 @@
+link = GL
+include = GL/gl.h
+pkg = gl
+

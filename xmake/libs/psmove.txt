@@ -1,0 +1,4 @@
+link = psmoveapi,psmoveapi_tracker
+include = psmoveapi/psmove.h
+dir = /usr/local/include
+

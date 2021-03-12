@@ -1,0 +1,5 @@
+link = z
+include = zlib.h
+pkg = zlib
+meson = zlib
+

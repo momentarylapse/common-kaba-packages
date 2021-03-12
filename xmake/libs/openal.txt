@@ -1,0 +1,5 @@
+link = openal
+include = AL/al.h
+dir = /usr/include/AL
+pkg = openal
+

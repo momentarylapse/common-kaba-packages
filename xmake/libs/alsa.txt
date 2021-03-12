@@ -1,0 +1,4 @@
+link = asound
+include = alsa/asoundlib.h
+pkg = alsa
+

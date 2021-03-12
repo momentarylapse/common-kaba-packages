@@ -1,0 +1,4 @@
+link = vulkan
+include = vulkan/vulkan.h
+pkg = vulkan
+

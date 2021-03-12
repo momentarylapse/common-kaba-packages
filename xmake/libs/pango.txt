@@ -1,0 +1,4 @@
+link = pango
+include = pango-1.0/pango/pango.h
+pkg = pango
+

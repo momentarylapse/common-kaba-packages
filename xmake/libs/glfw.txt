@@ -1,0 +1,4 @@
+link = glfw
+include = GLFW/glfw3.h
+pkg = glfw3
+

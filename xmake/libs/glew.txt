@@ -1,0 +1,4 @@
+link = GLEW
+include = GL/glew.h
+pkg = glew
+dependency = gl
