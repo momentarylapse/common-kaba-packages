@@ -202,7 +202,7 @@ void remote_upload(out LocalFile f)
 		log_error("todo", "upload edited file")
 		return
 	
-	string r = remote_interface("add", [_remote_path])
+	string r = call_alex("sp upload", [_remote_path])
 	if r[:2] != "ok"
 		log_error("error", "upload... {{r}}")
 		return
@@ -242,9 +242,10 @@ void remote_upload_meta(out LocalFile f)
 		log_error("error", "pure local")
 		return
 
-	string tags = tags2strh(f.tags)	
+	let tags = tags2strh(f.tags)	
 	
-	string r = remote_interface("override-meta", [f.id, f.name.hex(), tags])
+	#string r = remote_interface("override-meta", [f.id, f.name.hex(), tags])
+	let r = call_alex("sp override-meta", [f.id, f.name.hex(), tags])
 	
 	if r.tail(2) == "ok"
 		if conf.verbosity >= 2
