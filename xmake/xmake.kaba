@@ -70,6 +70,8 @@ void main(string[] arg)
 	p.opt(["--dry"], "dry run", lambda() conf.dry_run = true)
 	p.opta(["--ignore-lib"], "LIB", "", lambda(string o) conf.ignore_libs.add(o))
 	p.opt(["--all"], "enable all libraries", lambda() conf.force_all_libraries = true)
+	p.opt(["--rebuild"], "clear before build", lambda() conf.force_rebuild = true)
+	p.opta(["--profile"], "PROFILE", "", lambda(string o) conf.force_profile = o)
 	
 	p.cmd("has", "<LIBRARY>", "check if available", action_has)
 	p.cmd("list", "", "list available libs", action_list)

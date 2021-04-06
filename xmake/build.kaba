@@ -41,12 +41,25 @@ class T extends Thread
 		compile(s, cxx_flags)
 		#time.sleep(1)
 
-func build()
+
+
+ func get_profile(string name) -> Profile
+	for p in conf.profiles
+		if p.name == name
+			return p
 	Profile p
 	p.name = "local"
 	for l in conf.libs_optional
 		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
 			p.libs_optional.add(l)
+	return p
+
+func build()
+	if conf.force_rebuild
+		build_clear()
+
+
+	let p = get_profile(conf.force_profile)
 	
 	let binary_file = Path("..") << conf.binary_file
 			

@@ -23,6 +23,8 @@ class Config
 	bool verbose = false
 	bool dry_run = false
 	bool force_all_libraries = false
+	bool force_rebuild = false
+	string force_profile
 	
 	string name
 	string binary_file
