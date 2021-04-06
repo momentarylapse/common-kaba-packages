@@ -9,6 +9,7 @@ class Library
 	string[] meson
 	string[] includes
 	string dir_override
+	string flags
 	#void __init__(string _name, string[] _libs)
 	#	name = _name
 	#	libs = _libs
@@ -22,11 +23,11 @@ class Library
 			return "`pkg-config --cflags --libs {{pkg.join(" ")}}`"
 		if len(dir_override) > 0
 			return "-I{{dir_override}}"
-		return ""
+		return flags
 	const string linker_flags()
 		if len(pkg) > 0
 			return "`pkg-config --cflags {{pkg.join(" ")}}`"
-		string r
+		string r = flags
 		for l in libs
 			if len(l) > 0
 				r += " -l{{l}}"
@@ -58,6 +59,8 @@ class LibraryManager
 				l.pkg = c["pkg"].explode(",")
 			if len(c["meson"]) > 0
 				l.meson = c["meson"].explode(",")
+			if len(c["flags"]) > 0
+				l.flags = c["flags"]
 			l.dir_override = c["dir"]
 			libraries.add(l)
 

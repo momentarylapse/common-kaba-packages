@@ -1,0 +1,5 @@
+link = glm
+include = glm/vec3.hpp
+pkg = glm
+meson = glm
+
