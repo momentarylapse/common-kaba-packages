@@ -3,8 +3,28 @@ use config
 use tag
 use os
 
+func is_number(char c) -> bool
+	return c >= '0' and c <= '9'
 
-void auto_tag(out LocalFile f)
+# 1x23 - NAME.ext
+func video_guess_tags_by_name(out LocalFile f)
+	let n = f.path.basename_no_ext()
+	if len(n) < 8
+		return
+	int off_x = n.find("x", 0)
+	if off_x < 0 or off_x > 2
+		return
+	if n[off_x+3:off_x+6] != " - "
+		return
+	if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
+		return
+	f.tag_set(["season", n[:off_x]])
+	f.tag_set(["episode", str(int(n[off_x+1:off_x+3]))])
+	f.tag_set(["name", n[off_x+6:]])
+	
+
+
+func auto_tag(out LocalFile f)
 	if !Filesystem.exists(f.path)
 		return
 	let ext = f.path.extension()
@@ -101,5 +121,7 @@ void auto_tag(out LocalFile f)
 					f.tag_set(Tag("album", l[13:]))
 			if samples >= 0
 				f.tag_set(Tag("length", str(samples / sample_rate)))
+		else if ext in ["mp4", "avi", "flv"]
+			video_guess_tags_by_name(f)
 	except Exception as e
 		error_out(e)

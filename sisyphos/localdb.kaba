@@ -94,6 +94,8 @@ class LocalFile
 		tags = rtags # TODO
 		db.dirty = true
 	void set_name(string _name)
+		if _name == name
+			return
 		name = _name
 		db.dirty = true
 		if conf.verbosity > 0
