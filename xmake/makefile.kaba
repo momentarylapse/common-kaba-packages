@@ -113,9 +113,9 @@ void create_makefile(Profile p, string postfix)
 	for e in list
 		let path = Path("..") << e
 		if Filesystem.is_directory(path)
-			f << "	cp -rf '{{path}}' {{datadir}}"
+			f << "	cp -ruf '{{path}}' {{datadir}}"
 		else
-			f << "	cp -f '{{path}}' {{datadir}}"
+			f << "	cp -uf '{{path}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 	f << ""
 
