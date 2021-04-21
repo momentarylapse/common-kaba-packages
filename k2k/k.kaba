@@ -148,12 +148,12 @@ class DynamicValue
 		return float(s)
 	const bool __bool__()
 		return bool(s)
-	const DynamicValue* get_element(DynamicValue i)
+	selfref DynamicValue* get_element(DynamicValue i)
 		return s.get_element(i)
 	void add(DynamicValue el)
 		s.add(el)
 	const DynamicValue* copy()
-		DynamicValue* c = new DynamicValue()
+		let c = new DynamicValue()
 		del c.s
 		c.s = s.copy()
 		c.type = type
@@ -285,7 +285,7 @@ class DynamicValue
 			else if type == TYPE_FLOAT
 				setFloat(float(s) / float(b))
 
-	int compare(DynamicValue b)
+	const int compare(DynamicValue b)
 		if b.type == TYPE_INT
 			if type == TYPE_INT
 				return int(s) - int(b)
@@ -309,22 +309,22 @@ class DynamicValue
 
 class DynamicValueState
 	virtual void __delete__()
-	virtual string type()
+	virtual const string type()
 		return "???"
-	virtual string __str__()
+	virtual const string __str__()
 		return "nil"
-	virtual string render()
+	virtual const string render()
 		return str(self)
-	virtual int __int__()
+	virtual const int __int__()
 		return 0
-	virtual float __float__()
+	virtual const float __float__()
 		return 0.0
-	virtual bool __bool__()
+	virtual const bool __bool__()
 		return false
-	virtual DynamicValue* get_element(DynamicValue i)
+	virtual selfref DynamicValue* get_element(DynamicValue i)
 		return nil
 	virtual void add(DynamicValue el)
-	virtual DynamicValueState* copy()
+	virtual const DynamicValueState* copy()
 		
 
 class DynamicValueStateInt extends DynamicValueState

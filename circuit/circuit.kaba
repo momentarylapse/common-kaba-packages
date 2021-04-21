@@ -58,9 +58,9 @@ class Edge
 		#print(str(self))
 	void __assign__(Edge o)
 		pass
-	virtual float g(float dt)
+	virtual const float g(float dt)
 		return 0.0
-	virtual float I_off(float dt)
+	virtual const float I_off(float dt)
 		return 0.0
 	virtual void update(Node[] nodes, float dt)
 		U = nodes[a].phi - nodes[b].phi
@@ -68,9 +68,8 @@ class Edge
 	virtual void iterate(float dt)
 		pass
 	virtual void reset_state()
-	virtual string[] param_names()
-		string[] r
-		return r
+	virtual const string[] param_names()
+		return []
 
 class Cable extends Edge
 	void __init__(int[] n)
@@ -161,9 +160,9 @@ class Diode extends Edge
 		i_low = I_sch(u_low) - u_low*g_low
 	override string[] param_names()
 		return ["V_t", "ln(I_s)", "q"]
-	float I_sch(float u)
+	const float I_sch(float u)
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	float I_id(float u)
+	const float I_id(float u)
 		if u > u_high
 			return u*g_high + i_high
 		if u < u_low
