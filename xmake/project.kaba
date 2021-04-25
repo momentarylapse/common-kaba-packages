@@ -43,6 +43,7 @@ class Config
 	string desktop_file
 	string[] mime_files
 	string[] installs
+	string[] outputs = ["make"]
 	
 	bool ignored(string l)
 		for ig in ignore_libs
@@ -91,6 +92,8 @@ class Config
 				p.name = k[8:]
 				p.libs_optional = c[k].explode(",")
 				profiles.add(p)
+			else if k == "output"
+				outputs = c[k].explode(",")
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	void save()

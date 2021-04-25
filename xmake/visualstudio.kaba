@@ -1,0 +1,183 @@
+use os
+use project
+use library
+
+func win_path(Path p) -> string
+	return str(p).replace("/", "\\")
+
+func create_visual_studio()
+	print("-- visual studio --")
+	let GUID = "{4902439D-3481-4D78-B0FC-5962FB4F7540}"
+	let defines = "HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0"
+	
+	let includes = os.Filesystem.search("./", "*.h", "rf")
+	
+	let f = "
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30611.23
+MinimumVisualStudioVersion = 10.0.40219.1
+Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"{{conf.name}}\", \"{{conf.name}}.vcxproj\", \"{{GUID}}\"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{{GUID}}.Debug|x64.ActiveCfg = Debug|x64
+		{{GUID}}.Debug|x64.Build.0 = Debug|x64
+		{{GUID}}.Debug|x86.ActiveCfg = Debug|Win32
+		{{GUID}}.Debug|x86.Build.0 = Debug|Win32
+		{{GUID}}.Release|x64.ActiveCfg = Release|x64
+		{{GUID}}.Release|x64.Build.0 = Release|x64
+		{{GUID}}.Release|x86.ActiveCfg = Release|Win32
+		{{GUID}}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1C17E605-00BD-4298-9523-803FC7452E99}
+	EndGlobalSection
+EndGlobal"
+	Filesystem.write_text(conf.root << "../{{conf.name}}.sln", f)
+	
+	f = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
+  <ItemGroup Label=\"ProjectConfigurations\">
+    <ProjectConfiguration Include=\"Debug|Win32\">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include=\"Release|Win32\">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include=\"Debug|x64\">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include=\"Release|x64\">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label=\"Globals\">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{{GUID}}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project=\"$(VCTargetsPath)\Microsoft.Cpp.Default.props\" />
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\" Label=\"Configuration\">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\" Label=\"Configuration\">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\" Label=\"Configuration\">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\" Label=\"Configuration\">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project=\"$(VCTargetsPath)\Microsoft.Cpp.props\" />
+  <ImportGroup Label=\"ExtensionSettings\">
+  </ImportGroup>
+  <ImportGroup Label=\"Shared\">
+  </ImportGroup>
+  <ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\">
+    <Import Project=\"$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />
+  </ImportGroup>
+  <ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\">
+    <Import Project=\"$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />
+  </ImportGroup>
+  <ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">
+    <Import Project=\"$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />
+  </ImportGroup>
+  <ImportGroup Label=\"PropertySheets\" Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
+    <Import Project=\"$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props\" Condition=\"exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')\" Label=\"LocalAppDataPlatform\" />
+  </ImportGroup>
+  <PropertyGroup Label=\"UserMacros\" />
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);{{defines}}</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);{{defines}}</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\">
+    <ClCompile>
+      <PreprocessorDefinitions>;{{defines}}</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
+    <ClCompile>
+      <PreprocessorDefinitions>;{{defines}}</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>"
+  
+  
+	for s in sources
+		f += "
+    <ClCompile Include=\"src\\{{win_path(rel(s.filename))}}\" />"
+	f += "
+  </ItemGroup>
+  <ItemGroup>"
+
+	for i in includes
+		f += "
+    <ClInclude Include=\"src\\{{win_path(i)}}\" />"
+
+	f += "
+  </ItemGroup>
+  <Import Project=\"$(VCTargetsPath)\Microsoft.Cpp.targets\" />
+  <ImportGroup Label=\"ExtensionTargets\">
+  </ImportGroup>
+</Project>
+"
+
+	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj", f)

@@ -1,6 +1,7 @@
 use library
 use project
 use makefile
+use visualstudio
 use meson
 use build
 use cli_parser
@@ -38,9 +39,12 @@ void action_update(string[] a)
 	parse_dir(conf.root)
 
 	if not conf.dry_run
-		create_all_makefiles()
-	
-		create_meson()
+		if "make" in conf.outputs
+			create_all_makefiles()
+		if "meson" in conf.outputs
+			create_meson()
+		if "visualstudio" in conf.outputs
+			create_visual_studio()
 
 void action_build(string[] a)
 	#print("building {{conf.root}}")
