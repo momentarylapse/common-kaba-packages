@@ -1,0 +1,3 @@
+link = sndfile
+include = sndfile.hh
+
