@@ -30,8 +30,10 @@ func guess_guid() -> (string,string)
 func vs_might_have_lib(string l) -> bool
 	return l in ["gtk3", "zlib", "ogg", "flac", "fftw3", "portaudio"]
 
-func create_visual_studio()
-	print("-- visual studio --")
+func create_visual_studio(int version)
+	if version != 2019
+		raise(new Exception("only visual studio 2019 supported"))
+	print("-- visual studio {{version}} --")
 	#print(create_guid())
 	
 	let GUIDS = guess_guid()

@@ -43,8 +43,8 @@ void action_update(string[] a)
 			create_all_makefiles()
 		if "meson" in conf.outputs
 			create_meson()
-		if "visualstudio" in conf.outputs
-			create_visual_studio()
+		if "vs2019" in conf.outputs
+			create_visual_studio(2019)
 
 void action_build(string[] a)
 	#print("building {{conf.root}}")
