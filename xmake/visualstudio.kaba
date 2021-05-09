@@ -258,6 +258,7 @@ EndGlobal
       <Filter>{{win_path(Path("src") << i.parent())[:-1]}}</Filter>
     </ClInclude>"
 
+	rand_seed("src".hash())
 	f += "
   </ItemGroup>
   <ItemGroup>
@@ -267,8 +268,10 @@ EndGlobal
 
 	let fdirs = Filesystem.search(conf.root, "", "dr")
 	for d in fdirs
+		let dir = win_path(Path("src") << d)
+		rand_seed(dir.hash())
 		f += "
-    <Filter Include=\"{{win_path(Path("src") << d)}}\">
+    <Filter Include=\"{{dir}}\">
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
