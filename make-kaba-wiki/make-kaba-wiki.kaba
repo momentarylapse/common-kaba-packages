@@ -16,6 +16,11 @@ string param_pre(Variable v)
 string func_params(Function f)
 	return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{p.name}} {{f.var[i].name}}"].join(", ")
 
+string func_return(Function f)
+	if f.return_type.name == "void"
+		return ""
+	return " -> {{f.return_type.name}}"
+
 string show_func(string ns, Function f)
 	string name = f.name
 	if f.namespace
@@ -25,7 +30,7 @@ string show_func(string ns, Function f)
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	wiki += "{{f.return_type.name}} {{name}}({{func_params(f)}})\n"
+	wiki += "func {{name}}({{func_params(f)}}){{func_return(f)}}\n"
 	wiki += "</code>\n"
 	
 	if len(f.param_type) > 0
@@ -185,7 +190,7 @@ string show_class(string ns, Class c)
 		wiki += "\n{{SHIFT}}# functions\n"
 		for f in funcs
 			string pre = func_pre(f)
-			wiki += "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})\n"
+			wiki += "{{SHIFT}}{{pre}}func {{f.name}}({{func_params(f)}}){{func_return(f)}}\n"
 			
 	if len(ops) > 0 or is_list(c)
 		wiki += "\n{{SHIFT}}# operators\n"
@@ -200,24 +205,24 @@ string show_class(string ns, Class c)
 			else
 				if f.num_params >= 1
 					p = f.param_type[0]
-			let ll = "{{SHIFT}}{{pre}}{{f.return_type.name}} {{f.name}}({{func_params(f)}})"
+			let ll = "{{SHIFT}}{{pre}}func {{f.name}}({{func_params(f)}}){{func_return(f)}}"
 			wiki += "{{ll|-40}}"
 			if f.name == "__subarray__"
-				wiki += " # {{c.name}}[int:int]  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}}[int:int] -> {{f.return_type.name}}\n"
 			else if f.name == "__get__"
-				wiki += " # {{c.name}}[{{p.name}}]  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}}[{{p.name}}] -> {{f.return_type.name}}\n"
 			else if f.name == "__set__"
 				wiki += " # {{c.name}}[{{p.name}}] = {{f.param_type[1].name}}\n"
 			else if f.name == "__length__"
-				wiki += " # len({{c.name}})  -> {{f.return_type.name}}\n"
+				wiki += " # len({{c.name}}){{func_return(f)}}\n"
 			else if f.name in ["__str__", "__repr__", "__int__", "__float__", "__bool__", "__int64__", "__float64__", "__char__"]
-				wiki += " # {{f.name[2:-2]}}({{c.name}})  -> {{f.return_type.name}}\n"
+				wiki += " # {{f.name[2:-2]}}({{c.name}}){{func_return(f)}}\n"
 			else if f.name == "__contains__"
-				wiki += " # {{p.name}} in {{c.name}}  -> {{f.return_type.name}}\n"
+				wiki += " # {{p.name}} in {{c.name}}{{func_return(f)}}\n"
 			else if p
-				wiki += " # {{c.name}} {{opname(f.name)}} {{p.name}}  -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}} {{opname(f.name)}} {{p.name}}{{func_return(f)}}\n"
 			else
-				wiki += " # {{opname(f.name)}} {{c.name}}  -> {{f.return_type.name}}\n"
+				wiki += " # {{opname(f.name)}} {{c.name}}{{func_return(f)}}\n"
 				
 	if len(consts) > 0
 		wiki += "\n{{SHIFT}}# constants\n"
@@ -242,7 +247,7 @@ string show_class(string ns, Class c)
 				pre += "static "
 			if f.is_const()
 				pre += "const "
-			wiki += "; <tt>{{pre}}{{f.return_type.name}} [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}})\n"
+			wiki += "; <tt>{{pre}}func [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}\n"
 			wiki += ": description\n\n"
 	
 	if len(elements) > 0	
@@ -293,7 +298,7 @@ string show_package(Script p)
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			wiki += "* <tt>{{f.return_type.name}} '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}})\n"
+			wiki += "* <tt>func '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}\n"
 
 	let vars = sorted(p.variables(), "name")
 	if len(vars) > 0
@@ -322,7 +327,7 @@ string make_reference()
 			wiki += " (default)"
 		wiki += "\n"
 
-	wiki += "\n; external\n\n"
+	wiki += "\n; external program apis\n\n"
 	for p in external_packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
