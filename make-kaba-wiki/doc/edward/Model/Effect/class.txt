@@ -1,0 +1,10 @@
+description = 
+element:colors = 
+element:file = 
+element:intensity = 
+element:inv_quad = 
+element:kind = 
+element:size = 
+element:speed = 
+element:surface = 
+element:vertex = 

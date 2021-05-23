@@ -1,0 +1,16 @@
+description = 
+element:ang = 
+element:bloom_factor = 
+element:bloom_radius = 
+element:dest = 
+element:enabled = 
+element:exposure = 
+element:focal_blur = 
+element:focal_length = 
+element:focus_enabled = 
+element:fov = 
+element:m_view = 
+element:max_depth = 
+element:min_depth = 
+element:pos = 
+element:show = 

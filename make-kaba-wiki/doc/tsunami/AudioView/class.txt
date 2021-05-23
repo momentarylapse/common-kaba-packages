@@ -1,0 +1,6 @@
+description = 
+element:cam = 
+element:output_stream = 
+element:renderer = 
+element:sel = 
+element:signal_chain = 

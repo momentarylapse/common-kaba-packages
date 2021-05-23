@@ -1,0 +1,5 @@
+description = 
+element:normal = 
+element:num_triangles = 
+element:skin_vertex = 
+element:triangle_index = 

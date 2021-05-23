@@ -1,0 +1,7 @@
+description = 
+param:centerx = 
+param:centery = 
+param:map_height = 
+param:map_width = 
+param:zmax = 
+param:zmin = 

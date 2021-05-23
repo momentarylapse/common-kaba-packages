@@ -1,0 +1,4 @@
+description = The minimum (smaller one) of two values.
+param:a = First value.
+param:b = Second value.
+return = The smaller value.

@@ -1,0 +1,14 @@
+description = 
+element:is_selected = 
+element:is_special = 
+element:m_delta = 
+element:m_old = 
+element:material = 
+element:normal = 
+element:normal_dirty = 
+element:normal_index = 
+element:pos = 
+element:skin_vertex = 
+element:temp_normal = 
+element:vertex = 
+element:view_stage = 

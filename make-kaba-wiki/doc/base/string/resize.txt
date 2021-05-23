@@ -1,0 +1,2 @@
+description = Resizes the string. Either cuts off or adds zero-characters at the end.
+param:num = How long to make the string?

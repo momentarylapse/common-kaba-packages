@@ -1,0 +1,9 @@
+description = 
+element:index = 
+element:is_selected = 
+element:is_special = 
+element:m_delta = 
+element:m_old = 
+element:pos = 
+element:radius = 
+element:view_stage = 

@@ -1,0 +1,12 @@
+description = 
+element:const_pos = 
+element:is_selected = 
+element:is_special = 
+element:m_delta = 
+element:m_old = 
+element:matrix = 
+element:model = 
+element:model_file = 
+element:parent = 
+element:pos = 
+element:view_stage = 

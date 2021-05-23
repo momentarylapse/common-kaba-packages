@@ -1,0 +1,9 @@
+description = 
+param:factor = 
+param:func = 
+param:id_edit = 
+param:id_slider = 
+param:panel = 
+param:v_max = 
+param:v_min = 
+param:value = 

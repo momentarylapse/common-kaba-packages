@@ -1,0 +1,7 @@
+description = 
+element:_shared_ref_count = 
+element:axes = 
+element:buttons = 
+element:deadzone = 
+element:index = 
+element:state_prev = 

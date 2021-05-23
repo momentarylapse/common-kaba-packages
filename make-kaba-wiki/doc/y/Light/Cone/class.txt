@@ -1,0 +1,8 @@
+description = 
+element:color = 
+element:dir = 
+element:enabled = 
+element:harshness = 
+element:pos = 
+element:radius = 
+element:theta = 

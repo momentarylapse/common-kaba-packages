@@ -1,0 +1,11 @@
+description = 
+element:background = 
+element:ego = 
+element:fog = 
+element:gravity = 
+element:lights = 
+element:links = 
+element:objects = 
+element:physics_mode = 
+element:skyboxes = 
+element:terrains = 

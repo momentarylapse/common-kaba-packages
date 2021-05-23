@@ -1,0 +1,12 @@
+description = 
+element:_default_render_pass = 
+element:cb = 
+element:depth_buffer = 
+element:frame_buffer = 
+element:height = 
+element:image_available_semaphore = 
+element:in_flight_fence = 
+element:pool = 
+element:render_finished_semaphore = 
+element:tex = 
+element:width = 

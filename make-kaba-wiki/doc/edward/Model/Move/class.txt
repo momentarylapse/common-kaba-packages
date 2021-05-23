@@ -1,0 +1,6 @@
+description = 
+element:frame = 
+element:frames_per_sec_const = 
+element:frames_per_sec_factor = 
+element:name = 
+element:type = 

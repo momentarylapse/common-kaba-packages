@@ -1,0 +1,4 @@
+description = 
+element:bone_index = 
+element:sub = 
+element:vertex = 

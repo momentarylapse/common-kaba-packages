@@ -1,0 +1,6 @@
+description = 
+param:ang = 
+param:bone = 
+param:dpos = 
+param:frame = 
+param:move = 

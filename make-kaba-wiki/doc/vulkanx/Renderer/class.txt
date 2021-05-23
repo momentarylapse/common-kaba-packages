@@ -1,0 +1,8 @@
+description = 
+element:cb = 
+element:height = 
+element:image_available_semaphore = 
+element:in_flight_fence = 
+element:pool = 
+element:render_finished_semaphore = 
+element:width = 

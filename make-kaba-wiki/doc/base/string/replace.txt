@@ -1,0 +1,4 @@
+description = Finds and replaces each occurance of a sequence within a string.
+param:by = The sequence to replace it by.
+param:sub = The exact sequence to replace.
+return = The result of the replacement.

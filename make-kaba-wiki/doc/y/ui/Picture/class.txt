@@ -1,0 +1,11 @@
+description = 
+element:_eff_area = 
+element:align = 
+element:area = 
+element:blur = 
+element:color = 
+element:dz = 
+element:margin = 
+element:source = 
+element:texture = 
+element:visible = 

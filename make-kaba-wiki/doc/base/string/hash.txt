@@ -1,0 +1,2 @@
+description = Calculates a very simple hash, a number (more or less) unique to each text input.
+return = The hash number.

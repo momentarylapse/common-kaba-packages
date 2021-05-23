@@ -1,0 +1,2 @@
+description = Add a single character to the string.
+param:x = The character to add.

@@ -26,7 +26,9 @@ string show_func(string ns, Function f)
 	if f.namespace
 		name = "{{f.namespace.name}}.{{f.name}}"
 	
-	string wiki = "== Kaba function {{name}} ==\n"
+	string wiki = "== Kaba function {{name}} ==\n\n"
+	
+	wiki += "{{doc_get_func_description(ns, f)}}\n\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
@@ -37,11 +39,11 @@ string show_func(string ns, Function f)
 		wiki += "\n=== Parameters ===\n\n"
 		for p,i in f.param_type
 			wiki += "; <tt>{{p.name}} {{f.var[i].name}}</tt>\n"
-			wiki += ": description\n\n"
+			wiki += ": {{doc_get_func_param(ns, f, f.var[i].name)}}\n\n"
 
 	if f.return_type.name != "void"
 		wiki += "\n=== Return ===\n\n"
-		wiki += "description\n\n"
+		wiki += "{{doc_get_func_return(ns, f)}}\n\n"
 	
 	return wiki
 
@@ -171,7 +173,8 @@ string func_pre(Function f)
 
 
 string show_class(string ns, Class c)
-	string wiki = "== Kaba class {{c.name}} ==\n"
+	string wiki = "== Kaba class {{c.name}} ==\n\n"
+	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
 	let funcs = filter_funcs(c.functions, c)
 	let elements = filter_elements(c.elements)
@@ -237,7 +240,7 @@ string show_class(string ns, Class c)
 	if len(classes) > 0
 		wiki += "\n=== Child classes ===\n\n"
 		for cc in classes
-			wiki += "* <tt>class [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]\n"
+			wiki += "* <tt>class [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]</tt>\n"
 	
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
@@ -247,14 +250,14 @@ string show_class(string ns, Class c)
 				pre += "static "
 			if f.is_const()
 				pre += "const "
-			wiki += "; <tt>{{pre}}func [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}\n"
-			wiki += ": description\n\n"
+			wiki += "; <tt>{{pre}}func [[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}</tt>\n"
+			wiki += ": {{doc_get_func_description(ns + "." + c.name, f)}}\n\n"
 	
 	if len(elements) > 0	
 		wiki += "\n=== Elements ===\n\n"
 		for e in elements
 			wiki += "; <tt>{{e.type.name}} {{e.name}}</tt>\n"
-			wiki += ": description\n\n"
+			wiki += ": {{doc_get_class_element(ns, c, e)}}\n\n"
 
 #	if len(consts) > 0
 #		wiki += "\n=== Constants ===\n\n"
@@ -298,7 +301,7 @@ string show_package(Script p)
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			wiki += "* <tt>func '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}\n"
+			wiki += "* <tt>func '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
 	let vars = sorted(p.variables(), "name")
 	if len(vars) > 0
@@ -342,28 +345,26 @@ string make_reference()
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
 	return wiki
 
-void wiki_upload(string name, string wiki)
+func wiki_upload(string name, string wiki)
 	let f = Filesystem.create_text(name + ".txt")
 	f << wiki
 	del f
 
-void find_external()
+func find_external()
 	let list = Filesystem.search("extern", "*.kaba", "f")
 	for e in list
 		let p = weak(Script.load("extern/" + e, true))
 		p.name = str(e)[:-5]
 		external_packages.add(p)
 
-void find_external_libs()
+func find_external_libs()
 	let list = Filesystem.search("lib", "*.kaba", "f")
 	for e in list
 		let p = weak(Script.load("lib/" + e, true))
 		p.name = str(e)[:-5]
 		external_libs.add(p)
 
-void main()
-	find_external()
-	find_external_libs()
+func make_documentation()
 	wiki_upload("kaba.reference", make_reference())
 
 	for p in weak(packages)
@@ -373,17 +374,129 @@ void main()
 	for p in external_libs
 		make_package(p)
 
-void make_class(Class c, string ns)
+
+import hui
+
+func parse_doc_string(string s) -> string
+	string ss = s
+	while true
+		int p = ss.find("<class>", 0)
+		if p < 0
+			break
+		int p2 = ss.find("</class>", p)
+		if p2 < 0
+			break
+		string c = ss[p+7:p2]
+		let xx = c.explode(".")
+		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
+	return ss.unescape()
+
+func doc_get(string ns, string name, bool is_class, string key) -> string
+	let p = Path("doc/" + ns.replace(".", "/"))
+	if is_class
+		p = p << name << "class.txt"
+	else
+		p = p << name + ".txt"
+	#print(p)
+	hui.Configuration conf
+	conf.load(p)
+	if conf[key] == ""
+		print("MISSING: {{ns}}.{{name}}:  {{key}}")
+		conf[key] = ""
+		conf.save(p)
+	else if conf[key] == "."
+		return ""
+	else
+		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
+		return parse_doc_string(conf[key])
+	return "no description"
+
+func doc_get_class_description(string ns, Class c) -> string
+	return doc_get(ns, c.name, true, "description")
+
+func doc_get_class_element(string ns, Class c, ClassElement e) -> string
+	return doc_get(ns, c.name, true, "element:{{e.name}}")
+
+func doc_get_func_description(string ns, Function f) -> string
+	return doc_get(ns, f.name, false, "description")
+
+func doc_get_func_return(string ns, Function f) -> string
+	return doc_get(ns, f.name, false, "return")
+
+func doc_get_func_param(string ns, Function f, string p) -> string
+	return doc_get(ns, f.name, false, "param:{{p}}")
+
+func prepare_func(Function f, string ns, Path dir)
+	doc_get_func_description(ns, f)
+	for p,i in f.param_type
+		doc_get_func_param(ns, f, f.var[i].name)
+	if f.return_type.name != "void"
+		doc_get_func_return(ns, f)
+
+func prepare_class(Class c, string ns, Path dir)
+	if not Filesystem.exists(dir)
+		Filesystem.create_directory(dir)
+	
+	let funcs = filter_funcs(c.functions, c)
+	let elements = filter_elements(c.elements)
+	let consts = filter_consts(c.constants)
+	let classes = filter_classes(c.classes)
+	
+	doc_get_class_description(ns, c)
+	for e in elements
+		doc_get_class_element(ns, c, e)
+	
+	for f in funcs
+		prepare_func(f, ns + "." + c.name, dir)
+	
+	for cc in classes
+		prepare_class(cc, ns + "." + c.name, dir << cc.name)
+
+func prepare_package(Script p, Path dir)
+	if not Filesystem.exists(dir)
+		Filesystem.create_directory(dir)
+
+	let classes = filter_classes(p.classes())
+	for c in classes
+		prepare_class(c, p.name, dir << c.name)
+
+	let funcs = filter_funcs(p.functions(), p.base_class())
+	for f in funcs
+		prepare_func(f, p.name, dir)
+
+#	let vars = p.variables()
+#	for v in vars
+#		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
+
+
+func prepare(Path dir)
+	for p in weak(packages)
+		prepare_package(p, dir << p.name)
+	for p in external_packages
+		prepare_package(p, dir << p.name)
+	for p in external_libs
+		prepare_package(p, dir << p.name)
+
+func main(string[] arg)
+	find_external()
+	find_external_libs()
+	if len(arg) > 0
+		if arg[0] == "prepare"
+			prepare("doc")
+	else
+		make_documentation()
+
+func make_class(Class c, string ns)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
 
 	let funcs = filter_funcs(c.functions, c)
 	for f in funcs
-		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", show_func("{{ns}}.{{c.name}}.{{f.name}}", f))
+		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", show_func("{{ns}}.{{c.name}}", f))
 	let classes = filter_classes(c.classes)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-void make_package(Script p)	
+func make_package(Script p)
 	wiki_upload("kaba." + p.name, show_package(p))
 
 	let classes = filter_classes(p.classes())

@@ -1,0 +1,8 @@
+description = 
+element:ambient = 
+element:diffuse = 
+element:emission = 
+element:shader = 
+element:shininess = 
+element:specular = 
+element:textures = 

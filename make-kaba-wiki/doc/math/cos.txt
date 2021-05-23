@@ -1,0 +1,3 @@
+description = The cosine.
+param:x = The angle (in radians).
+return = The cosine.

@@ -1,0 +1,9 @@
+description = 
+element:_shared_ref_count = 
+element:bh_midi = 
+element:frequency = 
+element:loud_enough = 
+element:name = 
+element:pitch = 
+element:session = 
+element:volume = 

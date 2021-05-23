@@ -1,0 +1,13 @@
+description = 
+element:ang = 
+element:bones = 
+element:mass = 
+element:materials = 
+element:matrix = 
+element:mesh = 
+element:pos = 
+element:rot = 
+element:theta = 
+element:var = 
+element:var_i = 
+element:vel = 

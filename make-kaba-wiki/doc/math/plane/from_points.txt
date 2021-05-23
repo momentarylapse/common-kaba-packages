@@ -1,0 +1,5 @@
+description = Find the plane containing 3 points.
+param:a = The first point.
+param:b = The second point.
+param:c = The third point.
+return = The plane.

@@ -1,0 +1,3 @@
+description = Gives the minimal distance of a point to the plane.
+param:p = The point.
+return = The minimal distance.

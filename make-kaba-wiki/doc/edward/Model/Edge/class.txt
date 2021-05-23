@@ -1,0 +1,13 @@
+description = 
+element:is_round = 
+element:is_selected = 
+element:is_special = 
+element:m_delta = 
+element:m_old = 
+element:pos = 
+element:ref_count = 
+element:side = 
+element:triangle = 
+element:vertex = 
+element:view_stage = 
+element:weight = 
