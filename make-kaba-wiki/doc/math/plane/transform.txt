@@ -1,3 +1,3 @@
-description = 
-param:m = 
-return = 
+description = Transform the plane by a matrix (rotation, translation).
+param:m = The transformation matrix.
+return = The transformed plane.

@@ -5,5 +5,6 @@ element:frequency =
 element:loud_enough = 
 element:name = 
 element:pitch = 
+element:port_out = 
 element:session = 
 element:volume = 

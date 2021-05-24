@@ -1,4 +1,5 @@
 description = 
+element:allow_shadow = 
 element:color = 
 element:dir = 
 element:enabled = 
@@ -6,3 +7,5 @@ element:harshness =
 element:pos = 
 element:radius = 
 element:theta = 
+element:user_shadow_control = 
+element:user_shadow_theta = 

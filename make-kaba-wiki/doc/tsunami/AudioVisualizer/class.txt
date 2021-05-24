@@ -1,6 +1,10 @@
 description = 
 element:_shared_ref_count = 
 element:chunk_size = 
+element:current_reading = 
 element:name = 
+element:next_writing = 
 element:out = 
+element:port_out = 
+element:ring_buffer = 
 element:session = 

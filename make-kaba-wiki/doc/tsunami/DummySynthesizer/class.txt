@@ -8,6 +8,7 @@ element:freq =
 element:keep_notes = 
 element:name = 
 element:out = 
+element:port_out = 
 element:render_by_ref = 
 element:sample_rate = 
 element:session = 

@@ -1,5 +1,7 @@
 description = 
 param:affect_midi = 
+param:b = 
 param:beats = 
 param:bpm = 
 param:index = 
+param:mode = 

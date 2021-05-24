@@ -1,1 +1,2 @@
-description = 
+description = Create the plane with flipped normal vector.
+return = The inverted plane.

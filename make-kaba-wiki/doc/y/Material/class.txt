@@ -1,7 +1,11 @@
 description = 
+element:albedo = 
 element:ambient = 
+element:cast_shadow = 
 element:diffuse = 
 element:emission = 
+element:metal = 
+element:roughness = 
 element:shader = 
 element:shininess = 
 element:specular = 

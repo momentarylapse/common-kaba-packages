@@ -1,2 +1,2 @@
-description = 
-return = 
+description = The complex conjugate, with flipped imaginary part: <math> \\bar z = x - iy </math>.
+return = The complex conjugate.

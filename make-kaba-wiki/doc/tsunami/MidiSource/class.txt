@@ -2,4 +2,5 @@ description =
 element:_shared_ref_count = 
 element:bh_midi = 
 element:name = 
+element:port_out = 
 element:session = 

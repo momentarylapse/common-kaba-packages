@@ -1,5 +1,5 @@
-description = 
-element:_e = 
-element:x = 
-element:y = 
-element:z = 
+description = A 3d vector.
+element:_e = Reinterprete (x,y,z) as an array.
+element:x = .
+element:y = .
+element:z = .

@@ -1,4 +1,6 @@
 description = 
 param:fx = 
+param:r = 
 param:range = 
+param:t = 
 param:text = 

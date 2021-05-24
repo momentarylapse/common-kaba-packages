@@ -1,4 +1,6 @@
 description = 
 param:affect_midi = 
 param:index = 
+param:length = 
+param:mode = 
 param:time = 

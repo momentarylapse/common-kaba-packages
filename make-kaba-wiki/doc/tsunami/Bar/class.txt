@@ -6,3 +6,4 @@ element:index =
 element:index_text = 
 element:length = 
 element:offset = 
+element:total_sub_beats = 

@@ -1,6 +1,8 @@
 description = 
 element:_shared_ref_count = 
+element:apply_to_whole_buffer = 
 element:name = 
 element:out = 
+element:port_out = 
 element:session = 
 element:source = 

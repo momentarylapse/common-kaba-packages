@@ -1,1 +1,5 @@
 description = 
+element:num_x = 
+element:num_z = 
+element:pattern = 
+element:pos = 

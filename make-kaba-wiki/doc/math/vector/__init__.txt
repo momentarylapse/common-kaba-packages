@@ -1,4 +1,4 @@
-description = 
-param:x = 
-param:y = 
-param:z = 
+description = .
+param:x = .
+param:y = .
+param:z = .

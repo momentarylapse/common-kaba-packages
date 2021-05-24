@@ -1,2 +1,2 @@
-description = 
-return = 
+description = The absolute value <math>\\|z\\| = \\sqrt{x^2 + y^2} </math>.
+return = The absolute value.
