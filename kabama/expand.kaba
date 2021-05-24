@@ -3,14 +3,14 @@ use parser
 
 shared Term expand(shared Term _t)
 	# recursive
-	let t = _t.shallow_copy()
+	var t = _t.shallow_copy()
 	for p in t.params
 		p = expand(p)
 
 	# self
 	if t.name == "*"
-		let p1 = t.params[0]
-		let p2 = t.params[1]
+		var p1 = t.params[0]
+		var p2 = t.params[1]
 		
 		if (p1.name == "+") or (p1.name == "-")
 			# (x + y) * z  ->  x * z + y * z
@@ -21,8 +21,8 @@ shared Term expand(shared Term _t)
 			return expand(AddOperator(p2.name, AddOperator("*", p1, p2.params[0]),
 			                                   AddOperator("*", p1, p2.params[1])))
 	else if t.name == "^"
-		let p1 = t.params[0]
-		let p2 = t.params[1]
+		var p1 = t.params[0]
+		var p2 = t.params[1]
 		if p2.type == TYPE_NUMBER
 			if p1.name == "*"
 				# (a * b)^c  ->  a^c * b^c
@@ -30,7 +30,7 @@ shared Term expand(shared Term _t)
 				                               AddOperator("^", p1.params[1], p2)))
 			else if (p1.name == "+") or (p1.name == "-")
 				int e = int(p2.name)
-				let t_mul = p1
+				var t_mul = p1
 				for i in 1:e
 					t_mul = AddOperator("*", t_mul, p1)
 				return expand(t_mul)

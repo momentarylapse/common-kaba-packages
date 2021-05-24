@@ -92,7 +92,7 @@ DbFile parse_bson(void* b)
 				t.value = bson_iter_str(&iter)
 				f.tags.add(t)
 			else if _bson_iter_type(&iter) == 4 # array
-				let values = bson_iter_str_array(&iter)
+				var values = bson_iter_str_array(&iter)
 				for v in values
 					Tag t
 					t.key = key
@@ -141,15 +141,15 @@ class Database
 		del medium
 		del m
 	DbFile[] find(string json)
-		let r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
+		var r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
 		return parse_result(weak(r))
 	DbFile by_id(string id)
-		let r = files.find("{\"id\":\"{{id}}\"}")
+		var r = files.find("{\"id\":\"{{id}}\"}")
 		if r.has_more()
 			return parse_bson(r.doc)
 		raise(new Exception("id not found"))
 	DbFile by_hash(string hash)
-		let r = files.find("{\"hash\":\"{{hash}}\"}")
+		var r = files.find("{\"hash\":\"{{hash}}\"}")
 		if r.has_more()
 			return parse_bson(r.doc)
 		r = medium.find("{\"hash\":\"{{hash}}\"}")
@@ -161,7 +161,7 @@ class Database
 		raise(new Exception("hash not found"))
 	
 	void mediumify(out DbFile f)
-		let r = medium.find("{\"id\":\"{{f.id}}\"}")
+		var r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
 			DbMedium m = parse_bson_medium(r.doc)
 			f.make_medium(m)
@@ -195,7 +195,7 @@ by-hash <hash1> <hash2>")
 		else
 			arg.add(a)
 
-	let db = new Database()
+	var db = new Database()
 	if arg[0] == "find" and len(arg) >= 2
 		DbFile[] files = db.find(filter_to_json(arg[1]))
 		for f in files
@@ -206,14 +206,14 @@ by-hash <hash1> <hash2>")
 	if arg[0] == "by-id"
 		for i in 1:len(arg)
 			try
-				let f = db.by_id(arg[i])
+				var f = db.by_id(arg[i])
 				print(str(f))
 			except
 				print("-")
 	if arg[0] == "by-id-medium"
 		for i in 1:len(arg)
 			try
-				let f = db.by_id(arg[i])
+				var f = db.by_id(arg[i])
 				db.mediumify(f)
 				print(str(f))
 			except
@@ -221,7 +221,7 @@ by-hash <hash1> <hash2>")
 	if arg[0] == "by-hash"
 		for i in 1:len(arg)
 			try
-				let f = db.by_hash(arg[i])
+				var f = db.by_hash(arg[i])
 				print(str(f))
 			except
 				print("-")

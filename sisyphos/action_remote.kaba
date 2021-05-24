@@ -26,6 +26,6 @@ void action_remote_add(string[] arg) # filter, dir
 
 
 void action_remote_tag_list(string[] arg)
-	let r = call_alex("tag list", [arg[0]]).explode("\n")
+	var r = call_alex("tag list", [arg[0]]).explode("\n")
 	for t in r
 		print(t)

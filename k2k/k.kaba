@@ -153,7 +153,7 @@ class DynamicValue
 	void add(DynamicValue el)
 		s.add(el)
 	const DynamicValue* copy()
-		let c = new DynamicValue()
+		var c = new DynamicValue()
 		del c.s
 		c.s = s.copy()
 		c.type = type
@@ -338,7 +338,7 @@ class DynamicValueStateInt extends DynamicValueState
 	override float __float__()
 		return v
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateInt()
+		var c = new DynamicValueStateInt()
 		c.v = v
 		return c
 
@@ -351,7 +351,7 @@ class DynamicValueStateBool extends DynamicValueState
 	override bool __bool__()
 		return v
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateBool()
+		var c = new DynamicValueStateBool()
 		c.v = v
 		return c
 
@@ -366,7 +366,7 @@ class DynamicValueStateFloat extends DynamicValueState
 	override float __float__()
 		return v
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateFloat()
+		var c = new DynamicValueStateFloat()
 		c.v = v
 		return c
 
@@ -385,7 +385,7 @@ class DynamicValueStateString extends DynamicValueState
 	override bool __bool__()
 		return len(v) > 0
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateString()
+		var c = new DynamicValueStateString()
 		c.v = v
 		return c
 
@@ -415,7 +415,7 @@ class DynamicValueStateArray extends DynamicValueState
 	override void add(DynamicValue el)
 		a.add(el.copy())
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateArray()
+		var c = new DynamicValueStateArray()
 		for el in a
 			c.add(el.copy())
 		return c
@@ -444,7 +444,7 @@ class DynamicValueStateDict extends DynamicValueState
 			if k.compare(key) == 0
 				return values[j]
 		
-		let val = new DynamicValue()
+		var val = new DynamicValue()
 		values.add(val)
 		keys.add(key.copy())
 		return val
@@ -455,7 +455,7 @@ class DynamicValueStateDict extends DynamicValueState
 		values.add(val.copy())
 		keys.add(key.copy())
 	override DynamicValueState* copy()
-		let c = new DynamicValueStateDict()
+		var c = new DynamicValueStateDict()
 		for v,i in values
 			c.add(keys[i].copy(),v.copy())
 		return c
@@ -593,7 +593,7 @@ class FunctionRange extends FunctionInternal
 
 		int i = start
 		while i < end
-			let ii = new DynamicValue()
+			var ii = new DynamicValue()
 			ii.setInt(i)
 			a.a.add(ii)
 			i += step
@@ -917,7 +917,7 @@ class SyntaxTree
 		next() # ")"
 		return sn
 	SyntaxNode* getOperandArrayBuilder()
-		let sn = new SyntaxNodeArrayBuilder()
+		var sn = new SyntaxNodeArrayBuilder()
 		next() # "["
 		while cur != "]"
 			SyntaxNode *sub = getOperandGreedy()
@@ -929,7 +929,7 @@ class SyntaxTree
 		next() # "]"
 		return sn
 	SyntaxNode* getOperandDictBuilder()
-		let sn = new SyntaxNodeDictBuilder()
+		var sn = new SyntaxNodeDictBuilder()
 		next() # "{"
 		while cur != "}"
 			SyntaxNode *key = getOperandGreedy()
@@ -947,7 +947,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode* checkOperandExtensions(SyntaxNode* sn)
 		if cur == "["
-			let el = new SyntaxNodeArrayElement()
+			var el = new SyntaxNodeArrayElement()
 			el.params.add(sn)
 			next() # "["
 			SyntaxNode* index = getOperandGreedy()
@@ -1014,7 +1014,7 @@ class SyntaxTree
 			rank.remove(imin)
 		return sn[0]
 	SyntaxNode *getSpecialCommandReturn()
-		let sn = new SyntaxNodeReturn()
+		var sn = new SyntaxNodeReturn()
 		while !endOfLine()
 			next()
 			sn.params.add(getOperandGreedy())
@@ -1027,7 +1027,7 @@ class SyntaxTree
 		return sn
 	SyntaxNode *getSpecialCommandIf()
 		int indent0 = cur_line.indent
-		let sn = new SyntaxNodeIf()
+		var sn = new SyntaxNodeIf()
 		next() # "if"
 		sn.params.add(getOperandGreedy())
 		sn.block = parseBlock()

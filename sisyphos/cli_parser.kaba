@@ -78,7 +78,7 @@ class CLIParser
 	const void run(string[] arg)
 		current = &self
 		try
-			let arg2 = parse_options(arg)
+			var arg2 = parse_options(arg)
 			if parse_commands(arg2)
 				return
 			if len(arg2) > 0
@@ -116,7 +116,7 @@ class CLIParser
 				if len(arg) - len(c.name) < c.min_params()
 					raise(new Exception("missing parameters: {{c.sig()}}"))
 				#print("command {{c.name}}")
-				let aa = arg[len(c.name):]
+				var aa = arg[len(c.name):]
 				call(c.f, aa)
 				return true
 		return false
@@ -127,12 +127,12 @@ class CLIParser
 			print("")
 		print("commands:")
 		for c in commands
-			let s = c.sig()
+			var s = c.sig()
 			print("  {{s|-30}} # {{c.comment}}")
 		
 		if len(options) > 0
 			print("")
 			print("options:")
 			for o in options
-				let s = o.sig()
+				var s = o.sig()
 				print("  {{s|-30}} # {{o.comment}}")

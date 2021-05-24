@@ -12,7 +12,7 @@ void main()
 		print("\n>>> ")
 	
 	
-		let s = stdin.read(1000)
+		var s = stdin.read(1000)
 		if len(s) == 0
 			break
 		s = s[:-1]

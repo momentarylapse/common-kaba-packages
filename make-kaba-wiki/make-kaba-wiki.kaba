@@ -176,13 +176,13 @@ string show_class(string ns, Class c)
 	string wiki = "== Kaba class {{c.name}} ==\n\n"
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
-	let funcs = filter_funcs(c.functions, c)
-	let elements = filter_elements(c.elements)
-	let consts = filter_consts(c.constants)
-	let ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
+	var funcs = filter_funcs(c.functions, c)
+	var elements = filter_elements(c.elements)
+	var consts = filter_consts(c.constants)
+	var ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
 	
 	elements = sorted(elements, "name")
-	let classes = filter_classes(c.classes)
+	var classes = filter_classes(c.classes)
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
@@ -208,7 +208,7 @@ string show_class(string ns, Class c)
 			else
 				if f.num_params >= 1
 					p = f.param_type[0]
-			let ll = "{{SHIFT}}{{pre}}func {{f.name}}({{func_params(f)}}){{func_return(f)}}"
+			var ll = "{{SHIFT}}{{pre}}func {{f.name}}({{func_params(f)}}){{func_return(f)}}"
 			wiki += "{{ll|-40}}"
 			if f.name == "__subarray__"
 				wiki += " # {{c.name}}[int:int] -> {{f.return_type.name}}\n"
@@ -291,25 +291,25 @@ string show_package(Script p)
 	string wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package {{p.name}} (default) ==\n"
-	let classes = filter_classes(p.classes())
+	var classes = filter_classes(p.classes())
 	if len(classes) > 0
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
 			wiki += "* <tt>class '''[[kaba.{{p.name}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
 
-	let funcs = filter_funcs(p.functions(), p.base_class())
+	var funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
 			wiki += "* <tt>func '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
-	let vars = sorted(p.variables(), "name")
+	var vars = sorted(p.variables(), "name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
 			wiki += "* <tt>{{v.type.name}} '''[[kaba.{{p.name}}.{{v.name}}|{{v.name}}]]'''</tt>\n"
 
-	let consts = filter_consts(p.constants())
+	var consts = filter_consts(p.constants())
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for c in consts
@@ -339,28 +339,28 @@ string make_reference()
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
-	let stats = sorted(statements, "name")
+	var stats = sorted(statements, "name")
 	for s in stats
 		if s.name[:1] != "-" and len(s.name) > 0
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
 	return wiki
 
 func wiki_upload(string name, string wiki)
-	let f = Filesystem.create_text(name + ".txt")
+	var f = Filesystem.create_text(name + ".txt")
 	f << wiki
 	del f
 
 func find_external()
-	let list = Filesystem.search("extern", "*.kaba", "f")
+	var list = Filesystem.search("extern", "*.kaba", "f")
 	for e in list
-		let p = weak(Script.load("extern/" + e, true))
+		var p = weak(Script.load("extern/" + e, true))
 		p.name = str(e)[:-5]
 		external_packages.add(p)
 
 func find_external_libs()
-	let list = Filesystem.search("lib", "*.kaba", "f")
+	var list = Filesystem.search("lib", "*.kaba", "f")
 	for e in list
-		let p = weak(Script.load("lib/" + e, true))
+		var p = weak(Script.load("lib/" + e, true))
 		p.name = str(e)[:-5]
 		external_libs.add(p)
 
@@ -387,12 +387,12 @@ func parse_doc_string(string s) -> string
 		if p2 < 0
 			break
 		string c = ss[p+7:p2]
-		let xx = c.explode(".")
+		var xx = c.explode(".")
 		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 	return ss.unescape()
 
 func doc_get(string ns, string name, bool is_class, string key) -> string
-	let p = Path("doc/" + ns.replace(".", "/"))
+	var p = Path("doc/" + ns.replace(".", "/"))
 	if is_class
 		p = p << name << "class.txt"
 	else
@@ -437,10 +437,10 @@ func prepare_class(Class c, string ns, Path dir)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
 	
-	let funcs = filter_funcs(c.functions, c)
-	let elements = filter_elements(c.elements)
-	let consts = filter_consts(c.constants)
-	let classes = filter_classes(c.classes)
+	var funcs = filter_funcs(c.functions, c)
+	var elements = filter_elements(c.elements)
+	var consts = filter_consts(c.constants)
+	var classes = filter_classes(c.classes)
 	
 	doc_get_class_description(ns, c)
 	for e in elements
@@ -456,15 +456,15 @@ func prepare_package(Script p, Path dir)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
 
-	let classes = filter_classes(p.classes())
+	var classes = filter_classes(p.classes())
 	for c in classes
 		prepare_class(c, p.name, dir << c.name)
 
-	let funcs = filter_funcs(p.functions(), p.base_class())
+	var funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
 		prepare_func(f, p.name, dir)
 
-#	let vars = p.variables()
+#	var vars = p.variables()
 #	for v in vars
 #		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
 
@@ -489,24 +489,24 @@ func main(string[] arg)
 func make_class(Class c, string ns)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
 
-	let funcs = filter_funcs(c.functions, c)
+	var funcs = filter_funcs(c.functions, c)
 	for f in funcs
 		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", show_func("{{ns}}.{{c.name}}", f))
-	let classes = filter_classes(c.classes)
+	var classes = filter_classes(c.classes)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
 func make_package(Script p)
 	wiki_upload("kaba." + p.name, show_package(p))
 
-	let classes = filter_classes(p.classes())
+	var classes = filter_classes(p.classes())
 	for c in classes
 		make_class(c, p.name)
 
-	let funcs = filter_funcs(p.functions(), p.base_class())
+	var funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
 		wiki_upload("kaba.{{p.name}}.{{f.name}}", show_func(p.name, f))
 
-	let vars = p.variables()
+	var vars = p.variables()
 	for v in vars
 		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))

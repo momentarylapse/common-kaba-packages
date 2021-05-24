@@ -18,9 +18,9 @@ void test_compile(Path filename)
 		error_count ++
 
 void test_rec(Path dir)
-	let subdirs = Filesystem.search(dir, "", "dr0")
+	var subdirs = Filesystem.search(dir, "", "dr0")
 	for s in subdirs
-		let list = Filesystem.search(dir << s, "*.kaba", "f")
+		var list = Filesystem.search(dir << s, "*.kaba", "f")
 		if len(list) > 0
 			print("{{Term.YELLOW}}{{dir << s}}{{Term.END}}")
 		for e in list

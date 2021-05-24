@@ -8,8 +8,8 @@ use os
 
 void _action_tag_add(Path path, string tag)
 	set_working_dir(path)
-	let files = lister.find(path)
-	let t = str2tag(tag)
+	var files = lister.find(path)
+	var t = str2tag(tag)
 	for f in files
 		f.tag_add(t)
 
@@ -22,8 +22,8 @@ void action_tag_add(string[] arg)
 
 void _action_tag_set(Path path, string tag)
 	set_working_dir(path)
-	let files = lister.find(path)
-	let t = str2tag(tag)
+	var files = lister.find(path)
+	var t = str2tag(tag)
 	for f in files
 		f.tag_set(t)
 
@@ -36,8 +36,8 @@ void action_tag_set(string[] arg)
 
 void _action_tag_rm(Path path, string tag)
 	set_working_dir(path)
-	let files = lister.find(path)
-	let t = str2tag(tag)
+	var files = lister.find(path)
+	var t = str2tag(tag)
 	for f in files
 		f.tag_rm(t)
 
@@ -50,7 +50,7 @@ void action_tag_rm(string[] arg)
 
 void _action_tag_get(Path path, string key)
 	set_working_dir(path)
-	let files = lister.find(path)
+	var files = lister.find(path)
 	for f in files
 		f.show()
 		for t in f.tags
@@ -72,7 +72,7 @@ void action_tag_get(string[] arg)
 			
 void _action_tag_auto(Path path)
 	set_working_dir(path)
-	let files = lister.find(path)
+	var files = lister.find(path)
 	for f in files
 		auto_tag(f)
 
@@ -86,8 +86,8 @@ void action_tag_auto(string[] arg)
 
 void _action_tag_diff(Path path)
 	set_working_dir(path)
-	let files = lister.find(path)
-	let rfiles = remote_get_meta(files)
+	var files = lister.find(path)
+	var rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
 			if lf.id == rf.id

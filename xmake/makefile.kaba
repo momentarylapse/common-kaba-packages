@@ -74,7 +74,7 @@ void create_makefile(Profile p, string postfix)
 	f << cl("CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)")
 	f << "prefix = /usr/local"
 	f << ""
-	let obj = collect_objects()
+	var obj = collect_objects()
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
 	string main_ob = conf.main_file.replace(".cpp", ".o")
@@ -93,15 +93,15 @@ void create_makefile(Profile p, string postfix)
 
 	# install
 	f << "install :"
-	let datadir = "$(prefix)/share/{{conf.name}}"
-	let std = "../static/"
+	var datadir = "$(prefix)/share/{{conf.name}}"
+	var std = "../static/"
 	f << "	mkdir -p {{datadir}}"
 	if conf.desktop_file != ""
 		f << "	xdg-desktop-menu install {{std}}{{conf.desktop_file}}"
 	for m in conf.mime_files
 		f << "	xdg-mime install {{std}}{{m}}"
 	for icon,i in conf.icons
-		let xx = icon.explode(":")
+		var xx = icon.explode(":")
 		string e
 		if i < len(conf.icons) - 1
 			e += " --noupdate"
@@ -109,9 +109,9 @@ void create_makefile(Profile p, string postfix)
 			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} {{std}}{{xx[0]}} {{xx[2]}}{{e}}"
 #	if conf.icon != ""
 #		f << "	cp -f " + conf.icon + " " + datadir
-	let list = conf.needs_installing()
+	var list = conf.needs_installing()
 	for e in list
-		let path = Path("..") << e
+		var path = Path("..") << e
 		if Filesystem.is_directory(path)
 			f << "	cp -ruf '{{path}}' {{datadir}}"
 		else

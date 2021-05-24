@@ -16,7 +16,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	string pguid, sguid
 	try
-		let f = os.Filesystem.read_text(conf.root << "../{{conf.name}}.sln")
+		var f = os.Filesystem.read_text(conf.root << "../{{conf.name}}.sln")
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -36,9 +36,9 @@ func create_visual_studio(int version)
 	print("-- visual studio {{version}} --")
 	#print(create_guid())
 	
-	let GUIDS = guess_guid()
-	let PGUID = GUIDS.e0
-	let SGUID = GUIDS.e1
+	var GUIDS = guess_guid()
+	var PGUID = GUIDS.e0
+	var SGUID = GUIDS.e1
 	if PGUID == ""
 		PGUID = create_guid()
 	if SGUID == ""
@@ -60,13 +60,13 @@ func create_visual_studio(int version)
 		else
 			xdef.add("{{lib.define(l)}}=0")
 	#let defines = "HAS_LIB_GTK3=1;HAS_LIB_ZLIB=1;HAS_LIB_FFTW3=1;HAS_LIB_OGG=1;HAS_LIB_FLAC=1;HAS_LIB_ALSA=0;HAS_LIB_PULSEAUDIO=0;HAS_LIB_PORTAUDIO=1;HAS_LIB_UNWIND=0;HAS_LIB_DL=0;HAS_LIB_GL=0"
-	let defines = xdef.join(";")
+	var defines = xdef.join(";")
 	if conf.verbose
 		print(defines)
 	
-	let includes = os.Filesystem.search("./", "*.h", "rf")
+	var includes = os.Filesystem.search("./", "*.h", "rf")
 	
-	let f = "
+	var f = "
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
@@ -268,9 +268,9 @@ EndGlobal
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
-	let fdirs = Filesystem.search(conf.root, "", "dr")
+	var fdirs = Filesystem.search(conf.root, "", "dr")
 	for d in fdirs
-		let dir = win_path(Path("src") << d)
+		var dir = win_path(Path("src") << d)
 		rand_seed(dir.hash())
 		f += "
     <Filter Include=\"{{dir}}\">

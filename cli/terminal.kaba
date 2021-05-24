@@ -101,7 +101,7 @@ void move_cursor(int dx, int dy)
 
 
 string fancy_read_command(string prompt, out string[] history)
-	let ppp = _print_postfix
+	var ppp = _print_postfix
 	_print_postfix = ""
 	setraw()
 	print(prompt)
@@ -109,7 +109,7 @@ string fancy_read_command(string prompt, out string[] history)
 	int cursor_pos = 0
 	int hist_index = len(history)
 	while true
-		let s = stdin.read(4)
+		var s = stdin.read(4)
 		#print(s.hex())
 		if len(s) == 0
 			continue

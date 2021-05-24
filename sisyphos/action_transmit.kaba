@@ -10,7 +10,7 @@ use dblister
 void _action_pull(Path path)
 	set_working_dir(path)
 	
-	let files = lister.find(path)
+	var files = lister.find(path)
 	LocalFile*[] need_meta
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
@@ -34,7 +34,7 @@ void action_pull(string[] arg)
 void _action_push(Path path)
 	set_working_dir(path)
 	
-	let files = lister.find(path)
+	var files = lister.find(path)
 	for f in files
 		if !f.in_db()
 			continue
@@ -56,7 +56,7 @@ void action_push(string[] arg)
 
 bool make_path_safe_for_download(out LocalFile f)
 	if db.has_path(f.path) or Filesystem.exists(f.path)
-		let ff = db.find_by_path(f.path)
+		var ff = db.find_by_path(f.path)
 		if ff.id == f.id
 			# same path and id -> no need to download
 			return false
@@ -64,7 +64,7 @@ bool make_path_safe_for_download(out LocalFile f)
 		return true
 	
 	# try alternative
-	let ext = f.path.extension()
+	var ext = f.path.extension()
 	f.path = Path(str(f.path)[:-len(ext)] + "{{f.id}}.{{ext}}")
 	if db.has_path(f.path) or Filesystem.exists(f.path)
 		return false
@@ -84,7 +84,7 @@ void _get_file(out LocalFile f, string dest)
 	make_all_dirs(f.path)
 
 void _action_get(string filter, string dest)
-	let files = remote_find(filter, conf.default_quality)
+	var files = remote_find(filter, conf.default_quality)
 	for f in files
 		_get_file(f, dest)
 

@@ -8,7 +8,7 @@ func is_number(char c) -> bool
 
 # 1x23 - NAME.ext
 func video_guess_tags_by_name(out LocalFile f)
-	let n = f.path.basename_no_ext()
+	var n = f.path.basename_no_ext()
 	if len(n) < 8
 		return
 	int off_x = n.find("x", 0)
@@ -27,25 +27,25 @@ func video_guess_tags_by_name(out LocalFile f)
 func auto_tag(out LocalFile f)
 	if !Filesystem.exists(f.path)
 		return
-	let ext = f.path.extension()
+	var ext = f.path.extension()
 	#print(ext)
 	try
 		if ext == "pdf"
-			let s = shell_exec("pdfinfo \"{{bash_escape(f.path)}}\" | awk '/Pages/{print $2}'")
+			var s = shell_exec("pdfinfo \"{{bash_escape(f.path)}}\" | awk '/Pages/{print $2}'")
 			if len(s) > 0
 				f.tag_set(["pages", s])
 		else if ext in ["png", "bmp"] #, "jpg"]
-			let s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(f.path)}}\"").explode("\n")
+			var s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(f.path)}}\"").explode("\n")
 			if len(s) >= 2
 				f.tag_set(["width", s[0]])
 				f.tag_set(["height", s[1]])
 		else if ext == "jpg"
-			let s = shell_exec("exiv2 -pv \"{{bash_escape(f.path)}}\"").explode("\n")
+			var s = shell_exec("exiv2 -pv \"{{bash_escape(f.path)}}\"").explode("\n")
 			string model, make, time
 			for l in s
 				for i in 0:20
 					l = l.replace("  ", " ")
-				let xx = l.explode(" ")
+				var xx = l.explode(" ")
 				if len(xx) < 6
 					continue
 				if xx[0] == "0xa002" # PixelXDimension
@@ -74,10 +74,10 @@ func auto_tag(out LocalFile f)
 			if len(make) > 0 and len(model) > 0
 				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext == "jpg--"
-			let s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\" || echo --end--").explode("\n")
+			var s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\" || echo --end--").explode("\n")
 			string model, make, time
 			for l in s
-				let xx = l.explode("\t")
+				var xx = l.explode("\t")
 				if len(xx) < 2
 					continue
 				if xx[0] == "0xa002"
@@ -105,7 +105,7 @@ func auto_tag(out LocalFile f)
 			if len(make) > 0 and len(model) > 0
 				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
-			let s = shell_exec("tsunami --info \"{{bash_escape(f.path)}}\"").explode("\n")
+			var s = shell_exec("tsunami --info \"{{bash_escape(f.path)}}\"").explode("\n")
 			int samples = -1
 			int sample_rate = 44100
 			for l in s

@@ -21,7 +21,7 @@ void delete_files(out LocalFile*[] files)
 void delete_path_or_filter(string arg)
 	if not is_filter(arg)
 		set_working_dir(Path(arg))
-	let files = find_by_path_or_filter(arg)
+	var files = find_by_path_or_filter(arg)
 	delete_files(files)
 
 void action_rm(string[] arg)
@@ -34,7 +34,7 @@ void action_rm(string[] arg)
 void unadd_path(Path path)
 	set_working_dir(path)
 		
-	let files = lister.find(path)
+	var files = lister.find(path)
 	for f in files
 		log_warn("drop", f.path)
 		f.drop_me = true

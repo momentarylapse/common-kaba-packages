@@ -101,7 +101,7 @@ void file_add_new(out LocalFile f, string hash)
 # check for local changes
 void add_path(Path path)
 	set_working_dir(path)
-	let files = lister.find(path)
+	var files = lister.find(path)
 	for f in files
 		file_add(f)
 			

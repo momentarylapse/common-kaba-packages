@@ -51,22 +51,22 @@ void action_check(string[] arg)
 
 void action_export(string[] arg)
 
-	let dir = Path("./")
+	var dir = Path("./")
 	if len(arg) >= 1
 		dir = Path(arg[0])
 	conf.set_dir(dir)
 	conf.load()
 	
-	let own = load_own_lang(true)#false)
+	var own = load_own_lang(true)#false)
 	
-	let langs = load_prelangs()
+	var langs = load_prelangs()
 	
 	export_resources(resources, own, langs)
 
 void patch_language(out Language l, Language own, Path filename)
 	try
 		string ttt = Filesystem.read(filename)
-		let lines = ttt.explode("\n")
+		var lines = ttt.explode("\n")
 		for i in 0:len(lines)/3
 			string a = lines[i*3]
 			string b = lines[i*3+1]
@@ -83,7 +83,7 @@ void patch_language(out Language l, Language own, Path filename)
 		pass
 
 void action_translate(string[] arg)
-	let filename = Path(arg[0])
+	var filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()
 	
@@ -93,7 +93,7 @@ void action_translate(string[] arg)
 	if check_lang(l, own, true)
 		return
 	
-	let path = conf.dir << "TRANS"
+	var path = conf.dir << "TRANS"
 	try
 		shell_execute("sgribthmaker \"{{path}}\"")
 		patch_language(l, own, path)
@@ -107,7 +107,7 @@ void action_translate(string[] arg)
 		pass
 
 void action_add(string[] arg)
-	let filename = Path(arg[0])
+	var filename = Path(arg[0])
 	string name = arg[1]
 	conf.set_dir(filename.parent())
 	conf.load()
@@ -152,12 +152,12 @@ void swap_translate_guis(Language l)
 		del f
 
 void action_swap(string[] arg)
-	let source = Path(arg[0])
-	let target = Path(arg[1])
+	var source = Path(arg[0])
+	var target = Path(arg[1])
 	conf.set_dir(source.parent())
 	conf.load()
 	
-	let own = load_own_lang(true)
+	var own = load_own_lang(true)
 	
 	Language l = load_prelang(source)
 	if !check_lang(l, own, true)

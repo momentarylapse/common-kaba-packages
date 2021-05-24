@@ -38,7 +38,7 @@ void __main()
 	hallo Welt, ein kleiner Test bla bla bla"
 	print(len(a))
 	
-	let oo = compress(a)
+	var oo = compress(a)
 	print(len(oo))
 	print(oo.hex())
 	

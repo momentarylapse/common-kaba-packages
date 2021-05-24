@@ -10,7 +10,7 @@ void main(string[] arg)
 	
 	if len(arg) > 0
 		for a in arg
-			let t = r.eval(a)
+			var t = r.eval(a)
 			print(str(t))
 		return
 	
@@ -18,9 +18,9 @@ void main(string[] arg)
 	string[] history
 	while true
 		try
-			let s = terminal.fancy_read_command(">>> ", history)
+			var s = terminal.fancy_read_command(">>> ", history)
 			if s != ""
-				let t = r.eval(s)
+				var t = r.eval(s)
 				print(str(t))
 		except SyntaxError as e
 			print("Syntax error: {{e}}")

@@ -2,10 +2,10 @@ use common
 use subst
 use simplify
 
-shared Term zeros(shared Term t, string var)
+shared Term zeros(shared Term t, string _var)
 	shared Term[] z
 	for i in -1000:1000
-		let r = subst_variable(t, var, AddNumber(str(i)))
+		var r = subst_variable(t, _var, AddNumber(str(i)))
 		r = normalize(r)
 		if r.type == TYPE_NUMBER
 			if r.name == "0"

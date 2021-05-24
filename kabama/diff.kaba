@@ -33,7 +33,7 @@ shared Term diff(shared Term t, string by)
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == TYPE_FUNCTION
-		let r = diff_function(t.name, t.params)
+		var r = diff_function(t.name, t.params)
 		for p in t.params
 			r = AddOperator("*", diff(p, by), r)
 		# diff(f(a))  ->  f'(a) * diff(a)

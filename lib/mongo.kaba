@@ -76,7 +76,7 @@ string char_to_str(char[0]* p)
 void* json_to_bson(string json)
 	string t = json
 	t.add(0)
-	let b = _bson_new_from_json(&t[0], len(json), nil)
+	var b = _bson_new_from_json(&t[0], len(json), nil)
 	if !b
 		raise(new Exception("invalid json: {{json}}"))
 	return b
@@ -168,7 +168,7 @@ class Mongo as shared
 		_mongoc_cleanup()
 
 	const Collection* collection(string db, string col)
-		let c = new Collection()
+		var c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
 			raise(new Exception("can not open collection"))
@@ -181,30 +181,30 @@ class Collection as shared
 		if col
 			_mongoc_collection_destroy(col)
 	const shared Result find(any filter)
-		let b = json_to_bson(repr(filter))
+		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
 	const shared Result aggregate(any pattern)
-		let b = json_to_bson(repr(pattern))
+		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	void insert(any doc)
-		let b = json_to_bson(repr(doc))
+		var b = json_to_bson(repr(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
 			raise(new Exception("can not insert"))
 	void replace(any filter, any doc)
-		let b = json_to_bson(repr(filter))
-		let d = json_to_bson(repr(doc))
+		var b = json_to_bson(repr(filter))
+		var d = json_to_bson(repr(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
 			raise(new Exception("can not replace"))
 	void delete_one(any filter)
-		let b = json_to_bson(repr(filter))
+		var b = json_to_bson(repr(filter))
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
 			raise(new Exception("can not delete"))
 	void delete_many(any filter)
-		let b = json_to_bson(repr(filter))
+		var b = json_to_bson(repr(filter))
 		int[160] reply
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
 			raise(new Exception("can not delete"))
-		let r = bson_to_any(&reply)
+		var r = bson_to_any(&reply)
 		print(repr(r))
 
 class Result as shared
@@ -246,14 +246,14 @@ void* __mongoc_client_get_collection(void* client, string db, string col)
 #	bson_destroy(b)
 
 void main()
-	let m = new Mongo("localhost")
+	var m = new Mongo("localhost")
 	#let col = m.get_collection("wiki", "articles")
 	#let r = col.find("{\"name\":\"Hauptseite\"}")
-	let col = m.collection("alex", "files")
-#	let r = col.find(dyn({"id":"100222175"})) # 900942014
-#	let r = col.aggregate(dyn([{"$group": {"_id": "$artist", "num": {"$sum": 1} } }]))
+	var col = m.collection("alex", "files")
+#	var r = col.find(dyn({"id":"100222175"})) # 900942014
+#	var r = col.aggregate(dyn([{"$group": {"_id": "$artist", "num": {"$sum": 1} } }]))
 
-	let r = col.find(dyn({"author":{"$regex":".*einstein", "$options":"i"}})) # 900942014
+	var r = col.find(dyn({"author":{"$regex":".*einstein", "$options":"i"}})) # 900942014
 
 	while r.has_more()
 		#print(r.json())

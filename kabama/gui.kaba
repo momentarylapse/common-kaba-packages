@@ -6,10 +6,10 @@ class KabamaWindow extends hui.Window
 	string log
 
 	void on_eval()
-		let input = get_string("input")
+		var input = get_string("input")
 		log += ">>> {{input}}\n"
 		try
-			let t = r.eval(input)
+			var t = r.eval(input)
 			log += "{{t}}\n"
 		except Exception as e
 			log += "Error: {{e}}\n"
@@ -30,5 +30,5 @@ class KabamaWindow extends hui.Window
 		event("eval", on_eval)
 	
 void main()
-	let win = new KabamaWindow()
+	var win = new KabamaWindow()
 	win.run()

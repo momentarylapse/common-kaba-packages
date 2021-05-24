@@ -27,7 +27,7 @@ class Config
 	
 	void load()
 		try
-			let f = Filesystem.open_text(dir << "export.txt")
+			var f = Filesystem.open_text(dir << "export.txt")
 			string t
 			f >> t
 			f >> t

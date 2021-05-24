@@ -9,8 +9,8 @@ void create_meson()
 	File* f = Filesystem.create_text(conf.root << "../meson.build")
 	string debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
-	let opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
-	let opt = [for o in opts "'{{o}}'"].join(", ")
+	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
+	var opt = [for o in opts "'{{o}}'"].join(", ")
 	f << "add_project_arguments({{opt}}, language : ['cpp'])"
 	f << "
 #install_data
@@ -23,9 +23,9 @@ cc = meson.get_compiler('cpp')
 mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')"
 
-	let vars = ["mdep", "threaddep"]
+	var vars = ["mdep", "threaddep"]
 	for l in conf.libs
-		let ll = lib.get(l)
+		var ll = lib.get(l)
 		string var = l + "dep"
 		vars.add(var)
 		f << var + " = dependency('{{ll.meson_libs()[0]}}')"
@@ -36,12 +36,12 @@ threaddep = dependency('threads')"
 	for l in conf.libs_optional
 		f << "
 # optional dependency: " + l
-		let ll = lib.get(l)
-		let mlibs = ll.meson_libs()
+		var ll = lib.get(l)
+		var mlibs = ll.meson_libs()
 		string ltest
 		string deps
 		for m,i in mlibs
-			let v = "d"
+			var v = "d"
 			if len(mlibs) > 1
 				v += str(i+1)
 			f << v + " = cc.find_library('{{m}}', required : false)"
@@ -74,8 +74,8 @@ sources = ["
 	
 	f << ""
 	
-	let std = "static/"
-	let list = conf.needs_installing()
+	var std = "static/"
+	var list = conf.needs_installing()
 	for e in list
 		if Filesystem.is_directory(Path("..") << e)
 			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"

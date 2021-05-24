@@ -29,7 +29,7 @@ void action_update(string[] a)
 	
 	conf.load()
 	
-	let missing = [for l in conf.libs l if !lib.test(l)]
+	var missing = [for l in conf.libs l if !lib.test(l)]
 	for l in conf.libs_optional
 		if !conf.ignored(l)
 			lib.test(l)

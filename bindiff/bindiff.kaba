@@ -87,7 +87,7 @@ void diff(string a, string b)
 		expand_mapping(a, b, m)
 		if m.a1 >= len(a) or m.b1 >= len(b)
 			break
-		let m2 = try_match(a, b, m.a1, m.b1)
+		var m2 = try_match(a, b, m.a1, m.b1)
 		if m2.a0 < 0
 			break
 		expand_mapping(a, b, m2)

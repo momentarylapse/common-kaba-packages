@@ -167,15 +167,15 @@ class Device
 		int num_if = desc.num_interfaces()
 		for i in 0:num_if
 			print("  [interface]")
-			let ii = &desc.interface[i]
+			var ii = &desc.interface[i]
 			for j in 0:ii.num_altsettings
 				print("    [alt]")
-				let a = &ii.altsetting[j]
+				var a = &ii.altsetting[j]
 				print("      interface:   {{a.interface()}}")
 				print("      alt setting: {{a.alt_setting()}}")
 				#print(a)
 				for k in 0:a.num_endpoints()
-					let e = &a.endpoint[k]
+					var e = &a.endpoint[k]
 					#any ep
 					#ep.set("address", e.address())
 					#ep.set("attributes", e.attributes())
@@ -186,7 +186,7 @@ class Device
 					print("        max packet size: {{e.max_packet_size()}}")
 		_libusb_free_config_descriptor(desc)
 	Handle* open()
-		let h = new Handle()
+		var h = new Handle()
 		h.dev = &self
 		CHECK(_libusb_open(dev, &h.h), "can not open device")
 		return h
@@ -201,12 +201,12 @@ class Context
 		_device*[0]* list
 		int n = _libusb_get_device_list(c, &list)
 		for i in 0:n
-			let dev = new Device(list[i])
+			var dev = new Device(list[i])
 			r.add(dev)
 		_libusb_free_device_list(list, 1)
 		return r
 	Handle* open(int vid, int pid)
-		let h = new Handle()
+		var h = new Handle()
 		#int v = vid << 16 + pid
 		h.h = _libusb_open_device_with_vid_pid(c, vid, pid)
 		if !h.h
@@ -268,14 +268,14 @@ class Handle
 		return str(r)
 
 Context* init_usb()
-	let c = new Context()
+	var c = new Context()
 	CHECK(_libusb_init(&c.c), "can not init library")
 	return c
 
 
 void _main()
-	let c = init_usb()
-	let devs = c.enumerate()
+	var c = init_usb()
+	var devs = c.enumerate()
 	for d in devs
 		print(str(d.get_info()))
 	del c

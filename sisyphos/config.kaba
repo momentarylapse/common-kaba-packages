@@ -21,7 +21,7 @@ string _dir_canonical(string dir)
 	return dir + "/"
 
 string _canonify(string path)
-	let xx = path.explode("/")
+	var xx = path.explode("/")
 	for i in 0:len(xx)
 		if xx[i] == "."
 			xx.remove(i)
@@ -75,8 +75,8 @@ string bash_escape2(string s)
 	return r
 
 void make_all_dirs(Path path)
-#	let parents = path.all_parents()
-	let parts = str(path).explode("/")
+#	var parents = path.all_parents()
+	var parts = str(path).explode("/")
 	string dir
 	for p,i in parts
 		if i == len(parts) - 1
@@ -99,7 +99,7 @@ string get_tag(string[] parts, string key)
 	for p in parts
 		if p.find("=", 0) < 0
 			continue
-		let kv = p.explode("=")
+		var kv = p.explode("=")
 		if kv[0] == key
 			return kv[1]
 	return ""
@@ -155,7 +155,7 @@ class ConfigDirSync
 
 
 	const string[] get_structure()
-		let oo = options.explode(";")
+		var oo = options.explode(";")
 		for o in oo
 			if o[:10] == "structure="
 				return o[10:].explode("/")
@@ -165,7 +165,7 @@ class ConfigDirSync
 		return PERFECT
 
 	const Path guess_dir(string[] parts)
-		let structure = get_structure()
+		var structure = get_structure()
 		Path dir
 		for s in structure
 			string v = get_tag(parts, s)
@@ -198,7 +198,7 @@ class Config
 	string default_structure = "{name}.{ext}"
 
 	void load()
-		let f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
+		var f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
 		int n, m
 		f >> n
 		for i in 0:n
@@ -224,7 +224,7 @@ class Config
 		del f
 	const void save()
 		make_all_dirs(hui.app_directory << "sisyphos")
-		let f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
+		var f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)
@@ -248,7 +248,7 @@ class Config
 				print("    options: {{s.options}}")
 
 	void add_filter(Path dir, string filter, string _options)
-		let options = _options
+		var options = _options
 		if default_quality == MEDIUM and options == ""
 			options = "quality=medium"
 		for e in dirs

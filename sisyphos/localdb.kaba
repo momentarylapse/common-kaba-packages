@@ -168,11 +168,11 @@ class LocalFile
 		#	s += "\nmtime: " + mtime + " (REMOTE)"
 		print(l + "size:    {{size}}")
 		#print(l + "options: " + options)
-		let _tags = tags_sort(tags)
+		var _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
 	const string remote_path()
-		let ext = path.extension()
+		var ext = path.extension()
 		if is("quality=medium")
 			return ALEX_DIR + "medium/{{id}}.{{ext}}"
 		return ALEX_DIR + "links/{{id}}"
@@ -201,9 +201,9 @@ class LocalFile
 			p1 = r.find("}", p0)
 			if p1 < 0
 				break
-			let kkey = r[p0+1:p1]
-			let xkey = kkey.explode("|")
-			let val = get_tag(xkey[0])
+			var kkey = r[p0+1:p1]
+			var xkey = kkey.explode("|")
+			var val = get_tag(xkey[0])
 			if len(xkey) >= 2
 				val = str_format(val, xkey[1])
 			
@@ -230,7 +230,7 @@ class LocalFile
 		return true
 
 Path unique_path(LocalFile f)
-	let ext = f.path.extension()
+	var ext = f.path.extension()
 	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 
 
 class LocalFileDB
@@ -241,8 +241,8 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		#Timer tt
-		let ss = Filesystem.read(hui.app_directory << "sisyphos/db")
-		let lines = ss.explode("\n")
+		var ss = Filesystem.read(hui.app_directory << "sisyphos/db")
+		var lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
 		else if lines[0] == "version=1"
@@ -302,7 +302,7 @@ class LocalFileDB
 		for f in files
 			if f.path.is_empty()
 				continue
-			let l = by_hash(f.hash)
+			var l = by_hash(f.hash)
 			if l == &f
 				continue
 			if f.path == l.path
@@ -323,11 +323,11 @@ class LocalFileDB
 		for f in files
 			if f.path.is_empty()
 				continue
-			let l = find_by_path(f.path)
+			var l = find_by_path(f.path)
 			if l == &f
 				continue
 			log_error("path collision", f.path)
-			let new_path = unique_path(f)
+			var new_path = unique_path(f)
 			
 			log_warn("move", "{{rel_path(f.path)}} > {{rel_path(new_path)}}")
 			f.path = new_path

@@ -1,13 +1,13 @@
 use common
 
 # always copy
-shared Term subst_variable(shared Term _t, string var, shared Term by)
-	let t = _t.shallow_copy()
+shared Term subst_variable(shared Term _t, string _var, shared Term by)
+	var t = _t.shallow_copy()
 	for p in t.params
-		p = subst_variable(p, var, by)
+		p = subst_variable(p, _var, by)
 	
 	if t.type == TYPE_VARIABLE
-		if t.name == var
+		if t.name == _var
 			return by
 	return t
 
@@ -47,7 +47,7 @@ bool rule_match(shared Term t, shared Term m, out Matching mm)
 
 shared Term subst(shared Term _t, shared Term pattern, shared Term substitution, int max_recursion)
 	Matching mm
-	let t = _t.shallow_copy()
+	var t = _t.shallow_copy()
 	for p in t.params
 		p = subst(p, pattern, substitution, max_recursion)
 		
@@ -55,7 +55,7 @@ shared Term subst(shared Term _t, shared Term pattern, shared Term substitution,
 		#print("MATCH!!!!")
 		#print(str(mm))
 		
-		let r = substitution
+		var r = substitution
 		for x in mm.terms
 			r = subst_variable(r, x.name, x.t)
 		if max_recursion > 0

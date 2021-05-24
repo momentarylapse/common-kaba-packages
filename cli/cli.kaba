@@ -9,7 +9,7 @@ void main()
 	string[] history
 	while true
 		try
-			let s = fancy_read_command(">>> ", history)
+			var s = fancy_read_command(">>> ", history)
 			if s != ""
 				Script.execute_single_command(s)
 		except Exception as e

@@ -126,8 +126,8 @@ class MyPSMoveController
 		pos_last = pos
 
 		matrix *mat = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
-		let s = matrix.scale(1,  1,  -1)
-		let q = quaternion(s * *mat * s)
+		var s = matrix.scale(1,  1,  -1)
+		var q = quaternion(s * *mat * s)
 		dang = ang * q
 		ang = q.bar()
 		#ang = quaternion::rotation_m( *mat)
@@ -178,7 +178,7 @@ class PsMoveManager
 		for i in 0:n
 			print("- controller {{i}} -")
 			#let p = _psmove_connect()
-			let p = _psmove_connect_by_id(i)
+			var p = _psmove_connect_by_id(i)
 			psmoves.add(new MyPSMoveController(p, &self))
 
 	void update()

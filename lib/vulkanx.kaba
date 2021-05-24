@@ -13,7 +13,7 @@ Vertex _v1(vector p, vector n, float u, float v)
 
 
 VertexBuffer* create_quad(rect r)
-	let vb = new VertexBuffer()
+	var vb = new VertexBuffer()
 	Vertex[] vertices
 	vertices.add(_v1(vector(r.x1,r.y1,0), vector.EZ, 0, 0))
 	vertices.add(_v1(vector(r.x2,r.y1,0), vector.EZ, 1, 0))
@@ -250,7 +250,7 @@ class StatLayer
 			return
 		
 		im.create(256, 64, color(0,1,1,1))
-		let pp = im.start_draw()
+		var pp = im.start_draw()
 		pp.set_color(color.WHITE)
 		pp.set_font_size(20)
 		pp.draw_str(5,5, "{{frames/_time|1}}")

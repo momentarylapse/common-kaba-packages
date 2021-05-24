@@ -15,7 +15,7 @@ class Runtime
 		string[] params
 		shared Term formula
 		string __str__()
-			let p = params.join(", ")
+			var p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
 	shared Term[] assumptions
 	Function*[] functions
@@ -24,7 +24,7 @@ class Runtime
 	#class Error extends Exception
 	
 	void add_function(shared Term t)
-		let f = new Function()
+		var f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
 			f.params.add(p.name)
@@ -34,7 +34,7 @@ class Runtime
 
 	shared Term eval_term(shared Term _t)
 		# recursive
-		let t = _t.shallow_copy()
+		var t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
 			
 		# self
@@ -64,7 +64,7 @@ class Runtime
 		return t
 
 	shared Term eval(string s)
-		let t = parse(s)
-		let r = normalize(eval_term(t))
+		var t = parse(s)
+		var r = normalize(eval_term(t))
 		history.add(r)
 		return r

@@ -11,22 +11,22 @@ use time
 bool is_completely_built(SourceFile s)
 	if not os.Filesystem.exists(s.object())
 		return false
-	let ts = os.Filesystem.mtime(s.filename)
-	let to = os.Filesystem.mtime(s.object())
+	var ts = os.Filesystem.mtime(s.filename)
+	var to = os.Filesystem.mtime(s.object())
 	if to.time < ts.time
 		return false
 	for d in s.dep
-		let td = os.Filesystem.mtime(d)
+		var td = os.Filesystem.mtime(d)
 		if to.time < td.time
 			return false
 	return true
 
 func compile(SourceFile s, string cxx_flags) -> bool
-	let command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
+	var command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
 	if conf.verbose
 		print(command)
 	try
-		let r = shell_execute(command)
+		var r = shell_execute(command)
 	except Exception as e
 		#print("ERROR:")
 		#print(e)
@@ -59,20 +59,20 @@ func build()
 		build_clear()
 
 
-	let p = get_profile(conf.force_profile)
+	var p = get_profile(conf.force_profile)
 	
-	let binary_file = Path("..") << conf.binary_file
+	var binary_file = Path("..") << conf.binary_file
 			
 	string cflags, lflags, defines
 	collect_global_flags(p, cflags, lflags, defines)
 	string x
 	if conf.build_type == "debug"
 		x = "-g"
-	let global_flags = "{{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
-	let cxx_flags = "{{conf.flags_compiler}} {{cflags}} {{global_flags}}"
-	let cxx_flags_linking = "{{conf.flags_linker}} {{lflags}} {{global_flags}}"
+	var global_flags = "{{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
+	var cxx_flags = "{{conf.flags_compiler}} {{cflags}} {{global_flags}}"
+	var cxx_flags_linking = "{{conf.flags_linker}} {{lflags}} {{global_flags}}"
 	
-	let needs_building = [for s in sources s if not is_completely_built(s)]
+	var needs_building = [for s in sources s if not is_completely_built(s)]
 	#print("total {{len(sources)}}, build {{len(needs_building)}}")
 	
 	
@@ -130,13 +130,13 @@ func build()
 		return
 			
 	print("Link  {{Term.YELLOW}}{{binary_file}}{{Term.END}}")
-	let main_ob = conf.main_file.replace(".cpp", ".o")
-	let obj = collect_objects().join(" ")
-	let command = "g++ {{obj}} {{main_ob}} -o {{binary_file}} {{cxx_flags_linking}}"
+	var main_ob = conf.main_file.replace(".cpp", ".o")
+	var obj = collect_objects().join(" ")
+	var command = "g++ {{obj}} {{main_ob}} -o {{binary_file}} {{cxx_flags_linking}}"
 	if conf.verbose
 		print(command)
 	try
-		let r = shell_execute(command)
+		var r = shell_execute(command)
 	except Exception as e
 		#print("ERROR:")
 		#print(e)
@@ -151,7 +151,7 @@ func build_clear()
 			#print(s.object())
 		except
 			pass
-	let binary_file = Path("..") << conf.binary_file
+	var binary_file = Path("..") << conf.binary_file
 	try
 		os.Filesystem.delete(binary_file)
 	except

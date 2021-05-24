@@ -50,20 +50,20 @@ class Database
 	Query* query(string sql)
 		string s = sql
 		s.add(0)
-		let q = new Query()
+		var q = new Query()
 		if _sqlite3_prepare(db, &s[0], len(sql), &q.res, nil) != 0
 			raise(new Exception("sql query failed: " + error()))
 		return q
 
 	void run(string sql)
-		let q = query(sql)
+		var q = query(sql)
 		q.step()
 		del q
 	
 	any load_doc(string table, any id)
-		let sql = "select * from {{table}} where id = {{id}}"
+		var sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
-		let q = query(sql)
+		var q = query(sql)
 		if !q.has_more()
 			raise(new Exception("{{id}} not found in {{table}}"))
 		any r = q.get_column()
@@ -71,7 +71,7 @@ class Database
 		return r
 	
 	#any save_doc(string table, any id)
-	#	let q = query("select * from " + table + " where id = " + str(id))
+	#	var q = query("select * from " + table + " where id = " + str(id))
 	#	if !q.has_more()
 	#		raise(new Exception(str(id) + " not found in " + table))
 	#	any r = q.get_column()
@@ -150,7 +150,7 @@ Database* sqlite_create(string filename)
 
 
 void __main()
-	let db = sqlite_create("test.sqlite3")
+	var db = sqlite_create("test.sqlite3")
 	db.run("create table michi (id text, a integer, b text)")
 	db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
 	db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
@@ -158,9 +158,9 @@ void __main()
 	del db
 
 void main()
-	let db = sqlite_open("test.sqlite3")
-	let q = db.query("select * from michi")
-#	let q = db.query("SELECT * FROM sqlite_master where type='table'")
+	var db = sqlite_open("test.sqlite3")
+	var q = db.query("select * from michi")
+#	var q = db.query("SELECT * FROM sqlite_master where type='table'")
 #	print(q.column_names())
 	while q.has_more()
 		print(q.get_column())

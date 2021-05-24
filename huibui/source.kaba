@@ -25,7 +25,7 @@ class SourceParser
 
 
 	void parse_source_code_dir(Path dir)
-		let files = Filesystem.search(dir, "*.cpp", "fd")
+		var files = Filesystem.search(dir, "*.cpp", "fd")
 		for f in files
 			if Filesystem.is_directory(dir << f)
 				parse_source_code_dir(dir << f)

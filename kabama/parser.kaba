@@ -55,12 +55,12 @@ class Parser
 		return cur_index >= len(e)
 
 	shared Term parse_operand_minimal()
-		let c = cur()
+		var c = cur()
 		#print("min  {{c}} {{cur_index}}")
 		if c == "("
 			# recursion
 			next() # (
-			let o = parse_operand()
+			var o = parse_operand()
 			next() # )
 			return o
 		else if c == ")"
@@ -70,7 +70,7 @@ class Parser
 			return AddVariable("$")
 		else if cur() == "@"
 			next()
-			let name = "@" + cur()
+			var name = "@" + cur()
 			next()
 			return AddVariable(name)
 		else if char_type(c[0]) == CHAR_NUMBER
@@ -108,7 +108,7 @@ class Parser
 			# operand
 			if end_of_line()
 				raise(new SyntaxError("unexpected end of line"))
-			let xx = parse_operand_minimal()
+			var xx = parse_operand_minimal()
 			eid.add(xx)
 			
 			if end_of_line()
@@ -126,7 +126,7 @@ class Parser
 
 	shared Term parse_def()
 		next() # def
-		let op = parse_operand()
+		var op = parse_operand()
 		if op.name != "="
 			raise(new SyntaxError("def needs '='"))
 		if op.params[0].type != TYPE_FUNCTION
@@ -138,7 +138,7 @@ class Parser
 
 	shared Term parse_ass()
 		next() # ass
-		let op = parse_operand()
+		var op = parse_operand()
 	#	if op.name != ":"
 	#		raise(new SyntaxError("ass needs ':'"))
 		return AddSpecial("ass", [op])
@@ -178,7 +178,7 @@ shared Term f()
 
 void main()
 	#shared Term t = f()
-	let t = parse("x+1")
+	var t = parse("x+1")
 	print(str(t))
 	
 	

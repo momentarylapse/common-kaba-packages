@@ -22,8 +22,8 @@ void file_move(out LocalFile f, Path new_path)
 	
 void move_path(Path source, Path _dest)
 	try
-		let f = db.find_by_path(source)
-		let dest = Path(f.apply_structure(_dest))
+		var f = db.find_by_path(source)
+		var dest = Path(f.apply_structure(_dest))
 		if Filesystem.is_directory(dest)
 			dest = dest.canonical() << source.basename()
 		log_warn("move", "{{rel_path(source)}} -> {{rel_path(dest)}}")
@@ -47,7 +47,7 @@ void action_mv(string[] arg)
 
 
 void structure_file(out LocalFile f, string structure)
-	let new_path = Path(f.apply_structure(structure))
+	var new_path = Path(f.apply_structure(structure))
 	if f.path == new_path
 		return
 	log_warn("move", "{{rel_path(f.path)}} -> {{rel_path(new_path)}}")
@@ -64,9 +64,9 @@ void structure_file(out LocalFile f, string structure)
 
 void _action_structure_auto(Path dir)
 	set_working_dir(dir)
-	let files = db.get_in_dir(dir, conf.recursive)
+	var files = db.get_in_dir(dir, conf.recursive)
 	for f in files
-		let e = conf.get_cfg(f.path)
+		var e = conf.get_cfg(f.path)
 		if !e
 			continue
 		structure_file(f, e.dir << e.structure)
@@ -80,11 +80,11 @@ void action_structure_auto(string[] arg)
 
 void _action_dsync(Path dir)
 	set_working_dir(dir)
-	let e = conf.get_cfg(dir)
+	var e = conf.get_cfg(dir)
 	if e
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)
-	let files = db.get_in_dir(dir, conf.recursive)
+	var files = db.get_in_dir(dir, conf.recursive)
 	print("syncing entangled files")
 	remote_sync_by_id(files)
 	print("matching pure local files by hash")
@@ -98,7 +98,7 @@ void action_dsync(string[] arg)
 
 void _action_sync(Path path)
 	set_working_dir(path)
-	let files = lister.find(path)
+	var files = lister.find(path)
 	remote_sync_pure_locals_by_hash(files)
 	remote_sync_by_id(files)
 

@@ -14,13 +14,13 @@ class DBLister
 		return false
 
 	void find_paths(Path dir, bool recursive)
-		let list = Filesystem.search(dir, "*", "fd")
+		var list = Filesystem.search(dir, "*", "fd")
 		for e in list
 			if Filesystem.is_directory(dir << e)
 				if str(e).head(1) != "." and recursive
 					find_paths(dir << e, recursive)
 			else
-				let path = dir << e
+				var path = dir << e
 				if !is_ignored(path)
 					paths.add(path)
 	

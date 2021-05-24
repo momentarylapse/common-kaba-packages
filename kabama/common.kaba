@@ -28,12 +28,12 @@ class Term as shared
 	void __delete__()
 		#print("del Term {{type}} {{name}}")
 	const shared Term shallow_copy()
-		let c = new Term(type, name)
+		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
 		return c
 #	const shared Term copy()
-#		let c = new Term(type, name)
+#		var c = new Term(type, name)
 #		for p in params
 #			c.params.add(p.copy())
 #		return c
@@ -91,29 +91,29 @@ shared Term AddVariable(string s)
 	return new Term(TYPE_VARIABLE, s)
 
 shared Term AddOperator(string s, shared Term p1, shared Term p2)
-	let t = new Term(TYPE_OPERATOR, s)
+	var t = new Term(TYPE_OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return t
 
 shared Term AddFunction(string s, shared Term[] params)
-	let t = new Term(TYPE_FUNCTION, s)
+	var t = new Term(TYPE_FUNCTION, s)
 	t.params = params
 	return t
 
 shared Term PermuteOperator(shared Term t)
-	let r = t.shallow_copy()
+	var r = t.shallow_copy()
 	r.params[0] = t.params[1]
 	r.params[1] = t.params[0]
 	return r
 
 shared Term AddSpecial(string s, shared Term[] params)
-	let t = new Term(TYPE_SPECIAL, s)
+	var t = new Term(TYPE_SPECIAL, s)
 	t.params = params
 	return t
 
 shared Term AddList(shared Term[] params)
-	let t = new Term(TYPE_LIST, "-list-")
+	var t = new Term(TYPE_LIST, "-list-")
 	t.params = params
 	return t
 
@@ -132,4 +132,4 @@ class RuntimeError extends Exception
 
 
 void main()
-	let v = AddVariable("x")
+	var v = AddVariable("x")

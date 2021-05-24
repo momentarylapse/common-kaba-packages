@@ -45,7 +45,7 @@ class LibraryManager
 
 	void init()
 		Path lib_dir = hui.app_directory << "apps/xmake/libs"
-		let list = os.Filesystem.search(lib_dir, "*.txt", "f")
+		var list = os.Filesystem.search(lib_dir, "*.txt", "f")
 		for e in list
 			hui.Configuration c
 			c.load(lib_dir << e)

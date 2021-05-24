@@ -143,7 +143,7 @@ class Window
 				k = false
 	Input input
 	void __init__(string title, int w, int h)
-		let _title = title + "\x00"
+		var _title = title + "\x00"
 		win = _glfwCreateWindow(w, h, &_title[0], nil, nil)
 		_glfwSetWindowUserPointer(win, &self)
 		_glfwSetKeyCallback(win, _on_key.code)
@@ -184,7 +184,7 @@ class Window
 
 void _main()
 	init([])
-	let w = new Window("test", 800, 600)
+	var w = new Window("test", 800, 600)
 	w.run()
 	print("done")
 	end()
