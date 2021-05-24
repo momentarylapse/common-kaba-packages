@@ -1,9 +1,9 @@
 use os
 use cli_parser
 
-int MAX_DIFF_SIZE
-int MIN_MATCH_SIZE
-int CONTEXT
+var MAX_DIFF_SIZE: int
+var MIN_MATCH_SIZE: int
+var CONTEXT: int
 
 
 class Term
@@ -14,7 +14,7 @@ class Term
 
 
 class Mapping
-	int a0, a1, b0, b1
+	var a0, a1, b0, b1: int
 	func const la() -> int
 		return a1 - a0
 	func const lb() -> int

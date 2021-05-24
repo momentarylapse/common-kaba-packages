@@ -131,17 +131,17 @@ func _on_cursor(w: void*, xx: float64, yy: float64)
 
 
 class Window
-	void *win
+	var win: void*
 	class Input
-		bool[3] button
-		bool[256] key
-		float x, y, dx, dy
+		var button: bool[3]
+		var key: bool[256]
+		var x, y, dx, dy: float
 		func __init__()
 			for b in button
 				b = false
 			for k in key
 				k = false
-	Input input
+	var input: Input
 	func __init__(title: string, w: int, h: int)
 		var _title = title + "\x00"
 		win = _glfwCreateWindow(w, h, &_title[0], nil, nil)
@@ -190,8 +190,8 @@ func _main()
 	end()
 
 class GamepadState
-	bool[16] buttons
-	float[6] axes
+	var buttons: bool[16]
+	var axes: float[6]
 	func __init__()
 		for b in buttons
 			b = false
@@ -216,9 +216,9 @@ class Gamepad as shared extends GamepadState
 		DOWN
 		LEFT
 		
-	GamepadState state_prev
-	int index
-	float deadzone
+	var state_prev: GamepadState
+	var index: int
+	var deadzone: float
 	func __init__(i: int)
 		index = i
 		deadzone = 0.05

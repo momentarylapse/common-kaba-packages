@@ -3,19 +3,19 @@ use os
 
 
 class LangID
-	string id
-	string title
-	string tooltip
+	var id: string
+	var title: string
+	var tooltip: string
 
 class LangText
-	string orig
-	string trans
+	var orig: string
+	var trans: string
 
 class Language
-	Path filename
-	string name
-	LangID[] ids
-	LangText[] texts
+	var filename: Path
+	var name: string
+	var ids: LangID[]
+	var texts: LangText[]
 	func const show()
 		print(name)
 		for i in ids

@@ -5,8 +5,8 @@ const KABA_LINK = "/usr/lib/libc.so.6
 	_tcsetattr:tcsetattr"
 
 class Termios
-	int iflag, oflag, cflag, lflag
-	int[32] cc
+	var iflag, oflag, cflag, lflag: int
+	var cc: int[32]
 	func const __str__() -> string
 		return "i={{iflag|08x}} o={{oflag|08x}} c={{cflag|08x}} l={{lflag|08x}}"
 
@@ -50,7 +50,7 @@ func extern _tcgetattr(fno: int, t: Termios*) -> int
 func extern _tcsetattr(fno: int, opt: int, t: Termios*) -> int
 #extern void cfmakeraw(Termios* t)
 
-Termios _t_pre_raw
+var _t_pre_raw: Termios
 
 func setraw()
 	Termios t

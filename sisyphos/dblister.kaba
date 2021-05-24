@@ -4,16 +4,16 @@ use os
 
 # mix db files with "real" files
 class DBLister
-	Path[] paths
-	LocalFile[] fake_files
+	var paths: Path[]
+	var fake_files: LocalFile[]
 	
-	bool is_ignored(Path path)
+	func is_ignored(path: Path) -> bool
 		for i in conf.ignore
 			if str(path).match(i)
 				return true
 		return false
 
-	void find_paths(Path dir, bool recursive)
+	func find_paths(dir: Path, recursive: bool)
 		var list = Filesystem.search(dir, "*", "fd")
 		for e in list
 			if Filesystem.is_directory(dir << e)
@@ -24,13 +24,13 @@ class DBLister
 				if !is_ignored(path)
 					paths.add(path)
 	
-	LocalFile*[] find(Path dir)
+	func find(dir: Path) -> LocalFile*[]
 		if Filesystem.is_directory(dir)
 			return find_dir(dir)
 		return find_file(dir)
 		
 		
-	LocalFile*[] find_file(Path path)
+	func find_file(path: Path) -> LocalFile*[]
 		LocalFile*[] files
 		fake_files.clear()
 		paths.clear()
@@ -48,7 +48,7 @@ class DBLister
 				log_error("error", "can't find '{{path}}'")
 		return files
 		
-	LocalFile*[] find_dir(Path dir)
+	func find_dir(dir: Path) -> LocalFile*[]
 		LocalFile*[] files
 		fake_files.clear()
 		paths.clear()
@@ -67,15 +67,15 @@ class DBLister
 			files.add(&f)
 		return sorted(files, "path")
 
-DBLister lister
+var lister: DBLister
 
 
 
 
-bool is_filter(string s)
+func is_filter(s: string) -> bool
 	return s.find("=", 0) > 0
 
-LocalFile*[] find_by_path_or_filter(string arg)
+func find_by_path_or_filter(arg: string) -> LocalFile*[]
 	if is_filter(arg)
 		return db.find_by_tags(arg)
 	else

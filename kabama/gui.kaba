@@ -2,8 +2,8 @@ use hui
 use runtime
 
 class KabamaWindow extends hui.Window
-	Runtime r
-	string log
+	var r: Runtime
+	var log: string
 
 	void on_eval()
 		var input = get_string("input")

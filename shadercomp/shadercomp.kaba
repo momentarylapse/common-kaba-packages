@@ -10,18 +10,18 @@ enum Type
 	CLOSESTHIT
 	ANYHIT
 
-string tag_contents(string all, string tag)
-	int i0 = all.find("<{{tag}}>", 0)
+func tag_contents(all: string, tag: string) -> string
+	var i0 = all.find("<{{tag}}>", 0)
 	if i0 < 0
 		return ""
-	int i1 = all.find("</{{tag}}>", i0)
+	var i1 = all.find("</{{tag}}>", i0)
 	if i1 < 0
 		return ""
 	return all[i0+len(tag)+2:i1]
 
-Path cur_dir
+var cur_dir: Path
 
-string compile_stage(string code, string stage)
+func compile_stage(code: string, stage: string) -> string
 	if code == ""
 		return ""
 	var itmp = cur_dir << "shadercomp.glsl"
@@ -45,12 +45,12 @@ string compile_stage(string code, string stage)
 	return x
 
 class LayoutData
-	string bindings
-	string input
-	string topology
-	int push_size
+	var bindings: string
+	var input: string
+	var topology: string
+	var push_size: int
 
-LayoutData parse_layout(string layout)
+func parse_layout(layout: string) -> LayoutData
 	LayoutData ld
 	ld.push_size = 0
 	ld.topology = "triangles"
@@ -69,28 +69,28 @@ LayoutData parse_layout(string layout)
 		else
 			print("WARNING: layout info unknown: {{s}}")
 	return ld
-int extract_push_size(string layout)
+func extract_push_size(layout: string) -> int
 	return 0
 
-void compile(Path filename)
+func compile(filename: Path)
 	cur_dir = filename.parent()
-	string all = Filesystem.read(filename)
-	string layout = tag_contents(all, "Layout")
-	string code_vertex = tag_contents(all, "VertexShader")
-	string code_geometry = tag_contents(all, "GeometryShader")
-	string code_fragment = tag_contents(all, "FragmentShader")
-	string code_ray_gen = tag_contents(all, "RayGenShader")
-	string code_ray_miss = tag_contents(all, "RayMissShader")
-	string code_ray_closest_hit = tag_contents(all, "RayClosestHitShader")
+	var all = Filesystem.read_text(filename)
+	var layout = tag_contents(all, "Layout")
+	var code_vertex = tag_contents(all, "VertexShader")
+	var code_geometry = tag_contents(all, "GeometryShader")
+	var code_fragment = tag_contents(all, "FragmentShader")
+	var code_ray_gen = tag_contents(all, "RayGenShader")
+	var code_ray_miss = tag_contents(all, "RayMissShader")
+	var code_ray_closest_hit = tag_contents(all, "RayClosestHitShader")
 	
-	string x_vertex = compile_stage(code_vertex, "vert")
-	string x_geometry = compile_stage(code_geometry, "geom")
-	string x_fragment = compile_stage(code_fragment, "frag")
-	string x_ray_gen = compile_stage(code_ray_gen, "rgen")
-	string x_ray_miss = compile_stage(code_ray_miss, "rmiss")
-	string x_ray_closest_hit = compile_stage(code_ray_closest_hit, "rchit")
+	var x_vertex = compile_stage(code_vertex, "vert")
+	var x_geometry = compile_stage(code_geometry, "geom")
+	var x_fragment = compile_stage(code_fragment, "frag")
+	var x_ray_gen = compile_stage(code_ray_gen, "rgen")
+	var x_ray_miss = compile_stage(code_ray_miss, "rmiss")
+	var x_ray_closest_hit = compile_stage(code_ray_closest_hit, "rchit")
 	
-	LayoutData ld = parse_layout(layout)
+	var ld = parse_layout(layout)
 	
 	var f = Filesystem.create(Path(str(filename) + ".compiled"))
 	f << "Info"
@@ -123,7 +123,7 @@ void compile(Path filename)
 		f << x_ray_closest_hit
 	del f
 
-void main(string[] arg)
+func main(arg: string[])
 	for a in arg
 		compile(a)
 	if len(arg) == 0

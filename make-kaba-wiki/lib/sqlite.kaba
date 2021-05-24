@@ -40,7 +40,7 @@ func cstr2str(cs: char[0]*) -> string
 	return s
 
 class Database
-	void *db = nil
+	var db = nil
 	func __delete__()
 		_sqlite3_close(db)
 
@@ -79,9 +79,9 @@ class Database
 	#	return r
 
 class Query
-	void* res = nil
-	int step_result
-	bool needs_step = true
+	var res = nil
+	var step_result: int
+	var needs_step = true
 	func __delete__()
 		_sqlite3_finalize(res)
 

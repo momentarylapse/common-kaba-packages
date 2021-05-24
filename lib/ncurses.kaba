@@ -61,7 +61,7 @@ func extern _keypad(w: void*, b: bool) -> int
 func extern _setlocale(category: int, locale: char*) -> char*
 
 class Window
-	void* w = nil
+	var w = nil
 	func __init__()
 	func __init__(width: int, height: int, x: int, y: int)
 		w = _newwin(height, width, y, x)
@@ -125,7 +125,7 @@ class Key
 		MOUSE = 409
 		RESIZE = 410
 
-Window stdwin
+var stdwin: Window
 
 func init()
 	stdwin.w = _initscr()

@@ -154,7 +154,7 @@ func bson_to_any(doc: void*) -> any
 	return bson_iter_map_to_any(&iter)
 
 class Mongo as shared
-	void* client
+	var client: void*
 	func __init__(host: string)
 		_any_allow_simple_output = false
 		_mongoc_init()
@@ -176,7 +176,7 @@ class Mongo as shared
 
 
 class Collection as shared
-	void* col = nil
+	var col: void* = nil
 	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
@@ -208,8 +208,8 @@ class Collection as shared
 		print(repr(r))
 
 class Result as shared
-	void* cur
-	void* doc
+	var cur: void*
+	var doc: void*
 	func __init__(_cur: void*)
 		cur = _cur
 	func __delete__()

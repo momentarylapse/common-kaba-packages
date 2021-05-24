@@ -2,8 +2,8 @@ use linalg
 
 
 class Node
-	float phi = 0
-	complex pos
+	var phi = 0.0
+	var pos: complex
 	func __init__()
 	func __init__(p: complex)
 		pos = p
@@ -45,10 +45,10 @@ func empty() -> float[]
 	return r
 
 class Edge
-	int type
-	int a, b
-	float I, U
-	float[4] param
+	var type: int
+	var a, b: int
+	var I, U: float
+	var param: float[4]
 	func __init__(_type: int, n: int[], p: float[])
 		type = _type
 		a = n[0]
@@ -105,7 +105,7 @@ class Resistor extends Edge
 		return ["R"]
 
 class Capacitor extends Edge
-	float U_prev = 0
+	var U_prev = 0.0
 	func __init__(n: int[], C: float)
 		super.__init__(TYPE_CAPACITOR, n, [C])
 	func override g(dt: float) -> float
@@ -123,7 +123,7 @@ class Capacitor extends Edge
 		U_prev = 0
 
 class Inductor extends Edge
-	float I_prev = 0
+	var I_prev = 0.0
 	func __init__(n: int[], L: float)
 		super.__init__(TYPE_INDUCTOR, n, [L])
 	func override g(dt: float) -> float
@@ -145,9 +145,9 @@ class Inductor extends Edge
 const DIODE_DEFAULT_PARAMS = [0.02585, -23.0258, 1.5]
 
 class Diode extends Edge
-	float u_low, u_high
-	float i_low, i_high
-	float g_low, g_high
+	var u_low, u_high: float
+	var i_low, i_high: float
+	var g_low, g_high: float
 	func __init__(n: int[])
 		super.__init__(TYPE_DIODE, n, DIODE_DEFAULT_PARAMS)
 		U = param[0]
@@ -185,24 +185,24 @@ class Diode extends Edge
 		I = I_id(U)
 
 class SimResult
-	float[][] U, I
-	float[][] phi
+	var U, I: float[][]
+	var phi: float[][]
 	func clear()
 		U.clear()
 		I.clear()
 		phi.clear()
 
 class Circuit
-	Node[] nodes
-	Edge*[] edges
-	int out
+	var nodes: Node[]
+	var edges: Edge*[]
+	var _out: int
 	
 	func __init__()
 		reset_default()
 		
 	func clear()
 		nodes.clear()
-		out = 1
+		_out = 1
 		for e in edges
 			del e
 		edges.clear()
@@ -286,7 +286,7 @@ class Circuit
 	
 	func get_xxxx() -> float
 		float Uin = nodes[1].phi
-		float Uout = nodes[out].phi
+		float Uout = nodes[_out].phi
 		float factor = Uout / Uin
 		#print(factor)
 		return factor
@@ -328,7 +328,7 @@ class Circuit
 			for i in 0:n
 				s += ":{{e.param[i]}}"
 			s += "\n"
-		s += "Out:{{out}}\n"
+		s += "Out:{{_out}}\n"
 		return s
 	
 	func import(s: string)
@@ -341,7 +341,7 @@ class Circuit
 			if x[0] == "Node"
 				nodes.add(Node(complex(float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
-				out = int(x[1])
+				_out = int(x[1])
 			else
 				int t = edge_type(x[0])
 				int[] n = [int(x[1]), int(x[2])]

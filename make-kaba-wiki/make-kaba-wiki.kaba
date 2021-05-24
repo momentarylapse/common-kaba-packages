@@ -5,8 +5,8 @@ use time
 
 const SHIFT = "    "
 
-Script*[] external_packages
-Script*[] external_libs
+var external_packages: Script*[]
+var external_libs: Script*[]
 
 func param_pre(v: Variable) -> string
 	if not v.is_const
@@ -22,11 +22,11 @@ func func_return(f: Function) -> string
 	return " -> {{f.return_type.name}}"
 
 func show_func(ns: string, f: Function) -> string
-	string name = f.name
+	var name = f.name
 	if f.namespace
 		name = "{{f.namespace.name}}.{{f.name}}"
 	
-	string wiki = "== Kaba function {{name}} ==\n\n"
+	var wiki = "== Kaba function {{name}} ==\n\n"
 	
 	wiki += "{{doc_get_func_description(ns, f)}}\n\n"
 	
@@ -48,7 +48,7 @@ func show_func(ns: string, f: Function) -> string
 	return wiki
 
 func show_var(ns: string, v: Variable) -> string
-	string wiki = "== Kaba variable {{v.name}} ==\n"
+	var wiki = "== Kaba variable {{v.name}} ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
@@ -173,7 +173,7 @@ func func_pre(f: Function) -> string
 
 
 func show_class(ns: string, c: Class) -> string
-	string wiki = "== Kaba class {{c.name}} ==\n\n"
+	var wiki = "== Kaba class {{c.name}} ==\n\n"
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
 	var funcs = filter_funcs(c.functions, c)

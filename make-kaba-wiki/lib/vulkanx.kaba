@@ -24,11 +24,11 @@ func create_quad(r: rect) -> VertexBuffer*
 
 
 class Renderer
-	int width, height
-	Fence* in_flight_fence
-	Semaphore* image_available_semaphore, render_finished_semaphore
-	CommandBuffer* cb
-	DescriptorPool* pool
+	var width, height: int
+	var in_flight_fence: Fence*
+	var image_available_semaphore, render_finished_semaphore: Semaphore*
+	var cb: CommandBuffer*
+	var pool: DescriptorPool*
 
 	func __init__()
 		width = 0
@@ -64,13 +64,13 @@ class Renderer
 
 
 class WindowRenderer extends Renderer
-	void* window
-	SwapChain* swap_chain
-	RenderPass* _default_render_pass
-	DepthBuffer* depth_buffer
-	FrameBuffer*[] frame_buffers
-	int image_index
-	bool framebuffer_resized
+	var window: void*
+	var swap_chain: SwapChain*
+	var _default_render_pass: RenderPass*
+	var depth_buffer: DepthBuffer*
+	var frame_buffers: FrameBuffer*[]
+	var image_index: int
+	var framebuffer_resized: bool
 	
 	func __init__(_window: void*)
 		window = _window
@@ -152,10 +152,10 @@ class WindowRenderer extends Renderer
 
 
 class TextureRenderer extends Renderer
-	Texture* tex
-	DepthBuffer* depth_buffer
-	FrameBuffer* frame_buffer
-	RenderPass* _default_render_pass
+	var tex: Texture*
+	var depth_buffer: DepthBuffer*
+	var frame_buffer: FrameBuffer*
+	var _default_render_pass: RenderPass*
 
 
 	func __init__(t: Texture*)
@@ -200,18 +200,18 @@ class TextureRenderer extends Renderer
 
 
 class UBO
-	matrix m,v,p
+	var m,v,p: matrix
 
 class StatLayer
-	Texture* tex
-	UniformBuffer* ubo
-	DescriptorSet* dset
-	Timer* timer
-	Image* im
-	VertexBuffer* vb
-	Pipeline* pipeline
-	int frames
-	float _time
+	var tex: Texture*
+	var ubo: UniformBuffer*
+	var dset: DescriptorSet*
+	var timer: Timer*
+	var im: Image*
+	var vb: VertexBuffer*
+	var pipeline: Pipeline*
+	var frames: int
+	var _time: float
 	
 	func __init__(shader: Shader*, rp: RenderPass*, subpass: int, pool: DescriptorPool*)
 		timer = new Timer()

@@ -3,25 +3,22 @@ use mongo
 use os
 
 class Config
-	bool show_meta
-	func __init__()
-		show_meta = false
+	var show_meta = false
 
-Config conf
+var conf: Config
 
 class Tag
-	string key, value
+	var key, value: string
 
 class DbFile
-	string id, hash, hash_medium, type
-	Path path
-	string name
-	int size
-	int mtime
-	Tag[] tags
-	bool medium
-	func __init__()
-		medium = false
+	var id, hash, hash_medium, type: string
+	var path: Path
+	var name: string
+	var size: int
+	var mtime: int
+	var tags: Tag[]
+	var medium = false
+	
 	func const __str__() -> string
 		string s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
 		if medium
@@ -57,13 +54,13 @@ class DbFile
 		medium = true
 
 class DbMedium
-	string id, hash
-	int size
+	var id, hash: string
+	var size: int
 
 func parse_bson(b: void*) -> DbFile
 	DbFile f
 	# print(bson_to_json(b))
-	int[16] iter
+	var iter: int[16]
 	_bson_iter_init(&iter, b)
 	while _bson_iter_next(&iter)
 		string key = bson_iter_key(&iter)
@@ -129,9 +126,9 @@ func print_files(files: DbFile[])
 		print(str(f))
 
 class Database
-	Mongo* m
-	Collection* files
-	Collection* medium
+	var m: Mongo*
+	var files: Collection*
+	var medium: Collection*
 	func __init__()
 		m = new Mongo("localhost")
 		files = m.collection("alex", "files")

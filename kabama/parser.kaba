@@ -39,8 +39,8 @@ void check_function_params(string f, shared Term[] params)
 
 
 class Parser
-	string[] e
-	int cur_index
+	var e: string[]
+	var cur_index: int
 	string cur()
 		if cur_index >= len(e)
 			return "-eol-"

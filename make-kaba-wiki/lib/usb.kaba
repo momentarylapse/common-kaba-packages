@@ -33,9 +33,9 @@ class _context
 class _device
 class _handle
 class _descriptor
-	int[8] i
+	var i: int[8]
 class _endpoint_descriptor
-	int[3] i
+	var i: int[3]
 	func address() -> int
 		return (i[0] & 0x00ff0000) >> 16
 	func attributes() -> int
@@ -43,8 +43,8 @@ class _endpoint_descriptor
 	func max_packet_size() -> int
 		return i[1] & 0x0000ffff
 class _interface_descriptor
-	int[4] i
-	_endpoint_descriptor[0]* endpoint
+	var i: int[4]
+	var endpoint: _endpoint_descriptor[0]*
 	func num_endpoints() -> int
 		return i[1] & 0x000000ff
 	func interface() -> int
@@ -52,11 +52,11 @@ class _interface_descriptor
 	func alt_setting() -> int
 		return (i[0] & 0xff000000) >> 24
 class _interface
-	_interface_descriptor[0]* altsetting
-	int num_altsettings, xxx
+	var altsetting: _interface_descriptor[0]*
+	var num_altsettings, xxx: int
 class _config_descriptor
-	int[4] i
-	_interface[0]* interface
+	var i: int[4]
+	var interface: _interface[0]*
 	func num_interfaces() -> int
 		return i[1] & 0x000000ff
 	func config_value() -> int
@@ -96,9 +96,9 @@ func extern _libusb_interrupt_transfer(h: _handle*, entpoint: int, data: void*, 
 func extern _libusb_control_transfer(h: _handle*, req_type: int, request: int, value: int, index: int, data: void*, length: int, timeout: int) -> int
 
 class DeviceInfo
-	int bus, port, address
-	int _class, sub_class, protocoll, max_package_size, num_configs
-	int vid, pid
+	var bus, port, address: int
+	var _class, sub_class, protocoll, max_package_size, num_configs: int
+	var vid, pid: int
 	func str() -> string
 		return "{{bus}}:{{address}}  0x{{vid|4x}}:{{pid|4x}}  {{_class}}  {{sub_class}}"
 
@@ -134,7 +134,7 @@ func CHECK(r: int, msg: string)
 		REPORT_ERROR(r, msg)
 
 class Device
-	_device* dev
+	var dev: _device*
 	
 	func get_info() -> DeviceInfo
 		DeviceInfo i
@@ -193,7 +193,7 @@ class Device
 		
 
 class Context
-	_context* c = nil
+	var c: _context* = nil
 	func __delete__()
 		_libusb_exit(c)
 	func enumerate() -> Device*[]
@@ -215,8 +215,8 @@ class Context
 		return h
 
 class Handle
-	_handle* h = nil
-	Device* dev = nil
+	var h: _handle* = nil
+	var dev: Device* = nil
 	func __delete__()
 		if h
 			_libusb_close(h)

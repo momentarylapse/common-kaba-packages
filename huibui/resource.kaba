@@ -2,25 +2,25 @@ use config
 use os
 
 class Resource
-	string type
-	string id
-	string title
-	string tooltip
-	string[] options
-	int x, y
-	void __init__()
-	Resource[] children
+	var type: string
+	var id: string
+	var title: string
+	var tooltip: string
+	var options: string[]
+	var x, y: int
+	func __init__()
+	var children: Resource[]
 	#void reset()
-	extern void show(int indent)
-	extern string str(int indent)
+	func extern show(indent: int)
+	func extern str(indent: int) -> string
 	
-extern Resource ParseResource(string buffer, bool literally)
+func extern ParseResource(buffer: string, literally: bool) -> Resource
 
-Resource[] resources
-Path[] resource_files
+var resources: Resource[]
+var resource_files: Path[]
 
 
-Resource[] load_all_huis(bool literally)
+func load_all_huis(literally: bool) -> Resource[]
 	Resource[] res
 	var files = Filesystem.search(conf.dir, "*.hui", "f")
 	for f in files

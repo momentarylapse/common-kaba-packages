@@ -13,8 +13,8 @@ enum
 	SEL_TYPE_EDGE
 
 class Selection
-	int type = SEL_TYPE_NONE
-	int index = -1
+	var type = SEL_TYPE_NONE
+	var index = -1
 
 enum
 	MODE_DEFAULT
@@ -23,22 +23,22 @@ enum
 	MODE_MOVE_NODE
 
 class CircuitPanel extends hui.Panel
-	Circuit* c
-	float w, h
-	Selection sel
+	var c: Circuit*
+	var w, h: float
+	var sel: Selection
 	
-	SimResult res
-	int NT
-	float umin, umax
-	float imin, imax
+	var res: SimResult
+	var NT: int
+	var umin, umax: float
+	var imin, imax: float
 	
-	int mode
-	int add_type
-	int first_node
+	var mode: int
+	var add_type: int
+	var first_node: int
 	
-	color COLOR_BACKGROUND
-	color COLOR_TEXT
-	color COLOR_SELECTION
+	var COLOR_BACKGROUND: color
+	var COLOR_TEXT: color
+	var COLOR_SELECTION: color
 	
 	void __init__(Circuit _c)
 		from_source("
@@ -241,7 +241,7 @@ DrawingArea area '' grab-focus")
 				draw_line(p, pp + complex(-4, 30), pp + complex(4, 30))
 			if i == 1
 				p.draw_str(pp.x - 38, pp.y - 10, "in")
-			if i == c.out
+			if i == c._out
 				p.draw_str(pp.x + 20, pp.y - 10, "out")
 		
 		if mode == MODE_ADD_EDGE

@@ -11,15 +11,15 @@ class Runtime
 	#class Assumption
 	#	shared Term term
 	class Function
-		string name
-		string[] params
-		shared Term formula
+		var name: string
+		var params: string[]
+		var formula: shared Term
 		string __str__()
 			var p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
-	shared Term[] assumptions
-	Function*[] functions
-	shared Term[] history
+	var assumptions: shared Term[]
+	var functions: Function*[]
+	var history: shared Term[]
 	
 	#class Error extends Exception
 	

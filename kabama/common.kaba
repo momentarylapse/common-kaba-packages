@@ -15,12 +15,12 @@ enum
 	CHAR_SIGN
 	CHAR_WHITESPACE
 
-int num_terms
+var num_terms: int
 
 class Term as shared
-	int type
-	string name
-	shared Term[] params
+	var type: int
+	var name: string
+	var params: shared Term[]
 	func __init__(_type: int, _name: string)
 		type = _type
 		name = _name

@@ -12,20 +12,20 @@ use os
 #		if c == 
 #	return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\t", "\\t")
 
-string str_m2utf8(string s)
+func str_m2utf8(s: string) -> string
 	return s.replace("&a", "ä").replace("&o", "ö").replace("&u", "ü").replace("&A", "Ä").replace("&O", "Ö").replace("&U", "Ü").replace("&s", "ß")
 
 class Config
-	string own_lang_name
-	Path source_code_dir
-	Path export_dir
+	var own_lang_name: string
+	var source_code_dir: Path
+	var export_dir: Path
 	
-	Path dir
+	var dir: Path
 	
-	void set_dir(Path _dir)
+	func set_dir(_dir: Path)
 		dir = _dir
 	
-	void load()
+	func load()
 		try
 			var f = Filesystem.open_text(dir << "export.txt")
 			string t
@@ -45,4 +45,4 @@ class Config
 		except
 			pass
 
-Config conf
+var conf: Config

@@ -1,8 +1,8 @@
 
 
 class Tag
-	string key
-	string value
+	var key: string
+	var value: string
 	func const __str__() -> string
 		return "{{key}}={{value}}"
 	func const strh() -> string
@@ -14,7 +14,7 @@ class Tag
 	func const match(filter: Tag) -> bool
 		return key == filter.key and value.match(filter.value)
 
-Tag[] tags_sort(Tag[] tags)
+func tags_sort(tags: Tag[]) -> Tag[]
 	Tag[] r = tags
 	for i in 0:len(r)
 		for j in i+1:len(r)
@@ -24,10 +24,10 @@ Tag[] tags_sort(Tag[] tags)
 				r[j] = t
 	return r
 
-bool tags_equal(Tag[] a, Tag[] b)
+func tags_equal(a: Tag[], b: Tag[]) -> bool
 	return tags2str(tags_sort(a)) == tags2str(tags_sort(b))
 
-string tags2str(Tag[] tags)
+func tags2str(tags: Tag[]) -> string
 	string r
 	for t,i in tags
 		if i > 0
@@ -35,7 +35,7 @@ string tags2str(Tag[] tags)
 		r += str(t)
 	return r
 
-string tags2strh(Tag[] tags)
+func tags2strh(tags: Tag[]) -> string
 	string r
 	for t,i in tags
 		if i > 0
@@ -43,15 +43,15 @@ string tags2strh(Tag[] tags)
 		r += t.strh()
 	return r
 
-Tag str2tag(string s)
+func str2tag(s: string) -> Tag
 	var a = s.explode("=")
 	return Tag(a[0], a[1])
 
-Tag strh2tag(string s)
+func strh2tag(s: string) -> Tag
 	var a = s.explode("=")
 	return Tag(a[0], a[1].unhex())
 
-Tag alex2tag(string s)
+func alex2tag(s: string) -> Tag
 	var a = s.explode("=")
 	Tag t
 	t.key = a[0]
@@ -59,7 +59,7 @@ Tag alex2tag(string s)
 	return t
 
 
-Tag[] strh2tags(string s)
+func strh2tags(s: string) -> Tag[]
 	Tag[] tags
 	var a = s.explode(",")
 	for b in a
@@ -67,23 +67,23 @@ Tag[] strh2tags(string s)
 	return tags
 
 
-Tag[] str2tags(string s)
+func str2tags(s: string) -> Tag[]
 	Tag[] tags
 	string[] a = s.explode(",")
 	for b in a
 		tags.add(str2tag(b))
 	return tags
 
-bool tag_multi(string key)
+func tag_multi(key: string) -> bool
 	return key in ["artist", "author", "category", "genre"]
 
-bool tags_has(Tag[] tags, Tag t)
+func tags_has(tags: Tag[], t: Tag) -> bool
 	for tt in tags
 		if tt.key == t.key and tt.value == t.value
 			return true
 	return false
 
-void tags_diff(Tag[] a, Tag[] b)
+func tags_diff(a: Tag[], b: Tag[])
 	for ta in a
 		if !tags_has(b, ta)
 			print("+  {{ta}}")

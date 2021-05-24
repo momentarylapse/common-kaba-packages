@@ -1,13 +1,13 @@
 use kaba
 
 class CLIParser
-	static CLIParser* current
+	var static current: CLIParser*
 	
 	class Command
-		string[] name
-		string[] params
-		string[]->void f
-		string comment
+		var name: string[]
+		var params: string[]
+		var f: string[]->void
+		var comment: string
 
 		func const match(arg: string[]) -> bool
 			if len(arg) < len(name)
@@ -29,11 +29,11 @@ class CLIParser
 		func const sig() -> string
 			return name.join(" ") + " " + params.join(" ")
 	class Option
-		string[] name
-		string param
-		string->void f1
-		void->void f0
-		string comment
+		var name: string[]
+		var param: string
+		var f1: string->void
+		var f0: void->void
+		var comment: string
 		
 		func const sig() -> string
 			string s = name.join(", ")
@@ -41,9 +41,9 @@ class CLIParser
 				s += " {{param}}"
 			return s
 		
-	Command[] commands
-	Option[] options
-	string _info
+	var commands: Command[]
+	var options: Option[]
+	var _info: string
 	
 	func info(i: string)
 		_info = i

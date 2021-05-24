@@ -34,8 +34,8 @@ func compile(s: SourceFile, cxx_flags: string) -> bool
 	return true
 
 class T extends Thread
-	SourceFile s
-	string cxx_flags
+	var s: SourceFile
+	var cxx_flags: string
 	func override on_run()
 		#print("COMPILE  {{s.filename}}")
 		compile(s, cxx_flags)

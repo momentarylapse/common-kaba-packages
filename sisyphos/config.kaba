@@ -10,17 +10,17 @@ const ALEX_IN = ALEX_DIR + "in/"
 const MEDIUM = "medium"
 const PERFECT = "perfect"
 
-bool _is_canonical_dir(string dir)
+func _is_canonical_dir(dir: string) -> bool
 	if len(dir) == 0
 		return false
 	return dir[len(dir) - 1] == '/'
 
-string _dir_canonical(string dir)
+func _dir_canonical(dir: string) -> string
 	if _is_canonical_dir(dir)
 		return dir
 	return dir + "/"
 
-string _canonify(string path)
+func _canonify(path: string) -> string
 	var xx = path.explode("/")
 	for i in 0:len(xx)
 		if xx[i] == "."
@@ -32,7 +32,7 @@ string _canonify(string path)
 			i -= 2
 	return xx.join("/")
 
-Path absolute_path(Path path)
+func absolute_path(path: Path) -> Path
 	return path.absolute().canonical()
 	#if len(path) == 0
 	#	return path
@@ -40,17 +40,17 @@ Path absolute_path(Path path)
 	#	return canonify(path)
 	#return canonify(Filesystem.current_directory() << path)
 
-Path make_path(string p)
+func make_path(p: string) -> Path
 	return Path(p).absolute().canonical()
 
-Path working_dir
-void set_working_dir(Path path)
+var working_dir: Path
+func set_working_dir(path: Path)
 	if Filesystem.is_directory(path)
 		working_dir = path.canonical()
 	else
 		working_dir = path.parent().canonical()
 
-Path rel_path(Path path)
+func rel_path(path: Path) -> Path
 	if path in working_dir
 		return path.relative_to(working_dir)
 #		return str(path)[len(str(working_dir)):]
@@ -58,23 +58,23 @@ Path rel_path(Path path)
 
 
 # needs to be surrounded by "..."
-string bash_escape(string s)
-	string r = s
+func bash_escape(s: string) -> string
+	var r = s
 	r = r.replace("\\", "\\\\")
 	r = r.replace("\"", "\\\"")
 	r = r.replace("`", "\\`")
 	return r
 
 # needs to be surrounded by '...'
-string bash_escape2(string s)
-	string r = s
+func bash_escape2(s: string) -> string
+	var r = s
 	r = r.replace("\\", "\\\\")
 	r = r.replace("\"", "\\\"")
 	r = r.replace("'", "\\'")
 	r = r.replace("`", "\\`")
 	return r
 
-void make_all_dirs(Path path)
+func make_all_dirs(path: Path)
 #	var parents = path.all_parents()
 	var parts = str(path).explode("/")
 	string dir
@@ -95,7 +95,7 @@ void make_all_dirs(Path path)
 
 
 	
-string get_tag(string[] parts, string key)
+func get_tag(parts: string[], key: string) -> string
 	for p in parts
 		if p.find("=", 0) < 0
 			continue
@@ -115,29 +115,29 @@ class Term
 	const BOLD = "\x1b[1m"
 	const END = "\x1b[0m"
 
-void log_ok(string op, string msg)
+func log_ok(op: string, msg: string)
 	print("{{Term.YELLOW}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
 
-void log_warn(string op, string msg)
+func log_warn(op: string, msg: string)
 	print("{{Term.BLUE2}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
 
-void log_error(string op, string msg)
+func log_error(op: string, msg: string)
 	print("{{Term.RED}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
 
-void error_out(Exception e)
+func error_out(e: Exception)
 	log_error("error", str(e))
 
-string shell_exec(string cmd)
+func shell_exec(cmd: string) -> string
 	#if conf.verbose
 	#	print(cmd)
 	return shell_execute(cmd).trim()
 
 class ConfigDir
-	Path dir
-	ConfigDirSync[] syncs
-	string structure
+	var dir: Path
+	var syncs: ConfigDirSync[]
+	var structure: string
 	
-	void add_sync(string filter, string options)
+	func add_sync(filter: string, options: string)
 		ConfigDirSync s
 		s.dir = dir
 		s.filter = filter
@@ -146,11 +146,11 @@ class ConfigDir
 
 class ConfigDirSync
 	# from ConfigDir
-	Path dir
-	string structure
+	var dir: Path
+	var structure: string
 	
-	string filter
-	string options
+	var filter: string
+	var options: string
 	
 
 
@@ -176,26 +176,26 @@ class ConfigDirSync
 
 class Config
 		
-	ConfigDir[] dirs
-	string[] ignore
-	string server = "michi.is-a-geek.org"
+	var dirs: ConfigDir[]
+	var ignore: string[]
+	var server = "michi.is-a-geek.org"
 	
 	# runtime
-	int verbosity = 1
-	bool show_meta = false
-	bool show_meta_small = false
-	bool recursive = false
-	bool filter_pure_local = false
-	bool filter_pure_remote = false
-	bool show_pure_local = false
-	bool show_perfectly_fine = true
-	bool show_not_in_db = false
-	bool drop_deleted = false
-	bool pull_tags = false
-	bool pull_tags_only_add = false
-	bool dry_run = false
-	string default_quality = "perfect"
-	string default_structure = "{name}.{ext}"
+	var verbosity = 1
+	var show_meta = false
+	var show_meta_small = false
+	var recursive = false
+	var filter_pure_local = false
+	var filter_pure_remote = false
+	var show_pure_local = false
+	var show_perfectly_fine = true
+	var show_not_in_db = false
+	var drop_deleted = false
+	var pull_tags = false
+	var pull_tags_only_add = false
+	var dry_run = false
+	var default_quality = "perfect"
+	var default_structure = "{name}.{ext}"
 
 	func load()
 		var f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
@@ -247,7 +247,7 @@ class Config
 				print("  filter: {{s.filter}}")
 				print("    options: {{s.options}}")
 
-	void add_filter(Path dir, string filter, string _options)
+	func add_filter(dir: Path, filter: string, _options: string)
 		var options = _options
 		if default_quality == MEDIUM and options == ""
 			options = "quality=medium"
@@ -260,7 +260,7 @@ class Config
 		e.add_sync(filter, options)
 		dirs.add(e)
 	
-	selfref ConfigDir* get_cfg(Path dir)
+	func selfref get_cfg(dir: Path) -> ConfigDir*
 		for e in dirs
 			if e.dir == dir
 				return &e
@@ -270,7 +270,7 @@ class Config
 	func const dir_is_in_db(_dir: Path) -> bool
 		return get_cfg(_dir)
 
-	void rm_filter(Path dir, string filter)
+	func rm_filter(dir: Path, filter: string)
 		for e in dirs
 			if e.dir == dir
 				for s,i in e.syncs
@@ -279,11 +279,11 @@ class Config
 						return
 		print("NOT FOUND...")
 
-	void rm_dir(Path dir)
+	func rm_dir(dir: Path)
 		for e,i in dirs
 			if e.dir == dir
 				dirs.remove(i)
 				return
 		print("NOT FOUND...")
 
-Config conf
+var conf: Config

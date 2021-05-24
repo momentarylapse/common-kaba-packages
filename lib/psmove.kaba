@@ -90,14 +90,14 @@ enum
 	Btn_T = 1048576 # Trigger, on the back
 
 class MyPSMoveController
-	PSMove* psmove
-	vector pos, dpos, pos_last
-	vector acc, rot, mag
-	color col
-	quaternion ang, dang
-	float trigger, rumble
-	bool[8] button
-	PsMoveManager* manager
+	var psmove: PSMove*
+	var pos, dpos, pos_last: vector
+	var acc, rot, mag: vector
+	var col: color
+	var ang, dang: quaternion
+	var trigger, rumble: float
+	var button: bool[8]
+	var manager: PsMoveManager*
 	void __init__(PSMove *m, PsMoveManager* man)
 		manager = man
 		psmove = m
@@ -155,9 +155,9 @@ class MyPSMoveController
 		ang = quaternion.ID
 
 class PsMoveManager
-	PSMoveTracker* tracker = nil
-	PSMoveFusion* fusion = nil
-	MyPSMoveController*[] psmoves
+	var tracker: PSMoveTracker* = nil
+	var fusion: PSMoveFusion* = nil
+	var psmoves: MyPSMoveController*[]
 	void __init__()
 		int vv = 262152 #4<<16 + 0<<8 + 8
 		if _psmove_init(vv) != 1

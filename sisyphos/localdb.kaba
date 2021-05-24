@@ -7,7 +7,7 @@ const NONLOCAL = "nonlocal"
 const CHANGED_FILE = "changed"
 const CHANGED_META = "changed-meta"
 
-string str_format(string s, string fmt)
+func str_format(s: string, fmt: string) -> string
 	string r = s
 	if len(fmt) >= 2 and fmt[:1] == "0"
 		int n = int(fmt)
@@ -19,7 +19,7 @@ string str_format(string s, string fmt)
 			r = " " + r
 	return r
 
-string nice_size(int size)
+func nice_size(size: int) -> string
 	if size > 1000000000
 		return "{{size / 1000000000.0|.1}}G"
 	if size > 10000000
@@ -33,32 +33,32 @@ string nice_size(int size)
 	return "{{size}}"
 
 class LocalFile
-	bool drop_me = false
+	var drop_me = false
 
 	# remote
-	string id
-	string name
-	int remote_mtime
-#	string remote_path
+	var id: string
+	var name: string
+	var remote_mtime: int
+#	var remote_path: string
 	# local
-	Path path
-	string hash # can be "" if not local
-	int mtime
-	int size
-	string[] options
-	Tag[] tags
+	var path: Path
+	var hash: string # can be "" if not local
+	var mtime: int
+	var size: int
+	var options: string[]
+	var tags: Tag[]
 	
 	func const is(option: string) -> bool
 		for o in options
 			if o == option
 				return true
 		return false
-	void set(string option)
+	func set(option: string)
 		if is(option)
 			return
 		options.add(option)
 		db.dirty = true
-	void unset(string option)
+	func unset(option: string)
 		for o,i in options
 			if o == option
 				options.remove(i)
@@ -87,13 +87,13 @@ class LocalFile
 			if len(id) > 0 and len(f.id) > 0
 				return false
 		return true
-	void merge(LocalFile f)
+	func merge(f: LocalFile)
 		for o in f.options
 			set(o)
-	void sync_tags(Tag[] rtags)
+	func sync_tags(rtags: Tag[])
 		tags = rtags # TODO
 		db.dirty = true
-	void set_name(string _name)
+	func set_name(_name: string)
 		if _name == name
 			return
 		name = _name
@@ -101,7 +101,7 @@ class LocalFile
 		if conf.verbosity > 0
 			log_ok("name", name)
 		set(CHANGED_META)
-	void tag_add(Tag tt)
+	func tag_add(tt: Tag)
 		if tt.key == "name"
 			set_name(tt.value)
 			return
@@ -113,7 +113,7 @@ class LocalFile
 		if conf.verbosity > 0
 			log_ok("tag add", "{{tt}}")
 		set(CHANGED_META)
-	void tag_set(Tag tt)
+	func tag_set(tt: Tag)
 		if tt.key == "name"
 			set_name(tt.value)
 			return
@@ -128,7 +128,7 @@ class LocalFile
 				set(CHANGED_META)
 				return
 		tag_add(tt)
-	void tag_rm(Tag tt)
+	func tag_rm(tt: Tag)
 		for t,i in tags
 			if t.match(tt)
 				if conf.verbosity > 0
@@ -229,15 +229,15 @@ class LocalFile
 				return false
 		return true
 
-Path unique_path(LocalFile f)
+func unique_path(f: LocalFile) -> Path
 	var ext = f.path.extension()
 	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 
 
 class LocalFileDB
-	LocalFile[] files
-	bool dirty
+	var files: LocalFile[]
+	var dirty = false
 	
-	void load()
+	func load()
 		files.clear()
 		dirty = false
 		#Timer tt
@@ -250,9 +250,9 @@ class LocalFileDB
 		else
 			load_v1(lines)
 		
-	void load_v2(string[] lines)
+	func load_v2(lines: string[])
 		
-	void load_v1(string[] lines)
+	func load_v1(lines: string[])
 		int n = len(lines) / 10
 		for i in 0:n
 			LocalFile ff
@@ -276,12 +276,12 @@ class LocalFileDB
 			files.add(ff)
 		#print(tt.get())
 
-	void self_check()
+	func self_check()
 		check_basic()
 		check_hash_collisions()
 		check_duplicate_paths()
 	
-	void check_basic()
+	func check_basic()
 		for f in files
 			if f.path.is_empty()
 				log_error("empty hash", "...")
@@ -298,7 +298,7 @@ class LocalFileDB
 				#else
 					# hash='', id='', no file
 					#print("EMPTY HASH (REMOTE): " + ff.path)
-	void check_hash_collisions()
+	func check_hash_collisions()
 		for f in files
 			if f.path.is_empty()
 				continue
@@ -319,7 +319,7 @@ class LocalFileDB
 			else
 				log_error("hash collision", "{{f.path}}  <->  {{l.path}}")
 
-	void check_duplicate_paths()
+	func check_duplicate_paths()
 		for f in files
 			if f.path.is_empty()
 				continue
@@ -333,7 +333,7 @@ class LocalFileDB
 			f.path = new_path
 			db.dirty = true
 
-	void drop_selected()
+	func drop_selected()
 		for i in 0:len(files)
 			if files[i].drop_me
 				log_warn("drop", files[i].path)
@@ -341,7 +341,7 @@ class LocalFileDB
 				db.dirty = true
 				i --
 
-	void save()
+	func save()
 		make_all_dirs(hui.app_directory << "sisyphos")
 		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
 		f << "version=1"
@@ -366,13 +366,13 @@ class LocalFileDB
 				return true
 		return false
 
-	selfref LocalFile *find_by_id(string id)
+	func selfref find_by_id(id: string) -> LocalFile*
 		for f in files
 			if id == f.id
 				return &f
 		raise(new Exception("not in db: id={{id}}"))
 
-	selfref LocalFile *find_by_path(Path path)
+	func selfref find_by_path(path: Path) -> LocalFile*
 		for f in files
 			if path == f.path
 				return &f
@@ -384,7 +384,7 @@ class LocalFileDB
 				return true
 		return false
 
-	selfref LocalFile *by_hash(string hash)
+	func selfref by_hash(hash: string) -> LocalFile*
 		if hash == ""
 			raise(new Exception("invalid hash"))
 		for f in files
@@ -400,7 +400,7 @@ class LocalFileDB
 #				return &f
 #		raise(new Exception("not in db: hash=" + hash))
 		
-	selfref LocalFile*[] find_by_tags(string filter)
+	func selfref find_by_tags(filter: string) -> LocalFile*[]
 		Tag[] tags = str2tags(filter)
 		LocalFile*[] list
 		for f in files
@@ -408,7 +408,7 @@ class LocalFileDB
 				list.add(&f)
 		return sorted(list, "path")
 
-	selfref LocalFile*[] get_in_dir(Path dir, bool recursive)
+	func selfref get_in_dir(dir: Path, recursive: bool) -> LocalFile*[]
 			
 		LocalFile*[] list
 		if recursive
@@ -429,7 +429,7 @@ class LocalFileDB
 					list.add(&f)
 		return sorted(list, "path")
 
-	selfref LocalFile*[] get(Path path, bool rec)
+	func selfref get(path: Path, rec: bool) -> LocalFile*[]
 		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
 		LocalFile*[] files
@@ -439,7 +439,7 @@ class LocalFileDB
 			pass
 		return files
 		
-	void rehash()
+	func rehash()
 		for f in files
 			if f.pure_remote()
 				continue
@@ -452,11 +452,11 @@ class LocalFileDB
 					save()
 			except
 				pass
-	void optimize()
+	func optimize()
 		print("optimizing...")
 		files = sorted(files, "path")
 		dirty = true
 	
-LocalFileDB db
+var db: LocalFileDB
 
 

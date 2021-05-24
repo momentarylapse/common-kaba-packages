@@ -3,13 +3,13 @@ use hui
 use project
 
 class Library
-	string name
-	string[] libs
-	string[] pkg
-	string[] meson
-	string[] includes
-	string dir_override
-	string flags
+	var name: string
+	var libs: string[]
+	var pkg: string[]
+	var meson: string[]
+	var includes: string[]
+	var dir_override: string
+	var flags: string
 	#void __init__(string _name, string[] _libs)
 	#	name = _name
 	#	libs = _libs
@@ -41,10 +41,10 @@ class Library
 
 
 class LibraryManager
-	Library[] libraries
+	var libraries: Library[]
 
 	func init()
-		Path lib_dir = hui.app_directory << "apps/xmake/libs"
+		var lib_dir = hui.app_directory << "apps/xmake/libs"
 		var list = os.Filesystem.search(lib_dir, "*.txt", "f")
 		for e in list
 			hui.Configuration c
@@ -94,4 +94,4 @@ class LibraryManager
 	func const pkg(name: string) -> string[]
 		return get(name).pkg
 
-LibraryManager lib
+var lib: LibraryManager

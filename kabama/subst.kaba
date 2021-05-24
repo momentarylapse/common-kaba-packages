@@ -14,13 +14,13 @@ func subst_variable(_t: shared Term, _var: string, by: shared Term) -> shared Te
 
 
 class MatchingTerm
-	shared Term t
-	string name
+	var t: shared Term
+	var name: string
 	func const __str__() -> string
 		return "{{name}} -> {{t}}"
 
 class Matching
-	MatchingTerm[] terms
+	var terms: MatchingTerm[]
 	func add(t: shared Term, name: string) -> bool
 		#print("add: {{t}} <<< {{name}}")
 		MatchingTerm mt

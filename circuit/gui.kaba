@@ -4,7 +4,7 @@ use circuit
 use panel
 
 class EditorPanel extends CircuitPanel
-	CircuitEditor* ed
+	var ed: CircuitEditor*
 	void __init__(CircuitEditor e)
 		super.__init__(e.c)
 		ed = &e
@@ -14,8 +14,8 @@ class EditorPanel extends CircuitPanel
 			ed.load_from_part(ed.c.edges[sel.index])
 
 class CircuitEditor extends hui.Window
-	Circuit c
-	CircuitPanel* panel
+	var c: Circuit
+	var panel: CircuitPanel*
 	
 	
 	void __init__(string[] arg)

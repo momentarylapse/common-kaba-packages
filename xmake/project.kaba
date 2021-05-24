@@ -14,36 +14,36 @@ class Term
 
 
 class Profile
-	string name
-	string[] libs_optional
+	var name: string
+	var libs_optional: string[]
 
 # project
 class Config
-	Path root
-	bool verbose = false
-	bool dry_run = false
-	bool force_all_libraries = false
-	bool force_rebuild = false
-	string force_profile
+	var root: Path
+	var verbose = false
+	var dry_run = false
+	var force_all_libraries = false
+	var force_rebuild = false
+	var force_profile: string
 	
-	string name
-	string binary_file
-	string main_file
-	string[] libs
-	string[] libs_optional
-	string[] ignore_libs
-	Profile[] profiles
-	string language = "c++17"
-	string optimization = "2"
-	string build_type = "debug"
-	string flags_global
-	string flags_compiler
-	string flags_linker
-	string[] icons
-	string desktop_file
-	string[] mime_files
-	string[] installs
-	string[] outputs = ["make"]
+	var name: string
+	var binary_file: string
+	var main_file: string
+	var libs: string[]
+	var libs_optional: string[]
+	var ignore_libs: string[]
+	var profiles: Profile[]
+	var language = "c++17"
+	var optimization = "2"
+	var build_type = "debug"
+	var flags_global: string
+	var flags_compiler: string
+	var flags_linker: string
+	var icons: string[]
+	var desktop_file: string
+	var mime_files: string[]
+	var installs: string[]
+	var outputs = ["make"]
 	
 	func ignored(l: string) -> bool
 		for ig in ignore_libs
@@ -54,7 +54,7 @@ class Config
 	func load()
 		if not Filesystem.exists(conf.root << "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
-		hui.Configuration c
+		var c: hui.Configuration
 		c.load(conf.root << "xmake.conf")
 		for k in c.keys()
 			if k in ["project", "project-name"]
@@ -97,7 +97,7 @@ class Config
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	func save()
-		hui.Configuration c
+		var c: hui.Configuration
 		c["project"] = name
 		c["binary"] = binary_file
 		c["main-file"] = main_file
@@ -116,7 +116,7 @@ class Config
 		c.save(conf.root << "xmake.conf")
 	
 	func needs_installing() -> Path[]
-		Path[] r
+		var r: Path[]
 		var list = Filesystem.search(Path("../static"), "*.*", "fd")
 		var ignore = mime_files
 		ignore.add(desktop_file)
@@ -133,20 +133,20 @@ class Config
 				return true
 		return false
 
-Config conf
+var conf: Config
 
 class SourceFile
-	Path filename
+	var filename: Path
 	func const object() -> Path
 		return Path(str(filename).replace(".cpp", ".o"))
-	Path[] dep
+	var dep: Path[]
 	func add_dep(d: Path) -> bool
 		if d in dep
 			return false
 		dep.add(d)
 		return true
 
-SourceFile[] sources
+var sources: SourceFile[]
 
 func rel(filename: Path) -> Path
 	return filename.relative_to(conf.root)

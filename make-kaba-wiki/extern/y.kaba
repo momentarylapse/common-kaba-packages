@@ -1,148 +1,161 @@
 use nix
 use os
+use net
 
 class EngineData
-	bool debug
-	bool show_timings
-	bool console_enabled
+	var debug: bool
+	var show_timings: bool
+	var console_enabled: bool
 	#bool wire_mode
-	bool resetting_game, game_running, first_frame
-	float physical_aspect_ratio
+	var resetting_game, game_running, first_frame: bool
+	var physical_aspect_ratio: float
 	
-	bool physics_enabled, collisions_enabled
-	float detail_level
+	var physics_enabled, collisions_enabled: bool
+	var detail_level: float
 	
-	float elapsed
-	float elapsed_rt
-	float time_scale
+	var elapsed: float
+	var elapsed_rt: float
+	var time_scale: float
 	
-	float fps_min, fps_max
+	var fps_min, fps_max: float
 	
-	Path initial_world_file, second_world_file
+	var initial_world_file, second_world_file: Path
 	#Font* default_font
+	var renderer: RenderPath*
+
+class RenderPath
+	var cube_map: nix.CubeMap*
+	func extern virtual render_into_texture(fb: nix.FrameBuffer, cam: Camera)
+	func extern render_into_cubemap(db: nix.DepthBuffer, cube: nix.CubeMap, pos: vector)
 
 class Entity
 #	extern void __init__()
-	extern virtual void __delete__()
-	extern void __del_override__()
-	extern virtual void on_init()
-	extern virtual void on_delete()
-	extern virtual void on_iterate(float dt)
+	func extern virtual __delete__()
+	func extern __del_override__()
+	func extern virtual on_init()
+	func extern virtual on_delete()
+	func extern virtual on_iterate(dt: float)
 
 class Controller extends Entity
-	extern override void __delete__()
+	func extern override __delete__()
 	
 	# common
 #	extern virtual void on_iterate(float dt)
-	extern virtual void on_key_down(int key)
-	extern virtual void on_key_up(int key)
-	extern virtual void on_left_button_down()
-	extern virtual void on_left_button_up()
-	extern virtual void on_middle_button_down()
-	extern virtual void on_middle_button_up()
-	extern virtual void on_right_button_down()
-	extern virtual void on_right_button_up()
-	extern virtual void on_input()
+	func extern virtual on_key_down(key: int)
+	func extern virtual on_key_up(key: int)
+	func extern virtual on_left_button_down()
+	func extern virtual on_left_button_up()
+	func extern virtual on_middle_button_down()
+	func extern virtual on_middle_button_up()
+	func extern virtual on_right_button_down()
+	func extern virtual on_right_button_up()
+	func extern virtual on_input()
 	
 	# rare
-	extern virtual void on_iterate_pre(float dt)
-	extern virtual void on_draw_pre()
-	extern virtual void on_render_inject()
+	func extern virtual on_iterate_pre(dt: float)
+	func extern virtual on_draw_pre()
+	func extern virtual on_render_inject()
 
 class Camera extends Entity
-	vector pos
-	quaternion ang
-	rect dest
-	matrix m_view
-	float exposure
-	float bloom_radius
-	float bloom_factor
+	var pos: vector
+	var ang: quaternion
+	var dest: rect
+	var m_view: matrix
+	var exposure: float
+	var bloom_radius: float
+	var bloom_factor: float
 	
-	bool focus_enabled
-	float focal_length
-	float focal_blur
+	var focus_enabled: bool
+	var focal_length: float
+	var focal_blur: float
 	
-	float fov
-	float min_depth, max_depth
+	var fov: float
+	var min_depth, max_depth: float
 	
-	bool show, enabled
+	var show, enabled: bool
 
-	extern override void __delete__()
-	extern vector project(vector p)
-	extern vector unproject(vector p)
-	extern void update_matrices(float aspect_ratio)
+	func extern override __delete__()
+	func extern project(p: vector) -> vector
+	func extern unproject(p: vector) -> vector
+	func extern update_matrices(aspect_ratio: float)
 
 class Material
-	float ambient
-	color diffuse
-	float specular
-	color emission
-	float shininess
-	nix.Texture*[] textures
-	nix.Shader* shader
-	extern void add_uniform(string name, float* p, int size)
-	extern static Material* load(Path filename)
+	var albedo: color
+	var roughness: float
+	var metal: float
+	var emission: color
+	var textures: nix.Texture*[]
+	var shader: nix.Shader*
+	var cast_shadow: bool
+	func extern add_uniform(name: string, p: float*, size: int)
+	func extern static load(filename: Path) -> Material*
 
 class CollisionData
-	Model* m, sub
-	Terrain* t
-	vector p, n
+	var m, sub: Model*
+	var t: Terrain*
+	var p, n: vector
 
 class Model extends Entity
 	class Mesh
 		class Sub
-			int num_triangles
-			int[] triangle_index
-			float[] skin_vertex
-			vector[] normal
-		int[] bone_index
-		vector[] vertex
-		Sub[] sub
+			var num_triangles: int
+			var triangle_index: int[]
+			var skin_vertex: float[]
+			var normal: vector[]
+		var bone_index: int[]
+		var vertex: vector[]
+		var sub: Sub[]
 	class Bone
-		int parent
-		vector pos
-		Model* model
-		matrix dmatrix
-		quaternion cur_ang
-		vector cur_pos
-	vector pos
-	vector vel
-	quaternion ang
-	vector rot
-	matrix matrix
-	float mass
-	matrix3 theta
+		var parent: int
+		var pos: vector
+		var model: Model*
+		var dmatrix: matrix
+		var cur_ang: quaternion
+		var cur_pos: vector
+	var pos: vector
+	var vel: vector
+	var ang: quaternion
+	var rot: vector
+	var matrix: matrix
+	var mass: float
+	var theta: matrix3
+	var physics_active: bool
+	var physics_passive: bool
+	var g_factor: float
+	var name: string
+	var radius: float
+	var min, max: vector
 	
-	Material*[] materials
+	var materials: Material*[]
 	
-	Mesh*[3] mesh
-	Bone[] bones
+	var mesh: Mesh*[3]
+	var bones: Bone[]
 	
-	float[] var
-	int[] var_i
+	var vars: float[]
+	var vars_i: int[]
 
-	extern override void __init__()
-	extern override void __delete__()
-	extern virtual void on_collide(CollisionData c)
+	func extern override __init__()
+	func extern override __delete__()
+	func extern virtual on_collide(c: CollisionData)
 	
-	extern void make_editable()
-	extern void begin_edit(int detail)
-	extern void end_edit(int detail)
+	func extern make_editable()
+	func extern begin_edit(detail: int)
+	func extern end_edit(detail: int)
 	
-	extern vector get_vertex(int index)
+	func extern get_vertex(index: int) -> vector
 	
-	extern void add_force(vector f, vector rho)
-	extern void add_impulse(vector p, vector rho)
-	extern void add_torque(vector t)
-	extern void add_torque_impulse(vector l)
-	extern void update_mass()
-	extern void update_motion()
+	func extern add_force(f: vector, rho: vector)
+	func extern add_impulse(p: vector, rho: vector)
+	func extern add_torque(t: vector)
+	func extern add_torque_impulse(l: vector)
+	func extern update_mass()
+	func extern update_motion()
 	
-	extern void reset_animation()
-	extern void begin_edit_animation()
-	extern bool animate_x(int op, float p1, float p2, int move, float *t, float dt, float vel_param, bool loop)
-	extern bool animate(int op, int move, float *t, float dt, bool loop)
-	extern bool is_animation_done(int op_no)
+	func extern reset_animation()
+	func extern begin_edit_animation()
+	func extern animate_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
+	func extern animate(op: int, move: int, t: float*, dt: float, loop: bool) -> bool
+	func extern is_animation_done(op_no: int) -> bool
 	enum
 		MOVE_OP_SET           # overwrite
 		MOVE_OP_SET_NEW_KEYED # overwrite, if current doesn't equal 0
@@ -152,202 +165,228 @@ class Model extends Entity
 		MOVE_OP_MIX_2_FACTOR  # w = w_old * a     + w_new * b
 
 class Terrain extends Entity
+	var pos: vector
+	var pattern: vector
+	var num_x, num_z: int
+	func extern get_height(p: vector) -> float
 	# ...
 
 class Light extends Entity
-	vector pos
-	vector dir
-	color color
-	float radius
-	float theta
-	float harshness
-	bool enabled
+	var pos: vector
+	var dir: vector
+	var color: color
+	var radius: float
+	var theta: float
+	var harshness: float
+	var enabled: bool
+	var allow_shadow: bool
+	var user_shadow_control: bool
+	var user_shadow_theta: float
 
 	class Spherical extends Light
-		extern void __init__(vector pos, color c, float radius)
+		func extern __init__(pos: vector, c: color, radius: float)
 
 	class Parallel extends Light
-		extern void __init__(vector dir, color c)
+		func extern __init__(dir: vector, c: color)
 
 	class Cone extends Light
-		extern void __init__(vector pos, vector dir, color c, float radius, float theta)
+		func extern __init__(pos: vector, dir: vector, c: color, radius: float, theta: float)
 
 class Particle extends Entity
-	vector pos, vel
-	float radius
-	float time_to_live
-	bool suicidal
-	nix.Texture* texture
-	color color
-	rect source
-	bool enabled
-	extern void __init__(vector p, float r, nix.Texture t, float ttl)
-	extern override void __delete__()
+	var pos, vel: vector
+	var radius: float
+	var time_to_live: float
+	var suicidal: bool
+	var texture: nix.Texture*
+	var color: color
+	var source: rect
+	var enabled: bool
+	func extern __init__(p: vector, r: float, t: nix.Texture, ttl: float)
+	func extern override __delete__()
 
 class Beam extends Particle
-	vector length
-	extern void __init__(vector p, vector l, float r, nix.Texture t, float ttl)
+	var length: vector
+	func extern __init__(p: vector, l: vector, r: float, t: nix.Texture, ttl: float)
 
 class Fog
-	color color
-	float distance
-	bool enabled
+	var color: color
+	var distance: float
+	var enabled: bool
 
 class Link extends Entity
-	Model* a, b
-	extern void set_motor(float v, float max)
+	var a, b: Model*
+	func extern set_motor(v: float, max: float)
 #	extern void set_axis(vector v)
-	extern void set_frame(int n, quaternion q)
+	func extern set_frame(n: int, q: quaternion)
 
 #	class Socket extends Link
 #		extern void __init__(Model* a, Model* b, vector pos)
 #	...
 
 class World
-	Model*[] objects
-	Terrain*[] terrains
+	var objects: Model*[]
+	var terrains: Terrain*[]
 	
-	Model* ego
+	var ego: Model*
 	
-	Light*[] lights
+	var lights: Light*[]
 	
-	color background
-	Model*[] skyboxes
+	var background: color
+	var skyboxes: Model*[]
 	
-	Fog fog
-	vector gravity
+	var fog: Fog
+	var gravity: vector
 	
-	Link*[] links
+	var links: Link*[]
 	
 	enum
 		PHYSICS_NONE
 		PHYSICS_SIMPLE
 		PHYSICS_FULL_INTERNAL
 		PHYSICS_FULL_EXTERNAL
-	int physics_mode
+	var physics_mode: int
 	
-	extern void add_light(Light l)
-	extern void add_particle(Particle p)
-	extern Model* create_object(Path filename, string name, vector pos, quaternion ang, int overwrite_index)
-	extern Terrain* create_terrain(Path filename, vector pos)
-	extern void shift_all(vector dpos)
-	extern vector get_g(vector pos)
-	extern bool trace(vector p1, vector p2, out CollisionData d, bool simple_test, Model* ignore)
+	func extern add_light(l: Light)
+	func extern add_particle(p: Particle)
+	func extern add_sound(s: audio.Sound)
+	func extern create_object(filename: Path, pos: vector, ang: quaternion) -> Model*
+	func extern create_terrain(filename: Path, pos: vector) -> Terrain*
+	func extern set_active_physics(o: Model, active: bool)
+	func extern shift_all(dpos: vector)
+	func extern get_g(pos: vector) -> vector
+	func extern trace(p1: vector, p2: vector, out d: CollisionData, simple_test: bool, ignore: Model*) -> bool
 	
 #	extern void unregister(void* o) # Model, Link, Light, Particle, Beam
-	extern void delete(void* o)
+	func extern delete(o: void*)
 
 
 class ui
 	class Node
-		extern void __init__(rect r)
-		extern virtual void __delete__()
+		func extern __init__(r: rect)
+		func extern virtual __delete__()
+		func extern __del_override__()
 		
-		extern void add(Node n)
+		func extern add(n: Node)
 		
-		extern virtual void on_iterate(float dt)
-		extern virtual void on_enter()
-		extern virtual void on_leave()
-		extern virtual bool on_left_button_down()
-		extern virtual bool on_left_button_up()
-		extern virtual bool on_middle_button_down()
-		extern virtual bool on_middle_button_up()
-		extern virtual bool on_right_button_down()
-		extern virtual bool on_right_button_up()
-		rect area
-		rect _eff_area
-		rect margin
-		float dz
-		color color
-		int align
-		bool visible
+		func extern virtual on_iterate(dt: float)
+		func extern virtual on_enter()
+		func extern virtual on_leave()
+		func extern virtual on_left_button_down() -> bool
+		func extern virtual on_left_button_up() -> bool
+		func extern virtual on_middle_button_down() -> bool
+		func extern virtual on_middle_button_up() -> bool
+		func extern virtual on_right_button_down() -> bool
+		func extern virtual on_right_button_up() -> bool
+		var x, y: float
+		var width, height: float
+		func extern set_area(r: rect)
+		var _eff_area: rect
+		var margin: rect
+		var dz: float
+		var color: color
+		var align: int
+		var visible: bool
+		var children: Node*[]
 		
 		enum
 			ALIGN_NONE
-			ALIGN_FILL_X = 1
-			ALIGN_FILL_Y = 2
-			ALIGN_TOP = 4
-			ALIGN_BOTTOM = 8
-			ALIGN_LEFT = 16
-			ALIGN_RIGHT = 32
-			ALIGN_OFFSET = 64 # 2^6
-			ALIGN_NONSQUARE = 128
-			ALIGN_CENTER_H = 256
-			ALIGN_CENTER_V = 512
+			ALIGN_FILL_X = 2^0
+			ALIGN_FILL_Y = 2^1
+			ALIGN_TOP = 2^2
+			ALIGN_BOTTOM = 2^3
+			ALIGN_LEFT = 2^4
+			ALIGN_RIGHT = 2^5
+			ALIGN_NONSQUARE = 2^7
+			ALIGN_CENTER_H = 2^8
+			ALIGN_CENTER_V = 2^9
 	
 	class HBox extends Node
-		extern void __init__()
+		func extern __init__()
 	
 	class VBox extends Node
-		extern void __init__()
+		func extern __init__()
 		
 	class Picture extends Node
-		extern void __init__(rect r, Texture tex)
-		extern void __init__(rect r, Texture tex, rect source)
-		extern override void __delete__()
-		rect source
-		Texture* texture
-		float blur
+		func extern __init__(r: rect, tex: Texture)
+		func extern __init__(r: rect, tex: Texture, source: rect)
+		func extern override __delete__()
+		var source: rect
+		var texture: Texture*
+		var blur: float
+		var shader: nix.Shader*
 
 	class Text extends Picture
-		extern void __init__(string t, float font_size)
-		extern void __init__(string t, float font_size, float x, float y)
-		extern override void __delete__()
-		string text
-		float font_size
-		extern void set_text(string t)
+		func extern __init__(t: string, font_size: float)
+		func extern __init__(t: string, font_size: float, x: float, y: float)
+		func extern override __delete__()
+		var text: string
+		var font_size: float
+		func extern set_text(t: string)
 	
 	class Picture3d extends Node
-		Model* model
-		matrix matrix
-		bool world_3d
-		bool lighting
-		void __init__(Model* m, matrix mat, float z)
+		var model: Model*
+		var matrix: matrix
+		var world_3d: bool
+		var lighting: bool
+		func __init__(m: Model*, mat: matrix, z: float)
 			super.__init__(rect.ID)
 			model = m
 			self.matrix = mat
 
-	extern static Node* toplevel
-	extern static bool key(int k)
-	extern static bool key_down(int k)
-	extern static bool key_up(int k)
+	var extern static toplevel: Node*
+	func extern static key(k: int) -> bool
+	func extern static key_down(k: int) -> bool
+	func extern static key_up(k: int) -> bool
 
-	extern static vector mouse, dmouse, scroll
+	var extern static mouse, dmouse, scroll: vector
 
 class PerformanceMonitor
 	class Average
-		float frame_time
-		float[16] location
-	int frames
-	Average avg
+		var frame_time: float
+		var location: float[16]
+	var frames: int
+	var avg: Average
+
+
+class NetworkManager
+	class Connection
+		var s: Socket*
+		var buffer: BinaryBuffer*
+		func extern start_block(id: string)
+		func extern end_block()
+		func extern send()
+	var cur_con: Connection*
+	func extern connect_to_host(host: string) -> Connection*
+	func extern event(id: string, e: Entity, f: Entity->void)
 
 
 # TODO
-class sound
+class audio
 	class Sound
-		void pause(bool pause)
-		void play(bool loop)
-		void set(vector pos, vector vel, float r_min, float r_max, float speed, float volume)
-		void stop()
+		func extern pause(pause: bool)
+		func extern play(loop: bool)
+		func extern set(pos: vector, vel: vector, r_min: float, r_max: float, speed: float, volume: float)
+		func extern stop()
+		func extern static emit(filename: Path, pos: vector, r_min: float, r_max: float, speed: float, volume: float, loop: bool) -> Sound*
+		func extern static load(filename: Path) -> Sound*
 	class Music
-		void pause(bool pause)
-		void play(bool loop)
-		void set_rate(float rate)
-		void stop()
-	Sound* emit(Path filename, vector pos, float r_min, float r_max, float speed, float volume, bool loop)
-	Music* load_music(Path filename)
-	Sound* load_sound(Path filename)
+		func pause(pause: bool)
+		func play(loop: bool)
+		func set_rate(rate: float)
+		func stop()
+	func load_music(filename: Path) -> Music*
 	#void save_sound(Path filename, float[] buf_r, float[] buf_l, int freq, int channels, int bits)
-	float volume_music
-	float volume_sounds
+	var volume_music: float
+	var volume_sounds: float
 
 
-extern Model* load_model(Path filename)
+func extern load_model(filename: Path) -> Model*
 
 
-extern nix.Texture* tex_white
-extern EngineData engine
-extern World world
-extern Camera* cam
-extern PerformanceMonitor *perf_mon
-extern Material*[] post_processors
+var extern tex_white: nix.Texture*
+var extern engine: EngineData
+var extern world: World
+var extern cam: Camera*
+var extern perf_mon: PerformanceMonitor*
+var extern network: NetworkManager
+var extern post_processors: Material*[]
