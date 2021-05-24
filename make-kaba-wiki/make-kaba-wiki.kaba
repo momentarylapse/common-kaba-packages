@@ -345,7 +345,7 @@ string make_reference()
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
 	return wiki
 
-func wiki_upload(string name, string wiki)
+func wiki_upload(name: string, wiki: string)
 	var f = Filesystem.create_text(name + ".txt")
 	f << wiki
 	del f
@@ -377,7 +377,7 @@ func make_documentation()
 
 import hui
 
-func parse_doc_string(string s) -> string
+func parse_doc_string(s: string) -> string
 	string ss = s
 	while true
 		int p = ss.find("<class>", 0)
@@ -391,7 +391,7 @@ func parse_doc_string(string s) -> string
 		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 	return ss.unescape()
 
-func doc_get(string ns, string name, bool is_class, string key) -> string
+func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	var p = Path("doc/" + ns.replace(".", "/"))
 	if is_class
 		p = p << name << "class.txt"
@@ -411,29 +411,29 @@ func doc_get(string ns, string name, bool is_class, string key) -> string
 		return parse_doc_string(conf[key])
 	return "no description"
 
-func doc_get_class_description(string ns, Class c) -> string
+func doc_get_class_description(ns: string, c: Class) -> string
 	return doc_get(ns, c.name, true, "description")
 
-func doc_get_class_element(string ns, Class c, ClassElement e) -> string
+func doc_get_class_element(ns: string, c: Class, e: ClassElement) -> string
 	return doc_get(ns, c.name, true, "element:{{e.name}}")
 
-func doc_get_func_description(string ns, Function f) -> string
+func doc_get_func_description(ns: string, f: Function) -> string
 	return doc_get(ns, f.name, false, "description")
 
-func doc_get_func_return(string ns, Function f) -> string
+func doc_get_func_return(ns: string, f: Function) -> string
 	return doc_get(ns, f.name, false, "return")
 
-func doc_get_func_param(string ns, Function f, string p) -> string
+func doc_get_func_param(ns: string, f: Function, p: string) -> string
 	return doc_get(ns, f.name, false, "param:{{p}}")
 
-func prepare_func(Function f, string ns, Path dir)
+func prepare_func(f: Function, ns: string, dir: Path)
 	doc_get_func_description(ns, f)
 	for p,i in f.param_type
 		doc_get_func_param(ns, f, f.var[i].name)
 	if f.return_type.name != "void"
 		doc_get_func_return(ns, f)
 
-func prepare_class(Class c, string ns, Path dir)
+func prepare_class(c: Class, ns: string, dir: Path)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
 	
@@ -452,7 +452,7 @@ func prepare_class(Class c, string ns, Path dir)
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name, dir << cc.name)
 
-func prepare_package(Script p, Path dir)
+func prepare_package(p: Script, dir: Path)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
 
@@ -469,7 +469,7 @@ func prepare_package(Script p, Path dir)
 #		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
 
 
-func prepare(Path dir)
+func prepare(dir: Path)
 	for p in weak(packages)
 		prepare_package(p, dir << p.name)
 	for p in external_packages
@@ -477,7 +477,7 @@ func prepare(Path dir)
 	for p in external_libs
 		prepare_package(p, dir << p.name)
 
-func main(string[] arg)
+func main(arg: string[])
 	find_external()
 	find_external_libs()
 	if len(arg) > 0
@@ -486,7 +486,7 @@ func main(string[] arg)
 	else
 		make_documentation()
 
-func make_class(Class c, string ns)
+func make_class(c: Class, ns: string)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
 
 	var funcs = filter_funcs(c.functions, c)
@@ -496,7 +496,7 @@ func make_class(Class c, string ns)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-func make_package(Script p)
+func make_package(p: Script)
 	wiki_upload("kaba." + p.name, show_package(p))
 
 	var classes = filter_classes(p.classes())

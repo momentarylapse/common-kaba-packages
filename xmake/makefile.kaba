@@ -2,7 +2,7 @@ use os
 use project
 use library
 
-void create_all_makefiles()
+func create_all_makefiles()
 	# fixed profiles
 	for p in conf.profiles
 		if p.name == "default"
@@ -21,11 +21,11 @@ void create_all_makefiles()
 	create_makefile(p, "")
 
 
-void append(out string[] a, string[] b)
+func append(out a: string[], b: string[])
 	for t in b
 		a.add(t)
 
-func collect_global_flags(Profile p, out string cflags, out string lflags, out string defines)
+func collect_global_flags(p: Profile, out cflags: string, out lflags: string, out defines: string)
 	string[] pkg
 	for l in conf.libs
 		if len(lib.pkg(l)) > 0
@@ -56,10 +56,10 @@ func collect_objects() -> string[]
 	return obj
 
 # clean line
-string cl(string s)
+func cl(s: string) -> string
 	return s.replace("  ", " ").replace("  ", " ")
 
-void create_makefile(Profile p, string postfix)
+func create_makefile(p: Profile, postfix: string)
 	print("-- makefile {{p.name}} --")
 	File* f = Filesystem.create_text(conf.root << ("Makefile" + postfix))
 	f << "BIN = ../{{conf.binary_file}}"

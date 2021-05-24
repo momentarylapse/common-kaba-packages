@@ -8,7 +8,7 @@ use time
 
 
 
-bool is_completely_built(SourceFile s)
+func is_completely_built(s: SourceFile) -> bool
 	if not os.Filesystem.exists(s.object())
 		return false
 	var ts = os.Filesystem.mtime(s.filename)
@@ -21,7 +21,7 @@ bool is_completely_built(SourceFile s)
 			return false
 	return true
 
-func compile(SourceFile s, string cxx_flags) -> bool
+func compile(s: SourceFile, cxx_flags: string) -> bool
 	var command = "g++ -c {{rel(s.filename)}} -o {{rel(s.object())}} {{cxx_flags}}"
 	if conf.verbose
 		print(command)
@@ -36,14 +36,14 @@ func compile(SourceFile s, string cxx_flags) -> bool
 class T extends Thread
 	SourceFile s
 	string cxx_flags
-	override void on_run()
+	func override on_run()
 		#print("COMPILE  {{s.filename}}")
 		compile(s, cxx_flags)
 		#time.sleep(1)
 
 
 
- func get_profile(string name) -> Profile
+ func get_profile(name: string) -> Profile
 	for p in conf.profiles
 		if p.name == name
 			return p

@@ -2,10 +2,10 @@ use os
 use project
 use library
 
-func win_path(Path p) -> string
+func win_path(p: Path) -> string
 	return str(p).replace("/", "\\")
 
-func rand_hex(int chars) -> string
+func rand_hex(chars: int) -> string
 	string s
 	for i in 0:chars
 		s += binary(&randi(0xffff), 1).hex().upper()[:1]
@@ -27,10 +27,10 @@ func guess_guid() -> (string,string)
 		
 	return [pguid, sguid]
 
-func vs_might_have_lib(string l) -> bool
+func vs_might_have_lib(l: string) -> bool
 	return l in ["gtk3", "zlib", "ogg", "flac", "fftw3", "portaudio"]
 
-func create_visual_studio(int version)
+func create_visual_studio(version: int)
 	if version != 2019
 		raise(new Exception("only visual studio 2019 supported"))
 	print("-- visual studio {{version}} --")
