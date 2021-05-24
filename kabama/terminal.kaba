@@ -1,13 +1,13 @@
 use os
 
-const string KABA_LINK = "/usr/lib/libc.so.6
+const KABA_LINK = "/usr/lib/libc.so.6
 	_tcgetattr:tcgetattr
 	_tcsetattr:tcsetattr"
 
 class Termios
 	int iflag, oflag, cflag, lflag
 	int[32] cc
-	const string __str__()
+	func const __str__() -> string
 		return "i={{iflag|08x}} o={{oflag|08x}} c={{cflag|08x}} l={{lflag|08x}}"
 
 # default: iflag = IUTF8 + IMAXBEL + ICRNL
@@ -46,13 +46,13 @@ enum
 	VTIME = 5
 	VMIN = 6
 
-extern int _tcgetattr(int fno, Termios* t)
-extern int _tcsetattr(int fno, int opt, Termios* t)
+func extern _tcgetattr(fno: int, t: Termios*) -> int
+func extern _tcsetattr(fno: int, opt: int, t: Termios*) -> int
 #extern void cfmakeraw(Termios* t)
 
 Termios _t_pre_raw
 
-void setraw()
+func setraw()
 	Termios t
 	_tcgetattr(0, &t)
 	_t_pre_raw = t
@@ -65,7 +65,7 @@ void setraw()
 	t.cflag = t.cflag | CS8
 	#print(str(t))
 	_tcsetattr(0, TCSANOW, &t)
-void unsetraw()
+func unsetraw()
 	Termios t
 	t.iflag = 0x4500
 	t.oflag = 5
@@ -76,31 +76,32 @@ void unsetraw()
 
 	_tcsetattr(0, TCSANOW, &t)
 
-const string ESC = "\x1b"
+const ESC = "\x1b"
 
-void clear_scr()
+func clear_scr()
 	print(ESC + "[2J")
 
 class Key
-	#const string BACKSPACE = [0x1b, 0x5b, 0x44]
-	const string UP = [0x1b, 0x5b, 0x41]
-	const string DOWN = [0x1b, 0x5b, 0x42]
-	const string RIGHT = [0x1b, 0x5b, 0x43]
-	const string LEFT = [0x1b, 0x5b, 0x44]
-	const string END = [0x1b, 0x5b, 0x46]
-	const string HOME = [0x1b, 0x5b, 0x48]
-	const string DELETE = [0x1b, 0x5b, 0x33, 0x7e]
-	const string BACKSPACE = [0x7f]
+	#const BACKSPACE: string = [0x1b, 0x5b, 0x44]
+	const UP: string = [0x1b, 0x5b, 0x41]
+	const DOWN: string = [0x1b, 0x5b, 0x42]
+	const RIGHT: string = [0x1b, 0x5b, 0x43]
+	const LEFT: string = [0x1b, 0x5b, 0x44]
+	const END: string = [0x1b, 0x5b, 0x46]
+	const HOME: string = [0x1b, 0x5b, 0x48]
+	const DELETE: string = [0x1b, 0x5b, 0x33, 0x7e]
+	const BACKSPACE : string = [0x7f]
 
-void move_cursor(int dx, int dy)
+func move_cursor(dx: int, dy: int)
 	if dx > 0
 		print(ESC + "[{{dx}}C")
 	else if dx < 0
 		print(ESC + "[{{-dx}}D")
 
+
 class BreakSignal extends Exception
 
-string fancy_read_command(string prompt, out string[] history)
+func fancy_read_command(prompt: string, out history: string[]) -> string
 	var ppp = _print_postfix
 	_print_postfix = ""
 	setraw()
@@ -116,11 +117,11 @@ string fancy_read_command(string prompt, out string[] history)
 		if s == [0x03]
 			unsetraw()
 			_print_postfix = ppp
-			raise(new BreakSignal("break"))
+			raise(new Exception("break"))
 		if s == [0x04]
 			unsetraw()
 			_print_postfix = ppp
-			raise(new BreakSignal("end"))
+			raise(new Exception("end"))
 		else if s == [0x0d]#"\n"
 			print("\n")
 			if current != ""

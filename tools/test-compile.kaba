@@ -2,14 +2,14 @@ use os
 use kaba
 
 class Term
-	const string RED = "\x1b[0;31m"
-	const string GREEN = "\x1b[0;32m"
-	const string YELLOW = "\x1b[0;33m"
-	const string END = "\x1b[0m"
+	const RED = "\x1b[0;31m"
+	const GREEN = "\x1b[0;32m"
+	const YELLOW = "\x1b[0;33m"
+	const END = "\x1b[0m"
 
 int error_count
 
-void test_compile(Path filename)
+func test_compile(filename: Path)
 	print("    " + filename.basename())
 	try
 		Script.load(filename, true)
@@ -17,7 +17,7 @@ void test_compile(Path filename)
 		print("{{Term.RED}}  ERROR  {{e}}{{Term.END}}")
 		error_count ++
 
-void test_rec(Path dir)
+func test_rec(dir: Path)
 	var subdirs = Filesystem.search(dir, "", "dr0")
 	for s in subdirs
 		var list = Filesystem.search(dir << s, "*.kaba", "f")
@@ -26,7 +26,7 @@ void test_rec(Path dir)
 		for e in list
 			test_compile(dir << s << e)
 
-void main(string[] arg)
+func main(arg: string[])
 	if len(arg) == 0
 		print("directory?")
 		return

@@ -3,9 +3,9 @@ use hui
 use config
 use tag
 
-const string NONLOCAL = "nonlocal"
-const string CHANGED_FILE = "changed"
-const string CHANGED_META = "changed-meta"
+const NONLOCAL = "nonlocal"
+const CHANGED_FILE = "changed"
+const CHANGED_META = "changed-meta"
 
 string str_format(string s, string fmt)
 	string r = s
@@ -48,7 +48,7 @@ class LocalFile
 	string[] options
 	Tag[] tags
 	
-	const bool is(string option)
+	func const is(option: string) -> bool
 		for o in options
 			if o == option
 				return true
@@ -64,23 +64,23 @@ class LocalFile
 				options.remove(i)
 				db.dirty = true
 				return
-	const bool pure_remote()
+	func const pure_remote() -> bool
 		return is(NONLOCAL)
-	const bool pure_local()
+	func const pure_local() -> bool
 		return len(id) == 0
-	const bool perfectly_fine()
+	func const perfectly_fine() -> bool
 		if pure_remote() or pure_local()
 			return false
 		if changed_meta() or changed_file()
 			return false
 		return true
-	const bool in_db()
+	func const in_db() -> bool
 		return len(hash) > 0
-	const bool changed_file()
+	func const changed_file() -> bool
 		return is(CHANGED_FILE)
-	const bool changed_meta()
+	func const changed_meta() -> bool
 		return is(CHANGED_META)
-	const bool mergeable(LocalFile f)
+	func const mergeable(f: LocalFile) -> bool
 		if size != f.size
 			return false
 		if id != f.id
@@ -137,7 +137,7 @@ class LocalFile
 				db.dirty = true
 				set(CHANGED_META)
 				return
-	const string status_str()
+	func const status_str() -> string
 		if !in_db()
 			return "? "
 		if pure_local()
@@ -149,7 +149,7 @@ class LocalFile
 		if changed_meta()
 			return "* "
 		return "  "
-	const void show()
+	func const show()
 		string s
 		if conf.show_meta_small
 			s = str_format(nice_size(size), " 6")
@@ -158,7 +158,7 @@ class LocalFile
 			else
 				s += "  "
 		print("{{status_str()}} {{s}}  {{rel_path(path)}}")
-	const void show_info(string l)
+	func const show_info(l: string)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
 		print(l + "id:      {{id}}")
@@ -171,12 +171,12 @@ class LocalFile
 		var _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
-	const string remote_path()
+	func const remote_path() -> string
 		var ext = path.extension()
 		if is("quality=medium")
 			return ALEX_DIR + "medium/{{id}}.{{ext}}"
 		return ALEX_DIR + "links/{{id}}"
-	const string get_tag(string key)
+	func const get_tag(key: string) -> string
 		if key == "name"
 			return name
 		if key == "ext"
@@ -191,7 +191,7 @@ class LocalFile
 			if t.key == key
 				return t.value
 		return ""
-	const string apply_structure(string structure)
+	func const apply_structure(structure: string) -> string
 		string r = structure
 		int p1 = 0
 		while true
@@ -210,7 +210,7 @@ class LocalFile
 			r = r[:p0] + val + r[p1+1:]
 			p1 = p0 + len(val)
 		return r
-	const bool match(Tag[] mtags)
+	func const match(mtags: Tag[]) -> bool
 		for mt in mtags
 			bool tag_match = false
 			if mt.key == "name"
@@ -360,7 +360,7 @@ class LocalFileDB
 		del f
 		dirty = false
 	
-	const bool has_id(string id)
+	func const has_id(id: string) -> bool
 		for f in files
 			if id == f.id
 				return true
@@ -378,7 +378,7 @@ class LocalFileDB
 				return &f
 		raise(new Exception("not in db: '{{rel_path(path)}}'"))
 
-	const bool has_path(Path path)
+	func const has_path(path: Path) -> bool
 		for f in files
 			if path == f.path
 				return true

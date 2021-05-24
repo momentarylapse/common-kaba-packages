@@ -1,6 +1,6 @@
 use os
 
-const string KABA_LINK = "/usr/lib/libstdc++.so
+const KABA_LINK = "/usr/lib/libstdc++.so
 	_setlocale:setlocale
 /usr/lib/libncursesw.so
 	_initscr:initscr
@@ -31,77 +31,77 @@ const string KABA_LINK = "/usr/lib/libstdc++.so
 	noecho:noecho
 	_keypad:keypad"
 
-extern void* _initscr()
-extern int curs_set(int mode)
-extern bool has_colors()
-extern int start_color()
-extern int use_default_colors()
-extern int init_pair(int i, int a, int b)
-extern int _waddnstr(void* w, char* p, int n)
-extern int _waddnwstr(void* w, int* p, int n)
-extern int _wrefresh(void* w)
-extern int _getmaxx(void* w)
-extern int _getmaxy(void* w)
-extern int _wmove(void* w, int y, int x)
-extern int _wgetch(void* w)
-extern int _wclear(void* w)
-extern void* _newwin(int h, int w, int y, int x)
-extern int _wborder(void* w, int ls, int rs, int ts, int bs, int tl, int tr, int bl, int br)
-extern int _wattr_on(void* w, int a, void* xxx)
-extern int _wattr_off(void* w, int a, void* xxx)
-extern int _wbkgd(void* w, int c)
-extern int _waddch(void* w, int c)
-extern int endwin()
-extern int raw()
-extern int noraw()
-extern int echo()
-extern int noecho()
-extern int _keypad(void* w, bool b)
+func extern _initscr() -> void*
+func extern curs_set(mode: int) -> int
+func extern has_colors() -> bool
+func extern start_color() -> int
+func extern use_default_colors() -> int
+func extern init_pair(i: int, a: int, b: int) -> int
+func extern _waddnstr(w: void*, p: char*, n: int) -> int
+func extern _waddnwstr(w: void*, p: int*, n: int) -> int
+func extern _wrefresh(w: void*) -> int
+func extern _getmaxx(w: void*) -> int
+func extern _getmaxy(w: void*) -> int
+func extern _wmove(w: void*, y: int, x: int) -> int
+func extern _wgetch(w: void*) -> int
+func extern _wclear(w: void*) -> int
+func extern _newwin(h: int, w: int, y: int, x: int) -> void*
+func extern _wborder(w: void*, ls: int, rs: int, ts: int, bs: int, tl: int, tr: int, bl: int, br: int) -> int
+func extern _wattr_on(w: void*, a: int, xxx: void*) -> int
+func extern _wattr_off(w: void*, a: int, xxx: void*) -> int
+func extern _wbkgd(w: void*, c: int) -> int
+func extern _waddch(w: void*, c: int) -> int
+func extern endwin() -> int
+func extern raw() -> int
+func extern noraw() -> int
+func extern echo() -> int
+func extern noecho() -> int
+func extern _keypad(w: void*, b: bool) -> int
 
-extern char* _setlocale(int category, char* locale)
+func extern _setlocale(category: int, locale: char*) -> char*
 
 class Window
 	void* w = nil
-	void __init__()
-	void __init__(int width, int height, int x, int y)
+	func __init__()
+	func __init__(width: int, height: int, x: int, y: int)
 		w = _newwin(height, width, y, x)
-	void background(int c)
+	func background(c: int)
 		_wbkgd(w, c)
-	void print(string s)
+	func print(s: string)
 		_waddnstr(w, &s[0], s.num)
-	void printw(string s)
+	func printw(s: string)
 		var ss = s.utf8_to_utf32()
 		_waddnwstr(w, &ss[0], ss.num)
-	void addch(int c)
+	func addch(c: int)
 		_waddch(w, c)
-	void refresh()
+	func refresh()
 		_wrefresh(w)
-	void keypad(bool e)
+	func keypad(e: bool)
 		_keypad(w, e)
-	void move(int x, int y)
+	func move(x: int, y: int)
 		_wmove(w, y, x)
-	void attron(int a)
+	func attron(a: int)
 		_wattr_on(w, a, nil)
-	void attroff(int a)
+	func attroff(a: int)
 		_wattr_off(w, a, nil)
-	void border(string s)
+	func border(s: string)
 		_wborder(w, s[0], s[1], s[2], s[3], s[4], s[5], s[6], s[7])
-	void clear()
+	func clear()
 		_wclear(w)
-	int width()
+	func width() -> int
 		return _getmaxx(w)
-	int height()
+	func height() -> int
 		return _getmaxy(w)
-	int getch()
+	func getch() -> int
 		return _wgetch(w)
 
 class Attr
-	const int NORMAL = 0
-	const int COLOR = 0x0000ff00
-	const int REVERSE = 1<<(10+8)
-	const int UNDERLINE = 1<<(10+9)
-	const int BLINK = 1<<(11+8)
-	const int BOLD = 1<<(13+8)
+	const NORMAL = 0
+	const COLOR = 0x0000ff00
+	const REVERSE = 1<<(10+8)
+	const UNDERLINE = 1<<(10+9)
+	const BLINK = 1<<(11+8)
+	const BOLD = 1<<(13+8)
 
 class Color
 	enum
@@ -113,7 +113,7 @@ class Color
 		MAGENTA
 		CYAN
 		WHITE
-	static int pair(int n)
+	func static pair(n: int) -> int
 		return (n<<8) & Attr.COLOR
 
 class Key
@@ -127,13 +127,13 @@ class Key
 
 Window stdwin
 
-void init()
+func init()
 	stdwin.w = _initscr()
 	string s
 	s.add(0)
 	_setlocale(0, &s[0]) # LC_CTYPE
 
-void main()
+func main()
 	init()
 	raw()
 	noecho()
@@ -174,7 +174,7 @@ void main()
 	print(r)
 
 
-void _main()
+func _main()
 	init()
 	raw()
 	noecho()

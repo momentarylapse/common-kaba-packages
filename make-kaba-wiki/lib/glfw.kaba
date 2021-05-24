@@ -1,4 +1,4 @@
-const string KABA_LINK = "/usr/lib64/libglfw.so
+const KABA_LINK = "/usr/lib64/libglfw.so
 	_glfwInit:glfwInit
 	_glfwVulkanSupported:glfwVulkanSupported
 	_glfwWindowHint:glfwWindowHint
@@ -22,30 +22,30 @@ const string KABA_LINK = "/usr/lib64/libglfw.so
 import hui
 import time
 
-extern int _glfwInit()
-extern int _glfwVulkanSupported()
-extern void* _glfwCreateWindow(int width, int height, const char* title, void* monitor, void* share)
-extern int _glfwWindowShouldClose(void* window)
-extern void _glfwSetWindowUserPointer(void *window, void *p)
-extern void* _glfwGetWindowUserPointer(void *window)
-extern void* _glfwSetKeyCallback(void *window, void *f)
-extern void* _glfwSetCursorPosCallback(void *window, void *f)
-extern void* _glfwSetMouseButtonCallback(void *window, void *f)
-extern void _glfwGetCursorPos(void *window, float64* x, float64* y)
-extern void _glfwWindowHint(int hint, int value)
-extern void _glfwPollEvents()
-extern void _glfwTerminate()
-extern int _glfwJoystickPresent(int j)
-extern int _glfwJoystickIsGamepad(int j)
-extern char[0]* _glfwGetJoystickName(int j)
-extern char[0]* _glfwGetGamepadName(int j)
-extern int _glfwGetGamepadState(int j, void* p)
+func extern _glfwInit() -> int
+func extern _glfwVulkanSupported() -> int
+func extern _glfwCreateWindow(width: int, height: int, title: char*, monitor: void*, share: void*) -> void*
+func extern _glfwWindowShouldClose(window: void*) -> int
+func extern _glfwSetWindowUserPointer(window: void*, p: void*)
+func extern _glfwGetWindowUserPointer(window: void*) -> void*
+func extern _glfwSetKeyCallback(window: void*, f: void*) -> void*
+func extern _glfwSetCursorPosCallback(window: void*, f: void*) -> void*
+func extern _glfwSetMouseButtonCallback(window: void*, f: void*) -> void*
+func extern _glfwGetCursorPos(window: void*, x: float64*, y: float64*)
+func extern _glfwWindowHint(hint: int, value: int)
+func extern _glfwPollEvents()
+func extern _glfwTerminate()
+func extern _glfwJoystickPresent(j: int) -> int
+func extern _glfwJoystickIsGamepad(j: int) -> int
+func extern _glfwGetJoystickName(j: int) -> char[0]*
+func extern _glfwGetGamepadName(j: int) -> char[0]*
+func extern _glfwGetGamepadState(j: int, p: void*) -> int
 
-const int GLFW_CLIENT_API = 0x00022001
-const int GLFW_NO_API = 0
-const int GLFW_RESIZABLE = 0x00020003
+const GLFW_CLIENT_API = 0x00022001
+const GLFW_NO_API = 0
+const GLFW_RESIZABLE = 0x00020003
 
-void init(string[] opts)
+func init(opts: string[])
 	_glfwInit()
 	if "vulkan" in opts
 		print("VULKAN!!!!")
@@ -54,10 +54,10 @@ void init(string[] opts)
 		_glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API)
 		_glfwWindowHint(GLFW_RESIZABLE, 0)
 
-void end()
+func end()
 	_glfwTerminate()
 
-string cp2s(char[0]* p)
+func cp2s(p: char[0]*) -> string
 	if p == nil
 		return ""
 	string s
@@ -67,7 +67,7 @@ string cp2s(char[0]* p)
 		s.add(p[i])
 	return s
 
-int _get_key(int k)
+func _get_key(k: int) -> int
 	if k >= 65 and k < 91
 		return k - 65 + hui.KEY_A
 	if k == 32
@@ -91,7 +91,7 @@ int _get_key(int k)
 	return -1
 	
 
-void _on_key(void *w, int a, int b, int c, int d)
+func _on_key(w: void*, a: int, b: int, c: int, d: int)
 	#print("ON KEY   {{a}} {{b}} {{c}} {{d}}")
 	Window* win = _glfwGetWindowUserPointer(w)
 	int k = _get_key(a)
@@ -101,7 +101,7 @@ void _on_key(void *w, int a, int b, int c, int d)
 	if c > 0
 		win.on_key_down(k)
 
-void _on_button(void *w, int a, int action, int c)
+func _on_button(w: void*, a: int, action: int, c: int)
 	#print("ON BUTTON   {{a}} {{action}} {{c}}")
 	Window* win = _glfwGetWindowUserPointer(w)
 	if action == 1
@@ -119,7 +119,7 @@ void _on_button(void *w, int a, int action, int c)
 			win.input.button[1] = false
 			win.on_right_button_up()
 
-void _on_cursor(void *w, float64 xx, float64 yy)
+func _on_cursor(w: void*, xx: float64, yy: float64)
 	float x = float(xx)
 	float y = float(yy)
 	Window* win = _glfwGetWindowUserPointer(w)
@@ -136,53 +136,53 @@ class Window
 		bool[3] button
 		bool[256] key
 		float x, y, dx, dy
-		void __init__()
+		func __init__()
 			for b in button
 				b = false
 			for k in key
 				k = false
 	Input input
-	void __init__(string title, int w, int h)
+	func __init__(title: string, w: int, h: int)
 		var _title = title + "\x00"
 		win = _glfwCreateWindow(w, h, &_title[0], nil, nil)
 		_glfwSetWindowUserPointer(win, &self)
 		_glfwSetKeyCallback(win, _on_key.code)
 		_glfwSetCursorPosCallback(win, _on_cursor.code)
 		_glfwSetMouseButtonCallback(win, _on_button.code)
-	void __init__(void *ww)
+	func __init__(ww: void*)
 		win = ww
 		_glfwSetWindowUserPointer(win, &self)
 		_glfwSetKeyCallback(win, _on_key.code)
 		_glfwSetCursorPosCallback(win, _on_cursor.code)
 		_glfwSetMouseButtonCallback(win, _on_button.code)
-	void run()
+	func run()
 		while _glfwWindowShouldClose(win) == 0
 			_glfwPollEvents()
 			on_idle()
-	virtual void on_idle()
-	complex get_mouse()
+	func virtual on_idle()
+	func get_mouse() -> complex
 		float64 xx, yy
 		_glfwGetCursorPos(win, &xx, &yy)
 		return complex(float(xx), float(yy))
-	virtual void on_key_down(int key)
+	func virtual on_key_down(key: int)
 		#print("key {{key}}")
-	virtual void on_mouse_move()
+	func virtual on_mouse_move()
 		#print("ON CURSOR   {{get_mouse()}}")
-	virtual void on_left_button_down()
+	func virtual on_left_button_down()
 		#print("LBD")
-	virtual void on_left_button_up()
+	func virtual on_left_button_up()
 		#print("LBU")
-	virtual void on_right_button_down()
+	func virtual on_right_button_down()
 		#print("RBD")
-	virtual void on_right_button_up()
+	func virtual on_right_button_up()
 		#print("RBU")
-	bool key(int k)
+	func key(k: int) -> bool
 		if k < 0 or k >= 256
 			return false
 		return input.key[k]
 
 
-void _main()
+func _main()
 	init([])
 	var w = new Window("test", 800, 600)
 	w.run()
@@ -192,7 +192,7 @@ void _main()
 class GamepadState
 	bool[16] buttons
 	float[6] axes
-	void __init__()
+	func __init__()
 		for b in buttons
 			b = false
 		for a in axes
@@ -219,28 +219,32 @@ class Gamepad as shared extends GamepadState
 	GamepadState state_prev
 	int index
 	float deadzone
-	void __init__(int i)
+	func __init__(i: int)
 		index = i
-		deadzone = 0.03
+		deadzone = 0.05
 	
-	bool present()
+	func present() -> bool
 		return _glfwJoystickIsGamepad(index) == 1
 	
-	void update()
+	func update()
 		state_prev = self
 		_glfwGetGamepadState(index, &self)
 		for a in axes
 			if abs(a) < deadzone
 				a = 0
+			else if a > 0
+				a = (a - deadzone) / (1 - deadzone)
+			else
+				a = (a + deadzone) / (1 - deadzone)
 	
-	bool click(int b)
+	func click(b: int) -> bool
 		return buttons[b] and not state_prev.buttons[b]
 		
 	
-	static shared Gamepad get(int index)
+	func static get(index: int) -> shared Gamepad
 		return new Gamepad(index)
 
-void main()
+func main()
 	init([])
 	for j in 0:8
 		print("{{_glfwJoystickPresent(j)}}  {{_glfwJoystickIsGamepad(j)}} {{cp2s(_glfwGetGamepadName(j))}}")

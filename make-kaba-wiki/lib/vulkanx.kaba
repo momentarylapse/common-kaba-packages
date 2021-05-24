@@ -3,7 +3,7 @@ use time
 use image
 
 
-Vertex _v1(vector p, vector n, float u, float v)
+func _v1(p: vector, n: vector, u: float, v: float) -> Vertex
 	Vertex r
 	r.pos = p
 	r.normal = n
@@ -12,7 +12,7 @@ Vertex _v1(vector p, vector n, float u, float v)
 	return r
 
 
-VertexBuffer* create_quad(rect r)
+func create_quad(r: rect) -> VertexBuffer*
 	var vb = new VertexBuffer()
 	Vertex[] vertices
 	vertices.add(_v1(vector(r.x1,r.y1,0), vector.EZ, 0, 0))
@@ -30,7 +30,7 @@ class Renderer
 	CommandBuffer* cb
 	DescriptorPool* pool
 
-	void __init__()
+	func __init__()
 		width = 0
 		height = 0
 		pool = nil
@@ -40,26 +40,26 @@ class Renderer
 		render_finished_semaphore = new Semaphore()
 		cb = new CommandBuffer()
 	
-	virtual void __delete__()
+	func virtual __delete__()
 		del in_flight_fence
 		del image_available_semaphore
 		del render_finished_semaphore
 		if pool
 			del pool
 	
-	virtual RenderPass* default_render_pass()
+	func virtual default_render_pass() -> RenderPass*
 		return nil
 		
-	virtual FrameBuffer* current_frame_buffer()
+	func virtual current_frame_buffer() -> FrameBuffer*
 		return nil
 
-	virtual bool start_frame()
+	func virtual start_frame() -> bool
 		return false
 
-	virtual void end_frame()
+	func virtual end_frame()
 		pass
 	
-	const rect area()
+	func const area() -> rect
 		return rect(0, width, 0, height)
 
 
@@ -72,7 +72,7 @@ class WindowRenderer extends Renderer
 	int image_index
 	bool framebuffer_resized
 	
-	void __init__(void *_window)
+	func __init__(_window: void*)
 		window = _window
 		framebuffer_resized = false
 		pool = new DescriptorPool("buffer:1024,sampler:1024", 1024)
@@ -82,10 +82,10 @@ class WindowRenderer extends Renderer
 		#main_renderer = this
 	#glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback);
 
-	override void __delete__()
+	func override __delete__()
 		_delete_swap_chain_and_stuff()
 
-	void _create_swap_chain_and_stuff()
+	func _create_swap_chain_and_stuff()
 		swap_chain = new SwapChain(window)
 		depth_buffer = swap_chain.create_depth_buffer()
 		_default_render_pass = swap_chain.create_render_pass(depth_buffer)
@@ -93,7 +93,7 @@ class WindowRenderer extends Renderer
 		width = swap_chain.width
 		height = swap_chain.height
 	
-	void _delete_swap_chain_and_stuff()
+	func _delete_swap_chain_and_stuff()
 		for fb in frame_buffers
 			del fb
 		del _default_render_pass
@@ -108,7 +108,7 @@ class WindowRenderer extends Renderer
 #	height = h;
 #	framebuffer_resized = true;
 
-	void rebuild_default_stuff()
+	func rebuild_default_stuff()
 		print("recreate swap chain")
 
 		wait_device_idle()
@@ -116,13 +116,13 @@ class WindowRenderer extends Renderer
 		_delete_swap_chain_and_stuff()
 		_create_swap_chain_and_stuff()
 	
-	override RenderPass* default_render_pass()
+	func override default_render_pass() -> RenderPass*
 		return _default_render_pass
 
-	override FrameBuffer* current_frame_buffer()
+	func override current_frame_buffer() -> FrameBuffer*
 		return frame_buffers[image_index]
 
-	override bool start_frame()
+	func override start_frame() -> bool
 		in_flight_fence.wait()
 
 		if !swap_chain.aquire_image(&image_index, image_available_semaphore)
@@ -130,7 +130,7 @@ class WindowRenderer extends Renderer
 			return false
 		return true
 
-	override void end_frame()
+	func override end_frame()
 		queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
 
 		if !swap_chain.present(image_index, [render_finished_semaphore]) or framebuffer_resized
@@ -158,7 +158,7 @@ class TextureRenderer extends Renderer
 	RenderPass* _default_render_pass
 
 
-	void __init__(Texture* t)
+	func __init__(t: Texture*)
 		tex = t
 		width = tex.width
 		height = tex.height
@@ -171,17 +171,17 @@ class TextureRenderer extends Renderer
 		frame_buffer = new FrameBuffer(width, height, _default_render_pass, [tex.view, depth_buffer.view])
 
 
-	override void __delete__()
+	func override __delete__()
 		del _default_render_pass
 		del depth_buffer
 		del frame_buffer
 		del tex
 
-	override bool start_frame()
+	func override start_frame() -> bool
 		cb.begin()
 		return true
 
-	override void end_frame()
+	func override end_frame()
 		#cb->barrier([tex, depth_buffer], 0);
 		cb.barrier([depth_buffer], 0)
 		cb.end()
@@ -191,7 +191,7 @@ class TextureRenderer extends Renderer
 		wait_device_idle()
 
 
-	override FrameBuffer* current_frame_buffer()
+	func override current_frame_buffer() -> FrameBuffer*
 		return frame_buffer
 
 
@@ -213,7 +213,7 @@ class StatLayer
 	int frames
 	float _time
 	
-	void __init__(Shader* shader, RenderPass* rp, int subpass, DescriptorPool* pool)
+	func __init__(shader: Shader*, rp: RenderPass*, subpass: int, pool: DescriptorPool*)
 		timer = new Timer()
 		_time = 0
 		frames = 0
@@ -235,14 +235,14 @@ class StatLayer
 		pipeline.set_blend(6,7)
 		pipeline.set_z(false, false)
 		pipeline.rebuild()
-	void __delete__()
+	func __delete__()
 		del timer
 		del ubo
 		del tex
 		del dset
 		del vb
 		del pipeline
-	void tick()
+	func tick()
 		float dt = timer.get()
 		_time += dt
 		frames ++
@@ -260,7 +260,7 @@ class StatLayer
 		dset.update()
 		frames = 0
 		_time = 0
-	void draw(out CommandBuffer cb)
+	func draw(out cb: CommandBuffer)
 		cb.bind_pipeline(pipeline)
 		cb.bind_descriptor_set(0, dset)
 		cb.draw(vb)

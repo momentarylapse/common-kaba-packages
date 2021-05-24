@@ -3,25 +3,25 @@ use os
 use time
 # use "@/mongo"
 
-const string SHIFT = "    "
+const SHIFT = "    "
 
 Script*[] external_packages
 Script*[] external_libs
 
-string param_pre(Variable v)
+func param_pre(v: Variable) -> string
 	if not v.is_const
 		return "out "
 	return ""
 
-string func_params(Function f)
+func func_params(f: Function) -> string
 	return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{p.name}} {{f.var[i].name}}"].join(", ")
 
-string func_return(Function f)
+func func_return(f: Function) -> string
 	if f.return_type.name == "void"
 		return ""
 	return " -> {{f.return_type.name}}"
 
-string show_func(string ns, Function f)
+func show_func(ns: string, f: Function) -> string
 	string name = f.name
 	if f.namespace
 		name = "{{f.namespace.name}}.{{f.name}}"
@@ -47,7 +47,7 @@ string show_func(string ns, Function f)
 	
 	return wiki
 
-string show_var(string ns, Variable v)
+func show_var(ns: string, v: Variable) -> string
 	string wiki = "== Kaba variable {{v.name}} ==\n"
 	
 	wiki += "\n=== Syntax ===\n\n"
@@ -58,7 +58,7 @@ string show_var(string ns, Variable v)
 	return wiki
 
 
-string class_extension(Class c)
+func class_extension(c: Class) -> string
 	if len(c.param) > 0
 		# dirty hack...
 		if &c == string
@@ -72,7 +72,7 @@ string class_extension(Class c)
 	return ""
 
 
-Function*[] filter_funcs(Function*[] ff, Class namespace)
+func filter_funcs(ff: Function*[], namespace: Class) -> Function*[]
 	Function*[] r
 	for f in ff
 		if f.namespace != &namespace
@@ -89,17 +89,17 @@ Function*[] filter_funcs(Function*[] ff, Class namespace)
 	r = sorted(r, "is_static")
 	return r
 
-Constant*[] filter_consts(Constant*[] cc)
+func filter_consts(cc: Constant*[]) -> Constant*[]
 	Constant*[] r
 	for c in cc
 		if c.name[:1] != "-" and c.name != "KABA_LINK"
 			r.add(c)
 	return sorted(r, "name")
 
-ClassElement[] filter_elements(ClassElement[] cc)
+func filter_elements(cc: ClassElement[]) -> ClassElement[]
 	return sorted([for c in cc c if c.name[:1] != "-"], "name")
 
-string opname(string f)
+func opname(f: string) -> string
 	if f == "__add__"
 		return "+"
 	if f == "__sub__"
@@ -156,10 +156,10 @@ string opname(string f)
 		return "-"
 	return f
 
-bool is_list(Class c)
+func is_list(c: Class) -> bool
 	return c.name[-2:] == "[]" or &c == string
 
-string func_pre(Function f)
+func func_pre(f: Function) -> string
 	string pre
 	if f.is_static()
 		pre += "static "
@@ -172,7 +172,7 @@ string func_pre(Function f)
 	return pre
 
 
-string show_class(string ns, Class c)
+func show_class(ns: string, c: Class) -> string
 	string wiki = "== Kaba class {{c.name}} ==\n\n"
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
@@ -267,7 +267,7 @@ string show_class(string ns, Class c)
 	
 	return wiki
 
-Class*[] filter_classes(Class*[] cc)
+func filter_classes(cc: Class*[]) -> Class*[]
 	Class*[] r
 	for c in cc
 		if c.name.find("shared ", 0) >= 0
@@ -287,7 +287,7 @@ Class*[] filter_classes(Class*[] cc)
 	return sorted(r, "name")
 
 
-string show_package(Script p)
+func show_package(p: Script) -> string
 	string wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package {{p.name}} (default) ==\n"
@@ -317,7 +317,7 @@ string show_package(Script p)
 	return wiki
 
 
-string make_reference()
+func make_reference() -> string
 	string wiki = "== Kaba reference ==\n"
 
 	wiki += "\nVersion {{kaba_version}} from {{Date.now()|%F}}\n"

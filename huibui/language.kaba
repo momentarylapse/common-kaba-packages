@@ -16,7 +16,7 @@ class Language
 	string name
 	LangID[] ids
 	LangText[] texts
-	const void show()
+	func const show()
 		print(name)
 		for i in ids
 			print(i.id)
@@ -26,7 +26,7 @@ class Language
 		for t in texts
 			print(t.orig)
 			print("\t{{t.trans}}")
-	void add_id(string id, string title, string tooltip)
+	func add_id(id: string, title: string, tooltip: string)
 		for i in ids
 			if i.id == id
 				if len(title) > 0
@@ -39,7 +39,7 @@ class Language
 		i.title = title
 		i.tooltip = tooltip
 		ids.add(i)
-	void add_text(string orig, string trans)
+	func add_text(orig: string, trans: string)
 		for t in texts
 			if t.orig == orig
 				if len(trans) > 0
@@ -50,7 +50,7 @@ class Language
 		t.trans = trans
 		texts.add(t)
 		
-	void save()
+	func save()
 		File* f = Filesystem.create_text(filename)
 		f << "# Language"
 		f << name
@@ -70,17 +70,17 @@ class Language
 		del f
 
 
-	void sort()
+	func sort()
 		sort_ids(ids)
 		sort_texts(texts)
-	const LangID[] get_useful_ids()
+	func const get_useful_ids() -> LangID[]
 		LangID[] uids
 		for i in ids
 			if len(i.title) > 0 or len(i.tooltip) > 0
 				uids.add(i)
 		sort_ids(uids)
 		return uids
-	const LangText[] get_useful_texts()
+	func const get_useful_texts() -> LangText[]
 		LangText[] utexts
 		for t in texts
 			if len(t.trans) > 0
@@ -90,7 +90,7 @@ class Language
 
 
 
-Language load_prelang(Path filename)
+func load_prelang(filename: Path) -> Language
 	Language l
 	l.filename = filename
 	#try
@@ -127,7 +127,7 @@ Language load_prelang(Path filename)
 	#	print("ERROR: " + e.message())
 
 
-Language[] load_prelangs()
+func load_prelangs() -> Language[]
 	Language[] langs
 	var files = Filesystem.search(conf.dir, "*.prelang", "f")
 	for f in files
@@ -135,7 +135,7 @@ Language[] load_prelangs()
 		langs.add(l)
 	return langs
 
-void lang_id_add(out LangID[] ids, string id, string title, string tooltip, string ns)
+func lang_id_add(out ids: LangID[], id: string, title: string, tooltip: string, ns: string)
 	if id == "?" or id == ""
 		return
 	string cid = id
@@ -151,7 +151,7 @@ void lang_id_add(out LangID[] ids, string id, string title, string tooltip, stri
 	a.tooltip = tooltip
 	ids.add(a)
 
-void sort_ids(out LangID[] ids)
+func sort_ids(out ids: LangID[])
 	for i in 0:len(ids)
 		for j in i+1:len(ids)
 			if ids[i].id > ids[j].id
@@ -160,7 +160,7 @@ void sort_ids(out LangID[] ids)
 				ids[j] = t
 
 
-void sort_texts(out LangText[] texts)
+func sort_texts(out texts: LangText[])
 	for i in 0:len(texts)
 		for j in i+1:len(texts)
 			if texts[i].orig > texts[j].orig
@@ -170,7 +170,7 @@ void sort_texts(out LangText[] texts)
 
 
 
-bool check_lang(Language l, Language own, bool create_file)
+func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
 	int nerrors = 0
 	

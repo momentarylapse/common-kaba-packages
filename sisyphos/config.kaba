@@ -3,12 +3,12 @@ use hui
 
 #const string SERVER = "michi.is-a-geek.org"
 #const string SERVER = "myu"
-const string CMD = "kaba alex -S"
-const string ALEX_DIR = "/media/300/temp/alexandria-cache/"
-const string ALEX_IN = ALEX_DIR + "in/"
+const CMD = "kaba alex -S"
+const ALEX_DIR = "/media/300/temp/alexandria-cache/"
+const ALEX_IN = ALEX_DIR + "in/"
 
-const string MEDIUM = "medium"
-const string PERFECT = "perfect"
+const MEDIUM = "medium"
+const PERFECT = "perfect"
 
 bool _is_canonical_dir(string dir)
 	if len(dir) == 0
@@ -106,14 +106,14 @@ string get_tag(string[] parts, string key)
 
 
 class Term
-	const string RED = "\x1b[0;31m"
-	const string GREEN = "\x1b[0;32m"
-	const string YELLOW = "\x1b[0;33m"
-	const string BLUE = "\x1b[0;34m"
-	const string BLUE2 = "\x1b[0;36m"
-	const string VIOLET = "\x1b[0;35m"
-	const string BOLD = "\x1b[1m"
-	const string END = "\x1b[0m"
+	const RED = "\x1b[0;31m"
+	const GREEN = "\x1b[0;32m"
+	const YELLOW = "\x1b[0;33m"
+	const BLUE = "\x1b[0;34m"
+	const BLUE2 = "\x1b[0;36m"
+	const VIOLET = "\x1b[0;35m"
+	const BOLD = "\x1b[1m"
+	const END = "\x1b[0m"
 
 void log_ok(string op, string msg)
 	print("{{Term.YELLOW}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
@@ -154,17 +154,17 @@ class ConfigDirSync
 	
 
 
-	const string[] get_structure()
+	func const get_structure() -> string[]
 		var oo = options.explode(";")
 		for o in oo
 			if o[:10] == "structure="
 				return o[10:].explode("/")
-	const string quality()
+	func const quality() -> string
 		if options.find("quality=medium", 0) >= 0
 			return MEDIUM
 		return PERFECT
 
-	const Path guess_dir(string[] parts)
+	func const guess_dir(parts: string[]) -> Path
 		var structure = get_structure()
 		Path dir
 		for s in structure
@@ -197,7 +197,7 @@ class Config
 	string default_quality = "perfect"
 	string default_structure = "{name}.{ext}"
 
-	void load()
+	func load()
 		var f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
 		int n, m
 		f >> n
@@ -222,7 +222,7 @@ class Config
 			f >> ig
 			ignore.add(ig)
 		del f
-	const void save()
+	func const save()
 		make_all_dirs(hui.app_directory << "sisyphos")
 		var f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
 		f << len(dirs)
@@ -239,7 +239,7 @@ class Config
 		f << server
 		del f
 
-	const void show()
+	func const show()
 		for e in conf.dirs
 			print(e.dir)
 			print("structure: {{e.structure}}")
@@ -267,7 +267,7 @@ class Config
 		#raise(new Exception("not found"))
 		return nil
 
-	const bool dir_is_in_db(Path _dir)
+	func const dir_is_in_db(_dir: Path) -> bool
 		return get_cfg(_dir)
 
 	void rm_filter(Path dir, string filter)

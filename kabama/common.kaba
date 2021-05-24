@@ -21,13 +21,13 @@ class Term as shared
 	int type
 	string name
 	shared Term[] params
-	void __init__(int _type, string _name)
+	func __init__(_type: int, _name: string)
 		type = _type
 		name = _name
 		#print("new Term {{type}} {{name}}")
-	void __delete__()
+	func __delete__()
 		#print("del Term {{type}} {{name}}")
-	const shared Term shallow_copy()
+	func const shallow_copy() -> shared Term
 		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
@@ -37,7 +37,7 @@ class Term as shared
 #		for p in params
 #			c.params.add(p.copy())
 #		return c
-	const string __str__()
+	func const __str__() -> string
 		if type == TYPE_OPERATOR
 			string a = str(params[0])
 			string b = str(params[1])
@@ -62,7 +62,7 @@ class Term as shared
 		else if type == TYPE_LIST
 			return "[" + [for p in params str(p)].join(", ") + "]"
 		return "?"
-	const bool param_needs_paranthesis(int p)
+	func const param_needs_paranthesis(p: int) -> bool
 		if params[p].type == TYPE_NUMBER
 			if params[p].name[:1] == "-"
 				return true
@@ -84,35 +84,35 @@ class Term as shared
 #	return [for t in list t.copy()]
 		
 
-shared Term AddNumber(string s)
+func AddNumber(s: string) -> shared Term
 	return new Term(TYPE_NUMBER, s)
 
-shared Term AddVariable(string s)
+func AddVariable(s: string) -> shared Term
 	return new Term(TYPE_VARIABLE, s)
 
-shared Term AddOperator(string s, shared Term p1, shared Term p2)
+func AddOperator(s: string, p1: shared Term, p2: shared Term) -> shared Term
 	var t = new Term(TYPE_OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return t
 
-shared Term AddFunction(string s, shared Term[] params)
+func AddFunction(s: string, params: shared Term[]) -> shared Term
 	var t = new Term(TYPE_FUNCTION, s)
 	t.params = params
 	return t
 
-shared Term PermuteOperator(shared Term t)
+func PermuteOperator(t: shared Term) -> shared Term
 	var r = t.shallow_copy()
 	r.params[0] = t.params[1]
 	r.params[1] = t.params[0]
 	return r
 
-shared Term AddSpecial(string s, shared Term[] params)
+func AddSpecial(s: string, params: shared Term[]) -> shared Term
 	var t = new Term(TYPE_SPECIAL, s)
 	t.params = params
 	return t
 
-shared Term AddList(shared Term[] params)
+func AddList(params: shared Term[]) -> shared Term
 	var t = new Term(TYPE_LIST, "-list-")
 	t.params = params
 	return t
@@ -131,5 +131,5 @@ shared Term AddList(shared Term[] params)
 class RuntimeError extends Exception
 
 
-void main()
+func main()
 	var v = AddVariable("x")

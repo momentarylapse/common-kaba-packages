@@ -3,15 +3,15 @@
 class Tag
 	string key
 	string value
-	const string __str__()
+	func const __str__() -> string
 		return "{{key}}={{value}}"
-	const string strh()
+	func const strh() -> string
 		return key + "=" + value.hex()
-	const bool __lt__(Tag o)
+	func const __lt__(o: Tag) -> bool
 		if key == o.key
 			return value < o.value
 		return key < o.key
-	const bool match(Tag filter)
+	func const match(filter: Tag) -> bool
 		return key == filter.key and value.match(filter.value)
 
 Tag[] tags_sort(Tag[] tags)

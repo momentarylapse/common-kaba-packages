@@ -4,7 +4,7 @@ use os
 
 class Config
 	bool show_meta
-	void __init__()
+	func __init__()
 		show_meta = false
 
 Config conf
@@ -20,9 +20,9 @@ class DbFile
 	int mtime
 	Tag[] tags
 	bool medium
-	void __init__()
+	func __init__()
 		medium = false
-	const string __str__()
+	func const __str__() -> string
 		string s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
 		if medium
 			s += "\tm"
@@ -32,7 +32,7 @@ class DbFile
 			s += "\t{{t.key}}={{t.value.hex()}}"
 			# s += "\t" + t.key + "=" + t.value.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n")
 		return s
-	const void show()
+	func const show()
 		print(path)
 		if conf.show_meta
 			print("  id: {{id}}")
@@ -44,13 +44,13 @@ class DbFile
 			print("  size: {{size}}")
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
-	const string medium_path()
+	func const medium_path() -> string
 		if type.find("/audio/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
 		if type.find("/image/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/images/{{id}}.jpg"
 		return path
-	void make_medium(DbMedium m)
+	func make_medium(m: DbMedium)
 		hash = m.hash
 		size = m.size
 		path = medium_path()
@@ -60,7 +60,7 @@ class DbMedium
 	string id, hash
 	int size
 
-DbFile parse_bson(void* b)
+func parse_bson(b: void*) -> DbFile
 	DbFile f
 	# print(bson_to_json(b))
 	int[16] iter
@@ -101,7 +101,7 @@ DbFile parse_bson(void* b)
 	# f.show()
 	return f
 
-DbMedium parse_bson_medium(void* b)
+func parse_bson_medium(b: void*) -> DbMedium
 	DbMedium f
 	# print(bson_to_json(b))
 	int[16] iter
@@ -117,14 +117,14 @@ DbMedium parse_bson_medium(void* b)
 	# f.show()
 	return f
 
-DbFile[] parse_result(Result *r)
+func parse_result(r: Result*) -> DbFile[]
 	DbFile[] files
 	while r.has_more()
 		files.add(parse_bson(r.doc))
 	del r
 	return files
 
-void print_files(DbFile[] files)
+func print_files(files: DbFile[])
 	for f in files
 		print(str(f))
 
@@ -132,23 +132,23 @@ class Database
 	Mongo* m
 	Collection* files
 	Collection* medium
-	void __init__()
+	func __init__()
 		m = new Mongo("localhost")
 		files = m.collection("alex", "files")
 		medium = m.collection("alex", "medium")
-	void __delete__()
+	func __delete__()
 		del files
 		del medium
 		del m
-	DbFile[] find(string json)
+	func find(json: string) -> DbFile[]
 		var r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
 		return parse_result(weak(r))
-	DbFile by_id(string id)
+	func by_id(id: string) -> DbFile
 		var r = files.find("{\"id\":\"{{id}}\"}")
 		if r.has_more()
 			return parse_bson(r.doc)
 		raise(new Exception("id not found"))
-	DbFile by_hash(string hash)
+	func by_hash(hash: string) -> DbFile
 		var r = files.find("{\"hash\":\"{{hash}}\"}")
 		if r.has_more()
 			return parse_bson(r.doc)
@@ -160,13 +160,13 @@ class Database
 			return f
 		raise(new Exception("hash not found"))
 	
-	void mediumify(out DbFile f)
+	func mediumify(out f: DbFile)
 		var r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
 			DbMedium m = parse_bson_medium(r.doc)
 			f.make_medium(m)
 
-string filter_to_json(string filter)
+func filter_to_json(filter: string) -> string
 	string json = "{"
 	string[] xx = filter.explode(",")
 	for x,i in xx
@@ -181,7 +181,7 @@ string filter_to_json(string filter)
 
 # 900942014
 # bf5c0d14924b6e9d91202124badebd12
-void main(string[] _arg)
+func main(_arg: string[])
 	if len(_arg) == 0
 		print("find <filter>
 by-id <id1> <id2> ...

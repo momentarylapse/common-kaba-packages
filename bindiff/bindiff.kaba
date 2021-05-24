@@ -7,23 +7,23 @@ int CONTEXT
 
 
 class Term
-	const string RED = "\x1b[0;31m"
-	const string GREEN = "\x1b[0;32m"
-	const string YELLOW = "\x1b[0;33m"
-	const string END = "\x1b[0m"
+	const RED = "\x1b[0;31m"
+	const GREEN = "\x1b[0;32m"
+	const YELLOW = "\x1b[0;33m"
+	const END = "\x1b[0m"
 
 
 class Mapping
 	int a0, a1, b0, b1
-	const int la()
+	func const la() -> int
 		return a1 - a0
-	const int lb()
+	func const lb() -> int
 		return b1 - b0
-	string __str__()
+	func __str__() -> string
 		return "{{a0}}:+{{la()}} / {{b0}}:+{{lb()}}"
 
 
-void expand_mapping(string a, string b, out Mapping m)
+func expand_mapping(a: string, b: string, out m: Mapping)
 	int d = m.b0 - m.a0
 	
 	# forward comp
@@ -35,7 +35,7 @@ void expand_mapping(string a, string b, out Mapping m)
 	m.a1 = len(a)
 	m.b1 = m.a1 + d
 
-Mapping try_match(string a, string b, int offset_a, int offset_b)
+func try_match(a: string, b: string, offset_a: int, offset_b: int) -> Mapping
 	Mapping m
 	for i in 0:MAX_DIFF_SIZE
 		int oa = offset_a + i
@@ -48,10 +48,10 @@ Mapping try_match(string a, string b, int offset_a, int offset_b)
 	m.a0 = -1
 	return m
 
-bool is_printable_ascii(char c)
+func is_printable_ascii(c: char) -> bool
 	return c >= 0x20 and c <= 0x7e
 
-string hex(string s)
+func hex(s: string) -> string
 	string r
 	bool in_printable = false
 	for i in 0:len(s)
@@ -77,7 +77,7 @@ string hex(string s)
 		r += "»"
 	return r
 
-void diff(string a, string b)
+func diff(a: string, b: string)
 	Mapping[] diffs
 	Mapping m
 	m.a0 = 0
@@ -105,7 +105,7 @@ void diff(string a, string b)
 		print(hex(a[a000:d.a0]) + " {{Term.RED}}{{hex(a[d.a0:d.a1])}} {{Term.GREEN}}{{hex(b[d.b0:d.b1])}}{{Term.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
-void main(string[] arg)
+func main(arg: string[])
 	CONTEXT = 4
 	MAX_DIFF_SIZE = 4096*2
 	MIN_MATCH_SIZE = 16

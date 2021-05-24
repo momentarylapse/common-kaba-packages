@@ -5,9 +5,9 @@ use localdb
 use tag
 
 
-const int CHUNK_SIZE = 128
+const CHUNK_SIZE = 128
 
-string scp_escape(string s)
+func scp_escape(s: string) -> string
 	string r = s
 	r = r.replace("(", "\\\\\\(")
 	r = r.replace(")", "\\\\\\)")
@@ -15,7 +15,7 @@ string scp_escape(string s)
 	r = r.replace(" ", "\\\\\\ ")
 	return r
 
-string ssh_escape(string s)
+func ssh_escape(s: string) -> string
 	string r = s
 	r = r.replace(" ", "\\\\ ")
 	r = r.replace("(", "\\\\(")
@@ -23,20 +23,20 @@ string ssh_escape(string s)
 	r = r.replace("'", "\\\\'")
 	return r
 
-void scp_download(string source, string dest)
+func scp_download(source: string, dest: string)
 	string cmd = "scp -Tp"
 	cmd += " {{conf.server}}:\"'{{bash_escape2(source)}}'\" \"{{bash_escape(dest)}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
-void scp_upload(string source, string dest)
+func scp_upload(source: string, dest: string)
 	string cmd = "scp -Tp \"{{bash_escape(source)}}\" {{conf.server}}:{{scp_escape(dest)}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
-string remote_interface(string action, string[] params)
+func remote_interface(action: string, params: string[]) -> string
 	string cmd = "ssh {{conf.server}} python3 /home/michi/Tools/alex/if-{{action}}.py"
 	for p in params
 		cmd += " \\\"{{ssh_escape(p)}}\\\""
@@ -45,7 +45,7 @@ string remote_interface(string action, string[] params)
 		print(cmd)
 	return shell_exec(cmd).trim()
 
-string call_alex(string action, string[] params)
+func call_alex(action: string, params: string[]) -> string
 	string cmd = "ssh {{conf.server}} {{CMD}} {{action}}"
 	for p in params
 		#cmd += " \\\"" + ssh_escape(p) + "\\\""
@@ -57,7 +57,7 @@ string call_alex(string action, string[] params)
 
 class RemoteFile extends LocalFile
 
-RemoteFile[] remote_parse(string r)
+func remote_parse(r: string) -> RemoteFile[]
 	if conf.verbosity > 3
 		print(r)
 	RemoteFile[] rfiles
@@ -84,22 +84,22 @@ RemoteFile[] remote_parse(string r)
 		rfiles.add(rf)
 	return rfiles
 
-RemoteFile[] remote_find(string filter, string quality)
+func remote_find(filter: string, quality: string) -> RemoteFile[]
 	string r = call_alex("find", [filter, "--{{quality}}"])
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_hash_chunk(string[] hashes)
+func remote_find_by_hash_chunk(hashes: string[]) -> RemoteFile[]
 	string r = call_alex("sp by-hash", hashes)
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_id_chunk(string[] ids, string quality)
+func remote_find_by_id_chunk(ids: string[], quality: string) -> RemoteFile[]
 	string cmd = "sp by-id"
 	if quality == MEDIUM
 		cmd = "sp by-id-medium"
 	string r = call_alex(cmd, ids)
 	return remote_parse(r)
 
-RemoteFile[] remote_find_by_hash(string[] hashes)
+func remote_find_by_hash(hashes: string[]) -> RemoteFile[]
 	RemoteFile[] rr
 	int done = 0
 	while done < len(hashes)
@@ -112,7 +112,7 @@ RemoteFile[] remote_find_by_hash(string[] hashes)
 		done = ee
 	return rr
 
-RemoteFile[] remote_find_by_id(string[] ids, string quality)
+func remote_find_by_id(ids: string[], quality: string) -> RemoteFile[]
 	RemoteFile[] rr
 	int done = 0
 	while done < len(ids)
@@ -127,7 +127,7 @@ RemoteFile[] remote_find_by_id(string[] ids, string quality)
 
 
 
-void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
+func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 	if !db.has_id(rf.id)
 		#string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
@@ -152,7 +152,7 @@ void sync_add_pure_remote(RemoteFile rf, Path root, string structure)
 				ll.show_info("      ")
 
 
-void remote_sync_by_filter(string filter, string quality, string structure, Path dir)
+func remote_sync_by_filter(filter: string, quality: string, structure: string, dir: Path)
 	var rfiles = remote_find(filter, quality)
 	for rf in rfiles
 		try
@@ -162,7 +162,7 @@ void remote_sync_by_filter(string filter, string quality, string structure, Path
 			sync_add_pure_remote(rf, dir, structure)
 	db.save()
 
-void remote_download(out LocalFile f)
+func remote_download(out f: LocalFile)
 	log_ok("downloading", str(rel_path(f.path)))
 	if !f.in_db()
 		log_error("error", "not in db")
@@ -183,7 +183,7 @@ void remote_download(out LocalFile f)
 	db.save()
 
 
-void remote_upload(out LocalFile f)
+func remote_upload(out f: LocalFile)
 	log_ok("uploading", str(rel_path(f.path)))
 	
 	if !f.pure_local() and !f.is(CHANGED_FILE)
@@ -236,7 +236,7 @@ void remote_upload(out LocalFile f)
 #	print("ERROR: ????")
 
 
-void remote_upload_meta(out LocalFile f)
+func remote_upload_meta(out f: LocalFile)
 	
 	if f.pure_local()
 		log_error("error", "pure local")
@@ -260,7 +260,7 @@ void remote_upload_meta(out LocalFile f)
 	log_error("error", "????")
 
 
-RemoteFile[] remote_get_meta(LocalFile*[] files)
+func remote_get_meta(files: LocalFile*[]) -> RemoteFile[]
 	string[] ids_perfect
 	string[] ids_medium
 	for f in files
@@ -277,7 +277,7 @@ RemoteFile[] remote_get_meta(LocalFile*[] files)
 		rfiles.add(rf)
 	return rfiles
 
-void remote_download_meta(out LocalFile*[] files)
+func remote_download_meta(out files: LocalFile*[])
 	var rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
@@ -295,7 +295,7 @@ void remote_download_meta(out LocalFile*[] files)
 					lf.unset(CHANGED_META)
 				db.dirty = true
 
-void remote_sync_by_id(out LocalFile*[] files)
+func remote_sync_by_id(out files: LocalFile*[])
 	LocalFile*[] files_wanted
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
@@ -306,7 +306,7 @@ void remote_sync_by_id(out LocalFile*[] files)
 			if lf.id == rf.id
 				sync_file(rf, lf)
 
-void sync_file(RemoteFile rf, out LocalFile* lf)
+func sync_file(rf: RemoteFile, out lf: LocalFile*)
 	if conf.verbosity >= 2
 		print("sync {{lf.path}}")
 	lf.unset(CHANGED_FILE)
@@ -343,7 +343,7 @@ void sync_file(RemoteFile rf, out LocalFile* lf)
 		#db.dirty = true
 
 
-void remote_sync_pure_locals_by_hash(out LocalFile*[] files)
+func remote_sync_pure_locals_by_hash(out files: LocalFile*[])
 	string[] hashes
 	for f in files
 		if f.pure_local()

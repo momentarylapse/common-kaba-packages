@@ -1,4 +1,4 @@
-const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
+const KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_mongoc_init:mongoc_init
 	_mongoc_cleanup:mongoc_cleanup
 	_mongoc_client_new:mongoc_client_new
@@ -32,40 +32,40 @@ const string KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_bson_oid_to_string:bson_oid_to_string
 	_bson_iter_type:bson_iter_type"
 
-extern void _mongoc_init()
-extern void _mongoc_cleanup()
-extern void* _mongoc_client_new(char* uri)
-extern void* _mongoc_client_get_collection(void* client, char* db, char* col)
-extern void* _mongoc_collection_find_with_opts(void* col, void* filter, void* _opts, void* _prefs)
-extern void* _mongoc_collection_aggregate(void* col, int flags, void* pipeline, void* x, void* y)
-extern bool _mongoc_collection_insert_one(void* col, void* doc, void* _opts, void* _reply, void* _err)
-extern bool _mongoc_collection_replace_one(void* col, void* sel, void* doc, void* opts, void* reply, void* err)
-extern bool _mongoc_collection_delete_one(void* col, void* sel, void* opts, void* reply, void* err)
-extern bool _mongoc_collection_delete_many(void* col, void* sel, void* opts, void* reply, void* err)
-extern bool _mongoc_cursor_next(void* cur, void* bson)
-extern void _mongoc_cursor_destroy(void* cur)
-extern void _mongoc_collection_destroy(void* col)
-extern void _mongoc_client_destroy(void* client)
+func extern _mongoc_init()
+func extern _mongoc_cleanup()
+func extern _mongoc_client_new(uri: char*) -> void*
+func extern _mongoc_client_get_collection(client: void*, db: char*, col: char*) -> void*
+func extern _mongoc_collection_find_with_opts(col: void*, filter: void*, _opts: void*, _prefs: void*) -> void*
+func extern _mongoc_collection_aggregate(col: void*, flags: int, pipeline: void*, x: void*, y: void*) -> void*
+func extern _mongoc_collection_insert_one(col: void*, doc: void*, _opts: void*, _reply: void*, _err: void*) -> bool
+func extern _mongoc_collection_replace_one(col: void*, sel: void*, doc: void*, opts: void*, reply: void*, err: void*) -> bool
+func extern _mongoc_collection_delete_one(col: void*, sel: void*, opts: void*, reply: void*, err: void*) -> bool
+func extern _mongoc_collection_delete_many(col: void*, sel: void*, opts: void*, reply: void*, err: void*) -> bool
+func extern _mongoc_cursor_next(cur: void*, bson: void*) -> bool
+func extern _mongoc_cursor_destroy(cur: void*)
+func extern _mongoc_collection_destroy(col: void*)
+func extern _mongoc_client_destroy(client: void*)
 
-extern void* _bson_new_from_json(char* json, int len, void* err)
-extern char* _bson_as_canonical_extended_json(void* bson, void* __len)
-extern char* _bson_as_relaxed_extended_json(void* bson, void* __len)
-extern void _bson_free(void* str)
-extern void _bson_destroy(void* bson)
-extern void* _bson_new_from_data(char* data, int length)
-extern bool _bson_iter_init(void* i, void* bson)
-extern bool _bson_iter_next(void* i)
-extern char[0]* _bson_iter_key(void* i)
-extern int _bson_iter_int32(void* i)
-extern int64 _bson_iter_int64(void* i)
-extern float64 _bson_iter_double(void* i)
-extern char[0]* _bson_iter_utf8(void* i, void* __len)
-extern void _bson_iter_array(void* i, int* len, void* a)
-extern void* _bson_iter_oid(void *i)
-extern void _bson_oid_to_string(void* oid, char* str) # [25]
-extern int _bson_iter_type(void* i)
+func extern _bson_new_from_json(json: char*, len: int, err: void*) -> void*
+func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> char*
+func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> char*
+func extern _bson_free(str: void*)
+func extern _bson_destroy(bson: void*)
+func extern _bson_new_from_data(data: char*, length: int) -> void*
+func extern _bson_iter_init(i: void*, bson: void*) -> bool
+func extern _bson_iter_next(i: void*) -> bool
+func extern _bson_iter_key(i: void*) -> char[0]*
+func extern _bson_iter_int32(i: void*) -> int
+func extern _bson_iter_int64(i: void*) -> int64
+func extern _bson_iter_double(i: void*) -> float64
+func extern _bson_iter_utf8(i: void*, __len: void*) -> char[0]*
+func extern _bson_iter_array(i: void*, len: int*, a: void*)
+func extern _bson_iter_oid(i: void*) -> void*
+func extern _bson_oid_to_string(oid: void*, str: char*)
+func extern _bson_iter_type(i: void*) -> int
 
-string char_to_str(char[0]* p)
+func char_to_str(p: char[0]*) -> string
 	string t
 	for i in 0:10000
 		if p[i] == 0
@@ -73,7 +73,7 @@ string char_to_str(char[0]* p)
 		t.add(p[i])
 	return t
 
-void* json_to_bson(string json)
+func json_to_bson(json: string) -> void*
 	string t = json
 	t.add(0)
 	var b = _bson_new_from_json(&t[0], len(json), nil)
@@ -81,19 +81,19 @@ void* json_to_bson(string json)
 		raise(new Exception("invalid json: {{json}}"))
 	return b
 
-string bson_to_json(void *bson)
+func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
 	char[0]* x = _bson_as_relaxed_extended_json(bson, nil)
 	string t = char_to_str(x)
 	_bson_free(x)
 	return t
 
-string bson_iter_key(void* i)
+func bson_iter_key(i: void*) -> string
 	return char_to_str(_bson_iter_key(i))
-string bson_iter_str(void* i)
+func bson_iter_str(i: void*) -> string
 	return char_to_str(_bson_iter_utf8(i, nil))
 
-string[] bson_iter_str_array(void *i)
+func bson_iter_str_array(i: void*) -> string[]
 	string[] r
 	int[160] itarray
 	int length = 0
@@ -107,7 +107,7 @@ string[] bson_iter_str_array(void *i)
 
 
 
-any bson_iter_to_any(void *iter)
+func bson_iter_to_any(iter: void*) -> any
 	int t = _bson_iter_type(iter)
 	if t == 2 # str utf8
 		return bson_iter_str(iter)
@@ -141,33 +141,33 @@ any bson_iter_to_any(void *iter)
 	raise(new Exception("UNKNOWN TYPE: {{t}}"))
 
 
-any bson_iter_map_to_any(void *iter)
+func bson_iter_map_to_any(iter: void*) -> any
 	any r
 	while _bson_iter_next(iter)
 		string key = bson_iter_key(iter)
 		r[key] = bson_iter_to_any(iter)
 	return r
 
-any bson_to_any(void *doc)
+func bson_to_any(doc: void*) -> any
 	int[160] iter
 	_bson_iter_init(&iter, doc)
 	return bson_iter_map_to_any(&iter)
 
 class Mongo as shared
 	void* client
-	void __init__(string host)
+	func __init__(host: string)
 		_any_allow_simple_output = false
 		_mongoc_init()
 		client = __mongo_client_new("mongodb://{{host}}:27017/?appname=kaba")
 		if !client
 			raise(new Exception("can not connect to {{host}}"))
 
-	void __delete__()
+	func __delete__()
 		if client
 			_mongoc_client_destroy(client)
 		_mongoc_cleanup()
 
-	const Collection* collection(string db, string col)
+	func const collection(db: string, col: string) -> Collection*
 		var c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
@@ -177,29 +177,29 @@ class Mongo as shared
 
 class Collection as shared
 	void* col = nil
-	void __delete__()
+	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	const shared Result find(any filter)
+	func const find(filter: any) -> shared Result
 		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	const shared Result aggregate(any pattern)
+	func const aggregate(pattern: any) -> shared Result
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
-	void insert(any doc)
+	func insert(doc: any)
 		var b = json_to_bson(repr(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
 			raise(new Exception("can not insert"))
-	void replace(any filter, any doc)
+	func replace(filter: any, doc: any)
 		var b = json_to_bson(repr(filter))
 		var d = json_to_bson(repr(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
 			raise(new Exception("can not replace"))
-	void delete_one(any filter)
+	func delete_one(filter: any)
 		var b = json_to_bson(repr(filter))
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
 			raise(new Exception("can not delete"))
-	void delete_many(any filter)
+	func delete_many(filter: any)
 		var b = json_to_bson(repr(filter))
 		int[160] reply
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
@@ -210,26 +210,26 @@ class Collection as shared
 class Result as shared
 	void* cur
 	void* doc
-	void __init__(void *_cur)
+	func __init__(_cur: void*)
 		cur = _cur
-	void __delete__()
+	func __delete__()
 		if cur
 			_mongoc_cursor_destroy(cur)
-	const bool has_more()
+	func const has_more() -> bool
 		return _mongoc_cursor_next(cur, &doc)
 		# bson_to_json(doc)
-	const string json()
+	func const json() -> string
 		return bson_to_json(doc)
-	const any get()
+	func const get() -> any
 		return bson_to_any(doc)
 
 
-void* __mongo_client_new(string uri)
+func __mongo_client_new(uri: string) -> void*
 	string t = uri
 	t.add(0)
 	return _mongoc_client_new(&t[0])
 
-void* __mongoc_client_get_collection(void* client, string db, string col)
+func __mongoc_client_get_collection(client: void*, db: string, col: string) -> void*
 	string t1 = db
 	t1.add(0)
 	string t2 = col
@@ -245,7 +245,7 @@ void* __mongoc_client_get_collection(void* client, string db, string col)
 #	print(bson_to_json(b))
 #	bson_destroy(b)
 
-void main()
+func main()
 	var m = new Mongo("localhost")
 	#let col = m.get_collection("wiki", "articles")
 	#let r = col.find("{\"name\":\"Hauptseite\"}")

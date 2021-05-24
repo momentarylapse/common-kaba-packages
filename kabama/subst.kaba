@@ -1,7 +1,7 @@
 use common
 
 # always copy
-shared Term subst_variable(shared Term _t, string _var, shared Term by)
+func subst_variable(_t: shared Term, _var: string, by: shared Term) -> shared Term
 	var t = _t.shallow_copy()
 	for p in t.params
 		p = subst_variable(p, _var, by)
@@ -16,23 +16,23 @@ shared Term subst_variable(shared Term _t, string _var, shared Term by)
 class MatchingTerm
 	shared Term t
 	string name
-	const string __str__()
+	func const __str__() -> string
 		return "{{name}} -> {{t}}"
 
 class Matching
 	MatchingTerm[] terms
-	bool add(shared Term t, string name)
+	func add(t: shared Term, name: string) -> bool
 		#print("add: {{t}} <<< {{name}}")
 		MatchingTerm mt
 		mt.t = t
 		mt.name = name
 		terms.add(mt)
 		return true
-	const string __str__()
+	func const __str__() -> string
 		return str([for t in terms str(t)])
 	
 
-bool rule_match(shared Term t, shared Term m, out Matching mm)
+func rule_match(t: shared Term, m: shared Term, out mm: Matching) -> bool
 	if m.name[:1] == "@"
 		mm.add(t, m.name)
 		return true
@@ -45,7 +45,7 @@ bool rule_match(shared Term t, shared Term m, out Matching mm)
 			return false
 	return true
 
-shared Term subst(shared Term _t, shared Term pattern, shared Term substitution, int max_recursion)
+func subst(_t: shared Term, pattern: shared Term, substitution: shared Term, max_recursion: int) -> shared Term
 	Matching mm
 	var t = _t.shallow_copy()
 	for p in t.params

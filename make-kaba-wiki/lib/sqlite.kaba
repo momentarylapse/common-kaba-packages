@@ -1,4 +1,4 @@
-const string KABA_LINK = "/usr/lib64/libsqlite3.so
+const KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_open_v2:sqlite3_open_v2
 	_sqlite3_close:sqlite3_close
 	sqlite3_libversion_number:sqlite3_libversion_number
@@ -14,24 +14,24 @@ const string KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_column_type:sqlite3_column_type
 "
 
-const int SQLITE_OPEN_READWRITE = 2
-const int SQLITE_OPEN_CREATE = 4
+const SQLITE_OPEN_READWRITE = 2
+const SQLITE_OPEN_CREATE = 4
 
-extern int sqlite3_libversion_number()
-extern int _sqlite3_open_v2(char *fn, void *db, int flags, void *zzz)
-extern int _sqlite3_close(void *db)
-extern int _sqlite3_finalize(void *r)
-extern int _sqlite3_prepare(void *db, char *sql, int len, void *res, void *zzz)
-extern int _sqlite3_column_count(void *r)
-extern char[0]* _sqlite3_column_text(void *r, int c)
-extern int _sqlite3_column_int(void *r, int c)
-extern float64 _sqlite3_column_double(void *r, int c)
-extern int _sqlite3_step(void *r)
-extern char[0]* _sqlite3_errmsg(void *db)
-extern char[0]* _sqlite3_column_name(void* r, int c)
-extern int _sqlite3_column_type(void* r, int c)
+func extern sqlite3_libversion_number() -> int
+func extern _sqlite3_open_v2(fn: char*, db: void*, flags: int, zzz: void*) -> int
+func extern _sqlite3_close(db: void*) -> int
+func extern _sqlite3_finalize(r: void*) -> int
+func extern _sqlite3_prepare(db: void*, sql: char*, len: int, res: void*, zzz: void*) -> int
+func extern _sqlite3_column_count(r: void*) -> int
+func extern _sqlite3_column_text(r: void*, c: int) -> char[0]*
+func extern _sqlite3_column_int(r: void*, c: int) -> int
+func extern _sqlite3_column_double(r: void*, c: int) -> float64
+func extern _sqlite3_step(r: void*) -> int
+func extern _sqlite3_errmsg(db: void*) -> char[0]*
+func extern _sqlite3_column_name(r: void*, c: int) -> char[0]*
+func extern _sqlite3_column_type(r: void*, c: int) -> int
 
-string cstr2str(char[0]* cs)
+func cstr2str(cs: char[0]*) -> string
 	string s
 	for j in 0:10000
 		if cs[j] == 0
@@ -41,13 +41,13 @@ string cstr2str(char[0]* cs)
 
 class Database
 	void *db = nil
-	void __delete__()
+	func __delete__()
 		_sqlite3_close(db)
 
-	string error()
+	func error() -> string
 		return cstr2str(_sqlite3_errmsg(db))
 		
-	Query* query(string sql)
+	func query(sql: string) -> Query*
 		string s = sql
 		s.add(0)
 		var q = new Query()
@@ -55,12 +55,12 @@ class Database
 			raise(new Exception("sql query failed: " + error()))
 		return q
 
-	void run(string sql)
+	func run(sql: string)
 		var q = query(sql)
 		q.step()
 		del q
 	
-	any load_doc(string table, any id)
+	func load_doc(table: string, id: any) -> any
 		var sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
 		var q = query(sql)
@@ -82,19 +82,19 @@ class Query
 	void* res = nil
 	int step_result
 	bool needs_step = true
-	void __delete__()
+	func __delete__()
 		_sqlite3_finalize(res)
 
-	void step()
+	func step()
 		step_result = _sqlite3_step(res)
 	
-	bool has_more()
+	func has_more() -> bool
 		if needs_step
 			step()
 			needs_step = false
 		return step_result == 100
 	
-	string[] get_column_text()
+	func get_column_text() -> string[]
 		string[] r
 		if !has_more()
 			return r
@@ -104,7 +104,7 @@ class Query
 		needs_step = true
 		return r
 
-	any get_column()
+	func get_column() -> any
 		any r
 		if !has_more()
 			return r
@@ -122,7 +122,7 @@ class Query
 		return r
 
 
-	string[] column_names()
+	func column_names() -> string[]
 		string[] r
 		int n = _sqlite3_column_count(res)
 		for i in 0:n
@@ -130,7 +130,7 @@ class Query
 		return r
 		
 
-Database* sqlite_open(string filename)
+func sqlite_open(filename: string) -> Database*
 	string f = filename
 	f.add(0)
 	Database *db = new Database()
@@ -139,7 +139,7 @@ Database* sqlite_open(string filename)
 		raise(new Exception("can't open database {{filename}}"))
 	return db
 
-Database* sqlite_create(string filename)
+func sqlite_create(filename: string) -> Database*
 	string f = filename
 	f.add(0)
 	Database *db = new Database()
@@ -149,7 +149,7 @@ Database* sqlite_create(string filename)
 	return db
 
 
-void __main()
+func __main()
 	var db = sqlite_create("test.sqlite3")
 	db.run("create table michi (id text, a integer, b text)")
 	db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
@@ -157,7 +157,7 @@ void __main()
 	db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
 	del db
 
-void main()
+func main()
 	var db = sqlite_open("test.sqlite3")
 	var q = db.query("select * from michi")
 #	var q = db.query("SELECT * FROM sqlite_master where type='table'")

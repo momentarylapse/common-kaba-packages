@@ -3,14 +3,14 @@ use hui
 
 
 class Term
-	const string RED = "\x1b[0;31m"
-	const string GREEN = "\x1b[0;32m"
-	const string YELLOW = "\x1b[0;33m"
-	const string BLUE = "\x1b[0;34m"
-	const string BLUE2 = "\x1b[0;36m"
-	const string VIOLET = "\x1b[0;35m"
-	const string BOLD = "\x1b[1m"
-	const string END = "\x1b[0m"
+	const RED = "\x1b[0;31m"
+	const GREEN = "\x1b[0;32m"
+	const YELLOW = "\x1b[0;33m"
+	const BLUE = "\x1b[0;34m"
+	const BLUE2 = "\x1b[0;36m"
+	const VIOLET = "\x1b[0;35m"
+	const BOLD = "\x1b[1m"
+	const END = "\x1b[0m"
 
 
 class Profile
@@ -45,13 +45,13 @@ class Config
 	string[] installs
 	string[] outputs = ["make"]
 	
-	bool ignored(string l)
+	func ignored(l: string) -> bool
 		for ig in ignore_libs
 			if l == ig
 				return true
 		return false
 	
-	void load()
+	func load()
 		if not Filesystem.exists(conf.root << "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
 		hui.Configuration c
@@ -96,7 +96,7 @@ class Config
 				outputs = c[k].explode(",")
 			else
 				raise(new Exception("unknown tag: {{k}}"))
-	void save()
+	func save()
 		hui.Configuration c
 		c["project"] = name
 		c["binary"] = binary_file
@@ -115,7 +115,7 @@ class Config
 		c["additional-install"] = installs.join(",")
 		c.save(conf.root << "xmake.conf")
 	
-	Path[] needs_installing()
+	func needs_installing() -> Path[]
 		Path[] r
 		var list = Filesystem.search(Path("../static"), "*.*", "fd")
 		var ignore = mime_files
@@ -127,7 +127,7 @@ class Config
 			r.add(i)
 		return r
 		
-	bool has_explicit_default_profile()
+	func has_explicit_default_profile() -> bool
 		for p in conf.profiles
 			if p.name == "default"
 				return true
@@ -137,10 +137,10 @@ Config conf
 
 class SourceFile
 	Path filename
-	const Path object()
+	func const object() -> Path
 		return Path(str(filename).replace(".cpp", ".o"))
 	Path[] dep
-	bool add_dep(Path d)
+	func add_dep(d: Path) -> bool
 		if d in dep
 			return false
 		dep.add(d)
@@ -148,11 +148,11 @@ class SourceFile
 
 SourceFile[] sources
 
-Path rel(Path filename)
+func rel(filename: Path) -> Path
 	return filename.relative_to(conf.root)
 
 
-void find_dep(out SourceFile f, Path filename)
+func find_dep(out f: SourceFile, filename: Path)
 	string s
 	try
 		s = Filesystem.read(filename)
@@ -171,7 +171,7 @@ void find_dep(out SourceFile f, Path filename)
 				#	print("  <" + rel(d) + ">")
 					find_dep(f, d)
 
-void parse_source(Path filename)
+func parse_source(filename: Path)
 	if conf.verbose
 		print(rel(filename))
 	SourceFile f
@@ -181,7 +181,7 @@ void parse_source(Path filename)
 	
 	sources.add(f)
 
-void parse_dir(Path dir)
+func parse_dir(dir: Path)
 	var files = Filesystem.search(dir, "*.cpp", "fr")
 	for f in files
 		parse_source(dir << f)

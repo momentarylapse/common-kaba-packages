@@ -1,4 +1,4 @@
-const string KABA_LINK = "/usr/lib/libpsmoveapi.so
+const KABA_LINK = "/usr/lib/libpsmoveapi.so
 	_psmove_init:psmove_init
 	_psmove_count_connected:psmove_count_connected
 	_psmove_reinit:psmove_reinit
