@@ -1,0 +1,149 @@
+use os
+
+func process_comment(l: string) -> string
+	for c,i in l
+		if c == '#'
+			return l[:i]
+	return l
+
+func convert_func(l: string) -> string
+	print("FUNC    {{l}}")
+	var xx = l.parse_tokens(" (),")
+	#print(xx)
+	var flags: string
+	while xx[0] in ["const", "virtual", "extern", "selfref", "override", "static"]
+		flags += xx[0] + " "
+		xx.remove(0)
+	var name, type: string
+	var params, param_types: string[]
+	for _x,i0 in xx
+		if _x == "("
+			name = xx[i0-1]
+			type = xx[:i0-1].join(" ")
+			var i = i0 + 1
+			while xx[i] != ")"
+				var is_out = (xx[i] == "out")
+				if is_out
+					i ++
+				if (xx[i] == "shared")
+					i ++
+					param_types.add("shared {{xx[i]}}")
+				else
+					param_types.add(xx[i])
+				i ++
+				if is_out
+					params.add("out {{xx[i]}}")
+				else
+					params.add(xx[i])
+				i ++
+				if xx[i] == ")"
+					break
+				if xx[i] != ","
+					print("\n\n--------------------\n{{l}}\n---------------\n\n")
+					return l
+					#raise(new Exception(",,,,,,  {{l}}"))
+				i ++
+	#print(flags)
+	#print(type)
+	#print(name)
+	
+	var new_line = "func {{flags}}{{name}}("
+	for p,i in params
+		if i > 0
+			new_line += ", "
+		new_line += "{{p}}: {{param_types[i]}}"
+	new_line += ")"
+	if type != "void"
+		new_line += " -> {{type}}"
+	print("  ->     " + new_line)
+			
+	
+	return new_line
+
+
+func convert_decl(l: string) -> string
+	print("DECL    {{l}}")
+	var xx = l.parse_tokens(" ,")
+	var new_line = "var {{xx[1]}}: {{xx[0]}}"
+	print("  ->     " + new_line)
+	return new_line
+	
+	
+	
+func get_indent(l: string) -> int
+	for c,i in l
+		if c != '\t'
+			return i
+	return -1
+
+func count(l: string, p: string) -> int
+	return len(l.explode(p)) - 1
+
+func is_decl(l: string) -> bool
+	var xx = l.parse_tokens(" (),=+-%/")
+	if len(xx) != 2
+		return false
+	if xx[0] in ["use", "import", "enum", "return"]
+		return false
+	return true
+
+func process(p: Path, dry: bool)
+	var lines = Filesystem.read_text(p).explode("\n")
+	var lines_out = lines
+	var changed = false
+	var in_long_string = false
+	var in_class = false
+	
+	int level = 0
+	for ll,i in lines
+		if count(ll, "\"") % 2 == 1
+			#print("  STRING!!!!")
+			in_long_string = not in_long_string
+			continue
+		if in_long_string
+			continue
+			
+		var l = process_comment(ll)
+		if l.trim() == ""
+			continue
+		
+		int ind = get_indent(l)
+		if ind < level
+			level = ind
+			#print("<<< {{level}}")
+			
+		
+		if ind == level
+			#print(l[ind:ind+6])
+			if l[ind:ind+6] == "class "
+				level = ind + 1
+				#print(">>> {{level}}")
+			else if l[ind:ind+5] == "func "
+				#print(ll)
+				pass
+			else
+				if l.find("(", 0) > 0 and l.find("=", 0) < 0
+					# func header?
+					var lll = ll[:ind] + convert_func(ll[ind:])
+					if lll != ll
+						lines_out[i] = lll
+						changed = true
+				else if is_decl(l)
+					var lll = ll[:ind] + convert_decl(ll[ind:])
+					if lll != ll
+						lines_out[i] = lll
+						changed = true
+		#print("{{level}} {{ll}}")
+	if changed
+		print("CHANGED!!!!!")
+		#print(lines_out.join("\n"))
+		if not dry
+			Filesystem.write_text(p, lines_out.join("\n"))
+
+func main(arg: string[])
+	var dry = false
+	for a in arg
+		if a == "--dry"
+			dry = true
+		else
+			process(a, dry)

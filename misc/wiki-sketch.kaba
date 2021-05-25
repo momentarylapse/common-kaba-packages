@@ -1,0 +1,105 @@
+use hui
+
+class Stroke
+	var p: complex[]
+	
+	func length() -> float
+		float l = 0
+		for i in 1:len(p)
+			l += (p[i-1] - p[i]).abs()
+		return l
+	
+	func digest() -> Stroke
+		Stroke s = self
+		float l0 = self.length()
+		
+		while true
+			float lbest = l0 * 0.998
+			int ibest = -1
+			for i in 1:len(s.p)-1
+				Stroke t = s
+				t.p.remove(i)
+				var l = t.length()
+				if l > lbest
+					lbest = l
+					ibest = i
+			if ibest >= 0
+				s.p.remove(ibest)
+			else
+				break
+			
+			
+		return s
+
+class Sketcher extends Window
+	var strokes: Stroke[]
+	var cur: Stroke
+	var w, h: int
+	func __init__()
+		super.__init__("Sketcher", 800, 600)
+		from_source("
+Grid ? '' vertical
+	DrawingArea area '' expandx expandy
+	Grid ? ''
+		Edit out '' expandx
+		Button copy '' image=hui:copy
+		Button clear '' image=hui:delete")
+		
+		event("copy", on_copy)
+		event("clear", on_clear)
+		
+	func override on_left_button_down()
+		var e = hui.get_event()
+		cur.p.add(complex(e.mouse_x, e.mouse_y))
+		redraw("area")
+
+	func override on_left_button_up()
+		if len(cur.p) > 1
+			strokes.add(cur.digest())
+			update_output()
+		cur.p.clear()
+		redraw("area")
+
+	func override on_mouse_move()
+		var e = hui.get_event()
+		if e.button_l
+			cur.p.add(complex(e.mouse_x, e.mouse_y))
+			redraw("area")
+
+	func override on_draw(p: Painter)
+		w = p.width
+		h = p.height
+		p.set_color(color.WHITE)
+		p.draw_rect(0, 0, w, h)
+		
+		p.set_color(color.BLACK)
+		draw_stroke(p, cur)
+		for s in strokes
+			draw_stroke(p, s)
+		
+		p.draw_str(10,10, "{{len(to_text())}} b")
+
+	func draw_stroke(p: Painter, s: Stroke)
+		for i in 1:len(s.p)
+			p.draw_line(s.p[i-1].x, s.p[i-1].y, s.p[i].x, s.p[i].y)
+	
+	func to_text() -> string
+		string o = "{{w}} {{h}}"
+		for s in strokes
+			o += " [" + [for p in s.p "{{int(p.x)}} {{int(p.y)}}"].join(" ") + "]"
+		return o
+
+	func update_output()
+		set_string("out", to_text())
+	
+	func on_copy()
+		hui.copy_to_clipboard(to_text())
+	
+	func on_clear()
+		strokes.clear()
+		update_output()
+		redraw("area")
+
+func main()
+	var w = new Sketcher()
+	w.run()
