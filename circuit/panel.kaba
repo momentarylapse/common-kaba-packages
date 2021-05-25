@@ -1,10 +1,10 @@
 import hui
 use circuit
 
-void draw_line(hui.Painter p, complex a, complex b)
+func draw_line(p: hui.Painter, a: complex, b: complex)
 	p.draw_line(a.x, a.y, b.x, b.y)
 
-void draw_circle(hui.Painter p, complex c, float r)
+func draw_circle(p: hui.Painter, c: complex, r: float)
 	p.draw_circle(c.x, c.y, r)
 
 enum
@@ -40,7 +40,7 @@ class CircuitPanel extends hui.Panel
 	var COLOR_TEXT: color
 	var COLOR_SELECTION: color
 	
-	void __init__(Circuit _c)
+	func __init__(_c: Circuit)
 		from_source("
 DrawingArea area '' grab-focus")
 		
@@ -63,16 +63,16 @@ DrawingArea area '' grab-focus")
 		event_x("area", "hui:mouse-move", on_mouse_move)
 		event_x("area", "hui:key-down", on_key_down)
 	
-	void redraw()
+	func redraw()
 		redraw("area")	
 		
 
-	complex project_u(int i, float u)
+	func project_u(i: int, u: float) -> complex
 		return complex(float(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
-	complex project_i(int i, float v)
+	func project_i(i: int, v: float) -> complex
 		return complex(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
-	void on_simulate()
+	func on_simulate()
 		float duration = get_float("t")
 		float dt = get_float("dt")
 		float I = get_float("input-amp")
@@ -84,7 +84,7 @@ DrawingArea area '' grab-focus")
 		auto_scale()
 		redraw("area")
 	
-	void auto_scale()
+	func auto_scale()
 		umax = 0
 		for uu in res.U
 			for u in uu
@@ -100,13 +100,13 @@ DrawingArea area '' grab-focus")
 			imax = 1
 		imin = -imax
 	
-	complex project(complex p)
+	func project(p: complex) -> complex
 		return complex(p.x * w, h - p.y * h)
 	
-	complex unproject(complex p)
+	func unproject(p: complex) -> complex
 		return complex(p.x / w, (h - p.y) / h)
 	
-	void on_left_button_down()
+	func on_left_button_down()
 		sel.type = SEL_TYPE_NONE
 		complex m = complex(hui.get_event().mouse_x, hui.get_event().mouse_y)
 		for n,i in c.nodes
@@ -141,18 +141,18 @@ DrawingArea area '' grab-focus")
 		on_selection_change()
 		redraw("area")
 	
-	void on_left_button_up()
+	func on_left_button_up()
 		if mode == MODE_MOVE_NODE
 			mode = MODE_DEFAULT
 			redraw("area")
 
-	void on_mouse_move()
+	func on_mouse_move()
 		if mode == MODE_MOVE_NODE
 			complex m = complex(hui.get_event().mouse_x, hui.get_event().mouse_y)
 			c.nodes[sel.index].pos = unproject(m)
 			redraw("area")
 	
-	void on_key_down()
+	func on_key_down()
 		if hui.get_event().key == hui.KEY_DELETE
 			if sel.type == SEL_TYPE_EDGE
 				del c.edges[sel.index]
@@ -161,7 +161,7 @@ DrawingArea area '' grab-focus")
 				res.clear()
 		redraw("area")
 
-	void on_draw(hui.Painter p)
+	func on_draw(p: hui.Painter)
 		w = p.width
 		h = p.height
 		
@@ -254,7 +254,7 @@ DrawingArea area '' grab-focus")
 		else if mode == MODE_MOVE_NODE
 			p.draw_str(0, 0, "move the node")
 			
-	void draw_res(hui.Painter p)
+	func draw_res(p: hui.Painter)
 		
 		NT = len(res.U)
 		if NT == 0
@@ -287,6 +287,6 @@ DrawingArea area '' grab-focus")
 		p.set_color(COLOR_TEXT)
 		p.draw_str(20, h - 20, "Imax = {{imax}}    Umax = {{umax}}")
 	
-	virtual void on_selection_change()
+	func virtual on_selection_change()
 		pass
 

@@ -43,7 +43,7 @@ class T extends Thread
 
 
 
- func get_profile(name: string) -> Profile
+func get_profile(name: string) -> Profile
 	for p in conf.profiles
 		if p.name == name
 			return p

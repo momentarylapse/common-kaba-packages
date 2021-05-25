@@ -6,49 +6,49 @@ use remote
 use os
 
 
-void _action_tag_add(Path path, string tag)
+func _action_tag_add(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	var t = str2tag(tag)
 	for f in files
 		f.tag_add(t)
 
-void action_tag_add(string[] arg)
+func action_tag_add(arg: string[])
 	if len(arg) < 2
 		_action_tag_add(make_path("./"), arg[0])
 	for a in arg[1:]
 		_action_tag_add(make_path(a), arg[0])
 
 
-void _action_tag_set(Path path, string tag)
+func _action_tag_set(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	var t = str2tag(tag)
 	for f in files
 		f.tag_set(t)
 
-void action_tag_set(string[] arg)
+func action_tag_set(arg: string[])
 	if len(arg) < 2
 		_action_tag_set(make_path("./"), arg[0])
 	for a in arg[1:]
 		_action_tag_set(make_path(a), arg[0])
 
 
-void _action_tag_rm(Path path, string tag)
+func _action_tag_rm(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	var t = str2tag(tag)
 	for f in files
 		f.tag_rm(t)
 
-void action_tag_rm(string[] arg)
+func action_tag_rm(arg: string[])
 	if len(arg) < 2
 		_action_tag_rm(make_path("./"), arg[0])
 	for a in arg[1:]
 		_action_tag_rm(make_path(a), arg[0])
 
 
-void _action_tag_get(Path path, string key)
+func _action_tag_get(path: Path, key: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
@@ -63,20 +63,20 @@ void _action_tag_get(Path path, string key)
 		else if key == "id" and len(f.id) > 0
 			print("      id={{f.id}}")
 
-void action_tag_get(string[] arg)
+func action_tag_get(arg: string[])
 	if len(arg) < 2
 		_action_tag_get(make_path("./"), arg[0])
 	for a in arg[1:]
 		_action_tag_get(make_path(a), arg[0])
 		
 			
-void _action_tag_auto(Path path)
+func _action_tag_auto(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
 		auto_tag(f)
 
-void action_tag_auto(string[] arg)
+func action_tag_auto(arg: string[])
 	if len(arg) == 0
 		_action_tag_auto(make_path("./"))
 	for a in arg
@@ -84,7 +84,7 @@ void action_tag_auto(string[] arg)
 
 
 
-void _action_tag_diff(Path path)
+func _action_tag_diff(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	var rfiles = remote_get_meta(files)
@@ -95,7 +95,7 @@ void _action_tag_diff(Path path)
 					lf.show()
 					tags_diff(lf.tags, rf.tags)
 
-void action_tag_diff(string[] arg)
+func action_tag_diff(arg: string[])
 	if len(arg) == 0
 		_action_tag_diff(make_path("./"))
 	for a in arg

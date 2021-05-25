@@ -8,21 +8,21 @@ use export
 use cli_parser
 	
 
-void get_ids(out Language l, Resource r, string ns)
+func get_ids(out l: Language, r: Resource, ns: string)
 	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
 	
 	for c in r.children
 		get_ids(l, c, ns)
 
 
-void find_all_ids(out Language lang, Resource[] res)
+func find_all_ids(out lang: Language, res: Resource[])
 	for r in res
 		get_ids(lang, r, r.id)
 	
 #	lang.show()
 
 
-Language load_own_lang(bool literally)
+func load_own_lang(literally: bool) -> Language
 	Language own
 	own.name = conf.own_lang_name
 	
@@ -37,7 +37,7 @@ Language load_own_lang(bool literally)
 	return own
 
 	
-void action_check(string[] arg)
+func action_check(arg: string[])
 	Path dir = Path(arg[0])
 	conf.set_dir(dir)
 	conf.load()
@@ -49,7 +49,7 @@ void action_check(string[] arg)
 	for l in langs
 		check_lang(l, own, false)
 
-void action_export(string[] arg)
+func action_export(arg: string[])
 
 	var dir = Path("./")
 	if len(arg) >= 1
@@ -63,7 +63,7 @@ void action_export(string[] arg)
 	
 	export_resources(resources, own, langs)
 
-void patch_language(out Language l, Language own, Path filename)
+func patch_language(out l: Language, own: Language, filename: Path)
 	try
 		string ttt = Filesystem.read(filename)
 		var lines = ttt.explode("\n")
@@ -82,7 +82,7 @@ void patch_language(out Language l, Language own, Path filename)
 	except
 		pass
 
-void action_translate(string[] arg)
+func action_translate(arg: string[])
 	var filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()
@@ -106,7 +106,7 @@ void action_translate(string[] arg)
 	except
 		pass
 
-void action_add(string[] arg)
+func action_add(arg: string[])
 	var filename = Path(arg[0])
 	string name = arg[1]
 	conf.set_dir(filename.parent())
@@ -119,7 +119,7 @@ void action_add(string[] arg)
 	l.save()
 
 
-void swap_translate_lang(out Language own, Language l, Path target)
+func swap_translate_lang(out own: Language, l: Language, target: Path)
 	# own.ids are ok
 	# own.texts need ...
 	for t in own.texts
@@ -132,7 +132,7 @@ void swap_translate_lang(out Language own, Language l, Path target)
 	own.filename = target
 	own.save()
 
-void swap_translate_gui(out Resource r, Language l, string ns)
+func swap_translate_gui(out r: Resource, l: Language, ns: string)
 	for i in l.ids
 		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
 			r.title = i.title
@@ -140,7 +140,7 @@ void swap_translate_gui(out Resource r, Language l, string ns)
 	for c in r.children
 		swap_translate_gui(c, l, ns)
 
-void swap_translate_guis(Language l)
+func swap_translate_guis(l: Language)
 	for r,i in resources
 		print("----------")
 		print(resource_files[i])
@@ -151,7 +151,7 @@ void swap_translate_guis(Language l)
 		f.write(r.str(0))
 		del f
 
-void action_swap(string[] arg)
+func action_swap(arg: string[])
 	var source = Path(arg[0])
 	var target = Path(arg[1])
 	conf.set_dir(source.parent())
@@ -174,7 +174,7 @@ void action_swap(string[] arg)
 
 	
 
-void main(string[] arg)
+func main(arg: string[])
 	CLIParser p
 	p.info("hui gui builder...")
 	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)

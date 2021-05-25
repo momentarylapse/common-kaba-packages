@@ -4,7 +4,7 @@ use terminal
 
 
 
-void main()
+func main()
 	print("welcome to kaba {{kaba_version}}")
 	string[] history
 	while true

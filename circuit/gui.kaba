@@ -5,10 +5,10 @@ use panel
 
 class EditorPanel extends CircuitPanel
 	var ed: CircuitEditor*
-	void __init__(CircuitEditor e)
+	func __init__(e: CircuitEditor)
 		super.__init__(e.c)
 		ed = &e
-	override void on_selection_change()
+	func override on_selection_change()
 		ed.load_from_part(nil)
 		if sel.type == SEL_TYPE_EDGE
 			ed.load_from_part(ed.c.edges[sel.index])
@@ -18,7 +18,7 @@ class CircuitEditor extends hui.Window
 	var panel: CircuitPanel*
 	
 	
-	void __init__(string[] arg)
+	func __init__(arg: string[])
 		super.__init__("Circuit Editor", 800, 600)
 		from_source("
 Grid root ''
@@ -73,26 +73,26 @@ Toolbar toolbar ''
 		event_x("params", "hui:change", on_param)
 		load_from_part(nil)
 	
-	void on_new()
+	func on_new()
 		panel.res.clear()
 		c.reset_default()
 		panel.redraw()
 	
-	void on_save()
+	func on_save()
 		if hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, "*.circuit", "*.circuit")
 			Filesystem.write_text(hui.filename, c.export())
 	
-	void on_open()
+	func on_open()
 		if hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, "*.circuit", "*.circuit")
 			c.import(Filesystem.read_text(hui.filename))
 	
-	void on_param()
+	func on_param()
 		int row = hui.get_event().row
 		string p = get_cell("params", row, 1)
 		if panel.sel.type == SEL_TYPE_EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
 	
-	void load_from_part(Edge *e)
+	func load_from_part(e: Edge*)
 		reset("params")
 		if !e
 			return
@@ -103,7 +103,7 @@ Toolbar toolbar ''
 		
 
 		
-	void on_simulate()
+	func on_simulate()
 		float duration = get_float("t")
 		float dt = get_float("dt")
 		float I = get_float("input-amp")
@@ -116,7 +116,7 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	
-	void on_add_type()
+	func on_add_type()
 		int t = get_int("")
 		panel.first_node = -1
 		if t == NUM_TYPES
@@ -126,6 +126,6 @@ Toolbar toolbar ''
 			panel.add_type = t
 		panel.redraw()
 
-void main(string[] arg)
+func main(arg: string[])
 	hui.Window* w = new CircuitEditor(arg)
 	w.run()

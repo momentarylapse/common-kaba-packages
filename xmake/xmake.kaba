@@ -8,23 +8,23 @@ use cli_parser
 use os
 
 
-string blank(int n)
+func blank(n: int) -> string
 	return [for i in 0:n " "].join("")
 
-void action_has(string[] a)
+func action_has(a: string[])
 	lib.test(a[0])
 
-void action_list(string[] a)
+func action_list(a: string[])
 	for l in sorted(lib.libraries, "name")
 		if l.test()
 			print("{{l.name|14}} {{Term.GREEN}}found{{Term.END}}")
 		else
 			print("{{l.name|14}} {{Term.RED}}not found{{Term.END}}")
 
-void action_init(string[] a)
+func action_init(a: string[])
 	conf.save()
 
-void action_update(string[] a)
+func action_update(a: string[])
 	print("updating {{conf.root}}")
 	
 	conf.load()
@@ -46,20 +46,20 @@ void action_update(string[] a)
 		if "vs2019" in conf.outputs
 			create_visual_studio(2019)
 
-void action_build(string[] a)
+func action_build(a: string[])
 	#print("building {{conf.root}}")
 	conf.load()
 	parse_dir(conf.root)
 	build()
 
-void action_clear(string[] a)
+func action_clear(a: string[])
 	#print("clearing {{conf.root}}")
 	conf.load()
 	parse_dir(conf.root)
 	build_clear()
 
 
-void main(string[] arg)
+func main(arg: string[])
 	lib.init()
 	conf.verbose = false
 	conf.root = Path("./").absolute()

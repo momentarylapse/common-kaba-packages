@@ -4,7 +4,7 @@ use config
 use dblister
 
 
-void delete_files(out LocalFile*[] files)
+func delete_files(out files: LocalFile*[])
 	for f in files
 		log_warn("rm", rel_path(f.path))
 		if conf.dry_run
@@ -18,20 +18,20 @@ void delete_files(out LocalFile*[] files)
 		db.save()
 
 
-void delete_path_or_filter(string arg)
+func delete_path_or_filter(arg: string)
 	if not is_filter(arg)
 		set_working_dir(Path(arg))
 	var files = find_by_path_or_filter(arg)
 	delete_files(files)
 
-void action_rm(string[] arg)
+func action_rm(arg: string[])
 	for a in arg
 		delete_path_or_filter(a)
 
 
 
 
-void unadd_path(Path path)
+func unadd_path(path: Path)
 	set_working_dir(path)
 		
 	var files = lister.find(path)
@@ -40,7 +40,7 @@ void unadd_path(Path path)
 		f.drop_me = true
 		db.save()
 
-void action_unadd(string[] arg)
+func action_unadd(arg: string[])
 	if len(arg) == 0
 		unadd_path(make_path("./"))
 	for a in arg

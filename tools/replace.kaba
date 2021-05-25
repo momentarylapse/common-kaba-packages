@@ -2,7 +2,7 @@ use os
 use kaba
 use os
 
-void test_replace(Path filename, string what, string by, bool allow)
+func test_replace(filename: Path, what: string, by: string, allow: bool)
 	string s = Filesystem.read_text(filename)
 	int n = 0
 	while true
@@ -18,7 +18,7 @@ void test_replace(Path filename, string what, string by, bool allow)
 	if n > 0 and allow
 		Filesystem.write_text(filename, s)
 
-void test_rec(Path dir, string what, string by, bool allow)
+func test_rec(dir: Path, what: string, by: string, allow: bool)
 	var list = Filesystem.search(dir, "*.*", "fd")
 	for e in list
 		if Filesystem.is_directory(dir << e)
@@ -26,7 +26,7 @@ void test_rec(Path dir, string what, string by, bool allow)
 		else
 			test_replace(dir << e, what, by, allow)
 
-void main(string[] arg)
+func main(arg: string[])
 	if len(arg) < 3
 		raise(new Exception("[WHAT] [BY] [DIR]"))
 	bool allow = true

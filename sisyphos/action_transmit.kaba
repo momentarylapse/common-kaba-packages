@@ -7,7 +7,7 @@ use dblister
 
 
 
-void _action_pull(Path path)
+func _action_pull(path: Path)
 	set_working_dir(path)
 	
 	var files = lister.find(path)
@@ -23,7 +23,7 @@ void _action_pull(Path path)
 			print("downloading meta data")
 		remote_download_meta(need_meta)
 
-void action_pull(string[] arg)
+func action_pull(arg: string[])
 	if len(arg) == 0
 		_action_pull(make_path("./"))
 	for a in arg
@@ -31,7 +31,7 @@ void action_pull(string[] arg)
 
 
 
-void _action_push(Path path)
+func _action_push(path: Path)
 	set_working_dir(path)
 	
 	var files = lister.find(path)
@@ -46,7 +46,7 @@ void _action_push(Path path)
 			log_ok("uploading meta", rel_path(f.path))
 			remote_upload_meta(f)
 
-void action_push(string[] arg)
+func action_push(arg: string[])
 	if len(arg) == 0
 		_action_push(make_path("./"))
 	for a in arg
@@ -54,7 +54,7 @@ void action_push(string[] arg)
 
 
 
-bool make_path_safe_for_download(out LocalFile f)
+func make_path_safe_for_download(out f: LocalFile) -> bool
 	if db.has_path(f.path) or Filesystem.exists(f.path)
 		var ff = db.find_by_path(f.path)
 		if ff.id == f.id
@@ -70,7 +70,7 @@ bool make_path_safe_for_download(out LocalFile f)
 		return false
 	return true
 
-void _get_file(out LocalFile f, string dest)
+func _get_file(out f: LocalFile, dest: string)
 	f.path = Path(f.apply_structure(dest))
 	if not make_path_safe_for_download(f)
 		log_warn("exists", rel_path(f.path))
@@ -83,13 +83,13 @@ void _get_file(out LocalFile f, string dest)
 	db.files.add(f)
 	make_all_dirs(f.path)
 
-void _action_get(string filter, string dest)
+func _action_get(filter: string, dest: string)
 	var files = remote_find(filter, conf.default_quality)
 	for f in files
 		_get_file(f, dest)
 
 
-void action_get(string[] arg)
+func action_get(arg: string[])
 	if len(arg) >= 2
 		_action_get(arg[0], make_path(arg[1]))
 	else

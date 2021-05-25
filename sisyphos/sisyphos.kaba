@@ -11,7 +11,7 @@ use action_remote
 use cli_parser
 
 
-void main(string[] arg)
+func main(arg: string[])
 	CLIParser p
 	p.info("sisyphos - synchronize your files")
 	
@@ -81,7 +81,7 @@ void main(string[] arg)
 
 	
 
-void run_command(string[] arg)
+func run_command(arg: string[])
 	if arg[0] == "filter"
 		if len(arg) < 2
 			conf.show()

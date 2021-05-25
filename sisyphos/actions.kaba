@@ -10,7 +10,7 @@ use dblister
 
 
 
-void file_move(out LocalFile f, Path new_path)
+func file_move(out f: LocalFile, new_path: Path)
 	if conf.verbosity >= 1
 		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
@@ -20,7 +20,7 @@ void file_move(out LocalFile f, Path new_path)
 
 
 	
-void move_path(Path source, Path _dest)
+func move_path(source: Path, _dest: Path)
 	try
 		var f = db.find_by_path(source)
 		var dest = Path(f.apply_structure(_dest))
@@ -41,12 +41,12 @@ void move_path(Path source, Path _dest)
 	except Exception as e
 		error_out(e)
 
-void action_mv(string[] arg)
+func action_mv(arg: string[])
 	for i in 0:len(arg)-1
 		move_path(make_path(arg[i]), make_path(arg[len(arg)-1]))
 
 
-void structure_file(out LocalFile f, string structure)
+func structure_file(out f: LocalFile, structure: string)
 	var new_path = Path(f.apply_structure(structure))
 	if f.path == new_path
 		return
@@ -62,7 +62,7 @@ void structure_file(out LocalFile f, string structure)
 	except FileError as e
 		error_out(e)
 
-void _action_structure_auto(Path dir)
+func _action_structure_auto(dir: Path)
 	set_working_dir(dir)
 	var files = db.get_in_dir(dir, conf.recursive)
 	for f in files
@@ -71,14 +71,14 @@ void _action_structure_auto(Path dir)
 			continue
 		structure_file(f, e.dir << e.structure)
 
-void action_structure_auto(string[] arg)
+func action_structure_auto(arg: string[])
 	for a in arg
 		_action_structure_auto(make_path(a))
 
 
 
 
-void _action_dsync(Path dir)
+func _action_dsync(dir: Path)
 	set_working_dir(dir)
 	var e = conf.get_cfg(dir)
 	if e
@@ -90,19 +90,19 @@ void _action_dsync(Path dir)
 	print("matching pure local files by hash")
 	remote_sync_pure_locals_by_hash(files)
 
-void action_dsync(string[] arg)
+func action_dsync(arg: string[])
 	if len(arg) == 0
 		_action_dsync(make_path("./"))
 	for a in arg
 		_action_dsync(make_path(a))
 
-void _action_sync(Path path)
+func _action_sync(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	remote_sync_pure_locals_by_hash(files)
 	remote_sync_by_id(files)
 
-void action_sync(string[] arg)
+func action_sync(arg: string[])
 	if len(arg) == 0
 		_action_sync(make_path("./"))
 	for a in arg

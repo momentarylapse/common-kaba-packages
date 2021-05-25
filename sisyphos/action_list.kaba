@@ -5,7 +5,7 @@ use dblister
 use os
 
 
-void show_files(LocalFile*[] files)
+func show_files(files: LocalFile*[])
 	for f in files
 		if f.perfectly_fine() and !conf.show_perfectly_fine
 			continue
@@ -18,30 +18,30 @@ void show_files(LocalFile*[] files)
 
 
 
-void list_path(Path path)
+func list_path(path: Path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	show_files(lister.find(path))
 
-void action_list(string[] arg)
+func action_list(arg: string[])
 	if len(arg) == 0
 		list_path(make_path("./"))
 	for a in arg
 		list_path(make_path(a))
 
-void _action_status(Path path)
+func _action_status(path: Path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	conf.show_perfectly_fine = false
 	show_files(lister.find(path))
 
-void action_status(string[] arg)
+func action_status(arg: string[])
 	if len(arg) == 0
 		_action_status(make_path("./"))
 	for a in arg
 		_action_status(make_path(a))
 
-void action_find(string[] arg)
+func action_find(arg: string[])
 	for filter in arg
 		show_files(db.find_by_tags(filter))
 

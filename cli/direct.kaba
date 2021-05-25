@@ -5,7 +5,7 @@ use os
 #extern string print_postfix
 
 
-void main()
+func main()
 	_print_postfix = ""
 	print("welcome to kaba {{kaba_version}}")
 	while true#!stdin.eof()

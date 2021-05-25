@@ -4,7 +4,7 @@ use library
 
 #dep = compiler.find_library('ws2_32', required: true)
 
-void create_meson()
+func create_meson()
 	print("-- meson --")
 	File* f = Filesystem.create_text(conf.root << "../meson.build")
 	string debug = str(conf.build_type == "debug")

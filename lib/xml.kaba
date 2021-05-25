@@ -2,16 +2,16 @@ use os
 
 
 class xml
-	static bool _is_whitespace(char c)
+	func static _is_whitespace(c: char) -> bool
 		return (c == ' ' or c == 9 or c == 10 or c == 13)
-	static bool _is_special(char c)
+	func static _is_special(c: char) -> bool
 		return (c == '<' or c == '>' or c == '?' or c == '=')
-	static int _skip_ws(string s, int i0)
+	func static _skip_ws(s: string, i0: int) -> int
 		for i in i0:len(s)
 			if not _is_whitespace(s[i])
 				return i
 		return len(s)
-	static string _decode_str(string s)
+	func static _decode_str(s: string) -> string
 		if s[:1] == "\""
 			return s[1:-1]
 		if s[:1] == "'"

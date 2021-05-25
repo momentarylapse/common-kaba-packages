@@ -4,28 +4,28 @@ use config
 use resource
 
 class DemoDialog extends hui.Window
-	void __init__(string source)
+	func __init__(source: string)
 		super.__init__("", 100, 100)
 		set_border_width(10)
 		from_source(source)
 		event("close", on_close)
 		event("ok", on_close)
 		event("cancel", on_close)
-	void on_close()
+	func on_close()
 		destroy()
 
 class ToolbarDemoDialog extends hui.Window
-	void __init__(string source)
+	func __init__(source: string)
 		super.__init__("Toolbar demo", 800, 300)
 		toolbar(0).from_source(source)
 
 class MenuDemoDialog extends hui.Window
-	void __init__(string source)
+	func __init__(source: string)
 		super.__init__("Menu demo", 800, 300)
 		var m = hui.create_menu_from_source(source)
 		set_menu(m)
 
-void action_demo(string[] arg)
+func action_demo(arg: string[])
 	Path filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()

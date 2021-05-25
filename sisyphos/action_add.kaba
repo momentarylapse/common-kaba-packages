@@ -11,7 +11,7 @@ use dblister
 
 
 # "add"
-void file_add(out LocalFile f)
+func file_add(out f: LocalFile)
 	if f.in_db()
 
 		# suddenly appearing?!?
@@ -78,7 +78,7 @@ void file_add(out LocalFile f)
 		file_add_new(f, hash)
 
 
-void file_add_new(out LocalFile f, string hash)
+func file_add_new(out f: LocalFile, hash: string)
 	log_ok("add", rel_path(f.path))
 	f.name = f.path.basename()
 	string ext = f.path.extension()
@@ -99,7 +99,7 @@ void file_add_new(out LocalFile f, string hash)
 
 
 # check for local changes
-void add_path(Path path)
+func add_path(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
@@ -107,7 +107,7 @@ void add_path(Path path)
 			
 	db.save()
 
-void action_add(string[] arg)
+func action_add(arg: string[])
 	if len(arg) == 0
 		add_path(make_path("./"))
 	for a in arg
