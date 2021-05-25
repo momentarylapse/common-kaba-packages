@@ -5,7 +5,7 @@ class KabamaWindow extends hui.Window
 	var r: Runtime
 	var log: string
 
-	void on_eval()
+	func on_eval()
 		var input = get_string("input")
 		log += ">>> {{input}}\n"
 		try
@@ -15,7 +15,7 @@ class KabamaWindow extends hui.Window
 			log += "Error: {{e}}\n"
 		set_string("log", log)
 
-	void __init__()
+	func __init__()
 		super.__init__("kabama", 800, 600)
 		from_source("Grid table ''
 	MultilineEdit log ''
@@ -29,6 +29,6 @@ class KabamaWindow extends hui.Window
 	
 		event("eval", on_eval)
 	
-void main()
+func main()
 	var win = new KabamaWindow()
 	win.run()

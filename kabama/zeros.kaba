@@ -2,7 +2,7 @@ use common
 use subst
 use simplify
 
-shared Term zeros(shared Term t, string _var)
+func zeros(t: shared Term, _var: string) -> shared Term
 	shared Term[] z
 	for i in -1000:1000
 		var r = subst_variable(t, _var, AddNumber(str(i)))

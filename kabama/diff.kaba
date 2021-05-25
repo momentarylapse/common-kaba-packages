@@ -3,7 +3,7 @@ use parser
 use simplify
 
 
-shared Term diff_function(string f, shared Term[] params)
+func diff_function(f: string, params: shared Term[]) -> shared Term
 	if f == "exp"
 		return AddFunction("exp", params)
 	if f == "sin"
@@ -23,7 +23,7 @@ shared Term diff_function(string f, shared Term[] params)
 
 # d/dx
 # always copies...
-shared Term diff(shared Term t, string by)
+func diff(t: shared Term, by: string) -> shared Term
 
 	# self
 	if t.type == TYPE_NUMBER

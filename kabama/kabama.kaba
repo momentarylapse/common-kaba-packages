@@ -5,7 +5,7 @@ import terminal
 
 
 
-void main(string[] arg)
+func main(arg: string[])
 	Runtime r
 	
 	if len(arg) > 0
