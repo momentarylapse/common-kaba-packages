@@ -17,12 +17,12 @@ class xml
 		if s[:1] == "'"
 			return s[1:-1]
 		return s
-	static string _next(string s, out int *i0)
+	func static _next(s: string, out i0: int*) -> string
 		*i0 = _skip_ws(s, i0)
 		string r = _peek(s, *i0)
 		*i0 += len(r)
 		return r
-	static string _peek(string s, int i0)
+	func static _peek(s: string, i0: int) -> string
 		int i = i0
 		i = _skip_ws(s, i)
 		string r
@@ -41,7 +41,7 @@ class xml
 				return s[i:j]
 		return ""
 			
-	static any _parse_tag(out string tag_key, string s, out int *i0)
+	func static _parse_tag(out tag_key: string, s: string, out i0: int*) -> any
 		if _next(s, i0) != "<"
 			raise(new Exception("< expected"))
 
@@ -67,7 +67,7 @@ class xml
 				tag[key] = value
 		return tag
 	
-	static void _doc_set(out any doc, string k, any c)
+	func static _doc_set(out doc: any, k: string, c: any)
 		if k in doc.keys()
 			if doc[k].type != any[]
 				doc[k] = dyn([doc[k]])
@@ -77,7 +77,7 @@ class xml
 		else
 			doc[k] = c
 	
-	static string _parse_inside_part(string s, string key, out int *i0, out any part)
+	func static _parse_inside_part(s: string, key: string, out i0: int*, out part: any) -> string
 		#print(">> INSIDE {{key}}")
 		#print(part)
 		string content
@@ -132,7 +132,7 @@ class xml
 			#print("AGAIN! in {{key}}")
 		#print("<< OUTSIDE {{key}}")
 		
-	static any parse(string s)
+	func static parse(s: string) -> any
 		int i = 0
 		
 		string key
@@ -147,7 +147,7 @@ class xml
 		
 		return root
 
-	static string _encode_part(string key, any doc, string pre)
+	func static _encode_part(key: string, doc: any, pre: string) -> string
 		if doc.type in [int, float, string]
 			# string
 			return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
@@ -168,7 +168,7 @@ class xml
 		else
 			return "???{{doc.type}}\n"
 
-	static string encode(any doc)
+	func static encode(doc: any) -> string
 		string s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		if doc.type != any{}
 			raise(new Exception("doc must be a dict"))
@@ -176,7 +176,7 @@ class xml
 			s += _encode_part(k, doc[k], "")
 		return s
 
-void main()
+func main()
 	var d = dyn({"a":{"b":[{"x":2, "y":1.1}, "c"], "d":{"a":"4"}}})
 	print(d)
 	print(xml.encode(d))

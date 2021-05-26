@@ -24,7 +24,7 @@ class SourceParser
 			pos0 = pos + length
 
 
-	void parse_source_code_dir(Path dir)
+	func parse_source_code_dir(dir: Path)
 		var files = Filesystem.search(dir, "*.cpp", "fd")
 		for f in files
 			if Filesystem.is_directory(dir << f)
@@ -35,13 +35,13 @@ class SourceParser
 				parse()
 				end(dir << f)
 
-	virtual void handle(int pos, int length)
-	virtual void begin()
-	virtual void end(Path filename)
+	func virtual handle(pos: int, length: int)
+	func virtual begin()
+	func virtual end(filename: Path)
 
 class SourceLanguageFinder extends SourceParser
 	var l: Language*
-	override void handle(int pos, int length)
+	func override handle(pos: int, length: int)
 		LangText t
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
@@ -59,11 +59,11 @@ class SourceSwapper extends SourceParser
 	var source_new: string
 	var changed: bool
 	var delta: int
-	override void begin()
+	func override begin()
 		source_new = source
 		changed = false
 		delta = 0
-	override void handle(int pos, int length)
+	func override handle(pos: int, length: int)
 		string orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		for t in l.texts
@@ -77,7 +77,7 @@ class SourceSwapper extends SourceParser
 				delta += len(r) - length
 				
 				changed = true
-	override void end(Path filename)
+	func override end(filename: Path)
 		if !changed
 			return
 		#print(">>>>>>>>>>>")
@@ -87,13 +87,13 @@ class SourceSwapper extends SourceParser
 				
 
 
-void parse_source_code_dir(Path dir, Language l)
+func parse_source_code_dir(dir: Path, l: Language)
 	SourceLanguageFinder p
 	p.l = &l
 	p.parse_source_code_dir(dir)
 
 
-void swap_translate_source(Path dir, Language l)
+func swap_translate_source(dir: Path, l: Language)
 	SourceSwapper p
 	p.l = &l
 	p.parse_source_code_dir(dir)
