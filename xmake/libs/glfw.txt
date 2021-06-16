@@ -1,4 +1,5 @@
 link = glfw
 include = GLFW/glfw3.h
 pkg = glfw3
+vcpkg = glfw3
 

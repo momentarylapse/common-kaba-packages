@@ -1,4 +1,5 @@
 link = FLAC
 include = FLAC/all.h
 pkg = flac
+vcpkg = libflac
 

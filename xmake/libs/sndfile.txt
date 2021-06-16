@@ -1,3 +1,4 @@
 link = sndfile
 include = sndfile.hh
+vcpkg = libsndfile
 

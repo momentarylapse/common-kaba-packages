@@ -1,4 +1,5 @@
 link = BulletSoftBody,BulletDynamics,BulletCollision,LinearMath
 include = bullet/btBulletDynamicsCommon.h
 pkg = bullet
+vcpkg = bullet3
 

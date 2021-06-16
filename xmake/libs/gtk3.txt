@@ -1,4 +1,5 @@
 link = gtk+-3.0
 include = gtk-3.0/gtk/gtk.h
 pkg = gtk+-3.0
+vcpkg = gtk3
 

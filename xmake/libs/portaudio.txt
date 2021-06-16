@@ -1,3 +1,4 @@
 link = portaudio
 include = portaudio.h
+vcpkg = portaudio
 

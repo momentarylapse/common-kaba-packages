@@ -59,12 +59,30 @@ func action_clear(a: string[])
 	build_clear()
 
 
+func action_vcpkg_install(a: string[])
+	conf.load()
+	
+	var req: string[]
+	
+	for l in conf.libs
+		req += lib.get(l).vcpkg
+	for l in conf.libs_optional
+		if !conf.ignored(l)
+			req += lib.get(l).vcpkg
+	req = sorted(req, "")
+	if len(req) == 0
+		return
+
+	var cmd = "vcpkg install"
+	for r in req
+		cmd += " {{r}}:x64-windows"
+	print(cmd)
+
 func main(arg: string[])
 	lib.init()
 	conf.verbose = false
 	conf.root = Path("./").absolute()
 	
-	string[] command
 	conf.ignore_libs
 	
 	#bool build
@@ -83,4 +101,5 @@ func main(arg: string[])
 	p.cmd("build", "", "build project", action_build)
 	p.cmd("clear", "", "clear build files", action_clear)
 	p.cmd("update", "", "update build files", action_update)
+	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
 	p.run(arg)

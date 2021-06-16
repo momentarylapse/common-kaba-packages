@@ -6,6 +6,7 @@ class Library
 	var name: string
 	var libs: string[]
 	var pkg: string[]
+	var vcpkg: string[]
 	var meson: string[]
 	var includes: string[]
 	var dir_override: string
@@ -59,6 +60,8 @@ class LibraryManager
 				l.pkg = c["pkg"].explode(",")
 			if len(c["meson"]) > 0
 				l.meson = c["meson"].explode(",")
+			if len(c["vcpkg"]) > 0
+				l.vcpkg = c["vcpkg"].explode(",")
 			if len(c["flags"]) > 0
 				l.flags = c["flags"]
 			l.dir_override = c["dir"]
@@ -93,5 +96,8 @@ class LibraryManager
 	
 	func const pkg(name: string) -> string[]
 		return get(name).pkg
+		
+	func const vs_might_have(name: string) -> bool
+		return len(get(name).vcpkg) > 0
 
 var lib: LibraryManager

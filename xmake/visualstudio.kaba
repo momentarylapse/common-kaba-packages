@@ -27,9 +27,6 @@ func guess_guid() -> (string,string)
 		
 	return [pguid, sguid]
 
-func vs_might_have_lib(l: string) -> bool
-	return l in ["gtk3", "zlib", "ogg", "flac", "fftw3", "portaudio"]
-
 func create_visual_studio(version: int)
 	if version != 2019
 		raise(new Exception("only visual studio 2019 supported"))
@@ -55,7 +52,7 @@ func create_visual_studio(version: int)
 	for l in conf.libs
 		xdef.add("{{lib.define(l)}}=1")
 	for l in conf.libs_optional
-		if vs_might_have_lib(l)
+		if lib.vs_might_have(l)
 			xdef.add("{{lib.define(l)}}=1")
 		else
 			xdef.add("{{lib.define(l)}}=0")
