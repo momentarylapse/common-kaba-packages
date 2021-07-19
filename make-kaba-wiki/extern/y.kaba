@@ -1,6 +1,7 @@
 use nix
 use os
 use net
+use kaba
 
 class EngineData
 	var debug: bool
@@ -23,10 +24,33 @@ class EngineData
 	#Font* default_font
 	var renderer: RenderPath*
 
+	func extern exit()
+
 class RenderPath
+	var depth_buffer: nix.DepthBuffer*
 	var cube_map: nix.CubeMap*
-	func extern virtual render_into_texture(fb: nix.FrameBuffer, cam: Camera)
+	var fb_main, fb2, fb3, fb_small1, fb_small2: nix.FrameBuffer*
+	var shader_fx: nix.Shader*
+
+	func extern virtual render_into_texture(fb: nix.FrameBuffer, cam: Camera, area: rect)
 	func extern render_into_cubemap(db: nix.DepthBuffer, cube: nix.CubeMap, pos: vector)
+	func extern next_fb(cur: nix.FrameBuffer) -> nix.FrameBuffer*
+	func extern process(source: nix.Texture*[], target: nix.FrameBuffer, shader: nix.Shader)
+	func extern add_post_processor(f: nix.FrameBuffer*->nix.FrameBuffer*)
+	func extern add_fx_injector(f: void->void)
+
+# always let the engine create/delete!
+class Component
+	func extern __init__()
+	func extern virtual __delete__()
+	func extern virtual on_init()
+	func extern virtual on_delete()
+	func extern virtual on_iterate(dt: float)
+	func extern virtual on_collide(col: CollisionData)
+	func extern set_variables(vars: string)
+	var owner: Entity*
+
+func extern get_component_list(t: Class) -> Component*[]*
 
 class Entity
 #	extern void __init__()
@@ -35,6 +59,8 @@ class Entity
 	func extern virtual on_init()
 	func extern virtual on_delete()
 	func extern virtual on_iterate(dt: float)
+	func extern add_component(t: Class, vars: string) -> Component*
+	func extern const get_component(t: Class) -> Component*
 
 class Controller extends Entity
 	func extern override __delete__()
@@ -105,23 +131,9 @@ class Model extends Entity
 		var bone_index: int[]
 		var vertex: vector[]
 		var sub: Sub[]
-	class Bone
-		var parent: int
-		var pos: vector
-		var model: Model*
-		var dmatrix: matrix
-		var cur_ang: quaternion
-		var cur_pos: vector
 	var pos: vector
-	var vel: vector
 	var ang: quaternion
-	var rot: vector
 	var matrix: matrix
-	var mass: float
-	var theta: matrix3
-	var physics_active: bool
-	var physics_passive: bool
-	var g_factor: float
 	var name: string
 	var radius: float
 	var min, max: vector
@@ -129,20 +141,26 @@ class Model extends Entity
 	var materials: Material*[]
 	
 	var mesh: Mesh*[3]
-	var bones: Bone[]
-	
-	var vars: float[]
-	var vars_i: int[]
 
 	func extern override __init__()
 	func extern override __delete__()
-	func extern virtual on_collide(c: CollisionData)
 	
 	func extern make_editable()
 	func extern begin_edit(detail: int)
 	func extern end_edit(detail: int)
 	
 	func extern get_vertex(index: int) -> vector
+
+class SolidBody extends Component
+	var override owner: Model*
+	use owner
+	var vel: vector
+	var rot: vector
+	var mass: float
+	var theta: matrix3
+	var physics_active: bool
+	var physics_passive: bool
+	var g_factor: float
 	
 	func extern add_force(f: vector, rho: vector)
 	func extern add_impulse(p: vector, rho: vector)
@@ -150,12 +168,24 @@ class Model extends Entity
 	func extern add_torque_impulse(l: vector)
 	func extern update_mass()
 	func extern update_motion()
+
+class Collider extends Component
+	var override owner: Model*
+	use owner
+class MeshCollider extends Collider
+class BoxCollider extends Collider
+class SphereCollider extends Collider
+class TerrainCollider extends Collider
 	
-	func extern reset_animation()
-	func extern begin_edit_animation()
-	func extern animate_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
-	func extern animate(op: int, move: int, t: float*, dt: float, loop: bool) -> bool
-	func extern is_animation_done(op_no: int) -> bool
+class Animator extends Component
+	var override owner: Model*
+	use owner
+	
+	func extern reset()
+	func extern begin_edit()
+	func extern add_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
+	func extern add(op: int, move: int, t: float*, dt: float, loop: bool) -> bool
+	func extern is_done(op_no: int) -> bool
 	enum
 		MOVE_OP_SET           # overwrite
 		MOVE_OP_SET_NEW_KEYED # overwrite, if current doesn't equal 0
@@ -164,16 +194,32 @@ class Model extends Entity
 		MOVE_OP_MIX_1_FACTOR  # w = w_old * (1-f) + w_new * f
 		MOVE_OP_MIX_2_FACTOR  # w = w_old * a     + w_new * b
 
-class Terrain extends Entity
-	var pos: vector
+class Skeleton extends Component
+	var override owner: Model*
+	use owner
+	
+	class Bone
+		var parent: int
+		var pos: vector
+		var model: Model*
+		var dmatrix: matrix
+		var cur_ang: quaternion
+		var cur_pos: vector
+	var bones: Bone[]
+
+class Terrain extends Component
+	var override owner: Model* # for now...
+	use owner
+	
+	#var pos: vector
 	var pattern: vector
 	var num_x, num_z: int
-	func extern get_height(p: vector) -> float
+	func extern const get_height(p: vector) -> float
 	# ...
 
 class Light extends Entity
 	var pos: vector
-	var dir: vector
+	var ang: quaternion
 	var color: color
 	var radius: float
 	var theta: float
@@ -182,15 +228,16 @@ class Light extends Entity
 	var allow_shadow: bool
 	var user_shadow_control: bool
 	var user_shadow_theta: float
+	func extern set_direction(dir: vector)
 
 	class Spherical extends Light
 		func extern __init__(pos: vector, c: color, radius: float)
 
 	class Parallel extends Light
-		func extern __init__(dir: vector, c: color)
+		func extern __init__(ang: quaternion, c: color)
 
 	class Cone extends Light
-		func extern __init__(pos: vector, dir: vector, c: color, radius: float, theta: float)
+		func extern __init__(pos: vector, ang: quaternion, c: color, radius: float, theta: float)
 
 class Particle extends Entity
 	var pos, vel: vector
@@ -250,6 +297,7 @@ class World
 	func extern add_particle(p: Particle)
 	func extern add_sound(s: audio.Sound)
 	func extern create_object(filename: Path, pos: vector, ang: quaternion) -> Model*
+	func extern create_object_multi(filename: Path, pos: vector[], ang: quaternion[]) -> Model*
 	func extern create_terrain(filename: Path, pos: vector) -> Terrain*
 	func extern set_active_physics(o: Model, active: bool)
 	func extern shift_all(dpos: vector)
@@ -313,6 +361,7 @@ class ui
 		var source: rect
 		var texture: Texture*
 		var blur: float
+		var angle: float
 		var shader: nix.Shader*
 
 	class Text extends Picture
@@ -339,6 +388,33 @@ class ui
 	func extern static key_up(k: int) -> bool
 
 	var extern static mouse, dmouse, scroll: vector
+	
+	var extern static link_mouse_and_keyboard_into_pad: bool
+	
+	class Gamepad as shared
+		enum
+			CROSS
+			CIRCLE
+			SQUARE
+			TRIANGLE
+			L1
+			R1
+			OPTIONS
+			SHARE
+			PS
+			L3
+			R3
+			UP
+			RIGHT
+			DOWN
+			LEFT
+		var deadzone: float
+	
+		func extern is_present() -> bool
+		func extern axis(a: int) -> float
+		func extern button(b: int) -> bool
+		func extern clicked(b: int) -> bool
+	func extern static get_pad(index: int) -> shared Gamepad
 
 class PerformanceMonitor
 	class Average
@@ -362,14 +438,14 @@ class NetworkManager
 
 # TODO
 class audio
-	class Sound
+	class Sound extends Entity
 		func extern pause(pause: bool)
 		func extern play(loop: bool)
 		func extern set(pos: vector, vel: vector, r_min: float, r_max: float, speed: float, volume: float)
 		func extern stop()
 		func extern static emit(filename: Path, pos: vector, r_min: float, r_max: float, speed: float, volume: float, loop: bool) -> Sound*
 		func extern static load(filename: Path) -> Sound*
-	class Music
+	class Music extends Entity
 		func pause(pause: bool)
 		func play(loop: bool)
 		func set_rate(rate: float)
@@ -381,6 +457,9 @@ class audio
 
 
 func extern load_model(filename: Path) -> Model*
+func extern load_shader(filename: Path) -> nix.Shader*
+func extern load_texture(filename: Path) -> nix.Texture*
+func extern get_controller(type: Class) -> Controller*
 
 
 var extern tex_white: nix.Texture*
@@ -389,4 +468,3 @@ var extern world: World
 var extern cam: Camera*
 var extern perf_mon: PerformanceMonitor*
 var extern network: NetworkManager
-var extern post_processors: Material*[]
