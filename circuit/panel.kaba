@@ -1,12 +1,6 @@
 import hui
 use circuit
 
-func draw_line(p: hui.Painter, a: complex, b: complex)
-	p.draw_line(a.x, a.y, b.x, b.y)
-
-func draw_circle(p: hui.Painter, c: complex, r: float)
-	p.draw_circle(c.x, c.y, r)
-
 enum
 	SEL_TYPE_NONE
 	SEL_TYPE_NODE
@@ -67,10 +61,10 @@ DrawingArea area '' grab-focus")
 		redraw("area")	
 		
 
-	func project_u(i: int, u: float) -> complex
-		return complex(float(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
-	func project_i(i: int, v: float) -> complex
-		return complex(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
+	func project_u(i: int, u: float) -> vec2
+		return vec2(float(i) / NT * w, h - (u*0.9 - umin) / (umax - umin)  * h/4)
+	func project_i(i: int, v: float) -> vec2
+		return vec2(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
 	func on_simulate()
 		float duration = get_float("t")
@@ -100,25 +94,25 @@ DrawingArea area '' grab-focus")
 			imax = 1
 		imin = -imax
 	
-	func project(p: complex) -> complex
-		return complex(p.x * w, h - p.y * h)
+	func project(p: vec2) -> vec2
+		return vec2(p.x * w, h - p.y * h)
 	
-	func unproject(p: complex) -> complex
-		return complex(p.x / w, (h - p.y) / h)
+	func unproject(p: vec2) -> vec2
+		return vec2(p.x / w, (h - p.y) / h)
 	
 	func on_left_button_down()
 		sel.type = SEL_TYPE_NONE
-		complex m = complex(hui.get_event().mouse_x, hui.get_event().mouse_y)
+		var m = hui.get_event().mouse
 		for n,i in c.nodes
-			if (m - project(n.pos)).abs() < 20
+			if (m - project(n.pos)).length() < 20
 				sel.type = SEL_TYPE_NODE
 				sel.index = i
 				break
 		for e,i in c.edges
-			complex a = project(c.nodes[e.a].pos)
-			complex b = project(c.nodes[e.b].pos)
-			complex mm = (a+b)*0.5
-			if (m - mm).abs() < 40
+			var a = project(c.nodes[e.a].pos)
+			var b = project(c.nodes[e.b].pos)
+			var mm = (a+b)*0.5
+			if (m - mm).length() < 40
 				sel.type = SEL_TYPE_EDGE
 				sel.index = i
 				break
@@ -148,7 +142,7 @@ DrawingArea area '' grab-focus")
 
 	func on_mouse_move()
 		if mode == MODE_MOVE_NODE
-			complex m = complex(hui.get_event().mouse_x, hui.get_event().mouse_y)
+			var m = hui.get_event().mouse
 			c.nodes[sel.index].pos = unproject(m)
 			redraw("area")
 	
@@ -167,7 +161,7 @@ DrawingArea area '' grab-focus")
 		
 		# bg
 		p.set_color(COLOR_BACKGROUND)
-		p.draw_rect(0, 0, w, h)
+		p.draw_rect(rect(0,w, 0,h))
 		
 		draw_res(p)
 		
@@ -177,82 +171,82 @@ DrawingArea area '' grab-focus")
 			p.set_color(COLOR_TEXT)
 			if sel.type == SEL_TYPE_EDGE and sel.index == i
 				p.set_color(COLOR_SELECTION)
-			complex a = project(c.nodes[e.a].pos)
-			complex b = project(c.nodes[e.b].pos)
-			complex m = (a+b)*0.5
-			complex d = (b-a)* (1.0 / (b-a).abs())
-			complex dd = complex(d.y, -d.x)
+			var a = project(c.nodes[e.a].pos)
+			var b = project(c.nodes[e.b].pos)
+			var m = (a+b)*0.5
+			var d = (b-a)* (1.0 / len(b-a))
+			var dd = vec2(d.y, -d.x)
 			if e.type == TYPE_CABLE
-				draw_line(p, a, b)
+				p.draw_line(a, b)
 			else if e.type == TYPE_SOURCE
 				float l = 25
 				float r = 8
-				draw_line(p, b, m + d*(l+r))
-				draw_line(p, a, m - d*(l+r))
-				draw_circle(p, m + l*d, r)
-				draw_circle(p, m - l*d, r)
+				p.draw_line(b, m + d*(l+r))
+				p.draw_line(a, m - d*(l+r))
+				p.draw_circle(m + l*d, r)
+				p.draw_circle(m - l*d, r)
 			else if e.type == TYPE_RESISTOR
 				float l = 35
 				float r = 10
-				draw_line(p, b, m + d*l)
-				draw_line(p, a, m - d*l)
-				draw_line(p, m + d*l + dd*r, m + d*l - dd*r)
-				draw_line(p, m - d*l + dd*r, m - d*l - dd*r)
-				draw_line(p, m + d*l + dd*r, m - d*l + dd*r)
-				draw_line(p, m + d*l - dd*r, m - d*l - dd*r)
+				p.draw_line(b, m + d*l)
+				p.draw_line(a, m - d*l)
+				p.draw_line(m + d*l + dd*r, m + d*l - dd*r)
+				p.draw_line(m - d*l + dd*r, m - d*l - dd*r)
+				p.draw_line(m + d*l + dd*r, m - d*l + dd*r)
+				p.draw_line(m + d*l - dd*r, m - d*l - dd*r)
 			else if e.type == TYPE_CAPACITOR
 				float l = 30
 				float r = 5
-				draw_line(p, b, m + d*r)
-				draw_line(p, a, m - d*r)
-				draw_line(p, m + d*r - dd*l, m + d*r + dd*l)
-				draw_line(p, m - d*r - dd*l, m - d*r + dd*l)
+				p.draw_line(b, m + d*r)
+				p.draw_line(a, m - d*r)
+				p.draw_line(m + d*r - dd*l, m + d*r + dd*l)
+				p.draw_line(m - d*r - dd*l, m - d*r + dd*l)
 			else if e.type == TYPE_INDUCTOR
 				float l = 40
 				float r = 10
-				draw_line(p, b, m + d*(l+r))
-				draw_line(p, a, m - d*(l+r))
+				p.draw_line(b, m + d*(l+r))
+				p.draw_line(a, m - d*(l+r))
 				for t in -1.0:1.01:0.5
-					draw_circle(p, m + t*l*d, r)
+					p.draw_circle(m + t*l*d, r)
 			else if e.type == TYPE_DIODE
 				float l = 20
-				draw_line(p, b, m + d*l)
-				draw_line(p, a, m - d*l)
-				draw_line(p, m + d*l, m - d*l + dd*l)
-				draw_line(p, m + d*l, m - d*l - dd*l)
-				draw_line(p, m - d*l + dd*l, m - d*l - dd*l)
-				draw_line(p, m + d*l + dd*l, m + d*l - dd*l)
+				p.draw_line(b, m + d*l)
+				p.draw_line(a, m - d*l)
+				p.draw_line(m + d*l, m - d*l + dd*l)
+				p.draw_line(m + d*l, m - d*l - dd*l)
+				p.draw_line(m - d*l + dd*l, m - d*l - dd*l)
+				p.draw_line(m + d*l + dd*l, m + d*l - dd*l)
 			
-			draw_line(p, m + dd*30 - d*30, m + dd*30 + d*30)
-			draw_line(p, m + dd*30 + d*30, m + dd*25 + d*25)
-			draw_line(p, m + dd*30 + d*30, m + dd*35 + d*25)
+			p.draw_line(m + dd*30 - d*30, m + dd*30 + d*30)
+			p.draw_line(m + dd*30 + d*30, m + dd*25 + d*25)
+			p.draw_line(m + dd*30 + d*30, m + dd*35 + d*25)
 		
 		p.set_fill(true)
 		for n,i in c.nodes
 			p.set_color(COLOR_TEXT)
 			if sel.type == SEL_TYPE_NODE and sel.index == i
 				p.set_color(COLOR_SELECTION)
-			complex pp = project(n.pos)
-			draw_circle(p, pp, 5)
+			var pp = project(n.pos)
+			p.draw_circle(pp, 5)
 			if i == 0
-				draw_line(p, pp, pp + complex(0, 20))
-				draw_line(p, pp + complex(-20, 20), pp + complex(20, 20))
-				draw_line(p, pp + complex(-12, 25), pp + complex(12, 25))
-				draw_line(p, pp + complex(-4, 30), pp + complex(4, 30))
+				p.draw_line(pp, pp + vec2(0, 20))
+				p.draw_line(pp + vec2(-20, 20), pp + vec2(20, 20))
+				p.draw_line(pp + vec2(-12, 25), pp + vec2(12, 25))
+				p.draw_line(pp + vec2(-4, 30), pp + vec2(4, 30))
 			if i == 1
-				p.draw_str(pp.x - 38, pp.y - 10, "in")
+				p.draw_str([pp.x - 38, pp.y - 10], "in")
 			if i == c._out
-				p.draw_str(pp.x + 20, pp.y - 10, "out")
+				p.draw_str([pp.x + 20, pp.y - 10], "out")
 		
 		if mode == MODE_ADD_EDGE
 			if first_node < 0
-				p.draw_str(0, 0, "click first on node to connect with edge")
+				p.draw_str([0, 0], "click first on node to connect with edge")
 			else
-				p.draw_str(0, 0, "click second on node to connect with edge")
+				p.draw_str([0, 0], "click second on node to connect with edge")
 		else if mode == MODE_ADD_NODE
-			p.draw_str(0, 0, "place the node")
+			p.draw_str([0, 0], "place the node")
 		else if mode == MODE_MOVE_NODE
-			p.draw_str(0, 0, "move the node")
+			p.draw_str([0, 0], "move the node")
 			
 	func draw_res(p: hui.Painter)
 		
@@ -263,10 +257,10 @@ DrawingArea area '' grab-focus")
 		int e = sel.index
 		p.set_color(color(0.2,0.2,0.2, 1))
 		p.set_line_width(1)
-		draw_line(p, project_i(0,0), project_i(NT,0))
+		p.draw_line(project_i(0,0), project_i(NT,0))
 		if sel.type == SEL_TYPE_EDGE
 			p.set_color(color(0,0,0.8, 1))
-			complex[] pp
+			vec2[] pp
 			for i in 0:NT
 				pp.add(project_i(i, res.I[i][e]))
 			p.set_line_width(2)
@@ -279,13 +273,13 @@ DrawingArea area '' grab-focus")
 			p.draw_lines(pp)
 		else if sel.type == SEL_TYPE_NODE
 			p.set_color(color(0,0.8,0, 1))
-			complex[] pp
+			vec2[] pp
 			for i in 0:NT
 				pp.add(project_u(i, res.phi[i][e]))
 			p.draw_lines(pp)
 		
 		p.set_color(COLOR_TEXT)
-		p.draw_str(20, h - 20, "Imax = {{imax}}    Umax = {{umax}}")
+		p.draw_str([20, h - 20], "Imax = {{imax}}    Umax = {{umax}}")
 	
 	func virtual on_selection_change()
 		pass

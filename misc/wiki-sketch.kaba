@@ -1,12 +1,12 @@
 use hui
 
 class Stroke
-	var p: complex[]
+	var p: vec2[]
 	
 	func length() -> float
 		float l = 0
 		for i in 1:len(p)
-			l += (p[i-1] - p[i]).abs()
+			l += len(p[i-1] - p[i])
 		return l
 	
 	func digest() -> Stroke
@@ -50,7 +50,7 @@ Grid ? '' vertical
 		
 	func override on_left_button_down()
 		var e = hui.get_event()
-		cur.p.add(complex(e.mouse_x, e.mouse_y))
+		cur.p.add(e.mouse)
 		redraw("area")
 
 	func override on_left_button_up()
@@ -63,25 +63,25 @@ Grid ? '' vertical
 	func override on_mouse_move()
 		var e = hui.get_event()
 		if e.button_l
-			cur.p.add(complex(e.mouse_x, e.mouse_y))
+			cur.p.add(e.mouse)
 			redraw("area")
 
 	func override on_draw(p: Painter)
 		w = p.width
 		h = p.height
 		p.set_color(color.WHITE)
-		p.draw_rect(0, 0, w, h)
+		p.draw_rect(rect(0, w, 0, h))
 		
 		p.set_color(color.BLACK)
 		draw_stroke(p, cur)
 		for s in strokes
 			draw_stroke(p, s)
 		
-		p.draw_str(10,10, "{{len(to_text())}} b")
+		p.draw_str([10,10], "{{len(to_text())}} b")
 
 	func draw_stroke(p: Painter, s: Stroke)
 		for i in 1:len(s.p)
-			p.draw_line(s.p[i-1].x, s.p[i-1].y, s.p[i].x, s.p[i].y)
+			p.draw_line(s.p[i-1], s.p[i])
 	
 	func to_text() -> string
 		string o = "{{w}} {{h}}"

@@ -253,7 +253,7 @@ class StatLayer
 		var pp = im.start_draw()
 		pp.set_color(color.WHITE)
 		pp.set_font_size(20)
-		pp.draw_str(5,5, "{{frames/_time|1}}")
+		pp.draw_str([5,5], "{{frames/_time|1}}")
 		del pp
 		tex.override(im)
 		dset.set_texture(1, tex)

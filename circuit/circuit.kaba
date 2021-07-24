@@ -3,9 +3,9 @@ use linalg
 
 class Node
 	var phi = 0.0
-	var pos: complex
+	var pos: vec2
 	func __init__()
-	func __init__(p: complex)
+	func __init__(p: vec2)
 		pos = p
 
 enum
@@ -209,8 +209,8 @@ class Circuit
 	
 	func reset_default()
 		clear()
-		nodes.add(Node(complex(0.2, 0.3)))
-		nodes.add(Node(complex(0.2, 0.7)))
+		nodes.add(Node(vec2(0.2, 0.3)))
+		nodes.add(Node(vec2(0.2, 0.7)))
 	
 	func reset_state()
 		for e in edges
@@ -339,7 +339,7 @@ class Circuit
 			if len(x) == 0
 				continue
 			if x[0] == "Node"
-				nodes.add(Node(complex(float(x[1]), float(x[2]))))
+				nodes.add(Node(vec2(float(x[1]), float(x[2]))))
 			else if x[0] == "Out"
 				_out = int(x[1])
 			else
@@ -371,7 +371,7 @@ class Circuit
 func _main()
 	Circuit c
 	#c.edges.add(new Resistor([0,1], 1))
-	#c.nodes.add(Node(complex(0,0)))
+	#c.nodes.add(Node(vec2(0,0)))
 	#c.edges.add(new Diode([0, 2]))
 	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
