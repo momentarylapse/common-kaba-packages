@@ -1,6 +1,7 @@
 description = 
 element:_eff_area = 
 element:align = 
+element:angle = 
 element:area = 
 element:blur = 
 element:children = 
@@ -8,6 +9,7 @@ element:color =
 element:dz = 
 element:height = 
 element:margin = 
+element:pos = 
 element:shader = 
 element:source = 
 element:texture = 

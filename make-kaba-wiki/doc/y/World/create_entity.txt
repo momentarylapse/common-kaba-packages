@@ -1,0 +1,4 @@
+description = Create a "naked" entity without registering it. (add components and register_entity())
+param:ang = The orientation.
+param:pos = The position.
+return = The new entity.

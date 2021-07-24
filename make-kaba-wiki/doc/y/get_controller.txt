@@ -1,0 +1,3 @@
+description = Find the single instance of a controller class, managed by the engine.
+param:type = The class derived from Controller.
+return = The instance.

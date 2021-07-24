@@ -10,6 +10,7 @@ element:lighting =
 element:margin = 
 element:matrix = 
 element:model = 
+element:pos = 
 element:visible = 
 element:width = 
 element:world_3d = 

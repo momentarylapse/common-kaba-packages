@@ -1,5 +1,6 @@
 description = 
 element:allow_shadow = 
+element:ang = 
 element:color = 
 element:dir = 
 element:enabled = 

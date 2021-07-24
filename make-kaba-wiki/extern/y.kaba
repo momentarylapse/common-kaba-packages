@@ -62,6 +62,21 @@ class Entity
 	func extern add_component(t: Class, vars: string) -> Component*
 	func extern const get_component(t: Class) -> Component*
 
+class Entity3D extends Entity
+	var pos: vector
+	var ang: quaternion
+	
+	func selfref model() -> Model*
+		var m: Model* = get_component(Model)
+		return m
+	func selfref body() -> SolidBody*
+		var b: SolidBody* = get_component(SolidBody)
+		return b
+
+class Component3D extends Component
+	var override owner: Entity3D*
+	use owner
+
 class Controller extends Entity
 	func extern override __delete__()
 	
@@ -82,9 +97,7 @@ class Controller extends Entity
 	func extern virtual on_draw_pre()
 	func extern virtual on_render_inject()
 
-class Camera extends Entity
-	var pos: vector
-	var ang: quaternion
+class Camera extends Component3D
 	var dest: rect
 	var m_view: matrix
 	var exposure: float
@@ -100,7 +113,6 @@ class Camera extends Entity
 	
 	var show, enabled: bool
 
-	func extern override __delete__()
 	func extern project(p: vector) -> vector
 	func extern unproject(p: vector) -> vector
 	func extern update_matrices(aspect_ratio: float)
@@ -117,11 +129,12 @@ class Material
 	func extern static load(filename: Path) -> Material*
 
 class CollisionData
-	var m, sub: Model*
+	var sb: SolidBody*
+	var sub: Model*
 	var t: Terrain*
 	var p, n: vector
 
-class Model extends Entity
+class Model extends Component3D
 	class Mesh
 		class Sub
 			var num_triangles: int
@@ -131,8 +144,6 @@ class Model extends Entity
 		var bone_index: int[]
 		var vertex: vector[]
 		var sub: Sub[]
-	var pos: vector
-	var ang: quaternion
 	var matrix: matrix
 	var name: string
 	var radius: float
@@ -148,12 +159,11 @@ class Model extends Entity
 	func extern make_editable()
 	func extern begin_edit(detail: int)
 	func extern end_edit(detail: int)
+	func extern update_matrix()
 	
 	func extern get_vertex(index: int) -> vector
 
-class SolidBody extends Component
-	var override owner: Model*
-	use owner
+class SolidBody extends Component3D
 	var vel: vector
 	var rot: vector
 	var mass: float
@@ -169,18 +179,13 @@ class SolidBody extends Component
 	func extern update_mass()
 	func extern update_motion()
 
-class Collider extends Component
-	var override owner: Model*
-	use owner
+class Collider extends Component3D
 class MeshCollider extends Collider
 class BoxCollider extends Collider
 class SphereCollider extends Collider
 class TerrainCollider extends Collider
 	
-class Animator extends Component
-	var override owner: Model*
-	use owner
-	
+class Animator extends Component3D
 	func extern reset()
 	func extern begin_edit()
 	func extern add_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
@@ -194,10 +199,7 @@ class Animator extends Component
 		MOVE_OP_MIX_1_FACTOR  # w = w_old * (1-f) + w_new * f
 		MOVE_OP_MIX_2_FACTOR  # w = w_old * a     + w_new * b
 
-class Skeleton extends Component
-	var override owner: Model*
-	use owner
-	
+class Skeleton extends Component3D
 	class Bone
 		var parent: int
 		var pos: vector
@@ -207,17 +209,13 @@ class Skeleton extends Component
 		var cur_pos: vector
 	var bones: Bone[]
 
-class Terrain extends Component
-	var override owner: Model* # for now...
-	use owner
-	
-	#var pos: vector
+class Terrain extends Component3D
 	var pattern: vector
 	var num_x, num_z: int
 	func extern const get_height(p: vector) -> float
 	# ...
 
-class Light extends Entity
+class Light extends Component3D
 	var pos: vector
 	var ang: quaternion
 	var color: color
@@ -230,14 +228,14 @@ class Light extends Entity
 	var user_shadow_theta: float
 	func extern set_direction(dir: vector)
 
-	class Spherical extends Light
-		func extern __init__(pos: vector, c: color, radius: float)
-
-	class Parallel extends Light
-		func extern __init__(ang: quaternion, c: color)
-
-	class Cone extends Light
-		func extern __init__(pos: vector, ang: quaternion, c: color, radius: float, theta: float)
+#	class Spherical extends Light
+#		func extern __init__(pos: vector, c: color, radius: float)
+#
+#	class Parallel extends Light
+#		func extern __init__(ang: quaternion, c: color)
+#
+#	class Cone extends Light
+#		func extern __init__(pos: vector, ang: quaternion, c: color, radius: float, theta: float)
 
 class Particle extends Entity
 	var pos, vel: vector
@@ -271,10 +269,10 @@ class Link extends Entity
 #	...
 
 class World
-	var objects: Model*[]
+	var objects: Entity3D*[]
 	var terrains: Terrain*[]
 	
-	var ego: Model*
+	var ego: Entity3D*
 	
 	var lights: Light*[]
 	
@@ -293,19 +291,33 @@ class World
 		PHYSICS_FULL_EXTERNAL
 	var physics_mode: int
 	
-	func extern add_light(l: Light)
+	func extern load_soon(filename: Path)
+	
+	func extern add_light_parallel(ang: quaternion, c: color) -> Light*
+	func extern add_light_point(pos: vector, c: color, radius: float) -> Light*
+	func extern add_light_cone(pos: vector, ang: quaternion, c: color, radius: float, theta: float) -> Light*
 	func extern add_particle(p: Particle)
 	func extern add_sound(s: audio.Sound)
-	func extern create_object(filename: Path, pos: vector, ang: quaternion) -> Model*
-	func extern create_object_multi(filename: Path, pos: vector[], ang: quaternion[]) -> Model*
+	func extern create_object(filename: Path, pos: vector, ang: quaternion) -> Entity3D*
+	func extern create_object_no_reg(filename: Path, pos: vector, ang: quaternion) -> Entity3D*
+	func extern create_object_multi(filename: Path, pos: vector[], ang: quaternion[]) -> Entity3D*
 	func extern create_terrain(filename: Path, pos: vector) -> Terrain*
+	func extern create_entity(pos: vector, ang: quaternion) -> Entity3D*
+	func extern register_entity(e: Entity3D)
 	func extern set_active_physics(o: Model, active: bool)
 	func extern shift_all(dpos: vector)
 	func extern get_g(pos: vector) -> vector
-	func extern trace(p1: vector, p2: vector, out d: CollisionData, simple_test: bool, ignore: Model*) -> bool
+	func extern trace(p1: vector, p2: vector, out d: CollisionData, simple_test: bool, ignore: Entity3D*) -> bool
 	
 #	extern void unregister(void* o) # Model, Link, Light, Particle, Beam
-	func extern delete(o: void*)
+#	func extern delete(o: void*)
+	
+	class MessageData
+		var e: Entity3D*
+		var v: vector
+	var msg_data: MessageData
+	
+	func extern subscribe(msg: string, f: void->void)
 
 
 class ui
@@ -325,6 +337,7 @@ class ui
 		func extern virtual on_middle_button_up() -> bool
 		func extern virtual on_right_button_down() -> bool
 		func extern virtual on_right_button_up() -> bool
+		var pos: vec2
 		var x, y: float
 		var width, height: float
 		func extern set_area(r: rect)
@@ -366,7 +379,7 @@ class ui
 
 	class Text extends Picture
 		func extern __init__(t: string, font_size: float)
-		func extern __init__(t: string, font_size: float, x: float, y: float)
+		func extern __init__(t: string, font_size: float, p: vec2)
 		func extern override __delete__()
 		var text: string
 		var font_size: float
@@ -386,8 +399,9 @@ class ui
 	func extern static key(k: int) -> bool
 	func extern static key_down(k: int) -> bool
 	func extern static key_up(k: int) -> bool
+	func extern static button(b: int) -> bool
 
-	var extern static mouse, dmouse, scroll: vector
+	var extern static mouse, dmouse, scroll: vec2
 	
 	var extern static link_mouse_and_keyboard_into_pad: bool
 	
@@ -455,11 +469,14 @@ class audio
 	var volume_music: float
 	var volume_sounds: float
 
+class Scheduler
+	func static extern subscribe(dt: float, f: Function)
 
 func extern load_model(filename: Path) -> Model*
 func extern load_shader(filename: Path) -> nix.Shader*
 func extern load_texture(filename: Path) -> nix.Texture*
 func extern get_controller(type: Class) -> Controller*
+func extern add_camera(pos: vector, ang: quaternion, r: rect) -> Camera*
 
 
 var extern tex_white: nix.Texture*

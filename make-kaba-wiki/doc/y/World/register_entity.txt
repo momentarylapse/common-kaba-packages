@@ -1,0 +1,2 @@
+description = Add an entity to the world. Needed after create_entity().
+param:e = The entity to add.

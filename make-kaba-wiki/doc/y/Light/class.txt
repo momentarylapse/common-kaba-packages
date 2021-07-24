@@ -1,9 +1,11 @@
 description = 
 element:allow_shadow = 
+element:ang = 
 element:color = 
 element:dir = 
 element:enabled = 
 element:harshness = 
+element:owner = 
 element:pos = 
 element:radius = 
 element:theta = 

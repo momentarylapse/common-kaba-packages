@@ -408,7 +408,7 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	else
 		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
 		return parse_doc_string(conf[key])
-	return "no description"
+	return "..."
 
 func doc_get_class_description(ns: string, c: Class) -> string
 	return doc_get(ns, c.name, true, "description")

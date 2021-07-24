@@ -1,0 +1,9 @@
+description = 
+element:g_factor = 
+element:mass = 
+element:owner = 
+element:physics_active = 
+element:physics_passive = 
+element:rot = 
+element:theta = 
+element:vel = 
