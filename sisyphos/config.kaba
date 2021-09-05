@@ -110,8 +110,12 @@ class Term
 	const GREEN = "\x1b[0;32m"
 	const YELLOW = "\x1b[0;33m"
 	const BLUE = "\x1b[0;34m"
-	const BLUE2 = "\x1b[0;36m"
-	const VIOLET = "\x1b[0;35m"
+	const MAGENTA = "\x1b[0;35m"
+	const CYAN = "\x1b[0;36m"
+	#const GRAY = "\x1b[0;37m"
+	const GRAY = "\x1b[38;5;245m"
+	const DARK_GRAY = "\x1b[0;90m"
+	const ORANGE = "\x1b[38;5;209m"
 	const BOLD = "\x1b[1m"
 	const END = "\x1b[0m"
 
@@ -119,7 +123,7 @@ func log_ok(op: string, msg: string)
 	print("{{Term.YELLOW}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
 
 func log_warn(op: string, msg: string)
-	print("{{Term.BLUE2}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
+	print("{{Term.CYAN}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")
 
 func log_error(op: string, msg: string)
 	print("{{Term.RED}}{{Term.BOLD}}{{op.upper()}}{{Term.END}}  {{msg}}")

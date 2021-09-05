@@ -6,7 +6,7 @@ use remote
 
 func show_rfile_list(rfiles: RemoteFile[])
 	for f in rfiles
-		f.show()
+		show_file(f)
 		if conf.show_meta
 			f.show_info("      ")
 

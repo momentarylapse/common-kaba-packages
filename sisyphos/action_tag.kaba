@@ -52,7 +52,7 @@ func _action_tag_get(path: Path, key: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
-		f.show()
+		print(rel_path(f.path))
 		for t in f.tags
 			if t.key == key
 				print("      {{t}}")
@@ -92,7 +92,7 @@ func _action_tag_diff(path: Path)
 		for lf in files
 			if lf.id == rf.id
 				if !tags_equal(lf.tags, rf.tags)
-					lf.show()
+					print(rel_path(lf.path))
 					tags_diff(lf.tags, rf.tags)
 
 func action_tag_diff(arg: string[])

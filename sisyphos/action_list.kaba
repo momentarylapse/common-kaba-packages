@@ -11,7 +11,7 @@ func show_files(files: LocalFile*[])
 			continue
 		if !f.in_db() and !conf.show_not_in_db
 			continue
-		f.show()
+		show_file(f)
 		if conf.show_meta or conf.verbosity >= 2
 			f.show_info("      ")
 

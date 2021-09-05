@@ -32,6 +32,30 @@ func nice_size(size: int) -> string
 		return "{{size / 1000.0|.1}}K"
 	return "{{size}}"
 
+
+func file_status_color(f: LocalFile) -> string
+	if !f.in_db()
+		return "{{Term.DARK_GRAY}}"
+	if f.pure_local()
+		return "{{Term.GRAY}}"
+	if f.pure_remote()
+		return "{{Term.ORANGE}}{{Term.BOLD}}"
+	if f.changed_file()
+		return "{{Term.RED}}{{Term.BOLD}}"
+	if f.changed_meta()
+		return "{{Term.YELLOW}}{{Term.BOLD}}"
+	return "{{Term.BOLD}}"
+
+func show_file(f: LocalFile)
+	string s
+	if conf.show_meta_small
+		s = str_format(nice_size(f.size), " 6")
+		if f.is("quality=medium")
+			s += " m"
+		else
+			s += "  "
+	print("{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_path(f.path)}}{{Term.END}}")
+
 class LocalFile
 	var drop_me = false
 
@@ -149,15 +173,6 @@ class LocalFile
 		if changed_meta()
 			return "* "
 		return "  "
-	func const show()
-		string s
-		if conf.show_meta_small
-			s = str_format(nice_size(size), " 6")
-			if is("quality=medium")
-				s += " m"
-			else
-				s += "  "
-		print("{{status_str()}} {{s}}  {{rel_path(path)}}")
 	func const show_info(l: string)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
@@ -312,9 +327,7 @@ class LocalFileDB
 					dirty = true
 					f.drop_me = true
 				else
-					f.show()
-					print("   <->")
-					l.show()
+					print("   {{rel_path(f.path)}}   <->   {{rel_path(l.path)}}")
 					print("###################################")
 			else
 				log_error("hash collision", "{{f.path}}  <->  {{l.path}}")
