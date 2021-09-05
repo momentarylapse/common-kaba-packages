@@ -193,7 +193,7 @@ class Config
 	var filter_pure_remote = false
 	var show_pure_local = false
 	var show_perfectly_fine = true
-	var show_not_in_db = false
+	var show_not_in_db = true
 	var drop_deleted = false
 	var pull_tags = false
 	var pull_tags_only_add = false
