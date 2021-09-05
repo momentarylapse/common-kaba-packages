@@ -1,0 +1,5 @@
+link = gtk-4.0
+include = gtk-4.0/gtk/gtk.h
+pkg = gtk4
+vcpkg = gtk
+
