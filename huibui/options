@@ -42,6 +42,9 @@ ComboBox
 	!!editable
 DrawingArea
 	!!opengl
+	gesture=zoom
+	(makecurrentgl)
+	noeventcompression
 Edit
 	clear-placeholder
 	clear-completion

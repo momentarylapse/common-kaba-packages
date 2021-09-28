@@ -39,7 +39,7 @@ class Sketcher extends Window
 		super.__init__("Sketcher", 800, 600)
 		from_source("
 Grid ? '' vertical
-	DrawingArea area '' expandx expandy
+	DrawingArea area '' expandx expandy grabfocus
 	Grid ? ''
 		Edit out '' expandx
 		Button copy '' image=hui:copy
@@ -62,8 +62,16 @@ Grid ? '' vertical
 
 	func override on_mouse_move()
 		var e = hui.get_event()
-		if e.button_l
+		if len(cur.p) > 0
 			cur.p.add(e.mouse)
+			redraw("area")
+
+	func override on_key_down()
+		var e = hui.get_event()
+		if e.key == hui.KEY_CONTROL + hui.KEY_Z
+			if len(strokes) > 0
+				#strokes = strokes[:len(strokes)-1]
+				strokes.resize(len(strokes)-1)
 			redraw("area")
 
 	func override on_draw(p: Painter)
