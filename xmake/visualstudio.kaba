@@ -63,6 +63,8 @@ func create_visual_studio(version: int)
 	
 	var includes = os.Filesystem.search("./", "*.h", "rf")
 	
+	var CPPVER = conf.language.replace("c++", "stdcpp")
+	
 	var f = "
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
@@ -175,6 +177,7 @@ EndGlobal
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>{{CPPVER}}</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -189,6 +192,7 @@ EndGlobal
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>{{CPPVER}}</LanguageStandard>
     </ClCompile>
     <Link>
       <TargetMachine>MachineX86</TargetMachine>
@@ -202,12 +206,14 @@ EndGlobal
     <ClCompile>
       <PreprocessorDefinitions>WIN64;_DEBUG;_WINDOWS;%(PreprocessorDefinitions);{{defines}}</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>{{CPPVER}}</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\">
     <ClCompile>
       <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;%(PreprocessorDefinitions);{{defines}}</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)\%(RelativeDir)\%(Filename).obj</ObjectFileName>
+      <LanguageStandard>{{CPPVER}}</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>"
@@ -232,7 +238,7 @@ EndGlobal
 </Project>
 "
 
-	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj", f)
+	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -279,4 +285,4 @@ EndGlobal
 </Project>"
   
   
-	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj.filters", f)
+	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
