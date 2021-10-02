@@ -25,9 +25,12 @@ func create_quad(r: rect) -> VertexBuffer*
 
 class Renderer
 	var width, height: int
-	var in_flight_fence: Fence*
+	#var in_flight_fence: Fence*
+	var wait_for_frame_fences: Fence*[]
 	var image_available_semaphore, render_finished_semaphore: Semaphore*
-	var cb: CommandBuffer*
+	
+	var command_buffers: CommandBuffer*[]
+	#var cb: CommandBuffer*
 	var pool: DescriptorPool*
 
 	func __init__()
@@ -35,22 +38,25 @@ class Renderer
 		height = 0
 		pool = nil
 	
-		in_flight_fence = new Fence()
+		#in_flight_fence = new Fence()
 		image_available_semaphore = new Semaphore()
 		render_finished_semaphore = new Semaphore()
-		cb = new CommandBuffer()
+		#cb = new CommandBuffer()
 	
 	func virtual __delete__()
-		del in_flight_fence
+		#del in_flight_fence
 		del image_available_semaphore
 		del render_finished_semaphore
 		if pool
 			del pool
 	
-	func virtual default_render_pass() -> RenderPass*
+	func const virtual default_render_pass() -> RenderPass*
 		return nil
 		
-	func virtual current_frame_buffer() -> FrameBuffer*
+	func const virtual current_frame_buffer() -> FrameBuffer*
+		return nil
+		
+	func const virtual current_command_buffer() -> CommandBuffer*
 		return nil
 
 	func virtual start_frame() -> bool
@@ -87,6 +93,13 @@ class WindowRenderer extends Renderer
 
 	func _create_swap_chain_and_stuff()
 		swap_chain = new SwapChain(window)
+		var swap_images = swap_chain.create_textures()
+		for t in swap_images
+			wait_for_frame_fences.add(new Fence())
+			
+		for t in swap_images
+			command_buffers.add(new CommandBuffer())
+			
 		depth_buffer = swap_chain.create_depth_buffer()
 		_default_render_pass = swap_chain.create_render_pass(depth_buffer)
 		frame_buffers = swap_chain.create_frame_buffers(_default_render_pass, depth_buffer)
@@ -111,32 +124,46 @@ class WindowRenderer extends Renderer
 	func rebuild_default_stuff()
 		print("recreate swap chain")
 
-		wait_device_idle()
+		default_device.wait_idle()
 
 		_delete_swap_chain_and_stuff()
 		_create_swap_chain_and_stuff()
 	
-	func override default_render_pass() -> RenderPass*
+	func const override default_render_pass() -> RenderPass*
 		return _default_render_pass
 
-	func override current_frame_buffer() -> FrameBuffer*
+	func const override current_frame_buffer() -> FrameBuffer*
 		return frame_buffers[image_index]
 
-	func override start_frame() -> bool
-		in_flight_fence.wait()
+	func const override current_command_buffer() -> CommandBuffer*
+		return command_buffers[image_index]
 
-		if !swap_chain.aquire_image(&image_index, image_available_semaphore)
+	func override start_frame() -> bool
+		#in_flight_fence.wait()
+
+		if !swap_chain.acquire_image(&image_index, image_available_semaphore)
 			rebuild_default_stuff()
 			return false
+			
+		var f = wait_for_frame_fences[image_index]
+		f.wait()
+		f.reset()
 		return true
 
 	func override end_frame()
-		queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
+	#	queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
 
-		if !swap_chain.present(image_index, [render_finished_semaphore]) or framebuffer_resized
-			framebuffer_resized = false
-			rebuild_default_stuff()
-		wait_device_idle()
+	#	if !swap_chain.present(image_index, [render_finished_semaphore]) or framebuffer_resized
+	#		framebuffer_resized = false
+	#		rebuild_default_stuff()
+			
+			
+		var f = wait_for_frame_fences[image_index]
+		default_device.present_queue.submit(command_buffers[image_index], [image_available_semaphore], [render_finished_semaphore], f)
+
+		swap_chain.present(image_index, [render_finished_semaphore])
+			
+		default_device.wait_idle()
 
 
 
@@ -178,17 +205,17 @@ class TextureRenderer extends Renderer
 		del tex
 
 	func override start_frame() -> bool
-		cb.begin()
+		#cb.begin()
 		return true
 
 	func override end_frame()
 		#cb->barrier([tex, depth_buffer], 0);
-		cb.barrier([depth_buffer], 0)
-		cb.end()
+	#	cb.barrier([depth_buffer], 0)
+	#	cb.end()
 
-		queue_submit_command_buffer(cb, [], [], in_flight_fence)
-		in_flight_fence.wait()
-		wait_device_idle()
+	#	queue_submit_command_buffer(cb, [], [], in_flight_fence)
+	#	in_flight_fence.wait()
+		default_device.wait_idle()
 
 
 	func override current_frame_buffer() -> FrameBuffer*
