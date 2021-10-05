@@ -9,8 +9,8 @@ use dblister
 
 
 
-
-func file_move(out f: LocalFile, new_path: Path)
+# deprecated
+func ______file_move(out f: LocalFile, new_path: Path)
 	if conf.verbosity >= 1
 		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
@@ -19,8 +19,13 @@ func file_move(out f: LocalFile, new_path: Path)
 
 
 
+func move_path(source: Path, dest: Path)
+	if Filesystem.is_directory(source)
+		move_dir_by_path(source, dest)
+	else
+		move_file_by_path(source, dest)
 	
-func move_path(source: Path, _dest: Path)
+func move_file_by_path(source: Path, _dest: Path)
 	try
 		var f = db.find_by_path(source)
 		var dest = Path(f.apply_structure(_dest))
@@ -29,15 +34,40 @@ func move_path(source: Path, _dest: Path)
 		log_warn("move", "{{rel_path(source)}} -> {{rel_path(dest)}}")
 		if Filesystem.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
+		
+		if not Filesystem.exists(source)
+			raise(new Exception("file not found in filesystem???"))
 
 		if conf.dry_run
 			return
+		
+		var _source = source # since source might be a ref to f.path...
 		f.path = dest
 		db.save()
-		
-		if Filesystem.exists(source)
-			make_all_dirs(dest)
-			Filesystem.rename(source, dest)
+			
+		make_all_dirs(dest)
+		Filesystem.rename(_source, dest)
+	except Exception as e
+		error_out(e)
+	
+func move_dir_by_path(source: Path, dest: Path)
+	conf.recursive = true
+	try
+		Path source_ref = source.parent()
+		if Filesystem.exists(dest)
+			if not Filesystem.is_directory(dest)
+				raise(new Exception("target or its parent needs to be a directory, when moving directories"))
+		else
+			if Filesystem.is_directory(dest.parent())
+				source_ref = source
+			else
+				raise(new Exception("target or its parent needs to be a directory, when moving directories"))
+			
+			
+		var files = lister.find(source)
+		for f in files
+			#print()
+			move_file_by_path(f.path, dest << f.path.relative_to(source_ref))
 	except Exception as e
 		error_out(e)
 
