@@ -2,5 +2,6 @@ description =
 param:layout = 
 param:num_textures = 
 param:pass = 
+param:recursion_depth = 
 param:shader = 
 param:subpass = 

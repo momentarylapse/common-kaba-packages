@@ -9,7 +9,7 @@ var external_packages: Script*[]
 var external_libs: Script*[]
 
 func param_pre(v: Variable) -> string
-	if not v.is_const
+	if not v.is_const()
 		return "out "
 	return ""
 
@@ -476,14 +476,6 @@ func prepare(dir: Path)
 	for p in external_libs
 		prepare_package(p, dir << p.name)
 
-func main(arg: string[])
-	find_external()
-	find_external_libs()
-	if len(arg) > 0
-		if arg[0] == "prepare"
-			prepare("doc")
-	else
-		make_documentation()
 
 func make_class(c: Class, ns: string)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", show_class(ns, c))
@@ -509,3 +501,13 @@ func make_package(p: Script)
 	var vars = p.variables()
 	for v in vars
 		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
+
+
+func main(arg: string[])
+	find_external()
+	find_external_libs()
+	if len(arg) > 0
+		if arg[0] == "prepare"
+			prepare("doc")
+	else
+		make_documentation()

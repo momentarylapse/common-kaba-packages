@@ -1,6 +1,6 @@
 description = 
-element:background = The "sky" background color.
-element:ego = Can be used as a "main" player object.
+element:background = 'The "sky" background color.'
+element:ego = 'Can be used as a "main" player object.'
 element:fog = 
 element:gravity = The global gravity vector.
 element:lights = A list of all lights.

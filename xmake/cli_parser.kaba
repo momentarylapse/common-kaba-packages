@@ -101,12 +101,12 @@ class CLIParser
 			if name in o.name
 				#print("option {{o.name}}")
 				if o.param == ""
-					call(o.f0)
+					o.f0()
 					return 0
 				else
 					if len(arg_rest) == 0
 						raise(new Exception("missing parameter: {{o.sig()}}"))
-					call(o.f1, arg_rest[0])
+					o.f1(arg_rest[0])
 					return 1
 		raise(new Exception("unknown option {{name}}"))
 	
@@ -117,7 +117,7 @@ class CLIParser
 					raise(new Exception("missing parameters: {{c.sig()}}"))
 				#print("command {{c.name}}")
 				var aa = arg[len(c.name):]
-				call(c.f, aa)
+				c.f(aa)
 				return true
 		return false
 

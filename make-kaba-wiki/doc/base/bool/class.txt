@@ -1,1 +1,1 @@
-description = 
+description = Can hold a True/False value.

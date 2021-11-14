@@ -1,6 +1,7 @@
 description = 
 element:_default_render_pass = 
 element:cb = 
+element:command_buffers = 
 element:depth_buffer = 
 element:frame_buffers = 
 element:framebuffer_resized = 
@@ -11,5 +12,6 @@ element:in_flight_fence =
 element:pool = 
 element:render_finished_semaphore = 
 element:swap_chain = 
+element:wait_for_frame_fences = 
 element:width = 
 element:window = 

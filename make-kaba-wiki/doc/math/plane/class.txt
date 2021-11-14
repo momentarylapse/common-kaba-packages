@@ -1,4 +1,7 @@
 description = A 3d plane <math>(a,b,c,d)</math>.\nAll points <math>(x,y,z)</math> in the plane are defined by <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>.
+element:_a = 
+element:_b = 
+element:_c = 
 element:a = .
 element:b = .
 element:c = .
