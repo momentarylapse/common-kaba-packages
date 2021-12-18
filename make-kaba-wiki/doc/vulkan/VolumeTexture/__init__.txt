@@ -1,4 +1,7 @@
 description = 
 param:format = 
 param:h = 
+param:nx = 
+param:ny = 
+param:nz = 
 param:w = 

@@ -98,7 +98,7 @@ func filter_consts(cc: Constant*[]) -> Constant*[]
 	return sorted(r, "name")
 
 func filter_elements(cc: ClassElement[]) -> ClassElement[]
-	return sorted([for c in cc c if c.name[:1] != "-"], "name")
+	return sorted([for c in cc c if not (c.name[:1] in ["_", "-"])], "name")
 
 func opname(f: string) -> string
 	if f == "__add__"
@@ -273,7 +273,7 @@ func filter_classes(cc: Class*[]) -> Class*[]
 			continue
 		if c.name.find("*", 0) >= 0 or c.name.find("&", 0) >= 0
 			continue
-		if c.name.find("@", 0) >= 0 or c.name[0] == '-'
+		if c.name.find("@", 0) >= 0 or c.name[0] == '-' or c.name[0] == '<'
 			continue
 		if c.name[0] == '_'
 			continue

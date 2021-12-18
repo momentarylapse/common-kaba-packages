@@ -1,4 +1,2 @@
 description = 
-param:data = 
-param:index = 
 param:vertices = 
