@@ -146,15 +146,15 @@ class Window
 		var _title = title + "\x00"
 		win = _glfwCreateWindow(w, h, &_title[0], nil, nil)
 		_glfwSetWindowUserPointer(win, &self)
-		_glfwSetKeyCallback(win, _on_key.code)
-		_glfwSetCursorPosCallback(win, _on_cursor.code)
-		_glfwSetMouseButtonCallback(win, _on_button.code)
+		#_glfwSetKeyCallback(win, _on_key.code)
+		#_glfwSetCursorPosCallback(win, _on_cursor.code)
+		#_glfwSetMouseButtonCallback(win, _on_button.code)
 	func __init__(ww: void*)
 		win = ww
 		_glfwSetWindowUserPointer(win, &self)
-		_glfwSetKeyCallback(win, _on_key.code)
-		_glfwSetCursorPosCallback(win, _on_cursor.code)
-		_glfwSetMouseButtonCallback(win, _on_button.code)
+		#_glfwSetKeyCallback(win, _on_key.code)
+		#_glfwSetCursorPosCallback(win, _on_cursor.code)
+		#_glfwSetMouseButtonCallback(win, _on_button.code)
 	func run()
 		while _glfwWindowShouldClose(win) == 0
 			_glfwPollEvents()
