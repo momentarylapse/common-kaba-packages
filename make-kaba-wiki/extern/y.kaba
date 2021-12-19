@@ -1,7 +1,36 @@
-use nix
 use os
 use net
 use kaba
+
+class Vertex
+	var p, n: vector
+	var u, v: float
+
+class VertexFx
+	pos: vector
+	col: color
+	u, v: float
+
+class FrameBuffer
+	var width, height: int
+	func extern __init__(att: Texture*[])
+	func extern depth_buffer() -> DepthBuffer*
+	func extern color_attachments() -> Texture*[]
+
+class Shader
+
+class Texture as shared
+	var width, height: int
+	func extern __init__(w: int, h: int, format: string)
+	func extern __delete__()
+	#func extern override
+
+class CubeMap extends Texture
+class DepthBuffer extends Texture
+
+class VertexBuffer
+	func extern __init__(format: string)
+	func extern update(vertices: @DynamicArray)
 
 class EngineData
 	var debug: bool
@@ -19,25 +48,45 @@ class EngineData
 	var time_scale: float
 	
 	var fps_min, fps_max: float
+	var resolution_scale: vec2
 	
 	var initial_world_file, second_world_file: Path
 	#Font* default_font
-	var renderer: RenderPath*
+	var renderer: Renderer*
+	var render_path: RenderPath*
+	var hdr_renderer: HDRRenderer*
+	var post_processor: PostProcessor*
 
 	func extern exit()
 
-class RenderPath
-	var depth_buffer: nix.DepthBuffer*
-	var cube_map: nix.CubeMap*
-	var fb_main, fb2, fb3, fb_small1, fb_small2: nix.FrameBuffer*
-	var shader_fx: nix.Shader*
+class Renderer
 
-	func extern virtual render_into_texture(fb: nix.FrameBuffer, cam: Camera, area: rect)
-	func extern render_into_cubemap(db: nix.DepthBuffer, cube: nix.CubeMap, pos: vector)
-	func extern next_fb(cur: nix.FrameBuffer) -> nix.FrameBuffer*
-	func extern process(source: nix.Texture*[], target: nix.FrameBuffer, shader: nix.Shader)
-	func extern add_post_processor(f: nix.FrameBuffer*->nix.FrameBuffer*)
-	func extern add_fx_injector(f: void->void)
+class RenderPath
+	enum Type
+		NONE
+		FORWARD
+		DEFERRED
+	var type: int
+	var depth_buffer: DepthBuffer*
+	var cube_map: CubeMap*
+	var fb_shadow, fb_shadow2: FrameBuffer*
+	var shader_fx: Shader*
+	var gbuffer: FrameBuffer*
+
+	#func extern virtual render_into_texture(fb: FrameBuffer, cam: Camera)
+	#func extern render_into_cubemap(db: DepthBuffer, cube: CubeMap, pos: vector)
+	func extern add_fx_injector(f: void->void, transparent: bool)
+	func extern draw_user_mesh(vb: VertexBuffer, s: Shader, m: matrix, tex: Texture*[], data: any)
+
+class HDRRenderer
+	var fb_main: FrameBuffer*
+	var fb_small1, fb_small2: FrameBuffer*
+
+class PostProcessor
+	var fb1, fb2: FrameBuffer*
+	func extern next_fb(cur: FrameBuffer) -> FrameBuffer*
+	func extern process(source: Texture*[], target: FrameBuffer, shader: Shader)
+	func extern add_stage(f: FrameBuffer*->FrameBuffer*)
 
 # always let the engine create/delete!
 class Component
@@ -65,6 +114,8 @@ class Entity
 class Entity3D extends Entity
 	var pos: vector
 	var ang: quaternion
+	var parent: Entity3D*
+	func extern get_matrix() -> matrix
 	
 	func selfref model() -> Model*
 		var m: Model* = get_component(Model)
@@ -122,8 +173,8 @@ class Material
 	var roughness: float
 	var metal: float
 	var emission: color
-	var textures: nix.Texture*[]
-	var shader: nix.Shader*
+	var textures: Texture*[]
+	var shader: Shader*
 	var cast_shadow: bool
 	func extern add_uniform(name: string, p: float*, size: int)
 	func extern static load(filename: Path) -> Material*
@@ -144,7 +195,7 @@ class Model extends Component3D
 		var bone_index: int[]
 		var vertex: vector[]
 		var sub: Sub[]
-	var matrix: matrix
+#	var matrix: matrix
 	var name: string
 	var radius: float
 	var min, max: vector
@@ -159,7 +210,7 @@ class Model extends Component3D
 	func extern make_editable()
 	func extern begin_edit(detail: int)
 	func extern end_edit(detail: int)
-	func extern update_matrix()
+#	func extern update_matrix()
 	
 	func extern get_vertex(index: int) -> vector
 
@@ -187,7 +238,6 @@ class TerrainCollider extends Collider
 	
 class Animator extends Component3D
 	func extern reset()
-	func extern begin_edit()
 	func extern add_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
 	func extern add(op: int, move: int, t: float*, dt: float, loop: bool) -> bool
 	func extern is_done(op_no: int) -> bool
@@ -200,14 +250,10 @@ class Animator extends Component3D
 		MOVE_OP_MIX_2_FACTOR  # w = w_old * a     + w_new * b
 
 class Skeleton extends Component3D
-	class Bone
-		var parent: int
-		var pos: vector
-		var model: Model*
-		var dmatrix: matrix
-		var cur_ang: quaternion
-		var cur_pos: vector
-	var bones: Bone[]
+	var bones: Entity3D[]
+	var pos0, dpos: vector[]
+	var parents: int[]
+	func extern reset()
 
 class Terrain extends Component3D
 	var pattern: vector
@@ -216,8 +262,6 @@ class Terrain extends Component3D
 	# ...
 
 class Light extends Component3D
-	var pos: vector
-	var ang: quaternion
 	var color: color
 	var radius: float
 	var theta: float
@@ -226,6 +270,8 @@ class Light extends Component3D
 	var allow_shadow: bool
 	var user_shadow_control: bool
 	var user_shadow_theta: float
+	var shadow_dist_min: float
+	var shadow_dist_max: float
 	func extern set_direction(dir: vector)
 
 #	class Spherical extends Light
@@ -242,16 +288,16 @@ class Particle extends Entity
 	var radius: float
 	var time_to_live: float
 	var suicidal: bool
-	var texture: nix.Texture*
+	var texture: Texture*
 	var color: color
 	var source: rect
 	var enabled: bool
-	func extern __init__(p: vector, r: float, t: nix.Texture, ttl: float)
+	func extern __init__(p: vector, r: float, t: Texture, ttl: float)
 	func extern override __delete__()
 
 class Beam extends Particle
 	var length: vector
-	func extern __init__(p: vector, l: vector, r: float, t: nix.Texture, ttl: float)
+	func extern __init__(p: vector, l: vector, r: float, t: Texture, ttl: float)
 
 class Fog
 	var color: color
@@ -375,7 +421,8 @@ class ui
 		var texture: Texture*
 		var blur: float
 		var angle: float
-		var shader: nix.Shader*
+		var shader: Shader*
+		var shader_data: any
 
 	class Text extends Picture
 		func extern __init__(t: string, font_size: float)
@@ -431,11 +478,19 @@ class ui
 	func extern static get_pad(index: int) -> shared Gamepad
 
 class PerformanceMonitor
-	class Average
-		var frame_time: float
-		var location: float[16]
-	var frames: int
-	var avg: Average
+	class Channel
+		var name: string
+		var parent: int
+		var average: float
+	var extern static channels: Channel[]
+	var extern static avg_frame_time: float
+	var extern static frames: int
+	#class Average
+	#	var frame_time: float
+	#	var location: float[16]
+	#var frames: int
+	#var avg: Average
+#var extern perf_mon: PerformanceMonitor*
 
 
 class NetworkManager
@@ -470,18 +525,18 @@ class audio
 	var volume_sounds: float
 
 class Scheduler
-	func static extern subscribe(dt: float, f: Function)
+	func static extern subscribe(dt: float, f: void->void)
 
 func extern load_model(filename: Path) -> Model*
-func extern load_shader(filename: Path) -> nix.Shader*
-func extern load_texture(filename: Path) -> nix.Texture*
+func extern load_shader(filename: Path) -> Shader*
+func extern create_shader(source: string) -> Shader*
+func extern load_texture(filename: Path) -> Texture*
 func extern get_controller(type: Class) -> Controller*
 func extern add_camera(pos: vector, ang: quaternion, r: rect) -> Camera*
 
 
-var extern tex_white: nix.Texture*
+var extern tex_white: Texture*
 var extern engine: EngineData
 var extern world: World
 var extern cam: Camera*
-var extern perf_mon: PerformanceMonitor*
 var extern network: NetworkManager
