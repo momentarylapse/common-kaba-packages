@@ -1,7 +1,6 @@
-description = 
-param:a = 
-param:b = 
-param:c = 
-param:f = 
-param:g = 
-param:p = 
+description = Get the bary centric coordinates of a point inside a triangle.\nThese fulfill <math> p = f \cdot a + g \cdot b + (1-f-g) \cdot c </math>.
+param:a = First point of the triangle. 
+param:b = Second point of the triangle.
+param:c = Third point of the triangle.
+param:p = The test point.
+return = The bary centric coordinates <math>(f,g)</math> of p.

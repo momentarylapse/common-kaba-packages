@@ -1,3 +1,3 @@
-description = 
-element:x = 
-element:y = 
+description = A 2d vector.
+element:x = .
+element:y = .

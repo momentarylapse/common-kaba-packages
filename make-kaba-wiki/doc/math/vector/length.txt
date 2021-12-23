@@ -1,2 +1,2 @@
-description = The length of the vector <math>\sqrt{x^2 + y^2 + z^2}</math>.
+description = The length of the vector <math>\\sqrt{x^2 + y^2 + z^2}</math>.
 return = The length.

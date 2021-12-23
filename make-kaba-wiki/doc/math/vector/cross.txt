@@ -1,4 +1,4 @@
-description = 
-param:v1 = 
-param:v2 = 
-return = 
+description = The cross product <math> v_1 \\times v_2 </math> of two vectors.\nThe result is orthogonal two both input vectors.
+param:v1 = The first vector.
+param:v2 = The second vector.
+return = The cross product <math> v_1 \\times v_2 = (y_1 \\cdot z_2 - z_1 \\cdot y_2, z_1 \\cdot x_2 - x_1 \\cdot z_2, x_1 \\cdot y_2 - y_1 \\cdot x_2) </math>.

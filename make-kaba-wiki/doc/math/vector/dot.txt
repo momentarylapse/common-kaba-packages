@@ -1,4 +1,4 @@
-description = The dot product of two vectors.\nThis is <math> \\|v_1\\| \\|v_2\\| \\cos \\gamma </math> with the angle <math>\\gamma</math> between the vectors.
+description = The dot product <math> \\langle v_1, v_2 \\rangle </math> of two vectors.\nThis is <math> \\|v_1\\| \\cdot \\|v_2\\| \\cdot \\cos \\gamma </math> with the angle <math>\\gamma</math> between the vectors.
 param:v1 = The first vector.
 param:v2 = The second vector.
-return = The dot product <math> x_1 x_2 + y_1 y_2 + z_1 z_2 </math>.
+return = The dot product <math> \\langle v_1, v_2 \\rangle = x_1 \\cdot x_2 + y_1 \\cdot y_2  + z_1 \\cdot z_2 </math>.

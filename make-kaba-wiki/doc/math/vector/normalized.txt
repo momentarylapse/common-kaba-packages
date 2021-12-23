@@ -1,2 +1,2 @@
-description = 
-return = 
+description = Returns a vector of unit length in the same direction.
+return = The normalized vector.
