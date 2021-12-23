@@ -164,7 +164,9 @@ func func_pre(f: Function) -> string
 	string pre
 	if f.is_static()
 		pre += "static "
-	if f.is_const()
+	if f.is_pure()
+		pre += "pure "
+	else if f.is_const()
 		pre += "const "
 	if f.is_selfref()
 		pre += "selfref "
@@ -300,7 +302,8 @@ func show_package(p: Script) -> string
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			wiki += "* <tt>func static '''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
+			var pre = func_pre(f)
+			wiki += "* <tt>func {{pre}}'''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
 	var vars = sorted(p.variables(), "name")
 	if len(vars) > 0
@@ -323,6 +326,7 @@ func make_reference() -> string
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
+	var packages = sorted(weak(kaba.packages), "name")
 	for p in packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default
@@ -488,7 +492,7 @@ func make_class(c: Class, ns: string)
 		make_class(cc, "{{ns}}.{{c.name}}")
 
 func make_package(p: Script)
-	wiki_upload("kaba." + p.name, show_package(p))
+	wiki_upload("kaba.{{p.name}}", show_package(p))
 
 	var classes = filter_classes(p.classes())
 	for c in classes
@@ -511,3 +515,4 @@ func main(arg: string[])
 			prepare("doc")
 	else
 		make_documentation()
+

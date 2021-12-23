@@ -1,3 +1,6 @@
 description = 
 element:bones = 
+element:dpos = 
 element:owner = 
+element:parents = 
+element:pos0 = 

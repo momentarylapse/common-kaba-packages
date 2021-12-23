@@ -12,6 +12,7 @@ element:height =
 element:margin = 
 element:pos = 
 element:shader = 
+element:shader_data = 
 element:source = 
 element:text = 
 element:texture = 
