@@ -6,7 +6,18 @@ then
 	echo "using kaba: $KABA"
 fi
 
+# clean-up if needed
 rm -rf *.txt
+rm -rf current
+
+
+# make current version
 $KABA make-kaba-wiki.kaba
+mkdir current
+mv *.txt current
+
 python upload.py
-rm -rf *.txt
+
+# save version
+rm -rf previous
+mv current previous

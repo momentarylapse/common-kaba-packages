@@ -1,7 +1,7 @@
 use kaba
 use os
 use time
-# use "@/mongo"
+# use "mongo"
 
 const SHIFT = "    "
 
@@ -349,9 +349,7 @@ func make_reference() -> string
 	return wiki
 
 func wiki_upload(name: string, wiki: string)
-	var f = Filesystem.create_text(name + ".txt")
-	f << wiki
-	del f
+	Filesystem.write_text(name + ".txt", wiki)
 
 func find_external()
 	var list = Filesystem.search("extern", "*.kaba", "f")
@@ -394,6 +392,8 @@ func parse_doc_string(s: string) -> string
 		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 	return ss.unescape()
 
+var report_missing = false
+
 func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	var p = Path("doc/" + ns.replace(".", "/"))
 	if is_class
@@ -404,7 +404,8 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	hui.Configuration conf
 	conf.load(p)
 	if conf[key] == ""
-		print("MISSING: {{ns}}.{{name}}:  {{key}}")
+		if report_missing
+			print("MISSING: {{ns}}.{{name}}:  {{key}}")
 		conf[key] = ""
 		conf.save(p)
 	else if conf[key] == "."
@@ -512,6 +513,7 @@ func main(arg: string[])
 	find_external_libs()
 	if len(arg) > 0
 		if arg[0] == "prepare"
+			report_missing = true
 			prepare("doc")
 	else
 		make_documentation()

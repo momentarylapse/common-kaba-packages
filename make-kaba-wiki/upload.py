@@ -11,6 +11,7 @@ def new_article(name, wiki):
 
 
 def upload(name, wiki):
+	print(name)
 	r = db.articles.find({'name':name})
 	try:
 		r = db.articles.update_one({'_id': r[0]['_id']}, {'$set': {'wiki': wiki}})
@@ -20,13 +21,27 @@ def upload(name, wiki):
 		article = new_article(name, wiki)
 		db.articles.insert_one(article)
 
+n = 0
+n_skip = 0
 
-for f in listdir("./"):
+for f in sorted(listdir("current")):
 	if f[-4:] == ".txt":
 		name = f[:-4]
-		print(name)
 
-		file = open(f, "r")
+		file = open("current/" + f, "r")
 		wiki = file.read()
 
-		upload(name, wiki)
+		wiki0 = ""
+		try:
+			file0 = open("previous/" + f, "r")
+			wiki0 = file0.read()
+		except:
+			pass
+
+		if wiki != wiki0:
+			upload(name, wiki)
+		else:
+			n_skip += 1
+		n += 1
+
+print(f"{n_skip} of {n} skipped")
