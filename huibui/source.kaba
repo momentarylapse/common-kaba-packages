@@ -81,7 +81,7 @@ class SourceSwapper extends SourceParser
 		if !changed
 			return
 		#print(">>>>>>>>>>>")
-		File* f = Filesystem.create(filename)
+		var f = Filesystem.create(filename)
 		f.write(source_new)
 		del f
 				

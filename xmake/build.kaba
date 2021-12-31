@@ -80,12 +80,12 @@ func build()
 	
 	if num_threads > 1
 
-		T*[] threads
+		var threads: T*[]
 		for i in 0:num_threads
 			threads.add(new T())
 	
 		for s,i in needs_building
-			T* t = nil
+			var t: T* = nil
 			if i < num_threads
 				#print("{{i}} -> direct")
 				t = new T()

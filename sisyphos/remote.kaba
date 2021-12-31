@@ -131,7 +131,7 @@ func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 	if !db.has_id(rf.id)
 		#string rel_name = sync.guess_dir(["parts"]) + rf.rel_name.replace("/", " - ")
 		try
-			LocalFile* lf = db.by_hash(rf.hash)
+			var lf = db.by_hash(rf.hash)
 			if len(lf.id) > 0
 				log_error("hash collision", "{{rel_path(lf.path)}}  <->  REMOTE...")
 			lf.id = rf.id
@@ -142,7 +142,7 @@ func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 			return
 		except
 			# new remote file
-			LocalFile ll = rf
+			var ll = rf
 			ll.path = root << ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.files.add(ll)
@@ -156,7 +156,7 @@ func remote_sync_by_filter(filter: string, quality: string, structure: string, d
 	var rfiles = remote_find(filter, quality)
 	for rf in rfiles
 		try
-			LocalFile *lf = db.find_by_id(rf.id)
+			var lf = db.find_by_id(rf.id)
 			sync_file(rf, lf)
 		except
 			sync_add_pure_remote(rf, dir, structure)

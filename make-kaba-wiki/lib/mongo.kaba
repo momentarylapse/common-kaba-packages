@@ -83,7 +83,7 @@ func json_to_bson(json: string) -> void*
 
 func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
-	char[0]* x = _bson_as_relaxed_extended_json(bson, nil)
+	var x: char[0]* = _bson_as_relaxed_extended_json(bson, nil)
 	string t = char_to_str(x)
 	_bson_free(x)
 	return t
@@ -97,9 +97,9 @@ func bson_iter_str_array(i: void*) -> string[]
 	string[] r
 	int[160] itarray
 	int length = 0
-	char* array
+	var array: char*
 	_bson_iter_array(i, &length, &array)
-	void* bson = _bson_new_from_data(array, length)
+	var bson = _bson_new_from_data(array, length)
 	_bson_iter_init(&itarray, bson)
 	while _bson_iter_next(&itarray)
 		r.add(bson_iter_str(&itarray))
@@ -121,15 +121,15 @@ func bson_iter_to_any(iter: void*) -> any
 		any r
 		int[160] itarray
 		int length = 0
-		char* array
+		var array: char*
 		_bson_iter_array(iter, &length, &array)
-		void* bson = _bson_new_from_data(array, length)
+		var bson = _bson_new_from_data(array, length)
 		_bson_iter_init(&itarray, bson)
 		while _bson_iter_next(&itarray)
 			r.add(bson_iter_to_any(&itarray))
 		return r
 	else if t == 7 # ID
-		void *oid = _bson_iter_oid(iter)
+		var oid = _bson_iter_oid(iter)
 		string s
 		s.resize(25)
 		_bson_oid_to_string(oid, &s[0])

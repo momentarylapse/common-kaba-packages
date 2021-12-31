@@ -6,7 +6,7 @@ use library
 
 func create_meson()
 	print("-- meson --")
-	File* f = Filesystem.create_text(conf.root << "../meson.build")
+	var f = Filesystem.create_text(conf.root << "../meson.build")
 	string debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
@@ -26,9 +26,9 @@ threaddep = dependency('threads')"
 	var vars = ["mdep", "threaddep"]
 	for l in conf.libs
 		var ll = lib.get(l)
-		string var = l + "dep"
-		vars.add(var)
-		f << var + " = dependency('{{ll.meson_libs()[0]}}')"
+		string varx = l + "dep"
+		vars.add(varx)
+		f << varx + " = dependency('{{ll.meson_libs()[0]}}')"
 		f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
 	f << "deps = " + str(vars).replace("\"", "")
 	

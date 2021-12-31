@@ -51,7 +51,7 @@ class Language
 		texts.add(t)
 		
 	func save()
-		File* f = Filesystem.create_text(filename)
+		var f = Filesystem.create_text(filename)
 		f << "# Language"
 		f << name
 		f << "# Num IDs"
@@ -94,7 +94,8 @@ func load_prelang(filename: Path) -> Language
 	Language l
 	l.filename = filename
 	#try
-		File* f = Filesystem.open_text(filename)
+	if true
+		var f = Filesystem.open_text(filename)
 		string t
 		int n
 		f >> t
@@ -174,7 +175,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
 	int nerrors = 0
 	
-	File *f
+	var f: File*
 	if create_file
 		f = Filesystem.create_text(conf.dir << "TRANS")
 	

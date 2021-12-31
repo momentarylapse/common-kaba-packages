@@ -204,7 +204,7 @@ func show_class(ns: string, c: Class) -> string
 			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param[0].name}}\n"
 		for f in ops
 			string pre = func_pre(f)
-			Class* p = nil
+			var p: Class* = nil
 			if f.is_static()
 				if f.num_params >= 2
 					p = f.param_type[1]

@@ -147,7 +147,7 @@ func swap_translate_guis(l: Language)
 		print(r.str(0))
 		swap_translate_gui(r, l, r.id)
 		print(r.str(0))
-		File* f = Filesystem.create(resource_files[i])
+		var f = Filesystem.create(resource_files[i])
 		f.write(r.str(0))
 		del f
 
@@ -159,7 +159,7 @@ func action_swap(arg: string[])
 	
 	var own = load_own_lang(true)
 	
-	Language l = load_prelang(source)
+	var l = load_prelang(source)
 	if !check_lang(l, own, true)
 		print("ERROR: missing translations")
 		return

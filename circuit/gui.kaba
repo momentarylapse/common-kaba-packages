@@ -127,5 +127,5 @@ Toolbar toolbar ''
 		panel.redraw()
 
 func main(arg: string[])
-	hui.Window* w = new CircuitEditor(arg)
+	var w = new CircuitEditor(arg)
 	w.run()

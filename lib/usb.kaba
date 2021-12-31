@@ -158,7 +158,7 @@ class Device
 		CHECK(n, "can not get port numbers")
 		return [for ch in s[:n] int(ch)]
 	func get_config_desc(index: int)
-		_config_descriptor* desc
+		var desc: _config_descriptor*
 		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
 		#let b = binary(desc, 36).hex()
 		#print(b)
@@ -197,8 +197,8 @@ class Context
 	func __delete__()
 		_libusb_exit(c)
 	func enumerate() -> Device*[]
-		Device*[] r
-		_device*[0]* list
+		var r: Device*[]
+		var list: _device*[0]*
 		int n = _libusb_get_device_list(c, &list)
 		for i in 0:n
 			var dev = new Device(list[i])

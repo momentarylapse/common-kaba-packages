@@ -38,7 +38,7 @@ func write_language(f: File*, l: Language)
 		f << t.trans.escape()
 
 func export_resources(res: Resource[], own: Language, langs: Language[])
-	File *f = Filesystem.create_text(conf.export_dir << "hui_resources.txt")
+	var f = Filesystem.create_text(conf.export_dir << "hui_resources.txt")
 	f << "t7"
 	f << "# Number Of Resources"
 	f << len(res)

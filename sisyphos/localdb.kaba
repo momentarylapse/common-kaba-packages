@@ -356,7 +356,7 @@ class LocalFileDB
 
 	func save()
 		make_all_dirs(hui.app_directory << "sisyphos")
-		File *f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
+		var f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
 		f << "version=1"
 		f << len(files)
 		for ff in files

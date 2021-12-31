@@ -181,23 +181,23 @@ class DynamicValue
 				s = new DynamicValueState()
 	func setBool(b: bool)
 		setType(TYPE_BOOL)
-		DynamicValueStateBool *sb = s
+		var sb: DynamicValueStateBool* = s
 		sb.v = b
 	func setInt(i: int)
 		setType(TYPE_INT)
-		DynamicValueStateInt *si = s
+		var si: DynamicValueStateInt* = s
 		si.v = i
 	func setFloat(f: float)
 		setType(TYPE_FLOAT)
-		DynamicValueStateFloat *sf = s
+		var sf: DynamicValueStateFloat* = s
 		sf.v = f
 	func setString(_s: string)
 		setType(TYPE_STRING)
-		DynamicValueStateString *ss = s
+		var ss: DynamicValueStateString* = s
 		ss.v = _s
 	func setFunction(f: Function)
 		setType(TYPE_FUNCTION)
-		DynamicValueStateFunction *sf = s
+		var sf: DynamicValueStateFunction* = s
 		sf._func = &f
 	func __assign__(b: DynamicValue)
 		if b.type == TYPE_BOOL
@@ -210,17 +210,17 @@ class DynamicValue
 			setString(str(b))
 		else if b.type == TYPE_ARRAY
 			setType(TYPE_ARRAY)
-			DynamicValueStateArray* ba = b.s
+			var ba: DynamicValueStateArray* = b.s
 			for el in ba.a
 				s.add(el)
 		else if b.type == TYPE_DICT
 			setType(TYPE_DICT)
-			DynamicValueStateDict* bd = b.s
-			DynamicValueStateDict* ad = s
+			var bd: DynamicValueStateDict* = b.s
+			var ad: DynamicValueStateDict* = s
 			for el,i in bd.values
 				ad.add(bd.keys[i], el)
 		else if b.type == TYPE_FUNCTION
-			DynamicValueStateFunction* bf = b.s
+			var bf: DynamicValueStateFunction* = b.s
 			setFunction(bf._func)
 
 	func __iadd__(b: DynamicValue)
@@ -239,13 +239,13 @@ class DynamicValue
 				setString(str(s) + str(b))
 		else if b.type == TYPE_ARRAY
 			if type == TYPE_ARRAY
-				DynamicValueStateArray* ba = b.s
+				var ba: DynamicValueStateArray* = b.s
 				for el in ba.a
 					s.add(el)
 		else if b.type == TYPE_DICT
 			if type == TYPE_DICT
-				DynamicValueStateDict* bd = b.s
-				DynamicValueStateDict* ad = s
+				var bd: DynamicValueStateDict* = b.s
+				var ad: DynamicValueStateDict* = s
 				for el,i in bd.values
 					ad.add(bd.keys[i], el)
 
@@ -408,7 +408,7 @@ class DynamicValueStateArray extends DynamicValueState
 	func override get_element(i: DynamicValue) -> DynamicValue*
 		if i.type != TYPE_INT
 			return nil
-		DynamicValueStateInt* ii = i.s
+		var ii: DynamicValueStateInt* = i.s
 		if ii.v < 0 or ii.v >= len(a)
 			return nil
 		return a[ii.v]
@@ -569,16 +569,16 @@ class FunctionLen extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		if len(p) > 0
 			if p[0].v.type == TYPE_ARRAY
-				DynamicValueStateArray* a = p[0].v.s
+				var a: DynamicValueStateArray* = p[0].v.s
 				r.v.setInt(len(a.a))
 			if p[0].v.type == TYPE_DICT
-				DynamicValueStateDict* a = p[0].v.s
+				var a: DynamicValueStateDict* = p[0].v.s
 				r.v.setInt(len(a.values))
 
 class FunctionRange extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		r.v.setType(TYPE_ARRAY)
-		DynamicValueStateArray* a = r.v.s
+		var a: DynamicValueStateArray* = r.v.s
 		int start = 0
 		int end = 0
 		int step = 1
@@ -623,9 +623,9 @@ class FunctionMap extends FunctionInternal
 		if len(p) >= 2
 			if p[0].v.type == TYPE_FUNCTION and p[1].v.type == TYPE_ARRAY
 				r.v.setType(TYPE_ARRAY)
-				DynamicValueStateFunction *f = p[0].v.s
-				DynamicValueStateArray *pa = p[1].v.s
-				DynamicValueStateArray *ra = r.v.s
+				var f: DynamicValueStateFunction* = p[0].v.s
+				var pa: DynamicValueStateArray* = p[1].v.s
+				var ra: DynamicValueStateArray* = r.v.s
 				for e in pa.a
 					Variable temp
 					Variable temp2
@@ -656,14 +656,14 @@ enum
 class SyntaxNode
 	var type: int
 	var params: SyntaxNode*[]
-	func virtual str() -> string
+	func virtual tostr() -> string
 		return "???"
 	func virtual showPost(indent: int)
 	func show(indent: int)
 		string s
 		for i in 0:indent
 			s += "    "
-		print(s + str())
+		print(s + tostr())
 		for p in params
 			p.show(indent + 1)
 		showPost(indent)
@@ -674,7 +674,7 @@ class SyntaxNodeVariable extends SyntaxNode
 	func __init__(_name: string)
 		name = _name
 		type = TYPE_VARIABLE
-	func override str() -> string
+	func override tostr() -> string
 		return "variable " + name
 
 class SyntaxNodeConst extends SyntaxNode
@@ -682,7 +682,7 @@ class SyntaxNodeConst extends SyntaxNode
 	func __init__(_v: Variable*)
 		v = _v
 		type = TYPE_CONST
-	func override str() -> string
+	func override tostr() -> string
 		return "const " + v.v.render()
 
 class SyntaxNodeOperator extends SyntaxNode
@@ -690,7 +690,7 @@ class SyntaxNodeOperator extends SyntaxNode
 	func __init__(_op: string)
 		op = _op
 		type = TYPE_OPERATOR
-	func override str() -> string
+	func override tostr() -> string
 		return "operator " + op
 	func rank() -> int
 		if op == "*"
@@ -711,13 +711,13 @@ class SyntaxNodeCall extends SyntaxNode
 	func __init__(_name: string)
 		name = _name
 		type = TYPE_CALL
-	func override str() -> string
+	func override tostr() -> string
 		return "call " + name
 
 class SyntaxNodeBlock extends SyntaxNode
 	func override __init__()
 		type = TYPE_BLOCK
-	func override str() -> string
+	func override tostr() -> string
 		return "block"
 
 class SyntaxNodeIf extends SyntaxNode
@@ -725,7 +725,7 @@ class SyntaxNodeIf extends SyntaxNode
 	var block_else: SyntaxNode* = nil
 	func override __init__()
 		type = TYPE_IF
-	func override str() -> string
+	func override tostr() -> string
 		return "if"
 	func override showPost(indent: int)
 		block.show(indent+1)
@@ -737,7 +737,7 @@ class SyntaxNodeWhile extends SyntaxNode
 	var block_else: SyntaxNode* = nil
 	func override __init__()
 		type = TYPE_WHILE
-	func override str() -> string
+	func override tostr() -> string
 		return "while"
 	func override showPost(indent: int)
 		block.show(indent+1)
@@ -749,7 +749,7 @@ class SyntaxNodeFor extends SyntaxNode
 	var block_else: SyntaxNode* = nil
 	func override __init__()
 		type = TYPE_FOR
-	func override str() -> string
+	func override tostr() -> string
 		return "for"
 	func override showPost(indent: int)
 		block.show(indent+1)
@@ -760,37 +760,37 @@ class SyntaxNodeFor extends SyntaxNode
 class SyntaxNodeReturn extends SyntaxNode
 	func override __init__()
 		type = TYPE_RETURN
-	func override str() -> string
+	func override tostr() -> string
 		return "return"
 
 class SyntaxNodeBreak extends SyntaxNode
 	func override __init__()
 		type = TYPE_BREAK
-	func override str() -> string
+	func override tostr() -> string
 		return "break"
 
 class SyntaxNodeContinue extends SyntaxNode
 	func override __init__()
 		type = TYPE_CONTINUE
-	func override str() -> string
+	func override tostr() -> string
 		return "continue"
 
 class SyntaxNodeArrayBuilder extends SyntaxNode
 	func override __init__()
 		type = TYPE_ARRAY_BUILDER
-	func override str() -> string
+	func override tostr() -> string
 		return "new []"
 
 class SyntaxNodeDictBuilder extends SyntaxNode
 	func override __init__()
 		type = TYPE_DICT_BUILDER
-	func override str() -> string
+	func override tostr() -> string
 		return "new {}"
 
 class SyntaxNodeArrayElement extends SyntaxNode
 	func override __init__()
 		type = TYPE_ARRAY_ELEMENT
-	func override str() -> string
+	func override tostr() -> string
 		return "[]"
 
 class SyntaxError extends Exception
@@ -843,49 +843,49 @@ class SyntaxTree
 		raise(new SyntaxError("Syntax error: {{msg}}\n{{c}}"))
 	
 	func addGlobalVar(name: string) -> Variable*
-		Variable* v = new Variable(name)
+		var v = new Variable(name)
 		vars.add(v)
 		return v
 	func addConst() -> Variable*
-		Variable* c = new Variable("")
+		var c = new Variable("")
 		c.writable = false
 		consts.add(c)
 		return c
 	func addConstNumber(s: string) -> Variable*
-		Variable* c = addConst()
+		var c: Variable* = addConst()
 		if s.find(".", 0) >= 0
 			c.v.setFloat(float(s))
 		else
 			c.v.setInt(int(s))
 		return c
 	func addConstString(s: string) -> Variable*
-		Variable* c = addConst()
+		var c: Variable* = addConst()
 		c.v.setString(s)
 		return c
 	func addFunc(name: string) -> Function*
-		Function* f = new Function(name)
-		Variable* v = addGlobalVar(name)
+		var f: Function* = new Function(name)
+		var v: Variable* = addGlobalVar(name)
 		v.v.setFunction(f)
 		funcs.add(f)
 		return f
 	func add_internal_func(name: string, out f: Function*)
 		f.name = name
-		Variable* v = addGlobalVar(name)
+		var v: Variable* = addGlobalVar(name)
 		internal_funcs.add(f)
 		v.v.setFunction(f)
 		
 	func getNuclearOperand() -> SyntaxNode*
 		if isNumber(cur[0])
-			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstNumber(cur))
+			var sn: SyntaxNodeVariable* = new SyntaxNodeConst(addConstNumber(cur))
 			next()
 			return sn
 		if cur[0] == '"' or cur[0] == 0x27 # " or '
-			SyntaxNodeVariable* sn = new SyntaxNodeConst(addConstString(unescape(cur)))
+			var sn: SyntaxNodeVariable* = new SyntaxNodeConst(addConstString(unescape(cur)))
 			next()
 			return sn
 		if isOperator(cur[0])
 			setError("variable name expected")
-		SyntaxNodeVariable* sn = new SyntaxNodeVariable(cur)
+		var sn: SyntaxNodeVariable* = new SyntaxNodeVariable(cur)
 		if cur_word == 0
 			if peek() == "="
 				sn.allow_create = true
@@ -894,11 +894,11 @@ class SyntaxTree
 	func getOperator() -> SyntaxNode*
 		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
 			setError("operator expected")
-		SyntaxNode* sn = new SyntaxNodeOperator(cur)
+		var sn: SyntaxNode* = new SyntaxNodeOperator(cur)
 		next()
 		return sn
 	func getOperandFunc() -> SyntaxNode*
-		SyntaxNode* sn = new SyntaxNodeCall(cur)
+		var sn: SyntaxNode* = new SyntaxNodeCall(cur)
 		next() # name
 		if cur != "("
 			setError("( after function name expected")
@@ -906,7 +906,7 @@ class SyntaxTree
 		if cur == ")"
 			return sn
 		while true
-			SyntaxNode *param = getOperandGreedy()
+			var param: SyntaxNode* = getOperandGreedy()
 			sn.params.add(param)
 			if cur != "," and cur != ")"
 				setError(", or ) after parameter expexted")
@@ -920,7 +920,7 @@ class SyntaxTree
 		var sn = new SyntaxNodeArrayBuilder()
 		next() # "["
 		while cur != "]"
-			SyntaxNode *sub = getOperandGreedy()
+			var sub: SyntaxNode* = getOperandGreedy()
 			sn.params.add(sub)
 			if cur != "," and cur != "]"
 				setError(", or ] expected")
@@ -932,12 +932,12 @@ class SyntaxTree
 		var sn = new SyntaxNodeDictBuilder()
 		next() # "{"
 		while cur != "}"
-			SyntaxNode *key = getOperandGreedy()
+			var key: SyntaxNode* = getOperandGreedy()
 			sn.params.add(key)
 			if cur != ":"
 				setError(": expected")
 			next() # ":"
-			SyntaxNode *val = getOperandGreedy()
+			var val: SyntaxNode* = getOperandGreedy()
 			sn.params.add(val)
 			if cur != "," and cur != "}"
 				setError(", or } expected")
@@ -950,7 +950,7 @@ class SyntaxTree
 			var el = new SyntaxNodeArrayElement()
 			el.params.add(sn)
 			next() # "["
-			SyntaxNode* index = getOperandGreedy()
+			var index: SyntaxNode* = getOperandGreedy()
 			el.params.add(index)
 			if cur != "]"
 				setError("] expected")
@@ -962,7 +962,7 @@ class SyntaxTree
 		# bracket?
 		if cur == "("
 			next()
-			SyntaxNode *sn = getOperandGreedy()
+			var sn: SyntaxNode* = getOperandGreedy()
 			if cur != ")"
 				setError(") expected")
 			next() # ")"
@@ -981,13 +981,13 @@ class SyntaxTree
 			return checkOperandExtensions(getOperandFunc())
 		
 		# basic
-		SyntaxNode* sn = getNuclearOperand()
+		var sn: SyntaxNode* = getNuclearOperand()
 		return checkOperandExtensions(sn)
 	
 	
 	# sequence of [operand operator operand ...]
 	func getOperandGreedy() -> SyntaxNode*
-		SyntaxNode*[] sn
+		var sn: SyntaxNode*[]
 		sn.add(getOperand())
 		while !endOfLine()
 			if cur == "," or cur == ")" or cur == "]" or cur == "}" or cur == ":"
@@ -998,7 +998,7 @@ class SyntaxTree
 	func linkOperators(out sn: SyntaxNode*[]) -> SyntaxNode*
 		int[] rank
 		for i in 0:(len(sn)-1)/2
-			SyntaxNodeOperator *op = sn[i*2+1]
+			var op: SyntaxNodeOperator* = sn[i*2+1]
 			rank.add(op.rank())
 		while len(sn) > 2
 			int rmin = 100
@@ -1041,7 +1041,7 @@ class SyntaxTree
 		return sn
 	func getSpecialCommandWhile() -> SyntaxNode*
 		int indent0 = cur_line.indent
-		SyntaxNodeWhile *sn = new SyntaxNodeWhile()
+		var sn: SyntaxNodeWhile* = new SyntaxNodeWhile()
 		next() # "while"
 		sn.params.add(getOperandGreedy())
 		sn.block = parseBlock()
@@ -1055,12 +1055,12 @@ class SyntaxTree
 		return sn
 	func getSpecialCommandFor() -> SyntaxNode*
 		int indent0 = cur_line.indent
-		SyntaxNodeFor *sn = new SyntaxNodeFor()
+		var sn = new SyntaxNodeFor()
 		next() # "for"
-		SyntaxNodeVariable* var = new SyntaxNodeVariable(cur)
+		var vvv = new SyntaxNodeVariable(cur)
 		next()
-		var.allow_create = true
-		sn.params.add(var)
+		vvv.allow_create = true
+		sn.params.add(vvv)
 		if cur != "in"
 			setError("in extected")
 		next()
@@ -1075,16 +1075,14 @@ class SyntaxTree
 		sn.block_else = parseBlock()
 		return sn
 	func getSpecialCommandBreak() -> SyntaxNode*
-		SyntaxNodeBreak *sn = new SyntaxNodeBreak()
-		return sn
+		return new SyntaxNodeBreak()
 	func getSpecialCommandContinue() -> SyntaxNode*
-		SyntaxNodeContinue *sn = new SyntaxNodeContinue()
-		return sn
+		return new SyntaxNodeContinue()
 	func parseFunctionDef()
-		Function* prev_func = cur_func
+		var prev_func = cur_func
 		int indent0 = cur_line.indent
 		next()
-		Function *f = addFunc(cur)
+		var f = addFunc(cur)
 		cur_func = f
 		next()
 		if cur != "("
@@ -1121,15 +1119,15 @@ class SyntaxTree
 		if cur == "def"
 			parseFunctionDef()
 			return nil
-		SyntaxNode *sn = getOperandGreedy()
+		var sn = getOperandGreedy()
 		if !endOfLine()
 			setError("end of line expected")
 		return sn
 	func parseBlock() -> SyntaxNode*
-		SyntaxNodeBlock *sn = new SyntaxNodeBlock()
+		var sn = new SyntaxNodeBlock()
 		nextLine()
 		int indent0 = cur_line.indent
-		SyntaxNode *sub = parseLine()
+		var sub = parseLine()
 		if sub
 			sn.params.add(sub)
 		while !endOfFile()
@@ -1151,7 +1149,7 @@ class SyntaxTree
 		
 		func_main = addFunc("main")
 		
-		Variable* v = addGlobalVar("true")
+		var v = addGlobalVar("true")
 		v.v.setBool(true)
 		v.writable = false
 		v = addGlobalVar("false")
@@ -1241,14 +1239,14 @@ class Interpreter
 		if n > 0
 			cur_context = contexts[n - 1]
 	func doNode(sn: SyntaxNode, out ret: Variable)
-		Variable*[] params
+		var params: Variable*[]
 		bool[] is_temp
 		
 		# parameters
 		for p in sn.params
 			if p.type == TYPE_VARIABLE
-				SyntaxNodeVariable *vv = p
-				Variable* v = cur_context.get(vv.name)
+				var vv: SyntaxNodeVariable* = p
+				var v = cur_context.get(vv.name)
 				if !v
 					if vv.allow_create
 						v = new Variable(vv.name)
@@ -1258,11 +1256,11 @@ class Interpreter
 				params.add(v)
 				is_temp.add(false)
 			else if p.type == TYPE_CONST
-				SyntaxNodeConst *vv = p
+				var vv: SyntaxNodeConst* = p
 				params.add(vv.v)
 				is_temp.add(false)
 			else
-				Variable *temp = new Variable()
+				var temp = new Variable()
 				doNode(p, temp)
 				params.add(temp)
 				is_temp.add(true)
@@ -1272,7 +1270,7 @@ class Interpreter
 		
 		# execute
 		if sn.type == TYPE_OPERATOR
-			SyntaxNodeOperator *op = &sn
+			var op: SyntaxNodeOperator* = &sn
 			if op.op == "="
 				*params[0].v = *params[1].v
 			else if op.op == "+"
@@ -1314,14 +1312,14 @@ class Interpreter
 			else
 				setError("unhandled operator: {{op.op}}")
 		else if sn.type == TYPE_CALL
-			SyntaxNodeCall *call = &sn
-			Variable* v = cur_context.get(call.name)
+			var call: SyntaxNodeCall* = &sn
+			var v = cur_context.get(call.name)
 			if !v
 				setError("function not found: {{call.name}}")
 			if v.v.type != TYPE_FUNCTION
 				setError("is not a function: {{call.name}}")
-			DynamicValueStateFunction* fs = v.v.s
-			Function *f = fs._func
+			var fs: DynamicValueStateFunction* = v.v.s
+			var f: Function* = fs._func
 			stack_push(f, ret)
 			f.call(self, ret, params)
 			#if f.block
@@ -1333,13 +1331,13 @@ class Interpreter
 				
 		else if sn.type == TYPE_IF
 			Variable dummy
-			SyntaxNodeIf *_if = &sn
+			var _if: SyntaxNodeIf* = &sn
 			if bool(params[0].v)
 				doNode(_if.block, dummy)
 			else if _if.block_else
 				doNode(_if.block_else, dummy)
 		else if sn.type == TYPE_WHILE
-			SyntaxNodeWhile *_while = &sn
+			var _while: SyntaxNodeWhile* = &sn
 			while bool(params[0].v)
 				cur_context.flag_continue = false
 				Variable dummy
@@ -1355,8 +1353,8 @@ class Interpreter
 		else if sn.type == TYPE_FOR
 			if params[1].v.type != TYPE_ARRAY
 				setError("for needs array")
-			DynamicValueStateArray* a = params[1].v.s
-			SyntaxNodeFor *_for = &sn
+			var a: DynamicValueStateArray* = params[1].v.s
+			var _for: SyntaxNodeFor* = &sn
 			for el in a.a
 				params[0].setReference(el)
 				cur_context.flag_continue = false
@@ -1384,12 +1382,12 @@ class Interpreter
 				ret.v.add(c.v)
 		else if sn.type == TYPE_DICT_BUILDER
 			ret.setType(TYPE_DICT)
-			DynamicValueStateDict *ds = ret.v.s
+			var ds: DynamicValueStateDict* = ret.v.s
 			int n = len(params) / 2
 			for i in 0:n
 				ds.add(params[0].v, params[1].v)
 		else if sn.type == TYPE_ARRAY_ELEMENT
-			DynamicValue *dv = params[0].v.get_element(params[1].v)
+			var dv: DynamicValue* = params[0].v.get_element(params[1].v)
 			if dv
 				ret.setReference(dv)
 		else

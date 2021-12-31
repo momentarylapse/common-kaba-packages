@@ -95,13 +95,13 @@ class Window
 	func getch() -> int
 		return _wgetch(w)
 
-class Attr
-	const NORMAL = 0
-	const COLOR = 0x0000ff00
-	const REVERSE = 1<<(10+8)
-	const UNDERLINE = 1<<(10+9)
-	const BLINK = 1<<(11+8)
-	const BOLD = 1<<(13+8)
+enum Attr
+	NORMAL = 0
+	COLOR = 0x0000ff00
+	REVERSE = 1<<(10+8)
+	UNDERLINE = 1<<(10+9)
+	BLINK = 1<<(11+8)
+	BOLD = 1<<(13+8)
 
 class Color
 	enum
@@ -116,14 +116,13 @@ class Color
 	func static pair(n: int) -> int
 		return (n<<8) & Attr.COLOR
 
-class Key
-	enum
-		DOWN = 258
-		UP = 259
-		LEFT = 260
-		RIGHT = 261
-		MOUSE = 409
-		RESIZE = 410
+enum Key
+	DOWN = 258
+	UP = 259
+	LEFT = 260
+	RIGHT = 261
+	MOUSE = 409
+	RESIZE = 410
 
 var stdwin: Window
 
