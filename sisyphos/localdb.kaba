@@ -414,8 +414,8 @@ class LocalFileDB
 #		raise(new Exception("not in db: hash=" + hash))
 		
 	func selfref find_by_tags(filter: string) -> LocalFile*[]
-		Tag[] tags = str2tags(filter)
-		LocalFile*[] list
+		var tags = str2tags(filter)
+		var list: LocalFile*[]
 		for f in files
 			if f.match(tags)
 				list.add(&f)
@@ -423,7 +423,7 @@ class LocalFileDB
 
 	func selfref get_in_dir(dir: Path, recursive: bool) -> LocalFile*[]
 			
-		LocalFile*[] list
+		var list: LocalFile*[]
 		if recursive
 			for f in files
 				if f.path in dir
@@ -445,7 +445,7 @@ class LocalFileDB
 	func selfref get(path: Path, rec: bool) -> LocalFile*[]
 		if Filesystem.is_directory(path)
 			return get_in_dir(path, rec)
-		LocalFile*[] files
+		var files: LocalFile*[]
 		try
 			files.add(find_by_path(path))
 		except
@@ -469,6 +469,11 @@ class LocalFileDB
 		print("optimizing...")
 		files = sorted(files, "path")
 		dirty = true
+	
+	func manual_init()
+		print("initializing")
+		save()
+		conf.save()
 	
 var db: LocalFileDB
 

@@ -57,6 +57,7 @@ func main(arg: string[])
 	p.cmd("remote tag list", "<KEY>", "list all values of a tag key", action_remote_tag_list)
 #	p.cmd("remote add", "<FILTER> <DIR>", "???", action_remote_add)
 
+	p.cmd("db init", "", "init", lambda(_arg: string[]) db.manual_init())
 	p.cmd("db check", "", "self test", lambda(_arg: string[]) db.self_check())
 	p.cmd("db rehash", "", "rebuild hashes", lambda(_arg: string[]) db.rehash())
 	p.cmd("db optimize", "", "", lambda(_arg: string[]) db.optimize())
