@@ -81,9 +81,9 @@ class Config
 #			else if k == "linker-flags"
 #				flags_linker = c[k]
 			else if k == "build.libraries"
-				libs = c[k].explode(",")
-			else if k == "build.libraries-optional"
-				libs_optional = c[k].explode(",")
+				parse_libs(c[k], libs, libs_optional)
+			#else if k == "build.libraries-optional"
+			#	libs_optional = c[k].explode(",")
 			else if k == "install.source"
 				install_source = c[k]
 			else if k == "install.icons"
@@ -94,9 +94,9 @@ class Config
 				mime_files = c[k].explode(",")
 			else if k == "install.additional"
 				installs_additional = c[k].explode(",")
-			else if k[:8] == "profile-"
+			else if k[:14] == "build.profile-"
 				Profile p
-				p.name = k[8:]
+				p.name = k[14:]
 				p.libs_optional = c[k].explode(",")
 				profiles.add(p)
 			else if k == "build.system"
@@ -143,6 +143,13 @@ class Config
 		return false
 
 var conf: Config
+
+func parse_libs(s: string, out libs: string[], out libs_opt: string[])
+	for x in s.explode(",")
+		if x[-1:] == "?"
+			libs_opt.add(x[:-1])
+		else
+			libs.add(x)
 
 class SourceFile
 	var filename: Path
