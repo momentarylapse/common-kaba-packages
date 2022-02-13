@@ -4,7 +4,7 @@ use library
 
 func create_cmake()
 	
-	print("-- meson --")
+	print("-- cmake --")
 	
 	bool debug = conf.build_type == "debug"
 	
@@ -22,8 +22,8 @@ func create_cmake()
 		f << "	{{rel(s.filename)}}"
 	f << ")"
 	
-	
-	f << "find_package(PkgConfig REQUIRED)"
+	f << "
+find_package(PkgConfig REQUIRED)"
 	
 	
 #	find_package(OpenGL REQUIRED)
@@ -37,30 +37,66 @@ func create_cmake()
 
 
 	
-	var deps: string[]
+	#var deps: string[]
 	for l in conf.libs
 		var ll = lib.get(l)
 		var varx = l.upper()
-		deps.add("{{varx}}_LIBRARIES")
-		f << "
+		#deps.add("{{varx}}_LIBRARIES")
+		if len(ll.pkg) > 0
+			f << "
 # {{l}} mandatory
 pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
 include_directories(${"+varx+"_INCLUDE_DIRS})
 link_directories(${"+varx+"_LIBRARY_DIRS})
+list(APPEND DEPS ${"+varx+"_LIBRARIES})
 add_definitions(${"+varx+"_CFLAGS_OTHER})
 add_compile_definitions({{ll.define()}}=1)"
+		else
+			print("ERROR: no pkg for {{l}}")
 
 
-
-
-
+	for l in conf.libs_optional
+		var ll = lib.get(l)
+		var varx = l.upper()
+		#deps.add("{{varx}}_LIBRARIES")
+		if len(ll.pkg) > 0
+			f << "
+# {{l}} (optional)
+pkg_check_modules({{varx}} {{ll.pkg[0]}})
+if({{varx}}_FOUND)
+	include_directories(${"+varx+"_INCLUDE_DIRS})
+	link_directories(${"+varx+"_LIBRARY_DIRS})
+	list(APPEND DEPS ${"+varx+"_LIBRARIES})
+	add_definitions(${"+varx+"_CFLAGS_OTHER})
+	add_compile_definitions({{ll.define()}}=1)
+else()
+	add_compile_definitions({{ll.define()}}=0)
+endif()"
+		else if len(ll.cmake) > 0
+			var cn = ll.cmake[0]
+			f << "
+# {{l}} (optional)
+find_package({{cn}})
+if({{cn}}_FOUND)
+	include_directories(${"+cn+"_INCLUDE_DIRS})
+	link_directories(${"+cn+"_LIBRARY_DIRS})
+	add_definitions(${"+cn+"_DEFINITIONS})
+	list(APPEND DEPS ${"+cn+"_LIBRARIES})
+	add_compile_definitions({{ll.define()}}=1)
+else()
+	add_compile_definitions({{ll.define()}}=0)
+#endif()"
+		else
+			print("WARNING: lib {{l}} not in cmake")
 
 	
 	f << "
 add_executable({{conf.binary_file}} ${SOURCE})"
 	
 	f << "
-target_link_libraries({{conf.binary_file}} " + [for x in deps "${"+x+"}"].join(" ") + ")"
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
 
 
 	f << "

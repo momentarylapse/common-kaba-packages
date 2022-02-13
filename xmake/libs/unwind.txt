@@ -1,3 +1,4 @@
 link = unwind
 include = unwind.h
+pkg = libunwind
 

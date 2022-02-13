@@ -8,6 +8,7 @@ class Library
 	var pkg: string[]
 	var vcpkg: string[]
 	var meson: string[]
+	var cmake: string[]
 	var includes: string[]
 	var dir_override: string
 	var flags: string
@@ -60,6 +61,8 @@ class LibraryManager
 				l.pkg = c["pkg"].explode(",")
 			if len(c["meson"]) > 0
 				l.meson = c["meson"].explode(",")
+			if len(c["cmake"]) > 0
+				l.cmake = c["cmake"].explode(",")
 			if len(c["vcpkg"]) > 0
 				l.vcpkg = c["vcpkg"].explode(",")
 			if len(c["flags"]) > 0
