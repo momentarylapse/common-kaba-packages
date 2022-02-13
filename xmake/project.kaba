@@ -27,7 +27,8 @@ class Config
 	var force_profile: string
 	
 	var name: string
-	var binary_file: string
+	var binary_file: Path
+	var source_dir: Path
 	var main_file: string
 	var libs: string[]
 	var libs_optional: string[]
@@ -42,7 +43,8 @@ class Config
 	var icons: string[]
 	var desktop_file: string
 	var mime_files: string[]
-	var installs: string[]
+	var install_source: Path
+	var installs_additional: string[]
 	var outputs = ["make"]
 	
 	func ignored(l: string) -> bool
@@ -56,74 +58,81 @@ class Config
 			raise(new Exception("no xmake.conf found"))
 		var c: hui.Configuration
 		c.load(conf.root << "xmake.conf")
+		install_source = "static"
 		for k in c.keys()
-			if k in ["project", "project-name"]
+			if k in ["project.name"]
 				name = c[k]
-			else if k in ["binary-name", "binary", "binary-file"]
+			else if k in ["build.source"]
+				source_dir = c[k]
+			else if k in ["build.binary"]
 				binary_file = c[k]
-			else if k == "main-file"
+			else if k == "build.main"
 				main_file = c[k]
-			else if k == "language"
+			else if k == "build.language"
 				language = c.get_str(k, "c++17")
-			else if k == "flags"
+			else if k == "build.flags"
 				flags_global = c[k]
-			else if k == "optimization"
+			else if k == "build.optimization"
 				optimization = c.get_str(k, "2")
-			else if k == "build-type"
+			else if k == "build.type"
 				build_type = c.get_str(k, "debug")
 			#else if k == "compiler-flags"
 #				flags_compiler = c[k]
 #			else if k == "linker-flags"
 #				flags_linker = c[k]
-			else if k == "libraries"
+			else if k == "build.libraries"
 				libs = c[k].explode(",")
-			else if k == "libraries-optional"
+			else if k == "build.libraries-optional"
 				libs_optional = c[k].explode(",")
-			else if k == "icons"
+			else if k == "install.source"
+				install_source = c[k]
+			else if k == "install.icons"
 				icons = c[k].explode(",")
-			else if k == "desktop-file"
+			else if k == "install.desktop-file"
 				desktop_file = c[k]
-			else if k == "mime-files"
+			else if k == "install.mime-files"
 				mime_files = c[k].explode(",")
-			else if k == "additional-install"
-				installs = c[k].explode(",")
+			else if k == "install.additional"
+				installs_additional = c[k].explode(",")
 			else if k[:8] == "profile-"
 				Profile p
 				p.name = k[8:]
 				p.libs_optional = c[k].explode(",")
 				profiles.add(p)
-			else if k == "output"
+			else if k == "build.system"
 				outputs = c[k].explode(",")
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	func save()
 		var c: hui.Configuration
-		c["project"] = name
-		c["binary"] = binary_file
-		c["main-file"] = main_file
-		c["language"] = language
-		c["optimization"] = optimization
+		c["project.name"] = name
+		c["build.source"] = source_dir
+		c["build.binary"] = binary_file
+		c["build.main"] = main_file
+		c["build.language"] = language
+		c["build.optimization"] = optimization
 		c["build-type"] = build_type
-		c["flags"] = flags_global
-		c["libraries"] = libs.join(",")
-		c["libraries-optional"] = libs_optional.join(",")
+		c["build.flags"] = flags_global
+		c["build.libraries"] = libs.join(",")
+		c["build.libraries-optional"] = libs_optional.join(",")
 		for p in profiles
 			c["profile-{{p.name}}"] = p.libs_optional.join(",")
-		c["icons"] = icons.join(",")
-		c["desktop-file"] = desktop_file
-		c["mime-files"] = mime_files.join(",")
-		c["additional-install"] = installs.join(",")
+		c["install.source"] = install_source
+		c["install.icons"] = icons.join(",")
+		c["install.desktop-file"] = desktop_file
+		c["install.mime-files"] = mime_files.join(",")
+		c["install.additional"] = installs_additional.join(",")
 		c.save(conf.root << "xmake.conf")
 	
 	func needs_installing() -> Path[]
 		var r: Path[]
-		var list = Filesystem.search(Path("../static"), "*.*", "fd")
+		var list = Filesystem.search(install_source, "*.*", "fd")
 		var ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
 			if not (str(e) in ignore)
 				r.add(Path("static") << e)
-		for i in installs
+		for i in installs_additional
 			r.add(i)
 		return r
 		

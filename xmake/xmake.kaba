@@ -3,6 +3,7 @@ use project
 use makefile
 use visualstudio
 use meson
+use cmake
 use build
 use cli_parser
 use os
@@ -36,7 +37,7 @@ func action_update(a: string[])
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
-	parse_dir(conf.root)
+	parse_dir(conf.root << conf.source_dir)
 
 	if not conf.dry_run
 		if "make" in conf.outputs
@@ -45,6 +46,8 @@ func action_update(a: string[])
 			create_meson()
 		if "vs2019" in conf.outputs
 			create_visual_studio(2019)
+		if "cmake" in conf.outputs
+			create_cmake()
 
 func action_build(a: string[])
 	#print("building {{conf.root}}")

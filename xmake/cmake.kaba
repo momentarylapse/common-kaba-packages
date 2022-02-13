@@ -1,0 +1,102 @@
+use os
+use project
+use library
+
+func create_cmake()
+	
+	print("-- meson --")
+	
+	bool debug = conf.build_type == "debug"
+	
+	var f = Filesystem.create_text(conf.root << "CMakeLists.txt")
+	f << "# created by xmake"
+	f << "project({{conf.name}})"
+	f << "cmake_minimum_required(VERSION 3.22)"
+	f << "set(CMAKE_CXX_STANDARD {{conf.language[3:]}})"
+	f << "set(CMAKE_CXX_STANDARD_REQUIRED True)"
+	if debug
+		f << "set(CMAKE_BUILD_TYPE Debug)"
+	
+	f << "set(SOURCE "
+	for s,i in sources
+		f << "	{{rel(s.filename)}}"
+	f << ")"
+	
+	
+	f << "find_package(PkgConfig REQUIRED)"
+	
+	
+#	find_package(OpenGL REQUIRED)
+#include_directories(${OpenGL_INCLUDE_DIRS})
+#link_directories(${OpenGL_LIBRARY_DIRS})
+#add_definitions(${OpenGL_DEFINITIONS})
+#if(NOT OPENGL_FOUND)
+#    message(ERROR " OPENGL not found!")
+#endif(NOT OPENGL_FOUND)
+#add_compile_definitions(HAS_LIB_GL=1)
+
+
+	
+	var deps: string[]
+	for l in conf.libs
+		var ll = lib.get(l)
+		var varx = l.upper()
+		deps.add("{{varx}}_LIBRARIES")
+		f << "
+# {{l}} mandatory
+pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
+include_directories(${"+varx+"_INCLUDE_DIRS})
+link_directories(${"+varx+"_LIBRARY_DIRS})
+add_definitions(${"+varx+"_CFLAGS_OTHER})
+add_compile_definitions({{ll.define()}}=1)"
+
+
+
+
+
+
+	
+	f << "
+add_executable({{conf.binary_file}} ${SOURCE})"
+	
+	f << "
+target_link_libraries({{conf.binary_file}} " + [for x in deps "${"+x+"}"].join(" ") + ")"
+
+
+	f << "
+install(TARGETS {{conf.binary_file}} DESTINATION bin)"
+	var list = conf.needs_installing()
+	for e in list
+		if Filesystem.is_directory(conf.root << e)
+			f << "install(DIRECTORY {{e}} DESTINATION share/{{conf.name}})"
+		else
+			f << "install(FILES {{e}} DESTINATION share/{{conf.name}})"
+
+
+	if conf.desktop_file != ""
+		f << "
+find_program(XDG_MIME_EXECUTABLE xdg-mime)
+if(NOT XDG_DESKTOP_MENU_EXECUTABLE STREQUAL \"XDG_DESKTOP_MENU_EXECUTABLE_NOTFOUND\")
+	install(CODE \"message(STATUS \\\"installing desktop file\\\")\")
+	install(CODE \"execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}})\")
+endif()"
+	if len(conf.mime_files) > 0
+		f << "
+find_program(XDG_DESKTOP_MENU_EXECUTABLE xdg-desktop-menu)
+if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
+		for m in conf.mime_files
+			f << "	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
+	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
+		f << "endif()"
+
+
+
+
+
+#find_program(XDG-MIME_EXECUTABLE xdg-mime)
+#find_program(XDG-DESKTOP-MENU_EXECUTABLE xdg-desktop-menu)
+#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} install --novendor basket.xml)
+#execute_process(COMMAND ${XDG-DESKTOP-MENU_EXECUTABLE} install --novendor basket.desktop)
+#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default basket.desktop "application/x-basket-item")
+
+

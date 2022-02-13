@@ -16,7 +16,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	string pguid, sguid
 	try
-		var f = os.Filesystem.read_text(conf.root << "../{{conf.name}}.sln")
+		var f = os.Filesystem.read_text(conf.root << "{{conf.name}}.sln")
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -97,7 +97,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	Filesystem.write(conf.root << "../{{conf.name}}.sln", f.replace("\n", "\r\n"))
+	Filesystem.write(conf.root << "{{conf.name}}.sln", f.replace("\n", "\r\n"))
 	
 	f = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
@@ -221,14 +221,14 @@ EndGlobal
   
 	for s in sources
 		f += "
-    <ClCompile Include=\"src\\{{win_path(rel(s.filename))}}\" />"
+    <ClCompile Include=\"{{win_path(rel(s.filename))}}\" />"
 	f += "
   </ItemGroup>
   <ItemGroup>"
 
 	for i in includes
 		f += "
-    <ClInclude Include=\"src\\{{win_path(i)}}\" />"
+    <ClInclude Include=\"{{win_path(i)}}\" />"
 
 	f += "
   </ItemGroup>
@@ -238,7 +238,7 @@ EndGlobal
 </Project>
 "
 
-	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
+	Filesystem.write_text(conf.root << "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -249,8 +249,8 @@ EndGlobal
 
 	for s in sources
 		f += "
-    <ClCompile Include=\"src\\{{win_path(rel(s.filename))}}\">
-      <Filter>{{win_path(Path("src") << rel(s.filename.parent()))[:-1]}}</Filter>
+    <ClCompile Include=\"{{win_path(rel(s.filename))}}\">
+      <Filter>{{win_path(rel(s.filename.parent()))[:-1]}}</Filter>
     </ClCompile>"
 
 	f += "
@@ -259,21 +259,21 @@ EndGlobal
 
 	for i in includes
 		f += "
-    <ClInclude Include=\"src\\{{win_path(i)}}\">
-      <Filter>{{win_path(Path("src") << i.parent())[:-1]}}</Filter>
+    <ClInclude Include=\"{{win_path(i)}}\">
+      <Filter>{{win_path(i.parent())[:-1]}}</Filter>
     </ClInclude>"
 
-	rand_seed("src".hash())
+	rand_seed(win_path(conf.source_dir).hash())
 	f += "
   </ItemGroup>
   <ItemGroup>
-    <Filter Include=\"src\">
+    <Filter Include=\"{{win_path(conf.source_dir)}}\">
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
-	var fdirs = Filesystem.search(conf.root, "", "dr")
+	var fdirs = Filesystem.search(conf.root << conf.source_dir, "", "dr")
 	for d in fdirs
-		var dir = win_path(Path("src") << d)
+		var dir = win_path(conf.source_dir << d)
 		rand_seed(dir.hash())
 		f += "
     <Filter Include=\"{{dir}}\">
@@ -285,4 +285,4 @@ EndGlobal
 </Project>"
   
   
-	Filesystem.write_text(conf.root << "../{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	Filesystem.write_text(conf.root << "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

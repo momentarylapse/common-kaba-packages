@@ -61,7 +61,7 @@ func cl(s: string) -> string
 
 func create_makefile(p: Profile, postfix: string)
 	print("-- makefile {{p.name}} --")
-	var f = Filesystem.create_text(conf.root << ("Makefile" + postfix))
+	var f = Filesystem.create_text(conf.root << conf.source_dir << ("Makefile" + postfix))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	string cflags, lflags, defines
@@ -94,28 +94,26 @@ func create_makefile(p: Profile, postfix: string)
 	# install
 	f << "install :"
 	var datadir = "$(prefix)/share/{{conf.name}}"
-	var std = "../static/"
 	f << "	mkdir -p {{datadir}}"
 	if conf.desktop_file != ""
-		f << "	xdg-desktop-menu install {{std}}{{conf.desktop_file}}"
+		f << "	xdg-desktop-menu install {{conf.desktop_file}}"
 	for m in conf.mime_files
-		f << "	xdg-mime install {{std}}{{m}}"
+		f << "	xdg-mime install {{m}}"
 	for icon,i in conf.icons
 		var xx = icon.explode(":")
 		string e
 		if i < len(conf.icons) - 1
 			e += " --noupdate"
 		if len(xx) == 3
-			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} {{std}}{{xx[0]}} {{xx[2]}}{{e}}"
+			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} {{xx[0]}} {{xx[2]}}{{e}}"
 #	if conf.icon != ""
 #		f << "	cp -f " + conf.icon + " " + datadir
 	var list = conf.needs_installing()
 	for e in list
-		var path = Path("..") << e
-		if Filesystem.is_directory(path)
-			f << "	cp -ruf '{{path}}' {{datadir}}"
+		if Filesystem.is_directory(conf.root << e)
+			f << "	cp -ruf '{{e}}' {{datadir}}"
 		else
-			f << "	cp -uf '{{path}}' {{datadir}}"
+			f << "	cp -uf '{{e}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 	f << ""
 

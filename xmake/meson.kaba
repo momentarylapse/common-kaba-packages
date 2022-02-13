@@ -6,7 +6,7 @@ use library
 
 func create_meson()
 	print("-- meson --")
-	var f = Filesystem.create_text(conf.root << "../meson.build")
+	var f = Filesystem.create_text(conf.root << "meson.build")
 	string debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
@@ -65,7 +65,7 @@ sources = ["
 		string e
 		if i < len(sources) - 1
 			e = ","
-		f << "	'src/{{rel(s.filename)}}'{{e}}"
+		f << "	'{{rel(s.filename)}}'{{e}}"
 	f << "]
 
 "
@@ -74,15 +74,14 @@ sources = ["
 	
 	f << ""
 	
-	var std = "static/"
 	var list = conf.needs_installing()
 	for e in list
-		if Filesystem.is_directory(Path("..") << e)
+		if Filesystem.is_directory(e)
 			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 		else
 			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 	
 	if conf.desktop_file != ""
-		f << "install_data('{{std}}{{conf.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
+		f << "install_data('{{conf.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
 
 
