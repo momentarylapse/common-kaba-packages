@@ -10,7 +10,8 @@ func create_cmake()
 	
 	var f = Filesystem.create_text(conf.root << "CMakeLists.txt")
 	f << "# created by xmake"
-	f << "project({{conf.name}})"
+	f << "
+project({{conf.name}})"
 	f << "cmake_minimum_required(VERSION 3.22)"
 	f << "set(CMAKE_CXX_STANDARD {{conf.language[3:]}})"
 	f << "set(CMAKE_CXX_STANDARD_REQUIRED True)"
@@ -57,18 +58,20 @@ add_compile_definitions({{ll.define()}}=1)"
 
 	for l in conf.libs_optional
 		var ll = lib.get(l)
-		var varx = l.upper()
 		#deps.add("{{varx}}_LIBRARIES")
 		if len(ll.pkg) > 0
+			var varx = [for p in ll.pkg p.upper()]
 			f << "
-# {{l}} (optional)
-pkg_check_modules({{varx}} {{ll.pkg[0]}})
-if({{varx}}_FOUND)
-	include_directories(${"+varx+"_INCLUDE_DIRS})
-	link_directories(${"+varx+"_LIBRARY_DIRS})
-	list(APPEND DEPS ${"+varx+"_LIBRARIES})
-	add_definitions(${"+varx+"_CFLAGS_OTHER})
-	add_compile_definitions({{ll.define()}}=1)
+# {{l}} (optional)"
+			for v,i in varx
+				f << "pkg_check_modules({{v}} {{ll.pkg[i]}})"
+			f << "if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
+			for v,i in varx
+				f << "	include_directories(${"+v+"_INCLUDE_DIRS})"
+				f << "	link_directories(${"+v+"_LIBRARY_DIRS})"
+				f << "	list(APPEND DEPS ${"+v+"_LIBRARIES})"
+				f << "	add_definitions(${"+v+"_CFLAGS_OTHER})"
+			f << "	add_compile_definitions({{ll.define()}}=1)
 else()
 	add_compile_definitions({{ll.define()}}=0)
 endif()"
@@ -92,6 +95,7 @@ else()
 list(APPEND DEPS ${CMAKE_DL_LIBS})
 add_compile_definitions({{ll.define()}}=1)"
 		else
+			f << "add_compile_definitions({{ll.define()}}=0)"
 			print("WARNING: lib {{l}} not in cmake")
 
 	

@@ -84,7 +84,7 @@ func action_vcpkg_install(a: string[])
 func main(arg: string[])
 	lib.init()
 	conf.verbose = false
-	conf.root = Path("./").absolute()
+	conf.root = Path("./").absolute().canonical()
 	
 	conf.ignore_libs
 	

@@ -130,8 +130,8 @@ class Config
 		var ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
-			if not (str(e) in ignore)
-				r.add(Path("static") << e)
+			if not (str(install_source << e) in ignore)
+				r.add(install_source << e)
 		for i in installs_additional
 			r.add(i)
 		return r
@@ -166,6 +166,9 @@ var sources: SourceFile[]
 
 func rel(filename: Path) -> Path
 	return filename.relative_to(conf.root)
+
+func relsrc(filename: Path) -> Path
+	return filename.relative_to(conf.root << conf.source_dir)
 
 
 func find_dep(out f: SourceFile, filename: Path)

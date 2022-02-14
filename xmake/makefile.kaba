@@ -51,8 +51,8 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 func collect_objects() -> string[]
 	string[] obj
 	for s in sources
-		if str(rel(s.filename)) != conf.main_file
-			obj.add(str(rel(s.object())))
+		if rel(s.filename) != rel(conf.root << conf.main_file)
+			obj.add(str(relsrc(s.object())))
 	return obj
 
 # clean line
@@ -77,18 +77,18 @@ func create_makefile(p: Profile, postfix: string)
 	var obj = collect_objects()
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
-	string main_ob = conf.main_file.replace(".cpp", ".o")
+	string main_ob = relsrc(conf.root << conf.main_file.replace(".cpp", ".o"))
 	f << "$(BIN) : $(OBJ) {{main_ob}}"
 	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
 	f << ""
 	f << "all : $(BIN)"
 	f << ""
 	for s in sources
-		string a = "{{rel(s.object())}} : {{rel(s.filename)}}"
+		string a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
 		for d in s.dep
-			a += " {{rel(d)}}"
+			a += " {{relsrc(d)}}"
 		f << a
-		f << "\t$(CPP) -c {{rel(s.filename)}} -o $@ $(CXXFLAGS)"
+		f << "\t$(CPP) -c {{relsrc(s.filename)}} -o $@ $(CXXFLAGS)"
 		f << ""
 
 	# install
@@ -96,24 +96,24 @@ func create_makefile(p: Profile, postfix: string)
 	var datadir = "$(prefix)/share/{{conf.name}}"
 	f << "	mkdir -p {{datadir}}"
 	if conf.desktop_file != ""
-		f << "	xdg-desktop-menu install {{conf.desktop_file}}"
+		f << "	xdg-desktop-menu install ../{{conf.desktop_file}}"
 	for m in conf.mime_files
-		f << "	xdg-mime install {{m}}"
+		f << "	xdg-mime install ../{{m}}"
 	for icon,i in conf.icons
 		var xx = icon.explode(":")
 		string e
 		if i < len(conf.icons) - 1
 			e += " --noupdate"
 		if len(xx) == 3
-			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} {{xx[0]}} {{xx[2]}}{{e}}"
+			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} ../{{xx[0]}} {{xx[2]}}{{e}}"
 #	if conf.icon != ""
 #		f << "	cp -f " + conf.icon + " " + datadir
 	var list = conf.needs_installing()
 	for e in list
 		if Filesystem.is_directory(conf.root << e)
-			f << "	cp -ruf '{{e}}' {{datadir}}"
+			f << "	cp -ruf '../{{e}}' {{datadir}}"
 		else
-			f << "	cp -uf '{{e}}' {{datadir}}"
+			f << "	cp -uf '../{{e}}' {{datadir}}"
 	f << "	cp $(BIN) $(prefix)/bin"
 	f << ""
 

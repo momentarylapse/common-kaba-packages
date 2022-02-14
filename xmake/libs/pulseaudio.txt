@@ -1,3 +1,4 @@
 link = pulse
 include = pulse/pulseaudio.h
+pkg = libpulse
 
