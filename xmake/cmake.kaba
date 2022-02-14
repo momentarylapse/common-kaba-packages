@@ -2,6 +2,51 @@ use os
 use project
 use library
 
+
+func cmake_link(l: string) -> string
+	var ll = lib.get(l)
+	var varx = l.upper()
+	#deps.add("{{varx}}_LIBRARIES")
+	if len(ll.pkg) > 0
+		return "
+# {{l}} mandatory
+pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
+include_directories(${"+varx+"_INCLUDE_DIRS})
+link_directories(${"+varx+"_LIBRARY_DIRS})
+list(APPEND DEPS ${"+varx+"_LIBRARIES})
+add_definitions(${"+varx+"_CFLAGS_OTHER})
+add_compile_definitions({{ll.define()}}=1)"
+	else
+		print("ERROR: no pkg for {{l}}")
+		return ""
+
+
+func cmake_link_group(lg: string[]) -> string
+	var lls = [for l in lg lib.get(l)]
+	var varxs = [for l in lg l.upper()]
+	#deps.add("{{varx}}_LIBRARIES")
+	string cvar = varxs.join("_OR_")
+	var label = lg.join(" or ")
+	string s = "# {{label}} mandatory
+set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
+
+	for v,i in varxs
+		s += "
+if({{cvar}} STREQUAL \"{{lg[i]}}\")"
+		if len(lls[i].pkg) > 0
+			s += "
+	pkg_check_modules({{v}} REQUIRED {{lls[i].pkg[0]}})
+	include_directories(${"+v+"_INCLUDE_DIRS})
+	link_directories(${"+v+"_LIBRARY_DIRS})
+	list(APPEND DEPS ${"+v+"_LIBRARIES})
+	add_definitions(${"+v+"_CFLAGS_OTHER})
+	add_compile_definitions({{lls[i].define()}}=1)"
+		else
+			print("ERROR: no pkg for {{lls[i]}}")
+		s += "
+endif()"
+	return s
+
 func create_cmake()
 	
 	print("-- cmake --")
@@ -24,7 +69,8 @@ project({{conf.name}})"
 	f << ")"
 	
 	f << "
-find_package(PkgConfig REQUIRED)"
+find_package(PkgConfig REQUIRED)
+"
 	
 	
 #	find_package(OpenGL REQUIRED)
@@ -39,21 +85,11 @@ find_package(PkgConfig REQUIRED)"
 
 	
 	#var deps: string[]
-	for l in conf.libs
-		var ll = lib.get(l)
-		var varx = l.upper()
-		#deps.add("{{varx}}_LIBRARIES")
-		if len(ll.pkg) > 0
-			f << "
-# {{l}} mandatory
-pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
-include_directories(${"+varx+"_INCLUDE_DIRS})
-link_directories(${"+varx+"_LIBRARY_DIRS})
-list(APPEND DEPS ${"+varx+"_LIBRARIES})
-add_definitions(${"+varx+"_CFLAGS_OTHER})
-add_compile_definitions({{ll.define()}}=1)"
+	for lg in conf.lib_groups
+		if len(lg) > 1
+			f << cmake_link_group(lg)
 		else
-			print("ERROR: no pkg for {{l}}")
+			f << cmake_link(lg[0])
 
 
 	for l in conf.libs_optional

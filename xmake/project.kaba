@@ -31,6 +31,7 @@ class Config
 	var source_dir: Path
 	var main_file: string
 	var libs: string[]
+	var lib_groups: string[][]
 	var libs_optional: string[]
 	var ignore_libs: string[]
 	var profiles: Profile[]
@@ -81,7 +82,7 @@ class Config
 #			else if k == "linker-flags"
 #				flags_linker = c[k]
 			else if k == "build.libraries"
-				parse_libs(c[k], libs, libs_optional)
+				parse_libs(c[k], libs, lib_groups, libs_optional)
 			#else if k == "build.libraries-optional"
 			#	libs_optional = c[k].explode(",")
 			else if k == "install.source"
@@ -144,12 +145,13 @@ class Config
 
 var conf: Config
 
-func parse_libs(s: string, out libs: string[], out libs_opt: string[])
+func parse_libs(s: string, out libs: string[], out lib_groups: string[][], out libs_opt: string[])
 	for x in s.explode(",")
 		if x[-1:] == "?"
 			libs_opt.add(x[:-1])
 		else
-			libs.add(x)
+			lib_groups.add(x.explode("|"))
+			libs.add(x.explode("|")[0])
 
 class SourceFile
 	var filename: Path
