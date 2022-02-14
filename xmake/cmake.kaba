@@ -107,15 +107,18 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
 
+	f << "
+add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")"
+
 
 	f << "
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	var list = conf.needs_installing()
 	for e in list
 		if Filesystem.is_directory(conf.root << e)
-			f << "install(DIRECTORY {{e}} DESTINATION share/{{conf.name}})"
+			f << "install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else
-			f << "install(FILES {{e}} DESTINATION share/{{conf.name}})"
+			f << "install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
 
 
 	if conf.desktop_file != ""

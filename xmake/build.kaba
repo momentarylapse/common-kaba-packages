@@ -61,7 +61,7 @@ func build()
 
 	var p = get_profile(conf.force_profile)
 	
-	var binary_file = Path("..") << conf.binary_file
+	var binary_file = conf.binary_file
 			
 	string cflags, lflags, defines
 	collect_global_flags(p, cflags, lflags, defines)
@@ -131,7 +131,7 @@ func build()
 			
 	print("Link  {{Term.YELLOW}}{{binary_file}}{{Term.END}}")
 	var main_ob = conf.main_file.replace(".cpp", ".o")
-	var obj = collect_objects().join(" ")
+	var obj = collect_objects(conf.root).join(" ")
 	var command = "g++ {{obj}} {{main_ob}} -o {{binary_file}} {{cxx_flags_linking}}"
 	if conf.verbose
 		print(command)
@@ -151,7 +151,7 @@ func build_clear()
 			#print(s.object())
 		except
 			pass
-	var binary_file = Path("..") << conf.binary_file
+	var binary_file = conf.binary_file
 	try
 		os.Filesystem.delete(binary_file)
 	except
