@@ -41,7 +41,7 @@ class Config
 	var flags_compiler: string
 	var flags_linker: string
 	var icons: string[]
-	var desktop_file: string
+	var desktop_file: Path
 	var mime_files: string[]
 	var install_source: Path
 	var installs_additional: string[]

@@ -123,14 +123,17 @@ install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 
 	if conf.desktop_file != ""
 		f << "
-find_program(XDG_MIME_EXECUTABLE xdg-mime)
+set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+configure_file(\"{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+
+find_program(XDG_DESKTOP_MENU_EXECUTABLE xdg-desktop-menu)
 if(NOT XDG_DESKTOP_MENU_EXECUTABLE STREQUAL \"XDG_DESKTOP_MENU_EXECUTABLE_NOTFOUND\")
 	install(CODE \"message(STATUS \\\"installing desktop file\\\")\")
-	install(CODE \"execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}})\")
+	install(CODE \"execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install /tmp/{{conf.desktop_file.basename()}})\")
 endif()"
 	if len(conf.mime_files) > 0
 		f << "
-find_program(XDG_DESKTOP_MENU_EXECUTABLE xdg-desktop-menu)
+find_program(XDG_MIME_EXECUTABLE xdg-mime)
 if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
 		for m in conf.mime_files
 			f << "	install(CODE \"message(STATUS \\\"installing mime file\\\")\")

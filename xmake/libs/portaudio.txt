@@ -1,4 +1,5 @@
 link = portaudio
 include = portaudio.h
 vcpkg = portaudio
+pkg = portaudio-2.0
 
