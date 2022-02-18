@@ -22,7 +22,7 @@ class ToolbarDemoDialog extends hui.Window
 class MenuDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Menu demo", 800, 300)
-		var m = hui.create_menu_from_source(source)
+		var m = hui.create_menu_from_source(source, self)
 		set_menu(m)
 
 func action_demo(arg: string[])
@@ -38,13 +38,13 @@ func action_demo(arg: string[])
 	
 	if r.type in ["Dialog", "Window"]
 		var dlg = new DemoDialog(source)
-		dlg.run()
+		hui.fly(dlg, nil)
 	else if r.type == "Toolbar"
 		var dlg = new ToolbarDemoDialog(source)
-		dlg.run()
+		hui.fly(dlg, nil)
 	else if r.type == "Menu"
 		var dlg = new MenuDemoDialog(source)
-		dlg.run()
+		hui.fly(dlg, nil)
 	else
 		print("don't know how to show a {{r.type}}")
 
