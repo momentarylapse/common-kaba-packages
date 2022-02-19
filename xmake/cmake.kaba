@@ -31,11 +31,29 @@ func cmake_link_group(lg: string[]) -> string
 set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
 	for v,i in varxs
+		if len(lls[i].pkg) > 0
+			s += "
+pkg_check_modules({{v}} {{lls[i].pkg[0]}})
+if({{v}}_FOUND)
+	list(APPEND {{cvar}}_FOUND \"{{lg[i]}}\")
+endif()"
+	s += "
+if({{cvar}}_FOUND)
+	if(NOT ${GTK3_OR_GTK4} IN_LIST {{cvar}}_FOUND)
+		list(GET {{cvar}}_FOUND 0 X)
+		set({{cvar}} ${X} CACHE STRING \"choose\" FORCE)
+		message(WARNING \"Choice for {{cvar}} invalid, using ${"+cvar+"} instead\")
+	endif()
+else()
+	message(SEND_ERROR \"Neither {{label}} found\") #  or/nor..
+	set({{cvar}} \"\")
+endif()"
+	
+	for v,i in varxs
 		s += "
 if({{cvar}} STREQUAL \"{{lg[i]}}\")"
 		if len(lls[i].pkg) > 0
 			s += "
-	pkg_check_modules({{v}} REQUIRED {{lls[i].pkg[0]}})
 	include_directories(${"+v+"_INCLUDE_DIRS})
 	link_directories(${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
