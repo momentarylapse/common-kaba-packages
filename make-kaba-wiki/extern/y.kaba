@@ -21,15 +21,17 @@ class Shader
 
 class Texture as shared
 	var width, height: int
-	func extern __init__(w: int, h: int, format: string)
+	func extern __init__(w: int, h: int, format: string = "rgba:i8")
 	func extern __delete__()
-	#func extern override
+	#func extern update(im: Image)
 
 class CubeMap extends Texture
+	func extern __init__(size: int, format: string)
 class DepthBuffer extends Texture
+	func extern override __init__(w: int, h: int, format: string)
 
 class VertexBuffer
-	func extern __init__(format: string)
+	func extern __init__(format: string = "3f,3f,2f")
 	func extern update(vertices: @DynamicArray)
 
 class EngineData
@@ -223,8 +225,8 @@ class SolidBody extends Component3D
 	var physics_passive: bool
 	var g_factor: float
 	
-	func extern add_force(f: vector, rho: vector)
-	func extern add_impulse(p: vector, rho: vector)
+	func extern add_force(f: vector, rho: vector = vector.0)
+	func extern add_impulse(p: vector, rho: vector = vector.0)
 	func extern add_torque(t: vector)
 	func extern add_torque_impulse(l: vector)
 	func extern update_mass()
@@ -238,8 +240,8 @@ class TerrainCollider extends Collider
 	
 class Animator extends Component3D
 	func extern reset()
-	func extern add_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float, loop: bool) -> bool
-	func extern add(op: int, move: int, t: float*, dt: float, loop: bool) -> bool
+	func extern add_x(op: int, p1: float, p2: float, move: int, t: float*, dt: float, vel_param: float = 1.0, loop: bool = true) -> bool
+	func extern add(op: int, move: int, t: float*, dt: float, loop: bool = true) -> bool
 	func extern is_done(op_no: int) -> bool
 	enum
 		MOVE_OP_SET           # overwrite
@@ -414,8 +416,7 @@ class ui
 		func extern __init__()
 		
 	class Picture extends Node
-		func extern __init__(r: rect, tex: Texture)
-		func extern __init__(r: rect, tex: Texture, source: rect)
+		func extern __init__(r: rect, tex: Texture, source: rect = rect.ID)
 		func extern override __delete__()
 		var source: rect
 		var texture: Texture*
@@ -425,8 +426,7 @@ class ui
 		var shader_data: any
 
 	class Text extends Picture
-		func extern __init__(t: string, font_size: float)
-		func extern __init__(t: string, font_size: float, p: vec2)
+		func extern __init__(t: string, font_size: float, p: vec2 = vec2.0)
 		func extern override __delete__()
 		var text: string
 		var font_size: float
@@ -475,7 +475,7 @@ class ui
 		func extern axis(a: int) -> float
 		func extern button(b: int) -> bool
 		func extern clicked(b: int) -> bool
-	func extern static get_pad(index: int) -> shared Gamepad
+	func extern static get_pad(index: int) -> Gamepad shared
 
 class PerformanceMonitor
 	class Channel
@@ -510,9 +510,9 @@ class audio
 	class Sound extends Entity
 		func extern pause(pause: bool)
 		func extern play(loop: bool)
-		func extern set(pos: vector, vel: vector, r_min: float, r_max: float, speed: float, volume: float)
+		func extern set(pos: vector, vel: vector, r_min: float, r_max: float, speed: float = 1.0, volume: float = 1.0)
 		func extern stop()
-		func extern static emit(filename: Path, pos: vector, r_min: float, r_max: float, speed: float, volume: float, loop: bool) -> Sound*
+		func extern static emit(filename: Path, pos: vector, r_min: float, r_max: float, speed: float = 1.0, volume: float = 1.0, loop: bool = false) -> Sound*
 		func extern static load(filename: Path) -> Sound*
 	class Music extends Entity
 		func pause(pause: bool)

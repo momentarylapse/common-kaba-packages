@@ -109,5 +109,5 @@ Grid ? '' vertical
 		redraw("area")
 
 func main()
-	var w = new Sketcher()
-	w.run()
+	hui.run(new Sketcher())
+

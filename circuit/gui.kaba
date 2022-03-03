@@ -79,12 +79,16 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	func on_save()
-		if hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, "*.circuit", "*.circuit")
-			Filesystem.write_text(hui.filename, c.export())
+		var f = func(p: Path)
+			if bool(p)
+				Filesystem.write_text(p, c.export())
+		hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func on_open()
-		if hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, "*.circuit", "*.circuit")
-			c.import(Filesystem.read_text(hui.filename))
+		var f = func(p: Path)
+			if bool(p)
+				c.import(Filesystem.read_text(p))
+		hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func on_param()
 		int row = hui.get_event().row
@@ -127,5 +131,5 @@ Toolbar toolbar ''
 		panel.redraw()
 
 func main(arg: string[])
-	var w = new CircuitEditor(arg)
-	w.run()
+	hui.run(new CircuitEditor(arg))
+

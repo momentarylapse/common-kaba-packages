@@ -1,7 +1,7 @@
 use common
 use parser
 
-func expand(_t: shared Term) -> shared Term
+func expand(_t: Term shared) -> Term shared
 	# recursive
 	var t = _t.shallow_copy()
 	for p in t.params

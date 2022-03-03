@@ -78,7 +78,7 @@ class MidiEventBuffer extends MidiEvent[]
 		add(MidiEvent(n.range.end(), n.pitch, 0))
 	func extern add_metronome_click(pos: int, level: int, volume: float)
 
-class MidiNoteBuffer extends shared MidiNote[]
+class MidiNoteBuffer extends MidiNote shared[]
 	var samples: int
 	func extern override __init__()
 	func extern override __delete__()
@@ -352,7 +352,7 @@ class TrackMarker as shared
 		text = t
 	var range: Range
 	var text: string
-	var fx: shared AudioEffect[]
+	var fx: AudioEffect shared[]
 
 
 #class BarPattern
@@ -391,7 +391,7 @@ class Beat
 		range = Range(_offset, 0)
 		level = _level
 
-class BarCollection extends shared Bar[]
+class BarCollection extends Bar shared[]
 	func extern selfref get_bars(r: Range) -> Bar*[]
 	func extern selfref get_beats(r: Range, include_hidden: bool, include_sub_beats: bool, sub_beat_partition: int) -> Beat[]
 	func extern const get_next_beat(pos: int) -> int
@@ -402,8 +402,8 @@ class TrackLayer as shared
 	var track: Track*
 	var buffers: AudioBuffer[]
 	var midi: MidiNoteBuffer
-	var samples: shared SampleRef[]
-	var markers: shared TrackMarker[]
+	var samples: SampleRef shared[]
+	var markers: TrackMarker shared[]
 	
 	func extern get_buffers(out buf: AudioBuffer, r: Range)
 	func extern read_buffers(out buf: AudioBuffer, r: Range, allow_ref: bool)
@@ -435,8 +435,8 @@ class Sample as shared # TODO
 	func extern set_value(key: string, value: string)
 
 class SampleRef as shared
-	var origin: shared Sample
-	func extern __init__(sam: shared Sample)
+	var origin: Sample shared
+	func extern __init__(sam: Sample shared)
 	func extern virtual __delete__()
 
 
@@ -455,15 +455,15 @@ class Instrument
 class Track as shared
 	var type: int
 	var name: string
-	var layers: shared TrackLayer[]
+	var layers: TrackLayer shared[]
 
 	var volume, panning: float
 	var muted: bool
 	
-	var fx: shared AudioEffect[]
-	var midi_fx: shared MidiEffect[]
+	var fx: AudioEffect shared[]
+	var midi_fx: MidiEffect shared[]
 	
-	var synth: shared Synthesizer
+	var synth: Synthesizer shared
 	var instrument: Instrument
 
 	# editing
@@ -493,8 +493,8 @@ class Song as shared
 
 	var volume: float
 	
-	var tracks: shared Track[]
-	var samples: shared Sample[]
+	var tracks: Track shared[]
+	var samples: Sample shared[]
 	
 	var bars: BarCollection
 
@@ -516,10 +516,10 @@ class Song as shared
 	func extern add_sample(s: Sample)
 	func extern delete_sample(s: Sample)
 	
-	func extern undo()
-	func extern redo()
+	func extern undo() -> bool
+	func extern redo() -> bool
 	func extern reset_history()
-	func extern begin_action_group()
+	func extern begin_action_group(name: string)
 	func extern end_action_group()
 	
 	func extern const get_time_str(t: int) -> string
@@ -580,6 +580,10 @@ class AudioView extends Object
 	func extern unsubscribe(handler: Object)
 	func extern prepare_playback(r: Range, allow_loop: bool)
 	func extern play()
+	func extern is_playback_active() -> bool
+	func extern is_paused() -> bool
+	func extern playback_pos() -> int
+	func extern set_playback_pos(pos: int)
 	func extern set_playback_loop(loop: bool)
 	func extern optimize_view()
 	func extern cur_vlayer() -> Layer*
@@ -747,6 +751,15 @@ class GridPainter
 	func extern draw_time(p: Painter)
 	func extern draw_time_numbers(p: Painter)
 
+class MultiLinePainter
+	func extern __init__(song: Song, c: ColorScheme)
+	func extern __delete__()
+	func extern set_context(conf: any, page_width: float, avg_samples_per_line: float)
+	func extern set(conf: any)
+	func extern draw_next_line(p: Painter, out offset: int, pos: vec2) -> float
+	func extern next_line_samples(offset: int) -> int
+	func extern get_line_dy() -> float
+
 
 #extern PluginContext plugin_context
 var extern colors: ColorScheme
@@ -774,7 +787,7 @@ func extern SelectSample(session: Session, panel: Panel, old: Sample*) -> Sample
 
 func extern ChooseModule(parent: Panel, session: Session, type: int, old_name: string) -> string
 
-func extern draw_boxed_str(c: Painter, x: float, y: float, str: string, col_text: color, col_bg: color)
+func extern draw_boxed_str(c: Painter, p: vec2, str: string, col_text: color, col_bg: color)
 
 #extern void get_style_colors(Panel p, string id, color{} colors)
 func extern get_style_colors(p: Panel, id: string, colors: (string,color)[])

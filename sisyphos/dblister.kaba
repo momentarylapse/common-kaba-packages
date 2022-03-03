@@ -31,7 +31,7 @@ class DBLister
 		
 		
 	func find_file(path: Path) -> LocalFile*[]
-		LocalFile*[] files
+		var files: LocalFile*[]
 		fake_files.clear()
 		paths.clear()
 		
@@ -49,7 +49,7 @@ class DBLister
 		return files
 		
 	func find_dir(dir: Path) -> LocalFile*[]
-		LocalFile*[] files
+		var files: LocalFile*[]
 		fake_files.clear()
 		paths.clear()
 

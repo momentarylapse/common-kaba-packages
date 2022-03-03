@@ -20,14 +20,14 @@ var num_terms: int
 class Term as shared
 	var type: int
 	var name: string
-	var params: shared Term[]
+	var params: Term shared[]
 	func __init__(_type: int, _name: string)
 		type = _type
 		name = _name
 		#print("new Term {{type}} {{name}}")
 	func __delete__()
 		#print("del Term {{type}} {{name}}")
-	func const shallow_copy() -> shared Term
+	func const shallow_copy() -> Term shared
 		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
@@ -84,35 +84,35 @@ class Term as shared
 #	return [for t in list t.copy()]
 		
 
-func AddNumber(s: string) -> shared Term
+func AddNumber(s: string) -> Term shared
 	return new Term(TYPE_NUMBER, s)
 
-func AddVariable(s: string) -> shared Term
+func AddVariable(s: string) -> Term shared
 	return new Term(TYPE_VARIABLE, s)
 
-func AddOperator(s: string, p1: shared Term, p2: shared Term) -> shared Term
+func AddOperator(s: string, p1: Term shared, p2: Term shared) -> Term shared
 	var t = new Term(TYPE_OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return t
 
-func AddFunction(s: string, params: shared Term[]) -> shared Term
+func AddFunction(s: string, params: Term shared[]) -> Term shared
 	var t = new Term(TYPE_FUNCTION, s)
 	t.params = params
 	return t
 
-func PermuteOperator(t: shared Term) -> shared Term
+func PermuteOperator(t: Term shared) -> Term shared
 	var r = t.shallow_copy()
 	r.params[0] = t.params[1]
 	r.params[1] = t.params[0]
 	return r
 
-func AddSpecial(s: string, params: shared Term[]) -> shared Term
+func AddSpecial(s: string, params: Term shared[]) -> Term shared
 	var t = new Term(TYPE_SPECIAL, s)
 	t.params = params
 	return t
 
-func AddList(params: shared Term[]) -> shared Term
+func AddList(params: Term shared[]) -> Term shared
 	var t = new Term(TYPE_LIST, "-list-")
 	t.params = params
 	return t

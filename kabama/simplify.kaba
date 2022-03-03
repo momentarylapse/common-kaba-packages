@@ -38,7 +38,7 @@ func gcd(a: string, b: string) -> string
 func number_is_even(n: string) -> bool
 	return (int(n[-1:]) % 2) == 0
 
-func append_terms(out a: shared Term[], b: shared Term[])
+func append_terms(out a: Term shared[], b: Term shared[])
 	for x in b
 		a.add(x)
 
@@ -49,12 +49,12 @@ func append_neg(out a: bool[], b: bool[], inv: bool)
 		else
 			a.add(x)
 
-func print_group(gr: shared Term[])
+func print_group(gr: Term shared[])
 	print("[" + [for x in gr str(x)].join(", ") + "]")
 
 
-func extract_add_group(t: shared Term, out negative: bool[]) -> shared Term[]
-	shared Term[] l
+func extract_add_group(t: Term shared, out negative: bool[]) -> Term shared[]
+	Term shared[] l
 
 	# shortcut (-1)*a  ->  -a
 	if t.name == "*"
@@ -81,8 +81,8 @@ func extract_add_group(t: shared Term, out negative: bool[]) -> shared Term[]
 		l.add(t)
 	return l
 
-func extract_product_group(t: shared Term, out inverse: bool[]) -> shared Term[]
-	shared Term[] l
+func extract_product_group(t: Term shared, out inverse: bool[]) -> Term shared[]
+	Term shared[] l
 	if t.name == "*"
 		bool[] n0, n1
 		append_terms(l, extract_product_group(t.params[0], n0))
@@ -101,7 +101,7 @@ func extract_product_group(t: shared Term, out inverse: bool[]) -> shared Term[]
 	return l
 
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
-func split_off_factor(out l: shared Term[]) -> string[]
+func split_off_factor(out l: Term shared[]) -> string[]
 	string[] factor
 	for x,i in l
 		string f = "1"
@@ -113,7 +113,7 @@ func split_off_factor(out l: shared Term[]) -> string[]
 	return factor
 
 # a/b kürzen
-func eval_number_division(a: string, b: string) -> shared Term
+func eval_number_division(a: string, b: string) -> Term shared
 	vli va = a
 	vli vb = b
 	vli rem
@@ -133,7 +133,7 @@ func eval_number_division(a: string, b: string) -> shared Term
 	return AddOperator("/", AddNumber(str(va)), AddNumber(str(vb)))
 
 
-func literally_equal(a: shared Term, b: shared Term) -> bool
+func literally_equal(a: Term shared, b: Term shared) -> bool
 	if a.name != b.name
 		return false
 	for i in 0:len(a.params)
@@ -143,7 +143,7 @@ func literally_equal(a: shared Term, b: shared Term) -> bool
 	
 			
 	
-func sort_group(out l: shared Term[])
+func sort_group(out l: Term shared[])
 	# "render" all terms...   need a comp(term, term) function
 	var s = [for t in l str(t)]
 	
@@ -156,11 +156,11 @@ func sort_group(out l: shared Term[])
 
 
 
-func make_unique_in_product(out l: shared Term[], inv: bool[])
-	shared Term[] exponents
+func make_unique_in_product(out l: Term shared[], inv: bool[])
+	Term shared[] exponents
 	
 	for x,i in l
-		shared Term e
+		Term shared e
 		if x.name == "^"
 			e = x.params[1]
 			l[i] = x.params[0]
@@ -181,7 +181,7 @@ func make_unique_in_product(out l: shared Term[], inv: bool[])
 			l[i] = AddOperator("^", x, normalize(exponents[i]))
 
 
-func eval_product(t: shared Term) -> shared Term
+func eval_product(t: Term shared) -> Term shared
 	bool[] inverse
 	var l = extract_product_group(t, inverse)
 	#print_group(l)
@@ -218,7 +218,7 @@ func eval_product(t: shared Term) -> shared Term
 
 
 
-func make_unique_in_sum(out l: shared Term[], out negative: bool[])
+func make_unique_in_sum(out l: Term shared[], out negative: bool[])
 	string[] multiplicity
 	#print_group(l)
 	
@@ -249,7 +249,7 @@ func make_unique_in_sum(out l: shared Term[], out negative: bool[])
 			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
 
 
-func eval_sum(t: shared Term) -> shared Term
+func eval_sum(t: Term shared) -> Term shared
 	bool[] negative
 	var l = extract_add_group(t, negative)
 	#print_group(l)
@@ -288,7 +288,7 @@ func eval_sum(t: shared Term) -> shared Term
 			return AddOperator("+", t_r, AddNumber(num))
 	return t_r
 
-func eval_exponent(t: shared Term) -> shared Term
+func eval_exponent(t: Term shared) -> Term shared
 	var p0 = t.params[0]
 	var p1 = t.params[1]
 	if p1.type == TYPE_NUMBER
@@ -312,7 +312,7 @@ func eval_exponent(t: shared Term) -> shared Term
 
 
 
-func eval_function(t: shared Term) -> shared Term
+func eval_function(t: Term shared) -> Term shared
 	if t.name == "ln"
 		var p = t.params[0]
 		if p.name == "^"
@@ -367,7 +367,7 @@ func eval_function(t: shared Term) -> shared Term
 		
 	return t
 
-func eval_wedge(_t: shared Term) -> shared Term
+func eval_wedge(_t: Term shared) -> Term shared
 	var t = _t.shallow_copy()
 
 	# recursion
@@ -388,19 +388,19 @@ func eval_wedge(_t: shared Term) -> shared Term
 		
 	return t
 
-func eval_equal(t: shared Term) -> shared Term
+func eval_equal(t: Term shared) -> Term shared
 	if literally_equal(normalize(t.params[0]), normalize(t.params[1]))
 		return AddVariable("true")
 	else if t.params[0].type == TYPE_NUMBER and t.params[1].type == TYPE_NUMBER
 		return AddVariable("false")
 	return t
 
-func eval_in(t: shared Term) -> shared Term
+func eval_in(t: Term shared) -> Term shared
 	if t.params[0].type == TYPE_NUMBER and t.params[1].name in ["N", "Z"]
 		return AddVariable("true")
 	return t
 
-func normalize(_t: shared Term) -> shared Term
+func normalize(_t: Term shared) -> Term shared
 	var t = _t.shallow_copy()
 
 	# recursion

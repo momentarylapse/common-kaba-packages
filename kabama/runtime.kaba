@@ -13,17 +13,17 @@ class Runtime
 	class Function
 		var name: string
 		var params: string[]
-		var formula: shared Term
+		var formula: Term shared
 		func __str__() -> string
 			var p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
-	var assumptions: shared Term[]
+	var assumptions: Term shared[]
 	var functions: Function*[]
-	var history: shared Term[]
+	var history: Term shared[]
 	
 	#class Error extends Exception
 	
-	func add_function(t: shared Term)
+	func add_function(t: Term shared)
 		var f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
@@ -32,7 +32,7 @@ class Runtime
 		functions.add(f)
 		#print("added... " + str(f))
 
-	func eval_term(_t: shared Term) -> shared Term
+	func eval_term(_t: Term shared) -> Term shared
 		# recursive
 		var t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
@@ -63,7 +63,7 @@ class Runtime
 				
 		return t
 
-	func eval(s: string) -> shared Term
+	func eval(s: string) -> Term shared
 		var t = parse(s)
 		var r = normalize(eval_term(t))
 		history.add(r)

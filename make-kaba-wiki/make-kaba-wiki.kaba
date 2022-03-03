@@ -74,7 +74,7 @@ func class_extension(c: Class) -> string
 
 
 func filter_funcs(ff: Function*[], namespace: Class) -> Function*[]
-	Function*[] r
+	var r: Function*[]
 	for f in ff
 		if f.namespace != &namespace
 			continue
@@ -91,7 +91,7 @@ func filter_funcs(ff: Function*[], namespace: Class) -> Function*[]
 	return r
 
 func filter_consts(cc: Constant*[]) -> Constant*[]
-	Constant*[] r
+	var r: Constant*[]
 	for c in cc
 		if c.name[:1] != "-" and c.name != "KABA_LINK"
 			r.add(c)
@@ -267,7 +267,7 @@ func show_class(ns: string, c: Class) -> string
 	return wiki
 
 func filter_classes(cc: Class*[]) -> Class*[]
-	Class*[] r
+	var r: Class*[]
 	for c in cc
 		if c.name.find("shared ", 0) >= 0
 			continue
@@ -289,7 +289,7 @@ func filter_classes(cc: Class*[]) -> Class*[]
 
 
 func show_package(p: Script) -> string
-	string wiki = "== Kaba package {{p.name}} ==\n"
+	var wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package {{p.name}} (default) ==\n"
 	var classes = filter_classes(p.classes())
@@ -320,7 +320,7 @@ func show_package(p: Script) -> string
 
 
 func make_reference() -> string
-	string wiki = "== Kaba reference ==\n"
+	var wiki = "== Kaba reference ==\n"
 
 	wiki += "\nVersion {{kaba_version}} from {{Date.now()|%F}}\n"
 
@@ -379,15 +379,15 @@ func make_documentation()
 import hui
 
 func parse_doc_string(s: string) -> string
-	string ss = s
+	var ss = s
 	while true
-		int p = ss.find("<class>", 0)
+		var p = ss.find("<class>", 0)
 		if p < 0
 			break
-		int p2 = ss.find("</class>", p)
+		var p2 = ss.find("</class>", p)
 		if p2 < 0
 			break
-		string c = ss[p+7:p2]
+		var c = ss[p+7:p2]
 		var xx = c.explode(".")
 		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 	return ss.unescape()
@@ -401,7 +401,7 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	else
 		p = p << name + ".txt"
 	#print(p)
-	hui.Configuration conf
+	var conf: hui.Configuration
 	conf.load(p)
 	if conf[key] == ""
 		if report_missing

@@ -296,7 +296,7 @@ func remote_download_meta(out files: LocalFile*[])
 				db.dirty = true
 
 func remote_sync_by_id(out files: LocalFile*[])
-	LocalFile*[] files_wanted
+	var files_wanted: LocalFile*[]
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
 			files_wanted.add(f)

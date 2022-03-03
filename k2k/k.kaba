@@ -627,10 +627,9 @@ class FunctionMap extends FunctionInternal
 				var pa: DynamicValueStateArray* = p[1].v.s
 				var ra: DynamicValueStateArray* = r.v.s
 				for e in pa.a
-					Variable temp
-					Variable temp2
+					var temp, temp2: Variable
 					temp2.setReference(e)
-					Variable*[] pp
+					var pp: Variable*[]
 					pp.add(&temp2)
 					inter.stack_push(self, temp)
 					f._func.call(inter, temp, pp)

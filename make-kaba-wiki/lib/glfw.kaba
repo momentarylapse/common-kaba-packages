@@ -242,7 +242,7 @@ class Gamepad as shared extends GamepadState
 		return buttons[b] and not state_prev.buttons[b]
 		
 	
-	func static get(index: int) -> shared Gamepad
+	func static get(index: int) -> Gamepad shared
 		return new Gamepad(index)
 
 func _main()

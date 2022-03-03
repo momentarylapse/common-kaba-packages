@@ -33,7 +33,7 @@ func compile(s: SourceFile, cxx_flags: string) -> bool
 		return false
 	return true
 
-class T extends Thread
+class TX extends Thread
 	var s: SourceFile
 	var cxx_flags: string
 	func override on_run()
@@ -80,15 +80,15 @@ func build()
 	
 	if num_threads > 1
 
-		var threads: T*[]
+		var threads: TX*[]
 		for i in 0:num_threads
-			threads.add(new T())
+			threads.add(new TX())
 	
 		for s,i in needs_building
-			var t: T* = nil
+			var t: TX* = nil
 			if i < num_threads
 				#print("{{i}} -> direct")
-				t = new T()
+				t = new TX()
 				threads.add(t)
 			else
 				#print("{{i}} -> pool")
@@ -98,7 +98,7 @@ func build()
 							tt.join()
 							# TODO allow multiple run()s
 							del tt
-							tt = new T()
+							tt = new TX()
 							t = tt
 							break
 			print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")

@@ -180,10 +180,10 @@ class Collection as shared
 	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	func const find(filter: any) -> shared Result
+	func const find(filter: any) -> Result shared
 		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	func const aggregate(pattern: any) -> shared Result
+	func const aggregate(pattern: any) -> Result shared
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	func insert(doc: any)

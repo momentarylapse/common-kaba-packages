@@ -24,7 +24,7 @@ func operator_rank(s: string) -> int
 		return 4
 	return -1
 
-func check_function_params(f: string, params: shared Term[])
+func check_function_params(f: string, params: Term shared[])
 	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
 		if len(params) != 1
 			raise(new SyntaxError("function '{{f}}' expects 1 parameter, {{len(params)}} given"))
@@ -54,7 +54,7 @@ class Parser
 	func end_of_line() -> bool
 		return cur_index >= len(e)
 
-	func parse_operand_minimal() -> shared Term
+	func parse_operand_minimal() -> Term shared
 		var c = cur()
 		#print("min  {{c}} {{cur_index}}")
 		if c == "("
@@ -79,7 +79,7 @@ class Parser
 		else if char_type(c[0]) == CHAR_LETTER
 			next()
 			if cur() == "("
-				shared Term[] params
+				Term shared[] params
 				next() # (
 				while cur() != ")"
 					params.add(parse_operand())
@@ -97,13 +97,13 @@ class Parser
 		raise(new SyntaxError("unknown operand '{{c}}'"))
 	
 	
-	func parse_operand() -> shared Term
+	func parse_operand() -> Term shared
 		#print("operand {{cur_index}}")
 		if cur() == "def"
 			return parse_def()
 		if cur() == "ass"
 			return parse_ass()
-		shared Term[] eid
+		Term shared[] eid
 		while true
 			# operand
 			if end_of_line()
@@ -124,7 +124,7 @@ class Parser
 
 		return digest_operators(eid)
 
-	func parse_def() -> shared Term
+	func parse_def() -> Term shared
 		next() # def
 		var op = parse_operand()
 		if op.name != "="
@@ -136,14 +136,14 @@ class Parser
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
 
-	func parse_ass() -> shared Term
+	func parse_ass() -> Term shared
 		next() # ass
 		var op = parse_operand()
 	#	if op.name != ":"
 	#		raise(new SyntaxError("ass needs ':'"))
 		return AddSpecial("ass", [op])
 
-func digest_operators(out eid: shared Term[]) -> shared Term
+func digest_operators(out eid: Term shared[]) -> Term shared
 	if (len(eid) % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
 	
@@ -167,13 +167,13 @@ func digest_operators(out eid: shared Term[]) -> shared Term
 	
 	return eid[0]
 
-func parse(s: string) -> shared Term
+func parse(s: string) -> Term shared
 	Parser p
 	p.e = s.parse_tokens("+-*/^<=>(),@:|")
 	p.cur_index = 0
 	return p.parse_operand()
 
-func f() -> shared Term
+func f() -> Term shared
 	return new Term(TYPE_NUMBER, "1")
 
 func main()
