@@ -16,7 +16,7 @@ func main()
 		if len(s) == 0
 			break
 		s = s[:-1]
-		Script.execute_single_command(s)
+		Module.execute_single_command(s)
 		#print("read: " + s)
 	print("\n")
 

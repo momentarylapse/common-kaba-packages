@@ -5,8 +5,8 @@ use time
 
 const SHIFT = "    "
 
-var external_packages: Script*[]
-var external_libs: Script*[]
+var external_packages: Module*[]
+var external_libs: Module*[]
 
 func param_pre(v: Variable) -> string
 	if not v.is_const()
@@ -288,7 +288,7 @@ func filter_classes(cc: Class*[]) -> Class*[]
 	return sorted(r, "name")
 
 
-func show_package(p: Script) -> string
+func show_package(p: Module) -> string
 	var wiki = "== Kaba package {{p.name}} ==\n"
 	if p.used_by_default
 		wiki = "== Kaba package {{p.name}} (default) ==\n"
@@ -354,14 +354,14 @@ func wiki_upload(name: string, wiki: string)
 func find_external()
 	var list = Filesystem.search("extern", "*.kaba", "f")
 	for e in list
-		var p = weak(Script.load("extern/" + e, true))
+		var p = weak(Module.load("extern/" + e, true))
 		p.name = str(e)[:-5]
 		external_packages.add(p)
 
 func find_external_libs()
 	var list = Filesystem.search("lib", "*.kaba", "f")
 	for e in list
-		var p = weak(Script.load("lib/" + e, true))
+		var p = weak(Module.load("lib/" + e, true))
 		p.name = str(e)[:-5]
 		external_libs.add(p)
 
@@ -456,7 +456,7 @@ func prepare_class(c: Class, ns: string, dir: Path)
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name, dir << cc.name)
 
-func prepare_package(p: Script, dir: Path)
+func prepare_package(p: Module, dir: Path)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
 
@@ -492,7 +492,7 @@ func make_class(c: Class, ns: string)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-func make_package(p: Script)
+func make_package(p: Module)
 	wiki_upload("kaba.{{p.name}}", show_package(p))
 
 	var classes = filter_classes(p.classes())

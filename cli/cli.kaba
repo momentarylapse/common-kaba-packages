@@ -11,7 +11,7 @@ func main()
 		try
 			var s = fancy_read_command(">>> ", history)
 			if s != ""
-				Script.execute_single_command(s)
+				Module.execute_single_command(s)
 		except Exception as e
 			print("exit")
 			break
