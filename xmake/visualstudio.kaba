@@ -8,7 +8,7 @@ func win_path(p: Path) -> string
 func rand_hex(chars: int) -> string
 	string s
 	for i in 0:chars
-		s += binary(&randi(0xffff), 1).hex().upper()[:1]
+		s += binary(&rand(0xffff), 1).hex().upper()[:1]
 	return s
 func create_guid() -> string
 	return "{" + rand_hex(8) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(12) + "}"
