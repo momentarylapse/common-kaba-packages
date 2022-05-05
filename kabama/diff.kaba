@@ -26,19 +26,19 @@ func diff_function(f: string, params: Term shared[]) -> Term shared
 func diff(t: Term shared, by: string) -> Term shared
 
 	# self
-	if t.type == TYPE_NUMBER
+	if t.type == Type.NUMBER
 		return AddNumber("0")
-	if t.type == TYPE_VARIABLE
+	if t.type == Type.VARIABLE
 		if t.name == by
 			return AddNumber("1")
 		return AddNumber("0")
-	if t.type == TYPE_FUNCTION
+	if t.type == Type.FUNCTION
 		var r = diff_function(t.name, t.params)
 		for p in t.params
 			r = AddOperator("*", diff(p, by), r)
 		# diff(f(a))  ->  f'(a) * diff(a)
 		return r
-	if t.type == TYPE_OPERATOR
+	if t.type == Type.OPERATOR
 		var a, b: Term shared
 		if len(t.params) > 0
 			a = t.params[0]
@@ -57,7 +57,7 @@ func diff(t: Term shared, by: string) -> Term shared
 			                        AddOperator("/", AddOperator("*", a, diff(b, by)),
 			                                         AddOperator("^", b, AddNumber("2"))))
 		if t.name == "^"
-			if b.type == TYPE_NUMBER
+			if b.type == Type.NUMBER
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b,
 				                        AddOperator("*", AddOperator("^", a, AddNumber(sub(b.name, "1"))),

@@ -120,19 +120,19 @@ class LiteralParser
 			line_no ++
 		return r
 
-enum
-	TYPE_NONE
-	TYPE_BOOL
-	TYPE_INT
-	TYPE_FLOAT
-	TYPE_STRING
-	TYPE_ARRAY
-	TYPE_DICT
-	TYPE_FUNCTION
-	TYPE_OBJECT
+enum TType
+	NONE
+	BOOL
+	INT
+	FLOAT
+	STRING
+	ARRAY
+	DICT
+	FUNCTION
+	OBJECT
 
 class DynamicValue
-	var type = TYPE_NONE
+	var type = TType.NONE
 	var s: DynamicValueState*
 	func __init__()
 		s = new DynamicValueState()
@@ -158,146 +158,146 @@ class DynamicValue
 		c.s = s.copy()
 		c.type = type
 		return c
-	func setType(_type: int)
+	func setType(_type: TType)
 		if type != _type
 			#clear()
 			del s
 			type = _type
-			if type == TYPE_BOOL
+			if type == TType.BOOL
 				s = new DynamicValueStateBool()
-			else if type == TYPE_INT
+			else if type == TType.INT
 				s = new DynamicValueStateInt()
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				s = new DynamicValueStateFloat()
-			else if type == TYPE_STRING
+			else if type == TType.STRING
 				s = new DynamicValueStateString()
-			else if type == TYPE_ARRAY
+			else if type == TType.ARRAY
 				s = new DynamicValueStateArray()
-			else if type == TYPE_DICT
+			else if type == TType.DICT
 				s = new DynamicValueStateDict()
-			else if type == TYPE_FUNCTION
+			else if type == TType.FUNCTION
 				s = new DynamicValueStateFunction()
 			else
 				s = new DynamicValueState()
 	func setBool(b: bool)
-		setType(TYPE_BOOL)
+		setType(TType.BOOL)
 		var sb: DynamicValueStateBool* = s
 		sb.v = b
 	func setInt(i: int)
-		setType(TYPE_INT)
+		setType(TType.INT)
 		var si: DynamicValueStateInt* = s
 		si.v = i
 	func setFloat(f: float)
-		setType(TYPE_FLOAT)
+		setType(TType.FLOAT)
 		var sf: DynamicValueStateFloat* = s
 		sf.v = f
 	func setString(_s: string)
-		setType(TYPE_STRING)
+		setType(TType.STRING)
 		var ss: DynamicValueStateString* = s
 		ss.v = _s
 	func setFunction(f: Function)
-		setType(TYPE_FUNCTION)
+		setType(TType.FUNCTION)
 		var sf: DynamicValueStateFunction* = s
 		sf._func = &f
 	func __assign__(b: DynamicValue)
-		if b.type == TYPE_BOOL
+		if b.type == TType.BOOL
 			setBool(bool(b))
-		else if b.type == TYPE_INT
+		else if b.type == TType.INT
 			setInt(int(b))
-		else if b.type == TYPE_FLOAT
+		else if b.type == TType.FLOAT
 			setFloat(float(b))
-		else if b.type == TYPE_STRING
+		else if b.type == TType.STRING
 			setString(str(b))
-		else if b.type == TYPE_ARRAY
-			setType(TYPE_ARRAY)
+		else if b.type == TType.ARRAY
+			setType(TType.ARRAY)
 			var ba: DynamicValueStateArray* = b.s
 			for el in ba.a
 				s.add(el)
-		else if b.type == TYPE_DICT
-			setType(TYPE_DICT)
+		else if b.type == TType.DICT
+			setType(TType.DICT)
 			var bd: DynamicValueStateDict* = b.s
 			var ad: DynamicValueStateDict* = s
 			for el,i in bd.values
 				ad.add(bd.keys[i], el)
-		else if b.type == TYPE_FUNCTION
+		else if b.type == TType.FUNCTION
 			var bf: DynamicValueStateFunction* = b.s
 			setFunction(bf._func)
 
 	func __iadd__(b: DynamicValue)
-		if b.type == TYPE_INT
-			if type == TYPE_INT
+		if b.type == TType.INT
+			if type == TType.INT
 				setInt(int(s) + int(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setInt(int(s) + float(b))
-		else if b.type == TYPE_FLOAT
-			if type == TYPE_INT
+		else if b.type == TType.FLOAT
+			if type == TType.INT
 				setFloat(float(s) + int(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) + float(b))
-		else if b.type == TYPE_STRING
-			if type == TYPE_STRING
+		else if b.type == TType.STRING
+			if type == TType.STRING
 				setString(str(s) + str(b))
-		else if b.type == TYPE_ARRAY
-			if type == TYPE_ARRAY
+		else if b.type == TType.ARRAY
+			if type == TType.ARRAY
 				var ba: DynamicValueStateArray* = b.s
 				for el in ba.a
 					s.add(el)
-		else if b.type == TYPE_DICT
-			if type == TYPE_DICT
+		else if b.type == TType.DICT
+			if type == TType.DICT
 				var bd: DynamicValueStateDict* = b.s
 				var ad: DynamicValueStateDict* = s
 				for el,i in bd.values
 					ad.add(bd.keys[i], el)
 
 	func __isub__(b: DynamicValue)
-		if b.type == TYPE_INT
-			if type == TYPE_INT
+		if b.type == TType.INT
+			if type == TType.INT
 				setInt(int(s) - int(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setInt(int(s) - float(b))
-		else if b.type == TYPE_FLOAT
-			if type == TYPE_INT
+		else if b.type == TType.FLOAT
+			if type == TType.INT
 				setFloat(float(s) - float(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) - float(b))
 
 	func __imul__(b: DynamicValue)
-		if b.type == TYPE_INT
-			if type == TYPE_INT
+		if b.type == TType.INT
+			if type == TType.INT
 				setInt(int(s) * int(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) * int(b))
-		else if b.type == TYPE_FLOAT
-			if type == TYPE_INT
+		else if b.type == TType.FLOAT
+			if type == TType.INT
 				setFloat(int(s) * float(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) * float(b))
 
 	func __idiv__(b: DynamicValue)
-		if b.type == TYPE_INT
-			if type == TYPE_INT
+		if b.type == TType.INT
+			if type == TType.INT
 				setInt(int(s) / int(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) / int(b))
-		else if b.type == TYPE_FLOAT
-			if type == TYPE_INT
+		else if b.type == TType.FLOAT
+			if type == TType.INT
 				setFloat(int(s) / float(b))
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				setFloat(float(s) / float(b))
 
 	func const compare(b: DynamicValue) -> int
-		if b.type == TYPE_INT
-			if type == TYPE_INT
+		if b.type == TType.INT
+			if type == TType.INT
 				return int(s) - int(b)
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				return (float(s) - float(b)) * 1000.0
-		else if b.type == TYPE_FLOAT
-			if type == TYPE_INT
+		else if b.type == TType.FLOAT
+			if type == TType.INT
 				return (float(s) - float(b)) * 1000.0
-			else if type == TYPE_FLOAT
+			else if type == TType.FLOAT
 				return (float(s) - float(b)) * 1000.0
-		else if b.type == TYPE_STRING
-			if type == TYPE_STRING
+		else if b.type == TType.STRING
+			if type == TType.STRING
 				if str(s) < str(b)
 					return -1
 				if str(s) > str(b)
@@ -406,7 +406,7 @@ class DynamicValueStateArray extends DynamicValueState
 	func override __bool__() -> bool
 		return len(a) > 0
 	func override get_element(i: DynamicValue) -> DynamicValue*
-		if i.type != TYPE_INT
+		if i.type != TType.INT
 			return nil
 		var ii: DynamicValueStateInt* = i.s
 		if ii.v < 0 or ii.v >= len(a)
@@ -496,7 +496,7 @@ class Variable
 			s += name + " = "
 		s += v.render()
 		print(s)
-	func setType(_type: int)
+	func setType(_type: TType)
 		v.setType(_type)
 	func setReference(r: DynamicValue)
 		clear()
@@ -568,16 +568,16 @@ class FunctionPrint extends FunctionInternal
 class FunctionLen extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		if len(p) > 0
-			if p[0].v.type == TYPE_ARRAY
+			if p[0].v.type == TType.ARRAY
 				var a: DynamicValueStateArray* = p[0].v.s
 				r.v.setInt(len(a.a))
-			if p[0].v.type == TYPE_DICT
+			if p[0].v.type == TType.DICT
 				var a: DynamicValueStateDict* = p[0].v.s
 				r.v.setInt(len(a.values))
 
 class FunctionRange extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
-		r.v.setType(TYPE_ARRAY)
+		r.v.setType(TType.ARRAY)
 		var a: DynamicValueStateArray* = r.v.s
 		int start = 0
 		int end = 0
@@ -621,8 +621,8 @@ class FunctionBool extends FunctionInternal
 class FunctionMap extends FunctionInternal
 	func override call(out inter: Interpreter, out r: Variable, p: Variable*[])
 		if len(p) >= 2
-			if p[0].v.type == TYPE_FUNCTION and p[1].v.type == TYPE_ARRAY
-				r.v.setType(TYPE_ARRAY)
+			if p[0].v.type == TType.FUNCTION and p[1].v.type == TType.ARRAY
+				r.v.setType(TType.ARRAY)
 				var f: DynamicValueStateFunction* = p[0].v.s
 				var pa: DynamicValueStateArray* = p[1].v.s
 				var ra: DynamicValueStateArray* = r.v.s
@@ -636,24 +636,24 @@ class FunctionMap extends FunctionInternal
 					inter.stack_pop()
 					ra.a.add(temp.v.copy())
 
-enum
-	TYPE_OPERATOR
-	TYPE_VARIABLE
-	TYPE_CONST
-	TYPE_CALL
-	TYPE_BLOCK
-	TYPE_IF
-	TYPE_WHILE
-	TYPE_FOR
-	TYPE_BREAK
-	TYPE_CONTINUE
-	TYPE_RETURN
-	TYPE_ARRAY_BUILDER
-	TYPE_DICT_BUILDER
-	TYPE_ARRAY_ELEMENT
+enum NodeType
+	OPERATOR
+	VARIABLE
+	CONST
+	CALL
+	BLOCK
+	IF
+	WHILE
+	FOR
+	BREAK
+	CONTINUE
+	RETURN
+	ARRAY_BUILDER
+	DICT_BUILDER
+	ARRAY_ELEMENT
 
 class SyntaxNode
-	var type: int
+	var type: NodeType
 	var params: SyntaxNode*[]
 	func virtual tostr() -> string
 		return "???"
@@ -672,7 +672,7 @@ class SyntaxNodeVariable extends SyntaxNode
 	var allow_create = false
 	func __init__(_name: string)
 		name = _name
-		type = TYPE_VARIABLE
+		type = NodeType.VARIABLE
 	func override tostr() -> string
 		return "variable " + name
 
@@ -680,7 +680,7 @@ class SyntaxNodeConst extends SyntaxNode
 	var v: Variable*
 	func __init__(_v: Variable*)
 		v = _v
-		type = TYPE_CONST
+		type = NodeType.CONST
 	func override tostr() -> string
 		return "const " + v.v.render()
 
@@ -688,7 +688,7 @@ class SyntaxNodeOperator extends SyntaxNode
 	var op: string
 	func __init__(_op: string)
 		op = _op
-		type = TYPE_OPERATOR
+		type = NodeType.OPERATOR
 	func override tostr() -> string
 		return "operator " + op
 	func rank() -> int
@@ -709,13 +709,13 @@ class SyntaxNodeCall extends SyntaxNode
 	
 	func __init__(_name: string)
 		name = _name
-		type = TYPE_CALL
+		type = NodeType.CALL
 	func override tostr() -> string
 		return "call " + name
 
 class SyntaxNodeBlock extends SyntaxNode
 	func override __init__()
-		type = TYPE_BLOCK
+		type = NodeType.BLOCK
 	func override tostr() -> string
 		return "block"
 
@@ -723,7 +723,7 @@ class SyntaxNodeIf extends SyntaxNode
 	var block: SyntaxNode* = nil
 	var block_else: SyntaxNode* = nil
 	func override __init__()
-		type = TYPE_IF
+		type = NodeType.IF
 	func override tostr() -> string
 		return "if"
 	func override showPost(indent: int)
@@ -735,7 +735,7 @@ class SyntaxNodeWhile extends SyntaxNode
 	var block: SyntaxNode* = nil
 	var block_else: SyntaxNode* = nil
 	func override __init__()
-		type = TYPE_WHILE
+		type = NodeType.WHILE
 	func override tostr() -> string
 		return "while"
 	func override showPost(indent: int)
@@ -747,7 +747,7 @@ class SyntaxNodeFor extends SyntaxNode
 	var block: SyntaxNode* = nil
 	var block_else: SyntaxNode* = nil
 	func override __init__()
-		type = TYPE_FOR
+		type = NodeType.FOR
 	func override tostr() -> string
 		return "for"
 	func override showPost(indent: int)
@@ -758,37 +758,37 @@ class SyntaxNodeFor extends SyntaxNode
 
 class SyntaxNodeReturn extends SyntaxNode
 	func override __init__()
-		type = TYPE_RETURN
+		type = NodeType.RETURN
 	func override tostr() -> string
 		return "return"
 
 class SyntaxNodeBreak extends SyntaxNode
 	func override __init__()
-		type = TYPE_BREAK
+		type = NodeType.BREAK
 	func override tostr() -> string
 		return "break"
 
 class SyntaxNodeContinue extends SyntaxNode
 	func override __init__()
-		type = TYPE_CONTINUE
+		type = NodeType.CONTINUE
 	func override tostr() -> string
 		return "continue"
 
 class SyntaxNodeArrayBuilder extends SyntaxNode
 	func override __init__()
-		type = TYPE_ARRAY_BUILDER
+		type = NodeType.ARRAY_BUILDER
 	func override tostr() -> string
 		return "new []"
 
 class SyntaxNodeDictBuilder extends SyntaxNode
 	func override __init__()
-		type = TYPE_DICT_BUILDER
+		type = NodeType.DICT_BUILDER
 	func override tostr() -> string
 		return "new {}"
 
 class SyntaxNodeArrayElement extends SyntaxNode
 	func override __init__()
-		type = TYPE_ARRAY_ELEMENT
+		type = NodeType.ARRAY_ELEMENT
 	func override tostr() -> string
 		return "[]"
 
@@ -1243,7 +1243,7 @@ class Interpreter
 		
 		# parameters
 		for p in sn.params
-			if p.type == TYPE_VARIABLE
+			if p.type == NodeType.VARIABLE
 				var vv: SyntaxNodeVariable* = p
 				var v = cur_context.get(vv.name)
 				if !v
@@ -1254,7 +1254,7 @@ class Interpreter
 						setError("variable not found: {{vv.name}}")
 				params.add(v)
 				is_temp.add(false)
-			else if p.type == TYPE_CONST
+			else if p.type == NodeType.CONST
 				var vv: SyntaxNodeConst* = p
 				params.add(vv.v)
 				is_temp.add(false)
@@ -1268,7 +1268,7 @@ class Interpreter
 					break
 		
 		# execute
-		if sn.type == TYPE_OPERATOR
+		if sn.type == NodeType.OPERATOR
 			var op: SyntaxNodeOperator* = &sn
 			if op.op == "="
 				*params[0].v = *params[1].v
@@ -1310,12 +1310,12 @@ class Interpreter
 				ret.v.setBool(bool(params[0].v))
 			else
 				setError("unhandled operator: {{op.op}}")
-		else if sn.type == TYPE_CALL
+		else if sn.type == NodeType.CALL
 			var call: SyntaxNodeCall* = &sn
 			var v = cur_context.get(call.name)
 			if !v
 				setError("function not found: {{call.name}}")
-			if v.v.type != TYPE_FUNCTION
+			if v.v.type != TType.FUNCTION
 				setError("is not a function: {{call.name}}")
 			var fs: DynamicValueStateFunction* = v.v.s
 			var f: Function* = fs._func
@@ -1328,14 +1328,14 @@ class Interpreter
 #			else
 			stack_pop()
 				
-		else if sn.type == TYPE_IF
+		else if sn.type == NodeType.IF
 			Variable dummy
 			var _if: SyntaxNodeIf* = &sn
 			if bool(params[0].v)
 				doNode(_if.block, dummy)
 			else if _if.block_else
 				doNode(_if.block_else, dummy)
-		else if sn.type == TYPE_WHILE
+		else if sn.type == NodeType.WHILE
 			var _while: SyntaxNodeWhile* = &sn
 			while bool(params[0].v)
 				cur_context.flag_continue = false
@@ -1346,11 +1346,11 @@ class Interpreter
 					break
 
 				# reevaluate
-				if sn.params[0].type != TYPE_VARIABLE
+				if sn.params[0].type != NodeType.VARIABLE
 					doNode(sn.params[0], params[0])
 			cur_context.flag_break = false
-		else if sn.type == TYPE_FOR
-			if params[1].v.type != TYPE_ARRAY
+		else if sn.type == NodeType.FOR
+			if params[1].v.type != TType.ARRAY
 				setError("for needs array")
 			var a: DynamicValueStateArray* = params[1].v.s
 			var _for: SyntaxNodeFor* = &sn
@@ -1365,27 +1365,27 @@ class Interpreter
 					break
 					
 			cur_context.flag_break = false
-		else if sn.type == TYPE_RETURN
+		else if sn.type == NodeType.RETURN
 			if len(params) > 0
 				*cur_context.ret.v = *params[0].v
 			cur_context.flag_return = true
-		else if sn.type == TYPE_BREAK
+		else if sn.type == NodeType.BREAK
 			cur_context.flag_break = true
-		else if sn.type == TYPE_CONTINUE
+		else if sn.type == NodeType.CONTINUE
 			cur_context.flag_continue = true
-		else if sn.type == TYPE_BLOCK
+		else if sn.type == NodeType.BLOCK
 			pass
-		else if sn.type == TYPE_ARRAY_BUILDER
-			ret.setType(TYPE_ARRAY)
+		else if sn.type == NodeType.ARRAY_BUILDER
+			ret.setType(TType.ARRAY)
 			for c in params
 				ret.v.add(c.v)
-		else if sn.type == TYPE_DICT_BUILDER
-			ret.setType(TYPE_DICT)
+		else if sn.type == NodeType.DICT_BUILDER
+			ret.setType(TType.DICT)
 			var ds: DynamicValueStateDict* = ret.v.s
 			int n = len(params) / 2
 			for i in 0:n
 				ds.add(params[0].v, params[1].v)
-		else if sn.type == TYPE_ARRAY_ELEMENT
+		else if sn.type == NodeType.ARRAY_ELEMENT
 			var dv: DynamicValue* = params[0].v.get_element(params[1].v)
 			if dv
 				ret.setReference(dv)

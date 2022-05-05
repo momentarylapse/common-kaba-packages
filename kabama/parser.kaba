@@ -2,16 +2,16 @@ use common
 
 class SyntaxError extends Exception
 
-func char_type(c: char) -> int
+func char_type(c: char) -> CharType
 	if (c >= 'a') and (c <= 'z')
-		return CHAR_LETTER
+		return CharType.LETTER
 	if (c >= 'A') and (c <= 'Z')
-		return CHAR_LETTER
+		return CharType.LETTER
 	if (c >= '0') and (c <= '9')
-		return CHAR_NUMBER
+		return CharType.NUMBER
 	if c == ' ' or c == '\t' or c == '\n'
-		return CHAR_WHITESPACE
-	return CHAR_SIGN
+		return CharType.WHITESPACE
+	return CharType.SIGN
 
 func operator_rank(s: string) -> int
 	if s in ["=", ":"]
@@ -31,7 +31,7 @@ func check_function_params(f: string, params: Term shared[])
 	if f in ["diff", "zeros"]
 		if len(params) != 2
 			raise(new SyntaxError("function '{{f}}' expects 2 parameter, {{len(params)}} given"))
-		if params[1].type != TYPE_VARIABLE
+		if params[1].type != Type.VARIABLE
 			raise(new SyntaxError("function '{{f}}' expects a variable as the second parameter"))
 	if f == "subst"
 		if len(params) != 3
@@ -73,10 +73,10 @@ class Parser
 			var name = "@" + cur()
 			next()
 			return AddVariable(name)
-		else if char_type(c[0]) == CHAR_NUMBER
+		else if char_type(c[0]) == CharType.NUMBER
 			next()
 			return AddNumber(c)
-		else if char_type(c[0]) == CHAR_LETTER
+		else if char_type(c[0]) == CharType.LETTER
 			next()
 			if cur() == "("
 				Term shared[] params
@@ -119,7 +119,7 @@ class Parser
 			# operator
 			if operator_rank(cur()) < 0
 				raise(new SyntaxError("unknown operator '{{cur()}}'"))
-			eid.add(AddOperator(cur(), new Term(TYPE_DUMMY, ""), new Term(TYPE_DUMMY, "")))
+			eid.add(AddOperator(cur(), new Term(Type.DUMMY, ""), new Term(Type.DUMMY, "")))
 			next()
 
 		return digest_operators(eid)
@@ -129,10 +129,10 @@ class Parser
 		var op = parse_operand()
 		if op.name != "="
 			raise(new SyntaxError("def needs '='"))
-		if op.params[0].type != TYPE_FUNCTION
+		if op.params[0].type != Type.FUNCTION
 			raise(new SyntaxError("def needs function name before '='"))
 		for p in op.params[0].params
-			if p.type != TYPE_VARIABLE
+			if p.type != Type.VARIABLE
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
 
@@ -155,7 +155,7 @@ func digest_operators(out eid: Term shared[]) -> Term shared
 				if os > sig
 					sig = os
 					i_sig = i
-		if eid[i_sig].type != TYPE_OPERATOR
+		if eid[i_sig].type != Type.OPERATOR
 			raise(new SyntaxError("missing operator"))
 		eid[i_sig].params[0] = eid[i_sig - 1]
 		eid[i_sig].params[1] = eid[i_sig + 1]
@@ -174,7 +174,7 @@ func parse(s: string) -> Term shared
 	return p.parse_operand()
 
 func f() -> Term shared
-	return new Term(TYPE_NUMBER, "1")
+	return new Term(Type.NUMBER, "1")
 
 func main()
 	#shared Term t = f()

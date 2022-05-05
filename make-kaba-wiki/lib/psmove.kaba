@@ -77,17 +77,16 @@ func extern _psmove_fusion_get_position(fusion: PSMoveFusion*, psmove: PSMove*, 
 func extern _psmove_fusion_get_modelview_matrix(fusion: PSMoveFusion*, move: PSMove*) -> matrix*
 
 
-enum
-	Btn_TRIANGLE = 16 # Green triangle
-	Btn_CIRCLE = 32 # Red circle
-	Btn_CROSS = 64 # Blue cross
-	Btn_SQUARE = 128 # Pink square
-	Btn_SELECT = 256 # Select button, left side
-	Btn_START = 2048 # Start button, right side
+const Btn_TRIANGLE = 16 # Green triangle
+const Btn_CIRCLE = 32 # Red circle
+const Btn_CROSS = 64 # Blue cross
+const Btn_SQUARE = 128 # Pink square
+const Btn_SELECT = 256 # Select button, left side
+const Btn_START = 2048 # Start button, right side
 
-	Btn_PS = 65536 # PS button, front center
-	Btn_MOVE = 524288 # Move button, big front button
-	Btn_T = 1048576 # Trigger, on the back
+const Btn_PS = 65536 # PS button, front center
+const Btn_MOVE = 524288 # Move button, big front button
+const Btn_T = 1048576 # Trigger, on the back
 
 class MyPSMoveController
 	var psmove: PSMove*

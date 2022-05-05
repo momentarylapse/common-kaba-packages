@@ -1,27 +1,27 @@
-enum
-	TYPE_DUMMY
-	TYPE_NUMBER
-	TYPE_CONSTANT
-	TYPE_VARIABLE
-	TYPE_OPERATOR
-	TYPE_FUNCTION
-	TYPE_SPECIAL
-	TYPE_LIST
-#	TYPE_SET
+enum Type
+	DUMMY
+	NUMBER
+	CONSTANT
+	VARIABLE
+	OPERATOR
+	FUNCTION
+	SPECIAL
+	LIST
+#	SET
 
-enum
-	CHAR_LETTER
-	CHAR_NUMBER
-	CHAR_SIGN
-	CHAR_WHITESPACE
+enum CharType
+	LETTER
+	NUMBER
+	SIGN
+	WHITESPACE
 
 var num_terms: int
 
 class Term as shared
-	var type: int
+	var type: Type
 	var name: string
 	var params: Term shared[]
-	func __init__(_type: int, _name: string)
+	func __init__(_type: Type, _name: string)
 		type = _type
 		name = _name
 		#print("new Term {{type}} {{name}}")
@@ -38,7 +38,7 @@ class Term as shared
 #			c.params.add(p.copy())
 #		return c
 	func const __str__() -> string
-		if type == TYPE_OPERATOR
+		if type == Type.OPERATOR
 			string a = str(params[0])
 			string b = str(params[1])
 			if param_needs_paranthesis(0)
@@ -51,31 +51,31 @@ class Term as shared
 				return a + name + b
 			else
 				return "{{a}} {{name}} {{b}}"
-		else if type == TYPE_NUMBER
+		else if type == Type.NUMBER
 			return name
-		else if type == TYPE_VARIABLE
+		else if type == Type.VARIABLE
 			return name
-		else if type == TYPE_FUNCTION
+		else if type == Type.FUNCTION
 			return name + "(" + [for p in params str(p)].join(", ") + ")"
-		else if type == TYPE_SPECIAL
+		else if type == Type.SPECIAL
 			return "{{name}} " + str(params[0])
-		else if type == TYPE_LIST
+		else if type == Type.LIST
 			return "[" + [for p in params str(p)].join(", ") + "]"
 		return "?"
 	func const param_needs_paranthesis(p: int) -> bool
-		if params[p].type == TYPE_NUMBER
+		if params[p].type == Type.NUMBER
 			if params[p].name[:1] == "-"
 				return true
 		if name == "^"
-			return params[p].type == TYPE_OPERATOR
+			return params[p].type == Type.OPERATOR
 		if name == "/"
 			if params[p].name == "^"
 				return false
-			return params[p].type == TYPE_OPERATOR
+			return params[p].type == Type.OPERATOR
 		if name == "-"
 			if params[p].name == "*"
 				return false
-			return params[p].type == TYPE_OPERATOR
+			return params[p].type == Type.OPERATOR
 		if name == "*"
 			return params[p].name in ["+", "-"]
 		return false
@@ -85,19 +85,19 @@ class Term as shared
 		
 
 func AddNumber(s: string) -> Term shared
-	return new Term(TYPE_NUMBER, s)
+	return new Term(Type.NUMBER, s)
 
 func AddVariable(s: string) -> Term shared
-	return new Term(TYPE_VARIABLE, s)
+	return new Term(Type.VARIABLE, s)
 
 func AddOperator(s: string, p1: Term shared, p2: Term shared) -> Term shared
-	var t = new Term(TYPE_OPERATOR, s)
+	var t = new Term(Type.OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return t
 
 func AddFunction(s: string, params: Term shared[]) -> Term shared
-	var t = new Term(TYPE_FUNCTION, s)
+	var t = new Term(Type.FUNCTION, s)
 	t.params = params
 	return t
 
@@ -108,12 +108,12 @@ func PermuteOperator(t: Term shared) -> Term shared
 	return r
 
 func AddSpecial(s: string, params: Term shared[]) -> Term shared
-	var t = new Term(TYPE_SPECIAL, s)
+	var t = new Term(Type.SPECIAL, s)
 	t.params = params
 	return t
 
 func AddList(params: Term shared[]) -> Term shared
-	var t = new Term(TYPE_LIST, "-list-")
+	var t = new Term(Type.LIST, "-list-")
 	t.params = params
 	return t
 

@@ -14,37 +14,37 @@ class Termios
 #          oflag = 5
 #          cflag = 0o277 CREAD + CS8/CSIZE + ???
 #          lflag = 0o105073 = IEXTEN + ECHOKE + ECHOCTL + ECHOK + ECHOE + ECHO + ISIG + ICANON
-enum
-	# iflag
-	IGNBRK = 0x0001
-	BRKINT = 0x0002
-	PARMRK = 0x0008
-	ISTRIP = 0x0020
-	INLCR  = 0x0040
-	IGNCR  = 0x0080
-	ICRNL  = 0x0100
-	IXON   = 0x0400
-	IUTF8  = 0x8000
+
+# iflag
+const IGNBRK = 0x0001
+const BRKINT = 0x0002
+const PARMRK = 0x0008
+const ISTRIP = 0x0020
+const INLCR  = 0x0040
+const IGNCR  = 0x0080
+const ICRNL  = 0x0100
+const IXON   = 0x0400
+const IUTF8  = 0x8000
 	
-	# oflag
-	OPOST = 0x0001
+# oflag
+const OPOST = 0x0001
 	
-	# lflag
-	ISIG   = 0x0001
-	ICANON = 0x0002
-	ECHO   = 0x0008
-	ECHONL = 0x0040
-	IEXTEN = 0x8000
+# lflag
+const ISIG   = 0x0001
+const ICANON = 0x0002
+const ECHO   = 0x0008
+const ECHONL = 0x0040
+const IEXTEN = 0x8000
 	
-	# cflag
-	CSIZE  = 0x0030
-	PARENB = 0x0100
-	CS8    = 0x0030
+# cflag
+const CSIZE  = 0x0030
+const PARENB = 0x0100
+const CS8    = 0x0030
 	
 	
-	TCSANOW = 0
-	VTIME = 5
-	VMIN = 6
+const TCSANOW = 0
+const VTIME = 5
+const VMIN = 6
 
 func extern _tcgetattr(fno: int, t: Termios*) -> int
 func extern _tcsetattr(fno: int, opt: int, t: Termios*) -> int
@@ -61,7 +61,7 @@ func setraw()
 	#t.iflag -= (t.iflag & (IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON))
 	#t.oflag -= (t.oflag & OPOST)
 	t.lflag -= (t.lflag & (ECHO | ECHONL | ICANON | ISIG | IEXTEN))
-	t.cflag -= (t.cflag & (CSIZE | PARENB))
+	t.cflag -= (t.cflag & CSIZE | PARENB)
 	t.cflag = t.cflag | CS8
 	#print(str(t))
 	_tcsetattr(0, TCSANOW, &t)

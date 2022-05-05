@@ -6,7 +6,7 @@ func subst_variable(_t: Term shared, _var: string, by: Term shared) -> Term shar
 	for p in t.params
 		p = subst_variable(p, _var, by)
 	
-	if t.type == TYPE_VARIABLE
+	if t.type == Type.VARIABLE
 		if t.name == _var
 			return by
 	return t

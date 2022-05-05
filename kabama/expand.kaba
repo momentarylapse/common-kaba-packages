@@ -23,7 +23,7 @@ func expand(_t: Term shared) -> Term shared
 	else if t.name == "^"
 		var p1 = t.params[0]
 		var p2 = t.params[1]
-		if p2.type == TYPE_NUMBER
+		if p2.type == Type.NUMBER
 			if p1.name == "*"
 				# (a * b)^c  ->  a^c * b^c
 				return expand(AddOperator("*", AddOperator("^", p1.params[0], p2),

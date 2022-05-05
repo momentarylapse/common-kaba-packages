@@ -10,7 +10,7 @@ class EditorPanel extends CircuitPanel
 		ed = &e
 	func override on_selection_change()
 		ed.load_from_part(nil)
-		if sel.type == SEL_TYPE_EDGE
+		if sel.type == SelectionType.EDGE
 			ed.load_from_part(ed.c.edges[sel.index])
 
 class CircuitEditor extends hui.Window
@@ -58,8 +58,8 @@ Toolbar toolbar ''
 		
 		set_maximized(true)
 		
-		for t in 0:NUM_TYPES
-			set_string("add-type", edge_name(t))
+		for t in EdgeType.all()
+			set_string("add-type", str(t))
 		set_string("add-type", "Node")
 		
 		if len(arg) > 0
@@ -93,7 +93,7 @@ Toolbar toolbar ''
 	func on_param()
 		int row = hui.get_event().row
 		string p = get_cell("params", row, 1)
-		if panel.sel.type == SEL_TYPE_EDGE
+		if panel.sel.type == SelectionType.EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
 	
 	func load_from_part(e: Edge*)
@@ -123,11 +123,11 @@ Toolbar toolbar ''
 	func on_add_type()
 		int t = get_int("")
 		panel.first_node = -1
-		if t == NUM_TYPES
-			panel.mode = MODE_ADD_NODE
+		if t == len(EdgeType.all())
+			panel.mode = Mode.ADD_NODE
 		else if t >= 0
-			panel.mode = MODE_ADD_EDGE
-			panel.add_type = t
+			panel.mode = Mode.ADD_EDGE
+			panel.add_type = EdgeType.from_int(t)
 		panel.redraw()
 
 func main(arg: string[])

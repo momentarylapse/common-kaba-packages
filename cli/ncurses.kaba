@@ -31,12 +31,30 @@ const KABA_LINK = "/usr/lib/libstdc++.so
 	noecho:noecho
 	_keypad:keypad"
 
+enum Attr
+	NORMAL = 0
+	COLOR = 0x0000ff00
+	REVERSE = 1<<(10+8)
+	UNDERLINE = 1<<(10+9)
+	BLINK = 1<<(11+8)
+	BOLD = 1<<(13+8)
+
+enum Color
+	BLACK
+	RED
+	GREEN
+	YELLOW
+	BLUE
+	MAGENTA
+	CYAN
+	WHITE
+
 func extern _initscr() -> void*
 func extern curs_set(mode: int) -> int
 func extern has_colors() -> bool
 func extern start_color() -> int
 func extern use_default_colors() -> int
-func extern init_pair(i: int, a: int, b: int) -> int
+func extern init_pair(i: int, a: Color, b: Color) -> int
 func extern _waddnstr(w: void*, p: char*, n: int) -> int
 func extern _waddnwstr(w: void*, p: int*, n: int) -> int
 func extern _wrefresh(w: void*) -> int
@@ -80,6 +98,10 @@ class Window
 		_keypad(w, e)
 	func move(x: int, y: int)
 		_wmove(w, y, x)
+	func attron(a: Attr)
+		_wattr_on(w, int(a), nil)
+	func attroff(a: Attr)
+		_wattr_off(w, int(a), nil)
 	func attron(a: int)
 		_wattr_on(w, a, nil)
 	func attroff(a: int)
@@ -95,35 +117,17 @@ class Window
 	func getch() -> int
 		return _wgetch(w)
 
-class Attr
-	const NORMAL = 0
-	const COLOR = 0x0000ff00
-	const REVERSE = 1<<(10+8)
-	const UNDERLINE = 1<<(10+9)
-	const BLINK = 1<<(11+8)
-	const BOLD = 1<<(13+8)
 
-class Color
-	enum
-		BLACK
-		RED
-		GREEN
-		YELLOW
-		BLUE
-		MAGENTA
-		CYAN
-		WHITE
-	func static pair(n: int) -> int
-		return (n<<8) & Attr.COLOR
+func static color_pair(n: int) -> int
+	return (n<<8) & int(Attr.COLOR)
 
-class Key
-	enum
-		DOWN = 258
-		UP = 259
-		LEFT = 260
-		RIGHT = 261
-		MOUSE = 409
-		RESIZE = 410
+enum Key
+	DOWN = 258
+	UP = 259
+	LEFT = 260
+	RIGHT = 261
+	MOUSE = 409
+	RESIZE = 410
 
 var stdwin: Window
 
@@ -164,7 +168,7 @@ func main()
 	#ww.attron(1<<8)
 	#ww.attron(1<<11)
 	ww.print("hi test")
-	ww.attron(Color.pair(1))
+	ww.attron(color_pair(1))
 	ww.print("red")
 	#ww.addch('A' | Color.pair(1))
 	ww.refresh()
@@ -186,8 +190,8 @@ func _main()
 	var h = stdwin.height()
 	stdwin.printw("█▀▄▌▐∴∵∌∮")
 	for i in 0:256
-		init_pair(i+1, i, i)
-		stdwin.attron(Color.pair(i+1))
+		init_pair(i+1, Color.from_int(i), Color.from_int(i))
+		stdwin.attron(color_pair(i+1))
 		stdwin.print("M")
 	stdwin.refresh()
 	

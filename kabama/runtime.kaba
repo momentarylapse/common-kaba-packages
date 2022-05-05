@@ -53,10 +53,10 @@ class Runtime
 			return subst(t.params[0], t.params[1], t.params[2], 50)
 		else if t.name == "zeros"
 			return zeros(t.params[0], t.params[1].name)
-		else if t.type == TYPE_SPECIAL
+		else if t.type == Type.SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])
-		else if t.type == TYPE_FUNCTION
+		else if t.type == Type.FUNCTION
 			for f in functions
 				if f.name == t.name
 					return subst_variable(f.formula, f.params[0], t.params[0])

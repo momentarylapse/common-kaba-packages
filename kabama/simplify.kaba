@@ -106,7 +106,7 @@ func split_off_factor(out l: Term shared[]) -> string[]
 	for x,i in l
 		string f = "1"
 		if x.name == "*"
-			if x.params[0].type == TYPE_NUMBER
+			if x.params[0].type == Type.NUMBER
 				f = x.params[0].name
 				l[i] = x.params[1]
 		factor.add(f)
@@ -190,7 +190,7 @@ func eval_product(t: Term shared) -> Term shared
 	string num = "1"
 	string denum = "1"
 	for i in 0:len(l)
-		if l[i].type == TYPE_NUMBER
+		if l[i].type == Type.NUMBER
 			if inverse[i]
 				denum = mul(denum, l[i].name)
 			else
@@ -225,7 +225,7 @@ func make_unique_in_sum(out l: Term shared[], out negative: bool[])
 	for x,i in l
 		string m = "1"
 		if x.name == "*"
-			if x.params[0].type == TYPE_NUMBER
+			if x.params[0].type == Type.NUMBER
 				m = x.params[0].name
 				l[i] = x.params[1]
 		if negative[i]
@@ -257,7 +257,7 @@ func eval_sum(t: Term shared) -> Term shared
 	# add constants
 	string num = "0"
 	for i in 0:len(l)
-		if l[i].type == TYPE_NUMBER
+		if l[i].type == Type.NUMBER
 			if negative[i]
 				num = sub(num, l[i].name)
 			else
@@ -291,12 +291,12 @@ func eval_sum(t: Term shared) -> Term shared
 func eval_exponent(t: Term shared) -> Term shared
 	var p0 = t.params[0]
 	var p1 = t.params[1]
-	if p1.type == TYPE_NUMBER
+	if p1.type == Type.NUMBER
 		if p1.name == "1"
 			return normalize(p0)
 		if p1.name == "0"
 			return AddNumber("1")
-		if p0.type == TYPE_NUMBER
+		if p0.type == Type.NUMBER
 			return AddNumber(exponent(p0.name, p1.name))
 	if p0.name == "*"
 		var a = eval_exponent(AddOperator("^", p0.params[0], p1))
@@ -327,7 +327,7 @@ func eval_function(t: Term shared) -> Term shared
 		if p.name in ["0", "pi"]
 			return AddNumber("0")
 		if p.name == "*"
-			if p.params[0].type == TYPE_NUMBER and p.params[1].name == "pi"
+			if p.params[0].type == Type.NUMBER and p.params[1].name == "pi"
 				return AddNumber("0")
 	if t.name == "cos"
 		var p = t.params[0]
@@ -336,7 +336,7 @@ func eval_function(t: Term shared) -> Term shared
 		if p.name == "pi"
 			return AddNumber("-1")
 		if p.name == "*"
-			if p.params[0].type == TYPE_NUMBER and p.params[1].name == "pi"
+			if p.params[0].type == Type.NUMBER and p.params[1].name == "pi"
 				if number_is_even(p.params[0].name)
 					return AddNumber("1")
 				else
@@ -354,12 +354,12 @@ func eval_function(t: Term shared) -> Term shared
 				return normalize(p.params[0])
 		if p.name in ["1", "0"]
 			return normalize(p)
-		#if p.type == TYPE_NUMBER
+		#if p.type == Type.NUMBER
 			# test... apply
 			#return AddNumber("...")
 	if t.name == "deg"
 		var p = t.params[0]
-		if p.type == TYPE_NUMBER
+		if p.type == Type.NUMBER
 			return AddNumber("0")
 		if p.name == "∧"
 			return normalize(AddOperator("+", AddFunction("deg", [p.params[0]]),
@@ -391,12 +391,12 @@ func eval_wedge(_t: Term shared) -> Term shared
 func eval_equal(t: Term shared) -> Term shared
 	if literally_equal(normalize(t.params[0]), normalize(t.params[1]))
 		return AddVariable("true")
-	else if t.params[0].type == TYPE_NUMBER and t.params[1].type == TYPE_NUMBER
+	else if t.params[0].type == Type.NUMBER and t.params[1].type == Type.NUMBER
 		return AddVariable("false")
 	return t
 
 func eval_in(t: Term shared) -> Term shared
-	if t.params[0].type == TYPE_NUMBER and t.params[1].name in ["N", "Z"]
+	if t.params[0].type == Type.NUMBER and t.params[1].name in ["N", "Z"]
 		return AddVariable("true")
 	return t
 
@@ -408,7 +408,7 @@ func normalize(_t: Term shared) -> Term shared
 		t.params[i] = normalize(t.params[i])
 		
 	# self
-	if t.type == TYPE_FUNCTION
+	if t.type == Type.FUNCTION
 		return eval_function(t)
 	if t.name in ["*", "/"]
 		return eval_product(t)

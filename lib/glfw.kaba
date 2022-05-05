@@ -191,16 +191,16 @@ func main()
 	end()
 
 class GamepadState
-	var buttons: bool[16]
+	var _buttons: bool[16]
 	var axes: float[6]
 	func __init__()
-		for b in buttons
+		for b in _buttons
 			b = false
 		for a in axes
 			a = 0
 
 class Gamepad as shared extends GamepadState
-	enum
+	enum Button
 		CROSS
 		CIRCLE
 		SQUARE
@@ -238,8 +238,10 @@ class Gamepad as shared extends GamepadState
 			else
 				a = (a + deadzone) / (1 - deadzone)
 	
-	func click(b: int) -> bool
-		return buttons[b] and not state_prev.buttons[b]
+	func click(b: Button) -> bool
+		return _buttons[int(b)] and not state_prev._buttons[int(b)]
+	func button(b: Button) -> bool
+		return _buttons[int(b)]
 		
 	
 	func static get(index: int) -> Gamepad shared
