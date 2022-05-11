@@ -25,7 +25,7 @@ func operator_rank(s: string) -> int
 	return -1
 
 func check_function_params(f: string, params: Term shared[])
-	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "expand"]
+	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "atan", "expand", "float"]
 		if len(params) != 1
 			raise(new SyntaxError("function '{{f}}' expects 1 parameter, {{len(params)}} given"))
 	if f in ["diff", "zeros"]
@@ -65,6 +65,21 @@ class Parser
 			return o
 		else if c == ")"
 			raise(new SyntaxError("unexpected )"))
+		if c == "["
+			next() # [
+			var elements: Term shared[]
+			while cur() != "]"
+				elements.add(parse_operand())
+				if cur() == "]"
+					break
+				if cur() == ","
+					next()
+				else
+					raise(new SyntaxError(", or ] expected"))
+			next() # ]
+			return AddList(elements)
+		else if c == "]"
+			raise(new SyntaxError("unexpected ]"))
 		else if cur() == "$"
 			next()
 			return AddVariable("$")
@@ -75,6 +90,8 @@ class Parser
 			return AddVariable(name)
 		else if char_type(c[0]) == CharType.NUMBER
 			next()
+			if c.find(".") >= 0
+				return AddFloat(c)
 			return AddNumber(c)
 		else if char_type(c[0]) == CharType.LETTER
 			next()
@@ -91,6 +108,8 @@ class Parser
 				next() # )
 				check_function_params(c, params)
 				return AddFunction(c, params)
+			else if c in ["pi", "e"]
+				return AddConstant(c)
 			else
 				return AddVariable(c)
 
@@ -113,7 +132,7 @@ class Parser
 			
 			if end_of_line()
 				break
-			if cur() in [")", ","]
+			if cur() in [")", ",", "]"]
 				break
 			
 			# operator
@@ -169,7 +188,7 @@ func digest_operators(out eid: Term shared[]) -> Term shared
 
 func parse(s: string) -> Term shared
 	Parser p
-	p.e = s.parse_tokens("+-*/^<=>(),@:|")
+	p.e = s.parse_tokens("+-*/^<=>(),@:|[]") # ∧
 	p.cur_index = 0
 	return p.parse_operand()
 

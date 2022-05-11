@@ -1,1 +1,1 @@
-apply(2*ln(x*y*c),ln(@A*@B),ln(@A)+ln(@B))
+subst(2*ln(x*y*c),ln(@A*@B),ln(@A)+ln(@B))

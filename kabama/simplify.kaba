@@ -346,7 +346,7 @@ func eval_function(t: Term shared) -> Term shared
 		if p.name == "0"
 			return AddNumber("1")
 		if p.name == "1"
-			return AddVariable("e")
+			return AddConstant("e")
 	if t.name == "sqrt"
 		var p = t.params[0]
 		if p.name == "^"
@@ -357,6 +357,14 @@ func eval_function(t: Term shared) -> Term shared
 		#if p.type == Type.NUMBER
 			# test... apply
 			#return AddNumber("...")
+	if t.name == "atan"
+		var p = t.params[0]
+		if p.name == "0"
+			return AddNumber("0")
+		if p.name == "1"
+			return AddOperator("/", AddConstant("pi"), AddNumber("4"))
+		if p.name == "-1"
+			return normalize(AddOperator("-", AddNumber("0"), AddOperator("/", AddConstant("pi"), AddNumber("4"))))
 	if t.name == "deg"
 		var p = t.params[0]
 		if p.type == Type.NUMBER

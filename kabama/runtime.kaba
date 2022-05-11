@@ -5,6 +5,7 @@ use expand
 use diff
 use subst
 use zeros
+use float
 
 
 class Runtime
@@ -53,6 +54,8 @@ class Runtime
 			return subst(t.params[0], t.params[1], t.params[2], 50)
 		else if t.name == "zeros"
 			return zeros(t.params[0], t.params[1].name)
+		else if t.name == "float"
+			return make_float(t.params[0])
 		else if t.type == Type.SPECIAL
 			if t.name == "def"
 				add_function(t.params[0])

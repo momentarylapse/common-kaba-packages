@@ -1,6 +1,7 @@
 enum Type
 	DUMMY
 	NUMBER
+	FLOAT
 	CONSTANT
 	VARIABLE
 	OPERATOR
@@ -21,22 +22,27 @@ class Term as shared
 	var type: Type
 	var name: string
 	var params: Term shared[]
+
 	func __init__(_type: Type, _name: string)
 		type = _type
 		name = _name
 		#print("new Term {{type}} {{name}}")
+
 	func __delete__()
 		#print("del Term {{type}} {{name}}")
+
 	func const shallow_copy() -> Term shared
 		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
 		return c
+
 #	const shared Term copy()
 #		var c = new Term(type, name)
 #		for p in params
 #			c.params.add(p.copy())
 #		return c
+
 	func const __str__() -> string
 		if type == Type.OPERATOR
 			string a = str(params[0])
@@ -53,7 +59,11 @@ class Term as shared
 				return "{{a}} {{name}} {{b}}"
 		else if type == Type.NUMBER
 			return name
+		else if type == Type.FLOAT
+			return name
 		else if type == Type.VARIABLE
+			return name
+		else if type == Type.CONSTANT
 			return name
 		else if type == Type.FUNCTION
 			return name + "(" + [for p in params str(p)].join(", ") + ")"
@@ -62,6 +72,7 @@ class Term as shared
 		else if type == Type.LIST
 			return "[" + [for p in params str(p)].join(", ") + "]"
 		return "?"
+
 	func const param_needs_paranthesis(p: int) -> bool
 		if params[p].type == Type.NUMBER
 			if params[p].name[:1] == "-"
@@ -79,6 +90,10 @@ class Term as shared
 		if name == "*"
 			return params[p].name in ["+", "-"]
 		return false
+	
+	# not usable... float(Term shared) :(
+	func __float__() -> float
+		return float(name[:10])
 
 #shared Term[] copy_list(shared Term[] list)
 #	return [for t in list t.copy()]
@@ -87,8 +102,14 @@ class Term as shared
 func AddNumber(s: string) -> Term shared
 	return new Term(Type.NUMBER, s)
 
+func AddFloat(s: string) -> Term shared
+	return new Term(Type.FLOAT, s)
+
 func AddVariable(s: string) -> Term shared
 	return new Term(Type.VARIABLE, s)
+
+func AddConstant(s: string) -> Term shared
+	return new Term(Type.CONSTANT, s)
 
 func AddOperator(s: string, p1: Term shared, p2: Term shared) -> Term shared
 	var t = new Term(Type.OPERATOR, s)

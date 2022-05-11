@@ -1,0 +1,61 @@
+use common
+
+func all_params_are_float(t: Term shared) -> bool
+	for p in t.params
+		if p.type != Type.FLOAT
+			return false
+	return true
+
+func make_float(t_: Term shared) -> Term shared
+	var t = t_.shallow_copy()
+	for p,i in t.params
+		t.params[i] = make_float(p)
+		
+	if t.type == Type.FLOAT
+		return t
+	if t.type == Type.NUMBER
+		return AddFloat(t.name)
+	if t.type == Type.CONSTANT
+		if t.name == "pi"
+			return AddFloat("3.141592653589793")
+		if t.name == "e"
+			return AddFloat("2.718281828459045")
+		return t
+	if t.type == Type.VARIABLE
+		return t
+	if t.type == Type.FUNCTION
+		if all_params_are_float(t) and len(t.params) == 1
+			float f = float(t.params[0].name[:10])
+			if t.name == "sqrt"
+				return AddFloat(str(sqrt(f)))
+			if t.name == "sin"
+				return AddFloat(str(sin(f)))
+			if t.name == "cos"
+				return AddFloat(str(cos(f)))
+			if t.name == "exp"
+				return AddFloat(str(exp(f)))
+			if t.name == "ln"
+				return AddFloat(str(log(f)))
+			if t.name == "atan"
+				return AddFloat(str(atan(f)))
+		return t
+	if t.type == Type.OPERATOR
+		if not all_params_are_float(t)
+			return t
+		var a, b: float
+		if len(t.params) > 0
+			a = float(t.params[0].name[:10])
+		if len(t.params) > 1
+			b = float(t.params[1].name[:10])
+		if t.name == "+"
+			return AddFloat(str(a + b))
+		if t.name == "-"
+			return AddFloat(str(a - b))
+		if t.name == "*"
+			return AddFloat(str(a * b))
+		if t.name == "/"
+			return AddFloat(str(a / b))
+		if t.name == "^"
+			return AddFloat(str(a ^ b))
+#	raise(new RuntimeError("unhandled float..."))
+	return t

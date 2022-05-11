@@ -16,6 +16,8 @@ func diff_function(f: string, params: Term shared[]) -> Term shared
 		return AddFunction("sinh", params)
 	if f == "ln"
 		return AddOperator("/", AddNumber("1"), params[0])
+	if f == "atan"
+		return AddOperator("/", AddNumber("1"), AddOperator("+", AddNumber("1"), AddOperator("^", params[0], AddNumber("2"))))
 	if f == "sqrt"
 		return AddOperator("/", AddNumber("1"), AddFunction("sqrt", params))
 	raise(new RuntimeError("can not differentiate function '{{f}}'"))
@@ -26,7 +28,7 @@ func diff_function(f: string, params: Term shared[]) -> Term shared
 func diff(t: Term shared, by: string) -> Term shared
 
 	# self
-	if t.type == Type.NUMBER
+	if t.type == Type.NUMBER or t.type == Type.CONSTANT or t.type == Type.FLOAT # in [Type.NUMBER, Type.FLOAT, Type.CONSTANT]
 		return AddNumber("0")
 	if t.type == Type.VARIABLE
 		if t.name == by
@@ -57,7 +59,7 @@ func diff(t: Term shared, by: string) -> Term shared
 			                        AddOperator("/", AddOperator("*", a, diff(b, by)),
 			                                         AddOperator("^", b, AddNumber("2"))))
 		if t.name == "^"
-			if b.type == Type.NUMBER
+			if b.type == Type.NUMBER or b.type == Type.FLOAT or b.type == Type.CONSTANT # in [...]
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b,
 				                        AddOperator("*", AddOperator("^", a, AddNumber(sub(b.name, "1"))),
@@ -69,4 +71,9 @@ func diff(t: Term shared, by: string) -> Term shared
 			                        AddOperator("*", AddFunction("ln", [a]),
 			                                         AddOperator("*", AddOperator("^", a, b),
 			                                                          diff(b, by))))
+	if t.type == Type.LIST
+		var r = t.shallow_copy()
+		for p,i in r.params
+			r.params[i] = diff(p, by)
+		return r
 	raise(new RuntimeError("unhandled differential..."))
