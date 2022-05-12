@@ -28,8 +28,8 @@ func guess_guid() -> (string,string)
 	return [pguid, sguid]
 
 func create_visual_studio(version: int)
-	if version != 2019
-		raise(new Exception("only visual studio 2019 supported"))
+	if not (version in [2019, 2022])
+		raise(new Exception("only visual studio 2019 and 2022 supported"))
 	print("-- visual studio {{version}} --")
 	#print(create_guid())
 	
@@ -99,6 +99,10 @@ EndGlobal
 "
 	Filesystem.write(conf.root << "{{conf.name}}.sln", f.replace("\n", "\r\n"))
 	
+	var toolset = "v142"
+	if version == 2022
+		toolset = "v143"
+	
 	f = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
   <ItemGroup Label=\"ProjectConfigurations\">
@@ -128,22 +132,22 @@ EndGlobal
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|Win32'\" Label=\"Configuration\">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>{{toolset}}</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|Win32'\" Label=\"Configuration\">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>{{toolset}}</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\" Label=\"Configuration\">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>{{toolset}}</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='Release|x64'\" Label=\"Configuration\">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>{{toolset}}</PlatformToolset>
   </PropertyGroup>
   <Import Project=\"$(VCTargetsPath)\Microsoft.Cpp.props\" />
   <ImportGroup Label=\"ExtensionSettings\">

@@ -86,7 +86,7 @@ func main(arg: string[])
 	conf.verbose = false
 	conf.root = Path("./").absolute().canonical()
 	
-	conf.ignore_libs
+	#conf.ignore_libs
 	
 	#bool build
 	
