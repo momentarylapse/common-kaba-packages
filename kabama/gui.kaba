@@ -5,7 +5,7 @@ class KabamaWindow extends hui.Window
 	var r: Runtime
 	var log: string
 
-	func on_eval()
+	func mut on_eval()
 		var input = get_string("input")
 		log += ">>> {{input}}\n"
 		try

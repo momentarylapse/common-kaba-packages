@@ -24,7 +24,7 @@ class Runtime
 	
 	#class Error extends Exception
 	
-	func add_function(t: Term shared)
+	func mut add_function(t: Term shared)
 		var f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
@@ -33,7 +33,7 @@ class Runtime
 		functions.add(f)
 		#print("added... " + str(f))
 
-	func eval_term(_t: Term shared) -> Term shared
+	func mut eval_term(_t: Term shared) -> Term shared
 		# recursive
 		var t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
@@ -66,7 +66,7 @@ class Runtime
 				
 		return t
 
-	func eval(s: string) -> Term shared
+	func mut eval(s: string) -> Term shared
 		var t = parse(s)
 		var r = normalize(eval_term(t))
 		history.add(r)

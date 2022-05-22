@@ -11,7 +11,7 @@ class DemoDialog extends hui.Window
 		event("close", on_close)
 		event("ok", on_close)
 		event("cancel", on_close)
-	func on_close()
+	func mut on_close()
 		destroy()
 
 class ToolbarDemoDialog extends hui.Window

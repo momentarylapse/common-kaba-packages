@@ -83,16 +83,16 @@ class Query as shared
 	func __delete__()
 		_sqlite3_finalize(res)
 
-	func step()
+	func mut step()
 		step_result = _sqlite3_step(res)
 	
-	func has_more() -> bool
+	func mut has_more() -> bool
 		if needs_step
 			step()
 			needs_step = false
 		return step_result == 100
 	
-	func get_column_text() -> string[]
+	func mut get_column_text() -> string[]
 		string[] r
 		if !has_more()
 			return r
@@ -102,7 +102,7 @@ class Query as shared
 		needs_step = true
 		return r
 
-	func get_column() -> any
+	func mut get_column() -> any
 		any r
 		if !has_more()
 			return r

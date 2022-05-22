@@ -9,7 +9,7 @@ class CLIParser
 		var f: string[]->void
 		var comment: string
 
-		func const match(arg: string[]) -> bool
+		func match(arg: string[]) -> bool
 			if len(arg) < len(name)
 				return false
 			for n,i in name
@@ -17,7 +17,7 @@ class CLIParser
 					return false
 			return true
 		
-		func const min_params() -> int
+		func min_params() -> int
 			int m = 0
 			for p in params
 				if p == "..."
@@ -26,7 +26,7 @@ class CLIParser
 					m ++
 			return m
 
-		func const sig() -> string
+		func sig() -> string
 			return name.join(" ") + " " + params.join(" ")
 	class Option
 		var name: string[]
@@ -35,7 +35,7 @@ class CLIParser
 		var f0: void->void
 		var comment: string
 		
-		func const sig() -> string
+		func sig() -> string
 			string s = name.join(", ")
 			if param != ""
 				s += " {{param}}"
@@ -45,12 +45,12 @@ class CLIParser
 	var options: Option[]
 	var _info: string
 	
-	func info(i: string)
+	func mut info(i: string)
 		_info = i
 
 	# "example", "<P1> <P2> [OPT] ...", "comment", lambda(string[] a) ...
 	#  name = "" -> default
-	func cmd(name: string, params: string, comment: string, f: string[]->void)
+	func mut cmd(name: string, params: string, comment: string, f: string[]->void)
 		Command c
 		c.name = name.explode(" ")
 		c.params = params.explode(" ")
@@ -59,7 +59,7 @@ class CLIParser
 		commands.add(c)
 
 	# ["--example", "-e"], "<P1> <P2> [OPT] ...", "comment", lambda(string a) ...
-	func optx(name: string[], param: string, comment: string, f1: string->void, f0: void->void)
+	func mut optx(name: string[], param: string, comment: string, f1: string->void, f0: void->void)
 		Option c
 		c.name = name
 		c.param = param
@@ -69,13 +69,13 @@ class CLIParser
 		options.add(c)
 		
 	# ["--example", "-e"], "comment", lambda() ...
-	func opta(name: string[], param: string, comment: string, f: string->void)
+	func mut opta(name: string[], param: string, comment: string, f: string->void)
 		optx(name, param, comment, f, nil)
 
-	func opt(name: string[], comment: string, f: void->void)
+	func mut opt(name: string[], comment: string, f: void->void)
 		optx(name, "", comment, nil, f)
 
-	func const run(arg: string[])
+	func run(arg: string[])
 		current = &self
 		try
 			var arg2 = parse_options(arg)
@@ -87,7 +87,7 @@ class CLIParser
 		except Exception as e
 			print("ERROR: {{e}}")
 	
-	func const parse_options(arg: string[]) -> string[]
+	func parse_options(arg: string[]) -> string[]
 		string[] arg2
 		for a,i in arg
 			if a[:1] == "-"
@@ -96,7 +96,7 @@ class CLIParser
 				arg2.add(a)
 		return arg2
 
-	func const do_option(name: string, arg_rest: string[]) -> int
+	func do_option(name: string, arg_rest: string[]) -> int
 		for o in options
 			if name in o.name
 				#print("option {{o.name}}")
@@ -110,7 +110,7 @@ class CLIParser
 					return 1
 		raise(new Exception("unknown option {{name}}"))
 	
-	func const parse_commands(arg: string[]) -> bool
+	func parse_commands(arg: string[]) -> bool
 		for c in commands
 			if c.match(arg)
 				if len(arg) - len(c.name) < c.min_params()
@@ -121,7 +121,7 @@ class CLIParser
 				return true
 		return false
 
-	func const show_help()
+	func show_help()
 		if _info != ""
 			print(_info)
 			print("")

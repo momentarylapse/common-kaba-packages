@@ -22,10 +22,10 @@ class Config
 	
 	var dir: Path
 	
-	func set_dir(_dir: Path)
+	func mut set_dir(_dir: Path)
 		dir = _dir
 	
-	func load()
+	func mut load()
 		try
 			var f = Filesystem.open_text(dir << "export.txt")
 			string t

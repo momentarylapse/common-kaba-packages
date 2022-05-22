@@ -16,7 +16,7 @@ class Language
 	var name: string
 	var ids: LangID[]
 	var texts: LangText[]
-	func const show()
+	func show()
 		print(name)
 		for i in ids
 			print(i.id)
@@ -26,7 +26,7 @@ class Language
 		for t in texts
 			print(t.orig)
 			print("\t{{t.trans}}")
-	func add_id(id: string, title: string, tooltip: string)
+	func mut add_id(id: string, title: string, tooltip: string)
 		for i in ids
 			if i.id == id
 				if len(title) > 0
@@ -39,7 +39,7 @@ class Language
 		i.title = title
 		i.tooltip = tooltip
 		ids.add(i)
-	func add_text(orig: string, trans: string)
+	func mut add_text(orig: string, trans: string)
 		for t in texts
 			if t.orig == orig
 				if len(trans) > 0
@@ -70,17 +70,17 @@ class Language
 		del f
 
 
-	func sort()
+	func mut sort()
 		sort_ids(ids)
 		sort_texts(texts)
-	func const get_useful_ids() -> LangID[]
+	func get_useful_ids() -> LangID[]
 		LangID[] uids
 		for i in ids
 			if len(i.title) > 0 or len(i.tooltip) > 0
 				uids.add(i)
 		sort_ids(uids)
 		return uids
-	func const get_useful_texts() -> LangText[]
+	func get_useful_texts() -> LangText[]
 		LangText[] utexts
 		for t in texts
 			if len(t.trans) > 0

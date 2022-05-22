@@ -138,27 +138,27 @@ class DynamicValue
 		s = new DynamicValueState()
 	func virtual __delete__()
 		del s
-	func const __str__() -> string
+	func __str__() -> string
 		return str(s)
-	func const render() -> string
+	func render() -> string
 		return s.render()
-	func const __int__() -> int
+	func __int__() -> int
 		return int(s)
-	func const __float__() -> float
+	func __float__() -> float
 		return float(s)
-	func const __bool__() -> bool
+	func __bool__() -> bool
 		return bool(s)
-	func selfref get_element(i: DynamicValue) -> DynamicValue*
+	func selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return s.get_element(i)
-	func add(el: DynamicValue)
+	func mut add(el: DynamicValue)
 		s.add(el)
-	func const copy() -> DynamicValue*
+	func copy() -> DynamicValue*
 		var c = new DynamicValue()
 		del c.s
 		c.s = s.copy()
 		c.type = type
 		return c
-	func setType(_type: TType)
+	func mut setType(_type: TType)
 		if type != _type
 			#clear()
 			del s
@@ -179,23 +179,23 @@ class DynamicValue
 				s = new DynamicValueStateFunction()
 			else
 				s = new DynamicValueState()
-	func setBool(b: bool)
+	func mut setBool(b: bool)
 		setType(TType.BOOL)
 		var sb: DynamicValueStateBool* = s
 		sb.v = b
-	func setInt(i: int)
+	func mut setInt(i: int)
 		setType(TType.INT)
 		var si: DynamicValueStateInt* = s
 		si.v = i
-	func setFloat(f: float)
+	func mut setFloat(f: float)
 		setType(TType.FLOAT)
 		var sf: DynamicValueStateFloat* = s
 		sf.v = f
-	func setString(_s: string)
+	func mut setString(_s: string)
 		setType(TType.STRING)
 		var ss: DynamicValueStateString* = s
 		ss.v = _s
-	func setFunction(f: Function)
+	func mut setFunction(f: Function)
 		setType(TType.FUNCTION)
 		var sf: DynamicValueStateFunction* = s
 		sf._func = &f
@@ -223,7 +223,7 @@ class DynamicValue
 			var bf: DynamicValueStateFunction* = b.s
 			setFunction(bf._func)
 
-	func __iadd__(b: DynamicValue)
+	func mut __iadd__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
 				setInt(int(s) + int(b))
@@ -249,7 +249,7 @@ class DynamicValue
 				for el,i in bd.values
 					ad.add(bd.keys[i], el)
 
-	func __isub__(b: DynamicValue)
+	func mut __isub__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
 				setInt(int(s) - int(b))
@@ -261,7 +261,7 @@ class DynamicValue
 			else if type == TType.FLOAT
 				setFloat(float(s) - float(b))
 
-	func __imul__(b: DynamicValue)
+	func mut __imul__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
 				setInt(int(s) * int(b))
@@ -273,7 +273,7 @@ class DynamicValue
 			else if type == TType.FLOAT
 				setFloat(float(s) * float(b))
 
-	func __idiv__(b: DynamicValue)
+	func mut __idiv__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
 				setInt(int(s) / int(b))
@@ -285,7 +285,7 @@ class DynamicValue
 			else if type == TType.FLOAT
 				setFloat(float(s) / float(b))
 
-	func const compare(b: DynamicValue) -> int
+	func compare(b: DynamicValue) -> int
 		if b.type == TType.INT
 			if type == TType.INT
 				return int(s) - int(b)
@@ -309,22 +309,22 @@ class DynamicValue
 
 class DynamicValueState
 	func virtual __delete__()
-	func virtual const type() -> string
+	func virtual type() -> string
 		return "???"
-	func virtual const __str__() -> string
+	func virtual __str__() -> string
 		return "nil"
-	func virtual const render() -> string
+	func virtual render() -> string
 		return str(self)
-	func virtual const __int__() -> int
+	func virtual __int__() -> int
 		return 0
-	func virtual const __float__() -> float
+	func virtual __float__() -> float
 		return 0.0
-	func virtual const __bool__() -> bool
+	func virtual __bool__() -> bool
 		return false
-	func virtual selfref get_element(i: DynamicValue) -> DynamicValue*
+	func virtual selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return nil
-	func virtual add(el: DynamicValue)
-	func virtual const copy() -> DynamicValueState*
+	func virtual mut add(el: DynamicValue)
+	func virtual copy() -> DynamicValueState*
 		
 
 class DynamicValueStateInt extends DynamicValueState
@@ -412,7 +412,7 @@ class DynamicValueStateArray extends DynamicValueState
 		if ii.v < 0 or ii.v >= len(a)
 			return nil
 		return a[ii.v]
-	func override add(el: DynamicValue)
+	func override mut add(el: DynamicValue)
 		a.add(el.copy())
 	func override copy() -> DynamicValueState*
 		var c = new DynamicValueStateArray()
@@ -439,7 +439,7 @@ class DynamicValueStateDict extends DynamicValueState
 		return s + "}"
 	func override __bool__() -> bool
 		return len(values) > 0
-	func override get_element(key: DynamicValue) -> DynamicValue*
+	func override mut get_element(key: DynamicValue) -> DynamicValue*
 		for k,j in keys
 			if k.compare(key) == 0
 				return values[j]
@@ -448,7 +448,7 @@ class DynamicValueStateDict extends DynamicValueState
 		values.add(val)
 		keys.add(key.copy())
 		return val
-	func add(key: DynamicValue, val: DynamicValue)
+	func mut add(key: DynamicValue, val: DynamicValue)
 		for k,j in keys
 			if k.compare(key) == 0
 				return
@@ -479,7 +479,7 @@ class Variable
 		name = _name
 	func __delete__()
 		clear()
-	func clear()
+	func mut clear()
 		if !is_ref
 			del v
 		is_ref = false
@@ -496,9 +496,9 @@ class Variable
 			s += name + " = "
 		s += v.render()
 		print(s)
-	func setType(_type: TType)
+	func mut setType(_type: TType)
 		v.setType(_type)
-	func setReference(r: DynamicValue)
+	func mut setReference(r: DynamicValue)
 		clear()
 		is_ref = true
 		v = &r
@@ -812,7 +812,7 @@ class SyntaxTree
 	var cur: string
 	func endOfFile() -> bool
 		return cur_line_no >= len(lines.lines) - 1
-	func nextLine()
+	func mut nextLine()
 		if endOfFile()
 			setError("unexpected end of file")
 			return
@@ -825,7 +825,7 @@ class SyntaxTree
 	func expect_more()
 		if endOfLine()
 			setError("unexpected end of line")
-	func next()
+	func mut next()
 		#if endOfLine()
 #			setError("unexpected end of line")
 #			return
@@ -841,39 +841,39 @@ class SyntaxTree
 		string c = "line {{cur_line.physical_line_no + 1}} at {{cur}}"
 		raise(new SyntaxError("Syntax error: {{msg}}\n{{c}}"))
 	
-	func addGlobalVar(name: string) -> Variable*
+	func mut addGlobalVar(name: string) -> Variable*
 		var v = new Variable(name)
 		vars.add(v)
 		return v
-	func addConst() -> Variable*
+	func mut addConst() -> Variable*
 		var c = new Variable("")
 		c.writable = false
 		consts.add(c)
 		return c
-	func addConstNumber(s: string) -> Variable*
+	func mut addConstNumber(s: string) -> Variable*
 		var c: Variable* = addConst()
 		if s.find(".", 0) >= 0
 			c.v.setFloat(float(s))
 		else
 			c.v.setInt(int(s))
 		return c
-	func addConstString(s: string) -> Variable*
+	func mut addConstString(s: string) -> Variable*
 		var c: Variable* = addConst()
 		c.v.setString(s)
 		return c
-	func addFunc(name: string) -> Function*
+	func mut addFunc(name: string) -> Function*
 		var f: Function* = new Function(name)
 		var v: Variable* = addGlobalVar(name)
 		v.v.setFunction(f)
 		funcs.add(f)
 		return f
-	func add_internal_func(name: string, out f: Function*)
+	func mut add_internal_func(name: string, out f: Function*)
 		f.name = name
 		var v: Variable* = addGlobalVar(name)
 		internal_funcs.add(f)
 		v.v.setFunction(f)
 		
-	func getNuclearOperand() -> SyntaxNode*
+	func mut getNuclearOperand() -> SyntaxNode*
 		if isNumber(cur[0])
 			var sn: SyntaxNodeVariable* = new SyntaxNodeConst(addConstNumber(cur))
 			next()
@@ -890,13 +890,13 @@ class SyntaxTree
 				sn.allow_create = true
 		next()
 		return sn
-	func getOperator() -> SyntaxNode*
+	func mut getOperator() -> SyntaxNode*
 		if !isOperator(cur[0]) and (cur != "and") and (cur != "or")
 			setError("operator expected")
 		var sn: SyntaxNode* = new SyntaxNodeOperator(cur)
 		next()
 		return sn
-	func getOperandFunc() -> SyntaxNode*
+	func mut getOperandFunc() -> SyntaxNode*
 		var sn: SyntaxNode* = new SyntaxNodeCall(cur)
 		next() # name
 		if cur != "("
@@ -915,7 +915,7 @@ class SyntaxTree
 			next()
 		next() # ")"
 		return sn
-	func getOperandArrayBuilder() -> SyntaxNode*
+	func mut getOperandArrayBuilder() -> SyntaxNode*
 		var sn = new SyntaxNodeArrayBuilder()
 		next() # "["
 		while cur != "]"
@@ -927,7 +927,7 @@ class SyntaxTree
 				next()
 		next() # "]"
 		return sn
-	func getOperandDictBuilder() -> SyntaxNode*
+	func mut getOperandDictBuilder() -> SyntaxNode*
 		var sn = new SyntaxNodeDictBuilder()
 		next() # "{"
 		while cur != "}"
@@ -944,7 +944,7 @@ class SyntaxTree
 				next()
 		next() # "}"
 		return sn
-	func checkOperandExtensions(sn: SyntaxNode*) -> SyntaxNode*
+	func mut checkOperandExtensions(sn: SyntaxNode*) -> SyntaxNode*
 		if cur == "["
 			var el = new SyntaxNodeArrayElement()
 			el.params.add(sn)
@@ -957,7 +957,7 @@ class SyntaxTree
 			return checkOperandExtensions(el)
 		
 		return sn
-	func getOperand() -> SyntaxNode*
+	func mut getOperand() -> SyntaxNode*
 		# bracket?
 		if cur == "("
 			next()
@@ -985,7 +985,7 @@ class SyntaxTree
 	
 	
 	# sequence of [operand operator operand ...]
-	func getOperandGreedy() -> SyntaxNode*
+	func mut getOperandGreedy() -> SyntaxNode*
 		var sn: SyntaxNode*[]
 		sn.add(getOperand())
 		while !endOfLine()
@@ -1012,7 +1012,7 @@ class SyntaxTree
 			sn.remove(imin*2)
 			rank.remove(imin)
 		return sn[0]
-	func getSpecialCommandReturn() -> SyntaxNode*
+	func mut getSpecialCommandReturn() -> SyntaxNode*
 		var sn = new SyntaxNodeReturn()
 		while !endOfLine()
 			next()
@@ -1024,7 +1024,7 @@ class SyntaxTree
 					setError(", or end of line expected")
 					return nil
 		return sn
-	func getSpecialCommandIf() -> SyntaxNode*
+	func mut getSpecialCommandIf() -> SyntaxNode*
 		int indent0 = cur_line.indent
 		var sn = new SyntaxNodeIf()
 		next() # "if"
@@ -1038,7 +1038,7 @@ class SyntaxTree
 		# else
 		sn.block_else = parseBlock()
 		return sn
-	func getSpecialCommandWhile() -> SyntaxNode*
+	func mut getSpecialCommandWhile() -> SyntaxNode*
 		int indent0 = cur_line.indent
 		var sn: SyntaxNodeWhile* = new SyntaxNodeWhile()
 		next() # "while"
@@ -1052,7 +1052,7 @@ class SyntaxTree
 		# else
 		sn.block_else = parseBlock()
 		return sn
-	func getSpecialCommandFor() -> SyntaxNode*
+	func mut getSpecialCommandFor() -> SyntaxNode*
 		int indent0 = cur_line.indent
 		var sn = new SyntaxNodeFor()
 		next() # "for"
@@ -1073,11 +1073,11 @@ class SyntaxTree
 		# else
 		sn.block_else = parseBlock()
 		return sn
-	func getSpecialCommandBreak() -> SyntaxNode*
+	func mut getSpecialCommandBreak() -> SyntaxNode*
 		return new SyntaxNodeBreak()
-	func getSpecialCommandContinue() -> SyntaxNode*
+	func mut getSpecialCommandContinue() -> SyntaxNode*
 		return new SyntaxNodeContinue()
-	func parseFunctionDef()
+	func mut parseFunctionDef()
 		var prev_func = cur_func
 		int indent0 = cur_line.indent
 		next()
@@ -1102,7 +1102,7 @@ class SyntaxTree
 		f.block = parseBlock()
 		cur_func = prev_func
 		
-	func parseLine() -> SyntaxNode*
+	func mut parseLine() -> SyntaxNode*
 		if cur == "if"
 			return getSpecialCommandIf()
 		if cur == "while"
@@ -1122,7 +1122,7 @@ class SyntaxTree
 		if !endOfLine()
 			setError("end of line expected")
 		return sn
-	func parseBlock() -> SyntaxNode*
+	func mut parseBlock() -> SyntaxNode*
 		var sn = new SyntaxNodeBlock()
 		nextLine()
 		int indent0 = cur_line.indent
@@ -1141,7 +1141,7 @@ class SyntaxTree
 					sn.params.add(sub)
 		return sn
 	
-	func create(source: string)
+	func mut create(source: string)
 		LiteralParser lp
 		
 		vars = new Context("-global-", nil)
@@ -1209,7 +1209,7 @@ class Context
 		if parent
 			return parent.get(name)
 		return nil
-	func add(v: Variable*)
+	func mut add(v: Variable*)
 		vars.add(v)
 	func show()
 		print(">>>  {{name}}")
@@ -1224,20 +1224,20 @@ class Interpreter
 	var cur_context: Context*
 	func setError(msg: string)
 		raise(new RuntimeError("Runtime error: {{msg}}"))
-	func stack_push(f: Function, ret: Variable)
+	func mut stack_push(f: Function, ret: Variable)
 		cur_context = new Context(f.name, cur_context)
 		cur_context._func = &f
 		cur_context.ret = &ret
 		for n in f.params
 			cur_context.add(new Variable(n))
 		contexts.add(cur_context)
-	func stack_pop()
+	func mut stack_pop()
 		int n = len(contexts) - 1
 		del cur_context
 		contexts.remove(n)
 		if n > 0
 			cur_context = contexts[n - 1]
-	func doNode(sn: SyntaxNode, out ret: Variable)
+	func mut doNode(sn: SyntaxNode, out ret: Variable)
 		var params: Variable*[]
 		bool[] is_temp
 		
@@ -1395,7 +1395,7 @@ class Interpreter
 			if is_temp[i]
 				del p
 				
-	func run(_syntax: SyntaxTree)
+	func mut run(_syntax: SyntaxTree)
 		syntax = &_syntax
 		Variable dummy
 		cur_context = syntax.vars

@@ -227,7 +227,7 @@ class Gamepad as shared extends GamepadState
 	func present() -> bool
 		return _glfwJoystickIsGamepad(index) == 1
 	
-	func update()
+	func mut update()
 		state_prev = self
 		_glfwGetGamepadState(index, &self)
 		for a in axes

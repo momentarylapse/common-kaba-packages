@@ -19,7 +19,7 @@ class DbFile
 	var tags: Tag[]
 	var medium = false
 	
-	func const __str__() -> string
+	func __str__() -> string
 		string s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
 		if medium
 			s += "\tm"
@@ -29,7 +29,7 @@ class DbFile
 			s += "\t{{t.key}}={{t.value.hex()}}"
 			# s += "\t" + t.key + "=" + t.value.replace("\\", "\\\\").replace("\t", "\\t").replace("\n", "\\n")
 		return s
-	func const show()
+	func show()
 		print(path)
 		if conf.show_meta
 			print("  id: {{id}}")
@@ -41,13 +41,13 @@ class DbFile
 			print("  size: {{size}}")
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
-	func const medium_path() -> string
+	func medium_path() -> string
 		if type.find("/audio/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
 		if type.find("/image/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/images/{{id}}.jpg"
 		return path
-	func make_medium(m: DbMedium)
+	func mut make_medium(m: DbMedium)
 		hash = m.hash
 		size = m.size
 		path = medium_path()

@@ -111,7 +111,7 @@ class MyPSMoveController
 		ang = quaternion.ID
 		dang = quaternion.ID
 
-	func update()
+	func mut update()
 		if !psmove
 			return
 
@@ -149,7 +149,7 @@ class MyPSMoveController
 		button[6] = ((_buttons & Btn_PS) != 0)
 		button[7] = ((_buttons & Btn_MOVE) != 0)
 
-	func reset_orientation()
+	func mut reset_orientation()
 		_psmove_reset_orientation(psmove)
 		ang = quaternion.ID
 
@@ -161,13 +161,13 @@ class PsMoveManager
 		int vv = 262152 #4<<16 + 0<<8 + 8
 		if _psmove_init(vv) != 1
 			print("VERSION MISMATCH!")
-	func __delete()
+	func mut __delete()
 		psmoves.clear()
 		if fusion
 			_psmove_fusion_free(fusion)
 		if tracker
 			_psmove_tracker_free(tracker)
-	func connect()
+	func mut connect()
 		int n = _psmove_count_connected()
 		print("{{n}} found")
 		tracker = _psmove_tracker_new()
@@ -180,7 +180,7 @@ class PsMoveManager
 			var p = _psmove_connect_by_id(i)
 			psmoves.add(new MyPSMoveController(p, &self))
 
-	func update()
+	func mut update()
 		if !tracker
 			return
 		for m in psmoves

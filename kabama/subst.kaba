@@ -21,14 +21,14 @@ class MatchingTerm
 
 class Matching
 	var terms: MatchingTerm[]
-	func add(t: Term shared, name: string) -> bool
+	func mut add(t: Term shared, name: string) -> bool
 		#print("add: {{t}} <<< {{name}}")
 		MatchingTerm mt
 		mt.t = t
 		mt.name = name
 		terms.add(mt)
 		return true
-	func const __str__() -> string
+	func __str__() -> string
 		return str([for t in terms str(t)])
 	
 

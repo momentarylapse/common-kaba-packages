@@ -4,7 +4,7 @@ use language
 
 class SourceParser
 	var source: string
-	func parse()
+	func mut parse()
 		int pos0 = 0
 		while true
 			int pos = source.find("_(\"", pos0)
@@ -24,7 +24,7 @@ class SourceParser
 			pos0 = pos + length
 
 
-	func parse_source_code_dir(dir: Path)
+	func mut parse_source_code_dir(dir: Path)
 		var files = Filesystem.search(dir, "*.cpp", "fd")
 		for f in files
 			if Filesystem.is_directory(dir << f)
@@ -35,13 +35,13 @@ class SourceParser
 				parse()
 				end(dir << f)
 
-	func virtual handle(pos: int, length: int)
-	func virtual begin()
-	func virtual end(filename: Path)
+	func virtual mut handle(pos: int, length: int)
+	func virtual mut begin()
+	func virtual mut end(filename: Path)
 
 class SourceLanguageFinder extends SourceParser
 	var l: Language*
-	func override handle(pos: int, length: int)
+	func override mut handle(pos: int, length: int)
 		LangText t
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
@@ -59,11 +59,11 @@ class SourceSwapper extends SourceParser
 	var source_new: string
 	var changed: bool
 	var delta: int
-	func override begin()
+	func override mut begin()
 		source_new = source
 		changed = false
 		delta = 0
-	func override handle(pos: int, length: int)
+	func override mut handle(pos: int, length: int)
 		string orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		for t in l.texts

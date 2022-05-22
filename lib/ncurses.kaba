@@ -36,7 +36,7 @@ func extern curs_set(mode: int) -> int
 func extern has_colors() -> bool
 func extern start_color() -> int
 func extern use_default_colors() -> int
-func extern init_pair(i: int, a: int, b: int) -> int
+func extern init_pair(i: int, a: Color, b: Color) -> int
 func extern _waddnstr(w: void*, p: char*, n: int) -> int
 func extern _waddnwstr(w: void*, p: int*, n: int) -> int
 func extern _wrefresh(w: void*) -> int
@@ -103,18 +103,17 @@ enum Attr
 	BLINK = 1<<(11+8)
 	BOLD = 1<<(13+8)
 
-class Color
-	enum
-		BLACK
-		RED
-		GREEN
-		YELLOW
-		BLUE
-		MAGENTA
-		CYAN
-		WHITE
-	func static pair(n: int) -> int
-		return (n<<8) & Attr.COLOR
+enum Color
+	BLACK
+	RED
+	GREEN
+	YELLOW
+	BLUE
+	MAGENTA
+	CYAN
+	WHITE
+func static pair(n: Color) -> int
+	return (int(n)<<8) & int(Attr.COLOR)
 
 enum Key
 	DOWN = 258
