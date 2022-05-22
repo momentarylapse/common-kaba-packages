@@ -66,7 +66,7 @@ DrawingArea area '' grab-focus")
 	func project_i(i: int, v: float) -> vec2
 		return vec2(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
-	func on_simulate()
+	func mut on_simulate()
 		float duration = get_float("t")
 		float dt = get_float("dt")
 		float I = get_float("input-amp")
@@ -78,7 +78,7 @@ DrawingArea area '' grab-focus")
 		auto_scale()
 		redraw("area")
 	
-	func auto_scale()
+	func mut auto_scale()
 		umax = 0
 		for uu in res.U
 			for u in uu
@@ -100,7 +100,7 @@ DrawingArea area '' grab-focus")
 	func unproject(p: vec2) -> vec2
 		return vec2(p.x / w, (h - p.y) / h)
 	
-	func on_left_button_down()
+	func mut on_left_button_down()
 		sel.type = SelectionType.NONE
 		var m = hui.get_event().mouse
 		for n,i in c.nodes
@@ -135,18 +135,18 @@ DrawingArea area '' grab-focus")
 		on_selection_change()
 		redraw("area")
 	
-	func on_left_button_up()
+	func mut on_left_button_up()
 		if mode == Mode.MOVE_NODE
 			mode = Mode.DEFAULT
 			redraw("area")
 
-	func on_mouse_move()
+	func mut on_mouse_move()
 		if mode == Mode.MOVE_NODE
 			var m = hui.get_event().mouse
 			c.nodes[sel.index].pos = unproject(m)
 			redraw("area")
 	
-	func on_key_down()
+	func mut on_key_down()
 		if hui.get_event().key == hui.KEY_DELETE
 			if sel.type == SelectionType.EDGE
 				del c.edges[sel.index]
@@ -155,7 +155,7 @@ DrawingArea area '' grab-focus")
 				res.clear()
 		redraw("area")
 
-	func on_draw(p: hui.Painter)
+	func mut on_draw(p: hui.Painter)
 		w = p.width
 		h = p.height
 		
@@ -248,7 +248,7 @@ DrawingArea area '' grab-focus")
 		else if mode == Mode.MOVE_NODE
 			p.draw_str([0, 0], "move the node")
 			
-	func draw_res(p: hui.Painter)
+	func mut draw_res(p: hui.Painter)
 		
 		NT = len(res.U)
 		if NT == 0
@@ -281,6 +281,6 @@ DrawingArea area '' grab-focus")
 		p.set_color(COLOR_TEXT)
 		p.draw_str([20, h - 20], "Imax = {{imax}}    Umax = {{umax}}")
 	
-	func virtual on_selection_change()
+	func mut virtual on_selection_change()
 		pass
 

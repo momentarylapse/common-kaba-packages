@@ -54,7 +54,7 @@ class Config
 				return true
 		return false
 	
-	func load()
+	func mut load()
 		if not Filesystem.exists(conf.root << "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
 		var c: hui.Configuration
@@ -104,7 +104,7 @@ class Config
 				outputs = c[k].explode(",")
 			else
 				raise(new Exception("unknown tag: {{k}}"))
-	func save()
+	func mut save()
 		var c: hui.Configuration
 		c["project.name"] = name
 		c["build.source"] = source_dir
@@ -155,10 +155,10 @@ func parse_libs(s: string, out libs: string[], out lib_groups: string[][], out l
 
 class SourceFile
 	var filename: Path
-	func const object() -> Path
+	func object() -> Path
 		return Path(str(filename).replace(".cpp", ".o"))
 	var dep: Path[]
-	func add_dep(d: Path) -> bool
+	func mut add_dep(d: Path) -> bool
 		if d in dep
 			return false
 		dep.add(d)

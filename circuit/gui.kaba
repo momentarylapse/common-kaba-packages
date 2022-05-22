@@ -8,7 +8,7 @@ class EditorPanel extends CircuitPanel
 	func __init__(e: CircuitEditor)
 		super.__init__(e.c)
 		ed = &e
-	func override on_selection_change()
+	func override mut on_selection_change()
 		ed.load_from_part(nil)
 		if sel.type == SelectionType.EDGE
 			ed.load_from_part(ed.c.edges[sel.index])
@@ -73,7 +73,7 @@ Toolbar toolbar ''
 		event_x("params", "hui:change", on_param)
 		load_from_part(nil)
 	
-	func on_new()
+	func mut on_new()
 		panel.res.clear()
 		c.reset_default()
 		panel.redraw()
@@ -84,19 +84,19 @@ Toolbar toolbar ''
 				Filesystem.write_text(p, c.export())
 		hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
-	func on_open()
+	func mut on_open()
 		var f = func(p: Path)
 			if bool(p)
 				c.import(Filesystem.read_text(p))
 		hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
-	func on_param()
+	func mut on_param()
 		int row = hui.get_event().row
 		string p = get_cell("params", row, 1)
 		if panel.sel.type == SelectionType.EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
 	
-	func load_from_part(e: Edge*)
+	func mut load_from_part(e: Edge*)
 		reset("params")
 		if !e
 			return
@@ -107,7 +107,7 @@ Toolbar toolbar ''
 		
 
 		
-	func on_simulate()
+	func mut on_simulate()
 		float duration = get_float("t")
 		float dt = get_float("dt")
 		float I = get_float("input-amp")
@@ -120,7 +120,7 @@ Toolbar toolbar ''
 		panel.redraw()
 	
 	
-	func on_add_type()
+	func mut on_add_type()
 		int t = get_int("")
 		panel.first_node = -1
 		if t == len(EdgeType.all())

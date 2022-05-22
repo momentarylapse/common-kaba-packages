@@ -13,7 +13,7 @@ class DBLister
 				return true
 		return false
 
-	func find_paths(dir: Path, recursive: bool)
+	func mut find_paths(dir: Path, recursive: bool)
 		var list = Filesystem.search(dir, "*", "fd")
 		for e in list
 			if Filesystem.is_directory(dir << e)
@@ -24,13 +24,13 @@ class DBLister
 				if !is_ignored(path)
 					paths.add(path)
 	
-	func find(dir: Path) -> LocalFile*[]
+	func mut find(dir: Path) -> LocalFile*[]
 		if Filesystem.is_directory(dir)
 			return find_dir(dir)
 		return find_file(dir)
 		
 		
-	func find_file(path: Path) -> LocalFile*[]
+	func mut find_file(path: Path) -> LocalFile*[]
 		var files: LocalFile*[]
 		fake_files.clear()
 		paths.clear()
@@ -48,7 +48,7 @@ class DBLister
 				log_error("error", "can't find '{{path}}'")
 		return files
 		
-	func find_dir(dir: Path) -> LocalFile*[]
+	func mut find_dir(dir: Path) -> LocalFile*[]
 		var files: LocalFile*[]
 		fake_files.clear()
 		paths.clear()

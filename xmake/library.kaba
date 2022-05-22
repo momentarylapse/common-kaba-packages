@@ -15,18 +15,18 @@ class Library
 	#void __init__(string _name, string[] _libs)
 	#	name = _name
 	#	libs = _libs
-	func const test() -> bool
+	func test() -> bool
 		for i in includes
 			if not os.Filesystem.exists(Path("/usr/include") << i)
 				return false
 		return true
-	func const compiler_flags() -> string
+	func compiler_flags() -> string
 		if len(pkg) > 0
 			return "`pkg-config --cflags --libs {{pkg.join(" ")}}`"
 		if len(dir_override) > 0
 			return "-I{{dir_override}}"
 		return flags
-	func const linker_flags() -> string
+	func linker_flags() -> string
 		if len(pkg) > 0
 			return "`pkg-config --cflags {{pkg.join(" ")}}`"
 		string r = flags
@@ -34,18 +34,18 @@ class Library
 			if len(l) > 0
 				r += " -l{{l}}"
 		return r
-	func const meson_libs() -> string[]
+	func meson_libs() -> string[]
 		if len(meson) > 0
 			return meson
 		return libs
-	func const define() -> string
+	func define() -> string
 		return "HAS_LIB_{{name.upper()}}"
 
 
 class LibraryManager
 	var libraries: Library[]
 
-	func init()
+	func mut init()
 		var lib_dir = hui.app_directory << "apps/xmake/libs"
 		var list = os.Filesystem.search(lib_dir, "*.txt", "f")
 		for e in list
@@ -70,17 +70,17 @@ class LibraryManager
 			l.dir_override = c["dir"]
 			libraries.add(l)
 
-	func const get(name: string) -> Library*
+	func get(name: string) -> Library*
 		for l in libraries
 			if l.name == name
 				return &l
 		raise(new Exception("unknown library: {{name}}"))
 		return nil
 
-	func const has(name: string) -> bool
+	func has(name: string) -> bool
 		return get(name).test()
 	
-	func const test(name: string) -> bool
+	func test(name: string) -> bool
 		if has(name)
 			print("{{name|14}} {{Term.GREEN}}found{{Term.END}}")
 			return true
@@ -88,19 +88,19 @@ class LibraryManager
 			print("{{name|14}} {{Term.RED}}not found{{Term.END}}")
 		return false
 
-	func const compiler_flags(name: string) -> string
+	func compiler_flags(name: string) -> string
 		return get(name).compiler_flags()
 
-	func const linker_flags(name: string) -> string
+	func linker_flags(name: string) -> string
 		return get(name).linker_flags()
 	
-	func const define(name: string) -> string
+	func define(name: string) -> string
 		return get(name).define()
 	
-	func const pkg(name: string) -> string[]
+	func pkg(name: string) -> string[]
 		return get(name).pkg
 		
-	func const vs_might_have(name: string) -> bool
+	func vs_might_have(name: string) -> bool
 		return len(get(name).vcpkg) > 0
 
 var lib: LibraryManager

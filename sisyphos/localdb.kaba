@@ -72,52 +72,52 @@ class LocalFile
 	var options: string[]
 	var tags: Tag[]
 	
-	func const is(option: string) -> bool
+	func is(option: string) -> bool
 		for o in options
 			if o == option
 				return true
 		return false
-	func set(option: string)
+	func mut set(option: string)
 		if is(option)
 			return
 		options.add(option)
 		db.dirty = true
-	func unset(option: string)
+	func mut unset(option: string)
 		for o,i in options
 			if o == option
 				options.remove(i)
 				db.dirty = true
 				return
-	func const pure_remote() -> bool
+	func pure_remote() -> bool
 		return is(NONLOCAL)
-	func const pure_local() -> bool
+	func pure_local() -> bool
 		return len(id) == 0
-	func const perfectly_fine() -> bool
+	func perfectly_fine() -> bool
 		if pure_remote() or pure_local()
 			return false
 		if changed_meta() or changed_file()
 			return false
 		return true
-	func const in_db() -> bool
+	func in_db() -> bool
 		return len(hash) > 0
-	func const changed_file() -> bool
+	func changed_file() -> bool
 		return is(CHANGED_FILE)
-	func const changed_meta() -> bool
+	func changed_meta() -> bool
 		return is(CHANGED_META)
-	func const mergeable(f: LocalFile) -> bool
+	func mergeable(f: LocalFile) -> bool
 		if size != f.size
 			return false
 		if id != f.id
 			if len(id) > 0 and len(f.id) > 0
 				return false
 		return true
-	func merge(f: LocalFile)
+	func mut merge(f: LocalFile)
 		for o in f.options
 			set(o)
-	func sync_tags(rtags: Tag[])
+	func mut sync_tags(rtags: Tag[])
 		tags = rtags # TODO
 		db.dirty = true
-	func set_name(_name: string)
+	func mut set_name(_name: string)
 		if _name == name
 			return
 		name = _name
@@ -125,7 +125,7 @@ class LocalFile
 		if conf.verbosity > 0
 			log_ok("name", name)
 		set(CHANGED_META)
-	func tag_add(tt: Tag)
+	func mut tag_add(tt: Tag)
 		if tt.key == "name"
 			set_name(tt.value)
 			return
@@ -137,7 +137,7 @@ class LocalFile
 		if conf.verbosity > 0
 			log_ok("tag add", "{{tt}}")
 		set(CHANGED_META)
-	func tag_set(tt: Tag)
+	func mut tag_set(tt: Tag)
 		if tt.key == "name"
 			set_name(tt.value)
 			return
@@ -152,7 +152,7 @@ class LocalFile
 				set(CHANGED_META)
 				return
 		tag_add(tt)
-	func tag_rm(tt: Tag)
+	func mut tag_rm(tt: Tag)
 		for t,i in tags
 			if t.match(tt)
 				if conf.verbosity > 0
@@ -161,7 +161,7 @@ class LocalFile
 				db.dirty = true
 				set(CHANGED_META)
 				return
-	func const status_str() -> string
+	func status_str() -> string
 		if !in_db()
 			return "? "
 		if pure_local()
@@ -173,7 +173,7 @@ class LocalFile
 		if changed_meta()
 			return "* "
 		return "  "
-	func const show_info(l: string)
+	func show_info(l: string)
 		#print(l + "path: " + path)
 		print(l + "name:    {{name}}")
 		print(l + "id:      {{id}}")
@@ -186,12 +186,12 @@ class LocalFile
 		var _tags = tags_sort(tags)
 		for t in _tags
 			print(l + "  tag:   {{t.key}}={{t.value}}")
-	func const remote_path() -> string
+	func remote_path() -> string
 		var ext = path.extension()
 		if is("quality=medium")
 			return ALEX_DIR + "medium/{{id}}.{{ext}}"
 		return ALEX_DIR + "links/{{id}}"
-	func const get_tag(key: string) -> string
+	func get_tag(key: string) -> string
 		if key == "name"
 			return name
 		if key == "ext"
@@ -206,7 +206,7 @@ class LocalFile
 			if t.key == key
 				return t.value
 		return ""
-	func const apply_structure(structure: string) -> string
+	func apply_structure(structure: string) -> string
 		string r = structure
 		int p1 = 0
 		while true
@@ -225,7 +225,7 @@ class LocalFile
 			r = r[:p0] + val + r[p1+1:]
 			p1 = p0 + len(val)
 		return r
-	func const match(mtags: Tag[]) -> bool
+	func match(mtags: Tag[]) -> bool
 		for mt in mtags
 			bool tag_match = false
 			if mt.key == "name"
@@ -252,7 +252,7 @@ class LocalFileDB
 	var files: LocalFile[]
 	var dirty = false
 	
-	func load()
+	func mut load()
 		files.clear()
 		dirty = false
 		#Timer tt
@@ -265,9 +265,9 @@ class LocalFileDB
 		else
 			load_v1(lines)
 		
-	func load_v2(lines: string[])
+	func mut load_v2(lines: string[])
 		
-	func load_v1(lines: string[])
+	func mut load_v1(lines: string[])
 		int n = len(lines) / 10
 		for i in 0:n
 			LocalFile ff
@@ -291,12 +291,12 @@ class LocalFileDB
 			files.add(ff)
 		#print(tt.get())
 
-	func self_check()
+	func mut self_check()
 		check_basic()
 		check_hash_collisions()
 		check_duplicate_paths()
 	
-	func check_basic()
+	func mut check_basic()
 		for f in files
 			if f.path.is_empty()
 				log_error("empty hash", "...")
@@ -313,7 +313,7 @@ class LocalFileDB
 				#else
 					# hash='', id='', no file
 					#print("EMPTY HASH (REMOTE): " + ff.path)
-	func check_hash_collisions()
+	func mut check_hash_collisions()
 		for f in files
 			if f.path.is_empty()
 				continue
@@ -332,7 +332,7 @@ class LocalFileDB
 			else
 				log_error("hash collision", "{{f.path}}  <->  {{l.path}}")
 
-	func check_duplicate_paths()
+	func mut check_duplicate_paths()
 		for f in files
 			if f.path.is_empty()
 				continue
@@ -346,7 +346,7 @@ class LocalFileDB
 			f.path = new_path
 			db.dirty = true
 
-	func drop_selected()
+	func mut drop_selected()
 		for i in 0:len(files)
 			if files[i].drop_me
 				log_warn("drop", files[i].path)
@@ -354,7 +354,7 @@ class LocalFileDB
 				db.dirty = true
 				i --
 
-	func save()
+	func mut save()
 		make_all_dirs(hui.app_directory << "sisyphos")
 		var f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
 		f << "version=1"
@@ -452,7 +452,7 @@ class LocalFileDB
 			pass
 		return files
 		
-	func rehash()
+	func mut rehash()
 		for f in files
 			if f.pure_remote()
 				continue
@@ -465,12 +465,12 @@ class LocalFileDB
 					save()
 			except
 				pass
-	func optimize()
+	func mut optimize()
 		print("optimizing...")
 		files = sorted(files, "path")
 		dirty = true
 	
-	func manual_init()
+	func mut manual_init()
 		print("initializing")
 		save()
 		conf.save()

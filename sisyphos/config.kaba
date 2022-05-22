@@ -141,7 +141,7 @@ class ConfigDir
 	var syncs: ConfigDirSync[]
 	var structure: string
 	
-	func add_sync(filter: string, options: string)
+	func mut add_sync(filter: string, options: string)
 		ConfigDirSync s
 		s.dir = dir
 		s.filter = filter
@@ -158,17 +158,17 @@ class ConfigDirSync
 	
 
 
-	func const get_structure() -> string[]
+	func get_structure() -> string[]
 		var oo = options.explode(";")
 		for o in oo
 			if o[:10] == "structure="
 				return o[10:].explode("/")
-	func const quality() -> string
+	func quality() -> string
 		if options.find("quality=medium", 0) >= 0
 			return MEDIUM
 		return PERFECT
 
-	func const guess_dir(parts: string[]) -> Path
+	func guess_dir(parts: string[]) -> Path
 		var structure = get_structure()
 		Path dir
 		for s in structure
@@ -201,7 +201,7 @@ class Config
 	var default_quality = "perfect"
 	var default_structure = "{name}.{ext}"
 
-	func load()
+	func mut load()
 		var f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
 		int n, m
 		f >> n
@@ -226,7 +226,7 @@ class Config
 			f >> ig
 			ignore.add(ig)
 		del f
-	func const save()
+	func save()
 		make_all_dirs(hui.app_directory << "sisyphos")
 		var f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
 		f << len(dirs)
@@ -243,7 +243,7 @@ class Config
 		f << server
 		del f
 
-	func const show()
+	func show()
 		for e in conf.dirs
 			print(e.dir)
 			print("structure: {{e.structure}}")
@@ -251,7 +251,7 @@ class Config
 				print("  filter: {{s.filter}}")
 				print("    options: {{s.options}}")
 
-	func add_filter(dir: Path, filter: string, _options: string)
+	func mut add_filter(dir: Path, filter: string, _options: string)
 		var options = _options
 		if default_quality == MEDIUM and options == ""
 			options = "quality=medium"
@@ -271,10 +271,10 @@ class Config
 		#raise(new Exception("not found"))
 		return nil
 
-	func const dir_is_in_db(_dir: Path) -> bool
+	func dir_is_in_db(_dir: Path) -> bool
 		return get_cfg(_dir)
 
-	func rm_filter(dir: Path, filter: string)
+	func mut rm_filter(dir: Path, filter: string)
 		for e in dirs
 			if e.dir == dir
 				for s,i in e.syncs
@@ -283,7 +283,7 @@ class Config
 						return
 		print("NOT FOUND...")
 
-	func rm_dir(dir: Path)
+	func mut rm_dir(dir: Path)
 		for e,i in dirs
 			if e.dir == dir
 				dirs.remove(i)
