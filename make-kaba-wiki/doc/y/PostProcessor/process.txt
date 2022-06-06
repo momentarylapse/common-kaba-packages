@@ -1,4 +1,0 @@
-description = 
-param:shader = 
-param:source = 
-param:target = 

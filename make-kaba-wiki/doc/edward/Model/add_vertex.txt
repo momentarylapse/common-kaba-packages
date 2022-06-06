@@ -2,3 +2,4 @@ description =
 param:bone_index = 
 param:normal_mode = 
 param:pos = 
+param:self = 

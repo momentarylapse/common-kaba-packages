@@ -3,3 +3,4 @@ param:area =
 param:i = 
 param:mode = 
 param:playable = 
+param:self = 

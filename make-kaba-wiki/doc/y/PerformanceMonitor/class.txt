@@ -1,3 +1,0 @@
-description = 
-element:avg = 
-element:frames = 

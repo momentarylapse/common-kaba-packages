@@ -1,4 +1,5 @@
 description = 
 param:max_size = 
 param:req = 
+param:self = 
 return = 

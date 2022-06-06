@@ -1,4 +1,5 @@
 description = 
 param:max = 
 param:min = 
+param:self = 
 return = 

@@ -1,5 +1,6 @@
 description = 
 param:allow_cancel = 
+param:cb = 
 param:root = 
 param:text = 
 param:title = 

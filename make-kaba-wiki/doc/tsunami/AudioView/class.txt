@@ -1,5 +1,6 @@
 description = 
 element:cam = 
+element:mouse_wheel_speed = 
 element:output_stream = 
 element:renderer = 
 element:sel = 

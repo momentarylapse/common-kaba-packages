@@ -1,2 +1,3 @@
 description = Shift the positions of all entities (objects, lights, terrains, cameras) and particles.
 param:dpos = The shift distance.
+param:self = 

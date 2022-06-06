@@ -1,3 +1,4 @@
 description = 
 param:pitch = 
+param:self = 
 return = 

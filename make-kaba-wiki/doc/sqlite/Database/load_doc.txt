@@ -1,4 +1,5 @@
 description = 
 param:id = 
+param:self = 
 param:table = 
 return = 

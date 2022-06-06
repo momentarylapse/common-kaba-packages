@@ -1,5 +1,6 @@
 description = 
 param:endpoint = 
 param:max_size = 
+param:self = 
 param:timeout = 
 return = 

@@ -1,4 +1,5 @@
 description = 
 param:beats = 
 param:pitch = 
+param:self = 
 param:volume = 

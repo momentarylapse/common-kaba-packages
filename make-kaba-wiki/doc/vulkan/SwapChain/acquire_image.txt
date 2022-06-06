@@ -1,4 +1,5 @@
 description = 
 param:image_index = 
+param:self = 
 param:signal_sem = 
 return = 

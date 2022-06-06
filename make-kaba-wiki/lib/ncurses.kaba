@@ -31,6 +31,35 @@ const KABA_LINK = "/usr/lib/libstdc++.so
 	noecho:noecho
 	_keypad:keypad"
 
+enum Attr
+	NORMAL = 0
+	COLOR = 0x0000ff00
+	REVERSE = 1<<(10+8)
+	UNDERLINE = 1<<(10+9)
+	BLINK = 1<<(11+8)
+	BOLD = 1<<(13+8)
+
+enum Color
+	BLACK
+	RED
+	GREEN
+	YELLOW
+	BLUE
+	MAGENTA
+	CYAN
+	WHITE
+
+func static pair(n: Color) -> int
+	return (int(n)<<8) & int(Attr.COLOR)
+
+enum Key
+	DOWN = 258
+	UP = 259
+	LEFT = 260
+	RIGHT = 261
+	MOUSE = 409
+	RESIZE = 410
+
 func extern _initscr() -> void*
 func extern curs_set(mode: int) -> int
 func extern has_colors() -> bool
@@ -95,33 +124,6 @@ class Window
 	func getch() -> int
 		return _wgetch(w)
 
-enum Attr
-	NORMAL = 0
-	COLOR = 0x0000ff00
-	REVERSE = 1<<(10+8)
-	UNDERLINE = 1<<(10+9)
-	BLINK = 1<<(11+8)
-	BOLD = 1<<(13+8)
-
-enum Color
-	BLACK
-	RED
-	GREEN
-	YELLOW
-	BLUE
-	MAGENTA
-	CYAN
-	WHITE
-func static pair(n: Color) -> int
-	return (int(n)<<8) & int(Attr.COLOR)
-
-enum Key
-	DOWN = 258
-	UP = 259
-	LEFT = 260
-	RIGHT = 261
-	MOUSE = 409
-	RESIZE = 410
 
 var stdwin: Window
 
@@ -145,12 +147,12 @@ func main()
 	stdwin.print("hallo {{w}} {{h}} {{has_colors()}}")
 	stdwin.printw(" abc ö⼭ z")
 	stdwin.move(0, h-1)
-	stdwin.attron(Attr.REVERSE)
+	stdwin.attron(int(Attr.REVERSE))
 	for x in 0:w
 		stdwin.print(" ")
 	stdwin.move(1, h-1)
 	stdwin.print("test")
-	stdwin.attroff(Attr.REVERSE)
+	stdwin.attroff(int(Attr.REVERSE))
 	stdwin.refresh()
 	#let p = _stdscr
 	
@@ -158,11 +160,11 @@ func main()
 	ww.border("||--++++")
 	ww.background('~')
 	ww.move(1,1)
-	ww.attron(Attr.BOLD)
+	ww.attron(int(Attr.BOLD))
 	#ww.attron(1<<8)
 	#ww.attron(1<<11)
 	ww.print("hi test")
-	ww.attron(Color.pair(1))
+	ww.attron(pair(Color.RED))
 	ww.print("red")
 	#ww.addch('A' | Color.pair(1))
 	ww.refresh()
@@ -184,8 +186,8 @@ func _main()
 	var h = stdwin.height()
 	stdwin.printw("█▀▄▌▐∴∵∌∮")
 	for i in 0:256
-		init_pair(i+1, i, i)
-		stdwin.attron(Color.pair(i+1))
+		init_pair(i+1, Color.from_int(i), Color.from_int(i))
+		stdwin.attron(pair(Color.from_int(i+1)))
 		stdwin.print("M")
 	stdwin.refresh()
 	

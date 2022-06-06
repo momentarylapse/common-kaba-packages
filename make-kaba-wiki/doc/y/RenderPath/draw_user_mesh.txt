@@ -1,6 +1,0 @@
-description = 
-param:data = 
-param:m = 
-param:s = 
-param:tex = 
-param:vb = 

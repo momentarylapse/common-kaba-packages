@@ -5,6 +5,7 @@ param:move =
 param:op = 
 param:p1 = 
 param:p2 = 
+param:self = 
 param:t = 
 param:vel_param = 
 return = 

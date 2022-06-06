@@ -1,4 +1,5 @@
 description = 
 param:beats = 
 param:samples = 
+param:self = 
 return = 

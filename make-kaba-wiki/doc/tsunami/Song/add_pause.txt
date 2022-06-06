@@ -3,4 +3,5 @@ param:affect_midi =
 param:index = 
 param:length = 
 param:mode = 
+param:self = 
 param:time = 

@@ -1,4 +1,0 @@
-description = 
-param:format = 
-param:h = 
-param:w = 

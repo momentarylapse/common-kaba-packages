@@ -1,3 +1,4 @@
 description = Subscribe to receive event notifications.
 param:f = A callback, that will be called when the event happens.
 param:msg = The event name.
+param:self = 

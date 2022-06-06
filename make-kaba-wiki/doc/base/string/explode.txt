@@ -1,3 +1,4 @@
 description = 'Splits a string at each occurance of a sequence.\nAn empty string gives <tt>[""]</tt>.\n<tt>"hello|world|".explode("|") -> ["hello", "world", ""]</tt>'
+param:self = 
 param:str = The sequence at which to split.
 return = A list of splitted strings.

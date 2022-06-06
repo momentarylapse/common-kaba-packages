@@ -2,3 +2,4 @@ description =
 param:allow_ref = 
 param:buf = 
 param:r = 
+param:self = 

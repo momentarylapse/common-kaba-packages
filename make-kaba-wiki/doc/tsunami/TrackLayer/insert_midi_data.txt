@@ -1,3 +1,4 @@
 description = 
 param:midi = 
 param:offset = 
+param:self = 

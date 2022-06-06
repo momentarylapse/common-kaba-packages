@@ -1,5 +1,6 @@
 description = 
 param:data = 
 param:endpoint = 
+param:self = 
 param:timeout = 
 return = 

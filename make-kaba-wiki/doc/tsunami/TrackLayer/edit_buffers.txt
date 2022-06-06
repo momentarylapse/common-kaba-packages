@@ -1,4 +1,5 @@
 description = 
 param:buf = 
 param:r = 
+param:self = 
 return = 

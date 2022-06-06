@@ -4,4 +4,5 @@ param:filename =
 param:name = 
 param:overwrite_index = 
 param:pos = 
+param:self = 
 return = 

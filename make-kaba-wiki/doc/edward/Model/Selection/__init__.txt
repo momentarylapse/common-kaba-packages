@@ -1,4 +1,5 @@
 description = 
 param:edge = 
 param:polygon = 
+param:self = 
 param:vertex = 

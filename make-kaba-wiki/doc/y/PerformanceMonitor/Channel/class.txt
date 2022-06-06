@@ -1,4 +1,0 @@
-description = 
-element:average = 
-element:name = 
-element:parent = 

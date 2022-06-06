@@ -3,3 +3,4 @@ param:bg =
 param:bg_sel = 
 param:fg = 
 param:fg_sel = 
+param:self = 

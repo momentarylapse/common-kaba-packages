@@ -1,2 +1,0 @@
-description = 
-element:cur_con = 

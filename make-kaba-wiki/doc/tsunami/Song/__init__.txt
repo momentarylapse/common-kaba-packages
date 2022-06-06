@@ -1,3 +1,4 @@
 description = 
 param:sample_rate = 
+param:self = 
 param:session = 

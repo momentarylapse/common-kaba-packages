@@ -2,3 +2,4 @@ description =
 param:duration = 
 param:frame = 
 param:index = 
+param:self = 

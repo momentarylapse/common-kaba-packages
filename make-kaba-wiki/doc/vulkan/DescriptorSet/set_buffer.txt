@@ -1,4 +1,5 @@
 description = 
 param:binding = 
 param:buf = 
+param:self = 
 param:ubo = 

@@ -1,6 +1,7 @@
 description = 
 param:filename = 
 param:num_samples = 
+param:self = 
 param:source = 
 param:tags = 
 return = 

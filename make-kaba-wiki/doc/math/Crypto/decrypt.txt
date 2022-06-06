@@ -1,4 +1,5 @@
 description = 
 param:cut = 
+param:self = 
 param:str = 
 return = 

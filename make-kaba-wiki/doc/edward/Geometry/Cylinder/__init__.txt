@@ -5,3 +5,4 @@ param:pos1 =
 param:pos2 = 
 param:radius = 
 param:rings = 
+param:self = 

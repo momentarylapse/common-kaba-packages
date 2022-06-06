@@ -1,4 +1,5 @@
 description = 
 param:material = 
+param:self = 
 param:v = 
 return = 

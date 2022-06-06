@@ -2,3 +2,4 @@ description =
 param:_pitch = 
 param:_volume = 
 param:r = 
+param:self = 

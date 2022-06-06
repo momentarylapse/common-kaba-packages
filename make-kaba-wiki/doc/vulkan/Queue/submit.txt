@@ -1,5 +1,6 @@
 description = 
 param:cb = 
 param:fence = 
+param:self = 
 param:signal_sem = 
 param:wait_sem = 

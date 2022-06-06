@@ -4,3 +4,4 @@ param:bone =
 param:dpos = 
 param:frame = 
 param:move = 
+param:self = 

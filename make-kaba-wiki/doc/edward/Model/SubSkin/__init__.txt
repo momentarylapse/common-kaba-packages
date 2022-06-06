@@ -1,3 +1,4 @@
 description = 
 param:num_textures = 
+param:self = 
 param:triangle = 

@@ -1,3 +1,4 @@
 description = 
 param:filter = 
+param:self = 
 return = 

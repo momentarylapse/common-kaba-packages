@@ -1,4 +1,5 @@
 description = 
 param:beat_partition = 
 param:beats = 
+param:self = 
 param:sub_beats = 

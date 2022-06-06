@@ -1,12 +1,10 @@
 use kaba
 use os
 use time
+import hui
 # use "mongo"
 
 const SHIFT = "    "
-
-var external_packages: Module*[]
-var external_libs: Module*[]
 
 func param_pre(v: Variable) -> string
 	if not v.is_const()
@@ -288,28 +286,38 @@ func filter_classes(cc: Class*[]) -> Class*[]
 	return sorted(r, "name")
 
 
-func show_package(p: Module) -> string
-	var wiki = "== Kaba package {{p.name}} ==\n"
+func show_module(p: Module, _ns: string, sub_modules: (string,Module*)[]) -> string
+	string ns = p.name
+	if ns != ""
+		ns = "{{_ns}}.{{p.name}}"
+
+	var wiki = "== Kaba package {{ns}} ==\n"
 	if p.used_by_default
-		wiki = "== Kaba package {{p.name}} (default) ==\n"
+		wiki = "== Kaba package {{ns}} (default) ==\n"
+	
+	if len(sub_modules) > 0
+		wiki += "\n=== Modules ===\n\n"
+		for m in sub_modules
+			wiki += "* <tt>module '''[[kaba.{{ns}}.{{m.e0}}|{{m.e0}}]]'''</tt>"
+
 	var classes = filter_classes(p.classes())
 	if len(classes) > 0
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
-			wiki += "* <tt>class '''[[kaba.{{p.name}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
+			wiki += "* <tt>class '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
 
 	var funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
 			var pre = func_pre(f)
-			wiki += "* <tt>func {{pre}}'''[[kaba.{{p.name}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
+			wiki += "* <tt>func {{pre}}'''[[kaba.{{ns}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
 	var vars = sorted(p.variables(), "name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
-			wiki += "* <tt>var static '''[[kaba.{{p.name}}.{{v.name}}|{{v.name}}]]''': {{v.type.name}}</tt>\n"
+			wiki += "* <tt>var static '''[[kaba.{{ns}}.{{v.name}}|{{v.name}}]]''': {{v.type.name}}</tt>\n"
 
 	var consts = filter_consts(p.constants())
 	if len(consts) > 0
@@ -333,10 +341,12 @@ func make_reference() -> string
 			wiki += " (default)"
 		wiki += "\n"
 
+	var external_packages = find_external()
 	wiki += "\n; external program apis\n\n"
 	for p in external_packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
+	var external_libs = find_external_libs()
 	wiki += "\n; external libs\n\n"
 	for p in external_libs
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
@@ -351,32 +361,53 @@ func make_reference() -> string
 func wiki_upload(name: string, wiki: string)
 	Filesystem.write_text(name + ".txt", wiki)
 
-func find_external()
-	var list = Filesystem.search("extern", "*.kaba", "f")
-	for e in list
-		var p = weak(Module.load("extern/" + e, true))
-		p.name = str(e)[:-5]
-		external_packages.add(p)
+class ExternalPackage
+	name: string
+	main: Module*
+	sub_modules: (string,Module*)[]
+	#sub_names: string[]
+	
 
-func find_external_libs()
+func find_external() -> ExternalPackage[]
+	var r: ExternalPackage[]
+	var list = Filesystem.search("extern", "", "d")
+	for e in list
+		ExternalPackage p
+		p.name = e
+		p.main = weak(Module.load("extern/" + e + "/" + e + ".kaba", true))
+		
+		# sub-modules
+		var list2 = Filesystem.search("extern/" + e , "*.kaba", "f")
+		for e2 in list2
+			if str(e2) != str(e) + ".kaba"
+				p.sub_modules.add([str(e2).replace(".kaba", ""), weak(Module.load("extern/" + e + "/" + e2, true))])
+		#p.name = str(e)[:-5]
+		r.add(p)
+	return r
+
+func find_external_libs() -> Module*[]
+	var r: Module*[]
 	var list = Filesystem.search("lib", "*.kaba", "f")
 	for e in list
 		var p = weak(Module.load("lib/" + e, true))
 		p.name = str(e)[:-5]
-		external_libs.add(p)
+		r.add(p)
+	return r
 
 func make_documentation()
 	wiki_upload("kaba.reference", make_reference())
 
 	for p in weak(packages)
-		make_package(p)
+		make_module(p, p.name, "", [])
+
+	var external_packages = find_external()
 	for p in external_packages
-		make_package(p)
+		make_module(p.main, p.name, "", p.sub_modules)
+
+	var external_libs = find_external_libs()
 	for p in external_libs
-		make_package(p)
+		make_module(p, p.name, "", [])
 
-
-import hui
 
 func parse_doc_string(s: string) -> string
 	var ss = s
@@ -456,17 +487,18 @@ func prepare_class(c: Class, ns: string, dir: Path)
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name, dir << cc.name)
 
-func prepare_package(p: Module, dir: Path)
+func prepare_module(p: Module, name: string, dir: Path)
 	if not Filesystem.exists(dir)
 		Filesystem.create_directory(dir)
+	print("PREP MOD   {{name}}  {{dir}}")
 
 	var classes = filter_classes(p.classes())
 	for c in classes
-		prepare_class(c, p.name, dir << c.name)
+		prepare_class(c, name, dir << c.name)
 
 	var funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
-		prepare_func(f, p.name, dir)
+		prepare_func(f, name, dir)
 
 #	var vars = p.variables()
 #	for v in vars
@@ -475,11 +507,17 @@ func prepare_package(p: Module, dir: Path)
 
 func prepare(dir: Path)
 	for p in weak(packages)
-		prepare_package(p, dir << p.name)
+		prepare_module(p, p.name, dir << p.name)
+
+	var external_packages = find_external()
 	for p in external_packages
-		prepare_package(p, dir << p.name)
+		prepare_module(p.main, p.name, dir << p.name)
+		for m in p.sub_modules
+			prepare_module(m.e1, p.name + "." + m.e0, dir << p.name << m.e0)
+
+	var external_libs = find_external_libs()
 	for p in external_libs
-		prepare_package(p, dir << p.name)
+		prepare_module(p, p.name, dir << p.name)
 
 
 func make_class(c: Class, ns: string)
@@ -492,20 +530,27 @@ func make_class(c: Class, ns: string)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-func make_package(p: Module)
-	wiki_upload("kaba.{{p.name}}", show_package(p))
+func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Module*)[])
+	string ns = name
+	if _ns != ""
+		ns = "{{_ns}}.{{name}}"
+	print("MAKE MOD {{name}}   {{ns}}")
+	wiki_upload("kaba.{{ns}}", show_module(p, _ns, sub_modules))
 
 	var classes = filter_classes(p.classes())
 	for c in classes
-		make_class(c, p.name)
+		make_class(c, ns)
 
 	var funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
-		wiki_upload("kaba.{{p.name}}.{{f.name}}", show_func(p.name, f))
+		wiki_upload("kaba.{{ns}}.{{f.name}}", show_func(ns, f))
 
 	var vars = p.variables()
 	for v in vars
-		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
+		wiki_upload("kaba.{{ns}}.{{v.name}}", show_var(ns, v))
+	
+	for m in sub_modules
+		make_module(m.e1, m.e0, ns, [])
 
 
 func main(arg: string[])

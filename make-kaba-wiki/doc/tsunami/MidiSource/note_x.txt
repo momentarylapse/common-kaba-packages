@@ -2,5 +2,6 @@ description =
 param:beat_partition = 
 param:beats = 
 param:pitch = 
+param:self = 
 param:sub_beats = 
 param:volume = 

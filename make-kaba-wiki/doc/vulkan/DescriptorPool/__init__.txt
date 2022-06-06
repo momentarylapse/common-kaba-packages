@@ -1,3 +1,4 @@
 description = 
 param:max_sets = 
 param:s = 
+param:self = 

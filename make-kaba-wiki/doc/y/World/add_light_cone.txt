@@ -3,5 +3,6 @@ param:ang =
 param:c = 
 param:pos = 
 param:radius = 
+param:self = 
 param:theta = 
 return = 

@@ -6,5 +6,6 @@ param:radius1 =
 param:radius2 = 
 param:radius3 = 
 param:rings = 
+param:self = 
 param:turns = 
 param:twists = 

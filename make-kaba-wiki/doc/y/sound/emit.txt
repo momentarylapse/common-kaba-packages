@@ -1,9 +1,0 @@
-description = 
-param:filename = 
-param:loop = 
-param:pos = 
-param:r_max = 
-param:r_min = 
-param:speed = 
-param:volume = 
-return = 

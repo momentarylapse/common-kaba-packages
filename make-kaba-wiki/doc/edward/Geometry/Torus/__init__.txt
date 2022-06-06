@@ -5,3 +5,4 @@ param:num_y =
 param:pos = 
 param:radius1 = 
 param:radius2 = 
+param:self = 

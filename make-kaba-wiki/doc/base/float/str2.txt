@@ -1,3 +1,4 @@
 description = 
 param:decimals = 
+param:self = 
 return = 

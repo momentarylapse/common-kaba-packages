@@ -1,3 +1,0 @@
-description = 
-element:frame_time = 
-element:location = 

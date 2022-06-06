@@ -1,3 +1,4 @@
 description = 
 param:depth_buffer = 
+param:self = 
 return = 

@@ -5,3 +5,4 @@ param:beats =
 param:bpm = 
 param:index = 
 param:mode = 
+param:self = 
