@@ -288,7 +288,7 @@ func filter_classes(cc: Class*[]) -> Class*[]
 
 func show_module(p: Module, _ns: string, sub_modules: (string,Module*)[]) -> string
 	string ns = p.name
-	if ns != ""
+	if _ns != ""
 		ns = "{{_ns}}.{{p.name}}"
 
 	var wiki = "== Kaba package {{ns}} ==\n"
