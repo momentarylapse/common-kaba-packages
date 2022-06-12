@@ -1,3 +1,3 @@
-description = 
-param:self = 
-return = 
+description = Remove whitespace from start and end.\n<tt>"  &lt;TAB&gt;hello world   ".trim() -> "hello world"</tt>.
+param:self = Input text.
+return = Output with trailing whitespace removed.

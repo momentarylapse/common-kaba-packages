@@ -12,7 +12,10 @@ func param_pre(v: Variable) -> string
 	return ""
 
 func func_params(f: Function) -> string
-	return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{f.var[i].name}}: {{p.name}}"].join(", ")
+	if f.is_static()
+		return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{f.var[i].name}}: {{p.name}}"].join(", ")
+	else
+		return [for p,i in f.param_type[1:] "{{param_pre(f.var[i+1])}}{{f.var[i+1].name}}: {{p.name}}"].join(", ")
 
 func func_return(f: Function) -> string
 	if f.return_type.name == "void"
@@ -164,8 +167,8 @@ func func_pre(f: Function) -> string
 		pre += "static "
 	if f.is_pure()
 		pre += "pure "
-	else if f.is_const()
-		pre += "const "
+	else if not f.is_static() and not f.is_const()
+		pre += "mut "
 	if f.is_selfref()
 		pre += "selfref "
 	if f.virtual_index >= 0
@@ -203,12 +206,12 @@ func show_class(ns: string, c: Class) -> string
 		for f in ops
 			string pre = func_pre(f)
 			var p: Class* = nil
-			if f.is_static()
-				if f.num_params >= 2
-					p = f.param_type[1]
-			else
-				if f.num_params >= 1
-					p = f.param_type[0]
+			#if f.is_static()
+			if f.num_params >= 2
+				p = f.param_type[1]
+			#else
+			#	if f.num_params >= 1
+			#		p = f.param_type[0]
 			var ll = "{{SHIFT}}func {{pre}}{{f.name}}({{func_params(f)}}){{func_return(f)}}"
 			wiki += "{{ll|-40}}"
 			if f.name == "__subarray__"
@@ -286,10 +289,10 @@ func filter_classes(cc: Class*[]) -> Class*[]
 	return sorted(r, "name")
 
 
-func show_module(p: Module, _ns: string, sub_modules: (string,Module*)[]) -> string
-	string ns = p.name
+func show_module(p: Module, name: string, _ns: string, sub_modules: (string,Module*)[]) -> string
+	string ns = name
 	if _ns != ""
-		ns = "{{_ns}}.{{p.name}}"
+		ns = "{{_ns}}.{{name}}"
 
 	var wiki = "== Kaba package {{ns}} ==\n"
 	if p.used_by_default
@@ -298,7 +301,7 @@ func show_module(p: Module, _ns: string, sub_modules: (string,Module*)[]) -> str
 	if len(sub_modules) > 0
 		wiki += "\n=== Modules ===\n\n"
 		for m in sub_modules
-			wiki += "* <tt>module '''[[kaba.{{ns}}.{{m.e0}}|{{m.e0}}]]'''</tt>"
+			wiki += "* <tt>module '''[[kaba.{{ns}}.{{m.e0}}|{{m.e0}}]]'''</tt>\n"
 
 	var classes = filter_classes(p.classes())
 	if len(classes) > 0
@@ -535,7 +538,7 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Modu
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
 	print("MAKE MOD {{name}}   {{ns}}")
-	wiki_upload("kaba.{{ns}}", show_module(p, _ns, sub_modules))
+	wiki_upload("kaba.{{ns}}", show_module(p, name, _ns, sub_modules))
 
 	var classes = filter_classes(p.classes())
 	for c in classes

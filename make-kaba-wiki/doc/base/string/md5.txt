@@ -1,3 +1,3 @@
-description = 
-param:self = 
-return = 
+description = Md5 hash function.
+param:self = Binary input.
+return = Hash value, 32 character hex-string.

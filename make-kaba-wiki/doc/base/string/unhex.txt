@@ -1,3 +1,3 @@
-description = 
-param:self = 
-return = 
+description = Parse hexadecimal into binary.\n<tt>"61.62.63".unhex() -> "abc"</tt>.
+param:self = Hexadecimal code.
+return = Binary output.

@@ -1,5 +1,5 @@
-description = 
-param:self = 
-param:start = 
-param:str = 
-return = 
+description = Find a sub-string in text.
+param:self = The source text.
+param:start = Only start searching after this position in the source.
+param:str = The sub-string to find in the source.
+return = The location of the sub-string. Or <tt>-1</tt> if not found.

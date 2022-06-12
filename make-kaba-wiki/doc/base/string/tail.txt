@@ -1,4 +1,4 @@
-description = 
-param:self = 
-param:size = 
-return = 
+description = Returns the last couple of characters.
+param:self = Input text.
+param:size = How many characters.\nNumbers larger than <tt>len(self)</tt> will be clamped!
+return = The last characters.

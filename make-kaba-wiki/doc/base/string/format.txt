@@ -1,4 +1,4 @@
-description = 
-param:fmt = 
-param:self = 
-return = 
+description = Formating helper, mostly used by string-interpolation.
+param:fmt = A format descriptor (<tt>"%s"</tt> or <tt>" 10%s"</tt>).
+param:self = Input text.
+return = Formated output.
