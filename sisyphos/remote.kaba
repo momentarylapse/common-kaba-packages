@@ -25,7 +25,7 @@ func ssh_escape(s: string) -> string
 
 func scp_download(source: string, dest: string)
 	string cmd = "scp -Tp"
-	cmd += " {{conf.server}}:\"'{{bash_escape2(source)}}'\" \"{{bash_escape(dest)}}\""
+	cmd += " {{conf.server}}:\"{{bash_escape2(source)}}\" \"{{bash_escape(dest)}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
