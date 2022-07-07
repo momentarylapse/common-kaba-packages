@@ -63,7 +63,7 @@ Toolbar toolbar ''
 		set_string("add-type", "Node")
 		
 		if len(arg) > 0
-			c.import(Filesystem.read_text(Path(arg[0])))
+			c.import(fs.read_text(Path(arg[0])))
 		
 		event("new", on_new)
 		event("open", on_open)
@@ -81,13 +81,13 @@ Toolbar toolbar ''
 	func on_save()
 		var f = func(p: Path)
 			if bool(p)
-				Filesystem.write_text(p, c.export())
+				fs.write_text(p, c.export())
 		hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func mut on_open()
 		var f = func(p: Path)
 			if bool(p)
-				c.import(Filesystem.read_text(p))
+				c.import(fs.read_text(p))
 		hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func mut on_param()

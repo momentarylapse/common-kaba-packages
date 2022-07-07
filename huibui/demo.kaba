@@ -30,7 +30,7 @@ func action_demo(arg: string[])
 	conf.set_dir(filename.parent())
 	conf.load()
 	
-	string source = Filesystem.read(filename)
+	string source = fs.read_text(filename)
 	#print(source)
 	var r = ParseResource(source, true)
 	#r.show(0)

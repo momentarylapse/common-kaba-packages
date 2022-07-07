@@ -175,9 +175,9 @@ func remote_download(out f: LocalFile)
 	make_all_dirs(f.path)
 	scp_download(f.remote_path(), str(f.path))
 
-	f.size = Filesystem.size(f.path)
-	f.mtime = Filesystem.mtime(f.path).time
-	f.hash = Filesystem.hash(f.path, "md5")
+	f.size = fs.size(f.path)
+	f.mtime = fs.mtime(f.path).time
+	f.hash = fs.hash(f.path, "md5")
 	f.unset(NONLOCAL)
 	f.unset(CHANGED_FILE)
 	db.save()

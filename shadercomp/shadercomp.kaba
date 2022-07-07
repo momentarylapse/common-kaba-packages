@@ -34,7 +34,7 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 	if len(layout.version) > 0
 		c = "#version {{layout.version}}\n" + c
 	try
-		os.Filesystem.write_text(itmp, c)
+		os.fs.write_text(itmp, c)
 #		shell_execute("echo '{{code}}' > {{itmp}}")
 #		print("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}}")
 		shell_execute("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}} &> /tmp/shader-error")
@@ -43,8 +43,8 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 		print("  ----  ERROR ({{stage}})  ----\n{{x}}")
 		return ""
 	string x = shell_execute("cat {{otmp}}")
-	os.Filesystem.delete(itmp)
-	os.Filesystem.delete(otmp)
+	os.fs.delete(itmp)
+	os.fs.delete(otmp)
 	
 #	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
 	# print(cmd)
@@ -92,7 +92,7 @@ func extract_push_size(layout: string) -> int
 
 func compile(filename: Path)
 	cur_dir = filename.parent()
-	var all = Filesystem.read_text(filename)
+	var all = fs.read_text(filename)
 	var layout = tag_contents(all, "Layout")
 	var common = tag_contents(all, "Common")
 	var code_vertex = tag_contents(all, "VertexShader")
@@ -112,7 +112,7 @@ func compile(filename: Path)
 	var x_ray_miss = compile_stage(code_ray_miss, ld, "rmiss")
 	var x_ray_closest_hit = compile_stage(code_ray_closest_hit, ld, "rchit")
 	
-	var f = Filesystem.create(Path(str(filename) + ".compiled"))
+	var f = new BinaryFormatter(fs.open(Path(str(filename) + ".compiled"), "wb"))
 	f << "Info"
 	f << "{version=0.1,shaders=SPIR-V}"
 	f << "Input"

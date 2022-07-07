@@ -55,7 +55,7 @@ class Config
 		return false
 	
 	func mut load()
-		if not Filesystem.exists(conf.root << "xmake.conf")
+		if not fs.exists(conf.root << "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
 		var c: hui.Configuration
 		c.load(conf.root << "xmake.conf")
@@ -127,7 +127,7 @@ class Config
 	
 	func needs_installing() -> Path[]
 		var r: Path[]
-		var list = Filesystem.search(install_source, "*.*", "fd")
+		var list = fs.search(install_source, "*.*", "fd")
 		var ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
@@ -176,7 +176,7 @@ func relsrc(filename: Path) -> Path
 func find_dep(out f: SourceFile, filename: Path)
 	string s
 	try
-		s = Filesystem.read(filename)
+		s = fs.read(filename)
 	except
 		return
 	var lines = s.explode("\n")
@@ -187,7 +187,7 @@ func find_dep(out f: SourceFile, filename: Path)
 			int q = l.find("\"", p + 11)
 			Path d = filename.parent() << l[p+10:q]
 			d = d.canonical()
-			if Filesystem.exists(d)
+			if fs.exists(d)
 				if f.add_dep(d)
 				#	print("  <" + rel(d) + ">")
 					find_dep(f, d)
@@ -203,6 +203,6 @@ func parse_source(filename: Path)
 	sources.add(f)
 
 func parse_dir(dir: Path)
-	var files = Filesystem.search(dir, "*.cpp", "fr")
+	var files = fs.search(dir, "*.cpp", "fr")
 	for f in files
 		parse_source(dir << f)

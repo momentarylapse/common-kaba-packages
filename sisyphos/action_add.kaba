@@ -16,14 +16,14 @@ func file_add(out f: LocalFile)
 
 		# suddenly appearing?!?
 		if f.pure_remote()
-			if Filesystem.exists(f.path)
+			if fs.exists(f.path)
 				f.unset(NONLOCAL)
 				if conf.verbosity >= 1
 					log_warn("non-nonlocal", rel_path(f.path))
 				return
 		
 		# lost?
-		if !Filesystem.exists(f.path)
+		if !fs.exists(f.path)
 			if !f.pure_remote()
 				f.set(NONLOCAL)
 				if conf.verbosity >= 1
@@ -31,14 +31,14 @@ func file_add(out f: LocalFile)
 			return
 		
 		# time
-		int mtime = Filesystem.mtime(f.path).time
+		int mtime = fs.mtime(f.path).time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
 				log_ok("=", rel_path(f.path))
 		else
 			# changed?
 			try
-				string hash = Filesystem.hash(f.path, "md5")
+				string hash = fs.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
 						log_warn("touched", rel_path(f.path))
@@ -50,7 +50,7 @@ func file_add(out f: LocalFile)
 					f.set(CHANGED_FILE)
 					f.hash = hash
 					f.mtime = mtime
-					f.size = Filesystem.size(f.path)
+					f.size = fs.size(f.path)
 					if conf.verbosity >= 2 or conf.show_meta
 						f.show_info("      ")
 			except Exception as e
@@ -60,7 +60,7 @@ func file_add(out f: LocalFile)
 		# new file
 		string hash
 		try
-			hash = Filesystem.hash(f.path, "md5")
+			hash = fs.hash(f.path, "md5")
 		except Exception as e
 			error_out(e)
 			return
@@ -87,8 +87,8 @@ func file_add_new(out f: LocalFile, hash: string)
 	#print(ext)
 	#print(f.name)
 	f.hash = hash
-	f.mtime = Filesystem.mtime(f.path).time
-	f.size = Filesystem.size(f.path)
+	f.mtime = fs.mtime(f.path).time
+	f.size = fs.size(f.path)
 	auto_tag(f)
 	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")

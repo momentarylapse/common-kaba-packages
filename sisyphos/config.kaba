@@ -45,7 +45,7 @@ func make_path(p: string) -> Path
 
 var working_dir: Path
 func set_working_dir(path: Path)
-	if Filesystem.is_directory(path)
+	if fs.is_directory(path)
 		working_dir = path.canonical()
 	else
 		working_dir = path.parent().canonical()
@@ -85,10 +85,10 @@ func make_all_dirs(path: Path)
 			dir += "/"
 		dir += p
 		if i > 0
-			if Filesystem.exists(Path(dir))
+			if fs.exists(Path(dir))
 				continue
 			try
-				Filesystem.create_directory(Path(dir))
+				fs.create_directory(Path(dir))
 			except Exception as e
 				error_out(e)
 				return
@@ -202,7 +202,7 @@ class Config
 	var default_structure = "{name}.{ext}"
 
 	func mut load()
-		var f = Filesystem.open_text(hui.app_directory << "sisyphos/config")
+		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/config", "rt"))
 		int n, m
 		f >> n
 		for i in 0:n
@@ -228,7 +228,7 @@ class Config
 		del f
 	func save()
 		make_all_dirs(hui.app_directory << "sisyphos")
-		var f = Filesystem.create_text(hui.app_directory << "sisyphos/config")
+		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/config", "wt"))
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)

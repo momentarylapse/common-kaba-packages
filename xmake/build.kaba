@@ -9,14 +9,14 @@ use time
 
 
 func is_completely_built(s: SourceFile) -> bool
-	if not os.Filesystem.exists(s.object())
+	if not os.fs.exists(s.object())
 		return false
-	var ts = os.Filesystem.mtime(s.filename)
-	var to = os.Filesystem.mtime(s.object())
+	var ts = os.fs.mtime(s.filename)
+	var to = os.fs.mtime(s.object())
 	if to.time < ts.time
 		return false
 	for d in s.dep
-		var td = os.Filesystem.mtime(d)
+		var td = os.fs.mtime(d)
 		if to.time < td.time
 			return false
 	return true
@@ -125,7 +125,7 @@ func build()
 				return
 
 
-	if len(needs_building) == 0 and os.Filesystem.exists(binary_file)
+	if len(needs_building) == 0 and os.fs.exists(binary_file)
 		print("  up to date")
 		return
 			
@@ -147,13 +147,13 @@ func build()
 func build_clear()
 	for s in sources
 		try
-			os.Filesystem.delete(s.object())
+			os.fs.delete(s.object())
 			#print(s.object())
 		except
 			pass
 	var binary_file = conf.binary_file
 	try
-		os.Filesystem.delete(binary_file)
+		os.fs.delete(binary_file)
 	except
 		pass
 	

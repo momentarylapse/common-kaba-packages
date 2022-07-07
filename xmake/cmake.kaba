@@ -71,13 +71,13 @@ func create_cmake()
 	
 	bool debug = conf.build_type == "debug"
 	
-	var f = Filesystem.create_text(conf.root << "CMakeLists.txt")
-	f << "# created by xmake"
-	f << "
-project({{conf.name}})"
-	f << "cmake_minimum_required(VERSION 3.22)"
-	f << "set(CMAKE_CXX_STANDARD {{conf.language[3:]}})"
-	f << "set(CMAKE_CXX_STANDARD_REQUIRED True)"
+	var f = new TextLinesFormatter(fs.open(conf.root << "CMakeLists.txt", "wt"))
+	f << "# created by xmake
+
+project({{conf.name}})
+cmake_minimum_required(VERSION 3.21)
+set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
+set(CMAKE_CXX_STANDARD_REQUIRED True)"
 	if debug
 		f << "set(CMAKE_BUILD_TYPE Debug)"
 	
@@ -169,7 +169,7 @@ add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")"
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	var list = conf.needs_installing()
 	for e in list
-		if Filesystem.is_directory(conf.root << e)
+		if fs.is_directory(conf.root << e)
 			f << "install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else
 			f << "install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"

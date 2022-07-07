@@ -88,7 +88,7 @@ func is_decl(l: string) -> bool
 	return true
 
 func process(p: Path, dry: bool)
-	var lines = Filesystem.read_text(p).explode("\n")
+	var lines = fs.read_text(p).explode("\n")
 	var lines_out = lines
 	var changed = false
 	var in_long_string = false
@@ -138,7 +138,7 @@ func process(p: Path, dry: bool)
 		print("CHANGED!!!!!")
 		#print(lines_out.join("\n"))
 		if not dry
-			Filesystem.write_text(p, lines_out.join("\n"))
+			fs.write_text(p, lines_out.join("\n"))
 
 func main(arg: string[])
 	var dry = false

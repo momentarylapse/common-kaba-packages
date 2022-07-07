@@ -62,7 +62,7 @@ func cl(s: string) -> string
 
 func create_makefile(p: Profile, postfix: string)
 	print("-- makefile {{p.name}} --")
-	var f = Filesystem.create_text(conf.root << conf.source_dir << ("Makefile" + postfix))
+	var f = new TextLinesFormatter(fs.open(conf.root << conf.source_dir << ("Makefile" + postfix), "wt"))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	string cflags, lflags, defines
@@ -111,7 +111,7 @@ func create_makefile(p: Profile, postfix: string)
 #		f << "	cp -f " + conf.icon + " " + datadir
 	var list = conf.needs_installing()
 	for e in list
-		if Filesystem.is_directory(conf.root << e)
+		if fs.is_directory(conf.root << e)
 			f << "	cp -ruf '../{{e}}' {{datadir}}"
 		else
 			f << "	cp -uf '../{{e}}' {{datadir}}"

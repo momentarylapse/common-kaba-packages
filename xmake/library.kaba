@@ -17,7 +17,7 @@ class Library
 	#	libs = _libs
 	func test() -> bool
 		for i in includes
-			if not os.Filesystem.exists(Path("/usr/include") << i)
+			if not os.fs.exists(Path("/usr/include") << i)
 				return false
 		return true
 	func compiler_flags() -> string
@@ -47,7 +47,7 @@ class LibraryManager
 
 	func mut init()
 		var lib_dir = hui.app_directory << "apps/xmake/libs"
-		var list = os.Filesystem.search(lib_dir, "*.txt", "f")
+		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
 			hui.Configuration c
 			c.load(lib_dir << e)

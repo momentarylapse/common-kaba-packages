@@ -25,7 +25,7 @@ func video_guess_tags_by_name(out f: LocalFile)
 
 
 func auto_tag(out f: LocalFile)
-	if !Filesystem.exists(f.path)
+	if !fs.exists(f.path)
 		return
 	var ext = f.path.extension()
 	#print(ext)

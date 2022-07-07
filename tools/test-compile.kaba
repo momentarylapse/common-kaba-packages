@@ -10,7 +10,7 @@ class Term
 var error_count: int
 
 func test_compile(filename: Path)
-	print("    " + filename.basename())
+	print("    {{filename.basename()}}")
 	try
 		Module.load(filename, true)
 	except Exception as e
@@ -18,9 +18,9 @@ func test_compile(filename: Path)
 		error_count ++
 
 func test_rec(dir: Path)
-	var subdirs = Filesystem.search(dir, "", "dr0")
+	var subdirs = fs.search(dir, "", "dr0")
 	for s in subdirs
-		var list = Filesystem.search(dir << s, "*.kaba", "f")
+		var list = fs.search(dir << s, "*.kaba", "f")
 		if len(list) > 0
 			print("{{Term.YELLOW}}{{dir << s}}{{Term.END}}")
 		for e in list
@@ -32,7 +32,7 @@ func main(arg: string[])
 		return
 	error_count = 0
 	for a in arg
-		test_rec(Path(a))
+		test_rec(a)
 	if error_count > 0
 		print("{{Term.RED}}{{error_count}} errors found{{Term.END}}")
 	else

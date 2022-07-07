@@ -256,7 +256,7 @@ class LocalFileDB
 		files.clear()
 		dirty = false
 		#Timer tt
-		var ss = Filesystem.read(hui.app_directory << "sisyphos/db")
+		var ss = fs.read(hui.app_directory << "sisyphos/db")
 		var lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
@@ -302,9 +302,9 @@ class LocalFileDB
 				log_error("empty hash", "...")
 				f.show_info("    ")
 			if f.hash == ""
-				if Filesystem.exists(f.path)
+				if fs.exists(f.path)
 					log_error("empty hash", f.path)
-					f.hash = Filesystem.hash(f.path, "md5")
+					f.hash = fs.hash(f.path, "md5")
 					dirty = true
 				else if f.id == ""
 					log_error("ghost", f.path)
@@ -356,7 +356,7 @@ class LocalFileDB
 
 	func mut save()
 		make_all_dirs(hui.app_directory << "sisyphos")
-		var f = Filesystem.create_text(hui.app_directory << "sisyphos/db")
+		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/db", "wt"))
 		f << "version=1"
 		f << len(files)
 		for ff in files
@@ -443,7 +443,7 @@ class LocalFileDB
 		return sorted(list, "path")
 
 	func selfref get(path: Path, rec: bool) -> LocalFile*[]
-		if Filesystem.is_directory(path)
+		if fs.is_directory(path)
 			return get_in_dir(path, rec)
 		var files: LocalFile*[]
 		try
@@ -458,7 +458,7 @@ class LocalFileDB
 				continue
 			print(f.path)
 			try
-				string h2 = Filesystem.hash(f.path, "md5")
+				string h2 = fs.hash(f.path, "md5")
 				if h2 != f.hash
 					print("{{h2}} != {{f.hash}}")
 					f.hash = h2

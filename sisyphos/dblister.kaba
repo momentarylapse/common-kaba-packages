@@ -14,9 +14,9 @@ class DBLister
 		return false
 
 	func mut find_paths(dir: Path, recursive: bool)
-		var list = Filesystem.search(dir, "*", "fd")
+		var list = fs.search(dir, "*", "fd")
 		for e in list
-			if Filesystem.is_directory(dir << e)
+			if fs.is_directory(dir << e)
 				if str(e).head(1) != "." and recursive
 					find_paths(dir << e, recursive)
 			else
@@ -25,7 +25,7 @@ class DBLister
 					paths.add(path)
 	
 	func mut find(dir: Path) -> LocalFile*[]
-		if Filesystem.is_directory(dir)
+		if fs.is_directory(dir)
 			return find_dir(dir)
 		return find_file(dir)
 		
@@ -39,7 +39,7 @@ class DBLister
 			# in DB?
 			return [db.find_by_path(path)]
 		except
-			if Filesystem.exists(path)
+			if fs.exists(path)
 				LocalFile ff
 				ff.path = path
 				fake_files.add(ff)

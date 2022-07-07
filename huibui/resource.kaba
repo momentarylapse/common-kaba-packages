@@ -22,11 +22,11 @@ var resource_files: Path[]
 
 func load_all_huis(literally: bool) -> Resource[]
 	Resource[] res
-	var files = Filesystem.search(conf.dir, "*.hui", "f")
+	var files = fs.search(conf.dir, "*.hui", "f")
 	for f in files
-		string source = Filesystem.read(conf.dir << f)
+		string source = fs.read_text(conf.dir << f)
 		Resource r = ParseResource(source, literally)
-		if r.type == "Dialog" or r.type == "Window" or r.type == "Menu" or r.type == "Toolbar"
+		if r.type in ["Dialog", "Window", "Menu", "Toolbar"]
 			resource_files.add(conf.dir << f)
 			res.add(r)
 		else

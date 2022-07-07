@@ -11,7 +11,7 @@ func delete_files(out files: LocalFile*[])
 			return
 		if !f.pure_remote()
 			try
-				Filesystem.delete(f.path)
+				fs.delete(f.path)
 			except Exception as e
 				error_out(e)
 		f.drop_me = true

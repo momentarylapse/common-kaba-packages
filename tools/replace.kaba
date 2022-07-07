@@ -3,7 +3,7 @@ use kaba
 use os
 
 func test_replace(filename: Path, what: string, by: string, allow: bool)
-	string s = Filesystem.read_text(filename)
+	string s = fs.read_text(filename)
 	int n = 0
 	while true
 		int p = s.find(what, 0)
@@ -16,12 +16,12 @@ func test_replace(filename: Path, what: string, by: string, allow: bool)
 		print(">>  " + s[p-5:p+len(by) + 5])
 		n ++
 	if n > 0 and allow
-		Filesystem.write_text(filename, s)
+		fs.write_text(filename, s)
 
 func test_rec(dir: Path, what: string, by: string, allow: bool)
-	var list = Filesystem.search(dir, "*.*", "fd")
+	var list = fs.search(dir, "*.*", "fd")
 	for e in list
-		if Filesystem.is_directory(dir << e)
+		if fs.is_directory(dir << e)
 			test_rec(dir << e, what, by, allow)
 		else
 			test_replace(dir << e, what, by, allow)

@@ -16,7 +16,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	string pguid, sguid
 	try
-		var f = os.Filesystem.read_text(conf.root << "{{conf.name}}.sln")
+		var f = os.fs.read_text(conf.root << "{{conf.name}}.sln")
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -61,7 +61,7 @@ func create_visual_studio(version: int)
 	if conf.verbose
 		print(defines)
 	
-	var includes = os.Filesystem.search("./", "*.h", "rf")
+	var includes = os.fs.search("./", "*.h", "rf")
 	
 	var CPPVER = conf.language.replace("c++", "stdcpp")
 	
@@ -97,7 +97,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	Filesystem.write(conf.root << "{{conf.name}}.sln", f.replace("\n", "\r\n"))
+	fs.write(conf.root << "{{conf.name}}.sln", f.replace("\n", "\r\n"))
 	
 	var toolset = "v142"
 	if version == 2022
@@ -242,7 +242,7 @@ EndGlobal
 </Project>
 "
 
-	Filesystem.write_text(conf.root << "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
+	fs.write_text(conf.root << "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -275,7 +275,7 @@ EndGlobal
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
-	var fdirs = Filesystem.search(conf.root << conf.source_dir, "", "dr")
+	var fdirs = fs.search(conf.root << conf.source_dir, "", "dr")
 	for d in fdirs
 		var dir = win_path(conf.source_dir << d)
 		rand_seed(dir.hash())
@@ -289,4 +289,4 @@ EndGlobal
 </Project>"
   
   
-	Filesystem.write_text(conf.root << "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	fs.write_text(conf.root << "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

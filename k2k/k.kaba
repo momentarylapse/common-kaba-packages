@@ -1431,7 +1431,7 @@ func main(arg: string[])
 		string source = input
 		try
 			if from_file
-				source = Filesystem.read(Path(input))
+				source = fs.read_text(input)
 			eval(source)
 		except Exception as e
 			print("------------------------------------------------")
