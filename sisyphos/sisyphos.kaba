@@ -1,3 +1,4 @@
+use os
 use localdb
 use config
 use tag
@@ -8,27 +9,26 @@ use action_list
 use action_transmit
 use action_tag
 use action_remote
-use cli_parser
 
 
 func main(arg: string[])
-	CLIParser p
+	CommandLineParser p
 	p.info("sisyphos - synchronize your files")
 	
-	p.opt(["--verbose", "-v"], "", lambda() conf.verbosity = 5)
-	p.opt(["--silent", "-s"], "", lambda() conf.verbosity = 0)
-	p.opt(["--drop-deleted", "..."], "", lambda() conf.drop_deleted = true)
-	p.opt(["--show-meta", "--meta", "-m"], "", lambda() conf.show_meta = true)
-	p.opt(["--show-meta-light", "-l"], "", lambda() conf.show_meta_small = true)
-	p.opt(["--recursive", "-r"], "", lambda() conf.recursive = true)
-	p.opt(["--pure-local", "--local", "-L"], "", lambda() conf.filter_pure_local = true)
-	p.opt(["--pure-remote", "--remote", "-R"], "", lambda() conf.filter_pure_remote = true)
-	p.opt(["--not-in-db"], "show files that are not in the database (default)", lambda() conf.show_not_in_db = true)
-	p.opt(["--only-in-db"], "", lambda() conf.show_not_in_db = false)
-	p.opt(["--pull-tags"], "", lambda() conf.pull_tags = true)
-	p.opt(["--pull-tags-only-add"], "", lambda() conf.pull_tags_only_add = true)
-	p.opt(["--medium"], "", lambda() conf.default_quality = MEDIUM)
-	p.opt(["--dry"], "(some commands...)", lambda() conf.dry_run = true)
+	p.option("--verbose/-v", "", lambda() conf.verbosity = 5)
+	p.option("--silent/-s", "", lambda() conf.verbosity = 0)
+	p.option("--drop-deleted/...", "", lambda() conf.drop_deleted = true)
+	p.option("--show-meta/--meta/-m", "", lambda() conf.show_meta = true)
+	p.option("--show-meta-light/-l", "", lambda() conf.show_meta_small = true)
+	p.option("--recursive/-r", "", lambda() conf.recursive = true)
+	p.option("--pure-local/--local/-L", "", lambda() conf.filter_pure_local = true)
+	p.option("--pure-remote/--remote/-R", "", lambda() conf.filter_pure_remote = true)
+	p.option("--not-in-db", "show files that are not in the database (default)", lambda() conf.show_not_in_db = true)
+	p.option("--only-in-db", "", lambda() conf.show_not_in_db = false)
+	p.option("--pull-tags", "", lambda() conf.pull_tags = true)
+	p.option("--pull-tags-only-add", "", lambda() conf.pull_tags_only_add = true)
+	p.option("--medium", "", lambda() conf.default_quality = MEDIUM)
+	p.option("--dry", "(some commands...)", lambda() conf.dry_run = true)
 #	p.opta(["--structure"], "[STRUCTURE]", "a filename pattern with tags... ('{artist} - {year}-{month|02}.ogg')", lambda(string arg) conf.default_structure = arg)
 	
 	p.cmd("find", "<FILTER>", "find files by filter ('hash=...' or 'artist=The Beetles')", action_find)
@@ -75,7 +75,7 @@ func main(arg: string[])
 	
 	set_working_dir(make_path("./"))
 	
-	p.run(arg)
+	p.parse(arg)
 
 	db.drop_selected()	
 	if db.dirty
