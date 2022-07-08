@@ -1,5 +1,4 @@
 use os
-use cli_parser
 
 var MAX_DIFF_SIZE: int
 var MIN_MATCH_SIZE: int
@@ -110,12 +109,13 @@ func main(arg: string[])
 	MAX_DIFF_SIZE = 4096*2
 	MIN_MATCH_SIZE = 16
 
-	CLIParser p
+	CommandLineParser p
+	var pp = &p
 	p.info("find (small) differences between binary files")
-	p.opta(["--context"], "<BYTES>", "how many bytes of context are shown", lambda (a: string) CONTEXT = int(a))
-	p.opta(["--max-diff"], "<BYTES>", "maximum size of a non-matching chunk", lambda (a: string) MAX_DIFF_SIZE = int(a))
-	p.opta(["--min-match"], "<BYTES>", "minimum size to recognize a matching chunk", lambda (a: string) MIN_MATCH_SIZE = int(a))
-	p.cmd("help", "", "show help", lambda (a: string[]) CLIParser.current.show_help())
+	p.option("--context", "<BYTES>", "how many bytes of context are shown", lambda (a: string) CONTEXT = int(a))
+	p.option("--max-diff", "<BYTES>", "maximum size of a non-matching chunk", lambda (a: string) MAX_DIFF_SIZE = int(a))
+	p.option("--min-match", "<BYTES>", "minimum size to recognize a matching chunk", lambda (a: string) MIN_MATCH_SIZE = int(a))
+	p.cmd("help", "", "show help", lambda (a: string[]) pp.show())
 	p.cmd("", "<FILE1> <FILE2>", "show diff", lambda (a: string[]) diff(os.fs.read(a[0]), os.fs.read(a[1])))
-	p.run(arg)
+	p.parse(arg)
 	#p.show_help()
