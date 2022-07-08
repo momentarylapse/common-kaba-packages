@@ -5,7 +5,6 @@ use visualstudio
 use meson
 use cmake
 use build
-use cli_parser
 use os
 
 
@@ -90,13 +89,13 @@ func main(arg: string[])
 	
 	#bool build
 	
-	CLIParser p
-	p.opt(["-v", "--verbose"], "verbose output", lambda() conf.verbose = true)
-	p.opt(["--dry"], "dry run", lambda() conf.dry_run = true)
-	p.opta(["--ignore-lib"], "LIB", "", lambda(o: string) conf.ignore_libs.add(o))
-	p.opt(["--all"], "enable all libraries", lambda() conf.force_all_libraries = true)
-	p.opt(["--rebuild"], "clear before build", lambda() conf.force_rebuild = true)
-	p.opta(["--profile"], "PROFILE", "", lambda(o: string) conf.force_profile = o)
+	CommandLineParser p
+	p.option("-v/--verbose", "verbose output", lambda() conf.verbose = true)
+	p.option("--dry", "dry run", lambda() conf.dry_run = true)
+	p.option("--ignore-lib", "LIB", "", lambda(o: string) conf.ignore_libs.add(o))
+	p.option("--all", "enable all libraries", lambda() conf.force_all_libraries = true)
+	p.option("--rebuild", "clear before build", lambda() conf.force_rebuild = true)
+	p.option("--profile", "PROFILE", "", lambda(o: string) conf.force_profile = o)
 	
 	p.cmd("has", "<LIBRARY>", "check if available", action_has)
 	p.cmd("list", "", "list available libs", action_list)
@@ -105,4 +104,4 @@ func main(arg: string[])
 	p.cmd("clear", "", "clear build files", action_clear)
 	p.cmd("update", "", "update build files", action_update)
 	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
-	p.run(arg)
+	p.parse(arg)
