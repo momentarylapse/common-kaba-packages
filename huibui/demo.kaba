@@ -38,13 +38,13 @@ func action_demo(arg: string[])
 	
 	if r.type in ["Dialog", "Window"]
 		var dlg = new DemoDialog(source)
-		hui.fly(dlg, nil)
+		hui.run(dlg, nil)
 	else if r.type == "Toolbar"
 		var dlg = new ToolbarDemoDialog(source)
-		hui.fly(dlg, nil)
+		hui.run(dlg, nil)
 	else if r.type == "Menu"
 		var dlg = new MenuDemoDialog(source)
-		hui.fly(dlg, nil)
+		hui.run(dlg, nil)
 	else
 		print("don't know how to show a {{r.type}}")
 

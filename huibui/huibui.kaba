@@ -5,7 +5,6 @@ use resource
 use source
 use demo
 use export
-use cli_parser
 	
 
 func get_ids(out l: Language, r: Resource, ns: string)
@@ -173,7 +172,7 @@ func action_swap(arg: string[])
 	
 
 func main(arg: string[])
-	CLIParser p
+	CommandLineParser p
 	p.info("hui gui builder...")
 	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
 	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)
@@ -181,4 +180,4 @@ func main(arg: string[])
 	p.cmd("t", "<PRELANG-FILE>", "translate...", action_translate)
 	p.cmd("add", "<PRELANG-FILE> <LANGUAGE-NAME>", "add", action_add)
 	p.cmd("swap", "<PRELANG-FILE> <LANGUAGE-NAME>", "swap languages", action_swap)
-	p.run(arg)
+	p.parse(arg)
