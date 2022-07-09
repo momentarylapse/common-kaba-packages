@@ -13,7 +13,7 @@ use action_remote
 
 func main(arg: string[])
 	CommandLineParser p
-	p.info("sisyphos - synchronize your files")
+	p.info("sisyphos", "synchronize your files")
 	
 	p.option("--verbose/-v", "", lambda() conf.verbosity = 5)
 	p.option("--silent/-s", "", lambda() conf.verbosity = 0)

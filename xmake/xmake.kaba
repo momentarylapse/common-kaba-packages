@@ -90,6 +90,7 @@ func main(arg: string[])
 	#bool build
 	
 	CommandLineParser p
+	p.info("xmake", "the build tool for lazy people")
 	p.option("-v/--verbose", "verbose output", lambda() conf.verbose = true)
 	p.option("--dry", "dry run", lambda() conf.dry_run = true)
 	p.option("--ignore-lib", "LIB", "", lambda(o: string) conf.ignore_libs.add(o))

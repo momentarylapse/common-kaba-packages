@@ -173,7 +173,7 @@ func action_swap(arg: string[])
 
 func main(arg: string[])
 	CommandLineParser p
-	p.info("hui gui builder...")
+	p.info("huibui", "hui gui builder...")
 	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
 	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)
 	p.cmd("x", "[DIR]", "export...", action_export)

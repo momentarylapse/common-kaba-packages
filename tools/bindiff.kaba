@@ -111,7 +111,7 @@ func main(arg: string[])
 
 	CommandLineParser p
 	var pp = &p
-	p.info("find (small) differences between binary files")
+	p.info("bindiff", "find (small) differences between binary files")
 	p.option("--context", "<BYTES>", "how many bytes of context are shown", lambda (a: string) CONTEXT = int(a))
 	p.option("--max-diff", "<BYTES>", "maximum size of a non-matching chunk", lambda (a: string) MAX_DIFF_SIZE = int(a))
 	p.option("--min-match", "<BYTES>", "minimum size to recognize a matching chunk", lambda (a: string) MIN_MATCH_SIZE = int(a))

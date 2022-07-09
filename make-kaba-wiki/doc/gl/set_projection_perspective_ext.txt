@@ -1,7 +1,9 @@
 description = 
+param:center = 
 param:centerx = 
 param:centery = 
 param:height_1 = 
+param:size_1 = 
 param:width_1 = 
 param:zmax = 
 param:zmin = 
