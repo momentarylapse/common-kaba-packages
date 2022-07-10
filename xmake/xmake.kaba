@@ -98,7 +98,7 @@ func main(arg: string[])
 	p.option("--rebuild", "clear before build", lambda() conf.force_rebuild = true)
 	p.option("--profile", "PROFILE", "", lambda(o: string) conf.force_profile = o)
 	
-	p.cmd("has", "<LIBRARY>", "check if available", action_has)
+	p.cmd("has", "LIBRARY", "check if available", action_has)
 	p.cmd("list", "", "list available libs", action_list)
 	p.cmd("init", "", "create new project", action_init)
 	p.cmd("build", "", "build project", action_build)
