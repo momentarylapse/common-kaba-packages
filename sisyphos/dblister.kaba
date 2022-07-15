@@ -4,7 +4,6 @@ use os
 
 # mix db files with "real" files
 class DBLister
-	var paths: Path[]
 	var fake_files: LocalFile[]
 	
 	func is_ignored(path: Path) -> bool
@@ -13,27 +12,27 @@ class DBLister
 				return true
 		return false
 
-	func mut find_paths(dir: Path, recursive: bool)
-		var list = fs.search(dir, "*", "fd")
+	func mut find_paths(dir: Path, recursive: bool) -> Path[]
+		var paths: Path[]
+		var options = "f"
+		if recursive
+			options += "r"
+		var list = fs.search(dir, "*", options)
 		for e in list
-			if fs.is_directory(dir << e)
-				if str(e).head(1) != "." and recursive
-					find_paths(dir << e, recursive)
-			else
-				var path = dir << e
-				if !is_ignored(path)
-					paths.add(path)
+			var path = dir << e
+			if !is_ignored(path)
+				paths.add(path)
+		return paths
 	
 	func mut find(dir: Path) -> LocalFile*[]
 		if fs.is_directory(dir)
-			return find_dir(dir)
+			return find_in_dir(dir)
 		return find_file(dir)
 		
 		
 	func mut find_file(path: Path) -> LocalFile*[]
 		var files: LocalFile*[]
 		fake_files.clear()
-		paths.clear()
 		
 		try
 			# in DB?
@@ -48,23 +47,35 @@ class DBLister
 				log_error("error", "can't find '{{path}}'")
 		return files
 		
-	func mut find_dir(dir: Path) -> LocalFile*[]
-		var files: LocalFile*[]
-		fake_files.clear()
-		paths.clear()
-
-		files = db.get_in_dir(dir, conf.recursive)
 		
-		find_paths(dir, conf.recursive)
+	func mut mix(_files: LocalFile*[], paths: Path[]) -> LocalFile*[]
+		fake_files.clear()
+		var files = _files
+
 		for p in paths
-			try
-				db.find_by_path(p)
-			except
+			bool found = false
+			for f in files
+				if f.path == p
+					found = true
+					break
+			if not found
 				LocalFile f
 				f.path = p
 				fake_files.add(f)
 		for f in fake_files
 			files.add(&f)
+		return files
+		
+	func mut find_in_dir(dir: Path) -> LocalFile*[]
+
+		print("find...db")
+		var files = db.get_in_dir(dir, conf.recursive)
+		
+		print("find...")
+		var paths = find_paths(dir, conf.recursive)
+		print("find...mix")
+		files = mix(files, paths)
+		print("find...return")
 		return sorted(files, "path")
 
 var lister: DBLister
