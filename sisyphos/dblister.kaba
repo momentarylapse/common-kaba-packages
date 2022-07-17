@@ -48,10 +48,10 @@ class DBLister
 		return files
 		
 		
-	func mut mix(_files: LocalFile*[], paths: Path[]) -> LocalFile*[]
+	func mut mix__(_files: LocalFile*[], paths: Path[]) -> LocalFile*[]
 		fake_files.clear()
 		var files = _files
-
+		
 		for p in paths
 			bool found = false
 			for f in files
@@ -66,16 +66,36 @@ class DBLister
 			files.add(&f)
 		return files
 		
+		
+	func mut mix(files: LocalFile*[], paths: Path[]) -> LocalFile*[]
+		fake_files.clear()
+
+		var r: LocalFile*[]
+		var i = 0
+		for f in files
+			while paths[i] < f.path and i < len(paths)
+				LocalFile ff
+				ff.path = paths[i]
+				fake_files.add(ff)
+				i ++
+				
+			r.add(f)
+			if i < len(paths)
+				if f.path == paths[i]
+					i ++
+				
+		for f in fake_files
+			r.add(&f)
+		return r
+		
 	func mut find_in_dir(dir: Path) -> LocalFile*[]
 
-		print("find...db")
 		var files = db.get_in_dir(dir, conf.recursive)
+		files = sorted(files, "path")
 		
-		print("find...")
 		var paths = find_paths(dir, conf.recursive)
-		print("find...mix")
+		paths = sorted(paths, "")
 		files = mix(files, paths)
-		print("find...return")
 		return sorted(files, "path")
 
 var lister: DBLister
