@@ -1,7 +1,7 @@
 use kaba
 use os
 use time
-import hui
+import doc
 # use "mongo"
 
 const SHIFT = "    "
@@ -435,7 +435,7 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	else
 		p = p << name + ".txt"
 	#print(p)
-	var conf: hui.Configuration
+	var conf: doc.Configuration
 	conf.load(p)
 	if conf[key] == ""
 		if report_missing

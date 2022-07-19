@@ -1,5 +1,5 @@
 use os
-use hui
+use doc
 
 
 class Term
@@ -57,7 +57,7 @@ class Config
 	func mut load()
 		if not fs.exists(conf.root << "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
-		var c: hui.Configuration
+		var c: doc.Configuration
 		c.load(conf.root << "xmake.conf")
 		install_source = "static"
 		for k in c.keys()
@@ -105,7 +105,7 @@ class Config
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	func mut save()
-		var c: hui.Configuration
+		var c: doc.Configuration
 		c["project.name"] = name
 		c["build.source"] = source_dir
 		c["build.binary"] = binary_file

@@ -94,7 +94,7 @@ class DBLister
 		files = sorted(files, "path")
 		
 		var paths = find_paths(dir, conf.recursive)
-		paths = sorted(paths, "")
+		#paths = sorted(paths, "")
 		files = mix(files, paths)
 		return sorted(files, "path")
 
