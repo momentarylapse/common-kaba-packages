@@ -437,16 +437,16 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	#print(p)
 	var conf: doc.Configuration
 	conf.load(p)
-	if conf[key] == ""
+	if str(conf[key]) == ""
 		if report_missing
 			print("MISSING: {{ns}}.{{name}}:  {{key}}")
 		conf[key] = ""
 		conf.save(p)
-	else if conf[key] == "."
+	else if str(conf[key]) == "."
 		return ""
 	else
 		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
-		return parse_doc_string(conf[key])
+		return parse_doc_string(str(conf[key]))
 	return "..."
 
 func doc_get_class_description(ns: string, c: Class) -> string
