@@ -1,5 +1,5 @@
 link = vulkan
 include = vulkan/vulkan.h
 pkg = vulkan
-vcpkg = vulkan,vulkan-headers
+vcpkg = [vulkan,vulkan-headers]
 

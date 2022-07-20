@@ -55,20 +55,20 @@ class LibraryManager
 			Library l
 			l.name = e.basename()[:-4]
 			if len(c["link"]) > 0
-				l.libs = c["link"].explode(",")
+				l.libs = any2sa(c["link"])
 			if len(c["include"]) > 0
-				l.includes = c["include"].explode(",")
+				l.includes = any2sa(c["include"])
 			if len(c["pkg"]) > 0
-				l.pkg = c["pkg"].explode(",")
+				l.pkg = any2sa(c["pkg"])
 			if len(c["meson"]) > 0
-				l.meson = c["meson"].explode(",")
+				l.meson = any2sa(c["meson"])
 			if len(c["cmake"]) > 0
-				l.cmake = c["cmake"].explode(",")
+				l.cmake = any2sa(c["cmake"])
 			if len(c["vcpkg"]) > 0
-				l.vcpkg = c["vcpkg"].explode(",")
+				l.vcpkg = any2sa(c["vcpkg"])
 			if len(c["flags"]) > 0
-				l.flags = c["flags"]
-			l.dir_override = c["dir"]
+				l.flags = str(c["flags"])
+			l.dir_override = str(c["dir"])
 			libraries.add(l)
 
 	func get(name: string) -> Library*

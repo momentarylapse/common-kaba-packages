@@ -1,5 +1,5 @@
-link = ogg,vorbis,vorbisfile,vorbisenc
-include = vorbis/vorbisfile.h,vorbis/vorbisenc.h,ogg/ogg.h
-pkg = ogg,vorbis,vorbisfile,vorbisenc
-vcpkg = libogg,libvorbis
+link = [ogg,vorbis,vorbisfile,vorbisenc]
+include = [vorbis/vorbisfile.h,vorbis/vorbisenc.h,ogg/ogg.h]
+pkg = [ogg,vorbis,vorbisfile,vorbisenc]
+vcpkg = [libogg,libvorbis]
 

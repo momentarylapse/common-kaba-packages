@@ -17,6 +17,17 @@ class Profile
 	var name: string
 	var libs_optional: string[]
 
+func any2sa(a: any) -> string[]
+	if a.type == string
+		return [str(a)]
+	return [for s in a.as_array() str(s)]
+
+func sa2any(a: string[]) -> any
+	var r: any
+	for s in a
+		r.add(s)
+	return r
+
 # project
 class Config
 	var root: Path
@@ -62,17 +73,17 @@ class Config
 		install_source = "static"
 		for k in c.keys()
 			if k in ["project.name"]
-				name = c[k]
+				name = str(c[k])
 			else if k in ["build.source"]
-				source_dir = c[k]
+				source_dir = str(c[k])
 			else if k in ["build.binary"]
-				binary_file = c[k]
+				binary_file = str(c[k])
 			else if k == "build.main"
-				main_file = c[k]
+				main_file = str(c[k])
 			else if k == "build.language"
 				language = c.get_str(k, "c++17")
 			else if k == "build.flags"
-				flags_global = c[k]
+				flags_global = str(c[k])
 			else if k == "build.optimization"
 				optimization = c.get_str(k, "2")
 			else if k == "build.type"
@@ -86,22 +97,22 @@ class Config
 			#else if k == "build.libraries-optional"
 			#	libs_optional = c[k].explode(",")
 			else if k == "install.source"
-				install_source = c[k]
+				install_source = str(c[k])
 			else if k == "install.icons"
-				icons = c[k].explode(",")
+				icons = any2sa(c[k])
 			else if k == "install.desktop-file"
-				desktop_file = c[k]
+				desktop_file = str(c[k])
 			else if k == "install.mime-files"
-				mime_files = c[k].explode(",")
+				mime_files = any2sa(c[k])
 			else if k == "install.additional"
-				installs_additional = c[k].explode(",")
+				installs_additional = any2sa(c[k])
 			else if k[:14] == "build.profile-"
 				Profile p
 				p.name = k[14:]
-				p.libs_optional = c[k].explode(",")
+				p.libs_optional = any2sa(c[k])
 				profiles.add(p)
 			else if k == "build.system"
-				outputs = c[k].explode(",")
+				outputs = any2sa(c[k])
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	func mut save()
@@ -114,15 +125,15 @@ class Config
 		c["build.optimization"] = optimization
 		c["build-type"] = build_type
 		c["build.flags"] = flags_global
-		c["build.libraries"] = libs.join(",")
-		c["build.libraries-optional"] = libs_optional.join(",")
+		c["build.libraries"] = sa2any(libs)
+		c["build.libraries-optional"] = sa2any(libs_optional)
 		for p in profiles
-			c["profile-{{p.name}}"] = p.libs_optional.join(",")
+			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		c["install.source"] = install_source
-		c["install.icons"] = icons.join(",")
+		c["install.icons"] = sa2any(icons)
 		c["install.desktop-file"] = desktop_file
-		c["install.mime-files"] = mime_files.join(",")
-		c["install.additional"] = installs_additional.join(",")
+		c["install.mime-files"] = sa2any(mime_files)
+		c["install.additional"] = sa2any(installs_additional)
 		c.save(conf.root << "xmake.conf")
 	
 	func needs_installing() -> Path[]
@@ -145,8 +156,8 @@ class Config
 
 var conf: Config
 
-func parse_libs(s: string, out libs: string[], out lib_groups: string[][], out libs_opt: string[])
-	for x in s.explode(",")
+func parse_libs(s: any, out libs: string[], out lib_groups: string[][], out libs_opt: string[])
+	for x in any2sa(s)
 		if x[-1:] == "?"
 			libs_opt.add(x[:-1])
 		else
