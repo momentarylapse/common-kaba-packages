@@ -48,25 +48,6 @@ class DBLister
 		return files
 		
 		
-	func mut mix__(_files: LocalFile*[], paths: Path[]) -> LocalFile*[]
-		fake_files.clear()
-		var files = _files
-		
-		for p in paths
-			bool found = false
-			for f in files
-				if f.path == p
-					found = true
-					break
-			if not found
-				LocalFile f
-				f.path = p
-				fake_files.add(f)
-		for f in fake_files
-			files.add(&f)
-		return files
-		
-		
 	func mut mix(files: LocalFile*[], paths: Path[]) -> LocalFile*[]
 		fake_files.clear()
 
@@ -83,6 +64,11 @@ class DBLister
 			if i < len(paths)
 				if f.path == paths[i]
 					i ++
+		while i < len(paths)
+			LocalFile ff
+			ff.path = paths[i]
+			fake_files.add(ff)
+			i ++
 				
 		for f in fake_files
 			r.add(&f)
