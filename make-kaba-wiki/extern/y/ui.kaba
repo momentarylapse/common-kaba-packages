@@ -118,10 +118,10 @@ class Text extends Picture
 	
 class Picture3d extends Node
 	var model: Model*
-	var matrix: matrix
+	var matrix: mat4
 	var world_3d: bool
 	var lighting: bool
-	func __init__(m: Model*, mat: matrix, z: float)
+	func __init__(m: Model*, mat: mat4, z: float)
 		super.__init__(rect.ID)
 		model = m
 		self.matrix = mat

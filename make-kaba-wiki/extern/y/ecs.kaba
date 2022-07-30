@@ -12,10 +12,10 @@ class BaseClass
 	func extern virtual mut on_iterate(dt: float)
 
 class Entity extends BaseClass
-	var pos: vector
+	var pos: vec3
 	var ang: quaternion
 	var parent: Entity*
-	func extern get_matrix() -> matrix
+	func extern get_matrix() -> mat4
 	
 	func extern selfref mut __add_component(t: Class, vars: string) -> Component*
 	func extern selfref __get_component(t: Class) -> Component*
@@ -39,7 +39,7 @@ class Entity extends BaseClass
 class CollisionData
 	var entity: Entity*
 	#var body: SolidBody*
-	var pos, n: vector
+	var pos, n: vec3
 
 # always let the engine create/delete!
 class Component

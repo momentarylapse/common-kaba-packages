@@ -2,11 +2,11 @@ use image
 
 
 class Vertex
-	var p, n: vector
+	var p, n: vec3
 	var u, v: float
 
 class VertexFx
-	pos: vector
+	pos: vec3
 	col: color
 	u, v: float
 

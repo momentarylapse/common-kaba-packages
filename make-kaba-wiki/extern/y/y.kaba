@@ -8,7 +8,7 @@ use y.audio
 
 class Camera extends Component
 	var dest: rect
-	var m_view: matrix
+	var m_view: mat4
 	var exposure: float
 	var bloom_radius: float
 	var bloom_factor: float
@@ -22,8 +22,8 @@ class Camera extends Component
 	
 	var show, enabled: bool
 
-	func extern project(p: vector) -> vector
-	func extern unproject(p: vector) -> vector
+	func extern project(p: vec3) -> vec3
+	func extern unproject(p: vec3) -> vec3
 	func extern mut update_matrices(aspect_ratio: float)
 
 class Material
@@ -43,14 +43,14 @@ class Model extends Component
 			var num_triangles: int
 			var triangle_index: int[]
 			var skin_vertex: float[]
-			var normal: vector[]
+			var normal: vec3[]
 		var bone_index: int[]
-		var vertex: vector[]
+		var vertex: vec3[]
 		var sub: Sub[]
 #	var matrix: matrix
 	var name: string
 	var radius: float
-	var min, max: vector
+	var min, max: vec3
 	
 	var materials: Material*[]
 	
@@ -64,21 +64,21 @@ class Model extends Component
 	func extern mut end_edit(detail: int)
 #	func extern update_matrix()
 	
-	func extern get_vertex(index: int) -> vector
+	func extern get_vertex(index: int) -> vec3
 
 class SolidBody extends Component
-	var vel: vector
-	var rot: vector
+	var vel: vec3
+	var rot: vec3
 	var mass: float
-	var theta: matrix3
+	var theta: mat3
 	var physics_active: bool
 	var physics_passive: bool
 	var g_factor: float
 	
-	func extern mut add_force(f: vector, rho: vector = vector.0)
-	func extern mut add_impulse(p: vector, rho: vector = vector.0)
-	func extern mut add_torque(t: vector)
-	func extern mut add_torque_impulse(l: vector)
+	func extern mut add_force(f: vec3, rho: vec3 = vec3.0)
+	func extern mut add_impulse(p: vec3, rho: vec3 = vec3.0)
+	func extern mut add_torque(t: vec3)
+	func extern mut add_torque_impulse(l: vec3)
 	func extern mut update_mass()
 	func extern mut update_motion(mask: int)
 
@@ -103,15 +103,15 @@ class Animator extends Component
 
 class Skeleton extends Component
 	var bones: Entity[]
-	var pos0, dpos: vector[]
+	var pos0, dpos: vec3[]
 	var parents: int[]
 	func extern mut reset()
 
 class Terrain extends Component
-	var pattern: vector
+	var pattern: vec3
 	var num_x, num_z: int
 	var height: float[]
-	func extern get_height(p: vector) -> float
+	func extern get_height(p: vec3) -> float
 	func extern mut update(x1: int, x2: int, y1: int, y2: int, mask: int)
 	# ...
 
@@ -126,19 +126,19 @@ class Light extends Component
 	var user_shadow_theta: float
 	var shadow_dist_min: float
 	var shadow_dist_max: float
-	func extern mut set_direction(dir: vector)
+	func extern mut set_direction(dir: vec3)
 
 #	class Spherical extends Light
-#		func extern __init__(pos: vector, c: color, radius: float)
+#		func extern __init__(pos: vec3, c: color, radius: float)
 #
 #	class Parallel extends Light
 #		func extern __init__(ang: quaternion, c: color)
 #
 #	class Cone extends Light
-#		func extern __init__(pos: vector, ang: quaternion, c: color, radius: float, theta: float)
+#		func extern __init__(pos: vec3, ang: quaternion, c: color, radius: float, theta: float)
 
 class Particle extends BaseClass
-	var pos, vel: vector
+	var pos, vel: vec3
 	var radius: float
 	var time_to_live: float
 	var suicidal: bool
@@ -146,12 +146,12 @@ class Particle extends BaseClass
 	var color: color
 	var source: rect
 	var enabled: bool
-	func extern __init__(p: vector, r: float, t: Texture, ttl: float)
+	func extern __init__(p: vec3, r: float, t: Texture, ttl: float)
 	func extern override __delete__()
 
 class Beam extends Particle
-	var length: vector
-	func extern __init__(p: vector, l: vector, r: float, t: Texture, ttl: float)
+	var length: vec3
+	func extern __init__(p: vec3, l: vec3, r: float, t: Texture, ttl: float)
 
 class Fog
 	var color: color
@@ -177,7 +177,7 @@ class World
 	var skyboxes: Model*[]
 	
 	var fog: Fog
-	var gravity: vector
+	var gravity: vec3
 	
 	var links: Link*[]
 	
@@ -191,20 +191,20 @@ class World
 	func extern mut load_soon(filename: Path)
 	
 	func extern mut add_light_parallel(ang: quaternion, c: color) -> Light*
-	func extern mut add_light_point(pos: vector, c: color, radius: float) -> Light*
-	func extern mut add_light_cone(pos: vector, ang: quaternion, c: color, radius: float, theta: float) -> Light*
+	func extern mut add_light_point(pos: vec3, c: color, radius: float) -> Light*
+	func extern mut add_light_cone(pos: vec3, ang: quaternion, c: color, radius: float, theta: float) -> Light*
 	func extern mut add_particle(p: Particle)
 	func extern mut add_sound(s: Sound)
-	func extern mut create_object(filename: Path, pos: vector, ang: quaternion) -> Entity*
-	func extern mut create_object_no_reg(filename: Path, pos: vector, ang: quaternion) -> Entity*
-	func extern mut create_object_multi(filename: Path, pos: vector[], ang: quaternion[]) -> Entity*
-	func extern mut create_terrain(filename: Path, pos: vector) -> Terrain*
-	func extern mut create_entity(pos: vector, ang: quaternion) -> Entity*
+	func extern mut create_object(filename: Path, pos: vec3, ang: quaternion) -> Entity*
+	func extern mut create_object_no_reg(filename: Path, pos: vec3, ang: quaternion) -> Entity*
+	func extern mut create_object_multi(filename: Path, pos: vec3[], ang: quaternion[]) -> Entity*
+	func extern mut create_terrain(filename: Path, pos: vec3) -> Terrain*
+	func extern mut create_entity(pos: vec3, ang: quaternion) -> Entity*
 	func extern mut register_entity(e: Entity)
 	func extern mut set_active_physics(o: Model, active: bool)
-	func extern mut shift_all(dpos: vector)
-	func extern get_g(pos: vector) -> vector
-	func extern trace(p1: vector, p2: vector, out d: CollisionData, simple_test: bool, ignore: Entity*) -> bool
+	func extern mut shift_all(dpos: vec3)
+	func extern get_g(pos: vec3) -> vec3
+	func extern trace(p1: vec3, p2: vec3, out d: CollisionData, simple_test: bool, ignore: Entity*) -> bool
 	
 	func selfref objects() -> Model*[]*
 		return get_component_list[Model]()
@@ -216,7 +216,7 @@ class World
 	
 	class MessageData
 		var e: Entity*
-		var v: vector
+		var v: vec3
 	var msg_data: MessageData
 	
 	func extern mut subscribe(msg: string, f: void->void)
@@ -235,7 +235,7 @@ func extern load_model(filename: Path) -> Model*
 func extern load_shader(filename: Path) -> Shader*
 func extern create_shader(source: string) -> Shader*
 func extern load_texture(filename: Path) -> Texture*
-func extern add_camera(pos: vector, ang: quaternion, r: rect) -> Camera*
+func extern add_camera(pos: vec3, ang: quaternion, r: rect) -> Camera*
 
 
 var extern tex_white: Texture*
