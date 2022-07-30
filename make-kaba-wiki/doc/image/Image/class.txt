@@ -1,7 +1,7 @@
-description = 
-element:alpha_used = 
-element:data = 
-element:error = 
-element:height = 
-element:mode = 
-element:width = 
+description = ""
+element:alpha_used = ""
+element:data = ""
+element:error = ""
+element:height = ""
+element:mode = ""
+element:width = ""

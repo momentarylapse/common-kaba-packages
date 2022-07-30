@@ -1,8 +1,8 @@
-description = 
-param:format = 
-param:h = 
-param:nx = 
-param:ny = 
-param:nz = 
-param:self = 
-param:w = 
+description = ""
+param:format = ""
+param:h = ""
+param:nx = ""
+param:ny = ""
+param:nz = ""
+param:self = ""
+param:w = ""

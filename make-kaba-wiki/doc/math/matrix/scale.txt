@@ -1,5 +1,5 @@
-description = 
-param:s_x = 
-param:s_y = 
-param:s_z = 
-return = 
+description = ""
+param:s_x = ""
+param:s_y = ""
+param:s_z = ""
+return = ""

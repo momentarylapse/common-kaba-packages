@@ -1,4 +1,4 @@
-description = 
-element:ang = 
-element:parent = 
-element:pos = 
+description = ""
+element:ang = ""
+element:parent = ""
+element:pos = ""

@@ -1,6 +1,6 @@
-description = 
-param:ang = 
-param:filename = 
-param:pos = 
-param:self = 
-return = 
+description = ""
+param:ang = ""
+param:filename = ""
+param:pos = ""
+param:self = ""
+return = ""

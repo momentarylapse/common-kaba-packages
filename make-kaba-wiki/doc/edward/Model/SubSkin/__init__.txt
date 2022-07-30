@@ -1,4 +1,4 @@
-description = 
-param:num_textures = 
-param:self = 
-param:triangle = 
+description = ""
+param:num_textures = ""
+param:self = ""
+param:triangle = ""

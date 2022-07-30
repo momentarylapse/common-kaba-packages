@@ -1,4 +1,4 @@
-description = 
-param:midi = 
-param:self = 
-return = 
+description = ""
+param:midi = ""
+param:self = ""
+return = ""

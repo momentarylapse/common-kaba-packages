@@ -1,4 +1,4 @@
-description = 
-param:allow_loop = 
-param:r = 
-param:self = 
+description = ""
+param:allow_loop = ""
+param:r = ""
+param:self = ""

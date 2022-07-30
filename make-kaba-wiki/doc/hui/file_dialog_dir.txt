@@ -1,6 +1,6 @@
-description = 
-param:cb = 
-param:dir = 
-param:root = 
-param:title = 
-return = 
+description = ""
+param:cb = ""
+param:dir = ""
+param:root = ""
+param:title = ""
+return = nil

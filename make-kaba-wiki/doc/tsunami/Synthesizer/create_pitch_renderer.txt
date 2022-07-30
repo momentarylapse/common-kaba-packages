@@ -1,4 +1,4 @@
-description = 
-param:pitch = 
-param:self = 
-return = 
+description = ""
+param:pitch = ""
+param:self = ""
+return = ""

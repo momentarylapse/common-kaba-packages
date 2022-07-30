@@ -1,7 +1,7 @@
-description = 
-param:cam = 
-param:colors = 
-param:hover = 
-param:sel = 
-param:self = 
-param:song = 
+description = ""
+param:cam = ""
+param:colors = ""
+param:hover = ""
+param:sel = ""
+param:self = ""
+param:song = ""

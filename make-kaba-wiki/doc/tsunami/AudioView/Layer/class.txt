@@ -1,4 +1,4 @@
-description = 
-element:_shared_ref_count = 
-element:area = 
-element:layer = 
+description = ""
+element:_shared_ref_count = nil
+element:area = ""
+element:layer = ""

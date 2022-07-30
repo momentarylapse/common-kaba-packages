@@ -1,6 +1,6 @@
-description = 
-param:edge = 
-param:is_closed = 
-param:polygon = 
-param:self = 
-param:vertex = 
+description = ""
+param:edge = ""
+param:is_closed = ""
+param:polygon = ""
+param:self = ""
+param:vertex = ""

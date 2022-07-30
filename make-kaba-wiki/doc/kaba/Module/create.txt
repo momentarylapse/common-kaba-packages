@@ -1,4 +1,4 @@
-description = 
-param:just_analize = 
-param:source = 
-return = 
+description = ""
+param:just_analize = ""
+param:source = ""
+return = ""

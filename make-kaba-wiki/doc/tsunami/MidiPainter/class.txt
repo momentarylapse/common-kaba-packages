@@ -1,2 +1,2 @@
-description = 
-element:cam = 
+description = ""
+element:cam = ""

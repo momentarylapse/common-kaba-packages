@@ -1,4 +1,4 @@
-description = 
-param:mask = 
-param:self = 
-return = 
+description = ""
+param:mask = ""
+param:self = ""
+return = ""

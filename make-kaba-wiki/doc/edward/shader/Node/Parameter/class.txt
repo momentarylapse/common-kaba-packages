@@ -1,5 +1,5 @@
-description = 
-element:name = 
-element:options = 
-element:type = 
-element:value = 
+description = ""
+element:name = ""
+element:options = ""
+element:type = ""
+element:value = ""

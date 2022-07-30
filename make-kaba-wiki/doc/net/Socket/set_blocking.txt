@@ -1,3 +1,3 @@
-description = 
-param:block = 
-param:self = 
+description = ""
+param:block = ""
+param:self = ""

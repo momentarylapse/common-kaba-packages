@@ -1,6 +1,6 @@
-description = 
-param:self = 
-param:sources = 
-param:targets = 
-param:view = 
-return = 
+description = ""
+param:self = ""
+param:sources = ""
+param:targets = ""
+param:view = ""
+return = ""

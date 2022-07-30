@@ -1,5 +1,5 @@
-description = 
-param:comments = 
-param:length = 
-param:p = 
-return = 
+description = ""
+param:comments = ""
+param:length = ""
+param:p = ""
+return = ""

@@ -1,3 +1,3 @@
-description = 
-param:index = 
-param:self = 
+description = ""
+param:index = ""
+param:self = ""

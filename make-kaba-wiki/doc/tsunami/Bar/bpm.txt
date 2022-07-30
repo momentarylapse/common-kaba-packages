@@ -1,4 +1,4 @@
-description = 
-param:sample_rate = 
-param:self = 
-return = 
+description = ""
+param:sample_rate = ""
+param:self = ""
+return = ""

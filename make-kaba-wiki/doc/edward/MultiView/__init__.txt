@@ -1,6 +1,6 @@
-description = 
-param:action_con = 
-param:active_win = 
-param:cam = 
-param:mouse_win = 
-param:self = 
+description = ""
+param:action_con = ""
+param:active_win = ""
+param:cam = ""
+param:mouse_win = ""
+param:self = ""

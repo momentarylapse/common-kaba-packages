@@ -1,5 +1,5 @@
-description = 
-param:f = 
-param:name = 
-param:num = 
-param:self = 
+description = ""
+param:f = ""
+param:name = ""
+param:num = ""
+param:self = ""

@@ -1,3 +1,3 @@
-description = 
-param:muted = 
-param:self = 
+description = ""
+param:muted = ""
+param:self = ""

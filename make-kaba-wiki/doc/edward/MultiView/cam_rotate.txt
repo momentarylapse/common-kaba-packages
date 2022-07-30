@@ -1,4 +1,4 @@
-description = 
-param:cam_center = 
-param:dq = 
-param:self = 
+description = ""
+param:cam_center = ""
+param:dq = ""
+param:self = ""

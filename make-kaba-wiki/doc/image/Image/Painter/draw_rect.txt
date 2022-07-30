@@ -1,7 +1,7 @@
-description = 
-param:h = 
-param:r = 
-param:self = 
-param:w = 
-param:x = 
-param:y = 
+description = ""
+param:h = nil
+param:r = ""
+param:self = ""
+param:w = nil
+param:x = nil
+param:y = nil

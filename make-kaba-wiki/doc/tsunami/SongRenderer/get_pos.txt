@@ -1,4 +1,4 @@
-description = 
-param:delta = 
-param:self = 
-return = 
+description = ""
+param:delta = ""
+param:self = ""
+return = ""

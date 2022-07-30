@@ -1,7 +1,7 @@
-description = 
-element:height = 
-element:num_x = 
-element:num_z = 
-element:owner = 
-element:pattern = 
-element:pos = 
+description = ""
+element:height = ""
+element:num_x = ""
+element:num_z = ""
+element:owner = ""
+element:pattern = ""
+element:pos = nil

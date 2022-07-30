@@ -1,5 +1,5 @@
-description = 
-param:mute = 
-param:ref = 
-param:self = 
-param:volume = 
+description = ""
+param:mute = ""
+param:ref = ""
+param:self = ""
+param:volume = ""

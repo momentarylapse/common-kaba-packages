@@ -1,4 +1,4 @@
-description = 
-param:hash = 
-param:self = 
-return = 
+description = ""
+param:hash = ""
+param:self = ""
+return = ""

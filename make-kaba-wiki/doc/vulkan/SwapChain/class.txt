@@ -1,4 +1,4 @@
-description = 
-element:format = 
-element:height = 
-element:width = 
+description = ""
+element:format = ""
+element:height = ""
+element:width = ""

@@ -1,6 +1,6 @@
-description = 
-param:col = 
-param:pos = 
-param:self = 
-param:u = 
-param:v = 
+description = ""
+param:col = ""
+param:pos = ""
+param:self = ""
+param:u = ""
+param:v = ""

@@ -1,4 +1,4 @@
-description = 
-param:glob = 
-param:self = 
-return = 
+description = ""
+param:glob = ""
+param:self = ""
+return = ""

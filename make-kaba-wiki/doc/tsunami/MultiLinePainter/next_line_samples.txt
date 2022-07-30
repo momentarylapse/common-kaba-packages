@@ -1,4 +1,4 @@
-description = 
-param:offset = 
-param:self = 
-return = 
+description = ""
+param:offset = ""
+param:self = ""
+return = ""

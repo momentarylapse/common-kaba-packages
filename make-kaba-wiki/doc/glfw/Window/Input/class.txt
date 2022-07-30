@@ -1,7 +1,7 @@
-description = 
-element:button = 
-element:dx = 
-element:dy = 
-element:key = 
-element:x = 
-element:y = 
+description = ""
+element:button = ""
+element:dx = ""
+element:dy = ""
+element:key = ""
+element:x = ""
+element:y = ""

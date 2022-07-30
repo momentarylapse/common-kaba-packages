@@ -1,4 +1,4 @@
-description = 
-param:self = 
-param:sql = 
-return = 
+description = ""
+param:self = ""
+param:sql = ""
+return = ""

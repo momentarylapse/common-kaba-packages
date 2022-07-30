@@ -1,4 +1,4 @@
-description = 
-param:history = 
-param:prompt = 
-return = 
+description = ""
+param:history = ""
+param:prompt = ""
+return = ""

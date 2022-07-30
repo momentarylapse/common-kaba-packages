@@ -1,4 +1,4 @@
-description = 
-element:color = 
-element:distance = 
-element:enabled = 
+description = ""
+element:color = ""
+element:distance = ""
+element:enabled = ""

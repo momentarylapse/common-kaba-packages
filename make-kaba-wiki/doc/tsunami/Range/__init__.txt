@@ -1,6 +1,6 @@
-description = 
-param:_length = 
-param:_offset = 
-param:length = 
-param:offset = 
-param:self = 
+description = ""
+param:_length = nil
+param:_offset = nil
+param:length = ""
+param:offset = ""
+param:self = ""

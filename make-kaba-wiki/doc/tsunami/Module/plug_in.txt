@@ -1,5 +1,5 @@
-description = 
-param:in_port = 
-param:out_port = 
-param:self = 
-param:source = 
+description = ""
+param:in_port = ""
+param:out_port = ""
+param:self = ""
+param:source = ""

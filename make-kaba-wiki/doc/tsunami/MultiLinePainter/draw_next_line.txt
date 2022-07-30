@@ -1,6 +1,6 @@
-description = 
-param:offset = 
-param:p = 
-param:pos = 
-param:self = 
-return = 
+description = ""
+param:offset = ""
+param:p = ""
+param:pos = ""
+param:self = ""
+return = ""

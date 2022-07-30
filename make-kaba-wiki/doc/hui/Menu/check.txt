@@ -1,4 +1,4 @@
-description = 
-param:checked = 
-param:id = 
-param:self = 
+description = ""
+param:checked = ""
+param:id = ""
+param:self = ""

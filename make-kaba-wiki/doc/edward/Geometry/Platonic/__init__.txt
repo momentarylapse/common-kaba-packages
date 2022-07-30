@@ -1,5 +1,5 @@
-description = 
-param:pos = 
-param:radius = 
-param:samples = 
-param:self = 
+description = ""
+param:pos = ""
+param:radius = ""
+param:samples = ""
+param:self = ""

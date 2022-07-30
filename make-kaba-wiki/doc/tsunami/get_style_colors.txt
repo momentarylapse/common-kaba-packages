@@ -1,4 +1,4 @@
-description = 
-param:colors = 
-param:id = 
-param:p = 
+description = ""
+param:colors = ""
+param:id = ""
+param:p = ""

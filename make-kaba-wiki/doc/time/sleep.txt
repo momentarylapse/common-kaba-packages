@@ -1,2 +1,2 @@
-description = 
-param:duration = 
+description = ""
+param:duration = ""

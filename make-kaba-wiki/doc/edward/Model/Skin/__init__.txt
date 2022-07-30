@@ -1,5 +1,5 @@
-description = 
-param:normal_mode_all = 
-param:self = 
-param:sub = 
-param:vertex = 
+description = ""
+param:normal_mode_all = ""
+param:self = ""
+param:sub = ""
+param:vertex = ""

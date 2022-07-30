@@ -1,2 +1,2 @@
-description = 
-element:dev = 
+description = ""
+element:dev = ""

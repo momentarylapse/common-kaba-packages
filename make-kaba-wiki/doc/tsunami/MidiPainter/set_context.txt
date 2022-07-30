@@ -1,6 +1,6 @@
-description = 
-param:area = 
-param:i = 
-param:mode = 
-param:playable = 
-param:self = 
+description = ""
+param:area = ""
+param:i = ""
+param:mode = ""
+param:playable = ""
+param:self = ""

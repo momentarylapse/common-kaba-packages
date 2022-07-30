@@ -1,8 +1,8 @@
-description = 
-param:affect_midi = 
-param:b = 
-param:beats = 
-param:bpm = 
-param:index = 
-param:mode = 
-param:self = 
+description = ""
+param:affect_midi = nil
+param:b = ""
+param:beats = nil
+param:bpm = nil
+param:index = ""
+param:mode = ""
+param:self = ""

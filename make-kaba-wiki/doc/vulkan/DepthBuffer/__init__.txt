@@ -1,6 +1,6 @@
-description = 
-param:format = 
-param:h = 
-param:self = 
-param:w = 
-param:with_sampler = 
+description = ""
+param:format = ""
+param:h = ""
+param:self = ""
+param:w = ""
+param:with_sampler = ""

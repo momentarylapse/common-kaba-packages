@@ -1,4 +1,4 @@
-description = 
-param:decimals = 
-param:self = 
-return = 
+description = ""
+param:decimals = ""
+param:self = ""
+return = ""

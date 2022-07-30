@@ -1,5 +1,5 @@
-description = 
-param:max = 
-param:min = 
-param:self = 
-return = 
+description = ""
+param:max = ""
+param:min = ""
+param:self = ""
+return = ""

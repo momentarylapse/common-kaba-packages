@@ -1,5 +1,5 @@
-description = 
-param:allow_ref = 
-param:buf = 
-param:r = 
-param:self = 
+description = ""
+param:allow_ref = ""
+param:buf = ""
+param:r = ""
+param:self = ""

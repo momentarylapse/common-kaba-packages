@@ -1,4 +1,4 @@
-description = 
-param:f = 
-param:self = 
-param:transparent = 
+description = ""
+param:f = ""
+param:self = ""
+param:transparent = ""

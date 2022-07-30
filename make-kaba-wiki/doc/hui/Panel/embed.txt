@@ -1,6 +1,6 @@
-description = 
-param:id = 
-param:panel = 
-param:self = 
-param:x = 
-param:y = 
+description = ""
+param:id = ""
+param:panel = ""
+param:self = ""
+param:x = ""
+param:y = ""

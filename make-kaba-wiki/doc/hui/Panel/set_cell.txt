@@ -1,6 +1,6 @@
-description = 
-param:column = 
-param:id = 
-param:row = 
-param:s = 
-param:self = 
+description = ""
+param:column = ""
+param:id = ""
+param:row = ""
+param:s = ""
+param:self = ""

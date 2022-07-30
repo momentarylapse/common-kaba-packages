@@ -1,7 +1,7 @@
-description = 
-param:include_hidden = 
-param:include_sub_beats = 
-param:r = 
-param:self = 
-param:sub_beat_partition = 
-return = 
+description = ""
+param:include_hidden = ""
+param:include_sub_beats = ""
+param:r = ""
+param:self = ""
+param:sub_beat_partition = ""
+return = ""

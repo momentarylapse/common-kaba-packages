@@ -1,7 +1,7 @@
-description = 
-param:affect_midi = 
-param:index = 
-param:length = 
-param:mode = 
-param:self = 
-param:time = 
+description = ""
+param:affect_midi = nil
+param:index = ""
+param:length = ""
+param:mode = ""
+param:self = ""
+param:time = nil

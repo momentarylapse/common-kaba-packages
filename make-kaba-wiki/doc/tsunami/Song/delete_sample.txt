@@ -1,4 +1,4 @@
-description = 
-param:s = 
-param:sample = 
-param:self = 
+description = ""
+param:s = ""
+param:sample = nil
+param:self = ""

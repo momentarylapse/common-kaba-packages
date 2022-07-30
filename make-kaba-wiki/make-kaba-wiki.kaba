@@ -22,6 +22,14 @@ func func_return(f: Function) -> string
 		return ""
 	return " -> {{f.return_type.name}}"
 
+func func_notable_params(f: Function) -> (string,Class*)[]
+	var r: (string,Class*)[]
+	for p,i in f.param_type
+		if i == 0 and not f.is_static()
+			continue
+		r.add([f.var[i].name, p])
+	return r
+
 func show_func(ns: string, f: Function) -> string
 	var name = f.name
 	if f.namespace
@@ -37,11 +45,12 @@ func show_func(ns: string, f: Function) -> string
 	wiki += "func {{pre}}{{name}}({{func_params(f)}}){{func_return(f)}}\n"
 	wiki += "</code>\n"
 	
-	if len(f.param_type) > 0
+	var params = func_notable_params(f)
+	if len(params) > 0
 		wiki += "\n=== Parameters ===\n\n"
-		for p,i in f.param_type
-			wiki += "; <tt>{{f.var[i].name}}: {{p.name}}</tt>\n"
-			wiki += ": {{doc_get_func_param(ns, f, f.var[i].name)}}\n\n"
+		for p in params
+			wiki += "; <tt>{{p.e0}}: {{p.e1.name}}</tt>\n"
+			wiki += ": {{doc_get_func_param(ns, f, p.e0)}}\n\n"
 
 	if f.return_type.name != "void"
 		wiki += "\n=== Return ===\n\n"
@@ -251,7 +260,7 @@ func show_class(ns: string, c: Class) -> string
 		for f in funcs
 			string pre = func_pre(f)
 			wiki += "; <tt>func {{pre}}[[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}</tt>\n"
-			wiki += ": {{doc_get_func_description(ns + "." + c.name, f)}}\n\n"
+			wiki += ": {{short_doc(doc_get_func_description(ns + "." + c.name, f))}}\n\n"
 	
 	if len(elements) > 0	
 		wiki += "\n=== Elements ===\n\n"
@@ -437,12 +446,12 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	#print(p)
 	var conf: doc.Configuration
 	conf.load(p)
-	if str(conf[key]) == ""
+	if str(conf[key]) in ["nil", ""]
 		if report_missing
 			print("MISSING: {{ns}}.{{name}}:  {{key}}")
 		conf[key] = ""
 		conf.save(p)
-	else if str(conf[key]) == "."
+	else if str(conf[key]) == "!"
 		return ""
 	else
 		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
@@ -464,10 +473,19 @@ func doc_get_func_return(ns: string, f: Function) -> string
 func doc_get_func_param(ns: string, f: Function, p: string) -> string
 	return doc_get(ns, f.name, false, "param:{{p}}")
 
+func short_doc(s: string) -> string
+	if len(s) == 0
+		return s
+	var x = s.explode("\n")[0]
+	if len(x) > 100
+		x = x[:100] + "..."
+	return x
+
 func prepare_func(f: Function, ns: string, dir: Path)
 	doc_get_func_description(ns, f)
-	for p,i in f.param_type
-		doc_get_func_param(ns, f, f.var[i].name)
+	var params = func_notable_params(f)
+	for p in params
+		doc_get_func_param(ns, f, p.e0)
 	if f.return_type.name != "void"
 		doc_get_func_return(ns, f)
 

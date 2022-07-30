@@ -1,4 +1,4 @@
-description = 
-param:data = 
-param:self = 
-param:size = 
+description = ""
+param:data = ""
+param:self = ""
+param:size = ""

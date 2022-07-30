@@ -1,3 +1,3 @@
-description = 
-param:key = 
-param:self = 
+description = "Drop an entry from a map."
+param:key = "The key to the entry to drop."
+param:self = ""

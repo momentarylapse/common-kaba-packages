@@ -1,2 +1,2 @@
-description = 
-param:seed = 
+description = ""
+param:seed = ""

@@ -1,5 +1,5 @@
-description = 
-param:index = 
-param:self = 
-param:type = 
-return = 
+description = ""
+param:index = ""
+param:self = ""
+param:type = ""
+return = ""

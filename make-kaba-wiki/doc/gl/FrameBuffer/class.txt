@@ -1,5 +1,5 @@
-description = 
-element:color_attachments = 
-element:depth_buffer = 
-element:height = 
-element:width = 
+description = ""
+element:color_attachments = ""
+element:depth_buffer = ""
+element:height = ""
+element:width = ""

@@ -1,7 +1,7 @@
-description = 
-param:filename = 
-param:num_samples = 
-param:self = 
-param:source = 
-param:tags = 
-return = 
+description = ""
+param:filename = ""
+param:num_samples = ""
+param:self = ""
+param:source = ""
+param:tags = ""
+return = ""

@@ -1,4 +1,4 @@
-description = 
-param:s = 
-param:self = 
-param:version = 
+description = ""
+param:s = ""
+param:self = ""
+param:version = ""

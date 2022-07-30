@@ -1,5 +1,5 @@
-description = 
-param:color = 
-param:distance = 
-param:enabled = 
-param:self = 
+description = ""
+param:color = ""
+param:distance = ""
+param:enabled = ""
+param:self = ""

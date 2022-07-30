@@ -1,5 +1,5 @@
-description = 
-param:marker = 
-param:range = 
-param:self = 
-param:text = 
+description = ""
+param:marker = ""
+param:range = ""
+param:self = ""
+param:text = ""

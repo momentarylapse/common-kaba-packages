@@ -1,6 +1,6 @@
-description = 
-param:_out = 
-param:a = 
-param:b = 
-param:out = 
-return = 
+description = ""
+param:_out = ""
+param:a = ""
+param:b = ""
+param:out = nil
+return = ""

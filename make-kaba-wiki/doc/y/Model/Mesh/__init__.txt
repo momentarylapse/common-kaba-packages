@@ -1,5 +1,5 @@
-description = 
-param:bone_index = 
-param:self = 
-param:sub = 
-param:vertex = 
+description = ""
+param:bone_index = ""
+param:self = ""
+param:sub = ""
+param:vertex = ""

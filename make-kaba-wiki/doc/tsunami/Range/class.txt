@@ -1,3 +1,3 @@
-description = 
-element:length = 
-element:offset = 
+description = ""
+element:length = ""
+element:offset = ""

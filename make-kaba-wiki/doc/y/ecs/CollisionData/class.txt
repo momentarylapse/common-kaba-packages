@@ -1,4 +1,4 @@
-description = 
-element:entity = 
-element:n = 
-element:pos = 
+description = ""
+element:entity = ""
+element:n = ""
+element:pos = ""

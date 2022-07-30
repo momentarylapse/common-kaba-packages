@@ -1,4 +1,4 @@
-description = 
-element:edge = 
-element:polygon = 
-element:vertex = 
+description = ""
+element:edge = ""
+element:polygon = ""
+element:vertex = ""

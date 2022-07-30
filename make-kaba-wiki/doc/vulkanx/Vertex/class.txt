@@ -1,5 +1,5 @@
-description = 
-element:n = 
-element:pos = 
-element:u = 
-element:v = 
+description = ""
+element:n = ""
+element:pos = ""
+element:u = ""
+element:v = ""

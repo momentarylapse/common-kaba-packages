@@ -1,8 +1,8 @@
-description = 
-param:edges = 
-param:end_mode = 
-param:pos1 = 
-param:pos2 = 
-param:radius = 
-param:rings = 
-param:self = 
+description = ""
+param:edges = ""
+param:end_mode = ""
+param:pos1 = ""
+param:pos2 = ""
+param:radius = ""
+param:rings = ""
+param:self = ""

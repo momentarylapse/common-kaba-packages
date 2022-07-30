@@ -1,8 +1,8 @@
-description = 
-param:a = 
-param:b = 
-param:self = 
-param:x1 = 
-param:x2 = 
-param:y1 = 
-param:y2 = 
+description = ""
+param:a = ""
+param:b = ""
+param:self = ""
+param:x1 = nil
+param:x2 = nil
+param:y1 = nil
+param:y2 = nil

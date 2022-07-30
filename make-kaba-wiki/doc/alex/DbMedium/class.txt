@@ -1,4 +1,4 @@
-description = 
-element:hash = 
-element:id = 
-element:size = 
+description = ""
+element:hash = ""
+element:id = ""
+element:size = ""

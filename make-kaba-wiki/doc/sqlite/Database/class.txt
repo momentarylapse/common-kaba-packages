@@ -1,2 +1,2 @@
-description = 
-element:db = 
+description = ""
+element:db = ""

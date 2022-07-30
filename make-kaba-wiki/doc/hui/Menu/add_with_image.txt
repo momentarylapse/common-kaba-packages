@@ -1,5 +1,5 @@
-description = 
-param:id = 
-param:image = 
-param:name = 
-param:self = 
+description = ""
+param:id = ""
+param:image = ""
+param:name = ""
+param:self = ""

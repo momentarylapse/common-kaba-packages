@@ -1,5 +1,5 @@
-description = 
-element:x1 = 
-element:x2 = 
-element:y1 = 
-element:y2 = 
+description = ""
+element:x1 = ""
+element:x2 = ""
+element:y1 = ""
+element:y2 = ""

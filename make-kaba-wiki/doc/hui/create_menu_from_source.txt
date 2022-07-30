@@ -1,4 +1,4 @@
-description = 
-param:panel = 
-param:source = 
-return = 
+description = ""
+param:panel = ""
+param:source = ""
+return = ""

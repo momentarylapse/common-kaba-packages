@@ -1,5 +1,5 @@
-description = 
-param:depth_buffer = 
-param:render_pass = 
-param:self = 
-return = 
+description = ""
+param:depth_buffer = ""
+param:render_pass = ""
+param:self = ""
+return = ""

@@ -1,6 +1,6 @@
 description = A 3d vector.
 element:_e = Reinterprete (x,y,z) as an array.
 element:_xy = 
-element:x = .
-element:y = .
-element:z = .
+element:x = !
+element:y = !
+element:z = !

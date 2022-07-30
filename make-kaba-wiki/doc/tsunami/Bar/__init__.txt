@@ -1,5 +1,5 @@
-description = 
-param:beats = 
-param:length = 
-param:self = 
-param:sub_beats = 
+description = ""
+param:beats = ""
+param:length = ""
+param:self = ""
+param:sub_beats = ""

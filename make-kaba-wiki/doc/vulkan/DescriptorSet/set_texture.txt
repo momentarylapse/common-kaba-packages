@@ -1,4 +1,4 @@
-description = 
-param:binding = 
-param:self = 
-param:tex = 
+description = ""
+param:binding = ""
+param:self = ""
+param:tex = ""

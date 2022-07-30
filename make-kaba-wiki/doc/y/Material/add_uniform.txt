@@ -1,5 +1,5 @@
-description = 
-param:name = 
-param:p = 
-param:self = 
-param:size = 
+description = ""
+param:name = ""
+param:p = ""
+param:self = ""
+param:size = ""

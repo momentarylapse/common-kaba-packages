@@ -1,5 +1,5 @@
-description = 
-param:edge = 
-param:polygon = 
-param:self = 
-param:vertex = 
+description = ""
+param:edge = ""
+param:polygon = ""
+param:self = ""
+param:vertex = ""

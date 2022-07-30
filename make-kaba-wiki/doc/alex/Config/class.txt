@@ -1,2 +1,2 @@
-description = 
-element:show_meta = 
+description = ""
+element:show_meta = ""

@@ -1,5 +1,5 @@
-description = 
-param:binding = 
-param:buf = 
-param:self = 
-param:ubo = 
+description = ""
+param:binding = ""
+param:buf = ""
+param:self = ""
+param:ubo = nil

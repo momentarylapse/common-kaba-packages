@@ -1,6 +1,6 @@
-description = 
-param:dpos = 
-param:self = 
-param:skel_ang = 
-param:skel_dpos = 
-param:vertex_dpos = 
+description = ""
+param:dpos = ""
+param:self = ""
+param:skel_ang = ""
+param:skel_dpos = ""
+param:vertex_dpos = ""

@@ -1,3 +1,3 @@
-description = 
-element:axes = 
-element:buttons = 
+description = ""
+element:axes = ""
+element:buttons = nil

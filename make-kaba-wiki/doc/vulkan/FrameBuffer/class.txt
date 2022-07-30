@@ -1,4 +1,4 @@
-description = 
-element:_shared_ref_count = 
-element:height = 
-element:width = 
+description = ""
+element:_shared_ref_count = nil
+element:height = ""
+element:width = ""

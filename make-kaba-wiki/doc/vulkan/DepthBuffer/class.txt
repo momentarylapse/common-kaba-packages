@@ -1,6 +1,6 @@
-description = 
-element:_shared_ref_count = 
-element:format = 
-element:height = 
-element:view = 
-element:width = 
+description = ""
+element:_shared_ref_count = nil
+element:format = nil
+element:height = ""
+element:view = ""
+element:width = ""

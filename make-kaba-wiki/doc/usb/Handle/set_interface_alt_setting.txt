@@ -1,4 +1,4 @@
-description = 
-param:alt = 
-param:i = 
-param:self = 
+description = ""
+param:alt = ""
+param:i = ""
+param:self = ""

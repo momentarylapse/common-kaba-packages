@@ -1,7 +1,7 @@
-description = 
-param:aspect = 
-param:fovy = 
-param:z_far = 
-param:z_near = 
-param:z_sym = 
-return = 
+description = ""
+param:aspect = ""
+param:fovy = ""
+param:z_far = ""
+param:z_near = ""
+param:z_sym = ""
+return = ""

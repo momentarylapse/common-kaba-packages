@@ -1,2 +1,2 @@
-description = 
-param:view_mat = 
+description = ""
+param:view_mat = ""

@@ -1,4 +1,4 @@
-description = 
-element:needs_step = 
-element:res = 
-element:step_result = 
+description = ""
+element:needs_step = ""
+element:res = ""
+element:step_result = ""

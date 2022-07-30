@@ -1,6 +1,6 @@
-description = 
-param:format = 
-param:h = 
-param:self = 
-param:size = 
-param:w = 
+description = ""
+param:format = ""
+param:h = ""
+param:self = ""
+param:size = ""
+param:w = ""

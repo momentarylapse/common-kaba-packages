@@ -1,6 +1,6 @@
-description = 
-param:normal = 
-param:num_triangles = 
-param:self = 
-param:skin_vertex = 
-param:triangle_index = 
+description = ""
+param:normal = ""
+param:num_triangles = ""
+param:self = ""
+param:skin_vertex = ""
+param:triangle_index = ""

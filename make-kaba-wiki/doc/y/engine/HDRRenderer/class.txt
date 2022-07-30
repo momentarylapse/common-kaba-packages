@@ -1,4 +1,4 @@
-description = 
-element:fb_main = 
-element:fb_small1 = 
-element:fb_small2 = 
+description = ""
+element:fb_main = ""
+element:fb_small1 = ""
+element:fb_small2 = ""

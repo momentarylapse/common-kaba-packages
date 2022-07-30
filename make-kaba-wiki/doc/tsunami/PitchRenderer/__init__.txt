@@ -1,4 +1,4 @@
-description = 
-param:pitch = 
-param:self = 
-param:synth = 
+description = ""
+param:pitch = ""
+param:self = ""
+param:synth = ""

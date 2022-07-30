@@ -1,4 +1,4 @@
-description = Transform the plane by a matrix (rotation, translation).
-param:m = The transformation matrix.
-param:self = 
-return = The transformed plane.
+description = "Transform the plane by a matrix (rotation, translation)."
+param:m = "The transformation matrix."
+param:self = ""
+return = "The transformed plane."

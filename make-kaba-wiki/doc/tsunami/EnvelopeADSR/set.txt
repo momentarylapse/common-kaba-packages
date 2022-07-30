@@ -1,7 +1,7 @@
-description = 
-param:sample_rate = 
-param:self = 
-param:sustain = 
-param:t_attack = 
-param:t_decay = 
-param:t_release = 
+description = ""
+param:sample_rate = ""
+param:self = ""
+param:sustain = ""
+param:t_attack = ""
+param:t_decay = ""
+param:t_release = ""

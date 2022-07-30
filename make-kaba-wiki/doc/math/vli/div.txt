@@ -1,5 +1,5 @@
-description = 
-param:div = 
-param:rem = 
-param:self = 
-return = 
+description = ""
+param:div = ""
+param:rem = ""
+param:self = ""
+return = ""

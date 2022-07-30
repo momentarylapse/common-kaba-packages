@@ -1,5 +1,5 @@
-description = 
-param:samples = 
-param:self = 
-param:spec_l = 
-param:spec_r = 
+description = ""
+param:samples = ""
+param:self = ""
+param:spec_l = ""
+param:spec_r = ""

@@ -1,4 +1,4 @@
-description = 
-param:initial = 
-param:peak = 
-param:self = 
+description = ""
+param:initial = ""
+param:peak = ""
+param:self = ""

@@ -1,5 +1,5 @@
-description = 
-param:r = 
-param:self = 
-param:source = 
-param:tex = 
+description = ""
+param:r = ""
+param:self = ""
+param:source = ""
+param:tex = ""

@@ -1,4 +1,4 @@
-description = 
-element:delta_phi = 
-element:pitch = 
-element:synth = 
+description = ""
+element:delta_phi = ""
+element:pitch = ""
+element:synth = ""

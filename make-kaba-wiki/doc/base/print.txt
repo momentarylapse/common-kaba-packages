@@ -1,2 +1,2 @@
-description = 
-param:str = 
+description = ""
+param:str = ""

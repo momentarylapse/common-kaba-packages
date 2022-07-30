@@ -1,4 +1,4 @@
-description = 
-param:midi = 
-param:offset = 
-param:self = 
+description = ""
+param:midi = ""
+param:offset = ""
+param:self = ""

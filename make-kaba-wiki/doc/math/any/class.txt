@@ -1,3 +1,3 @@
-description = 
-element:data = 
-element:type = 
+description = "Can store an arbitrary value."
+element:data = "A pointer to the internal data."
+element:type = "The type of this value."

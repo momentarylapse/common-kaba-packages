@@ -1,5 +1,5 @@
-description = 
-param:col = 
-param:db = 
-param:self = 
-return = 
+description = ""
+param:col = ""
+param:db = ""
+param:self = ""
+return = ""

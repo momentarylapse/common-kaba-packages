@@ -1,6 +1,6 @@
-description = 
-param:h = 
-param:self = 
-param:title = 
-param:w = 
-param:ww = 
+description = ""
+param:h = ""
+param:self = ""
+param:title = ""
+param:w = ""
+param:ww = ""

@@ -1,4 +1,4 @@
-description = 
-param:self = 
-param:string_pitch = 
-param:type = 
+description = ""
+param:self = ""
+param:string_pitch = ""
+param:type = ""

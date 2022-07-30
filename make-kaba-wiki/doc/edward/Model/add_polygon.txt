@@ -1,5 +1,5 @@
-description = 
-param:material = 
-param:self = 
-param:v = 
-return = 
+description = ""
+param:material = ""
+param:self = ""
+param:v = ""
+return = ""

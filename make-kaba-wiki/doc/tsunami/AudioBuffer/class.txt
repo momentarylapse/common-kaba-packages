@@ -1,8 +1,8 @@
-description = 
-element:c = 
-element:channels = 
-element:l = 
-element:length = 
-element:offset = 
-element:peaks = 
-element:r = 
+description = ""
+element:c = ""
+element:channels = ""
+element:l = nil
+element:length = ""
+element:offset = ""
+element:peaks = ""
+element:r = nil

@@ -1,5 +1,5 @@
-description = 
-param:average = 
-param:name = 
-param:parent = 
-param:self = 
+description = ""
+param:average = ""
+param:name = ""
+param:parent = ""
+param:self = ""

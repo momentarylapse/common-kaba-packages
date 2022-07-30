@@ -1,8 +1,8 @@
-description = 
-param:d = 
-param:ignore = 
-param:p1 = 
-param:p2 = 
-param:self = 
-param:simple_test = 
-return = 
+description = ""
+param:d = ""
+param:ignore = ""
+param:p1 = ""
+param:p2 = ""
+param:self = ""
+param:simple_test = ""
+return = ""

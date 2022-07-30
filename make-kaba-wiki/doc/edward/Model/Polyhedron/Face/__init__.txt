@@ -1,5 +1,5 @@
-description = 
-param:index = 
-param:num_vertices = 
-param:plane = 
-param:self = 
+description = ""
+param:index = ""
+param:num_vertices = ""
+param:plane = ""
+param:self = ""

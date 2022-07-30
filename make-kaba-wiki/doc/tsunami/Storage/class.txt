@@ -1,2 +1,2 @@
-description = 
-element:current_directory = 
+description = ""
+element:current_directory = ""

@@ -1,4 +1,4 @@
-description = 
-param:root = 
-param:text = 
-param:title = 
+description = ""
+param:root = ""
+param:text = ""
+param:title = ""

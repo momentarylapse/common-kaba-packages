@@ -1,2 +1,2 @@
-description = 
-element:local_ang = 
+description = ""
+element:local_ang = ""

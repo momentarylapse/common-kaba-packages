@@ -1,5 +1,5 @@
-description = 
-element:edge = 
-element:is_closed = 
-element:polygon = 
-element:vertex = 
+description = ""
+element:edge = ""
+element:is_closed = ""
+element:polygon = ""
+element:vertex = ""

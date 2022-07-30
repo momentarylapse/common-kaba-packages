@@ -1,4 +1,4 @@
-description = 
-param:frame = 
-param:index = 
-param:self = 
+description = ""
+param:frame = ""
+param:index = ""
+param:self = ""

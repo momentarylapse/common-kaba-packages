@@ -1,2 +1,2 @@
-description = 
-param:vb = 
+description = ""
+param:vb = ""

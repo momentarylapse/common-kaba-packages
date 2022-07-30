@@ -1,4 +1,4 @@
-description = 
-param:bindings = 
-param:self = 
-return = 
+description = ""
+param:bindings = ""
+param:self = ""
+return = ""

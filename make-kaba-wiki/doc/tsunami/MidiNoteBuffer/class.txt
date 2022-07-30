@@ -1,3 +1,3 @@
-description = 
-element:num = 
-element:samples = 
+description = ""
+element:num = ""
+element:samples = ""

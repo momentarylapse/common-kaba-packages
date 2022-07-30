@@ -1,7 +1,7 @@
-description = 
-param:b = 
-param:offset = 
-param:self = 
-param:source = 
-param:target_offset = 
-param:volume = 
+description = ""
+param:b = nil
+param:offset = nil
+param:self = ""
+param:source = ""
+param:target_offset = ""
+param:volume = ""

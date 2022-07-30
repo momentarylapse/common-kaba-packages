@@ -1,7 +1,7 @@
-description = 
-param:font_size = 
-param:p = 
-param:self = 
-param:t = 
-param:x = 
-param:y = 
+description = ""
+param:font_size = ""
+param:p = ""
+param:self = ""
+param:t = ""
+param:x = nil
+param:y = nil

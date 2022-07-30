@@ -1,2 +1,2 @@
-description = 
-element:uid = 
+description = ""
+element:uid = ""

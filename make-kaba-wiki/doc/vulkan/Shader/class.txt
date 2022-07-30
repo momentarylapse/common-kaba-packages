@@ -1,2 +1,2 @@
-description = 
-element:_shared_ref_count = 
+description = ""
+element:_shared_ref_count = nil

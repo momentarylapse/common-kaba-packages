@@ -1,3 +1,3 @@
-description = 
-param:attachments = 
-param:self = 
+description = ""
+param:attachments = ""
+param:self = ""

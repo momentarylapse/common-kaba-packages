@@ -1,4 +1,4 @@
-description = 
-param:msg = 
-param:progress = 
-param:self = 
+description = ""
+param:msg = ""
+param:progress = ""
+param:self = ""

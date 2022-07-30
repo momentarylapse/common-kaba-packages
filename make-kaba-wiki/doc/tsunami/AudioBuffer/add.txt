@@ -1,6 +1,6 @@
-description = 
-param:b = 
-param:offset = 
-param:self = 
-param:source = 
-param:volume = 
+description = ""
+param:b = nil
+param:offset = ""
+param:self = ""
+param:source = ""
+param:volume = ""

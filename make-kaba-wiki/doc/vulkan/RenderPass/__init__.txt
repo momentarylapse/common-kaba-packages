@@ -1,4 +1,4 @@
-description = 
-param:formats = 
-param:options = 
-param:self = 
+description = ""
+param:formats = ""
+param:options = ""
+param:self = ""

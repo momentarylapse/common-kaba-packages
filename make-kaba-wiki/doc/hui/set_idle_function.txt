@@ -1,2 +1,2 @@
-description = 
-param:idle_func = 
+description = ""
+param:idle_func = ""

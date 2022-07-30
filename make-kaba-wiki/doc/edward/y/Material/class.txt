@@ -1,2 +1,2 @@
-description = 
-element:shader = 
+description = ""
+element:shader = ""

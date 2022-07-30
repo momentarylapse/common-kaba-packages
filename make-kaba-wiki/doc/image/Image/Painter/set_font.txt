@@ -1,6 +1,6 @@
-description = 
-param:bold = 
-param:font = 
-param:italic = 
-param:self = 
-param:size = 
+description = ""
+param:bold = ""
+param:font = ""
+param:italic = ""
+param:self = ""
+param:size = ""

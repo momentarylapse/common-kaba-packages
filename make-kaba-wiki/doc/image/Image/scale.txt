@@ -1,5 +1,5 @@
-description = 
-param:height = 
-param:self = 
-param:width = 
-return = 
+description = ""
+param:height = ""
+param:self = ""
+param:width = ""
+return = ""

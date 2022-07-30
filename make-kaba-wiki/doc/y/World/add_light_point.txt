@@ -1,6 +1,6 @@
-description = 
-param:c = 
-param:pos = 
-param:radius = 
-param:self = 
-return = 
+description = ""
+param:c = ""
+param:pos = ""
+param:radius = ""
+param:self = ""
+return = ""

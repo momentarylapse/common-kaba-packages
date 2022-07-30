@@ -1,6 +1,6 @@
-description = 
-element:_shared_ref_count = 
-element:args = 
-element:name = 
-element:port_out = 
-element:session = 
+description = ""
+element:_shared_ref_count = nil
+element:args = ""
+element:name = ""
+element:port_out = ""
+element:session = ""

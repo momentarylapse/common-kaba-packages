@@ -1,5 +1,5 @@
-description = 
-param:pos = 
-param:sample = 
-param:self = 
-return = 
+description = ""
+param:pos = ""
+param:sample = ""
+param:self = ""
+return = ""

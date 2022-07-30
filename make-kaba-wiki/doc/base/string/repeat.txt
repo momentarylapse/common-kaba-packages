@@ -1,4 +1,4 @@
-description = Glue several copies of a string together.
-param:n = How often to repeat?
-param:self = 
-return = The glued copies.
+description = "Glue several copies of a string together."
+param:n = "How often to repeat?"
+param:self = ""
+return = "The glued copies."

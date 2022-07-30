@@ -1,2 +1,2 @@
-description = 
-element:cur_mode = 
+description = ""
+element:cur_mode = ""

@@ -1,7 +1,7 @@
-description = 
-param:mask = 
-param:self = 
-param:x1 = 
-param:x2 = 
-param:y1 = 
-param:y2 = 
+description = ""
+param:mask = ""
+param:self = ""
+param:x1 = ""
+param:x2 = ""
+param:y1 = ""
+param:y2 = ""

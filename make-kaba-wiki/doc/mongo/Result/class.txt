@@ -1,4 +1,4 @@
-description = 
-element:_shared_ref_count = 
-element:cur = 
-element:doc = 
+description = ""
+element:_shared_ref_count = nil
+element:cur = ""
+element:doc = ""

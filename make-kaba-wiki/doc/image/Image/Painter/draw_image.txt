@@ -1,6 +1,6 @@
-description = 
-param:image = 
-param:p = 
-param:self = 
-param:x = 
-param:y = 
+description = ""
+param:image = ""
+param:p = ""
+param:self = ""
+param:x = nil
+param:y = nil

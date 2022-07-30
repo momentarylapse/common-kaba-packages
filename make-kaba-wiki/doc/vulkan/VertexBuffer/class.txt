@@ -1,3 +1,3 @@
-description = 
-element:index = 
-element:vertex = 
+description = ""
+element:index = ""
+element:vertex = ""

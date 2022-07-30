@@ -1,4 +1,4 @@
-description = 
-param:affect_midi = 
-param:index = 
-param:self = 
+description = ""
+param:affect_midi = ""
+param:index = ""
+param:self = ""

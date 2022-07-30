@@ -1,2 +1,2 @@
-description = 
-param:buffer = 
+description = ""
+param:buffer = ""

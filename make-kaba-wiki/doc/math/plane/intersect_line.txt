@@ -1,6 +1,6 @@
-description = Find the intersection point between the plane and a line (given by 2 points).
-param:inter = The intersection point.
-param:l1 = First point of the line.
-param:l2 = Second point of the line.
-param:self = 
-return = Do the plane and line intersect (might be parallel)?
+description = "Find the intersection point between the plane and a line (given by 2 points)."
+param:inter = "The intersection point."
+param:l1 = "First point of the line."
+param:l2 = "Second point of the line."
+param:self = ""
+return = "Do the plane and line intersect (might be parallel)?"

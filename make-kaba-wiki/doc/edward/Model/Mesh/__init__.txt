@@ -1,6 +1,6 @@
-description = 
-param:ball = 
-param:edge = 
-param:polygon = 
-param:self = 
-param:vertex = 
+description = ""
+param:ball = ""
+param:edge = ""
+param:polygon = ""
+param:self = ""
+param:vertex = ""

@@ -1,8 +1,8 @@
-description = 
-element:edge = 
-element:edge_direction = 
-element:normal = 
-element:normal_index = 
-element:skin_vertex = 
-element:triangulation = 
-element:vertex = 
+description = ""
+element:edge = ""
+element:edge_direction = ""
+element:normal = ""
+element:normal_index = ""
+element:skin_vertex = ""
+element:triangulation = ""
+element:vertex = ""

@@ -1,3 +1,3 @@
-description = 
-param:deadzone = 
-param:self = 
+description = ""
+param:deadzone = ""
+param:self = ""

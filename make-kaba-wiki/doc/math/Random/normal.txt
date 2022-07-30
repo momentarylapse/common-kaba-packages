@@ -1,5 +1,5 @@
-description = 
-param:mean = 
-param:self = 
-param:stddev = 
-return = 
+description = ""
+param:mean = ""
+param:self = ""
+param:stddev = ""
+return = ""

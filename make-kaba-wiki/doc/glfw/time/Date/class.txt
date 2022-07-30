@@ -1,2 +1,2 @@
-description = 
-element:time = 
+description = ""
+element:time = ""

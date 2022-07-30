@@ -1,6 +1,6 @@
-description = 
-param:attachments = 
-param:h = 
-param:rp = 
-param:self = 
-param:w = 
+description = ""
+param:attachments = ""
+param:h = nil
+param:rp = ""
+param:self = ""
+param:w = nil

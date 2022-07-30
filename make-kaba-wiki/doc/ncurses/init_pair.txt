@@ -1,5 +1,5 @@
-description = 
-param:a = 
-param:b = 
-param:i = 
-return = 
+description = ""
+param:a = ""
+param:b = ""
+param:i = ""
+return = ""

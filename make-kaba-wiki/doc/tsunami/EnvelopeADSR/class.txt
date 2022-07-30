@@ -1,2 +1,2 @@
-description = 
-element:just_killed = 
+description = ""
+element:just_killed = ""

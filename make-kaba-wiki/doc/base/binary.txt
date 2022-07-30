@@ -1,4 +1,4 @@
-description = 
-param:length = 
-param:p = 
-return = 
+description = ""
+param:length = ""
+param:p = ""
+return = ""

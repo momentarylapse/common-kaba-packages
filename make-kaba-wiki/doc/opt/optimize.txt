@@ -1,4 +1,4 @@
-description = 
-param:f = 
-param:x = 
-return = 
+description = ""
+param:f = ""
+param:x = ""
+return = ""

@@ -1,7 +1,7 @@
-description = 
-param:allow_parent = 
-param:height = 
-param:parent = 
-param:self = 
-param:title = 
-param:width = 
+description = ""
+param:allow_parent = ""
+param:height = ""
+param:parent = ""
+param:self = ""
+param:title = ""
+param:width = ""

@@ -1,6 +1,6 @@
-description = 
-param:self = 
-param:source = 
-param:source_port = 
-param:target = 
-param:target_port = 
+description = ""
+param:self = ""
+param:source = ""
+param:source_port = ""
+param:target = ""
+param:target_port = ""

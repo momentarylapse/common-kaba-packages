@@ -1,2 +1,2 @@
-description = 
-param:self = 
+description = ""
+param:self = ""

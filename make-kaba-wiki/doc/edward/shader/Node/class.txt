@@ -1,6 +1,6 @@
-description = 
-element:output = 
-element:params = 
-element:type = 
-element:x = 
-element:y = 
+description = ""
+element:output = ""
+element:params = ""
+element:type = ""
+element:x = ""
+element:y = ""

@@ -1,4 +1,4 @@
-description = Selects characters from the beginning of a string.
-param:self = 
-param:size = How many characters to select from the beginning?\nA negative number <tt>-N</tt> selects until <tt>N</tt> characters before the end.
-return = The selected head.
+description = "Selects characters from the beginning of a string."
+param:self = ""
+param:size = "How many characters to select from the beginning?\\nA negative number <tt>-N</tt> selects until <tt>N</tt> characters before the end."
+return = "The selected head."

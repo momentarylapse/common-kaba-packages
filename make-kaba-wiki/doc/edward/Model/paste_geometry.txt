@@ -1,4 +1,4 @@
-description = 
-param:default_material = 
-param:g = 
-param:self = 
+description = ""
+param:default_material = ""
+param:g = ""
+param:self = ""

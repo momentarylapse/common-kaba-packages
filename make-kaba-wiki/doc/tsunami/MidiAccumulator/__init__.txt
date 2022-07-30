@@ -1,4 +1,4 @@
-description = 
-param:self = 
-param:sub_type = 
-param:type = 
+description = ""
+param:self = ""
+param:sub_type = ""
+param:type = ""

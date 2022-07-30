@@ -1,5 +1,5 @@
-description = 
-param:cut = 
-param:self = 
-param:str = 
-return = 
+description = ""
+param:cut = ""
+param:self = ""
+param:str = ""
+return = ""

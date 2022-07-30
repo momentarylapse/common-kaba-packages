@@ -1,6 +1,6 @@
-description = 
-param:port = 
-param:self = 
-param:source = 
-param:wanted_type = 
-return = 
+description = ""
+param:port = ""
+param:self = ""
+param:source = ""
+param:wanted_type = ""
+return = ""

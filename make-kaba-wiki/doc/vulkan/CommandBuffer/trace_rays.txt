@@ -1,5 +1,5 @@
-description = 
-param:nx = 
-param:ny = 
-param:nz = 
-param:self = 
+description = ""
+param:nx = ""
+param:ny = ""
+param:nz = ""
+param:self = ""

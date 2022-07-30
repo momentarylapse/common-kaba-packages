@@ -1,8 +1,8 @@
-description = 
-param:format = 
-param:num_textures = 
-param:pass = 
-param:self = 
-param:shader = 
-param:subpass = 
-param:topology = 
+description = ""
+param:format = ""
+param:num_textures = nil
+param:pass = ""
+param:self = ""
+param:shader = ""
+param:subpass = ""
+param:topology = ""

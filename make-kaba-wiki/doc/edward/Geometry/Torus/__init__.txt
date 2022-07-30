@@ -1,8 +1,8 @@
-description = 
-param:axis = 
-param:num_x = 
-param:num_y = 
-param:pos = 
-param:radius1 = 
-param:radius2 = 
-param:self = 
+description = ""
+param:axis = ""
+param:num_x = ""
+param:num_y = ""
+param:pos = ""
+param:radius1 = ""
+param:radius2 = ""
+param:self = ""

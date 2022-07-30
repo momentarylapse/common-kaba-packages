@@ -1,4 +1,4 @@
-description = 
-param:filename = 
-param:self = 
-return = 
+description = ""
+param:filename = ""
+param:self = ""
+return = ""

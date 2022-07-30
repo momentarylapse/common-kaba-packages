@@ -1,4 +1,4 @@
-description = 
-param:area = 
-param:col = 
-param:self = 
+description = ""
+param:area = ""
+param:col = ""
+param:self = ""
