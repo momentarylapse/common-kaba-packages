@@ -24,6 +24,6 @@ func optimize(x: float[], f: float[]->float) -> float[]
 
 
 func main()
-	var ff_test = func (p: float[])  [for x in -5.0:5.0:0.2 p[0] * exp(-x*x * p[1]) - 3 * exp(-x*x * 0.7)].sum2()
+	var ff_test = func (p: float[])  sum_sqr([for x in -5.0:5.0:0.2 p[0] * exp(-x*x * p[1]) - 3 * exp(-x*x * 0.7)])
 	print(optimize([1.0,1.0], ff_test))
 	

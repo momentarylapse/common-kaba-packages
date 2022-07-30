@@ -74,7 +74,7 @@ func extern _psmove_tracker_update_image(tracker: PSMoveTracker*)
 func extern _psmove_fusion_new(tracker: PSMoveTracker*, a: float, b: float) -> PSMoveFusion*
 func extern _psmove_fusion_free(fusion: PSMoveFusion*)
 func extern _psmove_fusion_get_position(fusion: PSMoveFusion*, psmove: PSMove*, x: float*, y: float*, z: float*)
-func extern _psmove_fusion_get_modelview_matrix(fusion: PSMoveFusion*, move: PSMove*) -> matrix*
+func extern _psmove_fusion_get_modelview_matrix(fusion: PSMoveFusion*, move: PSMove*) -> mat4*
 
 
 const Btn_TRIANGLE = 16 # Green triangle
@@ -90,8 +90,8 @@ const Btn_T = 1048576 # Trigger, on the back
 
 class MyPSMoveController
 	var psmove: PSMove*
-	var pos, dpos, pos_last: vector
-	var acc, rot, mag: vector
+	var pos, dpos, pos_last: vec3
+	var acc, rot, mag: vec3
 	var col: color
 	var ang, dang: quaternion
 	var trigger, rumble: float
@@ -124,8 +124,8 @@ class MyPSMoveController
 		dpos = pos - pos_last
 		pos_last = pos
 
-		var mat: matrix* = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
-		var s = matrix.scale(1,  1,  -1)
+		var mat: mat4* = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
+		var s = mat4.scale(1,  1,  -1)
 		var q = quaternion(s * (*mat) * s)
 		dang = ang * q
 		ang = q.bar()

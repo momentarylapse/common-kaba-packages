@@ -3,8 +3,8 @@ use time
 use image
 
 class Vertex
-	pos: vector
-	n: vector
+	pos: vec3
+	n: vec3
 	u,v: float
 
 
@@ -218,7 +218,7 @@ class TextureRenderer extends Renderer
 
 
 class UBO
-	var m,v,p: matrix
+	var m,v,p: mat4
 
 class StatLayer
 	var tex: Texture*
@@ -240,9 +240,9 @@ class StatLayer
 		tex.override(im)
 		ubo = new UniformBuffer(64*3)
 		UBO u
-		u.p = matrix.ID
-		u.v = matrix.ID
-		u.m = matrix.ID
+		u.p = mat4.ID
+		u.v = mat4.ID
+		u.m = mat4.ID
 		ubo.update(&u)
 		dset = pool.create_set("buffer,sampler")
 		dset.set_buffer(0, ubo)
