@@ -1,0 +1,4 @@
+description = "Finds a set of 3 angles that rotate <math>(0,0,1)</math> into this vector, trying to keep <tt>up</tt> fixed."
+param:self = ""
+param:up = "The up vector."
+return = "The 3 angles."

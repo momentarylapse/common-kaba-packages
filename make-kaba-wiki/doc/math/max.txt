@@ -1,4 +1,5 @@
-description = The maximum (larger one) of two values.
-param:a = First value.
-param:b = Second value.
-return = The larger value.
+description = "The maximum (larger one) of two values."
+param:a = "First value."
+param:b = "Second value."
+param:list = ""
+return = "The larger value."

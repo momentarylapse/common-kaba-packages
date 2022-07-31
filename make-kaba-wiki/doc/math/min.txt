@@ -1,4 +1,5 @@
-description = The minimum (smaller one) of two values.
-param:a = First value.
-param:b = Second value.
-return = The smaller value.
+description = "The minimum (smaller one) of two values."
+param:a = "First value."
+param:b = "Second value."
+param:list = ""
+return = "The smaller value."

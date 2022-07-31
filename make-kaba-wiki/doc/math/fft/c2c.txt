@@ -1,0 +1,4 @@
+description = "Perform a complex->complex FFT."
+param:in = "Input data."
+param:invers = "<tt>false:</tt> forward, <tt>true></tt>: inverse."
+param:out = "Output data.\nWill be resized appropriately."

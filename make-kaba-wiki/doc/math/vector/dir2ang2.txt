@@ -1,4 +1,0 @@
-description = ""
-param:self = ""
-param:up = ""
-return = ""
