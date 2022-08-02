@@ -1,5 +1,6 @@
 description = ""
 param:mute = ""
 param:ref = ""
+param:s = ""
 param:self = ""
 param:volume = ""

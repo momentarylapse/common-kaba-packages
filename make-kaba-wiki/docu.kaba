@@ -1,0 +1,123 @@
+use kaba
+use os
+use doc
+use common
+
+var report_missing = false
+
+func parse_doc_string(s: string) -> string
+	var ss = s
+	while true
+		var p = ss.find("<class>", 0)
+		if p < 0
+			break
+		var p2 = ss.find("</class>", p)
+		if p2 < 0
+			break
+		var c = ss[p+7:p2]
+		var xx = c.explode(".")
+		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
+	return ss.unescape()
+
+func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
+	var p = Path("doc/" + ns.replace(".", "/"))
+	if is_class
+		p = p << name << "class.txt"
+	else
+		p = p << name + ".txt"
+	#print(p)
+	var conf: doc.Configuration
+	conf.load(p)
+	if str(conf[key]) in ["nil", ""]
+		if report_missing
+			print("MISSING: {{ns}}.{{name}}:  {{key}}")
+		conf[key] = ""
+		conf.save(p)
+	else if str(conf[key]) == "!"
+		return ""
+	else
+		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
+		return parse_doc_string(str(conf[key]))
+	return "..."
+
+func doc_get_class_description(ns: string, c: Class) -> string
+	return doc_get(ns, c.name, true, "description")
+
+func doc_get_class_element(ns: string, c: Class, e: ClassElement) -> string
+	return doc_get(ns, c.name, true, "element:{{e.name}}")
+
+func doc_get_func_description(ns: string, f: Function) -> string
+	return doc_get(ns, f.name, false, "description")
+
+func doc_get_func_return(ns: string, f: Function) -> string
+	return doc_get(ns, f.name, false, "return")
+
+func doc_get_func_param(ns: string, f: Function, p: string) -> string
+	return doc_get(ns, f.name, false, "param:{{p}}")
+
+func short_doc(s: string) -> string
+	if len(s) == 0
+		return s
+	var x = s.explode("\n")[0]
+	if len(x) > 100
+		x = x[:100] + "..."
+	return x
+
+func prepare_func(f: Function, ns: string, dir: Path)
+	doc_get_func_description(ns, f)
+	var params = func_notable_params(f)
+	for p in params
+		doc_get_func_param(ns, f, p.e0)
+	if f.return_type.name != "void"
+		doc_get_func_return(ns, f)
+
+func prepare_class(c: Class, ns: string, dir: Path)
+	if not fs.exists(dir)
+		fs.create_directory(dir)
+	
+	var funcs = filter_funcs(c.functions, c)
+	var elements = filter_elements(c.elements)
+	var consts = filter_consts(c.constants)
+	var classes = filter_classes(c.classes)
+	
+	doc_get_class_description(ns, c)
+	for e in elements
+		doc_get_class_element(ns, c, e)
+	
+	for f in funcs
+		prepare_func(f, ns + "." + c.name, dir)
+	
+	for cc in classes
+		prepare_class(cc, ns + "." + c.name, dir << cc.name)
+
+func prepare_module(p: Module, name: string, dir: Path)
+	if not fs.exists(dir)
+		fs.create_directory(dir)
+	print("PREP MOD   {{name}}  {{dir}}")
+
+	var classes = filter_classes(p.classes())
+	for c in classes
+		prepare_class(c, name, dir << c.name)
+
+	var funcs = filter_funcs(p.functions(), p.base_class())
+	for f in funcs
+		prepare_func(f, name, dir)
+
+#	var vars = p.variables()
+#	for v in vars
+#		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
+
+
+func prepare(dir: Path)
+	for p in weak(packages)
+		prepare_module(p, p.name, dir << p.name)
+
+	var external_packages = find_external()
+	for p in external_packages
+		prepare_module(p.main, p.name, dir << p.name)
+		for m in p.sub_modules
+			prepare_module(m.e1, p.name + "." + m.e0, dir << p.name << m.e0)
+
+	var external_libs = find_external_libs()
+	for p in external_libs
+		prepare_module(p, p.name, dir << p.name)

@@ -1,3 +1,3 @@
 description = A 2d vector.
-element:x = ~
-element:y = ~
+element:x = !
+element:y = !
