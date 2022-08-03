@@ -24,6 +24,12 @@ func make_documentation()
 	for p in external_libs
 		make_module(p, p.name, "", [])
 
+func get_func_alternatives(all: Function*[], f: Function) -> Function*[]
+	var alt: Function*[]
+	for ff in all
+		if ff.name == f.name
+			alt.add(ff)
+	return alt
 
 
 func make_class(c: Class, ns: string)
@@ -31,7 +37,7 @@ func make_class(c: Class, ns: string)
 
 	var funcs = filter_funcs(c.functions, c)
 	for f in funcs
-		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", wiki.render_func("{{ns}}.{{c.name}}", f))
+		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", wiki.render_func("{{ns}}.{{c.name}}", f, get_func_alternatives(funcs, f)))
 	var classes = filter_classes(c.classes)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
@@ -49,7 +55,7 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Modu
 
 	var funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
-		wiki_upload("kaba.{{ns}}.{{f.name}}", wiki.render_func(ns, f))
+		wiki_upload("kaba.{{ns}}.{{f.name}}", wiki.render_func(ns, f, get_func_alternatives(p.functions(), f)))
 
 	var vars = p.variables()
 	for v in vars

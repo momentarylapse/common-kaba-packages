@@ -25,7 +25,7 @@ func func_return(f: Function) -> string
 	return " -> {{f.return_type.name}}"
 
 
-func render_func(ns: string, f: Function) -> string
+func render_func(ns: string, f: Function, alternatives: Function*[]) -> string
 	var name = f.name
 	if f.namespace
 		name = "{{f.namespace.name}}.{{f.name}}"
@@ -36,8 +36,9 @@ func render_func(ns: string, f: Function) -> string
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	var pre = func_pre(f)
-	wiki += "func {{pre}}{{name}}({{func_params(f)}}){{func_return(f)}}\n"
+	for ff in alternatives
+		var pre = func_pre(ff)
+		wiki += "func {{pre}}{{name}}({{func_params(ff)}}){{func_return(ff)}}\n"
 	wiki += "</code>\n"
 	
 	var params = func_notable_params(f)
@@ -159,6 +160,8 @@ func render_class(ns: string, c: Class) -> string
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
 	var funcs = filter_funcs(c.functions, c)
+	var ctrs = [for f in funcs f if f.name == "__init__"]
+	funcs = [for f in funcs f if f.name != "__init__"]
 	var elements = filter_elements(c.elements)
 	var consts = filter_consts(c.constants)
 	var ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
@@ -171,6 +174,13 @@ func render_class(ns: string, c: Class) -> string
 	wiki += "class {{c.name}}{{class_extension(c)}}\n"
 	for e in elements
 		wiki += "{{SHIFT}}var {{e.name}}: {{e.type.name}}\n"
+
+	if len(ctrs) > 0
+		wiki += "\n{{SHIFT}}# constructors\n"
+		for f in ctrs
+			string pre = func_pre(f)
+			wiki += "{{SHIFT}}func {{pre}}{{f.name}}({{func_params(f)}}){{func_return(f)}}\n"
+
 	if len(funcs) > 0
 		wiki += "\n{{SHIFT}}# functions\n"
 		for f in funcs

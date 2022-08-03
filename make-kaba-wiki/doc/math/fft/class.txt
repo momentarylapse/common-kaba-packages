@@ -1,1 +1,1 @@
-description = "Namespace for fast fourier transformation functionsi."
+description = "Namespace for fast fourier transformation functions."
