@@ -1,6 +1,5 @@
 use kaba
 use os
-use doc
 use common
 
 var report_missing = false
@@ -26,7 +25,7 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	else
 		p = p << name + ".txt"
 	#print(p)
-	var conf: doc.Configuration
+	var conf: os.Configuration
 	conf.load(p)
 	if str(conf[key]) in ["nil", ""]
 		if report_missing

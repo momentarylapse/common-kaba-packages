@@ -1,6 +1,5 @@
 use os
 use hui
-use doc
 use project
 
 class Library
@@ -50,7 +49,7 @@ class LibraryManager
 		var lib_dir = hui.app_directory << "apps/xmake/libs"
 		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
-			doc.Configuration c
+			os.Configuration c
 			c.load(lib_dir << e)
 			Library l
 			l.name = e.basename()[:-4]

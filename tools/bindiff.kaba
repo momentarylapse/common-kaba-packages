@@ -67,7 +67,7 @@ func hex(s: string) -> string
 				r += "«"
 		
 		if in_printable
-			r += binary(&s[i], 1)
+			r += as_binary(&s[i], 1)
 		else
 			r += s[i:i+1].hex()
 			if i < len(s) -1

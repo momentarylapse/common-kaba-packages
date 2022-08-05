@@ -1,5 +1,6 @@
-description = "Find the minimum (smallest value).\nEither from a list or between two values"
+description = "Find the minimum (smallest value).\nEither from a list or between two values."
 param:a = "First value."
 param:b = "Second value."
 param:list = ""
 return = "The smallest value."
+
