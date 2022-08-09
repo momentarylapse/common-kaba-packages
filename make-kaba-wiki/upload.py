@@ -44,4 +44,5 @@ for f in sorted(listdir("current")):
 			n_skip += 1
 		n += 1
 
-print(f"{n_skip} of {n} skipped")
+print(f"{n-n_skip} of {n} updated, {n_skip} skipped")
+

@@ -1,0 +1,2 @@
+description = "Calculate the center point."
+return = "The center."

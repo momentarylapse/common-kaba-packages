@@ -1,5 +1,5 @@
 description = "Find the maximum (largest value).\nEither from a list or between two values."
 param:a = "First value."
 param:b = "Second value."
-param:list = ""
+param:list = "List of values."
 return = "The largest value."

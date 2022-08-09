@@ -11,7 +11,7 @@ func wiki_upload(name: string, wiki: string)
 
 
 func make_documentation()
-	wiki_upload("kaba.reference", wiki.render_reference())
+	wiki_upload("kaba reference", wiki.render_reference())
 
 	for p in weak(packages)
 		make_module(p, p.name, "", [])

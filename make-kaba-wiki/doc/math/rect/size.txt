@@ -1,0 +1,2 @@
+description = "Calculate the size/extension along the axes."
+return = "The size, <tt>[width(), height()]</tt>."
