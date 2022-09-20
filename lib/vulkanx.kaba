@@ -62,6 +62,7 @@ class Renderer
 
 class WindowRenderer extends Renderer
 	var window: void*
+	var device: Device*
 	var swap_chain: SwapChain*
 	var _default_render_pass: RenderPass*
 	var depth_buffer: DepthBuffer*
@@ -69,8 +70,9 @@ class WindowRenderer extends Renderer
 	var image_index: int
 	var framebuffer_resized: bool
 	
-	func __init__(_window: void*)
+	func __init__(_window: void*, _device: Device*)
 		window = _window
+		device = _device
 		framebuffer_resized = false
 		pool = new DescriptorPool("buffer:1024,sampler:1024", 1024)
 
@@ -83,7 +85,7 @@ class WindowRenderer extends Renderer
 		_delete_swap_chain_and_stuff()
 
 	func mut _create_swap_chain_and_stuff()
-		swap_chain = new SwapChain(window)
+		swap_chain = new SwapChain(window, device)
 		var swap_images = swap_chain.create_textures()
 		for t in swap_images
 			wait_for_frame_fences.add(new Fence())
@@ -97,7 +99,7 @@ class WindowRenderer extends Renderer
 		width = swap_chain.width
 		height = swap_chain.height
 	
-	func _delete_swap_chain_and_stuff()
+	func mut _delete_swap_chain_and_stuff()
 		for fb in frame_buffers
 			del fb
 		del _default_render_pass
@@ -129,19 +131,18 @@ class WindowRenderer extends Renderer
 	func override current_command_buffer() -> CommandBuffer*
 		return command_buffers[image_index]
 
-	func override mut start_frame() -> bool
+	func override start_frame() -> bool
 		#in_flight_fence.wait()
 
-		if !swap_chain.acquire_image(&image_index, image_available_semaphore)
+		if not swap_chain.acquire_image(&image_index, image_available_semaphore)
 			rebuild_default_stuff()
 			return false
-			
 		var f = wait_for_frame_fences[image_index]
 		f.wait()
 		f.reset()
 		return true
 
-	func override mut end_frame()
+	func override end_frame()
 	#	queue_submit_command_buffer(cb, [image_available_semaphore], [render_finished_semaphore], in_flight_fence)
 
 	#	if !swap_chain.present(image_index, [render_finished_semaphore]) or framebuffer_resized
@@ -227,7 +228,7 @@ class StatLayer
 	var timer: Timer*
 	var im: Image*
 	var vb: VertexBuffer*
-	var pipeline: Pipeline*
+	var pipeline: GraphicsPipeline*
 	var frames: int
 	var _time: float
 	
@@ -237,7 +238,7 @@ class StatLayer
 		frames = 0
 		im = new Image(256, 64, color(0,0,0,0))
 		tex = new Texture()
-		tex.override(im)
+		tex.write(im)
 		ubo = new UniformBuffer(64*3)
 		UBO u
 		u.p = mat4.ID
@@ -249,7 +250,7 @@ class StatLayer
 		dset.set_texture(1, tex)
 		dset.update()
 		vb = create_quad(rect(-1,-0.3,-1,-0.8))
-		pipeline = new Pipeline(shader, rp, subpass, "triangles", "3f,3f,2f")
+		pipeline = new GraphicsPipeline(shader, rp, subpass, "triangles", "3f,3f,2f")
 		pipeline.set_blend(6,7)
 		pipeline.set_z(false, false)
 		pipeline.rebuild()
@@ -273,7 +274,7 @@ class StatLayer
 		pp.set_font_size(20)
 		pp.draw_str([5,5], "{{frames/_time|1}}")
 		del pp
-		tex.override(im)
+		tex.write(im)
 		dset.set_texture(1, tex)
 		dset.update()
 		frames = 0

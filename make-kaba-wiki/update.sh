@@ -7,17 +7,21 @@ then
 fi
 
 # clean-up if needed
-rm -rf *.txt
+rm -f *.txt
 rm -rf current
 
 
 # make current version
-$KABA make-kaba-wiki.kaba
-mkdir current
-mv *.txt current
+if $KABA make-kaba-wiki.kaba
+then
+	mkdir current
+	mv *.txt current
 
-python upload.py
+	python upload.py
 
-# save version
-rm -rf previous
-mv current previous
+	# save version
+	rm -rf previous
+	mv current previous
+else
+	rm -f *.txt
+fi

@@ -3,6 +3,7 @@ element:_default_render_pass = nil
 element:cb = nil
 element:command_buffers = ""
 element:depth_buffer = ""
+element:device = ""
 element:frame_buffers = ""
 element:framebuffer_resized = ""
 element:height = ""

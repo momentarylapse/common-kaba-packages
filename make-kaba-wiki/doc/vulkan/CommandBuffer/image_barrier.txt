@@ -1,4 +1,8 @@
 description = ""
+param:dst_access = ""
 param:flags = ""
+param:new_layout = ""
+param:old_layout = ""
 param:self = ""
+param:src_access = ""
 param:t = ""

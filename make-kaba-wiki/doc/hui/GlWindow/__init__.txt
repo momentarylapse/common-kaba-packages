@@ -1,5 +1,7 @@
 description = ""
 param:height = ""
+param:id = ""
+param:parent = ""
 param:self = ""
 param:title = ""
 param:width = ""
