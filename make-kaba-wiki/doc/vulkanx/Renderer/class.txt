@@ -1,6 +1,7 @@
 description = ""
 element:cb = nil
 element:command_buffers = ""
+element:device = ""
 element:height = ""
 element:image_available_semaphore = ""
 element:in_flight_fence = nil
