@@ -19,19 +19,21 @@ class Renderer
 	#var in_flight_fence: Fence*
 	var wait_for_frame_fences: Fence*[]
 	var image_available_semaphore, render_finished_semaphore: Semaphore*
-	
+
+	var device: Device*
 	var command_buffers: CommandBuffer*[]
 	#var cb: CommandBuffer*
 	var pool: DescriptorPool*
 
-	func __init__()
+	func __init__(_device: Device*)
 		width = 0
 		height = 0
 		pool = nil
+		device = _device
 	
 		#in_flight_fence = new Fence()
-		image_available_semaphore = new Semaphore()
-		render_finished_semaphore = new Semaphore()
+		image_available_semaphore = new Semaphore(device)
+		render_finished_semaphore = new Semaphore(device)
 		#cb = new CommandBuffer()
 	
 	func virtual __delete__()
@@ -62,7 +64,6 @@ class Renderer
 
 class WindowRenderer extends Renderer
 	var window: void*
-	var device: Device*
 	var swap_chain: SwapChain*
 	var _default_render_pass: RenderPass*
 	var depth_buffer: DepthBuffer*
@@ -71,8 +72,8 @@ class WindowRenderer extends Renderer
 	var framebuffer_resized: bool
 	
 	func __init__(_window: void*, _device: Device*)
+		super.__init__(_device)
 		window = _window
-		device = _device
 		framebuffer_resized = false
 		pool = new DescriptorPool("buffer:1024,sampler:1024", 1024)
 
@@ -88,10 +89,10 @@ class WindowRenderer extends Renderer
 		swap_chain = new SwapChain(window, device)
 		var swap_images = swap_chain.create_textures()
 		for t in swap_images
-			wait_for_frame_fences.add(new Fence())
+			wait_for_frame_fences.add(new Fence(device))
 			
 		for t in swap_images
-			command_buffers.add(new CommandBuffer())
+			command_buffers.add(device.command_pool.create_command_buffer())
 			
 		depth_buffer = swap_chain.create_depth_buffer()
 		_default_render_pass = swap_chain.create_render_pass(depth_buffer)
@@ -177,7 +178,8 @@ class TextureRenderer extends Renderer
 	var _default_render_pass: RenderPass*
 
 
-	func __init__(t: Texture*)
+	func __init__(t: Texture*, d: Device*)
+		super.__init__(d)
 		tex = t
 		width = tex.width
 		height = tex.height
