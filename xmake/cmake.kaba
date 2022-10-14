@@ -4,8 +4,8 @@ use library
 
 
 func cmake_link(l: string) -> string
-	var ll = lib.get(l)
-	var varx = l.upper()
+	let ll = lib.get(l)
+	let varx = l.upper()
 	#deps.add("{{varx}}_LIBRARIES")
 	if len(ll.pkg) > 0
 		return "
@@ -22,12 +22,12 @@ add_compile_definitions({{ll.define()}}=1)"
 
 
 func cmake_link_group(lg: string[]) -> string
-	var lls = [for l in lg lib.get(l)]
-	var varxs = [for l in lg l.upper()]
+	let lls = [for l in lg lib.get(l)]
+	let varxs = [for l in lg l.upper()]
 	#deps.add("{{varx}}_LIBRARIES")
-	string cvar = varxs.join("_OR_")
-	var label = lg.join(" or ")
-	string s = "# {{label}} mandatory
+	let cvar = varxs.join("_OR_")
+	let label = lg.join(" or ")
+	var s = "# {{label}} mandatory
 set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
 	for v,i in varxs
@@ -49,7 +49,7 @@ else()
 	set({{cvar}} \"\")
 endif()"
 	
-	for v,i in varxs
+	for i=>v in varxs
 		s += "
 if({{cvar}} STREQUAL \"{{lg[i]}}\")"
 		if len(lls[i].pkg) > 0
@@ -69,7 +69,7 @@ func create_cmake()
 	
 	print("-- cmake --")
 	
-	bool debug = conf.build_type == "debug"
+	let debug = conf.build_type == "debug"
 	
 	var f = new TextLinesFormatter(fs.open(conf.root << "CMakeLists.txt", "wt"))
 	f << "# created by xmake
@@ -82,7 +82,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)"
 		f << "set(CMAKE_BUILD_TYPE Debug)"
 	
 	f << "set(SOURCE "
-	for s,i in sources
+	for i=>s in sources
 		f << "	{{rel(s.filename)}}"
 	f << ")"
 	
@@ -111,16 +111,16 @@ find_package(PkgConfig REQUIRED)
 
 
 	for l in conf.libs_optional
-		var ll = lib.get(l)
+		let ll = lib.get(l)
 		#deps.add("{{varx}}_LIBRARIES")
 		if len(ll.pkg) > 0
-			var varx = [for p in ll.pkg p.upper()]
+			let varx = [for p in ll.pkg p.upper()]
 			f << "
 # {{l}} (optional)"
-			for v,i in varx
+			for i=>v in varx
 				f << "pkg_check_modules({{v}} {{ll.pkg[i]}})"
 			f << "if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
-			for v,i in varx
+			for i=>v in varx
 				f << "	include_directories(${"+v+"_INCLUDE_DIRS})"
 				f << "	link_directories(${"+v+"_LIBRARY_DIRS})"
 				f << "	list(APPEND DEPS ${"+v+"_LIBRARIES})"
@@ -130,7 +130,7 @@ else()
 	add_compile_definitions({{ll.define()}}=0)
 endif()"
 		else if len(ll.cmake) > 0
-			var cn = ll.cmake[0]
+			let cn = ll.cmake[0]
 			f << "
 # {{l}} (optional)
 find_package({{cn}})
@@ -167,7 +167,7 @@ add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")"
 
 	f << "
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
-	var list = conf.needs_installing()
+	let list = conf.needs_installing()
 	for e in list
 		if fs.is_directory(conf.root << e)
 			f << "install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"

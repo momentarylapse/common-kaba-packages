@@ -36,7 +36,7 @@ func action_update(a: string[])
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
-	parse_dir(conf.root << conf.source_dir)
+	find_sources(conf.root << conf.source_dir)
 
 	if not conf.dry_run
 		if "make" in conf.outputs
@@ -51,13 +51,13 @@ func action_update(a: string[])
 func action_build(a: string[])
 	#print("building {{conf.root}}")
 	conf.load()
-	parse_dir(conf.root)
+	find_sources(conf.root)
 	build()
 
 func action_clear(a: string[])
 	#print("clearing {{conf.root}}")
 	conf.load()
-	parse_dir(conf.root)
+	find_sources(conf.root)
 	build_clear()
 
 
@@ -97,6 +97,7 @@ func main(arg: string[])
 	p.option("--all", "enable all libraries", lambda() conf.force_all_libraries = true)
 	p.option("--rebuild", "clear before build", lambda() conf.force_rebuild = true)
 	p.option("--profile", "PROFILE", "", lambda(o: string) conf.force_profile = o)
+	p.option("-j/--threads", "THREADS", "number of build threads", lambda(o: string) conf.force_threads = int(o))
 	
 	p.cmd("has", "LIBRARY", "check if available", action_has)
 	p.cmd("list", "", "list available libs", action_list)
@@ -105,4 +106,5 @@ func main(arg: string[])
 	p.cmd("clear", "", "clear build files", action_clear)
 	p.cmd("update", "", "update build files", action_update)
 	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
+	#p.cmd("", "", "default: build", action_build)
 	p.parse(arg)

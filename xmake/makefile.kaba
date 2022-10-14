@@ -3,6 +3,8 @@ use project
 use library
 
 func create_all_makefiles()
+	parse_dependencies()
+
 	# fixed profiles
 	for p in conf.profiles
 		if p.name == "default"
@@ -61,6 +63,9 @@ func cl(s: string) -> string
 	return s.replace("  ", " ").replace("  ", " ")
 
 func create_makefile(p: Profile, postfix: string)
+
+	raise(new Exception("Makefile deprecated!"))
+
 	print("-- makefile {{p.name}} --")
 	var f = new TextLinesFormatter(fs.open(conf.root << conf.source_dir << ("Makefile" + postfix), "wt"))
 	f << "BIN = ../{{conf.binary_file}}"

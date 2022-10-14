@@ -34,6 +34,7 @@ class Config
 	var force_all_libraries = false
 	var force_rebuild = false
 	var force_profile: string
+	var force_threads = -1
 	
 	var name: string
 	var binary_file: Path
@@ -58,10 +59,7 @@ class Config
 	var outputs = ["make"]
 	
 	func ignored(l: string) -> bool
-		for ig in ignore_libs
-			if l == ig
-				return true
-		return false
+		return l in ignore_libs
 	
 	func mut load()
 		if not fs.exists(conf.root << "xmake.conf")
@@ -136,7 +134,7 @@ class Config
 	
 	func needs_installing() -> Path[]
 		var r: Path[]
-		var list = fs.search(install_source, "*.*", "fd")
+		let list = fs.search(install_source, "*.*", "fd")
 		var ignore = mime_files
 		ignore.add(desktop_file)
 		for e in list
@@ -151,6 +149,9 @@ class Config
 			if p.name == "default"
 				return true
 		return false
+	
+	func build_dir() -> Path
+		return root << "build"
 
 var conf: Config
 
@@ -163,10 +164,16 @@ func parse_libs(s: any, out libs: string[], out lib_groups: string[][], out libs
 			libs.add(x.explode("|")[0])
 
 class SourceFile
-	var filename: Path
-	func object() -> Path
+	filename: Path
+	dep: Path[]
+
+	# makefile
+	func object_old() -> Path
 		return Path(str(filename).replace(".cpp", ".o"))
-	var dep: Path[]
+
+	func object() -> Path
+		return conf.build_dir() << rel(Path(str(filename).replace(".cpp", ".o")))
+
 	func mut add_dep(d: Path) -> bool
 		if d in dep
 			return false
@@ -188,12 +195,12 @@ func find_dep(out f: SourceFile, filename: Path)
 		s = fs.read(filename)
 	except
 		return
-	var lines = s.explode("\n")
-	
+
+	let lines = s.explode("\n")
 	for l in lines
-		int p = l.find("#include \"", 0)
+		let p = l.find("#include \"", 0)
 		if p >= 0
-			int q = l.find("\"", p + 11)
+			let q = l.find("\"", p + 11)
 			Path d = filename.parent() << l[p+10:q]
 			d = d.canonical()
 			if fs.exists(d)
@@ -201,17 +208,18 @@ func find_dep(out f: SourceFile, filename: Path)
 				#	print("  <" + rel(d) + ">")
 					find_dep(f, d)
 
-func parse_source(filename: Path)
-	if conf.verbose
-		print(rel(filename))
-	SourceFile f
-	f.filename = filename
-	
-	find_dep(f, filename)
-	
-	sources.add(f)
+func parse_dependencies()
+	for f in sources
+		f.dep.clear()
+	for f in sources
+		if conf.verbose
+			print(rel(f.filename))
+		find_dep(f, f.filename)
 
-func parse_dir(dir: Path)
-	var files = fs.search(dir, "*.cpp", "fr")
+func find_sources(dir: Path)
+	let files = fs.search(dir, "*.cpp", "fr")
 	for f in files
-		parse_source(dir << f)
+		SourceFile s
+		s.filename = dir << f
+		sources.add(s)
+
