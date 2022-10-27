@@ -1,12 +1,6 @@
 use os
 use kaba
 
-class Term
-	const RED = "\x1b[0;31m"
-	const GREEN = "\x1b[0;32m"
-	const YELLOW = "\x1b[0;33m"
-	const END = "\x1b[0m"
-
 var error_count: int
 
 func test_compile(filename: Path)
@@ -14,15 +8,15 @@ func test_compile(filename: Path)
 	try
 		Module.load(filename, true)
 	except Exception as e
-		print("{{Term.RED}}  ERROR  {{e}}{{Term.END}}")
+		print("{{terminal.RED}}  ERROR  {{e}}{{terminal.END}}")
 		error_count ++
 
 func test_rec(dir: Path)
-	var subdirs = fs.search(dir, "", "dr0")
+	let subdirs = fs.search(dir, "", "dr0")
 	for s in subdirs
-		var list = fs.search(dir << s, "*.kaba", "f")
+		let list = fs.search(dir << s, "*.kaba", "f")
 		if len(list) > 0
-			print("{{Term.YELLOW}}{{dir << s}}{{Term.END}}")
+			print("{{terminal.YELLOW}}{{dir << s}}{{terminal.END}}")
 		for e in list
 			test_compile(dir << s << e)
 
@@ -34,6 +28,6 @@ func main(arg: string[])
 	for a in arg
 		test_rec(a)
 	if error_count > 0
-		print("{{Term.RED}}{{error_count}} errors found{{Term.END}}")
+		print("{{terminal.RED}}{{error_count}} errors found{{terminal.END}}")
 	else
-		print("{{Term.GREEN}}all files ok{{Term.END}}")
+		print("{{terminal.GREEN}}all files ok{{terminal.END}}")

@@ -22,7 +22,6 @@ func is_completely_built(s: SourceFile) -> bool
 	return true
 
 func create_directory_recursive(dir: Path)
-#	print(dir)
 	if not os.fs.exists(dir)
 		create_directory_recursive(dir.parent())
 		try
@@ -119,7 +118,7 @@ func build()
 							tt = new TX()
 							t = tt
 							break
-			print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
+			print("{{i+1|3}}/{{len(needs_building)}} {{terminal.YELLOW}}{{rel(s.filename)}}{{terminal.END}}")
 			t.s = s
 			t.cxx_flags = cxx_flags
 			t.run()
@@ -138,7 +137,7 @@ func build()
 	
 	else
 		for i=>s in needs_building
-			print("{{i+1|3}}/{{len(needs_building)}} {{Term.YELLOW}}{{rel(s.filename)}}{{Term.END}}")
+			print("{{i+1|3}}/{{len(needs_building)}} {{terminal.YELLOW}}{{rel(s.filename)}}{{terminal.END}}")
 			if not compile(s, cxx_flags)
 				return
 
@@ -147,7 +146,7 @@ func build()
 		print("  up to date")
 		return
 			
-	print("Link  {{Term.YELLOW}}{{binary_file}}{{Term.END}}")
+	print("Link  {{terminal.YELLOW}}{{binary_file}}{{terminal.END}}")
 	var main_file: SourceFile
 	main_file.filename = conf.root << conf.main_file
 	let main_ob = main_file.object() #conf.main_file.replace(".cpp", ".o")

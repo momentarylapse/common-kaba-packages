@@ -1,16 +1,5 @@
 use os
 
-class Term
-	const RED = "\x1b[0;31m"
-	const GREEN = "\x1b[0;32m"
-	const YELLOW = "\x1b[0;33m"
-	const BLUE = "\x1b[0;34m"
-	const BLUE2 = "\x1b[0;36m"
-	const VIOLET = "\x1b[0;35m"
-	const BOLD = "\x1b[1m"
-	const END = "\x1b[0m"
-
-
 class Profile
 	var name: string
 	var libs_optional: string[]
@@ -35,6 +24,7 @@ class Config
 	var force_rebuild = false
 	var force_profile: string
 	var force_threads = -1
+	var force_build_dir: Path
 	
 	var name: string
 	var binary_file: Path
@@ -151,6 +141,8 @@ class Config
 		return false
 	
 	func build_dir() -> Path
+		if not force_build_dir.is_empty()
+			return force_build_dir
 		return root << "build"
 
 var conf: Config

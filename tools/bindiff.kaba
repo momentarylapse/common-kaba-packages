@@ -4,14 +4,6 @@ var MAX_DIFF_SIZE: int
 var MIN_MATCH_SIZE: int
 var CONTEXT: int
 
-
-class Term
-	const RED = "\x1b[0;31m"
-	const GREEN = "\x1b[0;32m"
-	const YELLOW = "\x1b[0;33m"
-	const END = "\x1b[0m"
-
-
 class Mapping
 	var a0, a1, b0, b1: int
 	func const la() -> int
@@ -98,10 +90,10 @@ func diff(a: string, b: string)
 		d.b1 = m2.b0
 		diffs.add(d)
 	
-		print("{{Term.YELLOW}}diff at {{d}}:{{Term.END}}")
+		print("{{terminal.YELLOW}}diff at {{d}}:{{terminal.END}}")
 		int a000 = clamp(d.a0-CONTEXT, 0, len(a))
 		int a111 = clamp(d.a1+CONTEXT, 0, len(a))
-		print(hex(a[a000:d.a0]) + " {{Term.RED}}{{hex(a[d.a0:d.a1])}} {{Term.GREEN}}{{hex(b[d.b0:d.b1])}}{{Term.END}} " + hex(a[d.a1:a111]))
+		print(hex(a[a000:d.a0]) + " {{terminal.RED}}{{hex(a[d.a0:d.a1])}} {{terminal.GREEN}}{{hex(b[d.b0:d.b1])}}{{terminal.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
 func main(arg: string[])
@@ -112,10 +104,10 @@ func main(arg: string[])
 	CommandLineParser p
 	var pp = &p
 	p.info("bindiff", "find (small) differences between binary files")
-	p.option("--context", "BYTES", "how many bytes of context are shown", lambda (a: string) CONTEXT = int(a))
-	p.option("--max-diff", "BYTES", "maximum size of a non-matching chunk", lambda (a: string) MAX_DIFF_SIZE = int(a))
-	p.option("--min-match", "BYTES", "minimum size to recognize a matching chunk", lambda (a: string) MIN_MATCH_SIZE = int(a))
-	p.cmd("help", "", "show help", lambda (a: string[]) pp.show())
-	p.cmd("", "FILE1 FILE2", "show diff", lambda (a: string[]) diff(os.fs.read(a[0]), os.fs.read(a[1])))
+	p.option("--context", "BYTES", "how many bytes of context are shown", func (a: string) CONTEXT = int(a))
+	p.option("--max-diff", "BYTES", "maximum size of a non-matching chunk", func (a: string) MAX_DIFF_SIZE = int(a))
+	p.option("--min-match", "BYTES", "minimum size to recognize a matching chunk", func (a: string) MIN_MATCH_SIZE = int(a))
+	p.cmd("help", "", "show help", func (a: string[]) pp.show())
+	p.cmd("", "FILE1 FILE2", "show diff", func (a: string[]) diff(os.fs.read(a[0]), os.fs.read(a[1])))
 	p.parse(arg)
 	#p.show_help()

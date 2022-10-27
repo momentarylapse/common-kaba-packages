@@ -82,10 +82,10 @@ class LibraryManager
 	
 	func test(name: string) -> bool
 		if has(name)
-			print("{{name|14}} {{Term.GREEN}}found{{Term.END}}")
+			print("{{name|14}} {{terminal.GREEN}}found{{terminal.END}}")
 			return true
 		else
-			print("{{name|14}} {{Term.RED}}not found{{Term.END}}")
+			print("{{name|14}} {{terminal.RED}}not found{{terminal.END}}")
 		return false
 
 	func compiler_flags(name: string) -> string

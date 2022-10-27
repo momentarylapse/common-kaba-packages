@@ -35,16 +35,16 @@ func nice_size(size: int) -> string
 
 func file_status_color(f: LocalFile) -> string
 	if !f.in_db()
-		return "{{Term.DARK_GRAY}}"
+		return "{{terminal.DARK_GRAY}}"
 	if f.pure_local()
-		return "{{Term.GRAY}}"
+		return "{{terminal.GRAY}}"
 	if f.pure_remote()
-		return "{{Term.ORANGE}}{{Term.BOLD}}"
+		return "{{terminal.ORANGE}}{{terminal.BOLD}}"
 	if f.changed_file()
-		return "{{Term.RED}}{{Term.BOLD}}"
+		return "{{terminal.RED}}{{terminal.BOLD}}"
 	if f.changed_meta()
-		return "{{Term.YELLOW}}{{Term.BOLD}}"
-	return "{{Term.BOLD}}"
+		return "{{terminal.YELLOW}}{{terminal.BOLD}}"
+	return "{{terminal.BOLD}}"
 
 func show_file(f: LocalFile)
 	string s
@@ -54,7 +54,7 @@ func show_file(f: LocalFile)
 			s += " m"
 		else
 			s += "  "
-	print("{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_path(f.path)}}{{Term.END}}")
+	print("{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_path(f.path)}}{{terminal.END}}")
 
 class LocalFile
 	var drop_me = false
