@@ -41,7 +41,7 @@ func render_func(ns: string, f: Function, alternatives: Function*[]) -> string
 		wiki += "func {{pre}}{{name}}({{func_params(ff)}}){{func_return(ff)}}\n"
 	wiki += "</code>\n"
 	
-	var params = func_notable_params(f)
+	let params = func_notable_params(f)
 	if len(params) > 0
 		wiki += "\n=== Parameters ===\n\n"
 		for p in params
@@ -160,14 +160,13 @@ func render_class(ns: string, c: Class) -> string
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
 	var funcs = filter_funcs(c.functions, c)
-	var ctrs = [for f in funcs f if f.name == "__init__"]
+	let ctrs = [for f in funcs f if f.name == "__init__"]
 	funcs = [for f in funcs f if f.name != "__init__"]
-	var elements = filter_elements(c.elements)
-	var consts = filter_consts(c.constants)
-	var ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
+	let elements = sorted(filter_elements(c.elements), "name")
+	let consts = filter_consts(c.constants)
+	let ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
 	
-	elements = sorted(elements, "name")
-	var classes = filter_classes(c.classes)
+	let classes = filter_classes(c.classes)
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
@@ -270,26 +269,26 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,Mo
 		for m in sub_modules
 			wiki += "* <tt>module '''[[kaba.{{ns}}.{{m.e0}}|{{m.e0}}]]'''</tt>\n"
 
-	var classes = filter_classes(p.classes())
+	let classes = filter_classes(p.classes())
 	if len(classes) > 0
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
 			wiki += "* <tt>class '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
 
-	var funcs = filter_funcs(p.functions(), p.base_class())
+	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
 			var pre = func_pre(f)
 			wiki += "* <tt>func {{pre}}'''[[kaba.{{ns}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
-	var vars = sorted(p.variables(), "name")
+	let vars = sorted(p.variables(), "name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
 			wiki += "* <tt>var static '''[[kaba.{{ns}}.{{v.name}}|{{v.name}}]]''': {{v.type.name}}</tt>\n"
 
-	var consts = filter_consts(p.constants())
+	let consts = filter_consts(p.constants())
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for c in consts
@@ -304,25 +303,25 @@ func render_reference() -> string
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
-	var packages = sorted(weak(kaba.packages), "name")
+	let packages = sorted(weak(kaba.default_context.packages), "name")
 	for p in packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default
 			wiki += " (default)"
 		wiki += "\n"
 
-	var external_packages = find_external()
+	let external_packages = find_external()
 	wiki += "\n; external program apis\n\n"
 	for p in external_packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
-	var external_libs = find_external_libs()
+	let external_libs = find_external_libs()
 	wiki += "\n; external libs\n\n"
 	for p in external_libs
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
-	var stats = sorted(statements, "name")
+	let stats = sorted(statements, "name")
 	for s in stats
 		if s.name[:1] != "-" and len(s.name) > 0
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"

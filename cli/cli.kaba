@@ -9,9 +9,9 @@ func main()
 	string[] history
 	while true
 		try
-			var s = fancy_read_command(">>> ", history)
+			let s = fancy_read_command(">>> ", history)
 			if s != ""
-				Module.execute_single_command(s)
+				default_context.execute_single_command(s)
 		except Exception as e
 			print("exit")
 			break

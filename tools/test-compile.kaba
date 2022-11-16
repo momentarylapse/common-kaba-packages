@@ -5,11 +5,13 @@ var error_count: int
 
 func test_compile(filename: Path)
 	print("    {{filename.basename()}}")
+	var context = Context.create()
 	try
-		Module.load(filename, true)
+		context.load_module(filename, true)
 	except Exception as e
 		print("{{terminal.RED}}  ERROR  {{e}}{{terminal.END}}")
 		error_count ++
+	del context
 
 func test_rec(dir: Path)
 	let subdirs = fs.search(dir, "", "dr0")

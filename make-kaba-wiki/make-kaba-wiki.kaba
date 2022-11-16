@@ -13,32 +13,28 @@ func wiki_upload(name: string, wiki: string)
 func make_documentation()
 	wiki_upload("kaba reference", wiki.render_reference())
 
-	for p in weak(packages)
+	for p in weak(default_context.packages)
 		make_module(p, p.name, "", [])
 
-	var external_packages = find_external()
+	let external_packages = find_external()
 	for p in external_packages
 		make_module(p.main, p.name, "", p.sub_modules)
 
-	var external_libs = find_external_libs()
+	let external_libs = find_external_libs()
 	for p in external_libs
 		make_module(p, p.name, "", [])
 
 func get_func_alternatives(all: Function*[], f: Function) -> Function*[]
-	var alt: Function*[]
-	for ff in all
-		if ff.name == f.name
-			alt.add(ff)
-	return alt
+	return [for ff in all  ff  if ff.name == f.name]
 
 
 func make_class(c: Class, ns: string)
 	wiki_upload("kaba.{{ns}}.{{c.name}}", wiki.render_class(ns, c))
 
-	var funcs = filter_funcs(c.functions, c)
+	let funcs = filter_funcs(c.functions, c)
 	for f in funcs
 		wiki_upload("kaba.{{ns}}.{{c.name}}.{{f.name}}", wiki.render_func("{{ns}}.{{c.name}}", f, get_func_alternatives(funcs, f)))
-	var classes = filter_classes(c.classes)
+	let classes = filter_classes(c.classes)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
@@ -49,15 +45,15 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Modu
 	print("MAKE MOD {{name}}   {{ns}}")
 	wiki_upload("kaba.{{ns}}", wiki.render_module(p, name, _ns, sub_modules))
 
-	var classes = filter_classes(p.classes())
+	let classes = filter_classes(p.classes())
 	for c in classes
 		make_class(c, ns)
 
-	var funcs = filter_funcs(p.functions(), p.base_class())
+	let funcs = filter_funcs(p.functions(), p.base_class())
 	for f in funcs
 		wiki_upload("kaba.{{ns}}.{{f.name}}", wiki.render_func(ns, f, get_func_alternatives(p.functions(), f)))
 
-	var vars = p.variables()
+	let vars = p.variables()
 	for v in vars
 		wiki_upload("kaba.{{ns}}.{{v.name}}", wiki.render_var(ns, v))
 	
