@@ -1,4 +1,3 @@
-description = ""
-param:p = ""
-param:self = ""
-return = ""
+description = "Compare two paths alphabetically."
+param:p = "The other path."
+return = "<tt>0</tt> if equal, positive if <tt>self</tt> sorts after <tt>p</tt>, negative if before."

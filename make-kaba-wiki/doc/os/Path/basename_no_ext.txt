@@ -1,3 +1,3 @@
-description = ""
-param:self = ""
-return = ""
+description = "Get the basename without extension as a string (<tt>'a/b/c.txt' -> 'c'</tt>)"
+param:self = "The path."
+return = "The basename."

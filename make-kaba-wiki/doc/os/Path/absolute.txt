@@ -1,3 +1,3 @@
-description = ""
-param:self = ""
-return = ""
+description = "Find the absolute path for a relative one."
+param:self = "The relative path."
+return = "The absolute path."

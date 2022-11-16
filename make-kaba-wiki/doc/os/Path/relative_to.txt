@@ -1,4 +1,3 @@
-description = ""
-param:p = ""
-param:self = ""
-return = ""
+description = "Describe a path relative to another path.\nThis simply removes parent directories: <tt>'a/b/c/d'</tt> relative to <tt>'a/b'</tt> -> <tt>'c/d'</tt>."
+param:p = "The reference point."
+return = "The relative path. Or an empty path, if the path is not inside <tt>p</tt>."

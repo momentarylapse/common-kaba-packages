@@ -22,18 +22,25 @@ func filter_funcs(ff: Function*[], namespace: Class) -> Function*[]
 			continue
 		else
 			r.add(f)
+#	return r
+#		|> sorted("name")
+#		|> sorted("is_static")
+	r = sorted(r, "name")
+	r = sorted(r, "is_static")
 	return r
-		|> sorted("name")
-		|> sorted("is_static")
 
 func filter_consts(cc: Constant*[]) -> Constant*[]
-	return [for c in cc  c  if c.name[:1] != "-" and c.name != "KABA_LINK"]
+#	return [for c in cc  c  if c.name[:1] != "-" and c.name != "KABA_LINK"]
 	#	|> filter (x => c.name[:1] != "-" and c.name != "KABA_LINK")
-		|> sorted("name")
+#		|> sorted("name")
+	let r = [for c in cc  c  if c.name[:1] != "-" and c.name != "KABA_LINK"]
+	return sorted(r, "name")
 
 func filter_elements(cc: ClassElement[]) -> ClassElement[]
-	return [for c in cc c if not (c.name[:1] in ["_", "-"])]
-		|> sorted("name")
+#	return [for c in cc c if not (c.name[:1] in ["_", "-"])]
+#		|> sorted("name")
+	let r = [for c in cc c if not (c.name[:1] in ["_", "-"])]
+	return sorted(r, "name")
 
 func filter_classes(cc: Class*[]) -> Class*[]
 	var r: Class*[]
@@ -54,7 +61,7 @@ func filter_classes(cc: Class*[]) -> Class*[]
 		if c.name.find("(", 0) >= 0
 			continue
 		r.add(c)
-	return r |> sorted("name")
+	return sorted(r, "name")
 
 
 

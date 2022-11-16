@@ -1,3 +1,3 @@
-description = ""
-param:self = ""
-return = ""
+description = "Get the basename of a path as a string (<tt>'a/b/c.txt' -> 'c.txt'</tt>)."
+param:self = "The path."
+return = "The basename."
