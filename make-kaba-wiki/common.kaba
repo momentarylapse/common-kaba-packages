@@ -9,59 +9,34 @@ func func_notable_params(f: Function) -> (string,Class*)[]
 	return r
 
 
-func filter_funcs(ff: Function*[], namespace: Class) -> Function*[]
-	var r: Function*[]
-	for f in ff
-		if f.namespace != &namespace
-			continue
-		else if f.name == "__init__"
-			r.add(f)
-		else if f.name[:1] in ["@", "_", "-"]
-			continue
-		else if f.name == "main"
-			continue
-		else
-			r.add(f)
-#	return r
-#		|> sorted("name")
-#		|> sorted("is_static")
-	r = sorted(r, "name")
-	r = sorted(r, "is_static")
-	return r
+func filter_funcs(funcs: Function*[], namespace: Class) -> Function*[]
+	return funcs
+		|> _filter(f => f.namespace == &namespace)
+		|> _filter(f => f.name != "main")
+		|> _filter(f => not(f.name[:1] in ["@", "_", "-"]) or f.name == "__init__")
+		|> sorted("name")
+		|> sorted("is_static")
 
-func filter_consts(cc: Constant*[]) -> Constant*[]
-#	return [for c in cc  c  if c.name[:1] != "-" and c.name != "KABA_LINK"]
-	#	|> filter (x => c.name[:1] != "-" and c.name != "KABA_LINK")
-#		|> sorted("name")
-	let r = [for c in cc  c  if c.name[:1] != "-" and c.name != "KABA_LINK"]
-	return sorted(r, "name")
+func filter_consts(consts: Constant*[]) -> Constant*[]
+	return consts
+		|> _filter(c => (c.name[:1] != "-" and c.name != "KABA_LINK"))
+		|> sorted("name")
 
-func filter_elements(cc: ClassElement[]) -> ClassElement[]
-#	return [for c in cc c if not (c.name[:1] in ["_", "-"])]
-#		|> sorted("name")
-	let r = [for c in cc c if not (c.name[:1] in ["_", "-"])]
-	return sorted(r, "name")
+func filter_elements(elements: ClassElement[]) -> ClassElement[]
+	return elements
+		|> _filter(e => not (e.name[:1] in ["_", "-"]))
+		|> sorted("name")
 
-func filter_classes(cc: Class*[]) -> Class*[]
-	var r: Class*[]
-	for c in cc
-		if c.name.find("shared ", 0) >= 0
-			continue
-		if c.name.find("->", 0) >= 0
-			continue
-		if c.name.find("*", 0) >= 0 or c.name.find("&", 0) >= 0
-			continue
-		if c.name.find("@", 0) >= 0 or c.name[0] == '-' or c.name[0] == '<'
-			continue
-		if c.name[0] == '_'
-			continue
-		if c.name.find("[", 0) >= 0 or c.name.find("{", 0) >= 0
-			if !(c.name in ["int[]", "float[]", "bool[]"])
-				continue
-		if c.name.find("(", 0) >= 0
-			continue
-		r.add(c)
-	return sorted(r, "name")
+func filter_classes(classes: Class*[]) -> Class*[]
+	return classes
+		|> _filter(c => not("shared" in c.name))
+		|> _filter(c => not("->" in c.name))
+		|> _filter(c => not("*" in c.name) and not("&" in c.name))
+		|> _filter(c => not("@" in c.name) and not("-" in c.name) and not("<" in c.name))
+		|> _filter(c => c.name[0] != '_')
+		|> _filter(c => (not("[" in c.name) and not("{" in c.name)) or (c.name in ["int[]", "float[]", "bool[]"]))
+		|> _filter(c => not("(" in c.name))
+		|> sorted("name")
 
 
 
@@ -97,3 +72,4 @@ func find_external_libs() -> Module*[]
 		p.name = str(e)[:-5]
 		r.add(p)
 	return r
+
