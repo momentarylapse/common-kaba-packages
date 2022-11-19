@@ -419,7 +419,7 @@ class LocalFileDB
 		for f in files
 			if f.match(tags)
 				list.add(&f)
-		return sorted(list, "path")
+		return list |> sort("path")
 
 	func selfref get_in_dir(dir: Path, recursive: bool) -> LocalFile*[]
 			
@@ -440,7 +440,7 @@ class LocalFileDB
 					if !f.pure_remote() and conf.filter_pure_remote
 						continue
 					list.add(&f)
-		return sorted(list, "path")
+		return list |> sort("path")
 
 	func selfref get(path: Path, rec: bool) -> LocalFile*[]
 		if fs.is_directory(path)
@@ -467,7 +467,7 @@ class LocalFileDB
 				pass
 	func mut optimize()
 		print("optimizing...")
-		files = sorted(files, "path")
+		files = files |> sort("path")
 		dirty = true
 	
 	func mut manual_init()

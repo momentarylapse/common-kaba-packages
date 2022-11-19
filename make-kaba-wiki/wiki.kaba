@@ -162,9 +162,10 @@ func render_class(ns: string, c: Class) -> string
 	var funcs = filter_funcs(c.functions, c)
 	let ctrs = [for f in funcs f if f.name == "__init__"]
 	funcs = [for f in funcs f if f.name != "__init__"]
-	let elements = sorted(filter_elements(c.elements), "name")
+	let elements = filter_elements(c.elements) |> sort("name")
 	let consts = filter_consts(c.constants)
-	let ops = [for f in c.functions f if f.name[:2] == "__" and f.name[:6] != "__mem_" and !(f.name in ["__init__", "__delete__"])]
+	let ops = c.functions
+		|> _filter(f => f.name[:2] == "__" and f.name[:6] != "__mem_" and not(f.name in ["__init__", "__delete__"]))
 	
 	let classes = filter_classes(c.classes)
 	
@@ -282,7 +283,7 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,Mo
 			var pre = func_pre(f)
 			wiki += "* <tt>func {{pre}}'''[[kaba.{{ns}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
 
-	let vars = sorted(p.variables(), "name")
+	let vars = p.variables() |> sort("name")
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
@@ -303,7 +304,7 @@ func render_reference() -> string
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
-	let packages = sorted(weak(kaba.default_context.packages), "name")
+	let packages = weak(kaba.default_context.packages) |> sort("name")
 	for p in packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default
@@ -321,8 +322,13 @@ func render_reference() -> string
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
-	let stats = sorted(statements, "name")
+	let stats = statements |> sort("name")
 	for s in stats
 		if s.name[:1] != "-" and len(s.name) > 0
 			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
+
+	wiki += "\n=== Special functions ===\n\n"
+	let specs = special_functions |> sort("name")
+	for s in specs
+		wiki += "* '''<tt>{{s.name}}(...)</tt>'''\n"
 	return wiki

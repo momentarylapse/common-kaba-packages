@@ -14,18 +14,18 @@ func filter_funcs(funcs: Function*[], namespace: Class) -> Function*[]
 		|> _filter(f => f.namespace == &namespace)
 		|> _filter(f => f.name != "main")
 		|> _filter(f => not(f.name[:1] in ["@", "_", "-"]) or f.name == "__init__")
-		|> sorted("name")
-		|> sorted("is_static")
+		|> sort("name")
+		|> sort("is_static")
 
 func filter_consts(consts: Constant*[]) -> Constant*[]
 	return consts
 		|> _filter(c => (c.name[:1] != "-" and c.name != "KABA_LINK"))
-		|> sorted("name")
+		|> sort("name")
 
 func filter_elements(elements: ClassElement[]) -> ClassElement[]
 	return elements
 		|> _filter(e => not (e.name[:1] in ["_", "-"]))
-		|> sorted("name")
+		|> sort("name")
 
 func filter_classes(classes: Class*[]) -> Class*[]
 	return classes
@@ -36,7 +36,7 @@ func filter_classes(classes: Class*[]) -> Class*[]
 		|> _filter(c => c.name[0] != '_')
 		|> _filter(c => (not("[" in c.name) and not("{" in c.name)) or (c.name in ["int[]", "float[]", "bool[]"]))
 		|> _filter(c => not("(" in c.name))
-		|> sorted("name")
+		|> sort("name")
 
 
 

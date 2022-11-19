@@ -15,7 +15,7 @@ func action_has(a: string[])
 	lib.test(a[0])
 
 func action_list(a: string[])
-	for l in sorted(lib.libraries, "name")
+	for l in sort(lib.libraries, "name")
 		if l.test()
 			print("{{l.name|14}} {{terminal.GREEN}}found{{terminal.END}}")
 		else
@@ -71,7 +71,7 @@ func action_vcpkg_install(a: string[])
 	for l in conf.libs_optional
 		if !conf.ignored(l)
 			req += lib.get(l).vcpkg
-	req = sorted(req, "")
+	req = sort(req, "")
 	if len(req) == 0
 		return
 

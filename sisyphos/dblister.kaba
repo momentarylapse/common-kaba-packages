@@ -17,10 +17,10 @@ class DBLister
 		var options = "f"
 		if recursive
 			options += "r"
-		var list = fs.search(dir, "*", options)
+		let list = fs.search(dir, "*", options)
 		for e in list
-			var path = dir << e
-			if !is_ignored(path)
+			let path = dir << e
+			if not is_ignored(path)
 				paths.add(path)
 		return paths
 	
@@ -39,6 +39,7 @@ class DBLister
 			return [db.find_by_path(path)]
 		except
 			if fs.exists(path)
+				# FIXME this looks like a memory bug... fake_files[] resize
 				LocalFile ff
 				ff.path = path
 				fake_files.add(ff)
@@ -77,12 +78,12 @@ class DBLister
 	func mut find_in_dir(dir: Path) -> LocalFile*[]
 
 		var files = db.get_in_dir(dir, conf.recursive)
-		files = sorted(files, "path")
+			|> sort("path")
 		
 		var paths = find_paths(dir, conf.recursive)
 		#paths = sorted(paths, "")
 		files = mix(files, paths)
-		return sorted(files, "path")
+		return files |> sort("path")
 
 var lister: DBLister
 

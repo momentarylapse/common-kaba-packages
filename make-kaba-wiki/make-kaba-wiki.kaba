@@ -25,7 +25,7 @@ func make_documentation()
 		make_module(p, p.name, "", [])
 
 func get_func_alternatives(all: Function*[], f: Function) -> Function*[]
-	return [for ff in all  ff  if ff.name == f.name]
+	return all |> _filter(ff => ff.name == f.name)
 
 
 func make_class(c: Class, ns: string)
@@ -39,7 +39,7 @@ func make_class(c: Class, ns: string)
 		make_class(cc, "{{ns}}.{{c.name}}")
 
 func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Module*)[])
-	string ns = name
+	var ns = name
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
 	print("MAKE MOD {{name}}   {{ns}}")
