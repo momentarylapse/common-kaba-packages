@@ -11,31 +11,31 @@ func func_notable_params(f: Function) -> (string,Class*)[]
 
 func filter_funcs(funcs: Function*[], namespace: Class) -> Function*[]
 	return funcs
-		|> _filter(f => f.namespace == &namespace)
-		|> _filter(f => f.name != "main")
-		|> _filter(f => not(f.name[:1] in ["@", "_", "-"]) or f.name == "__init__")
+		|> filter(f => f.namespace == &namespace)
+		|> filter(f => f.name != "main")
+		|> filter(f => not(f.name[:1] in ["@", "_", "-"]) or f.name == "__init__")
 		|> sort("name")
-		|> sort("is_static")
+		|> sort("is_static!")
 
 func filter_consts(consts: Constant*[]) -> Constant*[]
 	return consts
-		|> _filter(c => (c.name[:1] != "-" and c.name != "KABA_LINK"))
+		|> filter(c => (c.name[:1] != "-" and c.name != "KABA_LINK"))
 		|> sort("name")
 
 func filter_elements(elements: ClassElement[]) -> ClassElement[]
 	return elements
-		|> _filter(e => not (e.name[:1] in ["_", "-"]))
+		|> filter(e => not (e.name[:1] in ["_", "-"]))
 		|> sort("name")
 
 func filter_classes(classes: Class*[]) -> Class*[]
 	return classes
-		|> _filter(c => not("shared" in c.name))
-		|> _filter(c => not("->" in c.name))
-		|> _filter(c => not("*" in c.name) and not("&" in c.name))
-		|> _filter(c => not("@" in c.name) and not("-" in c.name) and not("<" in c.name))
-		|> _filter(c => c.name[0] != '_')
-		|> _filter(c => (not("[" in c.name) and not("{" in c.name)) or (c.name in ["int[]", "float[]", "bool[]"]))
-		|> _filter(c => not("(" in c.name))
+		|> filter(c => not("shared" in c.name))
+		|> filter(c => not("->" in c.name))
+		|> filter(c => not("*" in c.name) and not("&" in c.name))
+		|> filter(c => not("@" in c.name) and not("-" in c.name) and not("<" in c.name))
+		|> filter(c => c.name[0] != '_')
+		|> filter(c => (not("[" in c.name) and not("{" in c.name)) or (c.name in ["int[]", "float[]", "bool[]"]))
+		|> filter(c => not("(" in c.name))
 		|> sort("name")
 
 

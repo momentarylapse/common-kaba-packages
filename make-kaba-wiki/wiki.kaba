@@ -165,7 +165,7 @@ func render_class(ns: string, c: Class) -> string
 	let elements = filter_elements(c.elements) |> sort("name")
 	let consts = filter_consts(c.constants)
 	let ops = c.functions
-		|> _filter(f => f.name[:2] == "__" and f.name[:6] != "__mem_" and not(f.name in ["__init__", "__delete__"]))
+		|> filter(f => f.name[:2] == "__" and f.name[:6] != "__mem_" and not(f.name in ["__init__", "__delete__"]))
 	
 	let classes = filter_classes(c.classes)
 	
@@ -224,13 +224,13 @@ func render_class(ns: string, c: Class) -> string
 		for cc in consts
 			wiki += "{{SHIFT}}const {{cc.name}}: {{cc.type.name}}\n"
 	if len(classes) > 0
-		wiki += "\n{{SHIFT}}# child classes\n"
+		wiki += "\n{{SHIFT}}# nested classes\n"
 		for cc in classes
-			wiki += "{{SHIFT}} class {{cc.name}}\n"
+			wiki += "{{SHIFT}}class {{cc.name}}\n"
 	wiki += "</code>\n\n"
 	
 	if len(classes) > 0
-		wiki += "\n=== Child classes ===\n\n"
+		wiki += "\n=== Nested classes ===\n\n"
 		for cc in classes
 			wiki += "* <tt>class [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]</tt>\n"
 	

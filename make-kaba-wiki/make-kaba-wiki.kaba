@@ -25,7 +25,7 @@ func make_documentation()
 		make_module(p, p.name, "", [])
 
 func get_func_alternatives(all: Function*[], f: Function) -> Function*[]
-	return all |> _filter(ff => ff.name == f.name)
+	return all |> filter(ff => ff.name == f.name)
 
 
 func make_class(c: Class, ns: string)
