@@ -55,11 +55,12 @@ class DBLister
 		var r: LocalFile*[]
 		var i = 0
 		for f in files
-			while paths[i] < f.path and i < len(paths)
-				LocalFile ff
-				ff.path = paths[i]
-				fake_files.add(ff)
-				i ++
+			if i < len(paths)
+				while paths[i] < f.path and i < len(paths)
+					LocalFile ff
+					ff.path = paths[i]
+					fake_files.add(ff)
+					i ++
 				
 			r.add(f)
 			if i < len(paths)
