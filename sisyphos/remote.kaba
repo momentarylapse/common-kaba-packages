@@ -8,7 +8,7 @@ use tag
 const CHUNK_SIZE = 128
 
 func scp_escape(s: string) -> string
-	string r = s
+	var r = s
 	r = r.replace("(", "\\\\\\(")
 	r = r.replace(")", "\\\\\\)")
 	r = r.replace("'", "\\\\\\'")
@@ -16,7 +16,7 @@ func scp_escape(s: string) -> string
 	return r
 
 func ssh_escape(s: string) -> string
-	string r = s
+	var r = s
 	r = r.replace(" ", "\\\\ ")
 	r = r.replace("(", "\\\\(")
 	r = r.replace(")", "\\\\)")
@@ -24,20 +24,20 @@ func ssh_escape(s: string) -> string
 	return r
 
 func scp_download(source: string, dest: string)
-	string cmd = "scp -Tp"
+	var cmd = "scp -Tp"
 	cmd += " {{conf.server}}:\"{{bash_escape2(source)}}\" \"{{bash_escape(dest)}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 func scp_upload(source: string, dest: string)
-	string cmd = "scp -Tp \"{{bash_escape(source)}}\" {{conf.server}}:{{scp_escape(dest)}}"
+	var cmd = "scp -Tp \"{{bash_escape(source)}}\" {{conf.server}}:{{scp_escape(dest)}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
 func remote_interface(action: string, params: string[]) -> string
-	string cmd = "ssh {{conf.server}} python3 /home/michi/Tools/alex/if-{{action}}.py"
+	var cmd = "ssh {{conf.server}} python3 /home/michi/Tools/alex/if-{{action}}.py"
 	for p in params
 		cmd += " \\\"{{ssh_escape(p)}}\\\""
 	#cmd += ""
@@ -46,7 +46,7 @@ func remote_interface(action: string, params: string[]) -> string
 	return shell_exec(cmd).trim()
 
 func call_alex(action: string, params: string[]) -> string
-	string cmd = "ssh {{conf.server}} {{CMD}} {{action}}"
+	var cmd = "ssh {{conf.server}} {{CMD}} {{action}}"
 	for p in params
 		#cmd += " \\\"" + ssh_escape(p) + "\\\""
 		cmd += " " + ssh_escape(p)
@@ -60,20 +60,20 @@ class RemoteFile extends LocalFile
 func remote_parse(r: string) -> RemoteFile[]
 	if conf.verbosity > 3
 		print(r)
-	RemoteFile[] rfiles
-	var list = r.explode("\n")
+	var rfiles: RemoteFile[]
+	let list = r.explode("\n")
 	for l in list
-		var parts = l.explode("\t")
+		let parts = l.explode("\t")
 		if len(parts) < 7
 			continue
-		RemoteFile rf
+		var rf: RemoteFile
 		rf.id = parts[0]
 		rf.mtime = int(parts[1])
 		rf.size = int(parts[2])
 		rf.hash = parts[3]
 		#rf.remote_path = parts[4]
 		rf.name = parts[5]
-		string extension = parts[6]
+		var extension = parts[6]
 		rf.path = Path("{{rf.name}}.{{extension}}") # temporary
 		rf.path = absolute_path(Path(rf.apply_structure(conf.default_structure)))
 		for p in parts[8:]
@@ -85,25 +85,25 @@ func remote_parse(r: string) -> RemoteFile[]
 	return rfiles
 
 func remote_find(filter: string, quality: string) -> RemoteFile[]
-	string r = call_alex("find", [filter, "--{{quality}}"])
+	let r = call_alex("find", [filter, "--{{quality}}"])
 	return remote_parse(r)
 
 func remote_find_by_hash_chunk(hashes: string[]) -> RemoteFile[]
-	string r = call_alex("sp by-hash", hashes)
+	let r = call_alex("sp by-hash", hashes)
 	return remote_parse(r)
 
 func remote_find_by_id_chunk(ids: string[], quality: string) -> RemoteFile[]
-	string cmd = "sp by-id"
+	var cmd = "sp by-id"
 	if quality == MEDIUM
 		cmd = "sp by-id-medium"
-	string r = call_alex(cmd, ids)
+	let r = call_alex(cmd, ids)
 	return remote_parse(r)
 
 func remote_find_by_hash(hashes: string[]) -> RemoteFile[]
-	RemoteFile[] rr
-	int done = 0
+	var rr: RemoteFile[]
+	var done = 0
 	while done < len(hashes)
-		int ee = min(done + CHUNK_SIZE, len(hashes))
+		var ee = min(done + CHUNK_SIZE, len(hashes))
 		if conf.verbosity >= 2
 			print("hash... {{done}}:{{ee}} of {{len(hashes)}}")
 		var r = remote_find_by_hash_chunk(hashes[done:ee])
@@ -113,10 +113,10 @@ func remote_find_by_hash(hashes: string[]) -> RemoteFile[]
 	return rr
 
 func remote_find_by_id(ids: string[], quality: string) -> RemoteFile[]
-	RemoteFile[] rr
-	int done = 0
+	var rr: RemoteFile[]
+	var done = 0
 	while done < len(ids)
-		int ee = min(done + CHUNK_SIZE, len(ids))
+		var ee = min(done + CHUNK_SIZE, len(ids))
 		if conf.verbosity >= 2
 			print("ids... {{done}}:{{ee}} of {{len(ids)}}")
 		var r = remote_find_by_id_chunk(ids[done:ee], quality)
@@ -153,7 +153,7 @@ func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 
 
 func remote_sync_by_filter(filter: string, quality: string, structure: string, dir: Path)
-	var rfiles = remote_find(filter, quality)
+	let rfiles = remote_find(filter, quality)
 	for rf in rfiles
 		try
 			var lf = db.find_by_id(rf.id)
@@ -164,11 +164,11 @@ func remote_sync_by_filter(filter: string, quality: string, structure: string, d
 
 func remote_download(out f: LocalFile)
 	log_ok("downloading", str(rel_path(f.path)))
-	if !f.in_db()
+	if not f.in_db()
 		log_error("error", "not in db")
 		return
 
-	if !f.pure_remote() and !f.is(CHANGED_FILE)
+	if not f.pure_remote() and not f.is(CHANGED_FILE)
 		log_error("error", "neither pure remote nor changed")
 		return
 	
@@ -194,7 +194,7 @@ func remote_upload(out f: LocalFile)
 		log_error("error", "remote does not like files without extension: {{rel_path(f.path)}}")
 		return
 	
-	string _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
+	var _remote_path = ALEX_IN + "{{f.hash}}.{{f.path.extension()}}"
 	
 	scp_upload(f.path, Path(_remote_path))
 	
@@ -202,11 +202,11 @@ func remote_upload(out f: LocalFile)
 		log_error("todo", "upload edited file")
 		return
 	
-	string r = call_alex("sp upload", [_remote_path])
+	let r = call_alex("sp upload", [_remote_path])
 	if r[:2] != "ok"
 		log_error("error", "upload... {{r}}")
 		return
-	int nnn = r[3:].find("\n", 0)
+	let nnn = r[3:].find("\n", 0)
 	if nnn >= 0
 		log_warn("remote warning", "{{r[4+nnn:]}}")
 	f.id = r[3:].explode("\n")[0]
@@ -242,10 +242,10 @@ func remote_upload_meta(out f: LocalFile)
 		log_error("error", "pure local")
 		return
 
-	var tags = tags2strh(f.tags)	
+	let tags = tags2strh(f.tags)	
 	
 	#string r = remote_interface("override-meta", [f.id, f.name.hex(), tags])
-	var r = call_alex("sp override-meta", [f.id, f.name.hex(), tags])
+	let r = call_alex("sp override-meta", [f.id, f.name.hex(), tags])
 	
 	if r.tail(2) == "ok"
 		if conf.verbosity >= 2
@@ -261,14 +261,14 @@ func remote_upload_meta(out f: LocalFile)
 
 
 func remote_get_meta(files: LocalFile*[]) -> RemoteFile[]
-	string[] ids_perfect
-	string[] ids_medium
+	var ids_perfect: string[]
+	var ids_medium: string[]
 	for f in files
 		if f.is("quality=medium")
 			ids_medium.add(f.id)
 		else
 			ids_perfect.add(f.id)
-	RemoteFile[] rfiles, rfiles_medium
+	var rfiles, rfiles_medium: RemoteFile[]
 	if len(ids_perfect) > 0
 		rfiles = remote_find_by_id(ids_perfect, PERFECT)
 	if len(ids_medium) > 0
@@ -344,7 +344,7 @@ func sync_file(rf: RemoteFile, out lf: LocalFile*)
 
 
 func remote_sync_pure_locals_by_hash(out files: LocalFile*[])
-	string[] hashes
+	var hashes: string[]
 	for f in files
 		if f.pure_local()
 			hashes.add(f.hash)

@@ -31,14 +31,14 @@ func file_add(out f: LocalFile)
 			return
 		
 		# time
-		int mtime = fs.mtime(f.path).time
+		var mtime = fs.mtime(f.path).time
 		if mtime == f.mtime
 			if conf.verbosity >= 2
 				log_ok("=", rel_path(f.path))
 		else
 			# changed?
 			try
-				string hash = fs.hash(f.path, "md5")
+				var hash = fs.hash(f.path, "md5")
 				if hash == f.hash
 					if conf.verbosity >= 1
 						log_warn("touched", rel_path(f.path))
@@ -58,7 +58,7 @@ func file_add(out f: LocalFile)
 				return
 	else
 		# new file
-		string hash
+		var hash: string
 		try
 			hash = fs.hash(f.path, "md5")
 		except Exception as e
@@ -81,7 +81,7 @@ func file_add(out f: LocalFile)
 func file_add_new(out f: LocalFile, hash: string)
 	log_ok("add", rel_path(f.path))
 	f.name = f.path.basename()
-	string ext = f.path.extension()
+	var ext = f.path.extension()
 	if len(ext) > 0
 		f.name = f.name.head(len(f.name) - len(ext) - 1)
 	#print(ext)

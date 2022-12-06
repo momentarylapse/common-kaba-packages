@@ -77,7 +77,7 @@ func bash_escape2(s: string) -> string
 func make_all_dirs(path: Path)
 #	var parents = path.all_parents()
 	var parts = str(path).explode("/")
-	string dir
+	var dir: string
 	for p,i in parts
 		if i == len(parts) - 1
 			break
@@ -128,7 +128,7 @@ class ConfigDir
 	var structure: string
 	
 	func mut add_sync(filter: string, options: string)
-		ConfigDirSync s
+		var s: ConfigDirSync
 		s.dir = dir
 		s.filter = filter
 		s.options = options
@@ -156,9 +156,9 @@ class ConfigDirSync
 
 	func guess_dir(parts: string[]) -> Path
 		var structure = get_structure()
-		Path dir
+		var dir: Path
 		for s in structure
-			string v = get_tag(parts, s)
+			var v = get_tag(parts, s)
 			if len(v) > 0
 				dir = dir << v
 		return dir
@@ -189,17 +189,17 @@ class Config
 
 	func mut load()
 		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/config", "rt"))
-		int n, m
+		var n, m: int
 		f >> n
 		for i in 0:n
-			string t
-			ConfigDir e
+			var t: string
+			var e: ConfigDir
 			f >> t
 			e.dir = Path(t)
 			f >> e.structure
 			f >> m
 			for j in 0:m
-				ConfigDirSync s
+				var s: ConfigDirSync
 				s.dir = e.dir
 				s.structure = e.structure
 				f >> s.filter
@@ -208,7 +208,7 @@ class Config
 			dirs.add(e)
 		f >> n
 		for i in 0:n
-			string ig
+			var ig: string
 			f >> ig
 			ignore.add(ig)
 		del f
@@ -245,7 +245,7 @@ class Config
 			if e.dir == dir
 				e.add_sync(filter, options)
 				return
-		ConfigDir e
+		var e: ConfigDir
 		e.dir = dir
 		e.add_sync(filter, options)
 		dirs.add(e)

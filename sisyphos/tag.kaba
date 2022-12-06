@@ -15,11 +15,11 @@ class Tag
 		return key == filter.key and value.match(filter.value)
 
 func tags_sort(tags: Tag[]) -> Tag[]
-	Tag[] r = tags
+	var r = tags
 	for i in 0:len(r)
 		for j in i+1:len(r)
 			if r[j] < r[i]
-				Tag t = r[i]
+				var t = r[i]
 				r[i] = r[j]
 				r[j] = t
 	return r
@@ -28,39 +28,39 @@ func tags_equal(a: Tag[], b: Tag[]) -> bool
 	return tags2str(tags_sort(a)) == tags2str(tags_sort(b))
 
 func tags2str(tags: Tag[]) -> string
-	string r
-	for t,i in tags
+	var r: string
+	for i=>t in tags
 		if i > 0
 			r += ","
 		r += str(t)
 	return r
 
 func tags2strh(tags: Tag[]) -> string
-	string r
-	for t,i in tags
+	var r: string
+	for i=>t in tags
 		if i > 0
 			r += ","
 		r += t.strh()
 	return r
 
 func str2tag(s: string) -> Tag
-	var a = s.explode("=")
+	let a = s.explode("=")
 	return Tag(a[0], a[1])
 
 func strh2tag(s: string) -> Tag
-	var a = s.explode("=")
+	let a = s.explode("=")
 	return Tag(a[0], a[1].unhex())
 
 func alex2tag(s: string) -> Tag
-	var a = s.explode("=")
-	Tag t
+	let a = s.explode("=")
+	var t: Tag
 	t.key = a[0]
 	t.value = a[1].replace("\\t", "\t").replace("\\n", "\n").replace("\\\\", "\\")
 	return t
 
 
 func strh2tags(s: string) -> Tag[]
-	Tag[] tags
+	var tags: Tag[]
 	var a = s.explode(",")
 	for b in a
 		tags.add(strh2tag(b))
@@ -68,8 +68,8 @@ func strh2tags(s: string) -> Tag[]
 
 
 func str2tags(s: string) -> Tag[]
-	Tag[] tags
-	string[] a = s.explode(",")
+	var tags: Tag[]
+	let a = s.explode(",")
 	for b in a
 		tags.add(str2tag(b))
 	return tags

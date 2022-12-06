@@ -53,7 +53,7 @@ func move_file_by_path(source: Path, _dest: Path)
 func move_dir_by_path(source: Path, dest: Path)
 	conf.recursive = true
 	try
-		Path source_ref = source.parent()
+		var source_ref = source.parent()
 		if fs.exists(dest)
 			if not fs.is_directory(dest)
 				raise(new Exception("target or its parent needs to be a directory, when moving directories"))

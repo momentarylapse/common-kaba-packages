@@ -8,13 +8,13 @@ const CHANGED_FILE = "changed"
 const CHANGED_META = "changed-meta"
 
 func str_format(s: string, fmt: string) -> string
-	string r = s
+	var r = s
 	if len(fmt) >= 2 and fmt[:1] == "0"
-		int n = int(fmt)
+		var n = int(fmt)
 		while len(r) < n
 			r = "0" + r
 	if len(fmt) >= 2 and fmt[:1] == " "
-		int n = int(fmt)
+		var n = int(fmt)
 		while len(r) < n
 			r = " " + r
 	return r
@@ -47,7 +47,7 @@ func file_status_color(f: LocalFile) -> string
 	return "{{terminal.BOLD}}"
 
 func show_file(f: LocalFile)
-	string s
+	var s: string
 	if conf.show_meta_small
 		s = str_format(nice_size(f.size), " 6")
 		if f.is("quality=medium")
@@ -207,10 +207,10 @@ class LocalFile
 				return t.value
 		return ""
 	func apply_structure(structure: string) -> string
-		string r = structure
-		int p1 = 0
+		var r = structure
+		var p1 = 0
 		while true
-			int p0 = r.find("{", p1)
+			var p0 = r.find("{", p1)
 			if p0 < 0
 				break
 			p1 = r.find("}", p0)
@@ -227,7 +227,7 @@ class LocalFile
 		return r.replace("?", "").replace(":", "")
 	func match(mtags: Tag[]) -> bool
 		for mt in mtags
-			bool tag_match = false
+			var tag_match = false
 			if mt.key == "name"
 				tag_match = name.match(mt.value)
 			else if mt.key == "id"
@@ -268,10 +268,10 @@ class LocalFileDB
 	func mut load_v2(lines: string[])
 		
 	func mut load_v1(lines: string[])
-		int n = len(lines) / 10
+		var n = len(lines) / 10
 		for i in 0:n
-			LocalFile ff
-			int i0 = i*10+1
+			var ff: LocalFile
+			var i0 = i*10+1
 			ff.id = lines[i0]
 			ff.path = Path(lines[i0+1])
 			#ff.remote_path = lines[i0+2]
@@ -458,7 +458,7 @@ class LocalFileDB
 				continue
 			print(f.path)
 			try
-				string h2 = fs.hash(f.path, "md5")
+				var h2 = fs.hash(f.path, "md5")
 				if h2 != f.hash
 					print("{{h2}} != {{f.hash}}")
 					f.hash = h2

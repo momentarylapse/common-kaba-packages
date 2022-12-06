@@ -40,7 +40,7 @@ class DBLister
 		except
 			if fs.exists(path)
 				# FIXME this looks like a memory bug... fake_files[] resize
-				LocalFile ff
+				var ff: LocalFile
 				ff.path = path
 				fake_files.add(ff)
 				return [&fake_files[0]]
@@ -57,7 +57,7 @@ class DBLister
 		for f in files
 			if i < len(paths)
 				while paths[i] < f.path and i < len(paths)
-					LocalFile ff
+					var ff: LocalFile
 					ff.path = paths[i]
 					fake_files.add(ff)
 					i ++
@@ -67,7 +67,7 @@ class DBLister
 				if f.path == paths[i]
 					i ++
 		while i < len(paths)
-			LocalFile ff
+			var ff: LocalFile
 			ff.path = paths[i]
 			fake_files.add(ff)
 			i ++

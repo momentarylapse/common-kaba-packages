@@ -11,7 +11,7 @@ func video_guess_tags_by_name(out f: LocalFile)
 	var n = f.path.basename_no_ext()
 	if len(n) < 8
 		return
-	int off_x = n.find("x", 0)
+	var off_x = n.find("x", 0)
 	if off_x < 0 or off_x > 2
 		return
 	if n[off_x+3:off_x+6] != " - "
@@ -41,7 +41,7 @@ func auto_tag(out f: LocalFile)
 				f.tag_set(["height", s[1]])
 		else if ext == "jpg"
 			var s = shell_exec("exiv2 -pv \"{{bash_escape(f.path)}}\"").explode("\n")
-			string model, make, time
+			var model, make, time: string
 			for l in s
 				for i in 0:20
 					l = l.replace("  ", " ")
@@ -75,7 +75,7 @@ func auto_tag(out f: LocalFile)
 				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext == "jpg--"
 			var s = shell_exec("exif -mi \"{{bash_escape(f.path)}}\" || echo --end--").explode("\n")
-			string model, make, time
+			var model, make, time: string
 			for l in s
 				var xx = l.explode("\t")
 				if len(xx) < 2
@@ -106,8 +106,8 @@ func auto_tag(out f: LocalFile)
 				f.tag_set(Tag("camera", "{{make}} {{model}}"))
 		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
 			var s = shell_exec("tsunami --info \"{{bash_escape(f.path)}}\"").explode("\n")
-			int samples = -1
-			int sample_rate = 44100
+			var samples = -1
+			var sample_rate = 44100
 			for l in s
 				if l[:9] == "samples: "
 					samples = int(l[9:])
