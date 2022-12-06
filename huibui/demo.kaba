@@ -26,11 +26,11 @@ class MenuDemoDialog extends hui.Window
 		set_menu(m)
 
 func action_demo(arg: string[])
-	Path filename = Path(arg[0])
+	var filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()
 	
-	string source = fs.read_text(filename)
+	var source = fs.read_text(filename)
 	#print(source)
 	var r = ParseResource(source, true)
 	#r.show(0)

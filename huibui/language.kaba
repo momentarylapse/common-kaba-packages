@@ -34,7 +34,7 @@ class Language
 				if len(tooltip) > 0
 					i.tooltip = tooltip
 				return
-		LangID i
+		var i: LangID
 		i.id = id
 		i.title = title
 		i.tooltip = tooltip
@@ -45,7 +45,7 @@ class Language
 				if len(trans) > 0
 					t.trans = trans
 				return
-		LangText t
+		var t: LangText
 		t.orig = orig
 		t.trans = trans
 		texts.add(t)
@@ -74,14 +74,14 @@ class Language
 		sort_ids(ids)
 		sort_texts(texts)
 	func get_useful_ids() -> LangID[]
-		LangID[] uids
+		var uids: LangID[]
 		for i in ids
 			if len(i.title) > 0 or len(i.tooltip) > 0
 				uids.add(i)
 		sort_ids(uids)
 		return uids
 	func get_useful_texts() -> LangText[]
-		LangText[] utexts
+		var utexts: LangText[]
 		for t in texts
 			if len(t.trans) > 0
 				utexts.add(t)
@@ -91,20 +91,20 @@ class Language
 
 
 func load_prelang(filename: Path) -> Language
-	Language l
+	var l: Language
 	l.filename = filename
 	#try
 	if true
 		var f = new TextLinesFormatter(fs.open(filename, "rt"))
-		string t
-		int n
+		var t: string
+		var n: int
 		f >> t
 		f >> l.name
 		f >> t
 		f >> n
 		f >> t
 		for i in 0:n
-			LangID id
+			var id: LangID
 			f >> id.id
 			f >> t
 			id.title = t.unescape()
@@ -115,7 +115,7 @@ func load_prelang(filename: Path) -> Language
 		f >> n
 		f >> t
 		for i in 0:n
-			LangText tt
+			var tt: LangText
 			f >> t
 			tt.orig = t.unescape()
 			f >> t
@@ -129,7 +129,7 @@ func load_prelang(filename: Path) -> Language
 
 
 func load_prelangs() -> Language[]
-	Language[] langs
+	var langs: Language[]
 	var files = fs.search(conf.dir, "*.prelang", "f")
 	for f in files
 		var l = load_prelang(conf.dir << f)
@@ -139,14 +139,14 @@ func load_prelangs() -> Language[]
 func lang_id_add(out ids: LangID[], id: string, title: string, tooltip: string, ns: string)
 	if id == "?" or id == ""
 		return
-	string cid = id
+	var cid = id
 	if cid.find("/", 0) < 0
 		#if ns != id
 		cid = "{{ns}}/{{id}}"
 	for i in ids
 		if i.id == cid
 			return
-	LangID a
+	var a: LangID
 	a.id = cid
 	a.title = title
 	a.tooltip = tooltip
@@ -156,7 +156,7 @@ func sort_ids(out ids: LangID[])
 	for i in 0:len(ids)
 		for j in i+1:len(ids)
 			if ids[i].id > ids[j].id
-				LangID t = ids[i]
+				var t = ids[i]
 				ids[i] = ids[j]
 				ids[j] = t
 
@@ -165,7 +165,7 @@ func sort_texts(out texts: LangText[])
 	for i in 0:len(texts)
 		for j in i+1:len(texts)
 			if texts[i].orig > texts[j].orig
-				LangText t = texts[i]
+				var t = texts[i]
 				texts[i] = texts[j]
 				texts[j] = t
 
@@ -173,7 +173,7 @@ func sort_texts(out texts: LangText[])
 
 func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
-	int nerrors = 0
+	var nerrors = 0
 	
 	var f: TextLinesFormatter*
 	if create_file
@@ -182,8 +182,8 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	# check ids
 	for i in own.ids
 		
-		bool found_title = false
-		bool found_tooltip = false
+		var found_title = false
+		var found_tooltip = false
 		for j in l.ids
 			if j.id == i.id
 				found_title = (len(j.title) > 0)
@@ -206,7 +206,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	
 	# check texts
 	for t in own.texts
-		bool found = false
+		var found = false
 		for tt in l.texts
 			if t.orig == tt.orig
 				found = (len(tt.trans) > 0)

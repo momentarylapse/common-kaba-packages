@@ -5,13 +5,13 @@ use language
 class SourceParser
 	var source: string
 	func mut parse()
-		int pos0 = 0
+		var pos0 = 0
 		while true
-			int pos = source.find("_(\"", pos0)
+			var pos = source.find("_(\"", pos0)
 			if pos < 0
 				break
 			pos += 3
-			int length = 0
+			var length = 0
 			for i in 0:1024
 				if source[pos + i] == '\\'
 					i ++
@@ -42,11 +42,11 @@ class SourceParser
 class SourceLanguageFinder extends SourceParser
 	var l: Language*
 	func override mut handle(pos: int, length: int)
-		LangText t
+		var t: LangText
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		if len(t.orig) > 0
-			bool found = false
+			var found = false
 			for tt in l.texts
 				if tt.orig == t.orig
 					found = true
@@ -64,14 +64,14 @@ class SourceSwapper extends SourceParser
 		changed = false
 		delta = 0
 	func override mut handle(pos: int, length: int)
-		string orig = str_m2utf8(source[pos:pos+length]).unescape()
+		var orig = str_m2utf8(source[pos:pos+length]).unescape()
 		
 		for t in l.texts
 			if orig == t.orig
-				string r = t.trans.escape()
+				var r = t.trans.escape()
 				print("REPLACE {{orig}}    ->   {{r}}")
 				
-				int ppos = pos + delta
+				var ppos = pos + delta
 				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
 				
 				delta += len(r) - length
@@ -86,13 +86,13 @@ class SourceSwapper extends SourceParser
 
 
 func parse_source_code_dir(dir: Path, l: Language)
-	SourceLanguageFinder p
+	var p: SourceLanguageFinder
 	p.l = &l
 	p.parse_source_code_dir(dir)
 
 
 func swap_translate_source(dir: Path, l: Language)
-	SourceSwapper p
+	var p: SourceSwapper
 	p.l = &l
 	p.parse_source_code_dir(dir)
 

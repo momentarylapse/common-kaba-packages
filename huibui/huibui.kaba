@@ -22,7 +22,7 @@ func find_all_ids(out lang: Language, res: Resource[])
 
 
 func load_own_lang(literally: bool) -> Language
-	Language own
+	var own: Language
 	own.name = conf.own_lang_name
 	
 	print("loading own language: {{own.name}}")
@@ -37,13 +37,13 @@ func load_own_lang(literally: bool) -> Language
 
 	
 func action_check(arg: string[])
-	Path dir = Path(arg[0])
+	var dir = Path(arg[0])
 	conf.set_dir(dir)
 	conf.load()
 	
-	Language own = load_own_lang(true)
+	var own = load_own_lang(true)
 	
-	Language[] langs = load_prelangs()
+	var langs = load_prelangs()
 	
 	for l in langs
 		check_lang(l, own, false)
@@ -64,12 +64,12 @@ func action_export(arg: string[])
 
 func patch_language(out l: Language, own: Language, filename: Path)
 	try
-		string ttt = fs.read_text(filename)
+		var ttt = fs.read_text(filename)
 		var lines = ttt.explode("\n")
 		for i in 0:len(lines)/3
-			string a = lines[i*3]
-			string b = lines[i*3+1]
-			string c = lines[i*3+2]
+			var a = lines[i*3]
+			var b = lines[i*3+1]
+			var c = lines[i*3+2]
 			if c == ""
 				continue
 			if a.head(5) == "# id:"
@@ -86,9 +86,9 @@ func action_translate(arg: string[])
 	conf.set_dir(filename.parent())
 	conf.load()
 	
-	Language own = load_own_lang(true)
+	var own = load_own_lang(true)
 	
-	Language l = load_prelang(filename)
+	var l = load_prelang(filename)
 	if check_lang(l, own, true)
 		return
 	
@@ -107,11 +107,11 @@ func action_translate(arg: string[])
 
 func action_add(arg: string[])
 	var filename = Path(arg[0])
-	string name = arg[1]
+	var name = arg[1]
 	conf.set_dir(filename.parent())
 	conf.load()
 	
-	Language l
+	var l: Language
 	l.name = name
 	l.filename = filename
 	
@@ -172,7 +172,7 @@ func action_swap(arg: string[])
 	
 
 func main(arg: string[])
-	CommandLineParser p
+	var p: CommandLineParser
 	p.info("huibui", "hui gui builder...")
 	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
 	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)
