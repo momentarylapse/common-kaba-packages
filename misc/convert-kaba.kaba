@@ -94,7 +94,7 @@ func process(p: Path, dry: bool)
 	var in_long_string = false
 	var in_class = false
 	
-	int level = 0
+	var level = 0
 	for ll,i in lines
 		if count(ll, "\"") % 2 == 1
 			#print("  STRING!!!!")
@@ -107,7 +107,7 @@ func process(p: Path, dry: bool)
 		if l.trim() == ""
 			continue
 		
-		int ind = get_indent(l)
+		var ind = get_indent(l)
 		if ind < level
 			level = ind
 			#print("<<< {{level}}")

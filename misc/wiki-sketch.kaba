@@ -4,22 +4,22 @@ class Stroke
 	var p: vec2[]
 	
 	func length() -> float
-		float l = 0
+		var l = 0.0
 		for i in 1:len(p)
 			l += len(p[i-1] - p[i])
 		return l
 	
 	func digest() -> Stroke
-		Stroke s = self
-		float l0 = self.length()
+		var s = self
+		var l0 = self.length()
 		
 		while true
-			float lbest = l0 * 0.998
-			int ibest = -1
+			var lbest = l0 * 0.998
+			var ibest = -1
 			for i in 1:len(s.p)-1
-				Stroke t = s
+				var t = s
 				t.p.remove(i)
-				var l = t.length()
+				let l = t.length()
 				if l > lbest
 					lbest = l
 					ibest = i
@@ -49,7 +49,7 @@ Grid ? '' vertical
 		event("clear", on_clear)
 		
 	func override mut on_left_button_down()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		cur.p.add(e.mouse)
 		redraw("area")
 
@@ -61,13 +61,13 @@ Grid ? '' vertical
 		redraw("area")
 
 	func override mut on_mouse_move()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		if len(cur.p) > 0
 			cur.p.add(e.mouse)
 			redraw("area")
 
 	func override mut on_key_down()
-		var e = hui.get_event()
+		let e = hui.get_event()
 		if e.key == hui.KEY_CONTROL + hui.KEY_Z
 			if len(strokes) > 0
 				#strokes = strokes[:len(strokes)-1]
@@ -92,7 +92,7 @@ Grid ? '' vertical
 			p.draw_line(s.p[i-1], s.p[i])
 	
 	func to_text() -> string
-		string o = "{{w}} {{h}}"
+		var o = "{{w}} {{h}}"
 		for s in strokes
 			o += " [" + [for p in s.p "{{int(p.x)}} {{int(p.y)}}"].join(" ") + "]"
 		return o

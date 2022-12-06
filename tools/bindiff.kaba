@@ -15,7 +15,7 @@ class Mapping
 
 
 func expand_mapping(a: string, b: string, out m: Mapping)
-	int d = m.b0 - m.a0
+	var d = m.b0 - m.a0
 	
 	# forward comp
 	for i in m.a0:len(a)
@@ -27,11 +27,11 @@ func expand_mapping(a: string, b: string, out m: Mapping)
 	m.b1 = m.a1 + d
 
 func try_match(a: string, b: string, offset_a: int, offset_b: int) -> Mapping
-	Mapping m
+	var m: Mapping
 	for i in 0:MAX_DIFF_SIZE
-		int oa = offset_a + i
+		var oa = offset_a + i
 		for j in 0:MAX_DIFF_SIZE
-			int ob = offset_b + j
+			var ob = offset_b + j
 			if a[oa:oa+MIN_MATCH_SIZE] == b[ob:ob+MIN_MATCH_SIZE]
 				m.a0 = oa
 				m.b0 = ob
@@ -43,8 +43,8 @@ func is_printable_ascii(c: char) -> bool
 	return c >= 0x20 and c <= 0x7e
 
 func hex(s: string) -> string
-	string r
-	bool in_printable = false
+	var r: string
+	var in_printable = false
 	for i in 0:len(s)
 		if in_printable
 			if not is_printable_ascii(s[i])
@@ -69,8 +69,8 @@ func hex(s: string) -> string
 	return r
 
 func diff(a: string, b: string)
-	Mapping[] diffs
-	Mapping m
+	var diffs: Mapping[]
+	var m: Mapping
 	m.a0 = 0
 	m.b0 = 0
 	
@@ -83,7 +83,7 @@ func diff(a: string, b: string)
 			break
 		expand_mapping(a, b, m2)
 	
-		Mapping d
+		var d: Mapping
 		d.a0 = m.a1
 		d.b0 = m.b1
 		d.a1 = m2.a0
@@ -91,8 +91,8 @@ func diff(a: string, b: string)
 		diffs.add(d)
 	
 		print("{{terminal.YELLOW}}diff at {{d}}:{{terminal.END}}")
-		int a000 = clamp(d.a0-CONTEXT, 0, len(a))
-		int a111 = clamp(d.a1+CONTEXT, 0, len(a))
+		var a000 = clamp(d.a0-CONTEXT, 0, len(a))
+		var a111 = clamp(d.a1+CONTEXT, 0, len(a))
 		print(hex(a[a000:d.a0]) + " {{terminal.RED}}{{hex(a[d.a0:d.a1])}} {{terminal.GREEN}}{{hex(b[d.b0:d.b1])}}{{terminal.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
@@ -101,7 +101,7 @@ func main(arg: string[])
 	MAX_DIFF_SIZE = 4096*2
 	MIN_MATCH_SIZE = 16
 
-	CommandLineParser p
+	var p: CommandLineParser
 	var pp = &p
 	p.info("bindiff", "find (small) differences between binary files")
 	p.option("--context", "BYTES", "how many bytes of context are shown", func (a: string) CONTEXT = int(a))

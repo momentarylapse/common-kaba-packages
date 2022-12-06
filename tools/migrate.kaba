@@ -1,0 +1,150 @@
+use os
+use kaba
+use os
+use cli.terminal
+
+func is_letter(c: char) -> bool
+	return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or (c == '_')
+
+func count_indent(l: string) -> int
+	for i=>c in l
+		if c != '\t'
+			return i
+	return 0
+
+
+
+var in_asm: bool
+
+func potential_type_length(tokens: string[]) -> int
+	if not is_letter(tokens[0][0])
+		return 0
+	if len(tokens) > 4
+		if tokens[1:4] == ["shared", "[", "]"]
+			return 4
+	if len(tokens) > 3
+		if tokens[1:3] == ["[", "]"]
+			return 3
+	if len(tokens) > 2
+		if tokens[1:2] == ["shared"]
+			return 2
+	return 1
+
+func is_old_decl(tokens: string[]) -> bool
+	if in_asm
+		if tokens == ["}"]
+			#print("asm>>")
+			in_asm = false
+		return false
+		
+	if len(tokens) < 2
+		return false
+		
+	if tokens == ["asm", "{"]
+		#print("<<asm")
+		in_asm = true
+		return false
+		
+	if tokens[0] in ["func", "class", "let", "var", "enum", "const", "for", "if", "else", "while", "return", "use", "import", "new", "del", "try", "except", "#"] or tokens[1] in ["as"]
+		return false
+	
+	# type...
+	let ptl = potential_type_length(tokens)
+	if ptl == 0
+		return false
+		
+	if not is_letter(tokens[ptl][0])
+		return false
+	
+	if len(tokens) > ptl+1
+		if not (tokens[ptl+1] in [",", "="])
+			return false
+	
+	return true
+
+
+func glue_type(tokens: string[], ptl: int) -> string
+	var t = tokens[0]
+	for x in tokens[1:ptl]
+		if x == "shared"
+			t += " shared"
+		else
+			t += x
+	return t
+
+func migrate_file(filename: Path)
+	print(filename)
+	let s = fs.read_text(filename)
+	let lines = s.explode("\n")
+	var lines_out: string[]
+	
+	in_asm = false
+	
+	for l in lines
+		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:")
+		
+		
+		if not is_old_decl(tokens)
+			lines_out.add(l)
+			continue
+			
+			
+		print(l)
+		let ind = "\t".repeat(count_indent(l))
+		let ptl = potential_type_length(tokens)
+		var options: string[]
+		let type = glue_type(tokens, ptl)
+		if "=" in tokens
+			let p = l.find("=", 0)
+			options.add("{{ind}}var {{tokens[ptl]}}: {{type}} {{l[p:]}}")
+			options.add("{{ind}}var {{tokens[ptl]}} {{l[p:]}}")
+		else if "," in tokens
+			var z = [for i=>t in tokens[ptl:] t if (i % 2) == 0].join(", ")
+			options.add("{{ind}}var {{z}}: {{type}}")
+		else
+			options.add("{{ind}}var {{tokens[ptl]}}: {{type}}")
+			
+		if len(options) == 1
+			print("=>{{options[0]}}")
+			lines_out.add(options[0])
+			continue
+		for i=>o in options
+			#lines_out.add(ll)
+			print("{{i+1}}){{o}}")
+		
+		let x = read_char()
+		var done = false
+		for i=>o in options
+			if x == [0x31 + i]
+				lines_out.add(o)
+				done = true
+				print("=>>>>>")
+		if not done
+			lines_out.add(l)
+		
+#		let p = s.find(what, 0)
+#		if p < 0
+#			break
+#		if n == 0
+#			print(filename)
+#		print("    " + s[p-5:p+len(what) + 5])
+#		s = s[:p] + by + s[p + len(what):]
+#		print(">>  " + s[p-5:p+len(by) + 5])
+#		n ++
+		pass
+	let ss = lines_out.join("\n")
+	if ss != s
+		fs.write_text(filename, ss)
+		print("================================= saved")
+
+func migrate(arg: string[])
+	setraw()
+	let dir = Path(arg[0])
+	let list = fs.search(dir, "*.kaba", "fr")
+	for e in list
+		migrate_file(dir << e)
+
+func main(arg: string[])
+	var p: os.CommandLineParser
+	p.cmd("", "DIR", "", migrate)
+	p.parse(arg)

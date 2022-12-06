@@ -15,7 +15,7 @@ func isOperator(c: char) -> bool
 
 
 func unescape(s: string) -> string
-	string r
+	var r: string
 	for j in 1:len(s)-1
 		if s[j] == '\\' and j < len(s) + 1
 			j ++
@@ -45,7 +45,7 @@ class Lines
 
 class LiteralParser
 	func const getWord(source: string, i0: int) -> string
-		string r
+		var r: string
 		for j in i0:len(source)
 			if isWhitespace(source[j])
 				break
@@ -55,7 +55,7 @@ class LiteralParser
 		return r
 
 	func const getNumber(source: string, i0: int) -> string
-		string r
+		var r: string
 		for j in i0:len(source)
 			if !isNumber(source[j]) and (source[j] != '.')
 				break
@@ -63,7 +63,7 @@ class LiteralParser
 		return r
 		
 	func const getString(source: string, i0: int) -> string
-		string r
+		var r: string
 		r.add(source[i0])
 		for j in i0+1:len(source)
 			if source[j] == '\\' and j < len(source) + 1
@@ -77,7 +77,7 @@ class LiteralParser
 		return r
 
 	func const getOperator(source: string, i0: int) -> string
-		string r
+		var r: string
 		r.add(source[i0])
 		if len(source) > i0 + 1
 			if source[i0 + 1] == '='
@@ -86,13 +86,13 @@ class LiteralParser
 		return r
 	
 	func parseLine(source: string) -> Line
-		Line l
+		var l: Line
 		l.indent = 0
 		for i in 0:len(source)
 			l.indent = i
 			if source[i] != CHAR_TAB
 				break
-		string temp
+		var temp: string
 		for i in l.indent:len(source)
 			if isWhitespace(source[i])
 				continue
@@ -109,11 +109,11 @@ class LiteralParser
 		return l
 
 	func parse(source: string) -> Lines
-		Lines r
-		string[] lines = source.explode("\n")
-		int line_no = 0
+		var r: Lines
+		var lines = source.explode("\n")
+		var line_no = 0
 		for l in lines
-			Line ll = parseLine(l)
+			var ll = parseLine(l)
 			if len(ll.words) > 0
 				ll.physical_line_no = line_no
 				r.lines.add(ll)
@@ -397,7 +397,7 @@ class DynamicValueStateArray extends DynamicValueState
 	func override type() -> string
 		return "array"
 	func override __str__() -> string
-		string s = "["
+		var s = "["
 		for e,i in a
 			if i > 0
 				s += ","
@@ -431,7 +431,7 @@ class DynamicValueStateDict extends DynamicValueState
 	func override type() -> string
 		return "dict"
 	func override __str__() -> string
-		string s = "{"
+		var s = "{"
 		for e,i in values
 			if i > 0
 				s += ","
@@ -485,7 +485,7 @@ class Variable
 		is_ref = false
 		v = nil
 	func show()
-		string s
+		var s: string
 		if writable
 			s += "variable "
 		else
@@ -520,7 +520,7 @@ class Function
 	#	return v
 	func virtual call(out inter: Interpreter, out ret: Variable, p: Variable*[])
 		inter.stack_push(self, ret)
-		int n = min(len(p), len(params))
+		var n = min(len(p), len(params))
 		for i in 0:n
 			*inter.cur_context.vars[i].v = *p[i].v
 		inter.doNode(block, ret)
@@ -559,7 +559,7 @@ class FunctionAbs extends FunctionInternal
 
 class FunctionPrint extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
-		string s
+		var s: string
 		for pp in p
 			s += str(pp.v)
 			s += " "
@@ -579,9 +579,9 @@ class FunctionRange extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		r.v.setType(TType.ARRAY)
 		var a: DynamicValueStateArray* = r.v.s
-		int start = 0
-		int end = 0
-		int step = 1
+		var start = 0
+		var end = 0
+		var step = 1
 	
 		if len(p) == 1
 			end = int(p[0].v)
@@ -591,7 +591,7 @@ class FunctionRange extends FunctionInternal
 		if len(p) >= 3
 			step = int(p[2].v)
 
-		int i = start
+		var i = start
 		while i < end
 			var ii = new DynamicValue()
 			ii.setInt(i)
@@ -659,7 +659,7 @@ class SyntaxNode
 		return "???"
 	func virtual showPost(indent: int)
 	func show(indent: int)
-		string s
+		var s: string
 		for i in 0:indent
 			s += "    "
 		print(s + tostr())
@@ -838,7 +838,7 @@ class SyntaxTree
 		return ""
 	
 	func setError(msg: string)
-		string c = "line {{cur_line.physical_line_no + 1}} at {{cur}}"
+		var c = "line {{cur_line.physical_line_no + 1}} at {{cur}}"
 		raise(new SyntaxError("Syntax error: {{msg}}\n{{c}}"))
 	
 	func mut addGlobalVar(name: string) -> Variable*
@@ -995,13 +995,13 @@ class SyntaxTree
 			sn.add(getOperand())
 		return linkOperators(sn)
 	func linkOperators(out sn: SyntaxNode*[]) -> SyntaxNode*
-		int[] rank
+		var rank: int[]
 		for i in 0:(len(sn)-1)/2
 			var op: SyntaxNodeOperator* = sn[i*2+1]
 			rank.add(op.rank())
 		while len(sn) > 2
-			int rmin = 100
-			int imin = 0
+			var rmin = 100
+			var imin = 0
 			for r,i in rank
 				if r < rmin
 					rmin = r
@@ -1025,7 +1025,7 @@ class SyntaxTree
 					return nil
 		return sn
 	func mut getSpecialCommandIf() -> SyntaxNode*
-		int indent0 = cur_line.indent
+		var indent0 = cur_line.indent
 		var sn = new SyntaxNodeIf()
 		next() # "if"
 		sn.params.add(getOperandGreedy())
@@ -1039,7 +1039,7 @@ class SyntaxTree
 		sn.block_else = parseBlock()
 		return sn
 	func mut getSpecialCommandWhile() -> SyntaxNode*
-		int indent0 = cur_line.indent
+		var indent0 = cur_line.indent
 		var sn: SyntaxNodeWhile* = new SyntaxNodeWhile()
 		next() # "while"
 		sn.params.add(getOperandGreedy())
@@ -1053,7 +1053,7 @@ class SyntaxTree
 		sn.block_else = parseBlock()
 		return sn
 	func mut getSpecialCommandFor() -> SyntaxNode*
-		int indent0 = cur_line.indent
+		var indent0 = cur_line.indent
 		var sn = new SyntaxNodeFor()
 		next() # "for"
 		var vvv = new SyntaxNodeVariable(cur)
@@ -1079,7 +1079,7 @@ class SyntaxTree
 		return new SyntaxNodeContinue()
 	func mut parseFunctionDef()
 		var prev_func = cur_func
-		int indent0 = cur_line.indent
+		var indent0 = cur_line.indent
 		next()
 		var f = addFunc(cur)
 		cur_func = f
@@ -1125,7 +1125,7 @@ class SyntaxTree
 	func mut parseBlock() -> SyntaxNode*
 		var sn = new SyntaxNodeBlock()
 		nextLine()
-		int indent0 = cur_line.indent
+		var indent0 = cur_line.indent
 		var sub = parseLine()
 		if sub
 			sn.params.add(sub)
@@ -1142,7 +1142,7 @@ class SyntaxTree
 		return sn
 	
 	func mut create(source: string)
-		LiteralParser lp
+		var lp: LiteralParser
 		
 		vars = new Context("-global-", nil)
 		
@@ -1232,14 +1232,14 @@ class Interpreter
 			cur_context.add(new Variable(n))
 		contexts.add(cur_context)
 	func mut stack_pop()
-		int n = len(contexts) - 1
+		var n = len(contexts) - 1
 		del cur_context
 		contexts.remove(n)
 		if n > 0
 			cur_context = contexts[n - 1]
 	func mut doNode(sn: SyntaxNode, out ret: Variable)
 		var params: Variable*[]
-		bool[] is_temp
+		var is_temp: bool[]
 		
 		# parameters
 		for p in sn.params
@@ -1329,7 +1329,7 @@ class Interpreter
 			stack_pop()
 				
 		else if sn.type == NodeType.IF
-			Variable dummy
+			var dummy: Variable
 			var _if: SyntaxNodeIf* = &sn
 			if bool(params[0].v)
 				doNode(_if.block, dummy)
@@ -1339,7 +1339,7 @@ class Interpreter
 			var _while: SyntaxNodeWhile* = &sn
 			while bool(params[0].v)
 				cur_context.flag_continue = false
-				Variable dummy
+				var dummy: Variable
 				doNode(_while.block, dummy)
 				
 				if cur_context.flag_return or cur_context.flag_break
@@ -1358,7 +1358,7 @@ class Interpreter
 				params[0].setReference(el)
 				cur_context.flag_continue = false
 				
-				Variable dummy
+				var dummy: Variable
 				doNode(_for.block, dummy)
 				
 				if cur_context.flag_return or cur_context.flag_break
@@ -1382,7 +1382,7 @@ class Interpreter
 		else if sn.type == NodeType.DICT_BUILDER
 			ret.setType(TType.DICT)
 			var ds: DynamicValueStateDict* = ret.v.s
-			int n = len(params) / 2
+			var n = len(params) / 2
 			for i in 0:n
 				ds.add(params[0].v, params[1].v)
 		else if sn.type == NodeType.ARRAY_ELEMENT
@@ -1397,17 +1397,17 @@ class Interpreter
 				
 	func mut run(_syntax: SyntaxTree)
 		syntax = &_syntax
-		Variable dummy
+		var dummy: Variable
 		cur_context = syntax.vars
 		stack_push(syntax.func_main, dummy)
 		doNode(syntax.func_main.block, dummy)
 
 func eval(source: string)
-	SyntaxTree syntax
+	var syntax: SyntaxTree
 	syntax.create(source)
 	if verbose
 		syntax.show()
-	Interpreter inter
+	var inter: Interpreter
 	inter.run(syntax)
 	if verbose
 		print("--- variables ---")
@@ -1418,8 +1418,8 @@ func eval(source: string)
 
 func main(arg: string[])
 	verbose = false
-	string input
-	bool from_file = true
+	var input: string
+	var from_file = true
 	for a in arg
 		if a == "--verbose"
 			verbose = true
@@ -1428,7 +1428,7 @@ func main(arg: string[])
 		else
 			input = a
 	if len(input) > 0
-		string source = input
+		var source = input
 		try
 			if from_file
 				source = fs.read_text(input)

@@ -26,7 +26,7 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 		return ""
 	var itmp = cur_dir << "shadercomp.glsl"
 	var otmp = cur_dir << "shadercomp.bin"
-	string c = code
+	var c = code
 	if len(layout.common) > 0
 		c = layout.common + "\n" + c
 	for e in layout.extensions
@@ -39,10 +39,10 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 #		print("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}}")
 		shell_execute("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}} &> /tmp/shader-error")
 	except Exception as e
-		string x = shell_execute("cat /tmp/shader-error")
+		var x = shell_execute("cat /tmp/shader-error")
 		print("  ----  ERROR ({{stage}})  ----\n{{x}}")
 		return ""
-	string x = shell_execute("cat {{otmp}}")
+	var x = shell_execute("cat {{otmp}}")
 	os.fs.delete(itmp)
 	os.fs.delete(otmp)
 	
@@ -62,7 +62,7 @@ class LayoutData
 	var common: string
 
 func parse_layout(layout: string) -> LayoutData
-	LayoutData ld
+	var ld: LayoutData
 	ld.push_size = 0
 	ld.topology = "triangles"
 	var ll = layout.explode("\n")

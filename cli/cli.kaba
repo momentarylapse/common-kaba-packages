@@ -6,7 +6,7 @@ use terminal
 
 func main()
 	print("welcome to kaba {{kaba_version}}")
-	string[] history
+	var history: string[]
 	while true
 		try
 			let s = fancy_read_command(">>> ", history)
