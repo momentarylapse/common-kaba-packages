@@ -89,7 +89,7 @@ func main(arg: string[])
 	
 	#bool build
 	
-	CommandLineParser p
+	var p: CommandLineParser
 	p.info("xmake", "the build tool for lazy people")
 	p.option("-v/--verbose", "verbose output", func() conf.verbose = true)
 	p.option("--dry", "dry run", func() conf.dry_run = true)

@@ -6,7 +6,7 @@ func win_path(p: Path) -> string
 	return str(p).replace("/", "\\")
 
 func rand_hex(chars: int) -> string
-	string s
+	var s: string
 	for i in 0:chars
 		let r = rand(0xffff)
 		s += as_binary(&r, 1).hex().upper()[:1]
@@ -15,7 +15,7 @@ func create_guid() -> string
 	return "{" + rand_hex(8) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(12) + "}"
 
 func guess_guid() -> (string,string)
-	string pguid, sguid
+	var pguid, sguid: string
 	try
 		var f = os.fs.read_text(conf.root << "{{conf.name}}.sln")
 		for l in f.explode("\r\n")
@@ -49,7 +49,7 @@ func create_visual_studio(version: int)
 		print(" SGUID:{{SGUID}}")
 
 	
-	string[] xdef
+	var xdef: string[]
 	for l in conf.libs
 		xdef.add("{{lib.define(l)}}=1")
 	for l in conf.libs_optional
@@ -67,7 +67,7 @@ func create_visual_studio(version: int)
 	var CPPVER = conf.language.replace("c++", "stdcpp")
 	
 	var f = "
-Microsoft Visual Studio Solution File, Format Version 12.00
+var Visual, Solution, ,, Version: Microsoft
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1

@@ -93,7 +93,7 @@ class Config
 			else if k == "install.additional"
 				installs_additional = any2sa(c[k])
 			else if k[:14] == "build.profile-"
-				Profile p
+				var p: Profile
 				p.name = k[14:]
 				p.libs_optional = any2sa(c[k])
 				profiles.add(p)
@@ -182,7 +182,7 @@ func relsrc(filename: Path) -> Path
 
 
 func find_dep(out f: SourceFile, filename: Path)
-	string s
+	var s: string
 	try
 		s = fs.read(filename)
 	except
@@ -193,7 +193,7 @@ func find_dep(out f: SourceFile, filename: Path)
 		let p = l.find("#include \"", 0)
 		if p >= 0
 			let q = l.find("\"", p + 11)
-			Path d = filename.parent() << l[p+10:q]
+			var d = filename.parent() << l[p+10:q]
 			d = d.canonical()
 			if fs.exists(d)
 				if f.add_dep(d)
@@ -211,7 +211,7 @@ func parse_dependencies()
 func find_sources(dir: Path)
 	let files = fs.search(dir, "*.cpp", "fr")
 	for f in files
-		SourceFile s
+		var s: SourceFile
 		s.filename = dir << f
 		sources.add(s)
 

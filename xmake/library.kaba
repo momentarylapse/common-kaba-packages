@@ -29,7 +29,7 @@ class Library
 	func linker_flags() -> string
 		if len(pkg) > 0
 			return "`pkg-config --cflags {{pkg.join(" ")}}`"
-		string r = flags
+		var r = flags
 		for l in libs
 			if len(l) > 0
 				r += " -l{{l}}"
@@ -49,9 +49,9 @@ class LibraryManager
 		var lib_dir = hui.app_directory << "apps/xmake/libs"
 		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
-			os.Configuration c
+			var c: os.Configuration
 			c.load(lib_dir << e)
-			Library l
+			var l: Library
 			l.name = e.basename()[:-4]
 			if len(c["link"]) > 0
 				l.libs = any2sa(c["link"])

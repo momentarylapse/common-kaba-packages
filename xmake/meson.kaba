@@ -7,7 +7,7 @@ use library
 func create_meson()
 	print("-- meson --")
 	var f = new TextLinesFormatter(fs.open(conf.root << "meson.build", "wt"))
-	string debug = str(conf.build_type == "debug")
+	var debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
 	var opt = [for o in opts "'{{o}}'"].join(", ")
@@ -26,7 +26,7 @@ threaddep = dependency('threads')"
 	var vars = ["mdep", "threaddep"]
 	for l in conf.libs
 		var ll = lib.get(l)
-		string varx = l + "dep"
+		var varx = l + "dep"
 		vars.add(varx)
 		f << varx + " = dependency('{{ll.meson_libs()[0]}}')"
 		f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
@@ -38,8 +38,8 @@ threaddep = dependency('threads')"
 # optional dependency: " + l
 		var ll = lib.get(l)
 		var mlibs = ll.meson_libs()
-		string ltest
-		string deps
+		var ltest: string
+		var deps: string
 		for m,i in mlibs
 			var v = "d"
 			if len(mlibs) > 1
@@ -62,7 +62,7 @@ threaddep = dependency('threads')"
 
 sources = ["
 	for s,i in sources
-		string e
+		var e: string
 		if i < len(sources) - 1
 			e = ","
 		f << "	'{{rel(s.filename)}}'{{e}}"

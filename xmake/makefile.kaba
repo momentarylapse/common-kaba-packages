@@ -15,7 +15,7 @@ func create_all_makefiles()
 	# dynamic profile
 	if conf.has_explicit_default_profile()
 		return
-	Profile p
+	var p: Profile
 	p.name = "default"
 	for l in conf.libs_optional
 		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
@@ -28,7 +28,7 @@ func append(out a: string[], b: string[])
 		a.add(t)
 
 func collect_global_flags(p: Profile, out cflags: string, out lflags: string, out defines: string)
-	string[] pkg
+	var pkg: string[]
 	for l in conf.libs
 		if len(lib.pkg(l)) > 0
 			append(pkg, lib.pkg(l))
@@ -52,7 +52,7 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 	 defines += " -D'INSTALL_PREFIX=\"$(prefix)\"'"
 
 func collect_objects(from: Path) -> string[]
-	string[] obj
+	var obj: string[]
 	for s in sources
 		if rel(s.filename) != rel(conf.root << conf.main_file)
 			obj.add(str(s.object().relative_to(from)))
@@ -70,9 +70,9 @@ func create_makefile(p: Profile, postfix: string)
 	var f = new TextLinesFormatter(fs.open(conf.root << conf.source_dir << ("Makefile" + postfix), "wt"))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
-	string cflags, lflags, defines
+	var cflags, lflags, defines: string
 	collect_global_flags(p, cflags, lflags, defines)
-	string x
+	var x: string
 	if conf.build_type == "debug"
 		x = "-g"
 	f << "prefix = /usr/local"
@@ -83,14 +83,14 @@ func create_makefile(p: Profile, postfix: string)
 	var obj = collect_objects(conf.root << conf.source_dir)
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
-	string main_ob = relsrc(conf.root << conf.main_file.replace(".cpp", ".o"))
+	var main_ob = relsrc(conf.root << conf.main_file.replace(".cpp", ".o"))
 	f << "$(BIN) : $(OBJ) {{main_ob}}"
 	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
 	f << ""
 	f << "all : $(BIN)"
 	f << ""
 	for s in sources
-		string a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
+		var a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
 		for d in s.dep
 			a += " {{relsrc(d)}}"
 		f << a
@@ -107,7 +107,7 @@ func create_makefile(p: Profile, postfix: string)
 		f << "	xdg-mime install ../{{m}}"
 	for icon,i in conf.icons
 		var xx = icon.explode(":")
-		string e
+		var e: string
 		if i < len(conf.icons) - 1
 			e += " --noupdate"
 		if len(xx) == 3

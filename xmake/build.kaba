@@ -62,7 +62,7 @@ func get_profile(name: string) -> Profile
 	for p in conf.profiles
 		if p.name == name
 			return p
-	Profile p
+	var p: Profile
 	p.name = "local"
 	for l in conf.libs_optional
 		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
@@ -78,9 +78,9 @@ func build()
 	
 	let binary_file = conf.build_dir() << conf.binary_file
 			
-	string cflags, lflags, defines
+	var cflags, lflags, defines: string
 	collect_global_flags(p, cflags, lflags, defines)
-	string x
+	var x: string
 	if conf.build_type == "debug"
 		x = "-g"
 	let global_flags = "{{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
