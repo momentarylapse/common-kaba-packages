@@ -29,7 +29,7 @@ func expand(_t: Term shared) -> Term shared
 				return expand(AddOperator("*", AddOperator("^", p1.params[0], p2),
 				                               AddOperator("^", p1.params[1], p2)))
 			else if (p1.name == "+") or (p1.name == "-")
-				int e = int(p2.name)
+				var e = int(p2.name)
 				var t_mul = p1
 				for i in 1:e
 					t_mul = AddOperator("*", t_mul, p1)

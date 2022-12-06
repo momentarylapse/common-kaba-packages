@@ -23,7 +23,7 @@ class Matching
 	var terms: MatchingTerm[]
 	func mut add(t: Term shared, name: string) -> bool
 		#print("add: {{t}} <<< {{name}}")
-		MatchingTerm mt
+		var mt: MatchingTerm
 		mt.t = t
 		mt.name = name
 		terms.add(mt)
@@ -46,7 +46,7 @@ func rule_match(t: Term shared, m: Term shared, out mm: Matching) -> bool
 	return true
 
 func subst(_t: Term shared, pattern: Term shared, substitution: Term shared, max_recursion: int) -> Term shared
-	Matching mm
+	var mm: Matching
 	var t = _t.shallow_copy()
 	for p in t.params
 		p = subst(p, pattern, substitution, max_recursion)

@@ -45,8 +45,8 @@ class Term as shared
 
 	func const __str__() -> string
 		if type == Type.OPERATOR
-			string a = str(params[0])
-			string b = str(params[1])
+			var a = str(params[0])
+			var b = str(params[1])
 			if param_needs_paranthesis(0)
 				a = "({{a}})"
 			if param_needs_paranthesis(1)

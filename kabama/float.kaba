@@ -25,7 +25,7 @@ func make_float(t_: Term shared) -> Term shared
 		return t
 	if t.type == Type.FUNCTION
 		if all_params_are_float(t) and len(t.params) == 1
-			float f = float(t.params[0].name[:10])
+			var f = float(t.params[0].name[:10])
 			if t.name == "sqrt"
 				return AddFloat(str(sqrt(f)))
 			if t.name == "sin"

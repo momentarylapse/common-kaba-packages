@@ -6,7 +6,7 @@ import terminal
 
 
 func main(arg: string[])
-	Runtime r
+	var r: Runtime
 	
 	if len(arg) > 0
 		for a in arg
@@ -15,7 +15,7 @@ func main(arg: string[])
 		return
 	
 	print("welcome to kabama")
-	string[] history
+	var history: string[]
 	while true
 		try
 			var s = terminal.fancy_read_command(">>> ", history)

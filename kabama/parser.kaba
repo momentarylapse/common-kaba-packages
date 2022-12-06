@@ -96,7 +96,7 @@ class Parser
 		else if char_type(c[0]) == CharType.LETTER
 			next()
 			if cur() == "("
-				Term shared[] params
+				var params: Term shared[]
 				next() # (
 				while cur() != ")"
 					params.add(parse_operand())
@@ -122,7 +122,7 @@ class Parser
 			return parse_def()
 		if cur() == "ass"
 			return parse_ass()
-		Term shared[] eid
+		var eid: Term shared[]
 		while true
 			# operand
 			if end_of_line()
@@ -167,12 +167,13 @@ func digest_operators(out eid: Term shared[]) -> Term shared
 		raise(new SyntaxError("missing operand after operator"))
 	
 	while len(eid) > 2
-		int i_sig, sig = -1
+		var i_sig: int
+		var sig = -1
 		for i in 0:len(eid)
 			if (i % 2) == 1
-				int os = operator_rank(eid[i].name)
-				if os > sig
-					sig = os
+				let _os = operator_rank(eid[i].name)
+				if _os > sig
+					sig = _os
 					i_sig = i
 		if eid[i_sig].type != Type.OPERATOR
 			raise(new SyntaxError("missing operator"))
@@ -187,7 +188,7 @@ func digest_operators(out eid: Term shared[]) -> Term shared
 	return eid[0]
 
 func parse(s: string) -> Term shared
-	Parser p
+	var p: Parser
 	p.e = s.parse_tokens("+-*/^<=>(),@:|[]") # ∧
 	p.cur_index = 0
 	return p.parse_operand()

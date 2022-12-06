@@ -3,20 +3,20 @@ use parser
 
 func add(a: string, b: string) -> string
 	#return i2s(s2i(a) + s2i(b))
-	vli va = a
-	vli vb = b
+	var va: vli = a
+	var vb: vli = b
 	return str(va + vb)
 
 func sub(a: string, b: string) -> string
 	#return i2s(s2i(a) - s2i(b))
-	vli va = a
-	vli vb = b
+	var va: vli = a
+	var vb: vli = b
 	return str(va - vb)
 
 func mul(a: string, b: string) -> string
 	#return i2s(s2i(a) * s2i(b))
-	vli va = a
-	vli vb = b
+	var va: vli = a
+	var vb: vli = b
 	return str(va * vb)
 
 #string mod(string a, string b)
@@ -26,13 +26,13 @@ func mul(a: string, b: string) -> string
 #	return rem.str()
 
 func exponent(a: string, b: string) -> string
-	vli va = a
-	vli vb = b
+	var va: vli = a
+	var vb: vli = b
 	return str(va.pow(vb))
 
 func gcd(a: string, b: string) -> string
-	vli va = a
-	vli vb = b
+	var va: vli = a
+	var vb: vli = b
 	return str(va.gcd(vb))
 
 func number_is_even(n: string) -> bool
@@ -54,24 +54,24 @@ func print_group(gr: Term shared[])
 
 
 func extract_add_group(t: Term shared, out negative: bool[]) -> Term shared[]
-	Term shared[] l
+	var l: Term shared[]
 
 	# shortcut (-1)*a  ->  -a
 	if t.name == "*"
 		if t.params[0].name == "-1"
-			bool[] n1
+			var n1: bool[]
 			append_terms(l, extract_add_group(t.params[1], n1))
 			append_neg(negative, n1, true)
 			return l
 
 	if t.name == "+"
-		bool[] n0, n1
+		var n0, n1: bool[]
 		append_terms(l, extract_add_group(t.params[0], n0))
 		append_terms(l, extract_add_group(t.params[1], n1))
 		append_neg(negative, n0, false)
 		append_neg(negative, n1, false)
 	else if t.name == "-"
-		bool[] n0, n1
+		var n0, n1: bool[]
 		append_terms(l, extract_add_group(t.params[0], n0))
 		append_terms(l, extract_add_group(t.params[1], n1))
 		append_neg(negative, n0, false)
@@ -82,15 +82,15 @@ func extract_add_group(t: Term shared, out negative: bool[]) -> Term shared[]
 	return l
 
 func extract_product_group(t: Term shared, out inverse: bool[]) -> Term shared[]
-	Term shared[] l
+	var l: Term shared[]
 	if t.name == "*"
-		bool[] n0, n1
+		var n0, n1: bool[]
 		append_terms(l, extract_product_group(t.params[0], n0))
 		append_terms(l, extract_product_group(t.params[1], n1))
 		append_neg(inverse, n0, false)
 		append_neg(inverse, n1, false)
 	else if t.name == "/"
-		bool[] n0, n1
+		var n0, n1: bool[]
 		append_terms(l, extract_product_group(t.params[0], n0))
 		append_terms(l, extract_product_group(t.params[1], n1))
 		append_neg(inverse, n0, false)
@@ -102,9 +102,9 @@ func extract_product_group(t: Term shared, out inverse: bool[]) -> Term shared[]
 
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
 func split_off_factor(out l: Term shared[]) -> string[]
-	string[] factor
+	var factor: string[]
 	for x,i in l
-		string f = "1"
+		var f = "1"
 		if x.name == "*"
 			if x.params[0].type == Type.NUMBER
 				f = x.params[0].name
@@ -114,16 +114,16 @@ func split_off_factor(out l: Term shared[]) -> string[]
 
 # a/b kürzen
 func eval_number_division(a: string, b: string) -> Term shared
-	vli va = a
-	vli vb = b
-	vli rem
-	vli tt = va.div(vb, rem)
-	vli vli0 = 0
+	var va: vli = a
+	var vb: vli = b
+	var rem: vli
+	var tt = va.div(vb, rem)
+	var vli0: vli = 0
 	if rem == vli0
 		return AddNumber(str(tt))
-	string g = gcd(a, b)
+	var g = gcd(a, b)
 	if g != "1"
-		vli vg = g
+		var vg: vli = g
 		va.idiv(vg, tt)
 		vb.idiv(vg, tt)
 		if vb.sign
@@ -157,10 +157,10 @@ func sort_group(out l: Term shared[])
 
 
 func make_unique_in_product(out l: Term shared[], inv: bool[])
-	Term shared[] exponents
+	var exponents: Term shared[]
 	
 	for x,i in l
-		Term shared e
+		var e: Term shared
 		if x.name == "^"
 			e = x.params[1]
 			l[i] = x.params[0]
@@ -182,13 +182,13 @@ func make_unique_in_product(out l: Term shared[], inv: bool[])
 
 
 func eval_product(t: Term shared) -> Term shared
-	bool[] inverse
+	var inverse: bool[]
 	var l = extract_product_group(t, inverse)
 	#print_group(l)
 	
 	
-	string num = "1"
-	string denum = "1"
+	var num = "1"
+	var denum = "1"
 	for i in 0:len(l)
 		if l[i].type == Type.NUMBER
 			if inverse[i]
@@ -219,11 +219,11 @@ func eval_product(t: Term shared) -> Term shared
 
 
 func make_unique_in_sum(out l: Term shared[], out negative: bool[])
-	string[] multiplicity
+	var multiplicity: string[]
 	#print_group(l)
 	
 	for x,i in l
-		string m = "1"
+		var m = "1"
 		if x.name == "*"
 			if x.params[0].type == Type.NUMBER
 				m = x.params[0].name
@@ -250,12 +250,12 @@ func make_unique_in_sum(out l: Term shared[], out negative: bool[])
 
 
 func eval_sum(t: Term shared) -> Term shared
-	bool[] negative
+	var negative: bool[]
 	var l = extract_add_group(t, negative)
 	#print_group(l)
 	
 	# add constants
-	string num = "0"
+	var num = "0"
 	for i in 0:len(l)
 		if l[i].type == Type.NUMBER
 			if negative[i]
