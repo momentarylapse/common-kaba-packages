@@ -1,15 +1,15 @@
 
 
 func optimize(x: float[], f: float[]->float) -> float[]
-	float f_best = f(x)
+	var f_best = f(x)
 	var x_best = x
 	
 	for step in 0:1000
-		float dx = 0.01
+		var dx = 0.01
 		for i in 0:len(x)
 			var xx = x_best
 			xx[i] += dx
-			float cur = f(xx)
+			var cur = f(xx)
 			if cur < f_best
 				x_best = xx
 				f_best = cur

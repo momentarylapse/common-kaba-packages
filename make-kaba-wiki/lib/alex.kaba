@@ -63,7 +63,7 @@ func parse_bson(b: void*) -> DbFile
 	var iter: int[16]
 	_bson_iter_init(&iter, b)
 	while _bson_iter_next(&iter)
-		var key = bson_iter_key(&iter)
+		let key = bson_iter_key(&iter)
 		if key == "path"
 			f.path = bson_iter_str(&iter)
 		else if key == "name"
@@ -104,7 +104,7 @@ func parse_bson_medium(b: void*) -> DbMedium
 	var iter: int[16]
 	_bson_iter_init(&iter, b)
 	while _bson_iter_next(&iter)
-		var key = bson_iter_key(&iter)
+		let key = bson_iter_key(&iter)
 		if key == "hash"
 			f.hash = bson_iter_str(&iter)
 		else if key == "id"

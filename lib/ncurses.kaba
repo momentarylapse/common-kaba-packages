@@ -129,7 +129,7 @@ var stdwin: Window
 
 func init()
 	stdwin.w = _initscr()
-	string s
+	var s: string
 	s.add(0)
 	_setlocale(0, &s[0]) # LC_CTYPE
 
@@ -169,7 +169,7 @@ func main()
 	#ww.addch('A' | Color.pair(1))
 	ww.refresh()
 	
-	int r = stdwin.getch()
+	var r = stdwin.getch()
 	endwin()
 	print(r)
 
@@ -191,6 +191,6 @@ func _main()
 		stdwin.print("M")
 	stdwin.refresh()
 	
-	int r = stdwin.getch()
+	var r = stdwin.getch()
 	endwin()
 	print(r)

@@ -103,7 +103,7 @@ class DeviceInfo
 		return "{{bus}}:{{address}}  0x{{vid|4x}}:{{pid|4x}}  {{_class}}  {{sub_class}}"
 
 func REPORT_ERROR(r: int, msg: string)
-	string e = "????  {{r}}"
+	var e = "????  {{r}}"
 	if r == -1
 		e = "IO ERROR"
 	else if r == -2
@@ -137,12 +137,12 @@ class Device
 	var dev: _device*
 	
 	func get_info() -> DeviceInfo
-		DeviceInfo i
+		var i: DeviceInfo
 		i.bus = _libusb_get_bus_number(dev)
 		i.port = _libusb_get_port_number(dev)
 		i.address = _libusb_get_device_address(dev)
 		
-		_descriptor desc
+		var desc: _descriptor
 		CHECK(_libusb_get_device_descriptor(dev, &desc), "can not get device descriptor")
 		i._class = desc.i[1] & 0x000000ff
 		i.sub_class = (desc.i[1] & 0x0000ff00) >> 8
@@ -153,8 +153,8 @@ class Device
 		i.num_configs = (desc.i[4] & 0x0000ff00) >> 8
 		return i
 	func path() -> int[]
-		string s = "       "
-		int n = _libusb_get_port_numbers(dev, &s[0], len(s))
+		var s = "       "
+		var n = _libusb_get_port_numbers(dev, &s[0], len(s))
 		CHECK(n, "can not get port numbers")
 		return [for ch in s[:n] int(ch)]
 	func get_config_desc(index: int)
@@ -164,7 +164,7 @@ class Device
 		#print(b)
 		print("[config]")
 		print("  value: {{desc.config_value()}}")
-		int num_if = desc.num_interfaces()
+		var num_if = desc.num_interfaces()
 		for i in 0:num_if
 			print("  [interface]")
 			var ii = &desc.interface[i]
@@ -199,7 +199,7 @@ class Context
 	func enumerate() -> Device*[]
 		var r: Device*[]
 		var list: _device*[0]*
-		int n = _libusb_get_device_list(c, &list)
+		var n = _libusb_get_device_list(c, &list)
 		for i in 0:n
 			var dev = new Device(list[i])
 			r.add(dev)
@@ -231,7 +231,7 @@ class Handle
 	func release_interface(i: int)
 		_libusb_release_interface(h, i)
 	func kernel_driver_active(i: int) -> bool
-		int r = _libusb_kernel_driver_active(h, i)
+		var r = _libusb_kernel_driver_active(h, i)
 		CHECK(r, "kernel driver?!?")
 		return r == 1
 	func detach_kernel_driver(i: int)
@@ -243,27 +243,27 @@ class Handle
 		
 	
 	func interrupt_transfer(endpoint: int, data: string, timeout: int) -> int
-		int transferred
+		var transferred: int
 		CHECK(_libusb_interrupt_transfer(h, endpoint, &data[0], len(data), &transferred, timeout), "interrupt transfer")
 		return transferred
 	func interrupt_read(endpoint: int, max_size: int, timeout: int) -> string
-		string data
+		var data: string
 		data.resize(max_size)
-		int transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
+		var transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
 		data.resize(transferred)
 		return data
 	
 	# endpoint = 0
 	func control_transfer(req: int[], data: string, timeout: int) -> int
-		int r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
+		var r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
 		CHECK(r, "control transfer")
 		return r
 	func control_write(req: int[], data: string) -> int
 		return control_transfer(req, data, 1000)
 	func control_read(req: int[], max_size: int) -> string
-		string data
+		var data: string
 		data.resize(max_size)
-		int r = control_transfer(req, data, 1000)
+		var r = control_transfer(req, data, 1000)
 		data.resize(r)
 		return str(r)
 

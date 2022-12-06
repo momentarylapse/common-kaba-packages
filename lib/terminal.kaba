@@ -53,7 +53,7 @@ func extern _tcsetattr(fno: int, opt: int, t: Termios*) -> int
 var _t_pre_raw: Termios
 
 func setraw()
-	Termios t
+	var t: Termios
 	_tcgetattr(0, &t)
 	_t_pre_raw = t
 	#print("{{t}}\n")
@@ -66,7 +66,7 @@ func setraw()
 	#print(str(t))
 	_tcsetattr(0, TCSANOW, &t)
 func unsetraw()
-	Termios t
+	var t: Termios
 	t.iflag = 0x4500
 	t.oflag = 5
 	t.cflag = 0xbf
@@ -101,14 +101,28 @@ func move_cursor(dx: int, dy: int)
 
 class BreakSignal extends Exception
 
+func read_char() -> string
+	while true
+		var s = stdin.read(4)
+		#print(s.hex())
+		if len(s) == 0
+			continue
+		if s == [0x03]
+			unsetraw()
+			raise(new Exception("break"))
+		if s == [0x04]
+			unsetraw()
+			raise(new Exception("end"))
+		return s
+
 func fancy_read_command(prompt: string, out history: string[]) -> string
 	var ppp = _print_postfix
 	_print_postfix = ""
 	setraw()
 	print(prompt)
-	string current
-	int cursor_pos = 0
-	int hist_index = len(history)
+	var current: string
+	var cursor_pos = 0
+	var hist_index = len(history)
 	while true
 		var s = stdin.read(4)
 		#print(s.hex())

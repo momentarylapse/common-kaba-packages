@@ -60,7 +60,7 @@ func end()
 func cp2s(p: char[0]*) -> string
 	if p == nil
 		return ""
-	string s
+	var s: string
 	for i in 0:256
 		if p[i] == 0
 			break
@@ -94,7 +94,7 @@ func _get_key(k: int) -> int
 func _on_key(w: void*, a: int, b: int, c: int, d: int)
 #	print("ON KEY   {{a}} {{b}} {{c}} {{d}}")
 	var win: Window* = _glfwGetWindowUserPointer(w)
-	int k = _get_key(a)
+	var k = _get_key(a)
 	if k < 0
 		return
 	win.input.key[k] = (c > 0)
@@ -120,8 +120,8 @@ func _on_button(w: void*, a: int, action: int, c: int)
 			win.on_right_button_up()
 
 func _on_cursor(w: void*, xx: float64, yy: float64)
-	float x = float(xx)
-	float y = float(yy)
+	var x = float(xx)
+	var y = float(yy)
 #	print("ON CURSOR   {{x}}  {{y}}")
 	var win: Window* = _glfwGetWindowUserPointer(w)
 	win.input.dx = x - win.input.x
@@ -162,7 +162,7 @@ class Window
 			on_idle()
 	func virtual on_idle()
 	func get_mouse() -> complex
-		float64 xx, yy
+		var xx, yy: float64
 		_glfwGetCursorPos(win, &xx, &yy)
 		return complex(float(xx), float(yy))
 	func virtual on_key_down(key: int)
@@ -253,7 +253,7 @@ func _main()
 		print("{{_glfwJoystickPresent(j)}}  {{_glfwJoystickIsGamepad(j)}} {{cp2s(_glfwGetGamepadName(j))}}")
 		
 		
-	GamepadState state
+	var state: GamepadState
 	while true
 		time.sleep(0.1)
 		_glfwGetGamepadState(0, &state)
