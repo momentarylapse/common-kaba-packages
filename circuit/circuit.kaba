@@ -19,7 +19,7 @@ enum EdgeType
 
 # ARGH
 func empty() -> float[]
-	float[] r
+	var r: float[]
 	return r
 
 class Edge
@@ -195,18 +195,18 @@ class Circuit
 			e.reset_state()
 	
 	func quick_out()
-		string s
+		var s: string
 		for e in edges
 			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
 	func create_G(out G: Matrix, dt: float)
-		int n = len(nodes)-1
+		var n = len(nodes)-1
 		G.clear(n,n)
 		for e in edges
-			int a = e.a-1
-			int b = e.b-1
-			float g = e.g(dt)
+			var a = e.a-1
+			var b = e.b-1
+			var g = e.g(dt)
 			if a >= 0 and b >= 0
 				G.add(a, b, -g)
 				G.add(b, a, -g)
@@ -216,33 +216,33 @@ class Circuit
 				G.add(b, b, g)
 	
 	func create_I(out I: float[], I_in: float, dt: float)
-		int n = len(nodes)-1
+		var n = len(nodes)-1
 		I = [I_in]
 		I.resize(n)
 		for e in edges
-			int a = e.a-1
-			int b = e.b-1
-			float I_off = e.I_off(dt)
+			var a = e.a-1
+			var b = e.b-1
+			var I_off = e.I_off(dt)
 			if a >= 0
 				I[a] += I_off
 			if b >= 0
 				I[b] -= I_off
 
 	func mut optimizer_step(I_in: float, dt: float)
-		int n = len(nodes)-1
-		Matrix G
+		var n = len(nodes)-1
+		var G: Matrix
 		create_G(G, dt)
 		#print("G")
 		#print(G)
 		
 		
-		float[] I
+		var I: float[]
 		create_I(I, I_in, dt)
 		#print("I " + I)
 	
 		# U = R * I
 		# I = G * U
-		float[] u = G.solve(I)
+		var u = G.solve(I)
 		#print("u " + u)
 		
 		# update potentials
@@ -263,9 +263,9 @@ class Circuit
 			e.iterate(dt)
 	
 	func get_xxxx() -> float
-		float Uin = nodes[1].phi
-		float Uout = nodes[_out].phi
-		float factor = Uout / Uin
+		var Uin = nodes[1].phi
+		var Uout = nodes[_out].phi
+		var factor = Uout / Uin
 		#print(factor)
 		return factor
 	
@@ -273,7 +273,7 @@ class Circuit
 		for t in 0:t_max:dt
 		
 			# input
-			float input = amp
+			var input = amp
 			if type == 1
 				input = amp * sin(t * omega)
 			else if type == 2
@@ -286,7 +286,7 @@ class Circuit
 			time_step(input, dt)
 			
 			# result
-			float[] I, U, phi
+			var I, U, phi: float[]
 			for e in edges
 				I.add(e.I)
 				U.add(e.U)
@@ -297,12 +297,12 @@ class Circuit
 			res.phi.add(phi)
 	
 	func export() -> string
-		string s
+		var s: string
 		for n in nodes
 			s += "Node:{{n.pos.x}}:{{n.pos.y}}\n"
 		for e in edges
 			s += str(e.type) + ":{{e.a}:{{e.b}}"
-			int n = len(e.param_names())
+			var n = len(e.param_names())
 			for i in 0:n
 				s += ":{{e.param[i]}}"
 			s += "\n"
@@ -311,9 +311,9 @@ class Circuit
 	
 	func mut import(s: string)
 		clear()
-		string[] lines = s.explode("\n")
+		var lines = s.explode("\n")
 		for l in lines
-			string[] x = l.explode(":")
+			var x = l.explode(":")
 			if len(x) == 0
 				continue
 			if x[0] == "Node"
@@ -322,7 +322,7 @@ class Circuit
 				_out = int(x[1])
 			else
 				var t = EdgeType.parse(x[0])
-				int[] n = [int(x[1]), int(x[2])]
+				var n = [int(x[1]), int(x[2])]
 				var e: Edge* = add_default(n, t)
 				for i in 3:len(x)
 					e.param[i] = float(x[i])
@@ -347,14 +347,14 @@ class Circuit
 		return e
 
 func _main()
-	Circuit c
+	var c: Circuit
 	#c.edges.add(new Resistor([0,1], 1))
 	#c.nodes.add(Node((0,0)))
 	#c.edges.add(new Diode([0, 2]))
 	#c.edges.add(new Resistor([2,1], 1))
 	c.edges.add(new Diode([0, 1]))
 	print(str(c))
-	SimResult res
+	var res: SimResult
 	c.simulate(1, 1, 0.1, 1, 0, res)
 	print(str(c))
 

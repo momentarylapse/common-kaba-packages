@@ -67,11 +67,11 @@ DrawingArea area '' grab-focus")
 		return vec2(float(i) / NT * w, h - (v*0.9 - imin) / (imax - imin)  * h/4)
 		
 	func mut on_simulate()
-		float duration = get_float("t")
-		float dt = get_float("dt")
-		float I = get_float("input-amp")
-		float f = get_float("input-freq")
-		int type = get_int("input-type")
+		let duration = get_float("t")
+		let dt = get_float("dt")
+		let I = get_float("input-amp")
+		let f = get_float("input-freq")
+		let type = get_int("input-type")
 		res.clear()
 		c.reset_state()
 		c.simulate(duration, dt, I, f*2*pi, type, res)
@@ -103,12 +103,12 @@ DrawingArea area '' grab-focus")
 	func mut on_left_button_down()
 		sel.type = SelectionType.NONE
 		var m = hui.get_event().mouse
-		for n,i in c.nodes
+		for i=>n in c.nodes
 			if (m - project(n.pos)).length() < 20
 				sel.type = SelectionType.NODE
 				sel.index = i
 				break
-		for e,i in c.edges
+		for i=>e in c.edges
 			var a = project(c.nodes[e.a].pos)
 			var b = project(c.nodes[e.b].pos)
 			var mm = (a+b)*0.5
@@ -167,27 +167,27 @@ DrawingArea area '' grab-focus")
 		
 		p.set_line_width(2)
 		p.set_fill(false)
-		for e,i in c.edges
+		for i=>e in c.edges
 			p.set_color(COLOR_TEXT)
 			if sel.type == SelectionType.EDGE and sel.index == i
 				p.set_color(COLOR_SELECTION)
-			var a = project(c.nodes[e.a].pos)
-			var b = project(c.nodes[e.b].pos)
-			var m = (a+b)*0.5
-			var d = (b-a)* (1.0 / len(b-a))
-			var dd = vec2(d.y, -d.x)
+			let a = project(c.nodes[e.a].pos)
+			let b = project(c.nodes[e.b].pos)
+			let m = (a+b)*0.5
+			let d = (b-a)* (1.0 / len(b-a))
+			let dd = vec2(d.y, -d.x)
 			if e.type == EdgeType.CABLE
 				p.draw_line(a, b)
 			else if e.type == EdgeType.SOURCE
-				float l = 25
-				float r = 8
+				let l = 25.0
+				let r = 8.0
 				p.draw_line(b, m + d*(l+r))
 				p.draw_line(a, m - d*(l+r))
 				p.draw_circle(m + l*d, r)
 				p.draw_circle(m - l*d, r)
 			else if e.type == EdgeType.RESISTOR
-				float l = 35
-				float r = 10
+				let l = 35.0
+				let r = 10.0
 				p.draw_line(b, m + d*l)
 				p.draw_line(a, m - d*l)
 				p.draw_line(m + d*l + dd*r, m + d*l - dd*r)
@@ -195,21 +195,21 @@ DrawingArea area '' grab-focus")
 				p.draw_line(m + d*l + dd*r, m - d*l + dd*r)
 				p.draw_line(m + d*l - dd*r, m - d*l - dd*r)
 			else if e.type == EdgeType.CAPACITOR
-				float l = 30
-				float r = 5
+				let l = 30.0
+				let r = 5.0
 				p.draw_line(b, m + d*r)
 				p.draw_line(a, m - d*r)
 				p.draw_line(m + d*r - dd*l, m + d*r + dd*l)
 				p.draw_line(m - d*r - dd*l, m - d*r + dd*l)
 			else if e.type == EdgeType.INDUCTOR
-				float l = 40
-				float r = 10
+				let l = 40.0
+				let r = 10.0
 				p.draw_line(b, m + d*(l+r))
 				p.draw_line(a, m - d*(l+r))
 				for t in -1.0:1.01:0.5
 					p.draw_circle(m + t*l*d, r)
 			else if e.type == EdgeType.DIODE
-				float l = 20
+				let l = 20.0
 				p.draw_line(b, m + d*l)
 				p.draw_line(a, m - d*l)
 				p.draw_line(m + d*l, m - d*l + dd*l)
@@ -222,11 +222,11 @@ DrawingArea area '' grab-focus")
 			p.draw_line(m + dd*30 + d*30, m + dd*35 + d*25)
 		
 		p.set_fill(true)
-		for n,i in c.nodes
+		for i=>n in c.nodes
 			p.set_color(COLOR_TEXT)
 			if sel.type == SelectionType.NODE and sel.index == i
 				p.set_color(COLOR_SELECTION)
-			var pp = project(n.pos)
+			let pp = project(n.pos)
 			p.draw_circle(pp, 5)
 			if i == 0
 				p.draw_line(pp, pp + vec2(0, 20))
@@ -254,13 +254,13 @@ DrawingArea area '' grab-focus")
 		if NT == 0
 			return
 		
-		int e = sel.index
+		let e = sel.index
 		p.set_color(color(0.2,0.2,0.2, 1))
 		p.set_line_width(1)
 		p.draw_line(project_i(0,0), project_i(NT,0))
 		if sel.type == SelectionType.EDGE
 			p.set_color(color(0,0,0.8, 1))
-			vec2[] pp
+			var pp: vec2[]
 			for i in 0:NT
 				pp.add(project_i(i, res.I[i][e]))
 			p.set_line_width(2)
@@ -273,7 +273,7 @@ DrawingArea area '' grab-focus")
 			p.draw_lines(pp)
 		else if sel.type == SelectionType.NODE
 			p.set_color(color(0,0.8,0, 1))
-			vec2[] pp
+			var pp: vec2[]
 			for i in 0:NT
 				pp.add(project_u(i, res.phi[i][e]))
 			p.draw_lines(pp)

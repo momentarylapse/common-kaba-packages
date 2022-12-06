@@ -91,8 +91,8 @@ Toolbar toolbar ''
 		hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func mut on_param()
-		int row = hui.get_event().row
-		string p = get_cell("params", row, 1)
+		var row = hui.get_event().row
+		var p = get_cell("params", row, 1)
 		if panel.sel.type == SelectionType.EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
 	
@@ -108,11 +108,11 @@ Toolbar toolbar ''
 
 		
 	func mut on_simulate()
-		float duration = get_float("t")
-		float dt = get_float("dt")
-		float I = get_float("input-amp")
-		float f = get_float("input-freq")
-		int type = get_int("input-type")
+		var duration = get_float("t")
+		var dt = get_float("dt")
+		var I = get_float("input-amp")
+		var f = get_float("input-freq")
+		var type = get_int("input-type")
 		panel.res.clear()
 		c.reset_state()
 		c.simulate(duration, dt, I, f*2*pi, type, panel.res)
@@ -121,7 +121,7 @@ Toolbar toolbar ''
 	
 	
 	func mut on_add_type()
-		int t = get_int("")
+		var t = get_int("")
 		panel.first_node = -1
 		if t == len(EdgeType.all())
 			panel.mode = Mode.ADD_NODE
