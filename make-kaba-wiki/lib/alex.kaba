@@ -20,7 +20,7 @@ class DbFile
 	var medium = false
 	
 	func __str__() -> string
-		string s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
+		var s = "{{id}}\t{{mtime}}\t{{size}}\t{{hash}}\t{{path}}\t{{name}}\t{{path.extension()}}"
 		if medium
 			s += "\tm"
 		else
@@ -58,12 +58,12 @@ class DbMedium
 	var size: int
 
 func parse_bson(b: void*) -> DbFile
-	DbFile f
+	var f: DbFile
 	# print(bson_to_json(b))
 	var iter: int[16]
 	_bson_iter_init(&iter, b)
 	while _bson_iter_next(&iter)
-		string key = bson_iter_key(&iter)
+		var key = bson_iter_key(&iter)
 		if key == "path"
 			f.path = bson_iter_str(&iter)
 		else if key == "name"
@@ -84,14 +84,14 @@ func parse_bson(b: void*) -> DbFile
 			pass
 		else # tags
 			if _bson_iter_type(&iter) == 2 # str
-				Tag t
+				var t: Tag
 				t.key = key
 				t.value = bson_iter_str(&iter)
 				f.tags.add(t)
 			else if _bson_iter_type(&iter) == 4 # array
 				var values = bson_iter_str_array(&iter)
 				for v in values
-					Tag t
+					var t: Tag
 					t.key = key
 					t.value = v
 					f.tags.add(t)
@@ -99,12 +99,12 @@ func parse_bson(b: void*) -> DbFile
 	return f
 
 func parse_bson_medium(b: void*) -> DbMedium
-	DbMedium f
+	var f: DbMedium
 	# print(bson_to_json(b))
-	int[16] iter
+	var iter: int[16]
 	_bson_iter_init(&iter, b)
 	while _bson_iter_next(&iter)
-		string key = bson_iter_key(&iter)
+		var key = bson_iter_key(&iter)
 		if key == "hash"
 			f.hash = bson_iter_str(&iter)
 		else if key == "id"
@@ -115,7 +115,7 @@ func parse_bson_medium(b: void*) -> DbMedium
 	return f
 
 func parse_result(r: Result*) -> DbFile[]
-	DbFile[] files
+	var files: DbFile[]
 	while r.has_more()
 		files.add(parse_bson(r.doc))
 	del r
@@ -151,8 +151,8 @@ class Database
 			return parse_bson(r.doc)
 		r = medium.find("{\"hash\":\"{{hash}}\"}")
 		if r.has_more()
-			DbMedium m = parse_bson_medium(r.doc)
-			DbFile f = by_id(m.id)
+			var m = parse_bson_medium(r.doc)
+			var f = by_id(m.id)
 			f.make_medium(m)
 			return f
 		raise(new Exception("hash not found"))
@@ -160,16 +160,16 @@ class Database
 	func mediumify(out f: DbFile)
 		var r = medium.find("{\"id\":\"{{f.id}}\"}")
 		if r.has_more()
-			DbMedium m = parse_bson_medium(r.doc)
+			var m = parse_bson_medium(r.doc)
 			f.make_medium(m)
 
 func filter_to_json(filter: string) -> string
-	string json = "{"
-	string[] xx = filter.explode(",")
+	var json = "{"
+	var xx = filter.explode(",")
 	for x,i in xx
 		if i > 0
 			json += ","
-		int p = x.find("=", 0)
+		var p = x.find("=", 0)
 		if p >= 0
 			json += "\"{{x[:p]}}\":\"{{x[p+1:]}}\""
 	json += "}"
@@ -185,7 +185,7 @@ by-id <id1> <id2> ...
 by-hash <hash1> <hash2>")
 		return
 
-	string[] arg
+	var arg: string[]
 	for a in _arg
 		if a == "--meta"
 			conf.show_meta = true
@@ -194,7 +194,7 @@ by-hash <hash1> <hash2>")
 
 	var db = new Database()
 	if arg[0] == "find" and len(arg) >= 2
-		DbFile[] files = db.find(filter_to_json(arg[1]))
+		var files = db.find(filter_to_json(arg[1]))
 		for f in files
 			if len(arg) >= 3
 				if arg[2] == "medium"

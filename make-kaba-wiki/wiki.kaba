@@ -141,7 +141,7 @@ func is_list(c: Class) -> bool
 	return c.name[-2:] == "[]" or &c == string
 
 func func_pre(f: Function) -> string
-	string pre
+	var pre: string
 	if f.is_static()
 		pre += "static "
 	if f.is_pure()
@@ -178,13 +178,13 @@ func render_class(ns: string, c: Class) -> string
 	if len(ctrs) > 0
 		wiki += "\n{{SHIFT}}# constructors\n"
 		for f in ctrs
-			string pre = func_pre(f)
+			var pre = func_pre(f)
 			wiki += "{{SHIFT}}func {{pre}}{{f.name}}({{func_params(f)}}){{func_return(f)}}\n"
 
 	if len(funcs) > 0
 		wiki += "\n{{SHIFT}}# functions\n"
 		for f in funcs
-			string pre = func_pre(f)
+			var pre = func_pre(f)
 			wiki += "{{SHIFT}}func {{pre}}{{f.name}}({{func_params(f)}}){{func_return(f)}}\n"
 			
 	if len(ops) > 0 or is_list(c)
@@ -192,7 +192,7 @@ func render_class(ns: string, c: Class) -> string
 		if is_list(c)
 			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param[0].name}}\n"
 		for f in ops
-			string pre = func_pre(f)
+			var pre = func_pre(f)
 			var p: Class* = nil
 			#if f.is_static()
 			if f.num_params >= 2
@@ -237,7 +237,7 @@ func render_class(ns: string, c: Class) -> string
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
 		for f in funcs
-			string pre = func_pre(f)
+			var pre = func_pre(f)
 			wiki += "; <tt>func {{pre}}[[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}</tt>\n"
 			wiki += ": {{short_doc(doc_get_func_description(ns + "." + c.name, f))}}\n\n"
 	
@@ -257,7 +257,7 @@ func render_class(ns: string, c: Class) -> string
 
 
 func render_module(p: Module, name: string, _ns: string, sub_modules: (string,Module*)[]) -> string
-	string ns = name
+	var ns = name
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
 

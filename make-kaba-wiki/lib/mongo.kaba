@@ -66,7 +66,7 @@ func extern _bson_oid_to_string(oid: void*, str: char*)
 func extern _bson_iter_type(i: void*) -> int
 
 func char_to_str(p: char[0]*) -> string
-	string t
+	var t: string
 	for i in 0:10000
 		if p[i] == 0
 			break
@@ -74,7 +74,7 @@ func char_to_str(p: char[0]*) -> string
 	return t
 
 func json_to_bson(json: string) -> void*
-	string t = json
+	var t = json
 	t.add(0)
 	var b = _bson_new_from_json(&t[0], len(json), nil)
 	if !b
@@ -84,7 +84,7 @@ func json_to_bson(json: string) -> void*
 func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
 	var x: char[0]* = _bson_as_relaxed_extended_json(bson, nil)
-	string t = char_to_str(x)
+	var t = char_to_str(x)
 	_bson_free(x)
 	return t
 
@@ -94,9 +94,9 @@ func bson_iter_str(i: void*) -> string
 	return char_to_str(_bson_iter_utf8(i, nil))
 
 func bson_iter_str_array(i: void*) -> string[]
-	string[] r
-	int[160] itarray
-	int length = 0
+	var r: string[]
+	var itarray: int[160]
+	var length = 0
 	var array: char*
 	_bson_iter_array(i, &length, &array)
 	var bson = _bson_new_from_data(array, length)
@@ -108,7 +108,7 @@ func bson_iter_str_array(i: void*) -> string[]
 
 
 func bson_iter_to_any(iter: void*) -> any
-	int t = _bson_iter_type(iter)
+	var t = _bson_iter_type(iter)
 	if t == 2 # str utf8
 		return bson_iter_str(iter)
 	else if t == 16 # int
@@ -118,9 +118,9 @@ func bson_iter_to_any(iter: void*) -> any
 	else if t == 1 # double
 		return float(_bson_iter_double(iter))
 	else if t == 4 # array
-		any r
-		int[160] itarray
-		int length = 0
+		var r: any
+		var itarray: int[160]
+		var length = 0
 		var array: char*
 		_bson_iter_array(iter, &length, &array)
 		var bson = _bson_new_from_data(array, length)
@@ -130,26 +130,26 @@ func bson_iter_to_any(iter: void*) -> any
 		return r
 	else if t == 7 # ID
 		var oid = _bson_iter_oid(iter)
-		string s
+		var s: string
 		s.resize(25)
 		_bson_oid_to_string(oid, &s[0])
 		s.resize(24)
 		return s
 	else if t == 10 # null
-		any r
+		var r: any
 		return r
 	raise(new Exception("UNKNOWN TYPE: {{t}}"))
 
 
 func bson_iter_map_to_any(iter: void*) -> any
-	any r
+	var r: any
 	while _bson_iter_next(iter)
-		string key = bson_iter_key(iter)
+		var key = bson_iter_key(iter)
 		r[key] = bson_iter_to_any(iter)
 	return r
 
 func bson_to_any(doc: void*) -> any
-	int[160] iter
+	var iter: int[160]
 	_bson_iter_init(&iter, doc)
 	return bson_iter_map_to_any(&iter)
 
@@ -201,7 +201,7 @@ class Collection as shared
 			raise(new Exception("can not delete"))
 	func delete_many(filter: any)
 		var b = json_to_bson(repr(filter))
-		int[160] reply
+		var reply: int[160]
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
 			raise(new Exception("can not delete"))
 		var r = bson_to_any(&reply)
@@ -225,14 +225,14 @@ class Result as shared
 
 
 func __mongo_client_new(uri: string) -> void*
-	string t = uri
+	var t = uri
 	t.add(0)
 	return _mongoc_client_new(&t[0])
 
 func __mongoc_client_get_collection(client: void*, db: string, col: string) -> void*
-	string t1 = db
+	var t1 = db
 	t1.add(0)
-	string t2 = col
+	var t2 = col
 	t2.add(0)
 	return _mongoc_client_get_collection(client, &t1[0], &t2[0])
 

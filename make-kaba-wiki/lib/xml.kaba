@@ -19,13 +19,13 @@ class xml
 		return s
 	func static _next(s: string, out i0: int*) -> string
 		*i0 = _skip_ws(s, i0)
-		string r = _peek(s, *i0)
+		var r = _peek(s, *i0)
 		*i0 += len(r)
 		return r
 	func static _peek(s: string, i0: int) -> string
-		int i = i0
+		var i = i0
 		i = _skip_ws(s, i)
-		string r
+		var r: string
 		if _is_special(s[i])
 			return s[i:i+1]
 		if s[i] == '"'
@@ -50,19 +50,19 @@ class xml
 			tag_key = _next(s, i0)
 		#print("TAG: " + tag_key[:20])
 		
-		any tag
+		var tag: any
 		while true
-			string n = _next(s, i0)
+			var n = _next(s, i0)
 			if n == ">"
 				return tag
 			else if n == "?"
 				continue
 			else
-				string key = n
+				var key = n
 				#print("KEY {{key}}")
 				if _next(s, i0) != "="
 					raise(new Exception("= expected after {{key}}"))
-				string value = _decode_str(_next(s, i0))
+				var value = _decode_str(_next(s, i0))
 				#print("VAL {{value}}")
 				tag[key] = value
 		return tag
@@ -80,12 +80,12 @@ class xml
 	func static _parse_inside_part(s: string, key: string, out i0: int*, out part: any) -> string
 		#print(">> INSIDE {{key}}")
 		#print(part)
-		string content
+		var content: string
 		while true
-			string p = _peek(s, *i0)
+			var p = _peek(s, *i0)
 			if p == "<"
-				string k
-				any tag = _parse_tag(k, s, i0)
+				var k: string
+				var tag = _parse_tag(k, s, i0)
 				#print("---------------" + k[:20])
 				#print(tag)
 				if k[:1] == "/"
@@ -102,7 +102,7 @@ class xml
 					#print(">> SUB TAG {{k}} of {{key}}")
 					#print("BEFORE {{part}}")
 					#any subpart
-					string cc = _parse_inside_part(s, k, i0, tag)
+					var cc = _parse_inside_part(s, k, i0, tag)
 					#print("...add... " + subpart + " into " + part + " at " + k)
 					#print("{{len(tag)}}  {{len(cc)}}")
 					#print("BEFORE' {{part}}")
@@ -123,8 +123,8 @@ class xml
 					content.add(s[i])
 				*i0 += len(content)
 				#print("CONTENTS " + content)
-				string k
-				any tag = _parse_tag(k, s, i0)
+				var k: string
+				var tag = _parse_tag(k, s, i0)
 				if k != "/" + key
 					raise(new Exception("end tag expected"))
 				#print("<< OUTSIDE {{key}}")
@@ -133,13 +133,13 @@ class xml
 		#print("<< OUTSIDE {{key}}")
 		
 	func static parse(s: string) -> any
-		int i = 0
+		var i = 0
 		
-		string key
-		any header = _parse_tag(key, s, &i)
+		var key: string
+		var header = _parse_tag(key, s, &i)
 		
-		any root
-		any t = _parse_tag(key, s, &i)
+		var root: any
+		var t = _parse_tag(key, s, &i)
 		_parse_inside_part(s, key, &i, t)
 		root[key] = t
 		
@@ -153,7 +153,7 @@ class xml
 			return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
 		else if doc.type == any{}
 			# dict
-			string s
+			var s: string
 			s += "{{pre}}<{{key}}>\n"
 			for k in doc.keys()
 				s += _encode_part(k, doc[k], pre + "\t")
@@ -161,7 +161,7 @@ class xml
 			return s
 		else if doc.type == any[]
 			# array
-			string s
+			var s: string
 			for i in 0:len(doc)
 				s += _encode_part(key, doc[i], pre)
 			return s
@@ -169,7 +169,7 @@ class xml
 			return "???{{doc.type}}\n"
 
 	func static encode(doc: any) -> string
-		string s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+		var s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 		if doc.type != any{}
 			raise(new Exception("doc must be a dict"))
 		for k in doc.keys()

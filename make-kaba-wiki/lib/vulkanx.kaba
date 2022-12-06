@@ -242,7 +242,7 @@ class StatLayer
 		tex = new Texture()
 		tex.write(im)
 		ubo = new UniformBuffer(64*3)
-		UBO u
+		var u: UBO
 		u.p = mat4.ID
 		u.v = mat4.ID
 		u.m = mat4.ID
@@ -264,7 +264,7 @@ class StatLayer
 		del vb
 		del pipeline
 	func mut tick()
-		float dt = timer.get()
+		var dt = timer.get()
 		_time += dt
 		frames ++
 		if _time < 0.1

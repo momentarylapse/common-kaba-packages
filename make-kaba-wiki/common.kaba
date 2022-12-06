@@ -51,7 +51,7 @@ func find_external() -> ExternalPackage[]
 	var r: ExternalPackage[]
 	let list = fs.search("extern", "", "d")
 	for e in list
-		ExternalPackage p
+		var p: ExternalPackage
 		p.name = e
 		p.main = weak(default_context.load_module("extern/" + e + "/" + e + ".kaba", true))
 		
