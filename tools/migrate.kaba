@@ -44,6 +44,9 @@ func is_old_decl(tokens: string[]) -> bool
 		#print("<<asm")
 		in_asm = true
 		return false
+	
+	if tokens[len(tokens) - 1] == ";"
+		return false
 		
 	if tokens[0] in ["func", "class", "let", "var", "enum", "const", "for", "if", "else", "while", "return", "use", "import", "new", "del", "try", "except", "#"] or tokens[1] in ["as"]
 		return false
@@ -72,7 +75,7 @@ func glue_type(tokens: string[], ptl: int) -> string
 			t += x
 	return t
 
-func migrate_file(filename: Path)
+func migrate_file_decl(filename: Path)
 	print(filename)
 	let s = fs.read_text(filename)
 	let lines = s.explode("\n")
@@ -81,7 +84,7 @@ func migrate_file(filename: Path)
 	in_asm = false
 	
 	for l in lines
-		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:")
+		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:;")
 		
 		
 		if not is_old_decl(tokens)
@@ -137,14 +140,55 @@ func migrate_file(filename: Path)
 		fs.write_text(filename, ss)
 		print("================================= saved")
 
+
+func migrate_file_for(filename: Path)
+	print(filename)
+	let s = fs.read_text(filename)
+	let lines = s.explode("\n")
+	var lines_out: string[]
+	
+	for l in lines
+		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:;")
+		
+		
+		if len(tokens) < 4
+			lines_out.add(l)
+			continue
+		
+		if tokens[0] != "for" or tokens[2] != ","
+			lines_out.add(l)
+			continue
+			
+			
+		print(l)
+		let ind = "\t".repeat(count_indent(l))
+		let p = l.find("in", 0)
+		let o = "{{ind}}for {{tokens[3]}}=>{{tokens[1]}} {{l[p:]}}"
+		print("=>{{o}}")
+		let x = read_char()
+		
+		lines_out.add(o)
+	let ss = lines_out.join("\n")
+	if ss != s
+		fs.write_text(filename, ss)
+		print("================================= saved")
+
 func migrate(arg: string[])
 	setraw()
 	let dir = Path(arg[0])
 	let list = fs.search(dir, "*.kaba", "fr")
 	for e in list
-		migrate_file(dir << e)
+		migrate_file_decl(dir << e)
+
+func migrate_for(arg: string[])
+	setraw()
+	let dir = Path(arg[0])
+	let list = fs.search(dir, "*.kaba", "fr")
+	for e in list
+		migrate_file_for(dir << e)
 
 func main(arg: string[])
 	var p: os.CommandLineParser
 	p.cmd("", "DIR", "", migrate)
+	p.cmd("for", "DIR", "", migrate_for)
 	p.parse(arg)

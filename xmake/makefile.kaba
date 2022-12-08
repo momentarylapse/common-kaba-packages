@@ -105,7 +105,7 @@ func create_makefile(p: Profile, postfix: string)
 		f << "	xdg-desktop-menu install ../{{conf.desktop_file}}"
 	for m in conf.mime_files
 		f << "	xdg-mime install ../{{m}}"
-	for icon,i in conf.icons
+	for i=>icon in conf.icons
 		var xx = icon.explode(":")
 		var e: string
 		if i < len(conf.icons) - 1

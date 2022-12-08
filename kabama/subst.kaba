@@ -40,7 +40,7 @@ func rule_match(t: Term shared, m: Term shared, out mm: Matching) -> bool
 		return false
 	if len(t.params) != len(m.params)
 		return false
-	for p,i in t.params
+	for i=>p in t.params
 		if !rule_match(p, m.params[i], mm)
 			return false
 	return true

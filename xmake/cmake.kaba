@@ -30,7 +30,7 @@ func cmake_link_group(lg: string[]) -> string
 	var s = "# {{label}} mandatory
 set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
-	for v,i in varxs
+	for i=>v in varxs
 		if len(lls[i].pkg) > 0
 			s += "
 pkg_check_modules({{v}} {{lls[i].pkg[0]}})

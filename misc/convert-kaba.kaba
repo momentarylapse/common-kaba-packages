@@ -1,7 +1,7 @@
 use os
 
 func process_comment(l: string) -> string
-	for c,i in l
+	for i=>c in l
 		if c == '#'
 			return l[:i]
 	return l
@@ -16,7 +16,7 @@ func convert_func(l: string) -> string
 		xx.remove(0)
 	var name, type: string
 	var params, param_types: string[]
-	for _x,i0 in xx
+	for i0=>_x in xx
 		if _x == "("
 			name = xx[i0-1]
 			type = xx[:i0-1].join(" ")
@@ -48,7 +48,7 @@ func convert_func(l: string) -> string
 	#print(name)
 	
 	var new_line = "func {{flags}}{{name}}("
-	for p,i in params
+	for i=>p in params
 		if i > 0
 			new_line += ", "
 		new_line += "{{p}}: {{param_types[i]}}"
@@ -71,7 +71,7 @@ func convert_decl(l: string) -> string
 	
 	
 func get_indent(l: string) -> int
-	for c,i in l
+	for i=>c in l
 		if c != '\t'
 			return i
 	return -1
@@ -95,7 +95,7 @@ func process(p: Path, dry: bool)
 	var in_class = false
 	
 	var level = 0
-	for ll,i in lines
+	for i=>ll in lines
 		if count(ll, "\"") % 2 == 1
 			#print("  STRING!!!!")
 			in_long_string = not in_long_string

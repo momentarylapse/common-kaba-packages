@@ -103,7 +103,7 @@ func extract_product_group(t: Term shared, out inverse: bool[]) -> Term shared[]
 # [2x, 3y, z] -> [2,3,1], [x,y,z]
 func split_off_factor(out l: Term shared[]) -> string[]
 	var factor: string[]
-	for x,i in l
+	for i=>x in l
 		var f = "1"
 		if x.name == "*"
 			if x.params[0].type == Type.NUMBER
@@ -159,7 +159,7 @@ func sort_group(out l: Term shared[])
 func make_unique_in_product(out l: Term shared[], inv: bool[])
 	var exponents: Term shared[]
 	
-	for x,i in l
+	for i=>x in l
 		var e: Term shared
 		if x.name == "^"
 			e = x.params[1]
@@ -176,7 +176,7 @@ func make_unique_in_product(out l: Term shared[], inv: bool[])
 				exponents.remove(j)
 				l.remove(j)
 				j --
-	for x,i in l
+	for i=>x in l
 		if exponents[i].name != "1"
 			l[i] = AddOperator("^", x, normalize(exponents[i]))
 
@@ -222,7 +222,7 @@ func make_unique_in_sum(out l: Term shared[], out negative: bool[])
 	var multiplicity: string[]
 	#print_group(l)
 	
-	for x,i in l
+	for i=>x in l
 		var m = "1"
 		if x.name == "*"
 			if x.params[0].type == Type.NUMBER
@@ -238,13 +238,13 @@ func make_unique_in_sum(out l: Term shared[], out negative: bool[])
 				multiplicity.remove(j)
 				l.remove(j)
 				j --
-	for x,i in l
+	for i=>x in l
 		if multiplicity[i] == "0"
 			l.remove(i)
 			negative.remove(i)
 			multiplicity.remove(i)
 			i --
-	for x,i in l
+	for i=>x in l
 		if multiplicity[i] != "1"
 			l[i] = AddOperator("*", AddNumber(multiplicity[i]), x)
 

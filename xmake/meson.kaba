@@ -40,7 +40,7 @@ threaddep = dependency('threads')"
 		var mlibs = ll.meson_libs()
 		var ltest: string
 		var deps: string
-		for m,i in mlibs
+		for i=>m in mlibs
 			var v = "d"
 			if len(mlibs) > 1
 				v += str(i+1)
@@ -61,7 +61,7 @@ threaddep = dependency('threads')"
 	f << "
 
 sources = ["
-	for s,i in sources
+	for i=>s in sources
 		var e: string
 		if i < len(sources) - 1
 			e = ","

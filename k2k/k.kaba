@@ -217,7 +217,7 @@ class DynamicValue
 			setType(TType.DICT)
 			var bd: DynamicValueStateDict* = b.s
 			var ad: DynamicValueStateDict* = s
-			for el,i in bd.values
+			for i=>el in bd.values
 				ad.add(bd.keys[i], el)
 		else if b.type == TType.FUNCTION
 			var bf: DynamicValueStateFunction* = b.s
@@ -246,7 +246,7 @@ class DynamicValue
 			if type == TType.DICT
 				var bd: DynamicValueStateDict* = b.s
 				var ad: DynamicValueStateDict* = s
-				for el,i in bd.values
+				for i=>el in bd.values
 					ad.add(bd.keys[i], el)
 
 	func mut __isub__(b: DynamicValue)
@@ -398,7 +398,7 @@ class DynamicValueStateArray extends DynamicValueState
 		return "array"
 	func override __str__() -> string
 		var s = "["
-		for e,i in a
+		for i=>e in a
 			if i > 0
 				s += ","
 			s += e.render()
@@ -432,7 +432,7 @@ class DynamicValueStateDict extends DynamicValueState
 		return "dict"
 	func override __str__() -> string
 		var s = "{"
-		for e,i in values
+		for i=>e in values
 			if i > 0
 				s += ","
 			s += keys[i].render() + ":" + e.render()
@@ -440,7 +440,7 @@ class DynamicValueStateDict extends DynamicValueState
 	func override __bool__() -> bool
 		return len(values) > 0
 	func override mut get_element(key: DynamicValue) -> DynamicValue*
-		for k,j in keys
+		for j=>k in keys
 			if k.compare(key) == 0
 				return values[j]
 		
@@ -449,14 +449,14 @@ class DynamicValueStateDict extends DynamicValueState
 		keys.add(key.copy())
 		return val
 	func mut add(key: DynamicValue, val: DynamicValue)
-		for k,j in keys
+		for j=>k in keys
 			if k.compare(key) == 0
 				return
 		values.add(val.copy())
 		keys.add(key.copy())
 	func override copy() -> DynamicValueState*
 		var c = new DynamicValueStateDict()
-		for v,i in values
+		for i=>v in values
 			c.add(keys[i].copy(),v.copy())
 		return c
 
@@ -1002,7 +1002,7 @@ class SyntaxTree
 		while len(sn) > 2
 			var rmin = 100
 			var imin = 0
-			for r,i in rank
+			for i=>r in rank
 				if r < rmin
 					rmin = r
 					imin = i
@@ -1391,7 +1391,7 @@ class Interpreter
 				ret.setReference(dv)
 		else
 			setError("unhandled node: {{sn.type}}")
-		for p,i in params
+		for i=>p in params
 			if is_temp[i]
 				del p
 				

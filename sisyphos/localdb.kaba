@@ -83,7 +83,7 @@ class LocalFile
 		options.add(option)
 		db.dirty = true
 	func mut unset(option: string)
-		for o,i in options
+		for i=>o in options
 			if o == option
 				options.remove(i)
 				db.dirty = true
@@ -153,7 +153,7 @@ class LocalFile
 				return
 		tag_add(tt)
 	func mut tag_rm(tt: Tag)
-		for t,i in tags
+		for i=>t in tags
 			if t.match(tt)
 				if conf.verbosity > 0
 					log_ok("tag rm", "{{t}}")

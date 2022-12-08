@@ -166,7 +166,7 @@ class Database
 func filter_to_json(filter: string) -> string
 	var json = "{"
 	var xx = filter.explode(",")
-	for x,i in xx
+	for i=>x in xx
 		if i > 0
 			json += ","
 		var p = x.find("=", 0)

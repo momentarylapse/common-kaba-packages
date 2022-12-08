@@ -123,7 +123,7 @@ func run_command(arg: string[])
 			if len(arg) < 3
 				log_error("error", "ignore rm <PATH>")
 				return
-			for ig,i in conf.ignore
+			for i=>ig in conf.ignore
 				if ig == arg[2]
 					conf.ignore.remove(i)
 					break

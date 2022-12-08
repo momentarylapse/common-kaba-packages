@@ -101,7 +101,7 @@ func build()
 		for i in 0:num_threads
 			threads.add(new TX())
 	
-		for s,i in needs_building
+		for i=>s in needs_building
 			var t: TX* = nil
 			if i < num_threads
 				#print("{{i}} -> direct")

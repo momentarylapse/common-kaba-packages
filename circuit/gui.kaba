@@ -101,7 +101,7 @@ Toolbar toolbar ''
 		if !e
 			return
 		var names = e.param_names()
-		for n,i in names
+		for i=>n in names
 			add_string("params", "{{n}}\\{{e.param[i]}}")
 			
 		

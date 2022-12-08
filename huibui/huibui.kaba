@@ -140,7 +140,7 @@ func swap_translate_gui(out r: Resource, l: Language, ns: string)
 		swap_translate_gui(c, l, ns)
 
 func swap_translate_guis(l: Language)
-	for r,i in resources
+	for i=>r in resources
 		print("----------")
 		print(resource_files[i])
 		print(r.str(0))

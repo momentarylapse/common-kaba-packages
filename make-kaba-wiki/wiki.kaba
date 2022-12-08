@@ -15,9 +15,9 @@ func param_pre(v: Variable) -> string
 
 func func_params(f: Function) -> string
 	if f.is_static()
-		return [for p,i in f.param_type "{{param_pre(f.var[i])}}{{f.var[i].name}}: {{p.name}}"].join(", ")
+		return [for i=>p in f.param_type "{{param_pre(f.var[i])}}{{f.var[i].name}}: {{p.name}}"].join(", ")
 	else
-		return [for p,i in f.param_type[1:] "{{param_pre(f.var[i+1])}}{{f.var[i+1].name}}: {{p.name}}"].join(", ")
+		return [for i=>p in f.param_type[1:] "{{param_pre(f.var[i+1])}}{{f.var[i+1].name}}: {{p.name}}"].join(", ")
 
 func func_return(f: Function) -> string
 	if f.return_type.name == "void"

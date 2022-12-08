@@ -78,7 +78,7 @@ func make_all_dirs(path: Path)
 #	var parents = path.all_parents()
 	var parts = str(path).explode("/")
 	var dir: string
-	for p,i in parts
+	for i=>p in parts
 		if i == len(parts) - 1
 			break
 		if i > 0
@@ -263,14 +263,14 @@ class Config
 	func mut rm_filter(dir: Path, filter: string)
 		for e in dirs
 			if e.dir == dir
-				for s,i in e.syncs
+				for i=>s in e.syncs
 					if s.filter == filter
 						e.syncs.remove(i)
 						return
 		print("NOT FOUND...")
 
 	func mut rm_dir(dir: Path)
-		for e,i in dirs
+		for i=>e in dirs
 			if e.dir == dir
 				dirs.remove(i)
 				return

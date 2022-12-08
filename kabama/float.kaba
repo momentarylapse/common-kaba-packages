@@ -8,7 +8,7 @@ func all_params_are_float(t: Term shared) -> bool
 
 func make_float(t_: Term shared) -> Term shared
 	var t = t_.shallow_copy()
-	for p,i in t.params
+	for i=>p in t.params
 		t.params[i] = make_float(p)
 		
 	if t.type == Type.FLOAT

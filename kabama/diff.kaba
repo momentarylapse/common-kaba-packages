@@ -73,7 +73,7 @@ func diff(t: Term shared, by: string) -> Term shared
 			                                                          diff(b, by))))
 	if t.type == Type.LIST
 		var r = t.shallow_copy()
-		for p,i in r.params
+		for i=>p in r.params
 			r.params[i] = diff(p, by)
 		return r
 	raise(new RuntimeError("unhandled differential..."))
