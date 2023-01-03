@@ -82,12 +82,11 @@ class LocalFile
 		if is(option)
 			return
 		options.add(option)
-		db.dirty = true
+		#db.dirty = true
 	func mut unset(option: string)
 		for i=>o in options
 			if o == option
 				options.remove(i)
-				db.dirty = true
 				return
 	func pure_remote() -> bool
 		return is(NONLOCAL)
@@ -118,12 +117,10 @@ class LocalFile
 			set(o)
 	func mut sync_tags(rtags: Tag[])
 		tags = rtags # TODO
-		db.dirty = true
 	func mut set_name(_name: string)
 		if _name == name
 			return
 		name = _name
-		db.dirty = true
 		if conf.verbosity > 0
 			log_ok("name", name)
 		set(CHANGED_META)
@@ -135,7 +132,6 @@ class LocalFile
 			if t.key == tt.key and t.value == tt.value
 				return
 		tags.add(tt)
-		db.dirty = true
 		if conf.verbosity > 0
 			log_ok("tag add", "{{tt}}")
 		set(CHANGED_META)
@@ -150,7 +146,6 @@ class LocalFile
 				if conf.verbosity > 0
 					log_ok("tag set", "{{t}}  ->  {{tt.value}}")
 				t.value = tt.value
-				db.dirty = true
 				set(CHANGED_META)
 				return
 		tag_add(tt)
@@ -160,7 +155,6 @@ class LocalFile
 				if conf.verbosity > 0
 					log_ok("tag rm", "{{t}}")
 				tags.remove(i)
-				db.dirty = true
 				set(CHANGED_META)
 				return
 	func status_str() -> string
@@ -252,11 +246,9 @@ func unique_path(f: LocalFile) -> Path
 
 class LocalFileDB
 	var files: LocalFile[]
-	var dirty = false
 	
 	func mut load()
 		files.clear()
-		dirty = false
 		#Timer tt
 		var ss = fs.read(hui.app_directory << "sisyphos/db")
 		var lines = ss.explode("\n")
@@ -308,7 +300,7 @@ class LocalFileDB
 				if fs.exists(f.path)
 					log_error("empty hash", f.path)
 					f.hash = fs.hash(f.path, "md5")
-					dirty = true
+					save([f])
 				else if f.id == ""
 					log_error("ghost", f.path)
 					delete(f)
@@ -326,7 +318,7 @@ class LocalFileDB
 				log_error("duplicate", f.path)
 				if l.mergeable(f)
 					l.merge(f)
-					dirty = true
+					save([f])
 					delete(f)
 				else
 					print("   {{rel_path(f.path)}}   <->   {{rel_path(l.path)}}")
@@ -346,7 +338,7 @@ class LocalFileDB
 			
 			log_warn("move", "{{rel_path(f.path)}} > {{rel_path(new_path)}}")
 			f.path = new_path
-			db.dirty = true
+			save([f])
 
 #	func mut drop_selected()
 #		for i in 0:len(files)
@@ -394,7 +386,6 @@ class LocalFileDB
 			f << ff.options.join(",")
 			f << tags2strh(ff.tags)
 		del f
-		dirty = false
 	
 	func has_id(id: string) -> bool
 		for f in files
@@ -491,7 +482,7 @@ class LocalFileDB
 	func mut optimize()
 		print("optimizing...")
 		files = files |> sort("path")
-		dirty = true
+		save_all()
 	
 	func mut manual_init()
 		print("initializing")

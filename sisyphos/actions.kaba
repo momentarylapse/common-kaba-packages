@@ -14,7 +14,7 @@ func ______file_move(out f: LocalFile, new_path: Path)
 	if conf.verbosity >= 1
 		print("MOVED  {{rel_path(f.path)}} > {{rel_path(new_path)}}")
 	f.path = new_path
-	db.dirty = true
+	db.save([f])
 
 
 
@@ -110,7 +110,7 @@ func action_structure_auto(arg: string[])
 
 func _action_dsync(dir: Path)
 	set_working_dir(dir)
-	var e = conf.get_cfg(dir)
+	let e = conf.get_cfg(dir)
 	if e
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)

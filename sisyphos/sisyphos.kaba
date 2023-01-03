@@ -131,4 +131,4 @@ func run_command(arg: string[])
 	else if arg[0] == "db"
 		if arg[1] == "init"
 			conf.save()
-			db.dirty = true
+			db.save_all()
