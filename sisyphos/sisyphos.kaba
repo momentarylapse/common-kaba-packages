@@ -77,9 +77,9 @@ func main(arg: string[])
 	
 	p.parse(arg)
 
-	db.drop_selected()	
-	if db.dirty
-		db.save()
+	#db.drop_selected()	
+	#if db.dirty
+	#	db.save()
 
 	
 

@@ -57,7 +57,7 @@ func show_file(f: LocalFile)
 	print("{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_path(f.path)}}{{terminal.END}}")
 
 class LocalFile
-	var drop_me = false
+	#var drop_me = false
 
 	# remote
 	var id: string
@@ -71,6 +71,7 @@ class LocalFile
 	var size: int
 	var options: string[]
 	var tags: Tag[]
+	var local_id = -1
 	
 	func is(option: string) -> bool
 		for o in options
@@ -99,7 +100,8 @@ class LocalFile
 			return false
 		return true
 	func in_db() -> bool
-		return len(hash) > 0
+		return local_id >= 0
+	#	return len(hash) > 0
 	func changed_file() -> bool
 		return is(CHANGED_FILE)
 	func changed_meta() -> bool
@@ -272,6 +274,7 @@ class LocalFileDB
 		for i in 0:n
 			var ff: LocalFile
 			var i0 = i*10+1
+			ff.local_id = i
 			ff.id = lines[i0]
 			ff.path = Path(lines[i0+1])
 			#ff.remote_path = lines[i0+2]
@@ -308,8 +311,7 @@ class LocalFileDB
 					dirty = true
 				else if f.id == ""
 					log_error("ghost", f.path)
-					f.drop_me = true
-					dirty = true
+					delete(f)
 				#else
 					# hash='', id='', no file
 					#print("EMPTY HASH (REMOTE): " + ff.path)
@@ -318,14 +320,14 @@ class LocalFileDB
 			if f.path.is_empty()
 				continue
 			var l = by_hash(f.hash)
-			if l == &f
+			if l.local_id == f.local_id
 				continue
 			if f.path == l.path
 				log_error("duplicate", f.path)
 				if l.mergeable(f)
 					l.merge(f)
 					dirty = true
-					f.drop_me = true
+					delete(f)
 				else
 					print("   {{rel_path(f.path)}}   <->   {{rel_path(l.path)}}")
 					print("###################################")
@@ -337,7 +339,7 @@ class LocalFileDB
 			if f.path.is_empty()
 				continue
 			var l = find_by_path(f.path)
-			if l == &f
+			if l.local_id == f.local_id
 				continue
 			log_error("path collision", f.path)
 			var new_path = unique_path(f)
@@ -346,15 +348,36 @@ class LocalFileDB
 			f.path = new_path
 			db.dirty = true
 
-	func mut drop_selected()
-		for i in 0:len(files)
-			if files[i].drop_me
-				log_warn("drop", files[i].path)
-				files.remove(i)
-				db.dirty = true
-				i --
+#	func mut drop_selected()
+#		for i in 0:len(files)
+#			if files[i].drop_me
+#				log_warn("drop", files[i].path)
+#				files.remove(i)
+#				db.dirty = true
+#				i --
 
-	func mut save()
+	## TODO....
+	func selfref _find_by_local_id(id: int) -> LocalFile*
+		for f in files
+			if f.local_id == id
+				return &f
+		return nil
+		
+
+	func mut save(_files: LocalFile[])
+		for f in _files
+			var _f = _find_by_local_id(f.local_id)
+			if _f
+				*_f = f
+		save_all()
+	
+	func mut delete(f: LocalFile)
+		for i=>_f in files
+			if f.local_id == _f.local_id
+				files.remove(i)
+		save_all()
+
+	func mut save_all()
 		make_all_dirs(hui.app_directory << "sisyphos")
 		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/db", "wt"))
 		f << "version=1"
@@ -373,36 +396,36 @@ class LocalFileDB
 		del f
 		dirty = false
 	
-	func const has_id(id: string) -> bool
+	func has_id(id: string) -> bool
 		for f in files
 			if id == f.id
 				return true
 		return false
 
-	func selfref find_by_id(id: string) -> LocalFile*
+	func find_by_id(id: string) -> LocalFile
 		for f in files
 			if id == f.id
-				return &f
+				return f
 		raise(new Exception("not in db: id={{id}}"))
 
-	func selfref find_by_path(path: Path) -> LocalFile*
+	func find_by_path(path: Path) -> LocalFile
 		for f in files
 			if path == f.path
-				return &f
+				return f
 		raise(new Exception("not in db: '{{rel_path(path)}}'"))
 
-	func const has_path(path: Path) -> bool
+	func has_path(path: Path) -> bool
 		for f in files
 			if path == f.path
 				return true
 		return false
 
-	func selfref by_hash(hash: string) -> LocalFile*
+	func by_hash(hash: string) -> LocalFile
 		if hash == ""
 			raise(new Exception("invalid hash"))
 		for f in files
 			if hash == f.hash
-				return &f
+				return f
 		raise(new Exception("not in db: hash={{hash}}"))
 
 	#LocalFile *find_by_hash(string hash)
@@ -413,17 +436,17 @@ class LocalFileDB
 #				return &f
 #		raise(new Exception("not in db: hash=" + hash))
 		
-	func selfref find_by_tags(filter: string) -> LocalFile*[]
+	func find_by_tags(filter: string) -> LocalFile[]
 		var tags = str2tags(filter)
-		var list: LocalFile*[]
+		var list: LocalFile[]
 		for f in files
 			if f.match(tags)
-				list.add(&f)
+				list.add(f)
 		return list |> sort("path")
 
-	func selfref get_in_dir(dir: Path, recursive: bool) -> LocalFile*[]
+	func get_in_dir(dir: Path, recursive: bool) -> LocalFile[]
 			
-		var list: LocalFile*[]
+		var list: LocalFile[]
 		if recursive
 			for f in files
 				if f.path in dir
@@ -431,7 +454,7 @@ class LocalFileDB
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote
 						continue
-					list.add(&f)
+					list.add(f)
 		else
 			for f in files
 				if f.path.parent() == dir
@@ -439,13 +462,13 @@ class LocalFileDB
 						continue
 					if !f.pure_remote() and conf.filter_pure_remote
 						continue
-					list.add(&f)
+					list.add(f)
 		return list |> sort("path")
 
-	func selfref get(path: Path, rec: bool) -> LocalFile*[]
+	func get(path: Path, rec: bool) -> LocalFile[]
 		if fs.is_directory(path)
 			return get_in_dir(path, rec)
-		var files: LocalFile*[]
+		var files: LocalFile[]
 		try
 			files.add(find_by_path(path))
 		except
@@ -462,7 +485,7 @@ class LocalFileDB
 				if h2 != f.hash
 					print("{{h2}} != {{f.hash}}")
 					f.hash = h2
-					save()
+					save_all()
 			except
 				pass
 	func mut optimize()
@@ -472,7 +495,7 @@ class LocalFileDB
 	
 	func mut manual_init()
 		print("initializing")
-		save()
+		save_all()
 		conf.save()
 	
 var db: LocalFileDB

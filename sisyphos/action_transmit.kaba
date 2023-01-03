@@ -11,7 +11,7 @@ func _action_pull(path: Path)
 	set_working_dir(path)
 	
 	var files = lister.find(path)
-	var need_meta: LocalFile*[]
+	var need_meta: LocalFile[]
 	for f in files
 		if f.pure_remote() or f.is(CHANGED_FILE)
 			remote_download(f)
@@ -36,7 +36,7 @@ func _action_push(path: Path)
 	
 	var files = lister.find(path)
 	for f in files
-		if !f.in_db()
+		if not f.in_db()
 			continue
 		if f.pure_local() or f.is(CHANGED_FILE)
 			remote_upload(f)

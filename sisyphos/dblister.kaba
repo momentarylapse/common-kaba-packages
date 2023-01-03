@@ -4,8 +4,6 @@ use os
 
 # mix db files with "real" files
 class DBLister
-	var fake_files: LocalFile[]
-	
 	func is_ignored(path: Path) -> bool
 		for i in conf.ignore
 			if str(path).match(i)
@@ -24,16 +22,13 @@ class DBLister
 				paths.add(path)
 		return paths
 	
-	func mut find(dir: Path) -> LocalFile*[]
+	func mut find(dir: Path) -> LocalFile[]
 		if fs.is_directory(dir)
 			return find_in_dir(dir)
 		return find_file(dir)
 		
 		
-	func mut find_file(path: Path) -> LocalFile*[]
-		var files: LocalFile*[]
-		fake_files.clear()
-		
+	func mut find_file(path: Path) -> LocalFile[]
 		try
 			# in DB?
 			return [db.find_by_path(path)]
@@ -42,17 +37,15 @@ class DBLister
 				# FIXME this looks like a memory bug... fake_files[] resize
 				var ff: LocalFile
 				ff.path = path
-				fake_files.add(ff)
-				return [&fake_files[0]]
+				return [ff]
 			else
 				log_error("error", "can't find '{{path}}'")
-		return files
+		return []
 		
 		
-	func mut mix(files: LocalFile*[], paths: Path[]) -> LocalFile*[]
-		fake_files.clear()
-
-		var r: LocalFile*[]
+	func mut mix(files: LocalFile[], paths: Path[]) -> LocalFile[]
+		var fake_files: LocalFile[]
+		var r: LocalFile[]
 		var i = 0
 		for f in files
 			if i < len(paths)
@@ -73,10 +66,10 @@ class DBLister
 			i ++
 				
 		for f in fake_files
-			r.add(&f)
+			r.add(f)
 		return r
 		
-	func mut find_in_dir(dir: Path) -> LocalFile*[]
+	func mut find_in_dir(dir: Path) -> LocalFile[]
 
 		var files = db.get_in_dir(dir, conf.recursive)
 			|> sort("path")
@@ -94,7 +87,7 @@ var lister: DBLister
 func is_filter(s: string) -> bool
 	return s.find("=", 0) > 0
 
-func find_by_path_or_filter(arg: string) -> LocalFile*[]
+func find_by_path_or_filter(arg: string) -> LocalFile[]
 	if is_filter(arg)
 		return db.find_by_tags(arg)
 	else

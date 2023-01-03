@@ -4,18 +4,17 @@ use config
 use dblister
 
 
-func delete_files(out files: LocalFile*[])
+func delete_files(out files: LocalFile[])
 	for f in files
 		log_warn("rm", rel_path(f.path))
 		if conf.dry_run
 			return
-		if !f.pure_remote()
+		if not f.pure_remote()
 			try
 				fs.delete(f.path)
 			except Exception as e
 				error_out(e)
-		f.drop_me = true
-		db.save()
+		db.delete(f)
 
 
 func delete_path_or_filter(arg: string)
@@ -37,8 +36,7 @@ func unadd_path(path: Path)
 	var files = lister.find(path)
 	for f in files
 		log_warn("drop", f.path)
-		f.drop_me = true
-		db.save()
+		db.delete(f)
 
 func action_unadd(arg: string[])
 	if len(arg) == 0

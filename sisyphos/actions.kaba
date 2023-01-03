@@ -43,7 +43,7 @@ func move_file_by_path(source: Path, _dest: Path)
 		
 		var _source = source # since source might be a ref to f.path...
 		f.path = dest
-		db.save()
+		db.save([f])
 			
 		make_all_dirs(dest)
 		fs.rename(_source, dest)
@@ -85,10 +85,10 @@ func structure_file(out f: LocalFile, structure: string)
 		return
 	make_all_dirs(new_path)
 	try
-		if !f.pure_remote()
+		if not f.pure_remote()
 			fs.rename(f.path, new_path)
 		f.path = new_path
-		db.save()
+		db.save([f])
 	except FileError as e
 		error_out(e)
 

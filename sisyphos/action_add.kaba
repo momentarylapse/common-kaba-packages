@@ -105,7 +105,7 @@ func add_path(path: Path)
 	for f in files
 		file_add(f)
 			
-	db.save()
+	db.save(files)
 
 func action_add(arg: string[])
 	if len(arg) == 0

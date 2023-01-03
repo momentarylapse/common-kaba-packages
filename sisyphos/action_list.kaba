@@ -5,11 +5,11 @@ use dblister
 use os
 
 
-func show_files(files: LocalFile*[])
+func show_files(files: LocalFile[])
 	for f in files
-		if f.perfectly_fine() and !conf.show_perfectly_fine
+		if f.perfectly_fine() and not conf.show_perfectly_fine
 			continue
-		if !f.in_db() and !conf.show_not_in_db
+		if not f.in_db() and not conf.show_not_in_db
 			continue
 		show_file(f)
 		if conf.show_meta or conf.verbosity >= 2

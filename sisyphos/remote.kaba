@@ -160,7 +160,8 @@ func remote_sync_by_filter(filter: string, quality: string, structure: string, d
 			sync_file(rf, lf)
 		except
 			sync_add_pure_remote(rf, dir, structure)
-	db.save()
+	#db.save()
+	print("TODO save")
 
 func remote_download(out f: LocalFile)
 	log_ok("downloading", str(rel_path(f.path)))
@@ -180,7 +181,7 @@ func remote_download(out f: LocalFile)
 	f.hash = fs.hash(f.path, "md5")
 	f.unset(NONLOCAL)
 	f.unset(CHANGED_FILE)
-	db.save()
+	db.save([f])
 
 
 func remote_upload(out f: LocalFile)
@@ -212,7 +213,7 @@ func remote_upload(out f: LocalFile)
 	f.id = r[3:].explode("\n")[0]
 	if conf.verbosity >= 2
 		print("ID: {{f.id}}")
-	db.save()
+	db.save([f])
 
 	#string tagsh = tags2strh(f.tags)
 		
@@ -251,7 +252,7 @@ func remote_upload_meta(out f: LocalFile)
 		if conf.verbosity >= 2
 			print("yay")
 		f.unset(CHANGED_META)
-		db.save()
+		db.save([f])
 		return
 	if r == "not found"
 		log_error("error", "remote did not find")
@@ -260,7 +261,7 @@ func remote_upload_meta(out f: LocalFile)
 	log_error("error", "????")
 
 
-func remote_get_meta(files: LocalFile*[]) -> RemoteFile[]
+func remote_get_meta(files: LocalFile[]) -> RemoteFile[]
 	var ids_perfect: string[]
 	var ids_medium: string[]
 	for f in files
@@ -277,7 +278,7 @@ func remote_get_meta(files: LocalFile*[]) -> RemoteFile[]
 		rfiles.add(rf)
 	return rfiles
 
-func remote_download_meta(out files: LocalFile*[])
+func remote_download_meta(out files: LocalFile[])
 	var rfiles = remote_get_meta(files)
 	for rf in rfiles
 		for lf in files
@@ -295,8 +296,8 @@ func remote_download_meta(out files: LocalFile*[])
 					lf.unset(CHANGED_META)
 				db.dirty = true
 
-func remote_sync_by_id(out files: LocalFile*[])
-	var files_wanted: LocalFile*[]
+func remote_sync_by_id(out files: LocalFile[])
+	var files_wanted: LocalFile[]
 	for f in files
 		if !f.pure_remote() and !f.pure_local()
 			files_wanted.add(f)
@@ -306,7 +307,7 @@ func remote_sync_by_id(out files: LocalFile*[])
 			if lf.id == rf.id
 				sync_file(rf, lf)
 
-func sync_file(rf: RemoteFile, out lf: LocalFile*)
+func sync_file(rf: RemoteFile, out lf: LocalFile)
 	if conf.verbosity >= 2
 		print("sync {{lf.path}}")
 	lf.unset(CHANGED_FILE)
@@ -333,7 +334,7 @@ func sync_file(rf: RemoteFile, out lf: LocalFile*)
 			print("{{lf.name}} <-> {{rf.name}}")
 		lf.set(CHANGED_META)
 		#db.dirty = true
-	if !tags_equal(lf.tags, rf.tags)
+	if not tags_equal(lf.tags, rf.tags)
 		if conf.verbosity >= 1
 			log_warn("changed tags", rel_path(lf.path))
 		if conf.verbosity >= 2
@@ -343,7 +344,7 @@ func sync_file(rf: RemoteFile, out lf: LocalFile*)
 		#db.dirty = true
 
 
-func remote_sync_pure_locals_by_hash(out files: LocalFile*[])
+func remote_sync_pure_locals_by_hash(out files: LocalFile[])
 	var hashes: string[]
 	for f in files
 		if f.pure_local()
