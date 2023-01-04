@@ -1,0 +1,249 @@
+use os
+use config
+use tag
+
+const NONLOCAL = "nonlocal"
+const CHANGED_FILE = "changed"
+const CHANGED_META = "changed-meta"
+
+func str_format(s: string, fmt: string) -> string
+	var r = s
+	if len(fmt) >= 2 and fmt[:1] == "0"
+		var n = int(fmt)
+		while len(r) < n
+			r = "0" + r
+	if len(fmt) >= 2 and fmt[:1] == " "
+		var n = int(fmt)
+		while len(r) < n
+			r = " " + r
+	return r
+
+func nice_size(size: int) -> string
+	if size > 1000000000
+		return "{{size / 1000000000.0|.1}}G"
+	if size > 10000000
+		return "{{size / 1000000}}M"
+	if size > 1000000
+		return "{{size / 1000000.0|.1}}M"
+	if size > 10000
+		return "{{size / 1000}}K"
+	if size > 1000
+		return "{{size / 1000.0|.1}}K"
+	return "{{size}}"
+
+
+func file_status_color(f: LocalFile) -> string
+	if f.is_dir
+		return "{{terminal.BLUE}}{{terminal.BOLD}}"
+	if not f.in_db()
+		return "{{terminal.DARK_GRAY}}"
+	if f.pure_local()
+		return "{{terminal.GRAY}}"
+	if f.pure_remote()
+		return "{{terminal.ORANGE}}{{terminal.BOLD}}"
+	if f.changed_file()
+		return "{{terminal.RED}}{{terminal.BOLD}}"
+	if f.changed_meta()
+		return "{{terminal.YELLOW}}{{terminal.BOLD}}"
+	return "{{terminal.BOLD}}"
+
+func show_file(f: LocalFile, refpoint: Path, indent: string)
+	var s: string
+	if conf.show_meta_small
+		s = str_format(nice_size(f.size), " 6")
+		if f.is("quality=medium")
+			s += " m"
+		else
+			s += "  "
+	print("{{indent}}{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_to_path(f.path, refpoint)}}{{terminal.END}}")
+
+class LocalFile
+	#var drop_me = false
+
+	# remote
+	var id: string
+	var name: string
+	var remote_mtime: int
+#	var remote_path: string
+	# local
+	var path: Path
+	var hash: string # can be "" if not local
+	var mtime: int
+	var size: int
+	var options: string[]
+	var tags: Tag[]
+	var local_id = -1
+	var is_dir = false
+	
+	func is(option: string) -> bool
+		for o in options
+			if o == option
+				return true
+		return false
+	func mut set(option: string)
+		if is(option)
+			return
+		options.add(option)
+		#db.dirty = true
+	func mut unset(option: string)
+		for i=>o in options
+			if o == option
+				options.remove(i)
+				return
+	func pure_remote() -> bool
+		return is(NONLOCAL)
+	func pure_local() -> bool
+		return len(id) == 0
+	func perfectly_fine() -> bool
+		if pure_remote() or pure_local()
+			return false
+		if changed_meta() or changed_file()
+			return false
+		return true
+	func in_db() -> bool
+		return local_id >= 0
+	#	return len(hash) > 0
+	func changed_file() -> bool
+		return is(CHANGED_FILE)
+	func changed_meta() -> bool
+		return is(CHANGED_META)
+	func mergeable(f: LocalFile) -> bool
+		if size != f.size
+			return false
+		if id != f.id
+			if len(id) > 0 and len(f.id) > 0
+				return false
+		return true
+	func mut merge(f: LocalFile)
+		for o in f.options
+			set(o)
+	func mut sync_tags(rtags: Tag[])
+		tags = rtags # TODO
+	func mut set_name(_name: string)
+		if _name == name
+			return
+		name = _name
+		if conf.verbosity > 0
+			log_ok("name", name)
+		set(CHANGED_META)
+	func mut tag_add(tt: Tag)
+		if tt.key == "name"
+			set_name(tt.value)
+			return
+		for t in tags
+			if t.key == tt.key and t.value == tt.value
+				return
+		tags.add(tt)
+		if conf.verbosity > 0
+			log_ok("tag add", "{{tt}}")
+		set(CHANGED_META)
+	func mut tag_set(tt: Tag)
+		if tt.key == "name"
+			set_name(tt.value)
+			return
+		for t in tags
+			if t.key == tt.key
+				if t.value == tt.value
+					return
+				if conf.verbosity > 0
+					log_ok("tag set", "{{t}}  ->  {{tt.value}}")
+				t.value = tt.value
+				set(CHANGED_META)
+				return
+		tag_add(tt)
+	func mut tag_rm(tt: Tag)
+		for i=>t in tags
+			if t.match(tt)
+				if conf.verbosity > 0
+					log_ok("tag rm", "{{t}}")
+				tags.remove(i)
+				set(CHANGED_META)
+				return
+	func status_str() -> string
+		if is_dir
+			return "  "
+		if not in_db()
+			return "? "
+		if pure_local()
+			return "L "
+		if pure_remote()
+			return "R "
+		if changed_file()
+			return "**"
+		if changed_meta()
+			return "* "
+		return "  "
+	func show_info(l: string)
+		#print(l + "path: " + path)
+		print(l + "name:    {{name}}")
+		print(l + "id:      {{id}}")
+		print(l + "hash:    {{hash}}")
+		#print(l + "mtime:   {{mtime}}")
+		#if remote_mtime != 0 and remote_mtime != mtime
+		#	s += "\nmtime: " + mtime + " (REMOTE)"
+		print(l + "size:    {{size}}")
+		#print(l + "options: " + options)
+		var _tags = tags_sort(tags)
+		for t in _tags
+			print(l + "  tag:   {{t.key}}={{t.value}}")
+	func remote_path() -> string
+		var ext = path.extension()
+		if is("quality=medium")
+			return ALEX_DIR + "medium/{{id}}.{{ext}}"
+		return ALEX_DIR + "links/{{id}}"
+	func get_tag(key: string) -> string
+		if key == "name"
+			return name
+		if key == "ext"
+			return path.extension()
+		if key == "id"
+			return id
+		if key == "hash"
+			return hash
+		if key == "size"
+			return str(size)
+		for t in tags
+			if t.key == key
+				return t.value
+		return ""
+	func apply_structure(structure: string) -> string
+		var r = structure
+		var p1 = 0
+		while true
+			var p0 = r.find("{", p1)
+			if p0 < 0
+				break
+			p1 = r.find("}", p0)
+			if p1 < 0
+				break
+			var kkey = r[p0+1:p1]
+			var xkey = kkey.explode("|")
+			var val = get_tag(xkey[0])
+			if len(xkey) >= 2
+				val = str_format(val, xkey[1])
+			
+			r = r[:p0] + val + r[p1+1:]
+			p1 = p0 + len(val)
+		return r.replace("?", "").replace(":", "")
+	func match(mtags: Tag[]) -> bool
+		for mt in mtags
+			var tag_match = false
+			if mt.key == "name"
+				tag_match = name.match(mt.value)
+			else if mt.key == "id"
+				tag_match = id.match(mt.value)
+			else if mt.key == "hash"
+				tag_match = hash.match(mt.value)
+			else
+				for t in tags
+					#if t.key == mt.key and t.value == tm.value
+					if t.key == mt.key and t.value.match(mt.value)
+						tag_match = true
+						break
+			if !tag_match
+				return false
+		return true
+
+func unique_path(f: LocalFile) -> Path
+	var ext = f.path.extension()
+	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 

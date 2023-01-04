@@ -1,5 +1,6 @@
 use os
 use localdb
+use file
 use config
 use autotag
 use dblister
