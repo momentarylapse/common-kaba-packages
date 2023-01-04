@@ -4,6 +4,29 @@ use config
 use tag
 use file
 
+func common_head(a: string, b: string) -> string
+	for i in 0:len(a)
+		let n = len(a) - i
+		if a[:n] == b[:n]
+			return a[:n]
+	return ""
+
+func common_tail(a: string, b: string) -> string
+	for i in 0:len(a)
+		let n = len(a) - i
+		if a.tail(n) == b.tail(n)
+			return a.tail(n)
+	return ""
+
+func path_diff(a: Path, b: Path) -> string
+	let sa = str(a)
+	let sb = str(b)
+	let h = common_head(sa, sb)
+	let t = common_tail(sa[len(h):], sb[len(h):])
+	
+	#return "{{h}}  [{{sa[len(h):-len(t)]}}  <->  {{sb[len(h):-len(t)]}}]  {{t}}"
+	return "{{h}}{{terminal.RED}}{{sa[len(h):-len(t)]}}{{terminal.END}}{{t}}  <->  {{h}}{{terminal.GREEN}}{{sb[len(h):-len(t)]}}{{terminal.END}}{{t}}"
+
 class LocalFileDB
 	var files: LocalFile[]
 	
@@ -50,6 +73,7 @@ class LocalFileDB
 		check_empty_paths()
 		check_directories()
 		check_empty_hashes()
+		check_missing()
 		check_hash_collisions()
 		check_duplicate_paths()
 	
@@ -66,6 +90,12 @@ class LocalFileDB
 			if fs.exists(f.path) and fs.is_directory(f.path)
 				log_error("directory", f.path)
 				delete(f)
+	
+	func mut check_missing()
+		print("checking missing")
+		for f in files
+			if not fs.exists(f.path)
+				log_error("missing", f.path)
 
 	func mut check_empty_hashes()
 		print("checking empty hashes")
@@ -99,7 +129,7 @@ class LocalFileDB
 					print("   {{rel_path(f.path)}}   <->   {{rel_path(l.path)}}")
 					print("###################################")
 			else
-				log_error("hash collision", "{{f.path}}  <->  {{l.path}}")
+				log_warn("hash collision", path_diff(f.path, l.path))
 
 	func mut check_duplicate_paths()
 		print("checking duplicate paths")
@@ -212,22 +242,21 @@ class LocalFileDB
 		return list |> sort("path")
 
 	func get_in_dir(dir: Path, recursive: bool) -> LocalFile[]
-			
 		var list: LocalFile[]
 		if recursive
 			for f in files
 				if f.path in dir
-					if !f.pure_local() and conf.filter_pure_local
+					if not f.pure_local() and conf.filter_pure_local
 						continue
-					if !f.pure_remote() and conf.filter_pure_remote
+					if not f.pure_remote() and conf.filter_pure_remote
 						continue
 					list.add(f)
 		else
 			for f in files
 				if f.path.parent() == dir
-					if !f.pure_local() and conf.filter_pure_local
+					if not f.pure_local() and conf.filter_pure_local
 						continue
-					if !f.pure_remote() and conf.filter_pure_remote
+					if not f.pure_remote() and conf.filter_pure_remote
 						continue
 					list.add(f)
 		return list |> sort("path")

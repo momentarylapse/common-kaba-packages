@@ -7,56 +7,57 @@ use dblister
 
 
 
-
-
-
+func file_check(out f: LocalFile)
+	# suddenly appearing?!?
+	if f.pure_remote()
+		if fs.exists(f.path)
+			f.unset(NONLOCAL)
+			if conf.verbosity >= 1
+				log_warn("non-nonlocal", rel_path(f.path))
+			db.save([f])
+			return
+	
+	# lost?
+	if not fs.exists(f.path)
+		if not f.pure_remote()
+			f.set(NONLOCAL)
+			if conf.verbosity >= 1
+				log_error("lost", rel_path(f.path))
+			db.save([f])
+		return
+	
+	# time
+	let mtime = fs.mtime(f.path).time
+	if mtime == f.mtime
+		if conf.verbosity >= 2
+			log_ok("=", rel_path(f.path))
+	else
+		# changed?
+		try
+			let hash = fs.hash(f.path, "md5")
+			if hash == f.hash
+				if conf.verbosity >= 1
+					log_warn("touched", rel_path(f.path))
+				# ok
+				f.mtime = mtime
+			else
+				if conf.verbosity >= 1
+					log_warn("edited", rel_path(f.path))
+				f.set(CHANGED_FILE)
+				f.hash = hash
+				f.mtime = mtime
+				f.size = fs.size(f.path)
+				if conf.verbosity >= 2 or conf.show_meta
+					f.show_info("      ")
+			db.save([f])
+		except Exception as e
+			error_out(e)
+			return
 
 # "add"
 func file_add(out f: LocalFile)
 	if f.in_db()
-
-		# suddenly appearing?!?
-		if f.pure_remote()
-			if fs.exists(f.path)
-				f.unset(NONLOCAL)
-				if conf.verbosity >= 1
-					log_warn("non-nonlocal", rel_path(f.path))
-				return
-		
-		# lost?
-		if not fs.exists(f.path)
-			if not f.pure_remote()
-				f.set(NONLOCAL)
-				if conf.verbosity >= 1
-					log_error("lost", rel_path(f.path))
-			return
-		
-		# time
-		var mtime = fs.mtime(f.path).time
-		if mtime == f.mtime
-			if conf.verbosity >= 2
-				log_ok("=", rel_path(f.path))
-		else
-			# changed?
-			try
-				var hash = fs.hash(f.path, "md5")
-				if hash == f.hash
-					if conf.verbosity >= 1
-						log_warn("touched", rel_path(f.path))
-					# ok
-					f.mtime = mtime
-				else
-					if conf.verbosity >= 1
-						log_warn("edited", rel_path(f.path))
-					f.set(CHANGED_FILE)
-					f.hash = hash
-					f.mtime = mtime
-					f.size = fs.size(f.path)
-					if conf.verbosity >= 2 or conf.show_meta
-						f.show_info("      ")
-			except Exception as e
-				error_out(e)
-				return
+		file_check(f)
 	else
 		# new file
 		var hash: string
@@ -100,7 +101,7 @@ func file_add_new(out f: LocalFile, hash: string)
 
 
 # check for local changes
-func add_path(path: Path)
+func add_by_path(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
@@ -111,7 +112,7 @@ func add_path(path: Path)
 
 func action_add(arg: string[])
 	if len(arg) == 0
-		add_path(make_path("./"))
+		add_by_path(make_path("./"))
 	for a in arg
-		add_path(make_path(a))
+		add_by_path(make_path(a))
 

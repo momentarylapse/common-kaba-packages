@@ -1,10 +1,10 @@
-
+use config
 
 class Tag
 	var key: string
 	var value: string
 	func const __str__() -> string
-		return "{{key}}={{value}}"
+		return "{{key}}='{{bash_escape(value)}}'"
 	func const strh() -> string
 		return key + "=" + value.hex()
 	func const __lt__(o: Tag) -> bool

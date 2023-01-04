@@ -110,10 +110,11 @@ func get_tag(parts: string[], key: string) -> string
 
 
 func log_ok(op: string, msg: string)
-	print("{{terminal.YELLOW}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")
+	#{{terminal.WHITE}}
+	print("{{terminal.GREEN}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")
 
 func log_warn(op: string, msg: string)
-	print("{{terminal.CYAN}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")
+	print("{{terminal.YELLOW}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")
 
 func log_error(op: string, msg: string)
 	print("{{terminal.RED}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")

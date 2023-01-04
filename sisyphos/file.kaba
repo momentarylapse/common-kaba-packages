@@ -124,7 +124,7 @@ class LocalFile
 			return
 		name = _name
 		if conf.verbosity > 0
-			log_ok("name", name)
+			log_ok("name", "'{{bash_escape(name)}}'")
 		set(CHANGED_META)
 	func mut tag_add(tt: Tag)
 		if tt.key == "name"
@@ -146,7 +146,7 @@ class LocalFile
 				if t.value == tt.value
 					return
 				if conf.verbosity > 0
-					log_ok("tag set", "{{t}}  ->  {{tt.value}}")
+					log_ok("tag set", "{{t}}  ->  '{{bash_escape(tt.value)}}'")
 				t.value = tt.value
 				set(CHANGED_META)
 				return
@@ -175,7 +175,7 @@ class LocalFile
 		return "  "
 	func show_info(l: string)
 		#print(l + "path: " + path)
-		print(l + "name:    {{name}}")
+		print(l + "name:    '{{bash_escape(name)}}'")
 		print(l + "id:      {{id}}")
 		print(l + "hash:    {{hash}}")
 		#print(l + "mtime:   {{mtime}}")
@@ -185,7 +185,7 @@ class LocalFile
 		#print(l + "options: " + options)
 		var _tags = tags_sort(tags)
 		for t in _tags
-			print(l + "  tag:   {{t.key}}={{t.value}}")
+			print(l + "  tag:   {{t}}")
 	func remote_path() -> string
 		var ext = path.extension()
 		if is("quality=medium")
