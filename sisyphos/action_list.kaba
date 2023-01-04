@@ -5,15 +5,28 @@ use dblister
 use os
 
 
-func show_files(files: LocalFile[])
+func show_files(files: LocalFile[], refpoint: Path)
+	var cur_dir = refpoint
+	var indent = ""
+
 	for f in files
+		#var (indent,cur_dir) = get_indent_ref(f.path, refpoint)
+		while len(indent) > 0 and not (f.path in cur_dir)
+			cur_dir = cur_dir.parent()
+			indent = indent[:-4]
+		
 		if f.perfectly_fine() and not conf.show_perfectly_fine
 			continue
 		if not f.in_db() and not conf.show_not_in_db
 			continue
-		show_file(f)
+		show_file(f, cur_dir, indent)
 		if conf.show_meta or conf.verbosity >= 2
-			f.show_info("      ")
+			f.show_info(indent + "      ")
+		
+		
+		if f.is_dir
+			cur_dir = f.path
+			indent += "    "
 
 
 
@@ -21,7 +34,7 @@ func show_files(files: LocalFile[])
 func list_path(path: Path)
 	set_working_dir(path)
 	conf.show_pure_local = true
-	show_files(lister.find(path))
+	show_files(lister.find(path), working_dir)
 
 func action_list(arg: string[])
 	if len(arg) == 0
@@ -33,7 +46,7 @@ func _action_status(path: Path)
 	set_working_dir(path)
 	conf.show_pure_local = true
 	conf.show_perfectly_fine = false
-	show_files(lister.find(path))
+	show_files(lister.find(path), working_dir)
 
 func action_status(arg: string[])
 	if len(arg) == 0
@@ -43,5 +56,5 @@ func action_status(arg: string[])
 
 func action_find(arg: string[])
 	for filter in arg
-		show_files(db.find_by_tags(filter))
+		show_files(db.find_by_tags(filter), working_dir)
 

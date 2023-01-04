@@ -34,7 +34,9 @@ func nice_size(size: int) -> string
 
 
 func file_status_color(f: LocalFile) -> string
-	if !f.in_db()
+	if f.is_dir
+		return "{{terminal.BLUE}}{{terminal.BOLD}}"
+	if not f.in_db()
 		return "{{terminal.DARK_GRAY}}"
 	if f.pure_local()
 		return "{{terminal.GRAY}}"
@@ -46,7 +48,7 @@ func file_status_color(f: LocalFile) -> string
 		return "{{terminal.YELLOW}}{{terminal.BOLD}}"
 	return "{{terminal.BOLD}}"
 
-func show_file(f: LocalFile)
+func show_file(f: LocalFile, refpoint: Path, indent: string)
 	var s: string
 	if conf.show_meta_small
 		s = str_format(nice_size(f.size), " 6")
@@ -54,7 +56,7 @@ func show_file(f: LocalFile)
 			s += " m"
 		else
 			s += "  "
-	print("{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_path(f.path)}}{{terminal.END}}")
+	print("{{indent}}{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_to_path(f.path, refpoint)}}{{terminal.END}}")
 
 class LocalFile
 	#var drop_me = false
@@ -72,6 +74,7 @@ class LocalFile
 	var options: string[]
 	var tags: Tag[]
 	var local_id = -1
+	var is_dir = false
 	
 	func is(option: string) -> bool
 		for o in options
@@ -158,7 +161,9 @@ class LocalFile
 				set(CHANGED_META)
 				return
 	func status_str() -> string
-		if !in_db()
+		if is_dir
+			return "  "
+		if not in_db()
 			return "? "
 		if pure_local()
 			return "L "

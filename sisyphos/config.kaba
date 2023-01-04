@@ -44,17 +44,21 @@ func make_path(p: string) -> Path
 	return Path(p).absolute().canonical()
 
 var working_dir: Path
+
 func set_working_dir(path: Path)
 	if fs.is_directory(path)
 		working_dir = path.canonical()
 	else
 		working_dir = path.parent().canonical()
 
-func rel_path(path: Path) -> Path
-	if path in working_dir
-		return path.relative_to(working_dir)
+func rel_to_path(path: Path, refpoint: Path) -> Path
+	if path in refpoint
+		return path.relative_to(refpoint)
 #		return str(path)[len(str(working_dir)):]
 	return path
+
+func rel_path(path: Path) -> Path
+	return rel_to_path(path, working_dir)
 
 
 # needs to be surrounded by "..."

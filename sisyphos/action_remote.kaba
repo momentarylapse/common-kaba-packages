@@ -6,7 +6,7 @@ use remote
 
 func show_rfile_list(rfiles: RemoteFile[])
 	for f in rfiles
-		show_file(f)
+		show_file(f, working_dir, "")
 		if conf.show_meta
 			f.show_info("      ")
 
@@ -26,6 +26,6 @@ func action_remote_add(arg: string[])
 
 
 func action_remote_tag_list(arg: string[])
-	var r = call_alex("tag list", [arg[0]]).explode("\n")
+	let r = call_alex("tag list", [arg[0]]).explode("\n")
 	for t in r
 		print(t)

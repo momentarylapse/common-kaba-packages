@@ -23,8 +23,8 @@ func file_add(out f: LocalFile)
 				return
 		
 		# lost?
-		if !fs.exists(f.path)
-			if !f.pure_remote()
+		if not fs.exists(f.path)
+			if not f.pure_remote()
 				f.set(NONLOCAL)
 				if conf.verbosity >= 1
 					log_error("lost", rel_path(f.path))
@@ -81,7 +81,7 @@ func file_add(out f: LocalFile)
 func file_add_new(out f: LocalFile, hash: string)
 	log_ok("add", rel_path(f.path))
 	f.name = f.path.basename()
-	var ext = f.path.extension()
+	let ext = f.path.extension()
 	if len(ext) > 0
 		f.name = f.name.head(len(f.name) - len(ext) - 1)
 	#print(ext)
@@ -103,7 +103,8 @@ func add_path(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
 	for f in files
-		file_add(f)
+		if not f.is_dir
+			file_add(f)
 			
 	db.save(files)
 
