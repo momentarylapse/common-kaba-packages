@@ -146,7 +146,7 @@ func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 			var ll = rf
 			ll.path = root << ll.apply_structure(structure)
 			ll.set(NONLOCAL)
-			db.files.add(ll)
+			db.save([ll])
 			log_ok("add pure remote", str(rel_path(ll.path)))
 		
 			if conf.show_meta or conf.verbosity >= 2
@@ -161,7 +161,6 @@ func remote_sync_by_filter(filter: string, quality: string, structure: string, d
 			sync_file(rf, lf)
 		except
 			sync_add_pure_remote(rf, dir, structure)
-	#db.save()
 	print("TODO save")
 
 func remote_download(out f: LocalFile)

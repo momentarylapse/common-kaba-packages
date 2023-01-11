@@ -81,7 +81,7 @@ func _get_file(out f: LocalFile, dest: string)
 	
 	if conf.dry_run
 		return
-	db.files.add(f)
+	db.save([f])
 	make_all_dirs(f.path)
 
 func _action_get(filter: string, dest: string)

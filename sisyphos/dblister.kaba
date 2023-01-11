@@ -56,9 +56,11 @@ class DBLister
 		var i = 0
 		for f in files
 			if i < len(paths)
-				while paths[i] < f.path and i < len(paths)
+				while paths[i] < f.path
 					fake_files.add(file_from_path(paths[i]))
 					i ++
+					if i >= len(paths)
+						break
 
 			r.add(f)
 			if i < len(paths)

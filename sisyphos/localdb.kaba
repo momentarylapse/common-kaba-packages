@@ -156,6 +156,8 @@ class LocalFileDB
 
 	## TODO....
 	func selfref _find_by_local_id(id: int) -> LocalFile*
+		if id < 0
+			return nil
 		for f in files
 			if f.local_id == id
 				return &f
@@ -167,6 +169,8 @@ class LocalFileDB
 			var _f = _find_by_local_id(f.local_id)
 			if _f
 				*_f = f
+			else
+				files.add(f)
 		save_all()
 	
 	func mut delete(f: LocalFile)
