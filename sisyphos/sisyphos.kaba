@@ -117,7 +117,7 @@ func run_command(arg: string[])
 			if len(arg) < 3
 				log_error("error", "ignore add <PATH>")
 				return
-			conf.ignore.add(make_path(arg[2]))
+			conf.ignore.add(str(make_path(arg[2])))
 			conf.save()
 		else if arg[1] == "rm"
 			if len(arg) < 3

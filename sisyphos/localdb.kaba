@@ -88,25 +88,25 @@ class LocalFileDB
 		print("checking directories")
 		for f in files
 			if fs.exists(f.path) and fs.is_directory(f.path)
-				log_error("directory", f.path)
+				log_error("directory", str(f.path))
 				delete(f)
 	
 	func mut check_missing()
 		print("checking missing")
 		for f in files
 			if not fs.exists(f.path)
-				log_error("missing", f.path)
+				log_error("missing", str(f.path))
 
 	func mut check_empty_hashes()
 		print("checking empty hashes")
 		for f in files
 			if f.hash == ""
 				if fs.exists(f.path)
-					log_error("empty hash", f.path)
+					log_error("empty hash", str(f.path))
 					f.hash = fs.hash(f.path, "md5")
 					save([f])
 				else if f.id == ""
-					log_error("ghost", f.path)
+					log_error("ghost", str(f.path))
 					delete(f)
 				#else
 					# hash='', id='', no file
@@ -120,7 +120,7 @@ class LocalFileDB
 			if l.local_id == f.local_id
 				continue
 			if f.path == l.path
-				log_error("duplicate", f.path)
+				log_error("duplicate", str(f.path))
 				if l.mergeable(f)
 					l.merge(f)
 					save([f])
@@ -139,7 +139,7 @@ class LocalFileDB
 			let l = find_by_path(f.path)
 			if l.local_id == f.local_id
 				continue
-			log_error("path collision", f.path)
+			log_error("path collision", str(f.path))
 			let new_path = unique_path(f)
 			
 			log_warn("move", "{{rel_path(f.path)}} > {{rel_path(new_path)}}")

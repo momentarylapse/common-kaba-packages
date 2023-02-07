@@ -52,14 +52,14 @@ func find_external() -> ExternalPackage[]
 	let list = fs.search("extern", "", "d")
 	for e in list
 		var p: ExternalPackage
-		p.name = e
-		p.main = weak(default_context.load_module("extern/" + e + "/" + e + ".kaba", true))
+		p.name = str(e)
+		p.main = weak(default_context.load_module("extern/{{e}}/{{e}}.kaba", true))
 		
 		# sub-modules
-		let list2 = fs.search("extern/" + e , "*.kaba", "f")
+		let list2 = fs.search("extern/{{e}}", "*.kaba", "f")
 		for e2 in list2
 			if str(e2) != str(e) + ".kaba"
-				p.sub_modules.add([str(e2).replace(".kaba", ""), weak(default_context.load_module("extern/" + e + "/" + e2, true))])
+				p.sub_modules.add([str(e2).replace(".kaba", ""), weak(default_context.load_module("extern/{{e}}/{{e2}}", true))])
 		#p.name = str(e)[:-5]
 		r.add(p)
 	return r
@@ -68,7 +68,7 @@ func find_external_libs() -> Module*[]
 	var r: Module*[]
 	let list = fs.search("lib", "*.kaba", "f")
 	for e in list
-		var p = weak(default_context.load_module("lib/" + e, true))
+		var p = weak(default_context.load_module("lib/{{e}}", true))
 		p.name = str(e)[:-5]
 		r.add(p)
 	return r

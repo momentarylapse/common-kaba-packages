@@ -71,8 +71,8 @@ func make_path_safe_for_download(out f: LocalFile) -> bool
 		return false
 	return true
 
-func _get_file(out f: LocalFile, dest: string)
-	f.path = Path(f.apply_structure(dest))
+func _get_file(out f: LocalFile, dest: Path)
+	f.path = Path(f.apply_structure(str(dest)))
 	if not make_path_safe_for_download(f)
 		log_warn("exists", rel_path(f.path))
 		return
@@ -84,7 +84,7 @@ func _get_file(out f: LocalFile, dest: string)
 	db.save([f])
 	make_all_dirs(f.path)
 
-func _action_get(filter: string, dest: string)
+func _action_get(filter: string, dest: Path)
 	var files = remote_find(filter, conf.default_quality)
 	for f in files
 		_get_file(f, dest)

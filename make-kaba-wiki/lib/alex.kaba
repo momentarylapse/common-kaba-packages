@@ -41,7 +41,7 @@ class DbFile
 			print("  size: {{size}}")
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
-	func medium_path() -> string
+	func medium_path() -> Path
 		if type.find("/audio/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
 		if type.find("/image/", 0) >= 0

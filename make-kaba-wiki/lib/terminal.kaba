@@ -101,6 +101,20 @@ func move_cursor(dx: int, dy: int)
 
 class BreakSignal extends Exception
 
+func read_char() -> string
+	while true
+		var s = stdin.read(4)
+		#print(s.hex())
+		if len(s) == 0
+			continue
+		if s == [0x03]
+			unsetraw()
+			raise(new Exception("break"))
+		if s == [0x04]
+			unsetraw()
+			raise(new Exception("end"))
+		return s
+
 func fancy_read_command(prompt: string, out history: string[]) -> string
 	var ppp = _print_postfix
 	_print_postfix = ""

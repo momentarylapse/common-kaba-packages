@@ -104,9 +104,9 @@ class Config
 	func mut save()
 		var c: os.Configuration
 		c["project.name"] = name
-		c["build.source"] = source_dir
-		c["build.binary"] = binary_file
-		c["build.main"] = main_file
+		c["build.source"] = str(source_dir)
+		c["build.binary"] = str(binary_file)
+		c["build.main"] = str(main_file)
 		c["build.language"] = language
 		c["build.optimization"] = optimization
 		c["build-type"] = build_type
@@ -115,9 +115,9 @@ class Config
 		c["build.libraries-optional"] = sa2any(libs_optional)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
-		c["install.source"] = install_source
+		c["install.source"] = str(install_source)
 		c["install.icons"] = sa2any(icons)
-		c["install.desktop-file"] = desktop_file
+		c["install.desktop-file"] = str(desktop_file)
 		c["install.mime-files"] = sa2any(mime_files)
 		c["install.additional"] = sa2any(installs_additional)
 		c.save(conf.root << "xmake.conf")
@@ -126,7 +126,7 @@ class Config
 		var r: Path[]
 		let list = fs.search(install_source, "*.*", "fd")
 		var ignore = mime_files
-		ignore.add(desktop_file)
+		ignore.add(str(desktop_file))
 		for e in list
 			if not (str(install_source << e) in ignore)
 				r.add(install_source << e)

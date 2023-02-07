@@ -57,8 +57,8 @@ func rel_to_path(path: Path, refpoint: Path) -> Path
 #		return str(path)[len(str(working_dir)):]
 	return path
 
-func rel_path(path: Path) -> Path
-	return rel_to_path(path, working_dir)
+func rel_path(path: Path) -> string
+	return str(rel_to_path(path, working_dir))
 
 
 # needs to be surrounded by "..."

@@ -24,15 +24,15 @@ func ssh_escape(s: string) -> string
 	r = r.replace("'", "\\\\'")
 	return r
 
-func scp_download(source: string, dest: string)
+func scp_download(source: Path, dest: Path)
 	var cmd = "scp -Tp"
-	cmd += " {{conf.server}}:\"{{bash_escape2(source)}}\" \"{{bash_escape(dest)}}\""
+	cmd += " {{conf.server}}:\"{{bash_escape2(str(source))}}\" \"{{bash_escape(str(dest))}}\""
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)
 
-func scp_upload(source: string, dest: string)
-	var cmd = "scp -Tp \"{{bash_escape(source)}}\" {{conf.server}}:{{scp_escape(dest)}}"
+func scp_upload(source: Path, dest: Path)
+	var cmd = "scp -Tp \"{{bash_escape(str(source))}}\" {{conf.server}}:{{scp_escape(str(dest))}}"
 	if conf.verbosity >= 2
 		print(cmd)
 	shell_execute(cmd)

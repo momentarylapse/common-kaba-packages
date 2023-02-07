@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib64/libglfw.so
+let KABA_LINK = "/usr/lib64/libglfw.so
 	_glfwInit:glfwInit
 	_glfwVulkanSupported:glfwVulkanSupported
 	_glfwWindowHint:glfwWindowHint
@@ -41,9 +41,9 @@ func extern _glfwGetJoystickName(j: int) -> char[0]*
 func extern _glfwGetGamepadName(j: int) -> char[0]*
 func extern _glfwGetGamepadState(j: int, p: void*) -> int
 
-const GLFW_CLIENT_API = 0x00022001
-const GLFW_NO_API = 0
-const GLFW_RESIZABLE = 0x00020003
+let GLFW_CLIENT_API = 0x00022001
+let GLFW_NO_API = 0
+let GLFW_RESIZABLE = 0x00020003
 
 func init(opts: string[])
 	_glfwInit()
@@ -199,7 +199,7 @@ class GamepadState
 		for a in axes
 			a = 0
 
-class Gamepad as shared extends GamepadState
+class Gamepad extends GamepadState as shared
 	enum Button
 		CROSS
 		CIRCLE

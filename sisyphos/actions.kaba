@@ -29,7 +29,7 @@ func move_path(source: Path, dest: Path)
 func move_file_by_path(source: Path, _dest: Path)
 	try
 		var f = db.find_by_path(source)
-		var dest = Path(f.apply_structure(_dest))
+		var dest = Path(f.apply_structure(str(_dest)))
 		if fs.is_directory(dest)
 			dest = dest.canonical() << source.basename()
 		log_warn("move", "{{rel_path(source)}} -> {{rel_path(dest)}}")
@@ -97,10 +97,10 @@ func _action_structure_auto(dir: Path)
 	set_working_dir(dir)
 	var files = db.get_in_dir(dir, conf.recursive)
 	for f in files
-		var e = conf.get_cfg(f.path)
+		let e = conf.get_cfg(f.path)
 		if !e
 			continue
-		structure_file(f, e.dir << e.structure)
+		structure_file(f, str(e.dir << e.structure))
 
 func action_structure_auto(arg: string[])
 	for a in arg
