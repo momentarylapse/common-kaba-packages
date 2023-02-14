@@ -8,7 +8,7 @@ in
 Die Transformations-Matrix des Modelles, die die Modell-Vertices in die [0,1]x[0,1]-Koordinaten des Bildschirms projeziert.\n<c>m_id</c> diehnt als Identität (Einheits-Matrix).
 // Parameter z
 in
-Die Tiefe der Anzeige, sie muss in [0,1) liegen und wird f&ur die Darstellungs-Reihenfolge der Anzeigen verwendet.
+Die Tiefe der Anzeige, sie muss in [0,1) liegen und wird für die Darstellungs-Reihenfolge der Anzeigen verwendet.
 // Synopsis
 s:Picture3d
 #

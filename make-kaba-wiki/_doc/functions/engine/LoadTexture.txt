@@ -1,5 +1,5 @@
 // Description
-L&adt eine Textur-Datei.\nJede Datei wird nur einmal geladen, jeder weitere Aufruf mit dem selben Dateinamen gibt jedigilch die Referenz auf die schon geladene Textur zur&uck.\nUnterst&utzt werden die Formate bmp, tga, jpg und avi (animiert!).
+Lädt eine Textur-Datei.\nJede Datei wird nur einmal geladen, jeder weitere Aufruf mit dem selben Dateinamen gibt jedigilch die Referenz auf die schon geladene Textur zurück.\nUnterstützt werden die Formate bmp, tga, jpg und avi (animiert!).
 // Parameter filename
 in
 Der Name der Textur-Datei (relativ zum "Textures/"-Verzeichnis; mit Endung).

@@ -1,29 +1,29 @@
 // Description
-Animiert ein Modell, bzw. f&ugt dem Modell eine Animation hinzu.\nDie Formel f&ur das Weiterz&ahlen der Animation: [ <v>time</v> += <v>dt</v> * ( <v>FpsConst</v> + <v>v</v> * <v>FpsFactor</v> ) ], wobei <v>FpsConst</v> und <v>FpsFactor</v> die im Editor eingetragenen Eigenschaften der jeweiligen Animation sind..
+Animiert ein Modell, bzw. fügt dem Modell eine Animation hinzu.\nDie Formel für das Weiterzählen der Animation: [ <v>time</v> += <v>dt</v> * ( <v>FpsConst</v> + <v>v</v> * <v>FpsFactor</v> ) ], wobei <v>FpsConst</v> und <v>FpsFactor</v> die im Editor eingetragenen Eigenschaften der jeweiligen Animation sind..
 // Parameter operation
 in
-Die Art, wie die aktuelle Animation die bisherigen &uberlagern soll. M&oglich sind:\n<c>MoveOpSet</c> &uberschreibt die bisherigen Animationen (vorteilhaft f&ur die erste Animation)\n<c>MoveOpSetNewKeyed</c> &uberschreibt nur die Teile der Animation, die sich in dieser Animation bewegen\n<c>MoveOpSetOldKeyed</c> &uberschreibt nur die Teile der Animation, die bisher unbewegt blieben\n<c>MoveOpAdd1Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> + <v>aktuell</v> * <v>param1</v>\n<c>MoveOpMix1Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> * ( 1 - <v>param1</v> ) + <v>aktuell</v> * <v>param1</v>\n<c>MoveOpMix2Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> * <v>param1</v> + <v>aktuell</v> * <v>param2</v>.
+Die Art, wie die aktuelle Animation die bisherigen überlagern soll. Möglich sind:\n<c>MoveOpSet</c> überschreibt die bisherigen Animationen (vorteilhaft für die erste Animation)\n<c>MoveOpSetNewKeyed</c> überschreibt nur die Teile der Animation, die sich in dieser Animation bewegen\n<c>MoveOpSetOldKeyed</c> überschreibt nur die Teile der Animation, die bisher unbewegt blieben\n<c>MoveOpAdd1Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> + <v>aktuell</v> * <v>param1</v>\n<c>MoveOpMix1Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> * ( 1 - <v>param1</v> ) + <v>aktuell</v> * <v>param1</v>\n<c>MoveOpMix2Factor</c> interpoliert: <v>Resultat</v> = <v>bisher</v> * <v>param1</v> + <v>aktuell</v> * <v>param2</v>.
 // Parameter param1
 in
-Der erste Parameter zur &Uberlagerung.
+Der erste Parameter zur Überlagerung.
 // Parameter param2
 in
-Der zweite Parameter zur &Uberlagerung.
+Der zweite Parameter zur Überlagerung.
 // Parameter move
 in
 Der Index der Animation, der im Editor eingetragen wurde.
 // Parameter time
 in,out
-Die Variable, die den Stand der Animation speichert. Sie wird durch die folgenden Parameter weitergez&ahlt.
+Die Variable, die den Stand der Animation speichert. Sie wird durch die folgenden Parameter weitergezählt.
 // Parameter dt
 in
-Die Zeit, die seit dem letzten Frame vergangen sein soll. (in den meisten F&allen kann [[v:Elapsed]] angegeben werden.)
+Die Zeit, die seit dem letzten Frame vergangen sein soll. (in den meisten Fällen kann [[v:Elapsed]] angegeben werden.)
 // Parameter v
 in
-Der zus&atzliche Parameter f&ur die Weiterz&ahlung der Animation.
+Der zusätzliche Parameter für die Weiterzählung der Animation.
 // Parameter loop
 in
-Legt fest, ob die Animation wiederholt werden soll, wenn sie das Ende erreicht, oder ob sie dort anh&alt.
+Legt fest, ob die Animation wiederholt werden soll, wenn sie das Ende erreicht, oder ob sie dort anhält.
 // Return
 <c>true</c>, falls die Animation ihr Ende erreicht hat, ansonsten <c>false</c>.
 #

@@ -8,7 +8,7 @@ in
 Der Datei-Filter. Z.B. "*.txt", um nach Text-Dateien suchen zu lassen.
 // Parameter show_dirs
 in
-Gibt an, ob die Unterverzeichisse zu den Suchergebnissen hinzugef&ugt werden sollen.
+Gibt an, ob die Unterverzeichisse zu den Suchergebnissen hinzugefügt werden sollen.
 // Return
 Eine Liste von Dateieinträgen
 #

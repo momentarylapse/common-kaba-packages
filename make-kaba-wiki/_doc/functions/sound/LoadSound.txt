@@ -1,5 +1,5 @@
 // Description
-L&adt eine Sound-Datei in die 3d-Welt und l&asst sie als Schleife abspielen. Als Format ist nur Wave (*.wav) mit einem einzelnen Kanal erlaubt.\nEs sollte unverzüglich [[f:Sound.set]] aufgerufen werden, um die relevanten Daten festzulegen.
+Lädt eine Sound-Datei in die 3d-Welt und lässt sie als Schleife abspielen. Als Format ist nur Wave (*.wav) mit einem einzelnen Kanal erlaubt.\nEs sollte unverzüglich [[f:Sound.set]] aufgerufen werden, um die relevanten Daten festzulegen.
 // Parameter filename
 in
 Der Dateiname (relativ zum "Sounds/"-Verzeichnis, mit Endung).

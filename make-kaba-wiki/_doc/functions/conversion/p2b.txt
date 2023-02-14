@@ -4,5 +4,5 @@ Konvertiert einen Pointer in einen <t>bool</t>-Wert.
 in
 Der Pointer.
 // Return
-Der <t>bool</t>-Wert. <c>false</c> f&ur <v>p</v> = <c>nil</c>, ansonsten <c>true</c>.
+Der <t>bool</t>-Wert. <c>false</c> für <v>p</v> = <c>nil</c>, ansonsten <c>true</c>.
 #

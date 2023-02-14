@@ -1,5 +1,5 @@
 // Description
-Berechnet den Schnittpunkt einer Ebene mit einer Geraden.\nDie Gerade wird durch 2 Punkte definiert, durch die sie verl&auft.
+Berechnet den Schnittpunkt einer Ebene mit einer Geraden.\nDie Gerade wird durch 2 Punkte definiert, durch die sie verläuft.
 // Parameter l1
 in
 Der erste Punkt der Geraden.

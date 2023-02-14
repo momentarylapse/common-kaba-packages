@@ -2,7 +2,7 @@
 Erzeugt eine Zufallszahl vom Typ <v>int</t>.
 // Parameter max
 in
-Die obere Grenze f&ur die Zufallszahl.
+Die obere Grenze für die Zufallszahl.
 // Return
 Eine Zufallszahl aus dem halboffenen Intervall [0..<v>max</v>).
 // Synopsis

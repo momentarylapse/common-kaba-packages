@@ -5,5 +5,5 @@ out
 Die Rotations-Matrix.
 // Parameter ang
 in
-Der Drehwinkel (im Bogenma&s).
+Der Drehwinkel (im Bogenmaß).
 #

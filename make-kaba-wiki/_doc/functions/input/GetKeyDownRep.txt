@@ -1,5 +1,5 @@
 // Description
-Testet, ob eine Taste gerade gedr&uckt wurde (also in diesem Frame gedr&uckt ist, es aber im letzten noch nicht war). Zusätzlich schlägt diese Funktion in regelmäßigen Abständen an, solange die Taste gedrückt bleibt.
+Testet, ob eine Taste gerade gedrückt wurde (also in diesem Frame gedrückt ist, es aber im letzten noch nicht war). Zusätzlich schlägt diese Funktion in regelmäßigen Abständen an, solange die Taste gedrückt bleibt.
 // Return
 Die ID der gerade gedrückten Taste, ansonsten -2.
 #

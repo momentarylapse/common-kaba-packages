@@ -1,8 +1,8 @@
 // Description
-Ermittelt die Gr&o&se eines Variablentyps.
+Ermittelt die Größe eines Variablentyps.
 // Parameter type
 in
 Der Variablentyp.
 // Return
-Die Gr&o&se in byte.
+Die Größe in byte.
 #

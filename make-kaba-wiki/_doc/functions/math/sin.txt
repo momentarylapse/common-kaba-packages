@@ -2,7 +2,7 @@
 Berechnet den Sinus von x.
 // Parameter x
 in
-Winkel  (im Bogenma&s), dessen Sinus berechnet werden soll.
+Winkel  (im Bogenmaß), dessen Sinus berechnet werden soll.
 // Return
 Ja, was wohl?
 #

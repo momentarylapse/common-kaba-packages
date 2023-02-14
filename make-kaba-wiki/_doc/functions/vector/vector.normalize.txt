@@ -1,3 +1,3 @@
 // Description
-Normalisiert einen Vektor zu einem Einheitsvektor, verl&angert oder verk&urzt ihn also auf die L&ange 1.
+Normalisiert einen Vektor zu einem Einheitsvektor, verlängert oder verkürzt ihn also auf die Länge 1.
 #

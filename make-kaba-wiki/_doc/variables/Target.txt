@@ -1,5 +1,5 @@
 // Description
-Repr&asentiert den kompletten Bereich f&ur die grafische Darstellung.\nEntspricht <tt>rect( 0, TargetWidth, 0, TargetHeight )</tt>.
+Repräsentiert den kompletten Bereich für die grafische Darstellung.\nEntspricht <tt>rect( 0, TargetWidth, 0, TargetHeight )</tt>.
 // Synopsis
 TargetWidth,TargetHeight,Target,ScreenWidth,ScreenHeight,ScreenDepth
 #

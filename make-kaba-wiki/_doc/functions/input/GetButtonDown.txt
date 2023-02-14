@@ -1,8 +1,8 @@
 // Description
-Testet, ob eine Maustaste gerade gedr&uckt wurde (ob sie in diesem Frame gedr&uckt ist, es im letzten aber noch nicht war).
+Testet, ob eine Maustaste gerade gedrückt wurde (ob sie in diesem Frame gedrückt ist, es im letzten aber noch nicht war).
 // Parameter button
 in
 Die zu testende Maustaste (0 = linke, 1 = mittlere, 2 = rechte).
 // Return
-<c>true</c>, falls die Maustaste gerade gedr&uckt wurde, ansonsten <c>false</c>.
+<c>true</c>, falls die Maustaste gerade gedrückt wurde, ansonsten <c>false</c>.
 #

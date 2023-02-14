@@ -1,5 +1,5 @@
 // Description
-Gibt einen einzelnen Vertex-Punkt eines Modelles in Welt-Koordinaten zur&uck.\n---ethisch nicht perfekt---
+Gibt einen einzelnen Vertex-Punkt eines Modelles in Welt-Koordinaten zurück.\n---ethisch nicht perfekt---
 // Parameter index
 in
 Der Index des Vertex-Punktes.

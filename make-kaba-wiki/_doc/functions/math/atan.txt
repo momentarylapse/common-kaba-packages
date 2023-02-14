@@ -2,7 +2,7 @@
 Berechnet den Arcus-Tangens von x. Dies ist die Umkehrung des Tangens, also von [[f:tan]].
 // Parameter x
 in
-Parameter, dessen Arcus-Tangens berechnet werden soll. (keine Einschr&ankung)
+Parameter, dessen Arcus-Tangens berechnet werden soll. (keine Einschränkung)
 // Return
 Ein Wert aus (-<c>pi</c>/2,<c>pi</c>/2).
 #

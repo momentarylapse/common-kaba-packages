@@ -8,7 +8,7 @@ in
 Rot.
 // Parameter g
 in
-Gr&un.
+Grün.
 // Parameter b
 in
 Blau.

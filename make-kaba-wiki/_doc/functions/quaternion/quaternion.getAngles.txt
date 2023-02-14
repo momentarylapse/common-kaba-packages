@@ -1,5 +1,5 @@
 // Description
-Berechnet aus einer Quaternion die Winkel, mit denen um die jewiligen Achsen gedreht wurde.\nEs wurde um die Achsen gedreht in der Reihenfolge (Z,X,Y), wobei die Drehachsen nicht mitgedreht werden.\nW&urde der erhaltene Winkel-Vektor an [[QuaternionRotationV]] &ubergeben, so w&urde wieder die selbe Quaternion entstehen.
+Berechnet aus einer Quaternion die Winkel, mit denen um die jewiligen Achsen gedreht wurde.\nEs wurde um die Achsen gedreht in der Reihenfolge (Z,X,Y), wobei die Drehachsen nicht mitgedreht werden.\nWürde der erhaltene Winkel-Vektor an [[QuaternionRotationV]] übergeben, so würde wieder die selbe Quaternion entstehen.
 // Return
-Die Drehwinkel um die Koordinaten-Achsen sind die jeweiligen Komponenten des Vektors (im Bogenma&s).
+Die Drehwinkel um die Koordinaten-Achsen sind die jeweiligen Komponenten des Vektors (im Bogenmaß).
 #

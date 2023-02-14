@@ -1,5 +1,5 @@
 // Description
-Ermittelt zu einem Tasten-Index den zugeh&origen (englischen) Namen.
+Ermittelt zu einem Tasten-Index den zugehörigen (englischen) Namen.
 // Parameter id
 in
 Der Index der Taste.

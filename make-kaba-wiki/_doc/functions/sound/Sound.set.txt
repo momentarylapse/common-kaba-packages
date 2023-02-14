@@ -14,7 +14,7 @@ in
 Die Reichweite, in der der Sound gerade noch hörbar ist.
 // Parameter speed
 in
-Die Abspielgeschwindigkeit. 1 ist die nat&urliche Geschwindigkeit.
+Die Abspielgeschwindigkeit. 1 ist die natürliche Geschwindigkeit.
 // Parameter volume
 in
 Die Lautstärke (aus [0..1]).

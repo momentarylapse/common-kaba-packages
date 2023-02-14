@@ -5,7 +5,7 @@ out
 Die Rotations-Matrix.
 // Parameter ang
 in
-Die Drehwinkel um die jeweiligen Achsen sind die Komponenten des Vektors (im Bogenma&s).
+Die Drehwinkel um die jeweiligen Achsen sind die Komponenten des Vektors (im Bogenmaß).
 // Synopsis
 s:vector
 #

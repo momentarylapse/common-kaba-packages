@@ -1,8 +1,8 @@
 // Description
-Testet, ob eine Taste gerade losgelassen wurde (also im letzten Frame gedr&uckt war, es aber in diesem nicht mehr ist).
+Testet, ob eine Taste gerade losgelassen wurde (also im letzten Frame gedrückt war, es aber in diesem nicht mehr ist).
 // Parameter id
 in
-Index der zu pr&ufenden Taste. (z.B. <c>KEY_ESCAPE</c> f&ur die [Escape]-Taste)
+Index der zu prüfenden Taste. (z.B. <c>KEY_ESCAPE</c> für die [Escape]-Taste)
 // Return
 <c>true</c>, falls gerade losgelassen worden, ansonsten <c>false</c>.
 #

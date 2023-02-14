@@ -1,5 +1,5 @@
 // Description
-Testet, ob eine Maustaste gedr&uckt ist.
+Testet, ob eine Maustaste gedrückt ist.
 // Parameter button
 in
 Die zu testende Maustaste (0 = linke, 1 = mittlere, 2 = rechte).

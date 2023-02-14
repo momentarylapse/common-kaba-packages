@@ -3,11 +3,11 @@ Ein (3d-) Bild auf dem Bildschirm.
 // Element enabled
 Wird dieses Element auf <c>false</c> gesetzt, wird die Darstellung auf dem Bildschirm unterbunden. ('''default''': <c>true</c>)
 // Element lighting
-Beleuchtung des Modells durch Lichtquellen in der Karte? <c>false</c> l&asst das Modell in seiner maximalen Helligkeit erstrahlen. ('''default''': <c>false</c>)
+Beleuchtung des Modells durch Lichtquellen in der Karte? <c>false</c> lässt das Modell in seiner maximalen Helligkeit erstrahlen. ('''default''': <c>false</c>)
 // Element world_3d
 Wird dieses Element auf <c>true</c> gesetzt, so wird es in die 3d-Welt gesetzt, statt als 2d-Objekt in der graphischen Oberfläche zu dienen. ('''default''': <c>false</c>)
 // Element z
-Die Tiefe im Bildschirm. Nur f&ur die Reihenfolge/&Uberdeckung der Bilder. (muss aus [0..1) sein)
+Die Tiefe im Bildschirm. Nur für die Reihenfolge/Überdeckung der Bilder. (muss aus [0..1) sein)
 // Element matrix
 Die Matrix, die die Modell-Koordinaten in Bildschirm-Koordinaten transformiert.
 // Element model

@@ -1,5 +1,5 @@
 // Description
-Eine Oberfl&ache eines Modells.
+Eine Oberfläche eines Modells.
 // Element vertex
 Anzahl der Vertex-Punkte.
 // Element bone_index

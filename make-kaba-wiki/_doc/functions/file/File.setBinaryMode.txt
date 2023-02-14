@@ -1,6 +1,6 @@
 // Description
-Versetzt die Datei in den Bin&ar- oder Textmodus.\nIm Textmodus werden Daten in Ascii-Form gespeichert.
+Versetzt die Datei in den Binär- oder Textmodus.\nIm Textmodus werden Daten in Ascii-Form gespeichert.
 // Parameter binary
 in
-Bin&armodus.
+Binärmodus.
 #

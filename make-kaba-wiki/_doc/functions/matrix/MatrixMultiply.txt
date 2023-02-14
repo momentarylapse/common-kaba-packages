@@ -5,8 +5,8 @@ out
 Das Produkt der Matrizen
 // Parameter m2
 in
-Die Matrix, die die zweite auszuf&uhrende Transformation verk&orpert.
+Die Matrix, die die zweite auszuführende Transformation verkörpert.
 // Parameter m1
 in
-Die Matrix, die die zuerst auszuf&uhrende Transformation verk&orpert.
+Die Matrix, die die zuerst auszuführende Transformation verkörpert.
 #

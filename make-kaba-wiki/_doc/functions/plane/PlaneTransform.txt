@@ -8,5 +8,5 @@ in
 Die Transformationsmatrix.
 // Parameter pl_in
 in
-Die urspr&ungliche Ebene.
+Die ursprüngliche Ebene.
 #

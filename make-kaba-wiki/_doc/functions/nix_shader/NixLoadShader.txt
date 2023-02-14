@@ -1,5 +1,5 @@
 // Description
-L&adt eine (Shader-) Effekt-Datei OpenGL GLSL-Syntax f&ur Vertex- und Pixelshader.\nDer Effekt kann einem Modell oder der ganzen Kamera zugewie&sen werden.
+Lädt eine (Shader-) Effekt-Datei OpenGL GLSL-Syntax für Vertex- und Pixelshader.\nDer Effekt kann einem Modell oder der ganzen Kamera zugewießen werden.
 // Parameter filename
 in
 Der Dateiname (relativ zum "Materials/"-Verzeichnis, ohne Endung).

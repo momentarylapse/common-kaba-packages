@@ -1,5 +1,5 @@
 // Description
-Berechnet die L&ange eines Vektors.
+Berechnet die Länge eines Vektors.
 // Return
-Die L&ange. (<math> = \sqrt{x^2 + y^2 + z^2} </math> )
+Die Länge. (<math> = \sqrt{x^2 + y^2 + z^2} </math> )
 #

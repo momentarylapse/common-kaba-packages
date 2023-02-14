@@ -1,5 +1,5 @@
 // Description
-Erstellt eine Quaternion, das eine Rotation verk&orpert.\nEs wird um eine Einheits-Drehachse und einen Drhwinkel rotiert.
+Erstellt eine Quaternion, das eine Rotation verkörpert.\nEs wird um eine Einheits-Drehachse und einen Drhwinkel rotiert.
 // Parameter q_out
 out
 Die Rotations-Quaternion.
@@ -8,5 +8,5 @@ in
 Die Drehachse.
 // Parameter angle
 in
-Der Drehwinkel (im Bogenma&s).
+Der Drehwinkel (im Bogenmaß).
 #

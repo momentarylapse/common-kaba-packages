@@ -1,5 +1,5 @@
 // Description
-Berechnet eine Farbe aus Farbwert, S&attigung und Helligkeit.\nAlle Parameter sind aus dem Intervall [0..1].
+Berechnet eine Farbe aus Farbwert, Sättigung und Helligkeit.\nAlle Parameter sind aus dem Intervall [0..1].
 // Parameter a
 in
 Alpha. ("inverse Transparenz")
@@ -8,10 +8,10 @@ in
 Farbwert. Gibt den Punkt im Farbspektrum ab.
 // Parameter s
 in
-S&attigung. 0 entspricht einem Grauton, 1 der maximalen Farbintensit&at.
+Sättigung. 0 entspricht einem Grauton, 1 der maximalen Farbintensität.
 // Parameter b
 in
-Helligkeit. 0 entspricht schwarz, 1 der hellstm&oglichen Farbe.
+Helligkeit. 0 entspricht schwarz, 1 der hellstmöglichen Farbe.
 // Return
 Der errechnete Farbwert.
 // Synopsis

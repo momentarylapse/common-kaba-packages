@@ -6,5 +6,5 @@ Der Index der Animation, wie er im Editor eingetragen wurde.
 // Return
 Die Anzahl der Frames.
 // Remark
-Bei unanimierten Modellen oder fehlenden Animationen wird 0 zur&uckgegeben.
+Bei unanimierten Modellen oder fehlenden Animationen wird 0 zurückgegeben.
 #

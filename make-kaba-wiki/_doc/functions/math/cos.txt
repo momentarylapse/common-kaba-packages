@@ -2,7 +2,7 @@
 Berechnet den Kosinus von x.
 // Parameter x
 in
-Winkel  (im Bogenma&s), dessen Kosinus berechnet werden soll.
+Winkel  (im Bogenmaß), dessen Kosinus berechnet werden soll.
 // Return
 Ja, was wohl?
 #

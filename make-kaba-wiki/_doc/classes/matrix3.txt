@@ -1,5 +1,5 @@
 // Description
-Eine 3x3-Matrix.\nHaupts&achlich f&ur Tr&agheitstensoren von Objekten und Modellen.
+Eine 3x3-Matrix.\nHauptsächlich für Trägheitstensoren von Objekten und Modellen.
 // Element _11
 -
 // Element _12

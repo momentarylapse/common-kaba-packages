@@ -1,5 +1,5 @@
 // Description
-Testet, ob &uber eine Verbindung Daten empfangen werden k&onnen. Dazu muss sie die Gegenseite verschickt haben.
+Testet, ob über eine Verbindung Daten empfangen werden können. Dazu muss sie die Gegenseite verschickt haben.
 // Return
 <c>true</c>, wenn gelesen werden kann, ansonsten <c>false</c>.
 #

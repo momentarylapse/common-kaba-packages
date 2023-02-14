@@ -1,5 +1,5 @@
 // Description
-Testet, ob die Maustaste gerade losgelassen wurde (ob sie im letzten Frame gedr&uckt war, es in diesem aber nicht mehr ist).
+Testet, ob die Maustaste gerade losgelassen wurde (ob sie im letzten Frame gedrückt war, es in diesem aber nicht mehr ist).
 // Parameter button
 in
 Die zu testende Maustaste (0 = linke, 1 = mittlere, 2 = rechte).

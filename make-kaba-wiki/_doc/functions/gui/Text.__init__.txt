@@ -5,7 +5,7 @@ in
 Position der linken oberen Ecke des Textes. Wird <v>centric</v> gesetzt, so wird diese Position zur Mitte der oberen Kante.
 // Parameter size
 in
-H&ohe der Schrift als Bruchteil der Fenster-/Bildschirmh&ohe.
+Höhe der Schrift als Bruchteil der Fenster-/Bildschirmhöhe.
 // Parameter c
 in
 Die Farbe der Schrift,

@@ -2,10 +2,10 @@
 Erstellt eine Anzeige-Gruppe, die mehrere Elemente ([[s:Picture]], [[s:Text]], [[s:Picture3d]]) zusammenfassen kann, und deren Position und Farbe (nur beim Darstellen!) mitbeeinflusst. Die Gruppen- und Element-Positionen werden dabei addiert und die Farben multipliziert (auch Alpha).
 // Parameter pos
 in
-Kollektive Position der Gruppe. (0,0,0) l&asst die Elemente an ihren urspr&unglichen Positionen (Addition mit 0).
+Kollektive Position der Gruppe. (0,0,0) lässt die Elemente an ihren ursprünglichen Positionen (Addition mit 0).
 // Parameter set_cur
 in
-Wird <v>set_cur</v> gesetzt, wird automatisch die Variable [[v:CurrentLayer]] auf die erschaffene Gruppe gesetzt. Dadurch wird jedes danach erschaffene Element ([[s:Picture]], [[s:Text]], [[s:Picture3d]]) dieser Gruppe hinzugef&ugt, bis [[v:CurrentLayer]] wieder auf <c>nil</c> gesetzt wird.
+Wird <v>set_cur</v> gesetzt, wird automatisch die Variable [[v:CurrentLayer]] auf die erschaffene Gruppe gesetzt. Dadurch wird jedes danach erschaffene Element ([[s:Picture]], [[s:Text]], [[s:Picture3d]]) dieser Gruppe hinzugefügt, bis [[v:CurrentLayer]] wieder auf <c>nil</c> gesetzt wird.
 // Synopsis
 s:Layer
 #

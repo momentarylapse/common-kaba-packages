@@ -8,10 +8,10 @@ in
 Die Breite des Bildes.
 // Parameter height
 in
-Die H&ohe des Bildes.
+Die Höhe des Bildes.
 // Parameter texture
 in
-Eine Textur f&ur das Bild.\nWird keine Textur angegeben (Parameter = -1), entspricht das einer komplett weisen Textur.
+Eine Textur für das Bild.\nWird keine Textur angegeben (Parameter = -1), entspricht das einer komplett weisen Textur.
 // Synopsis
 s:Picture
 #

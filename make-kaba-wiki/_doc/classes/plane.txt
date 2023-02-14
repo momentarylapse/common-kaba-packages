@@ -1,5 +1,5 @@
 // Description
-Eine Ebene.\nAlle Punkte (x,y,z) auf der Ebene (a,b,c,d) erf&ullen die Gleichung <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>. Allgemein kann der Abstand eines beliebigen Punktes (x,y,z) zur Ebene &uber <math> a \cdot x + b \cdot y + c \cdot z + d </math> berechnet werden.
+Eine Ebene.\nAlle Punkte (x,y,z) auf der Ebene (a,b,c,d) erfüllen die Gleichung <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>. Allgemein kann der Abstand eines beliebigen Punktes (x,y,z) zur Ebene über <math> a \cdot x + b \cdot y + c \cdot z + d </math> berechnet werden.
 // Element a
 Die a-Komponente.
 // Element b

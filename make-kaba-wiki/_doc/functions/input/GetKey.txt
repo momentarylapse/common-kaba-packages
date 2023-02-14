@@ -1,8 +1,8 @@
 // Description
-Testet, ob eine Taste gerade gedr&uckt ist.
+Testet, ob eine Taste gerade gedrückt ist.
 // Parameter id
 in
-Index der zu pr&ufenden Taste. (z.B. <c>KEY_ESCAPE</c> f&ur die [Escape]-Taste)
+Index der zu prüfenden Taste. (z.B. <c>KEY_ESCAPE</c> für die [Escape]-Taste)
 // Return
-<c>true</c>, falls gedr&uckt, ansonsten <c>false</c>.
+<c>true</c>, falls gedrückt, ansonsten <c>false</c>.
 #

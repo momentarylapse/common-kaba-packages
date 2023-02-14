@@ -5,13 +5,13 @@ Zum Aktivieren/Deaktivieren des Bildes.
 // Element tc_inverted
 Verdreht die Textur, so dass X- und Y-Angaben vertauscht werden.
 // Element pos
-Die Position des Bildes auf dem Bildschirm in relativen Koordinaten. Die Z-Komponente aus [0..1] wird f&ur die Reihenfolge verwendet.
+Die Position des Bildes auf dem Bildschirm in relativen Koordinaten. Die Z-Komponente aus [0..1] wird für die Reihenfolge verwendet.
 // Element width
 Breite (relativ zum Bildschirm).
 // Element height
-H&ohe (relativ zum Bildschirm).
+Höhe (relativ zum Bildschirm).
 // Element color
-Farbe, der Alpha-Wert kann f&ur die Transparenz verwendet werden.
+Farbe, der Alpha-Wert kann für die Transparenz verwendet werden.
 // Element texture
 Die Textur. Keine Textur (-1) wird als weiß interpretiert.
 // Element source

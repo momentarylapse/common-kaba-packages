@@ -1,5 +1,5 @@
 // Description
-Testet, ob &uber eine Verbindung Daten verschickt werden k&onnen.
+Testet, ob über eine Verbindung Daten verschickt werden können.
 // Return
 <c>true</c>, falls verschickt werden kann, ansonsten <c>false</c>.
 #

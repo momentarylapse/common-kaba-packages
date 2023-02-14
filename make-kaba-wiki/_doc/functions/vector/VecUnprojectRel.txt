@@ -1,5 +1,5 @@
 // Description
-Projeziert einen Richtungs-Vektor von Bildschirmkoordinaten zur&uck nach Weltkoordinaten.
+Projeziert einen Richtungs-Vektor von Bildschirmkoordinaten zurück nach Weltkoordinaten.
 // Parameter v_out
 out
 Der projezierte Vektor

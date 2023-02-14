@@ -1,5 +1,5 @@
 // Description
-L&adt einen Spielstand aus einer Datei, der mit [[SaveGameState]] dort gespeichert wurde.
+Lädt einen Spielstand aus einer Datei, der mit [[SaveGameState]] dort gespeichert wurde.
 // Parameter filename
 in
 Die Datei des Spielstandes (relativ zum "Save/"-Verzeichnis, ohne Endung).

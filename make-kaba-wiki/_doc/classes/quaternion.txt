@@ -1,11 +1,11 @@
 // Description
 Ein Quaternion repräsentiert eine Rotation.\nEs begründet sich in den sogenannten "Hyperkomplexen Zahlen".\nDie Elemente werden kaum direkt angesprochen.
 // Element x
-Ein imagin&arer Anteil.
+Ein imaginärer Anteil.
 // Element y
-Ein imagin&arer Anteil.
+Ein imaginärer Anteil.
 // Element z
-Ein imagin&arer Anteil.
+Ein imaginärer Anteil.
 // Element w
 Der Realteil.
 // Synopsis

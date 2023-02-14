@@ -1,5 +1,5 @@
 // Description
-L&asst einen Frame lang eine Kraft auf ein Objekt einwirken.
+Lässt einen Frame lang eine Kraft auf ein Objekt einwirken.
 // Parameter force
 in
 Die Kraft. (in globalen Welt-Koordinaten)

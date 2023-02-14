@@ -11,7 +11,7 @@ Die Hintergrundfarbe. Zusammen mit der <tt>skybox</tt> kann mit ihr ein einfache
 // Element fog
 Der globale Nebel der Welt.
 // Element var
-Die globalen Scriptvariablen der Welt.\nSie sind zus&atzliche, von Scripten frei benutzbare Variablen, die im Editor vor-definiert werden k&onnen.
+Die globalen Scriptvariablen der Welt.\nSie sind zusätzliche, von Scripten frei benutzbare Variablen, die im Editor vor-definiert werden können.
 // Element ambient
 Der globale Ambient-Wert der Beleuchtung.<br>"Ambientes" Licht ist richtungsunabhägig, erhellt somit alle Oberfläche in der Welt gleich.
 // Element sun

@@ -1,8 +1,8 @@
 // Description
-Gibt das Zeichen (Character) zu einer bestimmten Taste zur&uck.\nDas Ergebnis ist abh&angig davon, ob gerade die Shift- bzw. Alt-Taste gedr&uckt ist und beeinflusst somit Klein- und Gro&sbuchstaben. Als Parameter kann der R&uckgabewert von [[GetKeyRhythmDown]] mitgegeben werden, um eine String-Eingabe zu implementieren.
+Gibt das Zeichen (Character) zu einer bestimmten Taste zurück.\nDas Ergebnis ist abhängig davon, ob gerade die Shift- bzw. Alt-Taste gedrückt ist und beeinflusst somit Klein- und Großbuchstaben. Als Parameter kann der Rückgabewert von [[GetKeyRhythmDown]] mitgegeben werden, um eine String-Eingabe zu implementieren.
 // Parameter id
 in
 Die ID der Taste (z.B. <c>KEY_RETURN</c>, <c>KEY_A</c>).
 // Return
-Das Zeichen (z.B. Zeilenumbruch, <tt>'a'</tt>).\nIm Falle einer ung&ultigen oder nicht mit einem Zeichen verbundenen Taste wird 0 zur&uckgegeben.
+Das Zeichen (z.B. Zeilenumbruch, <tt>'a'</tt>).\nIm Falle einer ungültigen oder nicht mit einem Zeichen verbundenen Taste wird 0 zurückgegeben.
 #

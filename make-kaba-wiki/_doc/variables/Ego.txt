@@ -1,5 +1,5 @@
 // Description
-Das Objekt, das den Spieler selbst repr&asentiert. Sie wird im Editor f&ur die Welt gesetzt, hat aber nur Auswirkungen auf Scripte, falls diese sie benutzen.
+Das Objekt, das den Spieler selbst repräsentiert. Sie wird im Editor für die Welt gesetzt, hat aber nur Auswirkungen auf Scripte, falls diese sie benutzen.
 // Synopsis
 s:Model
 #

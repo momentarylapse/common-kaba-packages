@@ -1,5 +1,5 @@
 // Description
-Weist einer Martix die Einheitsmatrix ("Identit&at") zu. Sie hat in der Hauptdiagonalen Einsen, ansonsten nur Nullen und bildet jeden Vektor wieder auf sich selbst ab.
+Weist einer Martix die Einheitsmatrix ("Identität") zu. Sie hat in der Hauptdiagonalen Einsen, ansonsten nur Nullen und bildet jeden Vektor wieder auf sich selbst ab.
 // Parameter m_out
 out
 Matrix, die zur Einheitsmatrix gemacht werden soll.
