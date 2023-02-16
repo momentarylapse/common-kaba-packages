@@ -17,7 +17,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	var pguid, sguid: string
 	try
-		var f = os.fs.read_text(conf.root << "{{conf.name}}.sln")
+		var f = os.fs.read_text(conf.root | "{{conf.name}}.sln")
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -98,7 +98,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	fs.write(conf.root << "{{conf.name}}.sln", f.replace("\n", "\r\n"))
+	fs.write(conf.root | "{{conf.name}}.sln", f.replace("\n", "\r\n"))
 	
 	var toolset = "v142"
 	if version == 2022
@@ -243,7 +243,7 @@ EndGlobal
 </Project>
 "
 
-	fs.write_text(conf.root << "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
+	fs.write_text(conf.root | "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -276,9 +276,9 @@ EndGlobal
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
-	var fdirs = fs.search(conf.root << conf.source_dir, "", "dr")
+	var fdirs = fs.search(conf.root | conf.source_dir, "", "dr")
 	for d in fdirs
-		var dir = win_path(conf.source_dir << d)
+		var dir = win_path(conf.source_dir | d)
 		rand_seed(dir.hash())
 		f += "
     <Filter Include=\"{{dir}}\">
@@ -290,4 +290,4 @@ EndGlobal
 </Project>"
   
   
-	fs.write_text(conf.root << "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	fs.write_text(conf.root | "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

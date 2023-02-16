@@ -54,7 +54,7 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 func collect_objects(from: Path) -> string[]
 	var obj: string[]
 	for s in sources
-		if rel(s.filename) != rel(conf.root << conf.main_file)
+		if rel(s.filename) != rel(conf.root | conf.main_file)
 			obj.add(str(s.object().relative_to(from)))
 	return obj
 
@@ -67,7 +67,7 @@ func create_makefile(p: Profile, postfix: string)
 	raise(new Exception("Makefile deprecated!"))
 
 	print("-- makefile {{p.name}} --")
-	var f = new TextLinesFormatter(fs.open(conf.root << conf.source_dir << ("Makefile" + postfix), "wt"))
+	var f = new TextLinesFormatter(fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt"))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	var cflags, lflags, defines: string
@@ -80,10 +80,10 @@ func create_makefile(p: Profile, postfix: string)
 	f << cl("CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)")
 	f << cl("CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)")
 	f << ""
-	var obj = collect_objects(conf.root << conf.source_dir)
+	var obj = collect_objects(conf.root | conf.source_dir)
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
-	var main_ob = relsrc(conf.root << conf.main_file.replace(".cpp", ".o"))
+	var main_ob = relsrc(conf.root | conf.main_file.replace(".cpp", ".o"))
 	f << "$(BIN) : $(OBJ) {{main_ob}}"
 	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
 	f << ""
@@ -116,7 +116,7 @@ func create_makefile(p: Profile, postfix: string)
 #		f << "	cp -f " + conf.icon + " " + datadir
 	var list = conf.needs_installing()
 	for e in list
-		if fs.is_directory(conf.root << e)
+		if fs.is_directory(conf.root | e)
 			f << "	cp -ruf '../{{e}}' {{datadir}}"
 		else
 			f << "	cp -uf '../{{e}}' {{datadir}}"

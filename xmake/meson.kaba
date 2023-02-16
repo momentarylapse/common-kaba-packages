@@ -6,7 +6,7 @@ use library
 
 func create_meson()
 	print("-- meson --")
-	var f = new TextLinesFormatter(fs.open(conf.root << "meson.build", "wt"))
+	var f = new TextLinesFormatter(fs.open(conf.root | "meson.build", "wt"))
 	var debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]

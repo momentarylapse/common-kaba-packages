@@ -76,7 +76,7 @@ func build()
 
 	let p = get_profile(conf.force_profile)
 	
-	let binary_file = conf.build_dir() << conf.binary_file
+	let binary_file = conf.build_dir() | conf.binary_file
 			
 	var cflags, lflags, defines: string
 	collect_global_flags(p, cflags, lflags, defines)
@@ -148,7 +148,7 @@ func build()
 			
 	print("Link  {{terminal.YELLOW}}{{binary_file}}{{terminal.END}}")
 	var main_file: SourceFile
-	main_file.filename = conf.root << conf.main_file
+	main_file.filename = conf.root | conf.main_file
 	let main_ob = main_file.object() #conf.main_file.replace(".cpp", ".o")
 	let obj = collect_objects(conf.root).join(" ")
 	let command = "g++ {{obj}} {{main_ob}} -o {{binary_file}} {{cxx_flags_linking}}"

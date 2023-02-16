@@ -71,7 +71,7 @@ func create_cmake()
 	
 	let debug = conf.build_type == "debug"
 	
-	var f = new TextLinesFormatter(fs.open(conf.root << "CMakeLists.txt", "wt"))
+	var f = new TextLinesFormatter(fs.open(conf.root | "CMakeLists.txt", "wt"))
 	f << "# created by xmake
 
 project({{conf.name}})
@@ -169,7 +169,7 @@ add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")"
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	let list = conf.needs_installing()
 	for e in list
-		if fs.is_directory(conf.root << e)
+		if fs.is_directory(conf.root | e)
 			f << "install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else
 			f << "install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
