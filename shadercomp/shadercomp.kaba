@@ -24,8 +24,8 @@ var cur_dir: Path
 func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 	if code == ""
 		return ""
-	var itmp = cur_dir << "shadercomp.glsl"
-	var otmp = cur_dir << "shadercomp.bin"
+	var itmp = cur_dir | "shadercomp.glsl"
+	var otmp = cur_dir | "shadercomp.bin"
 	var c = code
 	if len(layout.common) > 0
 		c = layout.common + "\n" + c

@@ -178,14 +178,14 @@ func migrate(arg: string[])
 	let dir = Path(arg[0])
 	let list = fs.search(dir, "*.kaba", "fr")
 	for e in list
-		migrate_file_decl(dir << e)
+		migrate_file_decl(dir | e)
 
 func migrate_for(arg: string[])
 	setraw()
 	let dir = Path(arg[0])
 	let list = fs.search(dir, "*.kaba", "fr")
 	for e in list
-		migrate_file_for(dir << e)
+		migrate_file_for(dir | e)
 
 func main(arg: string[])
 	var p: os.CommandLineParser

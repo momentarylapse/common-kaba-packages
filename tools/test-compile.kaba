@@ -16,11 +16,12 @@ func test_compile(filename: Path)
 func test_rec(dir: Path)
 	let subdirs = fs.search(dir, "", "dr0")
 	for s in subdirs
-		let list = fs.search(dir << s, "*.kaba", "f")
+		let list = fs.search(dir | s, "*.kaba", "f")
 		if len(list) > 0
-			print("{{terminal.YELLOW}}{{dir << s}}{{terminal.END}}")
+			let p = dir | s
+			print("{{terminal.YELLOW}}{{p}}{{terminal.END}}")
 		for e in list
-			test_compile(dir << s << e)
+			test_compile(dir | s | e)
 
 func main(arg: string[])
 	if len(arg) == 0

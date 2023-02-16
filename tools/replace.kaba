@@ -21,7 +21,7 @@ func test_replace(filename: Path, what: string, by: string, allow: bool)
 func test_rec(dir: Path, what: string, by: string, allow: bool)
 	let list = fs.search(dir, "*.*", "fr")
 	for e in list
-		test_replace(dir << e, what, by, allow)
+		test_replace(dir | e, what, by, allow)
 
 func main(arg: string[])
 	if len(arg) < 3
