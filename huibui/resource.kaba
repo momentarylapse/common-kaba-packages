@@ -24,10 +24,10 @@ func load_all_huis(literally: bool) -> Resource[]
 	var res: Resource[]
 	var files = fs.search(conf.dir, "*.hui", "f")
 	for f in files
-		var source = fs.read_text(conf.dir << f)
+		var source = fs.read_text(conf.dir | f)
 		var r = ParseResource(source, literally)
 		if r.type in ["Dialog", "Window", "Menu", "Toolbar"]
-			resource_files.add(conf.dir << f)
+			resource_files.add(conf.dir | f)
 			res.add(r)
 		else
 			print(" UNKNOWN TYPE {{f}}: {{r.type}}")

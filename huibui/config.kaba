@@ -27,7 +27,7 @@ class Config
 	
 	func mut load()
 		try
-			var f = new TextLinesFormatter(fs.open(dir << "export.txt", "rt"))
+			var f = new TextLinesFormatter(fs.open(dir | "export.txt", "rt"))
 			var t: string
 			f >> t
 			f >> t
@@ -39,8 +39,8 @@ class Config
 			f >> own_lang_name
 			del f
 			
-			source_code_dir = dir << source_code_dir
-			export_dir = dir << export_dir
+			source_code_dir = dir | source_code_dir
+			export_dir = dir | export_dir
 			hui.app_directory_static = export_dir
 		except
 			pass

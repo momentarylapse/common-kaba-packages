@@ -27,13 +27,13 @@ class SourceParser
 	func mut parse_source_code_dir(dir: Path)
 		var files = fs.search(dir, "*.cpp", "fd")
 		for f in files
-			if fs.is_directory(dir << f)
-				parse_source_code_dir(dir << f)
+			if fs.is_directory(dir | f)
+				parse_source_code_dir(dir | f)
 			else
-				source = fs.read(dir << f)
+				source = fs.read(dir | f)
 				begin()
 				parse()
-				end(dir << f)
+				end(dir | f)
 
 	func virtual mut handle(pos: int, length: int)
 	func virtual mut begin()

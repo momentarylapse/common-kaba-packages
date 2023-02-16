@@ -132,7 +132,7 @@ func load_prelangs() -> Language[]
 	var langs: Language[]
 	var files = fs.search(conf.dir, "*.prelang", "f")
 	for f in files
-		var l = load_prelang(conf.dir << f)
+		var l = load_prelang(conf.dir | f)
 		langs.add(l)
 	return langs
 
@@ -177,7 +177,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	
 	var f: TextLinesFormatter*
 	if create_file
-		f = new TextLinesFormatter(fs.open(conf.dir << "TRANS", "wt"))
+		f = new TextLinesFormatter(fs.open(conf.dir | "TRANS", "wt"))
 	
 	# check ids
 	for i in own.ids

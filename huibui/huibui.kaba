@@ -92,7 +92,7 @@ func action_translate(arg: string[])
 	if check_lang(l, own, true)
 		return
 	
-	var path = conf.dir << "TRANS"
+	var path = conf.dir | "TRANS"
 	try
 		shell_execute("sgribthmaker \"{{path}}\"")
 		patch_language(l, own, path)
