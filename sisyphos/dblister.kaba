@@ -24,7 +24,7 @@ class DBLister
 			options += "r"
 		let list = fs.search(dir, "*", options)
 		for e in list
-			let path = dir << e
+			let path = dir | e
 			if not is_ignored(path)
 				paths.add(path)
 		return paths |> sort()

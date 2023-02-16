@@ -246,4 +246,4 @@ class LocalFile
 
 func unique_path(f: LocalFile) -> Path
 	var ext = f.path.extension()
-	return f.path.parent() << "{{f.hash}} {{f.name}}.{{ext}}" 
+	return f.path.parent() | "{{f.hash}} {{f.name}}.{{ext}}" 

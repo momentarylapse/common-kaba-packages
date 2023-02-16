@@ -31,7 +31,7 @@ func move_file_by_path(source: Path, _dest: Path)
 		var f = db.find_by_path(source)
 		var dest = Path(f.apply_structure(str(_dest)))
 		if fs.is_directory(dest)
-			dest = dest.canonical() << source.basename()
+			dest = dest.canonical() | source.basename()
 		log_warn("move", "{{rel_path(source)}} -> {{rel_path(dest)}}")
 		if fs.exists(dest) or db.has_path(dest)
 			raise(new Exception("target already exists"))
@@ -68,7 +68,7 @@ func move_dir_by_path(source: Path, dest: Path)
 		var files = lister.find(source)
 		for f in files
 			#print()
-			move_file_by_path(f.path, dest << f.path.relative_to(source_ref))
+			move_file_by_path(f.path, dest | f.path.relative_to(source_ref))
 	except Exception as e
 		error_out(e)
 
@@ -100,7 +100,7 @@ func _action_structure_auto(dir: Path)
 		let e = conf.get_cfg(f.path)
 		if !e
 			continue
-		structure_file(f, str(e.dir << e.structure))
+		structure_file(f, str(e.dir | e.structure))
 
 func action_structure_auto(arg: string[])
 	for a in arg

@@ -33,7 +33,7 @@ class LocalFileDB
 	func mut load()
 		files.clear()
 		#Timer tt
-		var ss = fs.read(hui.app_directory << "sisyphos/db")
+		var ss = fs.read(hui.app_directory | "sisyphos/db")
 		var lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
@@ -180,8 +180,8 @@ class LocalFileDB
 		save_all()
 
 	func mut save_all()
-		make_all_dirs(hui.app_directory << "sisyphos")
-		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/db", "wt"))
+		make_all_dirs(hui.app_directory | "sisyphos")
+		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/db", "wt"))
 		f << "version=1"
 		f << len(files)
 		for ff in files

@@ -1,0 +1,20 @@
+		tot	db	os	mix	sort
+v0:
+	Strato
+		3.42
+	Music
+		79.8
+
+v1:
+	Strato
+		0.94
+	Music:
+		53.8	~17	0	~19	~18
+
+v2
+	Music
+		18.8	~1	0	~18	0
+
+v3
+	Music
+		1.75

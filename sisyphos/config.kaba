@@ -38,7 +38,7 @@ func absolute_path(path: Path) -> Path
 	#	return path
 	#if path[0] == '/'
 	#	return canonify(path)
-	#return canonify(Filesystem.current_directory() << path)
+	#return canonify(Filesystem.current_directory() | path)
 
 func make_path(p: string) -> Path
 	return Path(p).absolute().canonical()
@@ -165,7 +165,7 @@ class ConfigDirSync
 		for s in structure
 			var v = get_tag(parts, s)
 			if len(v) > 0
-				dir = dir << v
+				dir = dir | v
 		return dir
 
 
@@ -193,7 +193,7 @@ class Config
 	var default_structure = "{name}.{ext}"
 
 	func mut load()
-		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/config", "rt"))
+		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/config", "rt"))
 		var n, m: int
 		f >> n
 		for i in 0:n
@@ -218,8 +218,8 @@ class Config
 			ignore.add(ig)
 		del f
 	func save()
-		make_all_dirs(hui.app_directory << "sisyphos")
-		var f = new TextLinesFormatter(fs.open(hui.app_directory << "sisyphos/config", "wt"))
+		make_all_dirs(hui.app_directory | "sisyphos")
+		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/config", "wt"))
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)

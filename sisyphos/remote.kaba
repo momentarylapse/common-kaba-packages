@@ -144,7 +144,7 @@ func sync_add_pure_remote(rf: RemoteFile, root: Path, structure: string)
 		except
 			# new remote file
 			var ll = rf
-			ll.path = root << ll.apply_structure(structure)
+			ll.path = root | ll.apply_structure(structure)
 			ll.set(NONLOCAL)
 			db.save([ll])
 			log_ok("add pure remote", str(rel_path(ll.path)))
