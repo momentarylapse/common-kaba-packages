@@ -129,5 +129,3 @@ func create_makefile(p: Profile, postfix: string)
 	f << "\tfind . -name \"*.o\" -exec rm -f {} \\;"
 	f << "\tfind . -name \"*.a\" -exec rm -f {} \\;"
 	f << ""
-
-	del f

@@ -97,7 +97,7 @@ func build()
 	
 	if num_threads > 1
 
-		var threads: TX*[]
+		var threads: owned[TX][]
 		for i in 0:num_threads
 			threads.add(new TX())
 	
@@ -105,8 +105,8 @@ func build()
 			var t: TX* = nil
 			if i < num_threads
 				#print("{{i}} -> direct")
-				t = new TX()
-				threads.add(t)
+				threads.add(new TX())
+				t = weak(threads[len(threads)-1])
 			else
 				#print("{{i}} -> pool")
 				while not t
@@ -114,9 +114,8 @@ func build()
 						if tt.is_done()
 							tt.join()
 							# TODO allow multiple run()s
-							del tt
 							tt = new TX()
-							t = tt
+							t = weak(tt)
 							break
 			print("{{i+1|3}}/{{len(needs_building)}} {{terminal.YELLOW}}{{rel(s.filename)}}{{terminal.END}}")
 			t.s = s
@@ -125,7 +124,6 @@ func build()
 		
 		for t in threads
 			t.join()
-			del t
 	
 #	for t in threads
 #		t.run()
