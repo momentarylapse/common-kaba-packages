@@ -195,7 +195,6 @@ class LocalFileDB
 			f << ff.size
 			f << ff.options.join(",")
 			f << tags2strh(ff.tags)
-		del f
 	
 	func has_id(id: string) -> bool
 		for f in files

@@ -216,7 +216,6 @@ class Config
 			var ig: string
 			f >> ig
 			ignore.add(ig)
-		del f
 	func save()
 		make_all_dirs(hui.app_directory | "sisyphos")
 		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/config", "wt"))
@@ -232,7 +231,6 @@ class Config
 		for i in ignore
 			f << i
 		f << server
-		del f
 
 	func show()
 		for e in conf.dirs
