@@ -11,7 +11,7 @@ class EditorPanel extends CircuitPanel
 	func override mut on_selection_change()
 		ed.load_from_part(nil)
 		if sel.type == SelectionType.EDGE
-			ed.load_from_part(ed.c.edges[sel.index])
+			ed.load_from_part(weak(ed.c.edges[sel.index]))
 
 class CircuitEditor extends hui.Window
 	var c: Circuit

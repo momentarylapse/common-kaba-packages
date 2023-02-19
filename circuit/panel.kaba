@@ -149,7 +149,7 @@ DrawingArea area '' grab-focus")
 	func mut on_key_down()
 		if hui.get_event().key == hui.KEY_DELETE
 			if sel.type == SelectionType.EDGE
-				del c.edges[sel.index]
+				#del c.edges[sel.index]
 				c.edges.remove(sel.index)
 				sel.type = SelectionType.NONE
 				res.clear()
