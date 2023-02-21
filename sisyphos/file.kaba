@@ -57,7 +57,7 @@ func show_file(f: LocalFile, refpoint: Path, indent: string)
 			s += "  "
 	print("{{indent}}{{file_status_color(f)}}{{f.status_str()}}{{s}} {{rel_to_path(f.path, refpoint)}}{{terminal.END}}")
 
-class LocalFile
+struct LocalFile
 	#var drop_me = false
 
 	# remote

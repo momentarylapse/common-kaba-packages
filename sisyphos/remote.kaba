@@ -56,7 +56,7 @@ func call_alex(action: string, params: string[]) -> string
 		print(cmd)
 	return shell_exec(cmd).trim()
 
-class RemoteFile extends LocalFile
+struct RemoteFile extends LocalFile
 
 func remote_parse(r: string) -> RemoteFile[]
 	if conf.verbosity > 3

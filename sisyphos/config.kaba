@@ -127,19 +127,7 @@ func shell_exec(cmd: string) -> string
 	#	print(cmd)
 	return shell_execute(cmd).trim()
 
-class ConfigDir
-	var dir: Path
-	var syncs: ConfigDirSync[]
-	var structure: string
-	
-	func mut add_sync(filter: string, options: string)
-		var s: ConfigDirSync
-		s.dir = dir
-		s.filter = filter
-		s.options = options
-		syncs.add(s)
-
-class ConfigDirSync
+struct ConfigDirSync
 	# from ConfigDir
 	var dir: Path
 	var structure: string
@@ -168,8 +156,20 @@ class ConfigDirSync
 				dir = dir | v
 		return dir
 
+struct ConfigDir
+	var dir: Path
+	var syncs: ConfigDirSync[]
+	var structure: string
+	
+	func mut add_sync(filter: string, options: string)
+		var s: ConfigDirSync
+		s.dir = dir
+		s.filter = filter
+		s.options = options
+		syncs.add(s)
 
-class Config
+
+struct Config
 		
 	var dirs: ConfigDir[]
 	var ignore: string[]

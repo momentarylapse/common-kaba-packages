@@ -1,6 +1,6 @@
 use config
 
-class Tag
+struct Tag
 	var key: string
 	var value: string
 	func const __str__() -> string
