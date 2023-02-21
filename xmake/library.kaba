@@ -2,7 +2,7 @@ use os
 use hui
 use project
 
-class Library
+struct Library
 	var name: string
 	var libs: string[]
 	var pkg: string[]
@@ -42,7 +42,7 @@ class Library
 		return "HAS_LIB_{{name.upper()}}"
 
 
-class LibraryManager
+struct LibraryManager
 	var libraries: Library[]
 
 	func mut init()

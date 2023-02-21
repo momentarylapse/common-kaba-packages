@@ -1,6 +1,6 @@
 use os
 
-class Profile
+struct Profile
 	var name: string
 	var libs_optional: string[]
 
@@ -16,7 +16,7 @@ func sa2any(a: string[]) -> any
 	return r
 
 # project
-class Config
+struct Config
 	var root: Path
 	var verbose = false
 	var dry_run = false
@@ -155,7 +155,7 @@ func parse_libs(s: any, out libs: string[], out lib_groups: string[][], out libs
 			lib_groups.add(x.explode("|"))
 			libs.add(x.explode("|")[0])
 
-class SourceFile
+struct SourceFile
 	filename: Path
 	dep: Path[]
 
