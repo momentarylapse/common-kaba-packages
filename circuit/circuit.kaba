@@ -1,7 +1,7 @@
 use linalg
 
 
-class Node
+struct Node
 	var phi = 0.0
 	var pos: vec2
 	func __init__()
@@ -22,7 +22,7 @@ func empty() -> float[]
 	var r: float[]
 	return r
 
-class Edge
+struct Edge
 	var type: EdgeType
 	var a, b: int
 	var I, U: float
