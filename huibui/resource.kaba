@@ -1,14 +1,13 @@
 use config
 use os
 
-class Resource
+struct Resource
 	var type: string
 	var id: string
 	var title: string
 	var tooltip: string
 	var options: string[]
 	var x, y: int
-	func __init__()
 	var children: Resource[]
 	#void reset()
 	func extern show(indent: int)

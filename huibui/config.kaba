@@ -37,7 +37,6 @@ class Config
 			source_code_dir = Path(t)
 			f >> t
 			f >> own_lang_name
-			del f
 			
 			source_code_dir = dir | source_code_dir
 			export_dir = dir | export_dir

@@ -2,16 +2,16 @@ use config
 use os
 
 
-class LangID
+struct LangID
 	var id: string
 	var title: string
 	var tooltip: string
 
-class LangText
+struct LangText
 	var orig: string
 	var trans: string
 
-class Language
+struct Language
 	var filename: Path
 	var name: string
 	var ids: LangID[]
@@ -67,7 +67,6 @@ class Language
 		for t in texts
 			f << t.orig.escape()
 			f << t.trans.escape()
-		del f
 
 
 	func mut sort()
@@ -121,7 +120,6 @@ func load_prelang(filename: Path) -> Language
 			f >> t
 			tt.trans = t.unescape()
 			l.texts.add(tt)
-		del f
 		#l.show()
 		return l
 	#except Exception as e
