@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib64/libmongoc-1.0.so
+let KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_mongoc_init:mongoc_init
 	_mongoc_cleanup:mongoc_cleanup
 	_mongoc_client_new:mongoc_client_new
@@ -167,12 +167,12 @@ class Mongo as shared
 			_mongoc_client_destroy(client)
 		_mongoc_cleanup()
 
-	func const collection(db: string, col: string) -> Collection*
+	func collection(db: string, col: string) -> xfer[Collection]
 		var c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
 			raise(new Exception("can not open collection"))
-		return c
+		return give(c)
 
 
 class Collection as shared
@@ -180,10 +180,10 @@ class Collection as shared
 	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	func const find(filter: any) -> Result shared
+	func find(filter: any) -> shared[Result]
 		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	func const aggregate(pattern: any) -> Result shared
+	func aggregate(pattern: any) -> shared[Result]
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	func insert(doc: any)
@@ -215,12 +215,12 @@ class Result as shared
 	func __delete__()
 		if cur
 			_mongoc_cursor_destroy(cur)
-	func const has_more() -> bool
+	func has_more() -> bool
 		return _mongoc_cursor_next(cur, &doc)
 		# bson_to_json(doc)
-	func const json() -> string
+	func json() -> string
 		return bson_to_json(doc)
-	func const get() -> any
+	func get() -> any
 		return bson_to_any(doc)
 
 

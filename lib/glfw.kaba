@@ -190,7 +190,7 @@ func main()
 	print("done")
 	end()
 
-class GamepadState
+struct GamepadState
 	var _buttons: bool[16]
 	var axes: float[6]
 	func __init__()
@@ -199,7 +199,7 @@ class GamepadState
 		for a in axes
 			a = 0
 
-class Gamepad extends GamepadState as shared
+struct Gamepad extends GamepadState as shared
 	enum Button
 		CROSS
 		CIRCLE
@@ -244,7 +244,7 @@ class Gamepad extends GamepadState as shared
 		return _buttons[int(b)]
 		
 	
-	func static get(index: int) -> Gamepad shared
+	func static get(index: int) -> shared[Gamepad]
 		return new Gamepad(index)
 
 func _main()

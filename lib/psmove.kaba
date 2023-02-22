@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib/libpsmoveapi.so
+let KABA_LINK = "/usr/lib/libpsmoveapi.so
 	_psmove_init:psmove_init
 	_psmove_count_connected:psmove_count_connected
 	_psmove_reinit:psmove_reinit
@@ -35,9 +35,9 @@ const KABA_LINK = "/usr/lib/libpsmoveapi.so
 	_psmove_fusion_get_modelview_matrix:psmove_fusion_get_modelview_matrix"
 
 
-class PSMoveTracker
-class PSMoveFusion
-class PSMove
+struct PSMoveTracker
+struct PSMoveFusion
+struct PSMove
 
 func extern _psmove_count_connected() -> int
 func extern _psmove_init(version: int) -> int
@@ -156,13 +156,12 @@ class MyPSMoveController
 class PsMoveManager
 	var tracker: PSMoveTracker* = nil
 	var fusion: PSMoveFusion* = nil
-	var psmoves: MyPSMoveController*[]
+	var psmoves: owned[MyPSMoveController][]
 	func __init__()
 		var vv = 262152 #4<<16 + 0<<8 + 8
 		if _psmove_init(vv) != 1
 			print("VERSION MISMATCH!")
 	func mut __delete()
-		psmoves.clear()
 		if fusion
 			_psmove_fusion_free(fusion)
 		if tracker

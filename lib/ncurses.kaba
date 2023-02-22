@@ -1,6 +1,6 @@
 use os
 
-const KABA_LINK = "/usr/lib/libstdc++.so
+let KABA_LINK = "/usr/lib/libstdc++.so
 	_setlocale:setlocale
 /usr/lib/libncursesw.so
 	_initscr:initscr
