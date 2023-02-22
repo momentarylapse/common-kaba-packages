@@ -4,11 +4,11 @@ var MAX_DIFF_SIZE: int
 var MIN_MATCH_SIZE: int
 var CONTEXT: int
 
-class Mapping
+struct Mapping
 	var a0, a1, b0, b1: int
-	func const la() -> int
+	func la() -> int
 		return a1 - a0
-	func const lb() -> int
+	func lb() -> int
 		return b1 - b0
 	func __str__() -> string
 		return "{{a0}}:+{{la()}} / {{b0}}:+{{lb()}}"

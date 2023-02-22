@@ -1,6 +1,6 @@
 use hui
 
-class Stroke
+struct Stroke
 	var p: vec2[]
 	
 	func length() -> float

@@ -133,35 +133,32 @@ enum TType
 
 class DynamicValue
 	var type = TType.NONE
-	var s: DynamicValueState*
+	var s: owned[DynamicValueState]
 	func __init__()
 		s = new DynamicValueState()
 	func virtual __delete__()
-		del s
+		pass #del s
 	func __str__() -> string
 		return str(s)
 	func render() -> string
 		return s.render()
 	func __int__() -> int
-		return int(s)
+		return int(weak(s))
 	func __float__() -> float
-		return float(s)
+		return float(weak(s))
 	func __bool__() -> bool
-		return bool(s)
+		return bool(weak(s))
 	func selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return s.get_element(i)
 	func mut add(el: DynamicValue)
 		s.add(el)
-	func copy() -> DynamicValue*
+	func copy() -> xfer[DynamicValue]
 		var c = new DynamicValue()
-		del c.s
 		c.s = s.copy()
 		c.type = type
-		return c
+		return give(c)
 	func mut setType(_type: TType)
 		if type != _type
-			#clear()
-			del s
 			type = _type
 			if type == TType.BOOL
 				s = new DynamicValueStateBool()
@@ -181,23 +178,23 @@ class DynamicValue
 				s = new DynamicValueState()
 	func mut setBool(b: bool)
 		setType(TType.BOOL)
-		var sb: DynamicValueStateBool* = s
+		var sb: DynamicValueStateBool* = weak(s)
 		sb.v = b
 	func mut setInt(i: int)
 		setType(TType.INT)
-		var si: DynamicValueStateInt* = s
+		var si: DynamicValueStateInt* = weak(s)
 		si.v = i
 	func mut setFloat(f: float)
 		setType(TType.FLOAT)
-		var sf: DynamicValueStateFloat* = s
+		var sf: DynamicValueStateFloat* = weak(s)
 		sf.v = f
 	func mut setString(_s: string)
 		setType(TType.STRING)
-		var ss: DynamicValueStateString* = s
+		var ss: DynamicValueStateString* = weak(s)
 		ss.v = _s
 	func mut setFunction(f: Function)
 		setType(TType.FUNCTION)
-		var sf: DynamicValueStateFunction* = s
+		var sf: DynamicValueStateFunction* = weak(s)
 		sf._func = &f
 	func __assign__(b: DynamicValue)
 		if b.type == TType.BOOL
@@ -210,97 +207,97 @@ class DynamicValue
 			setString(str(b))
 		else if b.type == TType.ARRAY
 			setType(TType.ARRAY)
-			var ba: DynamicValueStateArray* = b.s
-			for el in ba.a
+			var ba: DynamicValueStateArray* = weak(b.s)
+			for el in weak(ba.array)
 				s.add(el)
 		else if b.type == TType.DICT
 			setType(TType.DICT)
-			var bd: DynamicValueStateDict* = b.s
-			var ad: DynamicValueStateDict* = s
+			var bd: DynamicValueStateDict* = weak(b.s)
+			var ad: DynamicValueStateDict* = weak(s)
 			for i=>el in bd.values
 				ad.add(bd.keys[i], el)
 		else if b.type == TType.FUNCTION
-			var bf: DynamicValueStateFunction* = b.s
+			var bf: DynamicValueStateFunction* = weak(b.s)
 			setFunction(bf._func)
 
 	func mut __iadd__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
-				setInt(int(s) + int(b))
+				setInt(int(weak(s)) + int(b))
 			else if type == TType.FLOAT
-				setInt(int(s) + float(b))
+				setInt(int(weak(s)) + float(b))
 		else if b.type == TType.FLOAT
 			if type == TType.INT
-				setFloat(float(s) + int(b))
+				setFloat(float(weak(s)) + int(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) + float(b))
+				setFloat(float(weak(s)) + float(b))
 		else if b.type == TType.STRING
 			if type == TType.STRING
-				setString(str(s) + str(b))
+				setString(str(weak(s)) + str(b))
 		else if b.type == TType.ARRAY
 			if type == TType.ARRAY
-				var ba: DynamicValueStateArray* = b.s
-				for el in ba.a
+				var ba: DynamicValueStateArray* = weak(b.s)
+				for el in weak(ba.array)
 					s.add(el)
 		else if b.type == TType.DICT
 			if type == TType.DICT
-				var bd: DynamicValueStateDict* = b.s
-				var ad: DynamicValueStateDict* = s
+				var bd: DynamicValueStateDict* = weak(b.s)
+				var ad: DynamicValueStateDict* = weak(s)
 				for i=>el in bd.values
 					ad.add(bd.keys[i], el)
 
 	func mut __isub__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
-				setInt(int(s) - int(b))
+				setInt(int(weak(s)) - int(b))
 			else if type == TType.FLOAT
-				setInt(int(s) - float(b))
+				setInt(int(weak(s)) - float(b))
 		else if b.type == TType.FLOAT
 			if type == TType.INT
-				setFloat(float(s) - float(b))
+				setFloat(float(weak(s)) - float(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) - float(b))
+				setFloat(float(weak(s)) - float(b))
 
 	func mut __imul__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
-				setInt(int(s) * int(b))
+				setInt(int(weak(s)) * int(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) * int(b))
+				setFloat(float(weak(s)) * int(b))
 		else if b.type == TType.FLOAT
 			if type == TType.INT
-				setFloat(int(s) * float(b))
+				setFloat(int(weak(s)) * float(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) * float(b))
+				setFloat(float(weak(s)) * float(b))
 
 	func mut __idiv__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
-				setInt(int(s) / int(b))
+				setInt(int(weak(s)) / int(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) / int(b))
+				setFloat(float(weak(s)) / int(b))
 		else if b.type == TType.FLOAT
 			if type == TType.INT
-				setFloat(int(s) / float(b))
+				setFloat(int(weak(s)) / float(b))
 			else if type == TType.FLOAT
-				setFloat(float(s) / float(b))
+				setFloat(float(weak(s)) / float(b))
 
 	func compare(b: DynamicValue) -> int
 		if b.type == TType.INT
 			if type == TType.INT
-				return int(s) - int(b)
+				return int(weak(s)) - int(b)
 			else if type == TType.FLOAT
-				return (float(s) - float(b)) * 1000.0
+				return (float(weak(s)) - float(b)) * 1000.0
 		else if b.type == TType.FLOAT
 			if type == TType.INT
-				return (float(s) - float(b)) * 1000.0
+				return (float(weak(s)) - float(b)) * 1000.0
 			else if type == TType.FLOAT
-				return (float(s) - float(b)) * 1000.0
+				return (float(weak(s)) - float(b)) * 1000.0
 		else if b.type == TType.STRING
 			if type == TType.STRING
-				if str(s) < str(b)
+				if str(weak(s)) < str(b)
 					return -1
-				if str(s) > str(b)
+				if str(weak(s)) > str(b)
 					return 1
 				return 0
 				#return ai.v.compare(bf.v)
@@ -324,7 +321,7 @@ class DynamicValueState
 	func virtual selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return nil
 	func virtual mut add(el: DynamicValue)
-	func virtual copy() -> DynamicValueState*
+	func virtual copy() -> xfer[DynamicValueState]
 		
 
 class DynamicValueStateInt extends DynamicValueState
@@ -337,10 +334,10 @@ class DynamicValueStateInt extends DynamicValueState
 		return v
 	func override __float__() -> float
 		return v
-	func override copy() -> DynamicValueState*
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateInt()
 		c.v = v
-		return c
+		return give(c)
 
 class DynamicValueStateBool extends DynamicValueState
 	var v = false
@@ -350,10 +347,10 @@ class DynamicValueStateBool extends DynamicValueState
 		return str(v)
 	func override __bool__() -> bool
 		return v
-	func override copy() -> DynamicValueState*
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateBool()
 		c.v = v
-		return c
+		return give(c)
 
 class DynamicValueStateFloat extends DynamicValueState
 	var v = 0.
@@ -365,10 +362,10 @@ class DynamicValueStateFloat extends DynamicValueState
 		return v
 	func override __float__() -> float
 		return v
-	func override copy() -> DynamicValueState*
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateFloat()
 		c.v = v
-		return c
+		return give(c)
 
 class DynamicValueStateString extends DynamicValueState
 	var v: string
@@ -384,55 +381,55 @@ class DynamicValueStateString extends DynamicValueState
 		return float(v)
 	func override __bool__() -> bool
 		return len(v) > 0
-	func override copy() -> DynamicValueState*
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateString()
 		c.v = v
-		return c
+		return give(c)
 
 class DynamicValueStateArray extends DynamicValueState
-	var a: DynamicValue*[]
+	var array: owned[DynamicValue][]
 	func override __delete__()
-		for e in a
-			del e
+#		for e in a
+#			del e
 	func override type() -> string
 		return "array"
 	func override __str__() -> string
 		var s = "["
-		for i=>e in a
+		for i=>e in weak(array)
 			if i > 0
 				s += ","
 			s += e.render()
 		return s + "]"
 	func override __bool__() -> bool
-		return len(a) > 0
+		return len(array) > 0
 	func override get_element(i: DynamicValue) -> DynamicValue*
 		if i.type != TType.INT
 			return nil
-		var ii: DynamicValueStateInt* = i.s
-		if ii.v < 0 or ii.v >= len(a)
+		var ii: DynamicValueStateInt* = weak(i.s)
+		if ii.v < 0 or ii.v >= len(array)
 			return nil
-		return a[ii.v]
+		return weak(array[ii.v])
 	func override mut add(el: DynamicValue)
-		a.add(el.copy())
-	func override copy() -> DynamicValueState*
+		array.add(el.copy())
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateArray()
-		for el in a
+		for el in weak(array)
 			c.add(el.copy())
-		return c
+		return give(c)
 
 class DynamicValueStateDict extends DynamicValueState
-	var keys: DynamicValue*[]
-	var values: DynamicValue*[]
+	var keys: owned[DynamicValue][]
+	var values: owned[DynamicValue][]
 	func override __delete__()
-		for e in values
-			del e
-		for e in keys
-			del e
+#		for e in values
+#			del e
+#		for e in keys
+#			del e
 	func override type() -> string
 		return "dict"
 	func override __str__() -> string
 		var s = "{"
-		for i=>e in values
+		for i=>e in weak(values)
 			if i > 0
 				s += ","
 			s += keys[i].render() + ":" + e.render()
@@ -440,25 +437,25 @@ class DynamicValueStateDict extends DynamicValueState
 	func override __bool__() -> bool
 		return len(values) > 0
 	func override mut get_element(key: DynamicValue) -> DynamicValue*
-		for j=>k in keys
+		for j=>k in weak(keys)
 			if k.compare(key) == 0
-				return values[j]
+				return weak(values[j])
 		
 		var val = new DynamicValue()
-		values.add(val)
+		values.add(give(val))
 		keys.add(key.copy())
-		return val
+		return weak(values[len(values)-1])
 	func mut add(key: DynamicValue, val: DynamicValue)
-		for j=>k in keys
+		for j=>k in weak(keys)
 			if k.compare(key) == 0
 				return
 		values.add(val.copy())
 		keys.add(key.copy())
-	func override copy() -> DynamicValueState*
+	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateDict()
 		for i=>v in values
 			c.add(keys[i].copy(),v.copy())
-		return c
+		return give(c)
 
 class DynamicValueStateFunction extends DynamicValueState
 	var _func: Function* = nil
@@ -569,16 +566,16 @@ class FunctionLen extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		if len(p) > 0
 			if p[0].v.type == TType.ARRAY
-				var a: DynamicValueStateArray* = p[0].v.s
-				r.v.setInt(len(a.a))
+				var a: DynamicValueStateArray* = weak(p[0].v.s)
+				r.v.setInt(len(a.array))
 			if p[0].v.type == TType.DICT
-				var a: DynamicValueStateDict* = p[0].v.s
+				var a: DynamicValueStateDict* = weak(p[0].v.s)
 				r.v.setInt(len(a.values))
 
 class FunctionRange extends FunctionInternal
 	func override call(inter: Interpreter, out r: Variable, p: Variable*[])
 		r.v.setType(TType.ARRAY)
-		var a: DynamicValueStateArray* = r.v.s
+		var a: DynamicValueStateArray* = weak(r.v.s)
 		var start = 0
 		var end = 0
 		var step = 1
@@ -595,7 +592,7 @@ class FunctionRange extends FunctionInternal
 		while i < end
 			var ii = new DynamicValue()
 			ii.setInt(i)
-			a.a.add(ii)
+			a.array.add(give(ii))
 			i += step
 
 class FunctionStr extends FunctionInternal
@@ -623,10 +620,10 @@ class FunctionMap extends FunctionInternal
 		if len(p) >= 2
 			if p[0].v.type == TType.FUNCTION and p[1].v.type == TType.ARRAY
 				r.v.setType(TType.ARRAY)
-				var f: DynamicValueStateFunction* = p[0].v.s
-				var pa: DynamicValueStateArray* = p[1].v.s
-				var ra: DynamicValueStateArray* = r.v.s
-				for e in pa.a
+				var f: DynamicValueStateFunction* = weak(p[0].v.s)
+				var pa: DynamicValueStateArray* = weak(p[1].v.s)
+				var ra: DynamicValueStateArray* = weak(r.v.s)
+				for e in weak(pa.array)
 					var temp, temp2: Variable
 					temp2.setReference(e)
 					var pp: Variable*[]
@@ -634,7 +631,7 @@ class FunctionMap extends FunctionInternal
 					inter.stack_push(self, temp)
 					f._func.call(inter, temp, pp)
 					inter.stack_pop()
-					ra.a.add(temp.v.copy())
+					ra.array.add(temp.v.copy())
 
 enum NodeType
 	OPERATOR
@@ -843,8 +840,8 @@ class SyntaxTree
 	
 	func mut addGlobalVar(name: string) -> Variable*
 		var v = new Variable(name)
-		vars.add(v)
-		return v
+		vars.add(give(v))
+		return vars[len(vars)-1]
 	func mut addConst() -> Variable*
 		var c = new Variable("")
 		c.writable = false

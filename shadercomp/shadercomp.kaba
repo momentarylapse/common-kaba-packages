@@ -52,7 +52,7 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 	# print(len(x))
 	return x
 
-class LayoutData
+struct LayoutData
 	var bindings: string
 	var input: string
 	var topology: string
@@ -141,7 +141,6 @@ func compile(filename: Path)
 	if len(x_ray_closest_hit) > 0
 		f << "RayClosestHitShader"
 		f << x_ray_closest_hit
-	del f
 
 func main(arg: string[])
 	for a in arg
