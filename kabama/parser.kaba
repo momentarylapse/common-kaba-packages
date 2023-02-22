@@ -24,7 +24,7 @@ func operator_rank(s: string) -> int
 		return 4
 	return -1
 
-func check_function_params(f: string, params: Term shared[])
+func check_function_params(f: string, params: shared[Term][])
 	if f in ["sin", "cos", "tan", "sqrt", "cosh", "sinh", "atan", "expand", "float"]
 		if len(params) != 1
 			raise(new SyntaxError("function '{{f}}' expects 1 parameter, {{len(params)}} given"))
@@ -54,7 +54,7 @@ class Parser
 	func end_of_line() -> bool
 		return cur_index >= len(e)
 
-	func parse_operand_minimal() -> Term shared
+	func parse_operand_minimal() -> shared[Term]
 		var c = cur()
 		#print("min  {{c}} {{cur_index}}")
 		if c == "("
@@ -67,7 +67,7 @@ class Parser
 			raise(new SyntaxError("unexpected )"))
 		if c == "["
 			next() # [
-			var elements: Term shared[]
+			var elements: shared[Term][]
 			while cur() != "]"
 				elements.add(parse_operand())
 				if cur() == "]"
@@ -96,7 +96,7 @@ class Parser
 		else if char_type(c[0]) == CharType.LETTER
 			next()
 			if cur() == "("
-				var params: Term shared[]
+				var params: shared[Term][]
 				next() # (
 				while cur() != ")"
 					params.add(parse_operand())
@@ -116,13 +116,13 @@ class Parser
 		raise(new SyntaxError("unknown operand '{{c}}'"))
 	
 	
-	func parse_operand() -> Term shared
+	func parse_operand() -> shared[Term]
 		#print("operand {{cur_index}}")
 		if cur() == "def"
 			return parse_def()
 		if cur() == "ass"
 			return parse_ass()
-		var eid: Term shared[]
+		var eid: shared[Term][]
 		while true
 			# operand
 			if end_of_line()
@@ -143,7 +143,7 @@ class Parser
 
 		return digest_operators(eid)
 
-	func parse_def() -> Term shared
+	func parse_def() -> shared[Term]
 		next() # def
 		var op = parse_operand()
 		if op.name != "="
@@ -155,14 +155,14 @@ class Parser
 				raise(new SyntaxError("only variables in function definition before '=' allowed"))
 		return AddSpecial("def", [op])
 
-	func parse_ass() -> Term shared
+	func parse_ass() -> shared[Term]
 		next() # ass
 		var op = parse_operand()
 	#	if op.name != ":"
 	#		raise(new SyntaxError("ass needs ':'"))
 		return AddSpecial("ass", [op])
 
-func digest_operators(out eid: Term shared[]) -> Term shared
+func digest_operators(out eid: shared[Term][]) -> shared[Term]
 	if (len(eid) % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
 	
@@ -187,13 +187,13 @@ func digest_operators(out eid: Term shared[]) -> Term shared
 	
 	return eid[0]
 
-func parse(s: string) -> Term shared
+func parse(s: string) -> shared[Term]
 	var p: Parser
 	p.e = s.parse_tokens("+-*/^<=>(),@:|[]") # ∧
 	p.cur_index = 0
 	return p.parse_operand()
 
-func f() -> Term shared
+func f() -> shared[Term]
 	return new Term(Type.NUMBER, "1")
 
 func main()

@@ -18,10 +18,10 @@ enum CharType
 
 var num_terms: int
 
-class Term as shared
+struct Term as shared
 	var type: Type
 	var name: string
-	var params: Term shared[]
+	var params: shared[Term][]
 
 	func __init__(_type: Type, _name: string)
 		type = _type
@@ -31,11 +31,11 @@ class Term as shared
 	func __delete__()
 		#print("del Term {{type}} {{name}}")
 
-	func const shallow_copy() -> Term shared
+	func shallow_copy() -> shared[Term]
 		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
-		return c
+		return give(c)
 
 #	const shared Term copy()
 #		var c = new Term(type, name)
@@ -91,7 +91,7 @@ class Term as shared
 			return params[p].name in ["+", "-"]
 		return false
 	
-	# not usable... float(Term shared) :(
+	# not usable... float(shared[Term]) :(
 	func __float__() -> float
 		return float(name[:10])
 
@@ -99,44 +99,44 @@ class Term as shared
 #	return [for t in list t.copy()]
 		
 
-func AddNumber(s: string) -> Term shared
+func AddNumber(s: string) -> shared[Term]
 	return new Term(Type.NUMBER, s)
 
-func AddFloat(s: string) -> Term shared
+func AddFloat(s: string) -> shared[Term]
 	return new Term(Type.FLOAT, s)
 
-func AddVariable(s: string) -> Term shared
+func AddVariable(s: string) -> shared[Term]
 	return new Term(Type.VARIABLE, s)
 
-func AddConstant(s: string) -> Term shared
+func AddConstant(s: string) -> shared[Term]
 	return new Term(Type.CONSTANT, s)
 
-func AddOperator(s: string, p1: Term shared, p2: Term shared) -> Term shared
+func AddOperator(s: string, p1: shared[Term], p2: shared[Term]) -> shared[Term]
 	var t = new Term(Type.OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
-	return t
+	return give(t)
 
-func AddFunction(s: string, params: Term shared[]) -> Term shared
+func AddFunction(s: string, params: shared[Term][]) -> shared[Term]
 	var t = new Term(Type.FUNCTION, s)
 	t.params = params
-	return t
+	return give(t)
 
-func PermuteOperator(t: Term shared) -> Term shared
+func PermuteOperator(t: shared[Term]) -> shared[Term]
 	var r = t.shallow_copy()
 	r.params[0] = t.params[1]
 	r.params[1] = t.params[0]
 	return r
 
-func AddSpecial(s: string, params: Term shared[]) -> Term shared
+func AddSpecial(s: string, params: shared[Term][]) -> shared[Term]
 	var t = new Term(Type.SPECIAL, s)
 	t.params = params
-	return t
+	return give(t)
 
-func AddList(params: Term shared[]) -> Term shared
+func AddList(params: shared[Term][]) -> shared[Term]
 	var t = new Term(Type.LIST, "-list-")
 	t.params = params
-	return t
+	return give(t)
 
 # (a+b)+(c+d)
 # 0 -> ~

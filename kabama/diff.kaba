@@ -3,7 +3,7 @@ use parser
 use simplify
 
 
-func diff_function(f: string, params: Term shared[]) -> Term shared
+func diff_function(f: string, params: shared[Term][]) -> shared[Term]
 	if f == "exp"
 		return AddFunction("exp", params)
 	if f == "sin"
@@ -25,7 +25,7 @@ func diff_function(f: string, params: Term shared[]) -> Term shared
 
 # d/dx
 # always copies...
-func diff(t: Term shared, by: string) -> Term shared
+func diff(t: shared[Term], by: string) -> shared[Term]
 
 	# self
 	if t.type == Type.NUMBER or t.type == Type.CONSTANT or t.type == Type.FLOAT # in [Type.NUMBER, Type.FLOAT, Type.CONSTANT]
@@ -41,7 +41,7 @@ func diff(t: Term shared, by: string) -> Term shared
 		# diff(f(a))  ->  f'(a) * diff(a)
 		return r
 	if t.type == Type.OPERATOR
-		var a, b: Term shared
+		var a, b: shared[Term]
 		if len(t.params) > 0
 			a = t.params[0]
 		if len(t.params) > 1

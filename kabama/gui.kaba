@@ -30,4 +30,5 @@ class KabamaWindow extends hui.Window
 		event("eval", on_eval)
 	
 func main()
-	hui.run(new KabamaWindow())
+	var w = new KabamaWindow()
+	hui.run(weak(w))

@@ -11,29 +11,29 @@ use float
 class Runtime
 	#class Assumption
 	#	shared Term term
-	class Function
+	struct Function
 		var name: string
 		var params: string[]
-		var formula: Term shared
+		var formula: shared[Term]
 		func __str__() -> string
 			var p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
-	var assumptions: Term shared[]
-	var functions: Function*[]
-	var history: Term shared[]
+	var assumptions: shared[Term][]
+	var functions: owned[Function][]
+	var history: shared[Term][]
 	
 	#class Error extends Exception
 	
-	func mut add_function(t: Term shared)
+	func mut add_function(t: shared[Term])
 		var f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
 			f.params.add(p.name)
 		f.formula = t.params[1]
-		functions.add(f)
+		functions.add(give(f))
 		#print("added... " + str(f))
 
-	func mut eval_term(_t: Term shared) -> Term shared
+	func mut eval_term(_t: shared[Term]) -> shared[Term]
 		# recursive
 		var t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
@@ -66,7 +66,7 @@ class Runtime
 				
 		return t
 
-	func mut eval(s: string) -> Term shared
+	func mut eval(s: string) -> shared[Term]
 		var t = parse(s)
 		var r = normalize(eval_term(t))
 		history.add(r)

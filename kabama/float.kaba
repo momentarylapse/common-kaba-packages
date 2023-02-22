@@ -1,12 +1,12 @@
 use common
 
-func all_params_are_float(t: Term shared) -> bool
+func all_params_are_float(t: shared[Term]) -> bool
 	for p in t.params
 		if p.type != Type.FLOAT
 			return false
 	return true
 
-func make_float(t_: Term shared) -> Term shared
+func make_float(t_: shared[Term]) -> shared[Term]
 	var t = t_.shallow_copy()
 	for i=>p in t.params
 		t.params[i] = make_float(p)
