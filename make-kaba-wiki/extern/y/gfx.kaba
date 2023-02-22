@@ -1,6 +1,11 @@
 use image
 
 
+enum PrimitiveTopology
+	TRIANGLES
+	LINES
+	POINTS
+
 class Vertex
 	var p, n: vec3
 	var u, v: float
@@ -9,6 +14,11 @@ class VertexFx
 	pos: vec3
 	col: color
 	u, v: float
+
+class PointVertex
+	pos: vec3
+	radius: float
+	col: color
 
 class FrameBuffer
 	var width, height: int

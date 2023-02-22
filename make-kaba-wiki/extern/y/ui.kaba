@@ -51,7 +51,7 @@ enum Button
 	MIDDLE
 	RIGHT
 
-class Node
+class Node as shared
 	enum Align
 		NONE
 		FILL_X = 2^0
@@ -151,7 +151,7 @@ class Gamepad as shared
 	func extern button(b: Button) -> bool
 	func extern clicked(b: Button) -> bool
 
-func extern static get_pad(index: int = -1) -> Gamepad shared
+func extern static get_pad(index: int = -1) -> shared[Gamepad]
 
 
 

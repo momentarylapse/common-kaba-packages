@@ -40,7 +40,7 @@ func filter_classes(classes: Class*[]) -> Class*[]
 
 
 
-class ExternalPackage
+struct ExternalPackage
 	name: string
 	main: Module*
 	sub_modules: (string,Module*)[]

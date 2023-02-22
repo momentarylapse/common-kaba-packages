@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib64/libsqlite3.so
+let KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_open_v2:sqlite3_open_v2
 	_sqlite3_close:sqlite3_close
 	sqlite3_libversion_number:sqlite3_libversion_number
@@ -14,8 +14,8 @@ const KABA_LINK = "/usr/lib64/libsqlite3.so
 	_sqlite3_column_type:sqlite3_column_type
 "
 
-const _SQLITE_OPEN_READWRITE = 2
-const _SQLITE_OPEN_CREATE = 4
+let _SQLITE_OPEN_READWRITE = 2
+let _SQLITE_OPEN_CREATE = 4
 
 func extern sqlite3_libversion_number() -> int
 func extern _sqlite3_open_v2(fn: char*, db: void*, flags: int, zzz: void*) -> int
@@ -47,13 +47,13 @@ class Database
 	func error() -> string
 		return _cstr2str(_sqlite3_errmsg(db))
 		
-	func query(sql: string) -> Query shared
+	func query(sql: string) -> xfer[Query]
 		var s = sql
 		s.add(0)
 		var q = new Query()
 		if _sqlite3_prepare(db, &s[0], len(sql), &q.res, nil) != 0
 			raise(new Exception("sql query failed: " + error()))
-		return q
+		return give(q)
 
 	func run(sql: string)
 		var q = query(sql)
@@ -128,23 +128,23 @@ class Query as shared
 		return r
 		
 
-func sqlite_open(filename: string) -> Database*
+func sqlite_open(filename: string) -> xfer[Database]
 	var f = filename
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE, nil)
 	if !db.db
 		raise(new Exception("can't open database {{filename}}"))
-	return db
+	return give(db)
 
-func sqlite_create(filename: string) -> Database*
+func sqlite_create(filename: string) -> xfer[Database]
 	var f = filename
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE + _SQLITE_OPEN_CREATE, nil)
 	if !db.db
 		raise(new Exception("can't create database {{filename}}"))
-	return db
+	return give(db)
 
 
 func __main()
@@ -153,7 +153,6 @@ func __main()
 	db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
 	db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
 	db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
-	del db
 
 func main()
 	var db = sqlite_open("test.sqlite3")
@@ -164,5 +163,4 @@ func main()
 		while q.has_more()
 			print(q.get_column())
 	#print(db.load_doc("michi", "1002"))
-	del db
 

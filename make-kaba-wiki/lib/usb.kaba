@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib64/libusb-1.0.so
+let KABA_LINK = "/usr/lib64/libusb-1.0.so
 	_libusb_init:libusb_init
 	_libusb_exit:libusb_exit
 	_libusb_set_debug:libusb_set_debug
@@ -95,7 +95,7 @@ func extern _libusb_set_interface_alt_setting(h: _handle*, i: int, alt: int) -> 
 func extern _libusb_interrupt_transfer(h: _handle*, entpoint: int, data: void*, length: int, transferred: int*, timeout: int) -> int
 func extern _libusb_control_transfer(h: _handle*, req_type: int, request: int, value: int, index: int, data: void*, length: int, timeout: int) -> int
 
-class DeviceInfo
+struct DeviceInfo
 	var bus, port, address: int
 	var _class, sub_class, protocoll, max_package_size, num_configs: int
 	var vid, pid: int
@@ -133,7 +133,7 @@ func CHECK(r: int, msg: string)
 	if r < 0
 		REPORT_ERROR(r, msg)
 
-class Device
+struct Device
 	var dev: _device*
 	
 	func get_info() -> DeviceInfo
@@ -185,34 +185,34 @@ class Device
 					print("        attributes:      {{e.attributes()}}")
 					print("        max packet size: {{e.max_packet_size()}}")
 		_libusb_free_config_descriptor(desc)
-	func open() -> Handle*
+	func open() -> xfer[Handle]
 		var h = new Handle()
 		h.dev = &self
 		CHECK(_libusb_open(dev, &h.h), "can not open device")
-		return h
+		return give(h)
 		
 
 class Context
 	var c: _context* = nil
 	func __delete__()
 		_libusb_exit(c)
-	func enumerate() -> Device*[]
-		var r: Device*[]
+	func enumerate() -> xfer[Device][]
+		var r: owned[Device][]
 		var list: _device*[0]*
 		var n = _libusb_get_device_list(c, &list)
 		for i in 0:n
 			var dev = new Device(list[i])
-			r.add(dev)
+			r.add(give(dev))
 		_libusb_free_device_list(list, 1)
-		return r
-	func open(vid: int, pid: int) -> Handle*
+		return give(r)
+	func open(vid: int, pid: int) -> xfer[Handle]
 		var h = new Handle()
 		#int v = vid << 16 + pid
 		h.h = _libusb_open_device_with_vid_pid(c, vid, pid)
 		if !h.h
 			raise(new Exception("device not found"))
 		h.dev = new Device(_libusb_get_device(h.h))
-		return h
+		return give(h)
 
 class Handle
 	var h: _handle* = nil
@@ -267,10 +267,10 @@ class Handle
 		data.resize(r)
 		return str(r)
 
-func init_usb() -> Context*
+func init_usb() -> xfer[Context]
 	var c = new Context()
 	CHECK(_libusb_init(&c.c), "can not init library")
-	return c
+	return give(c)
 
 
 func _main()
@@ -278,4 +278,4 @@ func _main()
 	var devs = c.enumerate()
 	for d in devs
 		print(str(d.get_info()))
-	del c
+

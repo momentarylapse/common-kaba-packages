@@ -38,8 +38,8 @@ class Material
 	func extern static load(filename: Path) -> Material*
 
 class Model extends Component
-	class Mesh
-		class Sub
+	struct Mesh
+		struct Sub
 			var num_triangles: int
 			var triangle_index: int[]
 			var skin_vertex: float[]
@@ -65,6 +65,15 @@ class Model extends Component
 #	func extern update_matrix()
 	
 	func extern get_vertex(index: int) -> vec3
+
+
+class UserMesh extends Component
+	vertex_buffer: VertexBuffer*
+	topology: PrimitiveTopology
+	material: Material*
+	vertex_shader_module: string
+	geometry_shader_module: string
+
 
 class SolidBody extends Component
 	var vel: vec3
@@ -106,6 +115,10 @@ class Skeleton extends Component
 	var pos0, dpos: vec3[]
 	var parents: int[]
 	func extern mut reset()
+
+class MultiInstance extends Component
+	var model: Model*
+	var matrices: mat4[]
 
 class Terrain extends Component
 	var pattern: vec3
@@ -207,9 +220,9 @@ class World
 	func extern trace(p1: vec3, p2: vec3, out d: CollisionData, simple_test: bool, ignore: Entity*) -> bool
 	
 	func selfref objects() -> Model*[]*
-		return get_component_list[Model]()
+		return get_component_family_list[Model]()
 	func selfref terrains() -> Terrain*[]*
-		return get_component_list[Terrain]()
+		return get_component_family_list[Terrain]()
 
 #	extern void unregister(void* o) # Model, Link, Light, Particle, Beam
 #	func extern delete(o: void*)

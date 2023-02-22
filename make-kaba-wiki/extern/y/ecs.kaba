@@ -3,7 +3,7 @@ use kaba
 #class extern Model
 #class extern SolidBody
 
-class BaseClass
+struct BaseClass
 #	extern void __init__()
 	func extern virtual __delete__()
 	func extern __del_override__()
@@ -11,7 +11,7 @@ class BaseClass
 	func extern virtual mut on_delete()
 	func extern virtual mut on_iterate(dt: float)
 
-class Entity extends BaseClass
+struct Entity extends BaseClass
 	var pos: vec3
 	var ang: quaternion
 	var parent: Entity*
@@ -53,10 +53,14 @@ class Component
 	var owner: Entity*
 	use owner
 
-##func extern get_component_list(t: Class) -> Component*[]*
 func extern __get_component_list(t: Class) -> Component*[]*
 func get_component_list[T]() -> T*[]*
 	var list: T*[]* = __get_component_list(T)
+	return list
+
+func extern __get_component_family_list(t: Class) -> Component*[]*
+func get_component_family_list[T]() -> T*[]*
+	var list: T*[]* = __get_component_family_list(T)
 	return list
 
 #func ffff()

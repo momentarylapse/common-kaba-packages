@@ -2,15 +2,15 @@ use mongo
 #use "file.kaba"
 use os
 
-class Config
+struct Config
 	var show_meta = false
 
 var conf: Config
 
-class Tag
+struct Tag
 	var key, value: string
 
-class DbFile
+struct DbFile
 	var id, hash, hash_medium, type: string
 	var path: Path
 	var name: string
@@ -53,7 +53,7 @@ class DbFile
 		path = medium_path()
 		medium = true
 
-class DbMedium
+struct DbMedium
 	var id, hash: string
 	var size: int
 
@@ -228,4 +228,4 @@ by-hash <hash1> <hash2>")
 		print(arg[3]) # hash
 		print(arg[4]) # mtime
 		print(arg[5]) # tags hex
-	del db
+

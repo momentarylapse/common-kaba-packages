@@ -8,22 +8,22 @@ class Vertex
 	u,v: float
 
 
-func create_quad(r: rect) -> VertexBuffer*
+func create_quad(r: rect) -> xfer[VertexBuffer]
 	var vb = new VertexBuffer("3f,3f,2f")
 	vb.create_quad(r, rect.ID)
-	return vb
+	return give(vb)
 
 
 class Renderer
 	var width, height: int
 	#var in_flight_fence: Fence*
-	var wait_for_frame_fences: Fence*[]
-	var image_available_semaphore, render_finished_semaphore: Semaphore*
+	var wait_for_frame_fences: owned[Fence][]
+	var image_available_semaphore, render_finished_semaphore: owned[Semaphore]
 
 	var device: Device*
-	var command_buffers: CommandBuffer*[]
+	var command_buffers: owned[CommandBuffer][]
 	#var cb: CommandBuffer*
-	var pool: DescriptorPool*
+	var pool: owned[DescriptorPool]
 
 	func __init__(_device: Device*)
 		width = 0
@@ -37,11 +37,6 @@ class Renderer
 		#cb = new CommandBuffer()
 	
 	func virtual __delete__()
-		#del in_flight_fence
-		del image_available_semaphore
-		del render_finished_semaphore
-		if pool
-			del pool
 	
 	func virtual default_render_pass() -> RenderPass*
 		return nil
@@ -130,7 +125,7 @@ class WindowRenderer extends Renderer
 		return frame_buffers[image_index]
 
 	func override current_command_buffer() -> CommandBuffer*
-		return command_buffers[image_index]
+		return weak(command_buffers)[image_index]
 
 	func override start_frame() -> bool
 		#in_flight_fence.wait()
@@ -138,7 +133,7 @@ class WindowRenderer extends Renderer
 		if not swap_chain.acquire_image(&image_index, image_available_semaphore)
 			rebuild_default_stuff()
 			return false
-		var f = wait_for_frame_fences[image_index]
+		var f = weak(wait_for_frame_fences[image_index])
 		f.wait()
 		f.reset()
 		return true
@@ -151,10 +146,10 @@ class WindowRenderer extends Renderer
 	#		rebuild_default_stuff()
 			
 			
-		var f = wait_for_frame_fences[image_index]
-		default_device.present_queue.submit(command_buffers[image_index], [image_available_semaphore], [render_finished_semaphore], f)
+		var f = weak(wait_for_frame_fences[image_index])
+		default_device.present_queue.submit(weak(command_buffers[image_index]), [weak(image_available_semaphore)], [weak(render_finished_semaphore)], f)
 
-		swap_chain.present(image_index, [render_finished_semaphore])
+		swap_chain.present(image_index, [weak(render_finished_semaphore)])
 			
 		default_device.wait_idle()
 
@@ -167,15 +162,11 @@ class WindowRenderer extends Renderer
 
 
 
-
-
-
-
 class TextureRenderer extends Renderer
 	var tex: Texture*
-	var depth_buffer: DepthBuffer*
-	var frame_buffer: FrameBuffer*
-	var _default_render_pass: RenderPass*
+	var depth_buffer: owned[DepthBuffer]
+	var frame_buffer: owned[FrameBuffer]
+	var _default_render_pass: owned[RenderPass]
 
 
 	func __init__(t: Texture*, d: Device*)
@@ -193,10 +184,7 @@ class TextureRenderer extends Renderer
 
 
 	func override __delete__()
-		del _default_render_pass
-		del depth_buffer
-		del frame_buffer
-		del tex
+		del tex # ???
 
 	func override start_frame() -> bool
 		#cb.begin()
@@ -213,7 +201,7 @@ class TextureRenderer extends Renderer
 
 
 	func override current_frame_buffer() -> FrameBuffer*
-		return frame_buffer
+		return weak(frame_buffer)
 
 
 
@@ -224,13 +212,13 @@ class UBO
 	var m,v,p: mat4
 
 class StatLayer
-	var tex: Texture*
-	var ubo: UniformBuffer*
-	var dset: DescriptorSet*
-	var timer: Timer*
-	var im: Image*
-	var vb: VertexBuffer*
-	var pipeline: GraphicsPipeline*
+	var tex: owned[Texture]
+	var ubo: owned[UniformBuffer]
+	var dset: owned[DescriptorSet]
+	var timer: owned[Timer]
+	var im: owned[Image]
+	var vb: owned[VertexBuffer]
+	var pipeline: owned[GraphicsPipeline]
 	var frames: int
 	var _time: float
 	
@@ -256,13 +244,6 @@ class StatLayer
 		pipeline.set_blend(6,7)
 		pipeline.set_z(false, false)
 		pipeline.rebuild()
-	func __delete__()
-		del timer
-		del ubo
-		del tex
-		del dset
-		del vb
-		del pipeline
 	func mut tick()
 		var dt = timer.get()
 		_time += dt
@@ -275,7 +256,6 @@ class StatLayer
 		pp.set_color(color.WHITE)
 		pp.set_font_size(20)
 		pp.draw_str([5,5], "{{frames/_time|1}}")
-		del pp
 		tex.write(im)
 		dset.set_texture(1, tex)
 		dset.update()
