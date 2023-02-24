@@ -119,7 +119,7 @@ func log_warn(op: string, msg: string)
 func log_error(op: string, msg: string)
 	print("{{terminal.RED}}{{terminal.BOLD}}{{op.upper()}}{{terminal.END}}  {{msg}}")
 
-func error_out(e: Exception)
+func error_out(e: Exception*)
 	log_error("error", str(e))
 
 func shell_exec(cmd: string) -> string

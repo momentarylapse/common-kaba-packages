@@ -97,10 +97,9 @@ func _action_structure_auto(dir: Path)
 	set_working_dir(dir)
 	var files = db.get_in_dir(dir, conf.recursive)
 	for f in files
-		let e = conf.get_cfg(f.path)
-		if !e
-			continue
-		structure_file(f, str(e.dir | e.structure))
+		let pe = conf.get_cfg(f.path)
+		for e in pe
+			structure_file(f, str(e.dir | e.structure))
 
 func action_structure_auto(arg: string[])
 	for a in arg
@@ -111,8 +110,8 @@ func action_structure_auto(arg: string[])
 
 func _action_dsync(dir: Path)
 	set_working_dir(dir)
-	let e = conf.get_cfg(dir)
-	if e
+	let ee = conf.get_cfg(dir)
+	for e in ee
 		for s in e.syncs
 			remote_sync_by_filter(s.filter, s.quality(), "", dir)
 	var files = db.get_in_dir(dir, conf.recursive)
