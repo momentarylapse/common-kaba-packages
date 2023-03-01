@@ -1,7 +1,7 @@
 use common
 
 # always copy
-func subst_variable(_t: shared[Term], _var: string, by: shared[Term]) -> shared[Term]
+func subst_variable(_t: shared![Term], _var: string, by: shared![Term]) -> shared![Term]
 	var t = _t.shallow_copy()
 	for p in t.params
 		p = subst_variable(p, _var, by)
@@ -9,19 +9,19 @@ func subst_variable(_t: shared[Term], _var: string, by: shared[Term]) -> shared[
 	if t.type == Type.VARIABLE
 		if t.name == _var
 			return by
-	return t
+	return give(t)
 
 
 
 struct MatchingTerm
-	var t: shared[Term]
+	var t: shared![Term]
 	var name: string
 	func __str__() -> string
 		return "{{name}} -> {{t}}"
 
 struct Matching
 	var terms: MatchingTerm[]
-	func mut add(t: shared[Term], name: string) -> bool
+	func mut add(t: shared![Term], name: string) -> bool
 		#print("add: {{t}} <<< {{name}}")
 		var mt: MatchingTerm
 		mt.t = t
@@ -32,7 +32,7 @@ struct Matching
 		return str([for t in terms str(t)])
 	
 
-func rule_match(t: shared[Term], m: shared[Term], out mm: Matching) -> bool
+func rule_match(t: shared![Term], m: shared![Term], out mm: Matching) -> bool
 	if m.name[:1] == "@"
 		mm.add(t, m.name)
 		return true
@@ -45,9 +45,9 @@ func rule_match(t: shared[Term], m: shared[Term], out mm: Matching) -> bool
 			return false
 	return true
 
-func subst(_t: shared[Term], pattern: shared[Term], substitution: shared[Term], max_recursion: int) -> shared[Term]
+func subst(_t: shared![Term], pattern: shared![Term], substitution: shared![Term], max_recursion: int) -> shared![Term]
 	var mm: Matching
-	var t = _t.shallow_copy()
+	var t: shared![Term] = _t.shallow_copy()
 	for p in t.params
 		p = subst(p, pattern, substitution, max_recursion)
 		

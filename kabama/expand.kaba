@@ -1,7 +1,7 @@
 use common
 use parser
 
-func expand(_t: shared[Term]) -> shared[Term]
+func expand(_t: shared![Term]) -> shared![Term]
 	# recursive
 	var t = _t.shallow_copy()
 	for p in t.params
@@ -38,4 +38,4 @@ func expand(_t: shared[Term]) -> shared[Term]
 			# (a ^ b) ^ c -> a ^ (b * c)
 			return expand(AddOperator("^", p1.params[0], AddOperator("*", p1.params[1], p2)))
 		
-	return t
+	return give(t)

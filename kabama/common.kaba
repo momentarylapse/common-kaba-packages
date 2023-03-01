@@ -21,7 +21,7 @@ var num_terms: int
 struct Term as shared
 	var type: Type
 	var name: string
-	var params: shared[Term][]
+	var params: shared![Term][]
 
 	func __init__(_type: Type, _name: string)
 		type = _type
@@ -31,7 +31,7 @@ struct Term as shared
 	func __delete__()
 		#print("del Term {{type}} {{name}}")
 
-	func shallow_copy() -> shared[Term]
+	func shallow_copy() -> xfer[Term]
 		var c = new Term(type, name)
 		for p in params
 			c.params.add(p)
@@ -73,23 +73,23 @@ struct Term as shared
 			return "[" + [for p in params str(p)].join(", ") + "]"
 		return "?"
 
-	func const param_needs_paranthesis(p: int) -> bool
-		if params[p].type == Type.NUMBER
-			if params[p].name[:1] == "-"
+	func param_needs_paranthesis(index: int) -> bool
+		let p = &!params[index]
+		if p.type == Type.NUMBER
+			if p.name[:1] == "-"
 				return true
 		if name == "^"
-			return params[p].type == Type.OPERATOR
+			return p.type == Type.OPERATOR
 		if name == "/"
-			if params[p].name == "^"
+			if p.name == "^"
 				return false
-			return params[p].type == Type.OPERATOR
+			return p.type == Type.OPERATOR
 		if name == "-"
-			if params[p].name == "*"
+			if p.name == "*"
 				return false
-			return params[p].type == Type.OPERATOR
+			return p.type == Type.OPERATOR
 		if name == "*"
-			return params[p].name in ["+", "-"]
-		return false
+			return p.name in ["+", "-"]
 	
 	# not usable... float(shared[Term]) :(
 	func __float__() -> float
@@ -99,41 +99,41 @@ struct Term as shared
 #	return [for t in list t.copy()]
 		
 
-func AddNumber(s: string) -> shared[Term]
+func AddNumber(s: string) -> xfer[Term]
 	return new Term(Type.NUMBER, s)
 
-func AddFloat(s: string) -> shared[Term]
+func AddFloat(s: string) -> xfer[Term]
 	return new Term(Type.FLOAT, s)
 
-func AddVariable(s: string) -> shared[Term]
+func AddVariable(s: string) -> xfer[Term]
 	return new Term(Type.VARIABLE, s)
 
-func AddConstant(s: string) -> shared[Term]
+func AddConstant(s: string) -> xfer[Term]
 	return new Term(Type.CONSTANT, s)
 
-func AddOperator(s: string, p1: shared[Term], p2: shared[Term]) -> shared[Term]
+func AddOperator(s: string, p1: shared![Term], p2: shared![Term]) -> xfer[Term]
 	var t = new Term(Type.OPERATOR, s)
 	t.params.add(p1)
 	t.params.add(p2)
 	return give(t)
 
-func AddFunction(s: string, params: shared[Term][]) -> shared[Term]
+func AddFunction(s: string, params: shared![Term][]) -> xfer[Term]
 	var t = new Term(Type.FUNCTION, s)
 	t.params = params
 	return give(t)
 
-func PermuteOperator(t: shared[Term]) -> shared[Term]
+func PermuteOperator(t: shared![Term]) -> xfer[Term]
 	var r = t.shallow_copy()
 	r.params[0] = t.params[1]
 	r.params[1] = t.params[0]
-	return r
+	return give(r)
 
-func AddSpecial(s: string, params: shared[Term][]) -> shared[Term]
+func AddSpecial(s: string, params: shared![Term][]) -> xfer[Term]
 	var t = new Term(Type.SPECIAL, s)
 	t.params = params
 	return give(t)
 
-func AddList(params: shared[Term][]) -> shared[Term]
+func AddList(params: shared![Term][]) -> xfer[Term]
 	var t = new Term(Type.LIST, "-list-")
 	t.params = params
 	return give(t)

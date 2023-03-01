@@ -3,7 +3,7 @@ use parser
 use simplify
 
 
-func diff_function(f: string, params: shared[Term][]) -> shared[Term]
+func diff_function(f: string, params: shared![Term][]) -> xfer[Term]
 	if f == "exp"
 		return AddFunction("exp", params)
 	if f == "sin"
@@ -25,27 +25,34 @@ func diff_function(f: string, params: shared[Term][]) -> shared[Term]
 
 # d/dx
 # always copies...
-func diff(t: shared[Term], by: string) -> shared[Term]
+func diff(t: shared![Term], by: string) -> xfer[Term]
+	print("D D D D")
+	print(t)
+	print(by)
 
 	# self
 	if t.type == Type.NUMBER or t.type == Type.CONSTANT or t.type == Type.FLOAT # in [Type.NUMBER, Type.FLOAT, Type.CONSTANT]
 		return AddNumber("0")
 	if t.type == Type.VARIABLE
 		if t.name == by
+			print("1")
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == Type.FUNCTION
 		var r = diff_function(t.name, t.params)
 		for p in t.params
-			r = AddOperator("*", diff(p, by), r)
+			r = AddOperator("*", diff(p, by), give(r))
 		# diff(f(a))  ->  f'(a) * diff(a)
-		return r
+		return give(r)
 	if t.type == Type.OPERATOR
-		var a, b: shared[Term]
-		if len(t.params) > 0
-			a = t.params[0]
-		if len(t.params) > 1
-			b = t.params[1]
+		print("DD op")
+		print(t)
+		if len(t.params) < 2
+			raise(new RuntimeError("unhandled differential..."))
+		print("a")
+		let a = t.params[0]
+		let b = t.params[1]
+		print("b")
 		if t.name in ["+", "-", "="]
 			# diff(a + b)  ->  diff(a) + diff(b)
 			return AddOperator(t.name, diff(a, by), diff(b, by))
@@ -59,11 +66,16 @@ func diff(t: shared[Term], by: string) -> shared[Term]
 			                        AddOperator("/", AddOperator("*", a, diff(b, by)),
 			                                         AddOperator("^", b, AddNumber("2"))))
 		if t.name == "^"
+			print("^")
 			if b.type == Type.NUMBER or b.type == Type.FLOAT or b.type == Type.CONSTANT # in [...]
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b,
 				                        AddOperator("*", AddOperator("^", a, AddNumber(sub(b.name, "1"))),
 				                                         diff(a, by)))
+			print("^^")
+			print([a])
+			print([a])
+			print([b])
 			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
 			return AddOperator("+", AddOperator("*", b,
 			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b, AddNumber("1"))),
@@ -75,5 +87,5 @@ func diff(t: shared[Term], by: string) -> shared[Term]
 		var r = t.shallow_copy()
 		for i=>p in r.params
 			r.params[i] = diff(p, by)
-		return r
+		return give(r)
 	raise(new RuntimeError("unhandled differential..."))

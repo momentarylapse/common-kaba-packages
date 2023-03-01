@@ -2,8 +2,8 @@ use common
 use subst
 use simplify
 
-func zeros(t: shared[Term], _var: string) -> shared[Term]
-	var z: shared[Term][]
+func zeros(t: shared![Term], _var: string) -> shared![Term]
+	var z: shared![Term][]
 	for i in -1000:1000
 		var r = subst_variable(t, _var, AddNumber(str(i)))
 		r = normalize(r)
