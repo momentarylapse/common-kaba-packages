@@ -17,12 +17,13 @@ class DemoDialog extends hui.Window
 class ToolbarDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Toolbar demo", 800, 300)
-		toolbar(0).from_source(source)
+		for t in toolbar(0)
+			t.from_source(source)
 
 class MenuDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Menu demo", 800, 300)
-		var m = hui.create_menu_from_source(source, self)
+		var m = hui.create_menu_from_source(source, &self)
 		set_menu(give(m))
 
 func action_demo(arg: string[])
@@ -37,14 +38,14 @@ func action_demo(arg: string[])
 	#print(r.str(0))
 	
 	if r.type in ["Dialog", "Window"]
-		var dlg = new DemoDialog(source)
-		hui.run(weak(dlg), nil)
+		var dlg: shared![DemoDialog] = new DemoDialog(source)
+		hui.run(dlg, nil)
 	else if r.type == "Toolbar"
-		var dlg = new ToolbarDemoDialog(source)
-		hui.run(weak(dlg), nil)
+		var dlg: shared![ToolbarDemoDialog] = new ToolbarDemoDialog(source)
+		hui.run(dlg, nil)
 	else if r.type == "Menu"
-		var dlg = new MenuDemoDialog(source)
-		hui.run(weak(dlg), nil)
+		var dlg: shared![MenuDemoDialog] = new MenuDemoDialog(source)
+		hui.run(dlg, nil)
 	else
 		print("don't know how to show a {{r.type}}")
 

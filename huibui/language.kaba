@@ -173,9 +173,9 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
 	var nerrors = 0
 	
-	var f: TextLinesFormatter*
+	var file: owned[TextLinesFormatter]
 	if create_file
-		f = new TextLinesFormatter(fs.open(conf.dir | "TRANS", "wt"))
+		file = new TextLinesFormatter(fs.open(conf.dir | "TRANS", "wt"))
 	
 	# check ids
 	for i in own.ids
@@ -188,14 +188,14 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 				found_tooltip = (len(j.tooltip) > 0)
 				break
 		if len(i.title) > 0 and !found_title
-			if create_file
+			for f in file
 				f << "# id:{{i.id}}"
 				f << i.title.escape()
 				f << ""
 			#print("    MISSING title for " + i.id)
 			nerrors ++
 		if len(i.tooltip) > 0 and !found_tooltip
-			if create_file
+			for f in file
 				f << "# tooltip:{{i.id}}"
 				f << i.tooltip.escape()
 				f << ""
@@ -210,7 +210,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 				found = (len(tt.trans) > 0)
 				break
 		if !found
-			if create_file
+			for f in file
 				f << "# text"
 				f << t.orig.escape()
 				f << ""
@@ -222,8 +222,6 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	else
 		print("    {{nerrors}} missing translations")
 
-	if create_file
-		del f
 	return nerrors == 0
 
 

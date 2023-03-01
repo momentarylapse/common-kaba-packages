@@ -40,7 +40,7 @@ class SourceParser
 	func virtual mut end(filename: Path)
 
 class SourceLanguageFinder extends SourceParser
-	var l: Language*
+	var l: Language&
 	func override mut handle(pos: int, length: int)
 		var t: LangText
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
@@ -55,7 +55,7 @@ class SourceLanguageFinder extends SourceParser
 				l.texts.add(t)
 
 class SourceSwapper extends SourceParser
-	var l: Language*
+	var l: Language&
 	var source_new: string
 	var changed: bool
 	var delta: int
@@ -87,12 +87,12 @@ class SourceSwapper extends SourceParser
 
 func parse_source_code_dir(dir: Path, l: Language)
 	var p: SourceLanguageFinder
-	p.l = &l
+	p.l := &!l
 	p.parse_source_code_dir(dir)
 
 
 func swap_translate_source(dir: Path, l: Language)
 	var p: SourceSwapper
-	p.l = &l
+	p.l := &!l
 	p.parse_source_code_dir(dir)
 
