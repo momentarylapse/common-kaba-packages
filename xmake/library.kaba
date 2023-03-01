@@ -70,12 +70,12 @@ struct LibraryManager
 			l.dir_override = str(c["dir"])
 			libraries.add(l)
 
-	func get(name: string) -> Library*
+	func get(name: string) -> Library&
 		for l in libraries
 			if l.name == name
-				return &l
+				return l
 		raise(new Exception("unknown library: {{name}}"))
-		return nil
+		#return nil
 
 	func has(name: string) -> bool
 		return get(name).test()
