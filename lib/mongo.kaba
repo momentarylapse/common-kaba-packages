@@ -48,24 +48,24 @@ func extern _mongoc_collection_destroy(col: void*)
 func extern _mongoc_client_destroy(client: void*)
 
 func extern _bson_new_from_json(json: char*, len: int, err: void*) -> void*
-func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> char*
-func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> char*
+func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> char[0]&
+func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> char[0]&
 func extern _bson_free(str: void*)
 func extern _bson_destroy(bson: void*)
 func extern _bson_new_from_data(data: char*, length: int) -> void*
 func extern _bson_iter_init(i: void*, bson: void*) -> bool
 func extern _bson_iter_next(i: void*) -> bool
-func extern _bson_iter_key(i: void*) -> char[0]*
+func extern _bson_iter_key(i: void*) -> char[0]&
 func extern _bson_iter_int32(i: void*) -> int
 func extern _bson_iter_int64(i: void*) -> int64
 func extern _bson_iter_double(i: void*) -> float64
-func extern _bson_iter_utf8(i: void*, __len: void*) -> char[0]*
+func extern _bson_iter_utf8(i: void*, __len: void*) -> char[0]&
 func extern _bson_iter_array(i: void*, len: int*, a: void*)
 func extern _bson_iter_oid(i: void*) -> void*
 func extern _bson_oid_to_string(oid: void*, str: char*)
 func extern _bson_iter_type(i: void*) -> int
 
-func char_to_str(p: char[0]*) -> string
+func char_to_str(p: char[0]&) -> string
 	var t: string
 	for i in 0:10000
 		if p[i] == 0
@@ -83,7 +83,7 @@ func json_to_bson(json: string) -> void*
 
 func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
-	var x: char[0]* = _bson_as_relaxed_extended_json(bson, nil)
+	var x: char[0]& = _bson_as_relaxed_extended_json(bson, nil)
 	var t = char_to_str(x)
 	_bson_free(x)
 	return t
@@ -180,10 +180,10 @@ class Collection as shared
 	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	func find(filter: any) -> shared[Result]
+	func find(filter: any) -> xfer[Result]
 		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	func aggregate(pattern: any) -> shared[Result]
+	func aggregate(pattern: any) -> xfer[Result]
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
 	func insert(doc: any)

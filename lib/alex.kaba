@@ -114,11 +114,10 @@ func parse_bson_medium(b: void*) -> DbMedium
 	# f.show()
 	return f
 
-func parse_result(r: Result*) -> DbFile[]
+func parse_result(out r: Result) -> DbFile[]
 	var files: DbFile[]
 	while r.has_more()
 		files.add(parse_bson(r.doc))
-	del r
 	return files
 
 func print_files(files: DbFile[])
@@ -126,20 +125,16 @@ func print_files(files: DbFile[])
 		print(str(f))
 
 class Database
-	var m: Mongo*
-	var files: Collection*
-	var medium: Collection*
+	var m: owned![Mongo]
+	var files: owned![Collection]
+	var medium: owned![Collection]
 	func __init__()
 		m = new Mongo("localhost")
 		files = m.collection("alex", "files")
 		medium = m.collection("alex", "medium")
-	func __delete__()
-		del files
-		del medium
-		del m
 	func find(json: string) -> DbFile[]
 		var r = files.find(json) # "{\"author\":\"Michael Ankele\"}")
-		return parse_result(weak(r))
+		return parse_result(r)
 	func by_id(id: string) -> DbFile
 		var r = files.find("{\"id\":\"{{id}}\"}")
 		if r.has_more()
