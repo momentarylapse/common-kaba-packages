@@ -4,10 +4,10 @@ use circuit
 use panel
 
 class EditorPanel extends CircuitPanel
-	var ed: CircuitEditor*
+	var ed: CircuitEditor&
 	func __init__(e: CircuitEditor)
 		super.__init__(e.c)
-		ed = &e
+		ed := &!e
 	func override mut on_selection_change()
 		ed.load_from_part(nil)
 		if sel.type == SelectionType.EDGE
@@ -15,7 +15,7 @@ class EditorPanel extends CircuitPanel
 
 class CircuitEditor extends hui.Window
 	var c: Circuit
-	var panel: CircuitPanel*
+	var panel: shared![CircuitPanel]
 	
 	
 	func __init__(arg: string[])
@@ -48,7 +48,8 @@ Grid root ''
 				Button simulate 'Run' expandx")
 		panel = new EditorPanel(self)
 		embed(panel, "root", 0,0)
-		toolbar(0).from_source("
+		for t in toolbar(0)
+			t.from_source("
 Toolbar toolbar ''
 	Item new 'New' image=hui:new
 	Item open 'Open' image=hui:open
@@ -82,13 +83,13 @@ Toolbar toolbar ''
 		var f = func(p: Path)
 			if bool(p)
 				fs.write_text(p, c.export())
-		hui.file_dialog_save(self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
+		hui.file_dialog_save(&self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func mut on_open()
 		var f = func(p: Path)
 			if bool(p)
 				c.import(fs.read_text(p))
-		hui.file_dialog_open(self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
+		hui.file_dialog_open(&self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
 	
 	func mut on_param()
 		var row = hui.get_event().row
@@ -96,13 +97,12 @@ Toolbar toolbar ''
 		if panel.sel.type == SelectionType.EDGE
 			c.edges[panel.sel.index].param[row] = float(p)
 	
-	func mut load_from_part(e: Edge*)
+	func mut load_from_part(_e: Edge*)
 		reset("params")
-		if !e
-			return
-		var names = e.param_names()
-		for i=>n in names
-			add_string("params", "{{n}}\\{{e.param[i]}}")
+		for e in _e
+			var names = e.param_names()
+			for i=>n in names
+				add_string("params", "{{n}}\\{{e.param[i]}}")
 			
 		
 

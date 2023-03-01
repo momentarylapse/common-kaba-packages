@@ -17,7 +17,7 @@ enum Mode
 	MOVE_NODE
 
 class CircuitPanel extends hui.Panel
-	var c: Circuit*
+	var c: Circuit&
 	var w, h: float
 	var sel: Selection
 	
@@ -38,7 +38,7 @@ class CircuitPanel extends hui.Panel
 		from_source("
 DrawingArea area '' grab-focus")
 		
-		c = &_c
+		c := &!_c
 		
 		mode = Mode.DEFAULT
 		
