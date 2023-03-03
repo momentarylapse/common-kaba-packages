@@ -17,10 +17,10 @@ class xml
 		if s[:1] == "'"
 			return s[1:-1]
 		return s
-	func static _next(s: string, out i0: int*) -> string
-		*i0 = _skip_ws(s, i0)
-		var r = _peek(s, *i0)
-		*i0 += len(r)
+	func static _next(s: string, out i0: int) -> string
+		i0 = _skip_ws(s, i0)
+		var r = _peek(s, i0)
+		i0 += len(r)
 		return r
 	func static _peek(s: string, i0: int) -> string
 		var i = i0
@@ -41,7 +41,7 @@ class xml
 				return s[i:j]
 		return ""
 			
-	func static _parse_tag(out tag_key: string, s: string, out i0: int*) -> any
+	func static _parse_tag(out tag_key: string, s: string, out i0: int) -> any
 		if _next(s, i0) != "<"
 			raise(new Exception("< expected"))
 
@@ -77,12 +77,12 @@ class xml
 		else
 			doc[k] = c
 	
-	func static _parse_inside_part(s: string, key: string, out i0: int*, out part: any) -> string
+	func static _parse_inside_part(s: string, key: string, out i0: int, out part: any) -> string
 		#print(">> INSIDE {{key}}")
 		#print(part)
 		var content: string
 		while true
-			var p = _peek(s, *i0)
+			var p = _peek(s, i0)
 			if p == "<"
 				var k: string
 				var tag = _parse_tag(k, s, i0)
@@ -117,11 +117,11 @@ class xml
 						_doc_set(part, k, cc)
 					#return ""
 			else
-				for i in *i0:len(s)
+				for i in i0:len(s)
 					if s[i] == '<'
 						break
 					content.add(s[i])
-				*i0 += len(content)
+				i0 += len(content)
 				#print("CONTENTS " + content)
 				var k: string
 				var tag = _parse_tag(k, s, i0)
@@ -136,11 +136,11 @@ class xml
 		var i = 0
 		
 		var key: string
-		var header = _parse_tag(key, s, &i)
+		var header = _parse_tag(key, s, i)
 		
 		var root: any
-		var t = _parse_tag(key, s, &i)
-		_parse_inside_part(s, key, &i, t)
+		var t = _parse_tag(key, s, i)
+		_parse_inside_part(s, key, i, t)
 		root[key] = t
 		
 		#root.set("?xml", header)

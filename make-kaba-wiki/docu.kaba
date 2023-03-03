@@ -108,16 +108,19 @@ func prepare_module(p: Module, name: string, dir: Path)
 
 
 func prepare(dir: Path)
-	for p in weak(default_context.packages)
+	for p in default_context.packages
 		prepare_module(p, p.name, dir | p.name)
 
 	let external_packages = find_external()
 	for p in external_packages
-		prepare_module(p.main, p.name, dir | p.name)
+		for m in p.main
+			prepare_module(m, p.name, dir | p.name)
 		for m in p.sub_modules
-			prepare_module(m.e1, p.name + "." + m.e0, dir | p.name | m.e0)
+			for mm in m[1]
+				prepare_module(mm, p.name + "." + m[0], dir | p.name | m[0])
 
 	let external_libs = find_external_libs()
-	for p in external_libs
-		prepare_module(p, p.name, dir | p.name)
+	for _p in external_libs
+		for p in _p
+			prepare_module(p, p.name, dir | p.name)
 

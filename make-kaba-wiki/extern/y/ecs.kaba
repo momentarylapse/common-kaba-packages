@@ -53,12 +53,12 @@ class Component
 	var owner: Entity*
 	use owner
 
-func extern __get_component_list(t: Class) -> Component*[]*
+func extern __get_component_list(t: Class*) -> Component*[]*
 func get_component_list[T]() -> T*[]*
 	var list: T*[]* = __get_component_list(T)
 	return list
 
-func extern __get_component_family_list(t: Class) -> Component*[]*
+func extern __get_component_family_list(t: Class*) -> Component*[]*
 func get_component_family_list[T]() -> T*[]*
 	var list: T*[]* = __get_component_family_list(T)
 	return list

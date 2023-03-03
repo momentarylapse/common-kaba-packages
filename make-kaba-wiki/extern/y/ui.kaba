@@ -70,7 +70,7 @@ class Node as shared
 	func extern virtual __delete__()
 	func extern mut __del_override__()
 		
-	func extern mut add(n: Node)
+	func extern mut add(n: shared[Node])
 		
 	func extern virtual mut on_iterate(dt: float)
 	func extern virtual mut on_enter()
@@ -91,7 +91,7 @@ class Node as shared
 	var color: color
 	var align: Align
 	var visible: bool
-	var children: Node*[]
+	var children: shared[Node][]
 	
 class HBox extends Node
 	func extern __init__()
@@ -100,13 +100,13 @@ class VBox extends Node
 	func extern __init__()
 		
 class Picture extends Node
-	func extern __init__(r: rect, tex: Texture, source: rect = rect.ID)
+	func extern __init__(r: rect, tex: shared[Texture], source: rect = rect.ID)
 	func extern override __delete__()
 	var source: rect
-	var texture: Texture*
+	var texture: shared[Texture]
 	var blur: float
 	var angle: float
-	var shader: Shader*
+	var shader: shared[Shader]
 	var shader_data: any
 
 class Text extends Picture
@@ -126,7 +126,7 @@ class Picture3d extends Node
 		model = m
 		self.matrix = mat
 
-var extern static toplevel: Node*
+var extern static toplevel: ptr![Node]
 func extern static key_state(k: Key) -> bool
 func extern static key_down(k: Key) -> bool
 func extern static key_up(k: Key) -> bool

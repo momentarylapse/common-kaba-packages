@@ -96,15 +96,16 @@ class MyPSMoveController
 	var ang, dang: quaternion
 	var trigger, rumble: float
 	var button: bool[8]
-	var manager: PsMoveManager*
-	func __init__(m: PSMove*, man: PsMoveManager*)
-		manager = man
+	var manager: PsMoveManager&
+	func __init__(m: PSMove*, man: PsMoveManager&)
+		manager := man
 		psmove = m
 		_psmove_enable_orientation(m, 1)
 		if _psmove_has_orientation(m) == 0
 			print(" ERROR: no orientation")
-		while _psmove_tracker_enable(manager.tracker, m) != 2 # Tracker_CALIBRATED
-			pass
+		for t in manager.tracker
+			while _psmove_tracker_enable(t, m) != 2 # Tracker_CALIBRATED
+				pass
 		col = color.BLACK
 		rumble = 0
 		trigger = 0
@@ -156,7 +157,7 @@ class MyPSMoveController
 class PsMoveManager
 	var tracker: PSMoveTracker* = nil
 	var fusion: PSMoveFusion* = nil
-	var psmoves: owned[MyPSMoveController][]
+	var psmoves: owned![MyPSMoveController][]
 	func __init__()
 		var vv = 262152 #4<<16 + 0<<8 + 8
 		if _psmove_init(vv) != 1
@@ -177,7 +178,7 @@ class PsMoveManager
 			print("- controller {{i}} -")
 			#let p = _psmove_connect()
 			var p = _psmove_connect_by_id(i)
-			psmoves.add(new MyPSMoveController(p, &self))
+			psmoves.add(new MyPSMoveController(p, &!self))
 
 	func mut update()
 		if !tracker

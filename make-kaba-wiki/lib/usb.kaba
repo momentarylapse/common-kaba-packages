@@ -44,7 +44,7 @@ class _endpoint_descriptor
 		return i[1] & 0x0000ffff
 class _interface_descriptor
 	var i: int[4]
-	var endpoint: _endpoint_descriptor[0]*
+	var endpoint: _endpoint_descriptor[0]&
 	func num_endpoints() -> int
 		return i[1] & 0x000000ff
 	func interface() -> int
@@ -52,11 +52,11 @@ class _interface_descriptor
 	func alt_setting() -> int
 		return (i[0] & 0xff000000) >> 24
 class _interface
-	var altsetting: _interface_descriptor[0]*
+	var altsetting: _interface_descriptor[0]&
 	var num_altsettings, xxx: int
 class _config_descriptor
 	var i: int[4]
-	var interface: _interface[0]*
+	var interface: _interface[0]&
 	func num_interfaces() -> int
 		return i[1] & 0x000000ff
 	func config_value() -> int
@@ -136,6 +136,8 @@ func CHECK(r: int, msg: string)
 struct Device
 	var dev: _device*
 	
+	var static dummy: _config_descriptor
+	
 	func get_info() -> DeviceInfo
 		var i: DeviceInfo
 		i.bus = _libusb_get_bus_number(dev)
@@ -158,7 +160,7 @@ struct Device
 		CHECK(n, "can not get port numbers")
 		return [for ch in s[:n] int(ch)]
 	func get_config_desc(index: int)
-		var desc: _config_descriptor*
+		var desc: _config_descriptor& = &!dummy
 		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
 		#let b = binary(desc, 36).hex()
 		#print(b)
@@ -167,15 +169,15 @@ struct Device
 		var num_if = desc.num_interfaces()
 		for i in 0:num_if
 			print("  [interface]")
-			var ii = &desc.interface[i]
+			var ii = &!desc.interface[i]
 			for j in 0:ii.num_altsettings
 				print("    [alt]")
-				var a = &ii.altsetting[j]
+				var a = &!ii.altsetting[j]
 				print("      interface:   {{a.interface()}}")
 				print("      alt setting: {{a.alt_setting()}}")
 				#print(a)
 				for k in 0:a.num_endpoints()
-					var e = &a.endpoint[k]
+					var e = &!a.endpoint[k]
 					#any ep
 					#ep.set("address", e.address())
 					#ep.set("attributes", e.attributes())
@@ -187,7 +189,7 @@ struct Device
 		_libusb_free_config_descriptor(desc)
 	func open() -> xfer[Handle]
 		var h = new Handle()
-		h.dev = &self
+##		h.dev = &self
 		CHECK(_libusb_open(dev, &h.h), "can not open device")
 		return give(h)
 		
@@ -200,9 +202,10 @@ class Context
 		var r: owned[Device][]
 		var list: _device*[0]*
 		var n = _libusb_get_device_list(c, &list)
-		for i in 0:n
-			var dev = new Device(list[i])
-			r.add(give(dev))
+		for ll in list
+			for i in 0:n
+				var dev = new Device(ll[i])
+				r.add(give(dev))
 		_libusb_free_device_list(list, 1)
 		return give(r)
 	func open(vid: int, pid: int) -> xfer[Handle]
@@ -211,12 +214,12 @@ class Context
 		h.h = _libusb_open_device_with_vid_pid(c, vid, pid)
 		if !h.h
 			raise(new Exception("device not found"))
-		h.dev = new Device(_libusb_get_device(h.h))
+##		h.dev = new Device(_libusb_get_device(h.h))
 		return give(h)
 
 class Handle
 	var h: _handle* = nil
-	var dev: Device* = nil
+##	var dev: Device*
 	func __delete__()
 		if h
 			_libusb_close(h)

@@ -13,18 +13,20 @@ func wiki_upload(name: string, wiki: string)
 func make_documentation()
 	wiki_upload("kaba reference", wiki.render_reference())
 
-	for p in weak(default_context.packages)
+	for p in default_context.packages
 		make_module(p, p.name, "", [])
 
 	let external_packages = find_external()
 	for p in external_packages
-		make_module(p.main, p.name, "", p.sub_modules)
+		for m in p.main
+			make_module(m, p.name, "", p.sub_modules)
 
 	let external_libs = find_external_libs()
-	for p in external_libs
-		make_module(p, p.name, "", [])
+	for _p in external_libs
+		for p in _p
+			make_module(p, p.name, "", [])
 
-func get_func_alternatives(all: Function*[], f: Function) -> Function*[]
+func get_func_alternatives(all: Function&[], f: Function) -> Function&[]
 	return all |> filter(ff => ff.name == f.name)
 
 
@@ -38,7 +40,7 @@ func make_class(c: Class, ns: string)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
 
-func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Module*)[])
+func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[])
 	var ns = name
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
@@ -58,7 +60,8 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,Modu
 		wiki_upload("kaba.{{ns}}.{{v.name}}", wiki.render_var(ns, v))
 	
 	for m in sub_modules
-		make_module(m.e1, m.e0, ns, [])
+		for mm in m[1]
+			make_module(mm, m[0], ns, [])
 
 
 func main(arg: string[])
