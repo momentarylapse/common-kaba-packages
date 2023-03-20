@@ -87,12 +87,12 @@ class SourceSwapper extends SourceParser
 
 func parse_source_code_dir(dir: Path, l: Language)
 	var p: SourceLanguageFinder
-	p.l := &!l
+	p.l := &l
 	p.parse_source_code_dir(dir)
 
 
 func swap_translate_source(dir: Path, l: Language)
 	var p: SourceSwapper
-	p.l := &!l
+	p.l := &l
 	p.parse_source_code_dir(dir)
 
