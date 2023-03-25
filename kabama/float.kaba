@@ -24,7 +24,7 @@ func make_float(t_: shared![Term]) -> xfer[Term]
 	if t.type == Type.VARIABLE
 		return give(t)
 	if t.type == Type.FUNCTION
-		if all_params_are_float(&!t) and len(t.params) == 1
+		if all_params_are_float(&t) and len(t.params) == 1
 			var f = float(t.params[0].name[:10])
 			if t.name == "sqrt"
 				return AddFloat(str(sqrt(f)))
@@ -40,7 +40,7 @@ func make_float(t_: shared![Term]) -> xfer[Term]
 				return AddFloat(str(atan(f)))
 		return give(t)
 	if t.type == Type.OPERATOR
-		if not all_params_are_float(&!t)
+		if not all_params_are_float(&t)
 			return give(t)
 		var a, b: float
 		if len(t.params) > 0

@@ -149,7 +149,7 @@ class Parser
 		var op = parse_operand()
 		if op.name != "="
 			raise(new SyntaxError("def needs '='"))
-		let p0 = &!op.params[0]
+		let p0 = &op.params[0]
 		if p0.type != Type.FUNCTION
 			raise(new SyntaxError("def needs function name before '='"))
 		for p in p0.params
@@ -195,8 +195,8 @@ func parse(s: string) -> shared![Term]
 	p.cur_index = 0
 	return p.parse_operand()
 
-func f() -> xfer[Term]
-	return new Term(Type.NUMBER, "1")
+#func f() -> xfer[Term]
+#	return new Term(Type.NUMBER, "1")
 
 func main()
 	#shared Term t = f()

@@ -74,7 +74,7 @@ struct Term as shared
 		return "?"
 
 	func param_needs_paranthesis(index: int) -> bool
-		let p = &!params[index]
+		let p = &params[index]
 		if p.type == Type.NUMBER
 			if p.name[:1] == "-"
 				return true
@@ -90,6 +90,7 @@ struct Term as shared
 			return p.type == Type.OPERATOR
 		if name == "*"
 			return p.name in ["+", "-"]
+		return false
 	
 	# not usable... float(shared[Term]) :(
 	func __float__() -> float

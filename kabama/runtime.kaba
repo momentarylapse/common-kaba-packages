@@ -37,7 +37,6 @@ class Runtime
 		# recursive
 		var t = _t.shallow_copy()
 		t.params = [for p in t.params eval_term(p)]
-		print(t)
 			
 		# self
 		if t.name == "$"
@@ -68,10 +67,7 @@ class Runtime
 		return give(t)
 
 	func mut eval(s: string) -> shared![Term]
-		var t = parse(s)
-		print(t)
-		print(eval_term(t))
-		var r = normalize(eval_term(t))
-		print(r)
+		let t = parse(s)
+		let r = normalize(eval_term(t))
 		history.add(r)
 		return r

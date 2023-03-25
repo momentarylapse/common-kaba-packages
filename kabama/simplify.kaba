@@ -143,7 +143,7 @@ func literally_equal(a: shared![Term], b: shared![Term]) -> bool
 	
 			
 	
-func sort_group(out l: shared[Term][])
+func sort_group(out l: shared![Term][])
 	# "render" all terms...   need a comp(term, term) function
 	var s = [for t in l str(t)]
 	
