@@ -74,8 +74,8 @@ func create_cmake()
 	var f = new TextLinesFormatter(fs.open(conf.root | "CMakeLists.txt", "wt"))
 	f << "# created by xmake
 
-project({{conf.name}})
 cmake_minimum_required(VERSION 3.21)
+project({{conf.name}})
 set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
 set(CMAKE_CXX_STANDARD_REQUIRED True)"
 	if debug
