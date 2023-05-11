@@ -7,7 +7,7 @@ class EditorPanel extends CircuitPanel
 	var ed: CircuitEditor&
 	func __init__(e: CircuitEditor)
 		super.__init__(e.c)
-		ed := &!e
+		ed := &e
 	func override mut on_selection_change()
 		ed.load_from_part(nil)
 		if sel.type == SelectionType.EDGE

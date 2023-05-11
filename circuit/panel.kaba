@@ -38,7 +38,7 @@ class CircuitPanel extends hui.Panel
 		from_source("
 DrawingArea area '' grab-focus")
 		
-		c := &!_c
+		c := &_c
 		
 		mode = Mode.DEFAULT
 		
