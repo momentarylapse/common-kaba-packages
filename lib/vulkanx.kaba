@@ -61,7 +61,7 @@ class WindowRenderer extends Renderer
 	var swap_chain: owned![SwapChain]
 	var _default_render_pass: owned[RenderPass]
 	var depth_buffer: owned[DepthBuffer]
-	var frame_buffers: FrameBuffer*[]
+	var frame_buffers: owned[FrameBuffer][]
 	var image_index: int
 	var framebuffer_resized: bool
 	

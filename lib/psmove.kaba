@@ -178,7 +178,7 @@ class PsMoveManager
 			print("- controller {{i}} -")
 			#let p = _psmove_connect()
 			var p = _psmove_connect_by_id(i)
-			psmoves.add(new MyPSMoveController(p, &!self))
+			psmoves.add(new MyPSMoveController(p, &self))
 
 	func mut update()
 		if !tracker
