@@ -1,5 +1,4 @@
 use os
-use y
 use y.gfx
 
 class EngineData
@@ -38,7 +37,7 @@ class RenderPath
 		DEFERRED
 	var type: Type
 	var depth_buffer: DepthBuffer&
-	var cube_map: CubeMap*
+	var cube_map: shared[CubeMap]
 	var fb_shadow, fb_shadow2: FrameBuffer&
 	var shader_fx: Shader*
 	var gbuffer: FrameBuffer*

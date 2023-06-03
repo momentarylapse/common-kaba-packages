@@ -1,6 +1,7 @@
 description = ""
 element:_shared_ref_count = nil
 element:id = ""
+element:playback = ""
 element:song = ""
 element:storage = ""
 element:view = ""

@@ -29,7 +29,7 @@ func filter_elements(elements: ClassElement[]) -> ClassElement[]
 
 func filter_classes(classes: Class&[]) -> Class&[]
 	return classes
-		|> filter(c => not("shared" in c.name))
+		|> filter(c => not("?" in c.name))
 		|> filter(c => not("->" in c.name))
 		|> filter(c => not("*" in c.name) and not("&" in c.name))
 		|> filter(c => not("@" in c.name) and not("-" in c.name) and not("<" in c.name))

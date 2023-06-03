@@ -1,0 +1,8 @@
+description = ""
+element:color = ""
+element:enabled = ""
+element:pos = ""
+element:radius = ""
+element:suicidal = ""
+element:time_to_live = ""
+element:vel = ""

@@ -102,7 +102,7 @@ func main(arg: string[])
 	MIN_MATCH_SIZE = 16
 
 	var p: CommandLineParser
-	var pp = &!p
+	var pp = &p
 	p.info("bindiff", "find (small) differences between binary files")
 	p.option("--context", "BYTES", "how many bytes of context are shown", func (a: string) CONTEXT = int(a))
 	p.option("--max-diff", "BYTES", "maximum size of a non-matching chunk", func (a: string) MAX_DIFF_SIZE = int(a))

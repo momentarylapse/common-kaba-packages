@@ -160,7 +160,7 @@ struct Device
 		CHECK(n, "can not get port numbers")
 		return [for ch in s[:n] int(ch)]
 	func get_config_desc(index: int)
-		var desc: _config_descriptor& = &!dummy
+		var desc: _config_descriptor& = &dummy
 		CHECK(_libusb_get_config_descriptor(dev, index, &desc), "can not get config descriptor")
 		#let b = binary(desc, 36).hex()
 		#print(b)
@@ -169,15 +169,15 @@ struct Device
 		var num_if = desc.num_interfaces()
 		for i in 0:num_if
 			print("  [interface]")
-			var ii = &!desc.interface[i]
+			var ii = &desc.interface[i]
 			for j in 0:ii.num_altsettings
 				print("    [alt]")
-				var a = &!ii.altsetting[j]
+				var a = &ii.altsetting[j]
 				print("      interface:   {{a.interface()}}")
 				print("      alt setting: {{a.alt_setting()}}")
 				#print(a)
 				for k in 0:a.num_endpoints()
-					var e = &!a.endpoint[k]
+					var e = &a.endpoint[k]
 					#any ep
 					#ep.set("address", e.address())
 					#ep.set("attributes", e.attributes())

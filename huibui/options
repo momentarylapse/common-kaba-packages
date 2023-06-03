@@ -70,6 +70,9 @@ ListView
 	(nobar)
 	bar=[true]|false
 	reorderable
+	singleclickactivate
+	style=navigation-sidebar|rich-list|data-table
+	grid
 	format=...
 MultilineEdit
 	!!noframe
