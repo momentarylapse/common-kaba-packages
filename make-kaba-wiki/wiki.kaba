@@ -9,7 +9,7 @@ use docu
 const SHIFT = "    "
 
 func param_pre(v: Variable) -> string
-	if not v.is_const()
+	if v.is_mutable()
 		return "out "
 	return ""
 
@@ -148,7 +148,7 @@ func func_pre(f: Function) -> string
 		pre += "static "
 	if f.is_pure()
 		pre += "pure "
-	else if not f.is_static() and not f.is_const()
+	else if not f.is_static() and f.is_mutable()
 		pre += "mut "
 	if f.is_selfref()
 		pre += "selfref "

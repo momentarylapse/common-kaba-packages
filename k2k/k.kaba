@@ -29,17 +29,17 @@ func unescape(s: string) -> string
 			r.add(s[j])
 	return r
 
-class Line
+struct Line
 	var indent: int
 	var physical_line_no: int
 	var words: string[]
-	func const show()
+	func show()
 		print(indent)
 		print(words)
 
 class Lines
 	var lines: Line[]
-	func const show()
+	func show()
 		for l in lines
 			l.show()
 
@@ -133,7 +133,7 @@ enum TType
 
 class DynamicValue
 	var type = TType.NONE
-	var s: owned[DynamicValueState]
+	var s: owned![DynamicValueState]
 	func __init__()
 		s = new DynamicValueState()
 	func virtual __delete__()
@@ -150,7 +150,7 @@ class DynamicValue
 		return bool(weak(s))
 	func selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return s.get_element(i)
-	func mut add(el: DynamicValue)
+	func mut add(el: xfer[DynamicValue])
 		s.add(el)
 	func copy() -> xfer[DynamicValue]
 		var c = new DynamicValue()
@@ -178,24 +178,24 @@ class DynamicValue
 				s = new DynamicValueState()
 	func mut setBool(b: bool)
 		setType(TType.BOOL)
-		var sb: DynamicValueStateBool* = weak(s)
+		var sb = weak(s) as DynamicValueStateBool&
 		sb.v = b
 	func mut setInt(i: int)
 		setType(TType.INT)
-		var si: DynamicValueStateInt* = weak(s)
+		var si = weak(s) as DynamicValueStateInt&
 		si.v = i
 	func mut setFloat(f: float)
 		setType(TType.FLOAT)
-		var sf: DynamicValueStateFloat* = weak(s)
+		var sf = weak(s) as DynamicValueStateFloat&
 		sf.v = f
 	func mut setString(_s: string)
 		setType(TType.STRING)
-		var ss: DynamicValueStateString* = weak(s)
+		var ss = weak(s) as DynamicValueStateString&
 		ss.v = _s
-	func mut setFunction(f: Function)
+	func mut setFunction(f: Function*)
 		setType(TType.FUNCTION)
-		var sf: DynamicValueStateFunction* = weak(s)
-		sf._func = &f
+		var sf = weak(s) as DynamicValueStateFunction&
+		sf._func = f
 	func __assign__(b: DynamicValue)
 		if b.type == TType.BOOL
 			setBool(bool(b))
@@ -207,17 +207,17 @@ class DynamicValue
 			setString(str(b))
 		else if b.type == TType.ARRAY
 			setType(TType.ARRAY)
-			var ba: DynamicValueStateArray* = weak(b.s)
-			for el in weak(ba.array)
-				s.add(el)
+			var ba = weak(b.s) as DynamicValueStateArray&
+			for el in ba.array
+				s.add(el.copy())
 		else if b.type == TType.DICT
 			setType(TType.DICT)
-			var bd: DynamicValueStateDict* = weak(b.s)
-			var ad: DynamicValueStateDict* = weak(s)
+			var bd = weak(b.s) as DynamicValueStateDict&
+			var ad = weak(s) as DynamicValueStateDict&
 			for i=>el in bd.values
-				ad.add(bd.keys[i], el)
+				ad.add(bd.keys[i].copy(), el.copy())
 		else if b.type == TType.FUNCTION
-			var bf: DynamicValueStateFunction* = weak(b.s)
+			var bf = weak(b.s) as DynamicValueStateFunction&
 			setFunction(bf._func)
 
 	func mut __iadd__(b: DynamicValue)
@@ -236,15 +236,15 @@ class DynamicValue
 				setString(str(weak(s)) + str(b))
 		else if b.type == TType.ARRAY
 			if type == TType.ARRAY
-				var ba: DynamicValueStateArray* = weak(b.s)
-				for el in weak(ba.array)
-					s.add(el)
+				var ba = weak(b.s) as DynamicValueStateArray&
+				for el in ba.array
+					s.add(el.copy())
 		else if b.type == TType.DICT
 			if type == TType.DICT
-				var bd: DynamicValueStateDict* = weak(b.s)
-				var ad: DynamicValueStateDict* = weak(s)
+				var bd = weak(b.s) as DynamicValueStateDict&
+				var ad = weak(s) as DynamicValueStateDict&
 				for i=>el in bd.values
-					ad.add(bd.keys[i], el)
+					ad.add(bd.keys[i].copy(), el.copy())
 
 	func mut __isub__(b: DynamicValue)
 		if b.type == TType.INT
@@ -320,7 +320,7 @@ class DynamicValueState
 		return false
 	func virtual selfref mut get_element(i: DynamicValue) -> DynamicValue*
 		return nil
-	func virtual mut add(el: DynamicValue)
+	func virtual mut add(el: xfer[DynamicValue])
 	func virtual copy() -> xfer[DynamicValueState]
 		
 
@@ -387,7 +387,7 @@ class DynamicValueStateString extends DynamicValueState
 		return give(c)
 
 class DynamicValueStateArray extends DynamicValueState
-	var array: owned[DynamicValue][]
+	var array: owned![DynamicValue][]
 	func override __delete__()
 #		for e in a
 #			del e
@@ -405,12 +405,12 @@ class DynamicValueStateArray extends DynamicValueState
 	func override get_element(i: DynamicValue) -> DynamicValue*
 		if i.type != TType.INT
 			return nil
-		var ii: DynamicValueStateInt* = weak(i.s)
+		var ii = weak(i.s) as DynamicValueStateInt&
 		if ii.v < 0 or ii.v >= len(array)
 			return nil
 		return weak(array[ii.v])
-	func override mut add(el: DynamicValue)
-		array.add(el.copy())
+	func override mut add(el: xfer[DynamicValue])
+		array.add(el)
 	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateArray()
 		for el in weak(array)
@@ -418,8 +418,8 @@ class DynamicValueStateArray extends DynamicValueState
 		return give(c)
 
 class DynamicValueStateDict extends DynamicValueState
-	var keys: owned[DynamicValue][]
-	var values: owned[DynamicValue][]
+	var keys: owned![DynamicValue][]
+	var values: owned![DynamicValue][]
 	func override __delete__()
 #		for e in values
 #			del e
@@ -445,12 +445,13 @@ class DynamicValueStateDict extends DynamicValueState
 		values.add(give(val))
 		keys.add(key.copy())
 		return weak(values[len(values)-1])
-	func mut add(key: DynamicValue, val: DynamicValue)
+	func mut add(_key: xfer[DynamicValue], val: xfer[DynamicValue])
+		var key = _key
 		for j=>k in weak(keys)
 			if k.compare(key) == 0
 				return
-		values.add(val.copy())
-		keys.add(key.copy())
+		values.add(val)
+		keys.add(give(key))
 	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateDict()
 		for i=>v in values
@@ -465,7 +466,7 @@ class DynamicValueStateFunction extends DynamicValueState
 		return "<func>"
 
 class Variable
-	var v: DynamicValue*
+	var v: owned![DynamicValue]
 	var name: string
 	var writable = true
 	var is_ref = false
@@ -477,7 +478,7 @@ class Variable
 	func __delete__()
 		clear()
 	func mut clear()
-		if !is_ref
+		if not is_ref
 			del v
 		is_ref = false
 		v = nil
