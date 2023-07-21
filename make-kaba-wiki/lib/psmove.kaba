@@ -104,7 +104,7 @@ class MyPSMoveController
 		if _psmove_has_orientation(m) == 0
 			print(" ERROR: no orientation")
 		for t in manager.tracker
-			while _psmove_tracker_enable(t, m) != 2 # Tracker_CALIBRATED
+			while _psmove_tracker_enable(&t, m) != 2 # Tracker_CALIBRATED
 				pass
 		col = color.BLACK
 		rumble = 0

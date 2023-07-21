@@ -73,7 +73,7 @@ struct LibraryManager
 	func get(name: string) -> Library&
 		for l in libraries
 			if l.name == name
-				return l
+				return &l
 		raise(new Exception("unknown library: {{name}}"))
 		#return nil
 

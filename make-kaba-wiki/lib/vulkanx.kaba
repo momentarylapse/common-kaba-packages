@@ -138,7 +138,7 @@ class WindowRenderer extends Renderer
 			
 		
 		for f in wait_for_frame_fences[image_index]
-			device.present_queue.submit(command_buffers[image_index], [weak(image_available_semaphore)], [weak(render_finished_semaphore)], f)
+			device.present_queue.submit(command_buffers[image_index], [weak(image_available_semaphore)], [weak(render_finished_semaphore)], &f)
 
 			swap_chain.present(image_index, [weak(render_finished_semaphore)])
 			
