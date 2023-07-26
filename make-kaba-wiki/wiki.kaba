@@ -62,8 +62,7 @@ func render_var(ns: string, v: Variable) -> string
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	for t in v.type
-		wiki += "var {{v.name}}: {{t.name}}\n"
+	wiki += "var {{v.name}}: {{v.type.name}}\n"
 	wiki += "</code>\n\n"
 	
 	return wiki
@@ -175,8 +174,7 @@ func render_class(ns: string, c: Class) -> string
 	wiki += "<code lang=\"kaba\">\n"
 	wiki += "class {{c.name}}{{class_extension(c)}}\n"
 	for e in elements
-		for t in e.type
-			wiki += "{{SHIFT}}var {{e.name}}: {{t.name}}\n"
+		wiki += "{{SHIFT}}var {{e.name}}: {{e.type.name}}\n"
 
 	if len(ctrs) > 0
 		wiki += "\n{{SHIFT}}# constructors\n"
@@ -229,8 +227,7 @@ func render_class(ns: string, c: Class) -> string
 	if len(consts) > 0
 		wiki += "\n{{SHIFT}}# constants\n"
 		for cc in consts
-			for t in cc.type
-				wiki += "{{SHIFT}}const {{cc.name}}: {{t.name}}\n"
+			wiki += "{{SHIFT}}const {{cc.name}}: {{cc.type.name}}\n"
 	if len(classes) > 0
 		wiki += "\n{{SHIFT}}# nested classes\n"
 		for cc in classes
@@ -252,9 +249,8 @@ func render_class(ns: string, c: Class) -> string
 	if len(elements) > 0	
 		wiki += "\n=== Elements ===\n\n"
 		for e in elements
-			for t in e.type
-				wiki += "; <tt>var {{e.name}}: {{t.name}}</tt>\n"
-				wiki += ": {{doc_get_class_element(ns, c, e)}}\n\n"
+			wiki += "; <tt>var {{e.name}}: {{e.type.name}}</tt>\n"
+			wiki += ": {{doc_get_class_element(ns, c, e)}}\n\n"
 
 #	if len(consts) > 0
 #		wiki += "\n=== Constants ===\n\n"
@@ -296,15 +292,13 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 	if len(vars) > 0
 		wiki += "\n=== Variables ===\n\n"
 		for v in vars
-			for t in v.type
-				wiki += "* <tt>var static '''[[kaba.{{ns}}.{{v.name}}|{{v.name}}]]''': {{t.name}}</tt>\n"
+			wiki += "* <tt>var static '''[[kaba.{{ns}}.{{v.name}}|{{v.name}}]]''': {{v.type.name}}</tt>\n"
 
 	let consts = filter_consts(p.constants())
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for c in consts
-			for t in c.type
-				wiki += "* <tt>const '''{{c.name}}''': {{t.name}}</tt>\n"
+			wiki += "* <tt>const '''{{c.name}}''': {{c.type.name}}</tt>\n"
 	return wiki
 
 

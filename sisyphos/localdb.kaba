@@ -166,9 +166,8 @@ class LocalFileDB
 
 	func mut save(_files: LocalFile[])
 		for f in _files
-			var _f = _find_by_local_id(f.local_id)
-			if _f
-				*_f = f
+			for _f in _find_by_local_id(f.local_id)
+				_f = f
 			else
 				files.add(f)
 		save_all()
