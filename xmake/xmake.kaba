@@ -8,9 +8,6 @@ use build
 use os
 
 
-func blank(n: int) -> string
-	return [for i in 0:n " "].join("")
-
 func action_has(a: string[])
 	lib.test(a[0])
 
@@ -29,10 +26,10 @@ func action_update(a: string[])
 	
 	conf.load()
 	
-	var missing = [for l in conf.libs l if !lib.test(l)]
+	var missing = conf.libs |> filter(l => not lib.test(l))
 	for l in conf.libs_optional
-		if !conf.ignored(l)
-			lib.test(l)
+		if not conf.ignored(l)
+			let x = lib.test(l)
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
