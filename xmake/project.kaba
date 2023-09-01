@@ -27,9 +27,12 @@ struct Config
 	var force_build_dir: Path
 	
 	var name: string
+	
+	# build
 	var binary_file: Path
 	var source_dir: Path
 	var main_file: string
+	var build_systems = ["cmake"]
 	var libs: string[]
 	var lib_groups: string[][]
 	var libs_optional: string[]
@@ -41,12 +44,14 @@ struct Config
 	var flags_global: string
 	var flags_compiler: string
 	var flags_linker: string
+	var include_directories: string[]
+	
+	# inctall
 	var icons: string[]
 	var desktop_file: Path
 	var mime_files: string[]
 	var install_source: Path
 	var installs_additional: string[]
-	var outputs = ["make"]
 	
 	func ignored(l: string) -> bool
 		return l in ignore_libs
@@ -60,7 +65,7 @@ struct Config
 		for k in c.keys()
 			if k in ["project.name"]
 				name = str(c[k])
-			else if k in ["build.source"]
+			else if k in ["build.source-directory", "build.source"]
 				source_dir = str(c[k])
 			else if k in ["build.binary"]
 				binary_file = str(c[k])
@@ -78,10 +83,14 @@ struct Config
 #				flags_compiler = c[k]
 #			else if k == "linker-flags"
 #				flags_linker = c[k]
+			else if k == "build.system"
+				build_systems = any2sa(c[k])
 			else if k == "build.libraries"
 				parse_libs(c[k], libs, lib_groups, libs_optional)
 			#else if k == "build.libraries-optional"
 			#	libs_optional = c[k].explode(",")
+			else if k == "build.include-directories"
+				include_directories = any2sa(c[k])
 			else if k == "install.source"
 				install_source = str(c[k])
 			else if k == "install.icons"
@@ -97,22 +106,25 @@ struct Config
 				p.name = k[14:]
 				p.libs_optional = any2sa(c[k])
 				profiles.add(p)
-			else if k == "build.system"
-				outputs = any2sa(c[k])
 			else
 				raise(new Exception("unknown tag: {{k}}"))
 	func mut save()
 		var c: os.Configuration
 		c["project.name"] = name
-		c["build.source"] = str(source_dir)
+		c["build.source-directory"] = str(source_dir)
 		c["build.binary"] = str(binary_file)
-		c["build.main"] = str(main_file)
+		if len(main_file) > 0
+			c["build.main"] = main_file
+		c["build.system"] = sa2any(build_systems)
 		c["build.language"] = language
 		c["build.optimization"] = optimization
 		c["build-type"] = build_type
 		c["build.flags"] = flags_global
-		c["build.libraries"] = sa2any(libs)
-		c["build.libraries-optional"] = sa2any(libs_optional)
+		c["build.include-directories"] = sa2any(include_directories)
+		c["build.libraries"] = sa2any(libs) # FIXME
+		if len(lib_groups) + len(libs_optional) > 0
+			print("ERROR: writing complex library definitions not handled...")
+			#c["build.libraries-optional"] = sa2any(libs_optional)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		c["install.source"] = str(install_source)

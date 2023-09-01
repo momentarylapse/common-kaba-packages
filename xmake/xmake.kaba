@@ -29,20 +29,20 @@ func action_update(a: string[])
 	var missing = conf.libs |> filter(l => not lib.test(l))
 	for l in conf.libs_optional
 		if not conf.ignored(l)
-			let x = lib.test(l)
+			lib.test(l)
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
 	find_sources(conf.root | conf.source_dir)
 
 	if not conf.dry_run
-		if "make" in conf.outputs
+		if "make" in conf.build_systems
 			create_all_makefiles()
-		if "meson" in conf.outputs
+		if "meson" in conf.build_systems
 			create_meson()
-		if "vs2019" in conf.outputs
+		if "vs2019" in conf.build_systems
 			create_visual_studio(2019)
-		if "cmake" in conf.outputs
+		if "cmake" in conf.build_systems
 			create_cmake()
 
 func action_build(a: string[])

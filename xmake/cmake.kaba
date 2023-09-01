@@ -9,7 +9,8 @@ func cmake_link(l: string) -> string
 	#deps.add("{{varx}}_LIBRARIES")
 	if len(ll.pkg) > 0
 		return "
-# {{l}} mandatory
+
+# lib: {{l}} mandatory
 pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
 include_directories(${"+varx+"_INCLUDE_DIRS})
 link_directories(${"+varx+"_LIBRARY_DIRS})
@@ -27,7 +28,9 @@ func cmake_link_group(lg: string[]) -> string
 	#deps.add("{{varx}}_LIBRARIES")
 	let cvar = varxs.join("_OR_")
 	let label = lg.join(" or ")
-	var s = "# {{label}} mandatory
+	var s = "
+
+# lib: {{label}} (mandatory)
 set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
 	for i=>v in varxs
@@ -69,24 +72,50 @@ func create_cmake()
 	
 	print("-- cmake --")
 	
+	var f = new TextLinesFormatter(fs.open(conf.root | "CMakeLists.txt", "wt"))
+	f << create_cmake_base()
+	
+	f << create_cmake_libs()
+
+	f << create_cmake_install()
+
+
+
+
+#find_program(XDG-MIME_EXECUTABLE xdg-mime)
+#find_program(XDG-DESKTOP-MENU_EXECUTABLE xdg-desktop-menu)
+#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} install --novendor basket.xml)
+#execute_process(COMMAND ${XDG-DESKTOP-MENU_EXECUTABLE} install --novendor basket.desktop)
+#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default basket.desktop "application/x-basket-item")
+
+
+func create_cmake_base() -> string
 	let debug = conf.build_type == "debug"
 	
-	var f = new TextLinesFormatter(fs.open(conf.root | "CMakeLists.txt", "wt"))
-	f << "# created by xmake
+	var r = "# created by xmake
 
 cmake_minimum_required(VERSION 3.21)
 project({{conf.name}})
 set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
 set(CMAKE_CXX_STANDARD_REQUIRED True)"
 	if debug
-		f << "set(CMAKE_BUILD_TYPE Debug)"
+		r += "
+set(CMAKE_BUILD_TYPE Debug)"
 	
-	f << "set(SOURCE "
-	for i=>s in sources
-		f << "	{{rel(s.filename)}}"
-	f << ")"
-	
-	f << "
+	let files = [for s in sources  str(rel(s.filename))].join("\n\t")
+	r += "
+set(SOURCE
+	{{files}}
+)
+
+add_executable({{conf.binary_file}} ${SOURCE})
+"
+	return r
+
+
+
+func create_cmake_libs() -> string
+	var r = "
 find_package(PkgConfig REQUIRED)
 "
 	
@@ -105,9 +134,9 @@ find_package(PkgConfig REQUIRED)
 	#var deps: string[]
 	for lg in conf.lib_groups
 		if len(lg) > 1
-			f << cmake_link_group(lg)
+			r += cmake_link_group(lg)
 		else
-			f << cmake_link(lg[0])
+			r += cmake_link(lg[0])
 
 
 	for l in conf.libs_optional
@@ -115,24 +144,30 @@ find_package(PkgConfig REQUIRED)
 		#deps.add("{{varx}}_LIBRARIES")
 		if len(ll.pkg) > 0
 			let varx = [for p in ll.pkg p.upper()]
-			f << "
-# {{l}} (optional)"
+			r += "
+
+# lib: {{l}} (optional)"
 			for i=>v in varx
-				f << "pkg_check_modules({{v}} {{ll.pkg[i]}})"
-			f << "if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
+				r += "
+pkg_check_modules({{v}} {{ll.pkg[i]}})"
+			r += "
+if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
 			for i=>v in varx
-				f << "	include_directories(${"+v+"_INCLUDE_DIRS})"
-				f << "	link_directories(${"+v+"_LIBRARY_DIRS})"
-				f << "	list(APPEND DEPS ${"+v+"_LIBRARIES})"
-				f << "	add_definitions(${"+v+"_CFLAGS_OTHER})"
-			f << "	add_compile_definitions({{ll.define()}}=1)
+				r += "
+	include_directories(${"+v+"_INCLUDE_DIRS})
+	link_directories(${"+v+"_LIBRARY_DIRS})
+	list(APPEND DEPS ${"+v+"_LIBRARIES})
+	add_definitions(${"+v+"_CFLAGS_OTHER})"
+			r += "
+	add_compile_definitions({{ll.define()}}=1)
 else()
 	add_compile_definitions({{ll.define()}}=0)
 endif()"
 		else if len(ll.cmake) > 0
 			let cn = ll.cmake[0]
-			f << "
-# {{l}} (optional)
+			r += "
+
+# lib: {{l}} (optional)
 find_package({{cn}})
 if({{cn}}_FOUND)
 	include_directories(${"+cn+"_INCLUDE_DIRS})
@@ -144,39 +179,47 @@ else()
 	add_compile_definitions({{ll.define()}}=0)
 #endif()"
 		else if l == "dl"
-			f << "
-# dl...
+			r += "
+
+# lib: dl...
 list(APPEND DEPS ${CMAKE_DL_LIBS})
 add_compile_definitions({{ll.define()}}=1)"
 		else
-			f << "add_compile_definitions({{ll.define()}}=0)"
+			r += "
+
+add_compile_definitions({{ll.define()}}=0)"
 			print("WARNING: lib {{l}} not in cmake")
 
 	
-	f << "
-add_executable({{conf.binary_file}} ${SOURCE})"
-	
-	f << "
+	r += "
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
+target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})
+"
+	return r
 
-	f << "
-add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")"
 
 
-	f << "
+func create_cmake_install() -> string
+	var r = "
+
+add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	let list = conf.needs_installing()
 	for e in list
 		if fs.is_directory(conf.root | e)
-			f << "install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
+			r += "
+install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else
-			f << "install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
+			r += "
+install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
 
 
 	if conf.desktop_file != ""
-		f << "
+		r += "
+
 set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
 configure_file(\"{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
 
@@ -186,22 +229,16 @@ if(NOT XDG_DESKTOP_MENU_EXECUTABLE STREQUAL \"XDG_DESKTOP_MENU_EXECUTABLE_NOTFOU
 	install(CODE \"execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install /tmp/{{conf.desktop_file.basename()}})\")
 endif()"
 	if len(conf.mime_files) > 0
-		f << "
+		r += "
+
 find_program(XDG_MIME_EXECUTABLE xdg-mime)
 if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
 		for m in conf.mime_files
-			f << "	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
+			r += "
+	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
 	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
-		f << "endif()"
-
-
-
-
-
-#find_program(XDG-MIME_EXECUTABLE xdg-mime)
-#find_program(XDG-DESKTOP-MENU_EXECUTABLE xdg-desktop-menu)
-#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} install --novendor basket.xml)
-#execute_process(COMMAND ${XDG-DESKTOP-MENU_EXECUTABLE} install --novendor basket.desktop)
-#execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default basket.desktop "application/x-basket-item")
-
+		r += "
+endif()
+"
+	return r
 
