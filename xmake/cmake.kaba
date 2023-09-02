@@ -166,8 +166,12 @@ set(SOURCE
 	{{files}}
 )
 
-add_executable({{conf.binary_file}} ${SOURCE})
-"
+add_executable({{conf.binary_file}} ${SOURCE})"
+
+	if len(conf.include_directories) > 0
+		let dirs = conf.include_directories.join(" ")
+		r += "
+target_include_directories({{conf.binary_file}} PRIVATE {{dirs}})"
 	return r
 
 
@@ -205,15 +209,13 @@ find_package(PkgConfig REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})
-"
+target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
 	return r
 
 
 
 func create_cmake_install() -> string
 	var r = "
-
 add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
