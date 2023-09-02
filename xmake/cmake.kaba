@@ -129,13 +129,23 @@ add_compile_definitions({{ll.define()}}=0)"
 func create_cmake()
 	
 	print("-- cmake --")
+	 
+	var r = create_cmake_base()
 	
-	var f = new TextLinesFormatter(fs.open(conf.root | "CMakeLists.txt", "wt"))
-	f << create_cmake_base()
+	r += create_cmake_libs()
 	
-	f << create_cmake_libs()
+	r += create_cmake_install_base()
 
-	f << create_cmake_install()
+	if conf.desktop_file != ""
+		r += create_cmake_install_desktop()
+
+#	if len(conf.icons) > 0
+#		r += create_cmake_install_icons()
+
+	if len(conf.mime_files) > 0
+		r += create_cmake_install_mime()
+		
+	fs.write_text(conf.root | "CMakeLists.txt", r)
 
 
 
@@ -178,22 +188,10 @@ target_include_directories({{conf.binary_file}} PRIVATE {{dirs}})"
 
 func create_cmake_libs() -> string
 	var r = "
+
 find_package(PkgConfig REQUIRED)
 "
-	
-	
-#	find_package(OpenGL REQUIRED)
-#include_directories(${OpenGL_INCLUDE_DIRS})
-#link_directories(${OpenGL_LIBRARY_DIRS})
-#add_definitions(${OpenGL_DEFINITIONS})
-#if(NOT OPENGL_FOUND)
-#    message(ERROR " OPENGL not found!")
-#endif(NOT OPENGL_FOUND)
-#add_compile_definitions(HAS_LIB_GL=1)
 
-
-	
-	#var deps: string[]
 	for g in conf.lib_groups
 		if g.optional
 			for l in g.libs
@@ -213,9 +211,9 @@ target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
 	return r
 
 
-
-func create_cmake_install() -> string
+func create_cmake_install_base() -> string
 	var r = "
+
 add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
@@ -227,29 +225,41 @@ install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else
 			r += "
 install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
+	return r
 
 
-	if conf.desktop_file != ""
-		r += "
+func create_cmake_install_desktop() -> string
+	return "
 
+# install .desktop file
 set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
 configure_file(\"{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+install(FILES /tmp/{{conf.desktop_file.basename()}} DESTINATION share/applications)"
 
-find_program(XDG_DESKTOP_MENU_EXECUTABLE xdg-desktop-menu)
-if(NOT XDG_DESKTOP_MENU_EXECUTABLE STREQUAL \"XDG_DESKTOP_MENU_EXECUTABLE_NOTFOUND\")
-	install(CODE \"message(STATUS \\\"installing desktop file\\\")\")
-	install(CODE \"execute_process(COMMAND ${XDG_DESKTOP_MENU_EXECUTABLE} install /tmp/{{conf.desktop_file.basename()}})\")
-endif()"
-	if len(conf.mime_files) > 0
-		r += "
 
+func create_cmake_install_icons() -> string
+	var r = "
+
+# install icons"
+	for i in conf.icons
+		let x = i.explode(":")
+		if len(x) >= 3
+			r += "
+install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
+	return r
+
+
+func create_cmake_install_mime() -> string
+	var r = "
+
+# install mime
 find_program(XDG_MIME_EXECUTABLE xdg-mime)
 if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
-		for m in conf.mime_files
-			r += "
+	for m in conf.mime_files
+		r += "
 	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
 	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
-		r += "
+	r += "
 endif()
 "
 	return r
