@@ -17,9 +17,11 @@ func create_all_makefiles()
 		return
 	var p: Profile
 	p.name = "default"
-	for l in conf.libs_optional
-		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
-			p.libs_optional.add(l)
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
+					p.libs_optional.add(l)
 	create_makefile(p, "")
 
 
@@ -29,23 +31,26 @@ func append(out a: string[], b: string[])
 
 func collect_global_flags(p: Profile, out cflags: string, out lflags: string, out defines: string)
 	var pkg: string[]
-	for l in conf.libs
-		if len(lib.pkg(l)) > 0
-			append(pkg, lib.pkg(l))
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if l in p.libs_optional
+					if len(lib.pkg(l)) > 0
+						append(pkg, lib.pkg(l))
+					else
+						cflags += " " + lib.compiler_flags(l)
+						lflags += " " + lib.linker_flags(l)
+					defines += " -D{{lib.define(l)}}=1"
+				else
+					defines += " -D{{lib.define(l)}}=0"
 		else
-			cflags += " " + lib.compiler_flags(l)
-			lflags += " " + lib.linker_flags(l)
-		defines += " -D{{lib.define(l)}}=1"
-	for l in conf.libs_optional
-		if l in p.libs_optional
-			if len(lib.pkg(l)) > 0
-				append(pkg, lib.pkg(l))
-			else
-				cflags += " " + lib.compiler_flags(l)
-				lflags += " " + lib.linker_flags(l)
-			defines += " -D{{lib.define(l)}}=1"
-		else
-			defines += " -D{{lib.define(l)}}=0"
+			for l in g.libs
+				if len(lib.pkg(l)) > 0
+					append(pkg, lib.pkg(l))
+				else
+					cflags += " " + lib.compiler_flags(l)
+					lflags += " " + lib.linker_flags(l)
+				defines += " -D{{lib.define(l)}}=1"
 	if len(pkg) > 0
 		cflags += " `pkg-config --cflags {{pkg.join(" ")}}`"
 		lflags += " `pkg-config --cflags --libs {{pkg.join(" ")}}`"

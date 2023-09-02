@@ -3,7 +3,7 @@ use project
 use library
 
 
-func cmake_link(l: string) -> string
+func cmake_link_mandatory_lib(l: string) -> string
 	let ll = lib.get(l)
 	let varx = l.upper()
 	#deps.add("{{varx}}_LIBRARIES")
@@ -22,23 +22,23 @@ add_compile_definitions({{ll.define()}}=1)"
 		return ""
 
 
-func cmake_link_group(lg: string[]) -> string
-	let lls = [for l in lg lib.get(l)]
-	let varxs = [for l in lg l.upper()]
+func cmake_link_mandatory_group(g: LibGroup) -> string
+	let lls = [for l in g.libs  lib.get(l)]
+	let varxs = [for l in g.libs  l.upper()]
 	#deps.add("{{varx}}_LIBRARIES")
 	let cvar = varxs.join("_OR_")
-	let label = lg.join(" or ")
+	let label = g.libs.join(" or ")
 	var s = "
 
 # lib: {{label}} (mandatory)
-set({{cvar}} \"{{lg[0]}}\" CACHE STRING \"Use {{label}}?\")"
+set({{cvar}} \"{{g.libs[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
 	for i=>v in varxs
 		if len(lls[i].pkg) > 0
 			s += "
 pkg_check_modules({{v}} {{lls[i].pkg[0]}})
 if({{v}}_FOUND)
-	list(APPEND {{cvar}}_FOUND \"{{lg[i]}}\")
+	list(APPEND {{cvar}}_FOUND \"{{g.libs[i]}}\")
 endif()"
 	s += "
 if({{cvar}}_FOUND)
@@ -54,7 +54,7 @@ endif()"
 	
 	for i=>v in varxs
 		s += "
-if({{cvar}} STREQUAL \"{{lg[i]}}\")"
+if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
 		if len(lls[i].pkg) > 0
 			s += "
 	include_directories(${"+v+"_INCLUDE_DIRS})
@@ -67,6 +67,64 @@ if({{cvar}} STREQUAL \"{{lg[i]}}\")"
 		s += "
 endif()"
 	return s
+
+func cmake_link_optional_lib(l: string) -> string
+	let ll = lib.get(l)
+	#deps.add("{{varx}}_LIBRARIES")
+	
+	if len(ll.pkg) > 0
+		# => pkg
+		let varx = [for p in ll.pkg p.upper()]
+		var r = "
+
+# lib: {{l}} (optional)"
+		for i=>v in varx
+			r += "
+pkg_check_modules({{v}} {{ll.pkg[i]}})"
+		r += "
+if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
+		for i=>v in varx
+			r += "
+	include_directories(${"+v+"_INCLUDE_DIRS})
+	link_directories(${"+v+"_LIBRARY_DIRS})
+	list(APPEND DEPS ${"+v+"_LIBRARIES})
+	add_definitions(${"+v+"_CFLAGS_OTHER})"
+		r += "
+	add_compile_definitions({{ll.define()}}=1)
+else()
+	add_compile_definitions({{ll.define()}}=0)
+endif()"
+		return r
+
+	else if len(ll.cmake) > 0
+		# => cmake
+		let cn = ll.cmake[0]
+		return "
+
+# lib: {{l}} (optional)
+find_package({{cn}})
+if({{cn}}_FOUND)
+	include_directories(${"+cn+"_INCLUDE_DIRS})
+	link_directories(${"+cn+"_LIBRARY_DIRS})
+	add_definitions(${"+cn+"_DEFINITIONS})
+	list(APPEND DEPS ${"+cn+"_LIBRARIES})
+	add_compile_definitions({{ll.define()}}=1)
+else()
+	add_compile_definitions({{ll.define()}}=0)
+#endif()"
+
+	else if l == "dl"
+		return "
+
+# lib: dl...
+list(APPEND DEPS ${CMAKE_DL_LIBS})
+add_compile_definitions({{ll.define()}}=1)"
+
+
+	print("WARNING: lib {{l}} not in cmake")
+	return "
+
+add_compile_definitions({{ll.define()}}=0)"
 
 func create_cmake()
 	
@@ -132,63 +190,15 @@ find_package(PkgConfig REQUIRED)
 
 	
 	#var deps: string[]
-	for lg in conf.lib_groups
-		if len(lg) > 1
-			r += cmake_link_group(lg)
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				r += cmake_link_optional_lib(l)
 		else
-			r += cmake_link(lg[0])
-
-
-	for l in conf.libs_optional
-		let ll = lib.get(l)
-		#deps.add("{{varx}}_LIBRARIES")
-		if len(ll.pkg) > 0
-			let varx = [for p in ll.pkg p.upper()]
-			r += "
-
-# lib: {{l}} (optional)"
-			for i=>v in varx
-				r += "
-pkg_check_modules({{v}} {{ll.pkg[i]}})"
-			r += "
-if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
-			for i=>v in varx
-				r += "
-	include_directories(${"+v+"_INCLUDE_DIRS})
-	link_directories(${"+v+"_LIBRARY_DIRS})
-	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	add_definitions(${"+v+"_CFLAGS_OTHER})"
-			r += "
-	add_compile_definitions({{ll.define()}}=1)
-else()
-	add_compile_definitions({{ll.define()}}=0)
-endif()"
-		else if len(ll.cmake) > 0
-			let cn = ll.cmake[0]
-			r += "
-
-# lib: {{l}} (optional)
-find_package({{cn}})
-if({{cn}}_FOUND)
-	include_directories(${"+cn+"_INCLUDE_DIRS})
-	link_directories(${"+cn+"_LIBRARY_DIRS})
-	add_definitions(${"+cn+"_DEFINITIONS})
-	list(APPEND DEPS ${"+cn+"_LIBRARIES})
-	add_compile_definitions({{ll.define()}}=1)
-else()
-	add_compile_definitions({{ll.define()}}=0)
-#endif()"
-		else if l == "dl"
-			r += "
-
-# lib: dl...
-list(APPEND DEPS ${CMAKE_DL_LIBS})
-add_compile_definitions({{ll.define()}}=1)"
-		else
-			r += "
-
-add_compile_definitions({{ll.define()}}=0)"
-			print("WARNING: lib {{l}} not in cmake")
+			if len(g.libs) > 1
+				r += cmake_link_mandatory_group(g)
+			else
+				r += cmake_link_mandatory_lib(g.libs[0])
 
 	
 	r += "

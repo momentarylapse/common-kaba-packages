@@ -26,10 +26,12 @@ func action_update(a: string[])
 	
 	conf.load()
 	
-	var missing = conf.libs |> filter(l => not lib.test(l))
-	for l in conf.libs_optional
-		if not conf.ignored(l)
-			lib.test(l)
+	var missing = []#conf.libs |> filter(l => not lib.test(l))
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if not conf.ignored(l)
+					lib.test(l)
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
@@ -63,11 +65,14 @@ func action_vcpkg_install(a: string[])
 	
 	var req: string[]
 	
-	for l in conf.libs
-		req += lib.get(l).vcpkg
-	for l in conf.libs_optional
-		if !conf.ignored(l)
-			req += lib.get(l).vcpkg
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if !conf.ignored(l)
+					req += lib.get(l).vcpkg
+		else
+			for l in g.libs
+				req += lib.get(l).vcpkg
 	req = sort(req, "")
 	if len(req) == 0
 		return

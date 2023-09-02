@@ -15,6 +15,10 @@ func sa2any(a: string[]) -> any
 		r.add(s)
 	return r
 
+struct LibGroup
+	var optional = false
+	var libs: string[]
+
 # project
 struct Config
 	var root: Path
@@ -33,9 +37,7 @@ struct Config
 	var source_dir: Path
 	var main_file: string
 	var build_systems = ["cmake"]
-	var libs: string[]
-	var lib_groups: string[][]
-	var libs_optional: string[]
+	var lib_groups: LibGroup[]
 	var ignore_libs: string[]
 	var profiles: Profile[]
 	var language = "c++17"
@@ -86,7 +88,7 @@ struct Config
 			else if k == "build.system"
 				build_systems = any2sa(c[k])
 			else if k == "build.libraries"
-				parse_libs(c[k], libs, lib_groups, libs_optional)
+				lib_groups = parse_libs(c[k])
 			#else if k == "build.libraries-optional"
 			#	libs_optional = c[k].explode(",")
 			else if k == "build.include-directories"
@@ -121,10 +123,7 @@ struct Config
 		c["build-type"] = build_type
 		c["build.flags"] = flags_global
 		c["build.include-directories"] = sa2any(include_directories)
-		c["build.libraries"] = sa2any(libs) # FIXME
-		if len(lib_groups) + len(libs_optional) > 0
-			print("ERROR: writing complex library definitions not handled...")
-			#c["build.libraries-optional"] = sa2any(libs_optional)
+		c["build.libraries"] = encode_libs(lib_groups)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		c["install.source"] = str(install_source)
@@ -159,13 +158,27 @@ struct Config
 
 var conf: Config
 
-func parse_libs(s: any, out libs: string[], out lib_groups: string[][], out libs_opt: string[])
+func parse_libs(s: any) -> LibGroup[]
+	var r: LibGroup[]
 	for x in any2sa(s)
+		var g: LibGroup
 		if x[-1:] == "?"
-			libs_opt.add(x[:-1])
+			g.optional = true
+			g.libs = [x[:-1]]
+			pass#r.add([true, [x[:-1]]])
 		else
-			lib_groups.add(x.explode("|"))
-			libs.add(x.explode("|")[0])
+			g.libs = x.explode("|")
+		r.add(g)
+	return r
+
+func encode_libs(lib_groups: LibGroup[]) -> any
+	var a: any
+	for g in lib_groups
+		if g.optional
+			a.add(g.libs.join("|") + "?")
+		else
+			a.add(g.libs.join("|"))
+	return a
 
 struct SourceFile
 	filename: Path

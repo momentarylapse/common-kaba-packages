@@ -24,39 +24,39 @@ mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')"
 
 	var vars = ["mdep", "threaddep"]
-	for l in conf.libs
-		var ll = lib.get(l)
-		var varx = l + "dep"
-		vars.add(varx)
-		f << varx + " = dependency('{{ll.meson_libs()[0]}}')"
-		f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
-	f << "deps = " + str(vars).replace("\"", "")
-	
-	
-	for l in conf.libs_optional
-		f << "
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				f << "
 # optional dependency: " + l
-		var ll = lib.get(l)
-		var mlibs = ll.meson_libs()
-		var ltest: string
-		var deps: string
-		for i=>m in mlibs
-			var v = "d"
-			if len(mlibs) > 1
-				v += str(i+1)
-			f << v + " = cc.find_library('{{m}}', required : false)"
-			if i > 0
-				ltest += " and "
-				deps += ","
-			ltest += v + ".found()"
-			deps += v
-		f << "if {{ltest}}"
-		f << "	add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
-		f << "	deps += [{{deps}}]"
-		f << "else"
-		f << "	add_project_arguments('-D{{ll.define()}}=0', language : ['cpp'])"
-		f << "endif"
-
+				var ll = lib.get(l)
+				var mlibs = ll.meson_libs()
+				var ltest: string
+				var deps: string
+				for i=>m in mlibs
+					var v = "d"
+					if len(mlibs) > 1
+						v += str(i+1)
+					f << v + " = cc.find_library('{{m}}', required : false)"
+					if i > 0
+						ltest += " and "
+						deps += ","
+					ltest += v + ".found()"
+					deps += v
+				f << "if {{ltest}}"
+				f << "	add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
+				f << "	deps += [{{deps}}]"
+				f << "else"
+				f << "	add_project_arguments('-D{{ll.define()}}=0', language : ['cpp'])"
+				f << "endif"
+		else
+			for l in g.libs
+				var ll = lib.get(l)
+				var varx = l + "dep"
+				vars.add(varx)
+				f << varx + " = dependency('{{ll.meson_libs()[0]}}')"
+				f << "add_project_arguments('-D{{ll.define()}}=1', language : ['cpp'])"
+	f << "deps = " + str(vars).replace("\"", "")
 	
 	f << "
 

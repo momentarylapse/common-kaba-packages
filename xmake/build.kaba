@@ -64,9 +64,11 @@ func get_profile(name: string) -> Profile
 			return p
 	var p: Profile
 	p.name = "local"
-	for l in conf.libs_optional
-		if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
-			p.libs_optional.add(l)
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
+					p.libs_optional.add(l)
 	return p
 
 func build()
