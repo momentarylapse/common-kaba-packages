@@ -81,15 +81,13 @@ Toolbar toolbar ''
 	
 	func on_save()
 		var f = func(p: Path)
-			if bool(p)
-				fs.write_text(p, c.export())
-		hui.file_dialog_save(&self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
+			fs.write_text(p, c.export())
+		hui.file_dialog_save(&self, "Save the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
 	
 	func mut on_open()
 		var f = func(p: Path)
-			if bool(p)
-				c.import(fs.read_text(p))
-		hui.file_dialog_open(&self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"], f)
+			c.import(fs.read_text(p))
+		hui.file_dialog_open(&self, "Load the circuit", Path.EMPTY, ["filter=*.circuit", "filtershow=*.circuit"]).then(f)
 	
 	func mut on_param()
 		var row = hui.get_event().row

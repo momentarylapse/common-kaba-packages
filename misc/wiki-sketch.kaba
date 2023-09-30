@@ -48,27 +48,24 @@ Grid ? '' vertical
 		event("copy", on_copy)
 		event("clear", on_clear)
 		
-	func override mut on_left_button_down()
-		let e = hui.get_event()
-		cur.p.add(e.mouse)
+	func override mut on_left_button_down(m: vec2)
+		cur.p.add(m)
 		redraw("area")
 
-	func override mut on_left_button_up()
+	func override mut on_left_button_up(m: vec2)
 		if len(cur.p) > 1
 			strokes.add(cur.digest())
 			update_output()
 		cur.p.clear()
 		redraw("area")
 
-	func override mut on_mouse_move()
-		let e = hui.get_event()
+	func override mut on_mouse_move(m: vec2)
 		if len(cur.p) > 0
-			cur.p.add(e.mouse)
+			cur.p.add(m)
 			redraw("area")
 
-	func override mut on_key_down()
-		let e = hui.get_event()
-		if e.key == hui.KEY_CONTROL + hui.KEY_Z
+	func override mut on_key_down(key: int)
+		if key == hui.KEY_CONTROL + hui.KEY_Z
 			if len(strokes) > 0
 				#strokes = strokes[:len(strokes)-1]
 				strokes.resize(len(strokes)-1)
