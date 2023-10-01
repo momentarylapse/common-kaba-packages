@@ -233,7 +233,7 @@ func create_cmake_install_desktop() -> string
 
 # install .desktop file
 set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
-configure_file(\"{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
 install(FILES /tmp/{{conf.desktop_file.basename()}} DESTINATION share/applications)"
 
 
