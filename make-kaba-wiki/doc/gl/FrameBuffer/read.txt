@@ -1,2 +1,2 @@
 description = ""
-param:ctx = ""
+param:image = ""
