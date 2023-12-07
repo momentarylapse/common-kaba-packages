@@ -94,7 +94,7 @@ func file_add_new(out f: LocalFile, hash: string)
 	auto_tag(f)
 	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")
-	db.files.add(f)
+	#db.files.add(f)
 
 
 
