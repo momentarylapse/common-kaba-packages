@@ -29,6 +29,7 @@ func path_diff(a: Path, b: Path) -> string
 
 class LocalFileDB
 	var files: LocalFile[]
+	var to_delete: LocalFile[]
 	
 	func mut load()
 		files.clear()
@@ -68,14 +69,22 @@ class LocalFileDB
 	
 			files.add(ff)
 		#print(tt.get())
+	
+	func mut delete_later(f: LocalFile)
+		to_delete.add(f)
+	
+	func mut delete_now()
+		for f in to_delete
+			delete(f)
+		to_delete.clear()
 
 	func mut self_check()
-		check_empty_paths()
+		#check_empty_paths()
 		check_directories()
-		check_empty_hashes()
-		check_missing()
-		check_hash_collisions()
-		check_duplicate_paths()
+		#check_empty_hashes()
+		#check_missing()
+		#check_hash_collisions()
+		#check_duplicate_paths()
 	
 	func mut check_empty_paths()
 		print("checking empty paths")
@@ -89,7 +98,8 @@ class LocalFileDB
 		for f in files
 			if fs.exists(f.path) and fs.is_directory(f.path)
 				log_error("directory", str(f.path))
-				delete(f)
+				delete_later(f)
+		delete_now()
 	
 	func mut check_missing()
 		print("checking missing")
@@ -107,10 +117,11 @@ class LocalFileDB
 					save([f])
 				else if f.id == ""
 					log_error("ghost", str(f.path))
-					delete(f)
+					delete_later(f)
 				#else
 					# hash='', id='', no file
 					#print("EMPTY HASH (REMOTE): " + ff.path)
+		delete_now()
 	func mut check_hash_collisions()
 		print("checking hash collisions")
 		for f in files
@@ -124,12 +135,13 @@ class LocalFileDB
 				if l.mergeable(f)
 					l.merge(f)
 					save([f])
-					delete(f)
+					delete_later(f)
 				else
 					print("   {{rel_path(f.path)}}   <->   {{rel_path(l.path)}}")
 					print("###################################")
 			else
 				log_warn("hash collision", path_diff(f.path, l.path))
+		delete_now()
 
 	func mut check_duplicate_paths()
 		print("checking duplicate paths")
@@ -166,6 +178,8 @@ class LocalFileDB
 
 	func mut save(_files: LocalFile[])
 		for f in _files
+			if f.is_dir
+				continue
 			for _f in _find_by_local_id(f.local_id)
 				_f = f
 			else
@@ -179,6 +193,8 @@ class LocalFileDB
 		save_all()
 
 	func mut save_all()
+		#print("NOT SAVING :P")
+		#return
 		make_all_dirs(hui.app_directory | "sisyphos")
 		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/db", "wt"))
 		f << "version=1"

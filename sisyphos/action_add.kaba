@@ -95,6 +95,7 @@ func file_add_new(out f: LocalFile, hash: string)
 	if conf.show_meta or conf.verbosity >= 2
 		f.show_info("      ")
 	#db.files.add(f)
+	db.save([f])
 
 
 
@@ -108,7 +109,7 @@ func add_by_path(path: Path)
 		if not f.is_dir
 			file_add(f)
 			
-	db.save(files)
+	#db.save(files)
 
 func action_add(arg: string[])
 	if len(arg) == 0
