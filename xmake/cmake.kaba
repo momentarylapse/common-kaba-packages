@@ -68,16 +68,20 @@ if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
 endif()"
 	return s
 
+
 func cmake_link_optional_lib(l: string) -> string
 	let ll = lib.get(l)
 	#deps.add("{{varx}}_LIBRARIES")
+	
+	let var_enabled = "LIB_{{l.upper()}}_ENABLED"
 	
 	if len(ll.pkg) > 0
 		# => pkg
 		let varx = [for p in ll.pkg p.upper()]
 		var r = "
 
-# lib: {{l}} (optional)"
+# lib: {{l}} (optional)
+set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")"
 		for i=>v in varx
 			r += "
 pkg_check_modules({{v}} {{ll.pkg[i]}})"
@@ -90,6 +94,10 @@ if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
 	add_definitions(${"+v+"_CFLAGS_OTHER})"
 		r += "
+else()
+	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
+endif()
+if(${"+var_enabled+"})
 	add_compile_definitions({{ll.define()}}=1)
 else()
 	add_compile_definitions({{ll.define()}}=0)
@@ -102,12 +110,17 @@ endif()"
 		return "
 
 # lib: {{l}} (optional)
+set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")
 find_package({{cn}})
 if({{cn}}_FOUND)
 	include_directories(${"+cn+"_INCLUDE_DIRS})
 	link_directories(${"+cn+"_LIBRARY_DIRS})
 	add_definitions(${"+cn+"_DEFINITIONS})
 	list(APPEND DEPS ${"+cn+"_LIBRARIES})
+else()
+	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
+endif()
+if(${"+var_enabled+"})
 	add_compile_definitions({{ll.define()}}=1)
 else()
 	add_compile_definitions({{ll.define()}}=0)
