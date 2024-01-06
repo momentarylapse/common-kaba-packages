@@ -1,12 +1,11 @@
 use os
-use kaba
-use os
 
 func test_replace(filename: Path, what: string, by: string, allow: bool)
 	var s = fs.read_text(filename)
 	var n = 0
+	var pos0 = 0
 	while true
-		let p = s.find(what, 0)
+		let p = s.find(what, pos0)
 		if p < 0
 			break
 		if n == 0
@@ -15,12 +14,12 @@ func test_replace(filename: Path, what: string, by: string, allow: bool)
 		s = s[:p] + by + s[p + len(what):]
 		print(">>  " + s[p-5:p+len(by) + 5])
 		n ++
+		pos0 = p + 1
 	if n > 0 and allow
 		fs.write_text(filename, s)
 
 func test_rec(dir: Path, what: string, by: string, allow: bool)
-	let list = fs.search(dir, "*.*", "fr")
-	for e in list
+	for e in fs.search(dir, "*.*", "fr")
 		test_replace(dir | e, what, by, allow)
 
 func main(arg: string[])
