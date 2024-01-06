@@ -7,16 +7,16 @@ use os
 
 func main()
 	_print_postfix = ""
-	print("welcome to kaba {{kaba_version}}")
+	print("welcome to kaba {{kaba.kaba_version}}")
 	while true#!stdin.eof()
 		print("\n>>> ")
 	
 	
-		var s = stdin.read(1000)
+		var s = os.stdin.read(1000)
 		if len(s) == 0
 			break
 		s = s[:-1]
-		default_context.execute_single_command(s)
+		kaba.default_context.execute_single_command(s)
 		#print("read: " + s)
 	print("\n")
 

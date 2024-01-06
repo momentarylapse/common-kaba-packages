@@ -5,13 +5,13 @@ use terminal
 
 
 func main()
-	print("welcome to kaba {{kaba_version}}")
+	print("welcome to kaba {{kaba.kaba_version}}")
 	var history: string[]
 	while true
 		try
-			let s = fancy_read_command(">>> ", history)
+			let s = terminal.fancy_read_command(">>> ", history)
 			if s != ""
-				default_context.execute_single_command(s)
+				kaba.default_context.execute_single_command(s)
 		except Exception as e
 			print("exit")
 			break

@@ -103,7 +103,7 @@ class BreakSignal extends Exception
 
 func read_char() -> string
 	while true
-		var s = stdin.read(4)
+		var s = os.stdin.read(4)
 		#print(s.hex())
 		if len(s) == 0
 			continue
@@ -124,7 +124,7 @@ func fancy_read_command(prompt: string, out history: string[]) -> string
 	var cursor_pos = 0
 	var hist_index = len(history)
 	while true
-		var s = stdin.read(4)
+		var s = os.stdin.read(4)
 		#print(s.hex())
 		if len(s) == 0
 			continue
