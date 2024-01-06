@@ -1,7 +1,6 @@
 use os
 use kaba
-use os
-use cli.terminal
+use cli.terminal.*
 
 func is_letter(c: char) -> bool
 	return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or (c == '_')
@@ -75,9 +74,9 @@ func glue_type(tokens: string[], ptl: int) -> string
 			t += x
 	return t
 
-func migrate_file_decl(filename: Path)
+func migrate_file_decl(filename: os.Path)
 	print(filename)
-	let s = fs.read_text(filename)
+	let s = os.fs.read_text(filename)
 	let lines = s.explode("\n")
 	var lines_out: string[]
 	
@@ -141,7 +140,7 @@ func migrate_file_decl(filename: Path)
 		print("================================= saved")
 
 
-func migrate_file_for(filename: Path)
+func migrate_file_for(filename: os.Path)
 	print(filename)
 	let s = fs.read_text(filename)
 	let lines = s.explode("\n")

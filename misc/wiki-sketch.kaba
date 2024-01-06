@@ -31,7 +31,7 @@ struct Stroke
 			
 		return s
 
-class Sketcher extends Window
+class Sketcher extends hui.Window
 	var strokes: Stroke[]
 	var cur: Stroke
 	var w, h: int
@@ -71,7 +71,7 @@ Grid ? '' vertical
 				strokes.resize(len(strokes)-1)
 			redraw("area")
 
-	func override mut on_draw(p: Painter)
+	func override mut on_draw(p: hui.Painter)
 		w = p.width
 		h = p.height
 		p.set_color(color.WHITE)
@@ -84,7 +84,7 @@ Grid ? '' vertical
 		
 		p.draw_str([10,10], "{{len(to_text())}} b")
 
-	func draw_stroke(p: Painter, s: Stroke)
+	func draw_stroke(p: hui.Painter, s: Stroke)
 		for i in 1:len(s.p)
 			p.draw_line(s.p[i-1], s.p[i])
 	

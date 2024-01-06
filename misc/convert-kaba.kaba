@@ -1,4 +1,5 @@
 use os
+use os.Path
 
 func process_comment(l: string) -> string
 	for i=>c in l
@@ -88,7 +89,7 @@ func is_decl(l: string) -> bool
 	return true
 
 func process(p: Path, dry: bool)
-	var lines = fs.read_text(p).explode("\n")
+	var lines = os.fs.read_text(p).explode("\n")
 	var lines_out = lines
 	var changed = false
 	var in_long_string = false
@@ -138,7 +139,7 @@ func process(p: Path, dry: bool)
 		print("CHANGED!!!!!")
 		#print(lines_out.join("\n"))
 		if not dry
-			fs.write_text(p, lines_out.join("\n"))
+			os.fs.write_text(p, lines_out.join("\n"))
 
 func main(arg: string[])
 	var dry = false

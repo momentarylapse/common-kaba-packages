@@ -90,10 +90,10 @@ func diff(a: string, b: string)
 		d.b1 = m2.b0
 		diffs.add(d)
 	
-		print("{{terminal.YELLOW}}diff at {{d}}:{{terminal.END}}")
+		print("{{os.terminal.YELLOW}}diff at {{d}}:{{os.terminal.END}}")
 		var a000 = clamp(d.a0-CONTEXT, 0, len(a))
 		var a111 = clamp(d.a1+CONTEXT, 0, len(a))
-		print(hex(a[a000:d.a0]) + " {{terminal.RED}}{{hex(a[d.a0:d.a1])}} {{terminal.GREEN}}{{hex(b[d.b0:d.b1])}}{{terminal.END}} " + hex(a[d.a1:a111]))
+		print(hex(a[a000:d.a0]) + " {{os.terminal.RED}}{{hex(a[d.a0:d.a1])}} {{os.terminal.GREEN}}{{hex(b[d.b0:d.b1])}}{{os.terminal.END}} " + hex(a[d.a1:a111]))
 		m = m2
 
 func main(arg: string[])
@@ -101,7 +101,7 @@ func main(arg: string[])
 	MAX_DIFF_SIZE = 4096*2
 	MIN_MATCH_SIZE = 16
 
-	var p: CommandLineParser
+	var p: os.CommandLineParser
 	var pp = &p
 	p.info("bindiff", "find (small) differences between binary files")
 	p.option("--context", "BYTES", "how many bytes of context are shown", func (a: string) CONTEXT = int(a))
