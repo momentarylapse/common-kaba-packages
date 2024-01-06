@@ -1,18 +1,18 @@
 use os
-use localdb
-use config
-use tag
-use actions
-use action_add
-use action_delete
-use action_list
-use action_transmit
-use action_tag
-use action_remote
+use localdb.*
+use config.*
+use tag.*
+use actions.*
+use action_add.*
+use action_delete.*
+use action_list.*
+use action_transmit.*
+use action_tag.*
+use action_remote.*
 
 
 func main(arg: string[])
-	var p: CommandLineParser
+	var p: os.CommandLineParser
 	p.info("sisyphos", "synchronize your files")
 	
 	p.option("--verbose/-v", "", lambda() conf.verbosity = 5)

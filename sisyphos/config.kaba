@@ -1,4 +1,4 @@
-use os
+use os.*
 use hui
 
 #const string SERVER = "michi.is-a-geek.org"

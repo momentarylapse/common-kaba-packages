@@ -1,7 +1,7 @@
-use localdb
-use file
-use config
-use os
+use localdb.*
+use file.*
+use config.*
+use os.*
 
 func file_from_path(p: Path) -> LocalFile
 	var f: LocalFile

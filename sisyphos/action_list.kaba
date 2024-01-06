@@ -1,9 +1,9 @@
-use config
-use localdb
-use file
-use tag
-use dblister
-use os
+use config.*
+use localdb.*
+use file.*
+use tag.*
+use dblister.*
+use os.*
 
 
 func show_files(files: LocalFile[], refpoint: Path)

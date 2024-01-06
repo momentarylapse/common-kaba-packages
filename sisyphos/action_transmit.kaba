@@ -1,10 +1,9 @@
-use os
-use config
-use localdb
-use file
-use config
-use remote
-use dblister
+use os.*
+use config.*
+use localdb.*
+use file.*
+use remote.*
+use dblister.*
 
 
 

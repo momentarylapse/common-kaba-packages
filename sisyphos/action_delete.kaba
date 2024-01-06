@@ -1,8 +1,8 @@
-use os
-use localdb
-use file
-use config
-use dblister
+use os.*
+use localdb.*
+use file.*
+use config.*
+use dblister.*
 
 
 func delete_files(out files: LocalFile[])

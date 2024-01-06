@@ -1,7 +1,7 @@
-use file
-use config
-use tag
-use os
+use file.*
+use config.*
+use tag.*
+use os.*
 
 func is_number(c: char) -> bool
 	return c >= '0' and c <= '9'

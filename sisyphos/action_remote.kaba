@@ -1,7 +1,7 @@
-use localdb
-use file
-use config
-use remote
+use localdb.*
+use file.*
+use config.*
+use remote.*
 
 
 

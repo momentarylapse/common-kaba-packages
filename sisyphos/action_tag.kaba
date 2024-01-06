@@ -1,11 +1,11 @@
-use config
-use tag
-use autotag
-use dblister
-use localdb
-use file
-use remote
-use os
+use config.*
+use tag.*
+use autotag.*
+use dblister.*
+use localdb.*
+use file.*
+use remote.*
+use os.*
 
 
 func _action_tag_add(path: Path, tag: string)

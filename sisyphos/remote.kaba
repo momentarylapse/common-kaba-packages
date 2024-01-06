@@ -1,9 +1,9 @@
-use os
+use os.*
 use hui
-use config
-use localdb
-use file
-use tag
+use config.*
+use localdb.*
+use file.*
+use tag.*
 
 
 const CHUNK_SIZE = 128
