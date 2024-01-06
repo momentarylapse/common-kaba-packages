@@ -1,13 +1,13 @@
-use kaba
+use kaba.*
 use os
 use time
-use common
-import doc
-import wiki
-import docu
+use common.*
+use doc
+use wiki
+use docu
 
 func wiki_upload(name: string, wiki: string)
-	fs.write_text(name + ".txt", wiki)
+	os.fs.write_text(name + ".txt", wiki)
 
 
 func make_documentation()

@@ -1,7 +1,9 @@
 use os
-use y.gfx
+use gfx.*
+use image.Image
 
 class EngineData
+	var context: void&
 	var debug: bool
 	var show_timings: bool
 	var console_enabled: bool
@@ -19,9 +21,10 @@ class EngineData
 	var fps_min, fps_max: float
 	var resolution_scale: vec2
 	
-	var initial_world_file, second_world_file: Path
+	var initial_world_file, second_world_file: os.Path
 	#Font* default_font
 	var renderer: Renderer&
+	var region_renderer: RegionRenderer&
 	var render_path: RenderPath&
 	var hdr_renderer: HDRRenderer*
 	var post_processor: PostProcessor*
@@ -30,25 +33,34 @@ class EngineData
 
 class Renderer
 
+class RegionRenderer
+	struct Region
+		var dest: rect
+		var z: int
+		var renderer: Renderer&
+	var regions: Region[]
+	func extern add_region(r: Renderer&, dest: rect, z: int)
+
 class RenderPath
 	enum Type
 		NONE
 		FORWARD
 		DEFERRED
 	var type: Type
-	var depth_buffer: DepthBuffer&
-	var cube_map: shared[CubeMap]
-	var fb_shadow, fb_shadow2: FrameBuffer&
 	var shader_fx: Shader*
-	var gbuffer: FrameBuffer*
 	var wireframe: bool
+	
+	# debugging
+	func extern get_gbuffer() -> FrameBuffer*
+	func extern get_fb_shadow() -> FrameBuffer&[]
+	func extern get_cubemap() -> CubeMap*
 
 	#func extern virtual render_into_texture(fb: FrameBuffer, cam: Camera)
 	#func extern render_into_cubemap(db: DepthBuffer, cube: CubeMap, pos: vector)
 
 class HDRRenderer
 	var fb_main: FrameBuffer&
-	var fb_small1, fb_small2: FrameBuffer&
+	func extern fb_bloom() -> FrameBuffer&[]
 
 class PostProcessor
 	var fb1, fb2: FrameBuffer&
@@ -65,7 +77,16 @@ class PerformanceMonitor
 		var name: string
 		var parent: int
 		var average: float
+	struct TimingData
+		var channel: int
+		var offset: float
+	struct FrameTimingData
+		var cpu0: TimingData[]
+		var gpu: TimingData[]
+		var total_time: float
+	func extern static get_name(channel: int)
 	var extern static channels: Channel[]
+	var extern static previous_frame_timing: FrameTimingData
 	var extern static avg_frame_time: float
 	var extern static frames: int
 	#class Average
@@ -76,3 +97,5 @@ class PerformanceMonitor
 #var extern perf_mon: PerformanceMonitor*
 
 var extern engine: EngineData
+
+func extern screenshot(out im: Image)

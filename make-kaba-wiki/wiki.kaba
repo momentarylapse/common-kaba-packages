@@ -1,9 +1,9 @@
-use kaba
+use kaba.*
 use os
 use time
-import doc
-use common
-use docu
+use doc
+use common.*
+use docu.*
 # use "mongo"
 
 const SHIFT = "    "
@@ -305,11 +305,11 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 func render_reference() -> string
 	var wiki = "== Kaba reference ==\n"
 
-	wiki += "\nVersion {{kaba_version}} from {{Date.now()|%F}}\n"
+	wiki += "\nVersion {{kaba_version}} from {{time.Date.now()|%F}}\n"
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
-	let packages = kaba.default_context.packages |> sort("name")
+	let packages = default_context.packages |> sort("name")
 	for p in packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default

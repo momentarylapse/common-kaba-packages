@@ -1,5 +1,5 @@
-use kaba
-use os
+use kaba.*
+use os.*
 
 func func_notable_params(f: Function) -> (string,Class*)[]
 	var r: (string,Class*)[]

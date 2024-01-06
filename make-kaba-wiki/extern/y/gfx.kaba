@@ -1,10 +1,11 @@
-use image
+use image.Image
 use os
 
 
 enum PrimitiveTopology
 	TRIANGLES
 	LINES
+	LINESTRIP
 	POINTS
 
 struct Vertex
@@ -35,12 +36,15 @@ class Texture as shared
 	var width, height: int
 	func extern __init__(w: int, h: int, format: string = "rgba:i8")
 	func extern __delete__()
-	func extern mut update(im: Image)
+	func extern mut write(im: Image)
+	func extern mut write_float(data: @DynamicArray)
 
 class CubeMap extends Texture
 	func extern __init__(size: int, format: string)
 class DepthBuffer extends Texture
 	func extern override __init__(w: int, h: int, format: string)
+class VolumeTexture extends Texture
+	func extern __init__(nx: int, ny: int, nz: int, format: string)
 
 class VertexBuffer
 	func extern __init__(format: string = "3f,3f,2f")
@@ -48,6 +52,6 @@ class VertexBuffer
 
 var extern tex_white: shared![Texture]
 
-func extern load_shader(filename: Path) -> Shader&
-func extern create_shader(source: string) -> Shader&
-func extern load_texture(filename: Path) -> shared![Texture]
+func extern load_shader(filename: os.Path) -> shared![Shader]
+func extern create_shader(source: string) -> xfer[Shader]
+func extern load_texture(filename: os.Path) -> shared![Texture]

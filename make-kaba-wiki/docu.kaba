@@ -1,6 +1,6 @@
-use kaba
+use kaba.*
 use os
-use common
+use common.*
 
 var report_missing = false
 
@@ -19,7 +19,7 @@ func parse_doc_string(s: string) -> string
 	return ss.unescape()
 
 func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
-	var p = Path("doc/" + ns.replace(".", "/"))
+	var p = os.Path("doc/" + ns.replace(".", "/"))
 	if is_class
 		p = p | name | "class.txt"
 	else
@@ -62,7 +62,7 @@ func short_doc(s: string) -> string
 		x = x[:100] + "..."
 	return x
 
-func prepare_func(f: Function, ns: string, dir: Path)
+func prepare_func(f: Function, ns: string, dir: os.Path)
 	doc_get_func_description(ns, f)
 	let params = func_notable_params(f)
 	for p in params
@@ -70,9 +70,9 @@ func prepare_func(f: Function, ns: string, dir: Path)
 	if f.return_type.name != "void"
 		let x = doc_get_func_return(ns, f)
 
-func prepare_class(c: Class, ns: string, dir: Path)
-	if not fs.exists(dir)
-		fs.create_directory(dir)
+func prepare_class(c: Class, ns: string, dir: os.Path)
+	if not os.fs.exists(dir)
+		os.fs.create_directory(dir)
 	
 	let funcs = filter_funcs(c.functions, c)
 	let elements = filter_elements(c.elements)
@@ -89,9 +89,9 @@ func prepare_class(c: Class, ns: string, dir: Path)
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name, dir | cc.name)
 
-func prepare_module(p: Module, name: string, dir: Path)
-	if not fs.exists(dir)
-		fs.create_directory(dir)
+func prepare_module(p: Module, name: string, dir: os.Path)
+	if not os.fs.exists(dir)
+		os.fs.create_directory(dir)
 	print("PREP MOD   {{name}}  {{dir}}")
 
 	let classes = filter_classes(p.classes())
@@ -107,7 +107,7 @@ func prepare_module(p: Module, name: string, dir: Path)
 #		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
 
 
-func prepare(dir: Path)
+func prepare(dir: os.Path)
 	for p in default_context.packages
 		prepare_module(p, p.name, dir | p.name)
 

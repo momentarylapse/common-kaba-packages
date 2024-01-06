@@ -1,9 +1,9 @@
 use os
-use y.gfx
-use y.fx
-use y.ecs
-use y.model
-use y.audio
+use gfx.*
+use fx.*
+use ecs.*
+use model.*
+use audio.*
 
 class SolidBody extends Component
 	var vel: vec3
@@ -36,6 +36,8 @@ class Terrain extends Component
 	var pattern: vec3
 	var num_x, num_z: int
 	var height: float[]
+	var vertex_shader_module: string
+	var material: owned![Material]
 	func extern get_height(p: vec3) -> float
 	func extern mut update(x1: int, x2: int, y1: int, y2: int, mask: int)
 	# ...
@@ -63,6 +65,27 @@ class Light extends Component
 #		func extern __init__(pos: vec3, ang: quaternion, c: color, radius: float, theta: float)
 
 
+class Camera extends Component
+	var m_view: mat4
+	var exposure: float
+	var bloom_radius: float
+	var bloom_factor: float
+	
+	var focus_enabled: bool
+	var focal_length: float
+	var focal_blur: float
+	
+	var fov: float
+	var min_depth, max_depth: float
+	
+	var show, enabled: bool
+
+	func extern project(p: vec3) -> vec3
+	func extern unproject(p: vec3) -> vec3
+	func extern mut update_matrices(aspect_ratio: float)
+
+
+
 class Fog
 	var color: color
 	var distance: float
@@ -82,8 +105,6 @@ class Link extends BaseClass
 class World
 	var ego: Entity*
 	
-	var lights: Light&[]
-	
 	var background: color
 	var skyboxes: Model&[]
 	
@@ -99,18 +120,21 @@ class World
 		FULL_EXTERNAL
 	var physics_mode: PhysicsMode
 	
-	func extern mut load_soon(filename: Path)
+	func extern mut load_soon(filename: os.Path)
 	
-	func extern mut add_light_parallel(ang: quaternion, c: color) -> Light&
-	func extern mut add_light_point(pos: vec3, c: color, radius: float) -> Light&
-	func extern mut add_light_cone(pos: vec3, ang: quaternion, c: color, radius: float, theta: float) -> Light&
-	func extern mut add_particle(p: xfer[LegacyParticle]) -> LegacyParticle&
-	func extern mut add_sound(s: xfer[Sound])
-	func extern mut create_object(filename: Path, pos: vec3, ang: quaternion) -> Entity&
-	func extern mut create_object_no_reg(filename: Path, pos: vec3, ang: quaternion) -> Entity&
-	func extern mut create_object_multi(filename: Path, pos: vec3[], ang: quaternion[]) -> Entity&
-	func extern mut create_terrain(filename: Path, pos: vec3) -> Terrain&
-	func extern mut create_entity(pos: vec3, ang: quaternion) -> Entity&
+	func extern mut selfref create_light_parallel(ang: quaternion, c: color) -> Light&
+	func extern mut selfref create_light_point(pos: vec3, c: color, radius: float) -> Light&
+	func extern mut selfref create_light_cone(pos: vec3, ang: quaternion, c: color, radius: float, theta: float) -> Light&
+	func extern mut selfref add_particle(p: xfer[LegacyParticle]) -> LegacyParticle&
+	func extern mut selfref add_sound(s: xfer[Sound])
+	func extern mut selfref create_object(filename: os.Path, pos: vec3, ang: quaternion) -> Entity&
+	func extern mut selfref create_object_no_reg(filename: os.Path, pos: vec3, ang: quaternion) -> Entity&
+	func extern mut selfref create_object_multi(filename: os.Path, pos: vec3[], ang: quaternion[]) -> Entity&
+	func extern mut selfref create_terrain(filename: os.Path, pos: vec3) -> Terrain&
+	func extern mut selfref create_camera(pos: vec3, ang: quaternion) -> Camera&
+	func extern mut selfref create_entity(pos: vec3, ang: quaternion) -> Entity&
+	func extern mut selfref attach_model(e: Entity&, filename: os.Path) -> Model&
+	func extern mut selfref unattach_model(m: Model&)
 	func extern mut register_entity(e: Entity*)
 	func extern mut set_active_physics(o: Model, active: bool)
 	func extern mut shift_all(dpos: vec3)
@@ -121,6 +145,8 @@ class World
 		return get_component_family_list[Model]()
 	func selfref terrains() -> Terrain&[]&
 		return get_component_family_list[Terrain]()
+	func selfref lights() -> Light&[]&
+		return get_component_family_list[Light]()
 
 #	extern void unregister(void* o) # Model, Link, Light, Particle, Beam
 #	func extern delete(o: void*)

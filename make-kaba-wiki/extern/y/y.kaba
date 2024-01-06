@@ -1,51 +1,35 @@
 use os
 use kaba
-use image
-use y.gfx
-use y.ecs
-use y.model
-use y.audio
-use y.ui
-use y.engine
-use y.fx
-use y.world
-use y.net
+use image.Image
+use gfx.*
+use ecs.*
+use model.*
+use audio.*
+use ui.*
+use engine.*
+use fx.*
+use world.*
+use networking.*
 
 
 let EXPORT_IMPORTS = true
 
 
-class Camera extends Component
-	var dest: rect
-	var m_view: mat4
-	var exposure: float
-	var bloom_radius: float
-	var bloom_factor: float
-	
-	var focus_enabled: bool
-	var focal_length: float
-	var focal_blur: float
-	
-	var fov: float
-	var min_depth, max_depth: float
-	
-	var show, enabled: bool
-
-	func extern project(p: vec3) -> vec3
-	func extern unproject(p: vec3) -> vec3
-	func extern mut update_matrices(aspect_ratio: float)
-
-
 class UserMesh extends Component
-	vertex_buffer: owned![VertexBuffer]
+	vertex_buffer: owned[VertexBuffer]
 	topology: PrimitiveTopology
-	material: Material*
+	material: owned[Material]
 	vertex_shader_module: string
 	geometry_shader_module: string
 
 
+class TimeTable
+	func extern __init__()
+	func extern mut at(t: float, f: void->void)
+	func extern iterate(dt: float)
 
-func extern add_camera(pos: vec3, ang: quaternion, r: rect) -> Camera&
+
+func extern create_render_path(cam: Camera&) -> xfer[Renderer]
 
 
 var extern cam: Camera&

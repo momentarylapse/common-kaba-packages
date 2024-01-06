@@ -1,4 +1,4 @@
-use mongo
+use mongo.*
 #use "file.kaba"
 use os
 
@@ -12,7 +12,7 @@ struct Tag
 
 struct DbFile
 	var id, hash, hash_medium, type: string
-	var path: Path
+	var path: os.Path
 	var name: string
 	var size: int
 	var mtime: int
@@ -41,7 +41,7 @@ struct DbFile
 			print("  size: {{size}}")
 			for t in tags
 				print("  {{t.key}}: {{t.value}}")
-	func medium_path() -> Path
+	func medium_path() -> os.Path
 		if type.find("/audio/", 0) >= 0
 			return "/media/300/temp/alexandria-cache/ogg/{{id}}.ogg"
 		if type.find("/image/", 0) >= 0

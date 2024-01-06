@@ -1,6 +1,6 @@
-use vulkan
-use time
-use image
+use vulkan.*
+use time.Timer
+use image.Image
 
 class Vertex
 	pos: vec3
@@ -87,7 +87,7 @@ class WindowRenderer extends Renderer
 				command_buffers.add(pool.create_command_buffer())
 			
 		depth_buffer = swap_chain.create_depth_buffer()
-		_default_render_pass = swap_chain.create_render_pass(depth_buffer)
+		_default_render_pass = swap_chain.create_render_pass(depth_buffer, [])
 		frame_buffers = swap_chain.create_frame_buffers(_default_render_pass, depth_buffer)
 		width = swap_chain.width
 		height = swap_chain.height
@@ -170,7 +170,7 @@ class TextureRenderer extends Renderer
 		depth_buffer = new DepthBuffer(width, height, "d:f32", true)
 		#vulkan::next_compare_op = VK_COMPARE_OP_ALWAYS;
 
-		_default_render_pass = new RenderPass(["rgba:i8", "d:f32"], "clear")
+		_default_render_pass = new RenderPass(["rgba:i8", "d:f32"], ["clear"])
 		frame_buffer = new FrameBuffer(_default_render_pass, [tex, depth_buffer])
 
 	func override start_frame() -> bool

@@ -1,6 +1,6 @@
-use y.gfx
-use y.ecs
-use y.model
+use gfx.*
+use ecs.*
+use model.*
 use kaba
 
 enum Key
@@ -71,6 +71,8 @@ class Node as shared
 	func extern mut __del_override__()
 		
 	func extern mut add(n: shared![Node])
+	func extern mut remove_all_children()
+	func extern mut remove(n: Node&)
 		
 	func extern virtual mut on_iterate(dt: float)
 	func extern virtual mut on_enter()
@@ -106,7 +108,7 @@ class Picture extends Node
 	var texture: shared![Texture]
 	var blur: float
 	var angle: float
-	var shader: Shader*
+	var shader: shared[Shader]
 	var shader_data: any
 
 class Text extends Picture
@@ -177,6 +179,6 @@ class Controller extends BaseClass
 	func extern virtual mut on_render_inject()
 
 
-func extern __get_controller(type: Class*) -> Controller*
+func extern __get_controller(type: kaba.Class*) -> Controller*
 func get_controller[T]() -> T*
 	return __get_controller(T) as T*
