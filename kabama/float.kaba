@@ -1,4 +1,4 @@
-use common
+use common.*
 
 func all_params_are_float(t: Term&) -> bool
 	for p in t.params

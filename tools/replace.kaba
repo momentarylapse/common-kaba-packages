@@ -1,4 +1,4 @@
-use os
+use os.*
 
 func test_replace(filename: Path, what: string, by: string, allow: bool)
 	var s = fs.read_text(filename)

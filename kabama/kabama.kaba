@@ -1,7 +1,7 @@
-use common
-use parser
-use runtime
-import terminal
+use common.*
+use parser.*
+use runtime.*
+use terminal
 
 
 

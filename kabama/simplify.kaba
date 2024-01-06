@@ -1,5 +1,5 @@
-use common
-use parser
+use common.*
+use parser.*
 
 func add(a: string, b: string) -> string
 	#return i2s(s2i(a) + s2i(b))

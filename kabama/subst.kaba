@@ -1,4 +1,4 @@
-use common
+use common.*
 
 # always copy
 func subst_variable(_t: shared![Term], _var: string, by: shared![Term]) -> shared![Term]
