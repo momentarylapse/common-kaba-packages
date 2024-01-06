@@ -1,5 +1,6 @@
 use hui
 use os
+use os.Path
 
 #string str_unescape(string s)
 #	string r
@@ -27,7 +28,7 @@ class Config
 	
 	func mut load()
 		try
-			var f = new TextLinesFormatter(fs.open(dir | "export.txt", "rt"))
+			var f = new os.TextLinesFormatter(os.fs.open(dir | "export.txt", "rt"))
 			var t: string
 			f >> t
 			f >> t

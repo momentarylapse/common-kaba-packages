@@ -1,7 +1,8 @@
 use os
+use os.Path
 use hui
-use config
-use resource
+use config.*
+use resource.*
 
 class DemoDialog extends hui.Window
 	func __init__(source: string)
@@ -31,7 +32,7 @@ func action_demo(arg: string[])
 	conf.set_dir(filename.parent())
 	conf.load()
 	
-	var source = fs.read_text(filename)
+	var source = os.fs.read_text(filename)
 	#print(source)
 	var r = ParseResource(source, true)
 	#r.show(0)

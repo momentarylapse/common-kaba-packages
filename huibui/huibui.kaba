@@ -1,10 +1,11 @@
 use os
-use config
-use language
-use resource
-use source
-use demo
-use export
+use os.Path
+use config.*
+use language.*
+use resource.*
+use source.*
+use demo.*
+use export.*
 	
 
 func get_ids(out l: Language, r: Resource, ns: string)
@@ -64,7 +65,7 @@ func action_export(arg: string[])
 
 func patch_language(out l: Language, own: Language, filename: Path)
 	try
-		var ttt = fs.read_text(filename)
+		var ttt = os.fs.read_text(filename)
 		var lines = ttt.explode("\n")
 		for i in 0:len(lines)/3
 			var a = lines[i*3]
@@ -94,14 +95,14 @@ func action_translate(arg: string[])
 	
 	var path = conf.dir | "TRANS"
 	try
-		shell_execute("sgribthmaker \"{{path}}\"")
+		os.shell_execute("sgribthmaker \"{{path}}\"")
 		patch_language(l, own, path)
 		check_lang(l, own, false)
 		l.save()
 	except
 		pass
 	try
-		fs.delete(path)
+		os.fs.delete(path)
 	except
 		pass
 
@@ -146,7 +147,7 @@ func swap_translate_guis(l: Language)
 		print(r.str(0))
 		swap_translate_gui(r, l, r.id)
 		print(r.str(0))
-		fs.write_text(resource_files[i], r.str(0))
+		os.fs.write_text(resource_files[i], r.str(0))
 
 func action_swap(arg: string[])
 	var source = Path(arg[0])
@@ -172,7 +173,7 @@ func action_swap(arg: string[])
 	
 
 func main(arg: string[])
-	var p: CommandLineParser
+	var p: os.CommandLineParser
 	p.info("huibui", "hui gui builder...")
 	p.cmd("check", "<HUI-FILE>", "just check ...", action_check)
 	p.cmd("demo", "<HUI-FILE>", "show ...", action_demo)

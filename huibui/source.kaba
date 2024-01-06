@@ -1,6 +1,7 @@
 use os
-use config
-use language
+use os.Path
+use config.*
+use language.*
 
 class SourceParser
 	var source: string
@@ -25,12 +26,12 @@ class SourceParser
 
 
 	func mut parse_source_code_dir(dir: Path)
-		var files = fs.search(dir, "*.cpp", "fd")
+		var files = os.fs.search(dir, "*.cpp", "fd")
 		for f in files
-			if fs.is_directory(dir | f)
+			if os.fs.is_directory(dir | f)
 				parse_source_code_dir(dir | f)
 			else
-				source = fs.read(dir | f)
+				source = os.fs.read(dir | f)
 				begin()
 				parse()
 				end(dir | f)
@@ -81,7 +82,7 @@ class SourceSwapper extends SourceParser
 		if !changed
 			return
 		#print(">>>>>>>>>>>")
-		fs.write_text(filename, source_new)
+		os.fs.write_text(filename, source_new)
 				
 
 

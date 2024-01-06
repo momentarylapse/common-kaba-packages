@@ -1,5 +1,6 @@
-use config
+use config.*
 use os
+use os.Path
 
 
 struct LangID
@@ -51,7 +52,7 @@ struct Language
 		texts.add(t)
 		
 	func save()
-		var f = new TextLinesFormatter(fs.open(filename, "wt"))
+		var f = new os.TextLinesFormatter(os.fs.open(filename, "wt"))
 		f << "# Language"
 		f << name
 		f << "# Num IDs"
@@ -94,7 +95,7 @@ func load_prelang(filename: Path) -> Language
 	l.filename = filename
 	#try
 	if true
-		var f = new TextLinesFormatter(fs.open(filename, "rt"))
+		var f = new os.TextLinesFormatter(os.fs.open(filename, "rt"))
 		var t: string
 		var n: int
 		f >> t
@@ -128,7 +129,7 @@ func load_prelang(filename: Path) -> Language
 
 func load_prelangs() -> Language[]
 	var langs: Language[]
-	var files = fs.search(conf.dir, "*.prelang", "f")
+	var files = os.fs.search(conf.dir, "*.prelang", "f")
 	for f in files
 		var l = load_prelang(conf.dir | f)
 		langs.add(l)
@@ -173,9 +174,9 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
 	var nerrors = 0
 	
-	var file: owned[TextLinesFormatter]
+	var file: owned[os.TextLinesFormatter]
 	if create_file
-		file = new TextLinesFormatter(fs.open(conf.dir | "TRANS", "wt"))
+		file = new os.TextLinesFormatter(os.fs.open(conf.dir | "TRANS", "wt"))
 	
 	# check ids
 	for i in own.ids
