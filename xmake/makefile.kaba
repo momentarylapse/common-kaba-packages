@@ -1,6 +1,7 @@
 use os
-use project
-use library
+use os.Path
+use project.*
+use library.*
 
 func create_all_makefiles()
 	parse_dependencies()
@@ -72,7 +73,7 @@ func create_makefile(p: Profile, postfix: string)
 	raise(new Exception("Makefile deprecated!"))
 
 	print("-- makefile {{p.name}} --")
-	var f = new TextLinesFormatter(fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt"))
+	var f = new os.TextLinesFormatter(os.fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt"))
 	f << "BIN = ../{{conf.binary_file}}"
 	f << "CPP = g++"
 	var cflags, lflags, defines: string
@@ -121,7 +122,7 @@ func create_makefile(p: Profile, postfix: string)
 #		f << "	cp -f " + conf.icon + " " + datadir
 	var list = conf.needs_installing()
 	for e in list
-		if fs.is_directory(conf.root | e)
+		if os.fs.is_directory(conf.root | e)
 			f << "	cp -ruf '../{{e}}' {{datadir}}"
 		else
 			f << "	cp -uf '../{{e}}' {{datadir}}"

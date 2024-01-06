@@ -1,3 +1,4 @@
+use os.Path
 use os
 
 struct Profile
@@ -59,7 +60,7 @@ struct Config
 		return l in ignore_libs
 	
 	func mut load()
-		if not fs.exists(conf.root | "xmake.conf")
+		if not os.fs.exists(conf.root | "xmake.conf")
 			raise(new Exception("no xmake.conf found"))
 		var c: os.Configuration
 		c.load(conf.root | "xmake.conf")
@@ -135,7 +136,7 @@ struct Config
 	
 	func needs_installing() -> Path[]
 		var r: Path[]
-		let list = fs.search(install_source, "*.*", "fd")
+		let list = os.fs.search(install_source, "*.*", "fd")
 		var ignore = mime_files
 		ignore.add(str(desktop_file))
 		for e in list
@@ -209,7 +210,7 @@ func relsrc(filename: Path) -> Path
 func find_dep(out f: SourceFile, filename: Path)
 	var s: string
 	try
-		s = fs.read(filename)
+		s = os.fs.read(filename)
 	except
 		return
 
@@ -220,7 +221,7 @@ func find_dep(out f: SourceFile, filename: Path)
 			let q = l.find("\"", p + 11)
 			var d = filename.parent() | l[p+10:q]
 			d = d.canonical()
-			if fs.exists(d)
+			if os.fs.exists(d)
 				if f.add_dep(d)
 				#	print("  <" + rel(d) + ">")
 					find_dep(f, d)
@@ -234,7 +235,7 @@ func parse_dependencies()
 		find_dep(f, f.filename)
 
 func find_sources(dir: Path)
-	let files = fs.search(dir, "*.cpp", "fr")
+	let files = os.fs.search(dir, "*.cpp", "fr")
 	for f in files
 		var s: SourceFile
 		s.filename = dir | f

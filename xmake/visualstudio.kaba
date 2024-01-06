@@ -1,6 +1,7 @@
 use os
-use project
-use library
+use os.Path
+use project.*
+use library.*
 
 func win_path(p: Path) -> string
 	return str(p).replace("/", "\\")
@@ -97,7 +98,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	fs.write(conf.root | "{{conf.name}}.sln", f.replace("\n", "\r\n"))
+	os.fs.write(conf.root | "{{conf.name}}.sln", f.replace("\n", "\r\n"))
 	
 	var toolset = "v142"
 	if version == 2022
@@ -242,7 +243,7 @@ EndGlobal
 </Project>
 "
 
-	fs.write_text(conf.root | "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -275,7 +276,7 @@ EndGlobal
       <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
     </Filter>"
 
-	var fdirs = fs.search(conf.root | conf.source_dir, "", "dr")
+	var fdirs = os.fs.search(conf.root | conf.source_dir, "", "dr")
 	for d in fdirs
 		var dir = win_path(conf.source_dir | d)
 		rand_seed(dir.hash())
@@ -289,4 +290,4 @@ EndGlobal
 </Project>"
   
   
-	fs.write_text(conf.root | "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

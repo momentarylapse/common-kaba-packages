@@ -1,6 +1,6 @@
 use os
-use project
-use library
+use project.*
+use library.*
 
 
 func cmake_link_mandatory_lib(l: string) -> string
@@ -158,7 +158,7 @@ func create_cmake()
 	if len(conf.mime_files) > 0
 		r += create_cmake_install_mime()
 		
-	fs.write_text(conf.root | "CMakeLists.txt", r)
+	os.fs.write_text(conf.root | "CMakeLists.txt", r)
 
 
 
@@ -232,7 +232,7 @@ add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	let list = conf.needs_installing()
 	for e in list
-		if fs.is_directory(conf.root | e)
+		if os.fs.is_directory(conf.root | e)
 			r += "
 install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
 		else

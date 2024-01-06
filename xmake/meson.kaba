@@ -1,12 +1,13 @@
 use os
-use project
-use library
+use os.Path
+use project.*
+use library.*
 
 #dep = compiler.find_library('ws2_32', required: true)
 
 func create_meson()
 	print("-- meson --")
-	var f = new TextLinesFormatter(fs.open(conf.root | "meson.build", "wt"))
+	var f = new os.TextLinesFormatter(os.fs.open(conf.root | "meson.build", "wt"))
 	var debug = str(conf.build_type == "debug")
 	f << "project('{{conf.name}}', 'cpp', default_options : ['cpp_std={{conf.language}}', 'warning_level=1', 'optimization={{conf.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
@@ -76,7 +77,7 @@ sources = ["
 	
 	var list = conf.needs_installing()
 	for e in list
-		if fs.is_directory(e)
+		if os.fs.is_directory(e)
 			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"
 		else
 			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.name}}'))"

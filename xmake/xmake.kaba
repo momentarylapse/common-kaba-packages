@@ -1,10 +1,10 @@
-use library
-use project
-use makefile
-use visualstudio
-use meson
-use cmake
-use build
+use library.*
+use project.*
+use makefile.*
+use visualstudio.*
+use meson.*
+use cmake.*
+use build.*
 use os
 
 
@@ -14,9 +14,9 @@ func action_has(a: string[])
 func action_list(a: string[])
 	for l in sort(lib.libraries, "name")
 		if l.test()
-			print("{{l.name|14}} {{terminal.GREEN}}found{{terminal.END}}")
+			print("{{l.name|14}} {{os.terminal.GREEN}}found{{os.terminal.END}}")
 		else
-			print("{{l.name|14}} {{terminal.RED}}not found{{terminal.END}}")
+			print("{{l.name|14}} {{os.terminal.RED}}not found{{os.terminal.END}}")
 
 func action_init(a: string[])
 	conf.save()
@@ -85,13 +85,13 @@ func action_vcpkg_install(a: string[])
 func main(arg: string[])
 	lib.init()
 	conf.verbose = false
-	conf.root = Path("./").absolute().canonical()
+	conf.root = os.Path("./").absolute().canonical()
 	
 	#conf.ignore_libs
 	
 	#bool build
 	
-	var p: CommandLineParser
+	var p: os.CommandLineParser
 	p.info("xmake", "the build tool for lazy people")
 	p.option("-v/--verbose", "verbose output", func() conf.verbose = true)
 	p.option("--dry", "dry run", func() conf.dry_run = true)
