@@ -1,4 +1,4 @@
-use os
+use os.*
 
 enum Type
 	VERTEX
@@ -34,7 +34,7 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 	if len(layout.version) > 0
 		c = "#version {{layout.version}}\n" + c
 	try
-		os.fs.write_text(itmp, c)
+		fs.write_text(itmp, c)
 #		shell_execute("echo '{{code}}' > {{itmp}}")
 #		print("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}}")
 		shell_execute("glslangValidator -V -S {{stage}} {{itmp}} -o {{otmp}} &> /tmp/shader-error")
@@ -43,8 +43,8 @@ func compile_stage(code: string, layout: LayoutData, stage: string) -> string
 		print("  ----  ERROR ({{stage}})  ----\n{{x}}")
 		return ""
 	var x = shell_execute("cat {{otmp}}")
-	os.fs.delete(itmp)
-	os.fs.delete(otmp)
+	fs.delete(itmp)
+	fs.delete(otmp)
 	
 #	string cmd = "echo '{{code}}' | glslc -fshader-stage={{stage}} - -o -"
 	# print(cmd)
