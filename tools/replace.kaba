@@ -28,4 +28,4 @@ func main(arg: string[])
 	var allow = true
 	if len(arg) >= 4
 		allow = (arg[3] != "--dry")
-	test_rec(Path(arg[2]), arg[0], arg[1], allow)
+	test_rec(Path(arg[2]), arg[0].unescape(), arg[1].unescape(), allow)
