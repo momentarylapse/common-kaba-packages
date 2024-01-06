@@ -1,6 +1,8 @@
 description = ""
 element:height = ""
+element:material = ""
 element:num_x = ""
 element:num_z = ""
 element:owner = ""
 element:pattern = ""
+element:vertex_shader_module = ""

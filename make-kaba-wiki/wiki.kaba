@@ -268,7 +268,7 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 
 	var wiki = "== Kaba package {{ns}} ==\n"
 	if p.used_by_default
-		wiki = "== Kaba package {{ns}} (default) ==\n"
+		wiki = "== Kaba package {{ns}} (auto import) ==\n"
 	
 	if len(sub_modules) > 0
 		wiki += "\n=== Modules ===\n\n"
@@ -313,7 +313,7 @@ func render_reference() -> string
 	for p in packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
 		if p.used_by_default
-			wiki += " (default)"
+			wiki += " (auto import)"
 		wiki += "\n"
 
 	let external_packages = find_external()

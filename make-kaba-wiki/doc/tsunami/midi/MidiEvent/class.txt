@@ -1,0 +1,7 @@
+description = ""
+element:clef_position = ""
+element:flags = ""
+element:pitch = ""
+element:pos = ""
+element:stringno = ""
+element:volume = ""
