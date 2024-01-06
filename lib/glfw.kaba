@@ -19,8 +19,8 @@ let KABA_LINK = "/usr/lib64/libglfw.so
 	_glfwGetGamepadState:glfwGetGamepadState
 "
 
-import hui
-import time
+use hui
+use time
 
 func extern _glfwInit() -> int
 func extern _glfwVulkanSupported() -> int
