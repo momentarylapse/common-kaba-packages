@@ -305,7 +305,7 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 func render_reference() -> string
 	var wiki = "== Kaba reference ==\n"
 
-	wiki += "\nVersion {{kaba_version}} from {{time.Date.now()|%F}}\n"
+	wiki += "\nVersion {{kaba_version}} from {{time.now()|%F}}\n"
 
 	wiki += "\n=== Packages ===\n\n"
 	wiki += "\n; internal\n\n"
