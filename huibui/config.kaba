@@ -28,7 +28,7 @@ class Config
 	
 	func mut load()
 		try
-			var f = new os.TextLinesFormatter(os.fs.open(dir | "export.txt", "rt"))
+			var f = os.fs.open(dir | "export.txt", "rt")
 			var t: string
 			f >> t
 			f >> t

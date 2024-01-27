@@ -196,7 +196,7 @@ class LocalFileDB
 		#print("NOT SAVING :P")
 		#return
 		make_all_dirs(hui.app_directory | "sisyphos")
-		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/db", "wt"))
+		var f = fs.open(hui.app_directory | "sisyphos/db", "wt")
 		f << "version=1"
 		f << len(files)
 		for ff in files

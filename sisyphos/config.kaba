@@ -193,7 +193,7 @@ struct Config
 	var default_structure = "{name}.{ext}"
 
 	func mut load()
-		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/config", "rt"))
+		var f = fs.open(hui.app_directory | "sisyphos/config", "rt")
 		var n, m: int
 		f >> n
 		for i in 0:n
@@ -218,7 +218,7 @@ struct Config
 			ignore.add(ig)
 	func save()
 		make_all_dirs(hui.app_directory | "sisyphos")
-		var f = new TextLinesFormatter(fs.open(hui.app_directory | "sisyphos/config", "wt"))
+		var f = fs.open(hui.app_directory | "sisyphos/config", "wt")
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)

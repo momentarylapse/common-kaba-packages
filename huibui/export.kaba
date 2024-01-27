@@ -4,7 +4,7 @@ use config.*
 use resource.*
 use language.*
 
-func write_resource(out f: os.TextLinesFormatter, r: Resource)
+func write_resource(out f: os.FileStream, r: Resource)
 	f << r.type
 	if r.id.head(1) == "/"
 		f << r.id[1:]
@@ -18,7 +18,7 @@ func write_resource(out f: os.TextLinesFormatter, r: Resource)
 		write_resource(f, c)
 
 
-func write_language(out f: os.TextLinesFormatter, l: Language)
+func write_language(out f: os.FileStream, l: Language)
 	var ids = l.get_useful_ids()
 	var texts = l.get_useful_texts()
 
@@ -39,7 +39,7 @@ func write_language(out f: os.TextLinesFormatter, l: Language)
 		f << t.trans.escape()
 
 func export_resources(res: Resource[], own: Language, langs: Language[])
-	var f = new os.TextLinesFormatter(os.fs.open(conf.export_dir | "hui_resources.txt", "wt"))
+	var f = os.fs.open(conf.export_dir | "hui_resources.txt", "wt")
 	f << "t7"
 	f << "# Number Of Resources"
 	f << len(res)
