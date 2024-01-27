@@ -69,6 +69,25 @@ class LocalFileDB
 	
 			files.add(ff)
 		#print(tt.get())
+
+	func mut save_all()
+		#print("NOT SAVING :P")
+		#return
+		make_all_dirs(hui.app_directory | "sisyphos/")
+		var f = fs.open(hui.app_directory | "sisyphos/db", "wt")
+		f << "version=1"
+		f << len(files)
+		for ff in files
+			f << ff.id
+			f << str(ff.path)
+			f << "" # ff.remote_path
+			f << ff.name
+			f << ff.hash
+			f << ff.mtime
+			f << ff.remote_mtime
+			f << ff.size
+			f << ff.options.join(",")
+			f << tags2strh(ff.tags)
 	
 	func mut delete_later(f: LocalFile)
 		to_delete.add(f)
@@ -191,25 +210,6 @@ class LocalFileDB
 			if f.local_id == _f.local_id
 				files.remove(i)
 		save_all()
-
-	func mut save_all()
-		#print("NOT SAVING :P")
-		#return
-		make_all_dirs(hui.app_directory | "sisyphos")
-		var f = fs.open(hui.app_directory | "sisyphos/db", "wt")
-		f << "version=1"
-		f << len(files)
-		for ff in files
-			f << ff.id
-			f << str(ff.path)
-			f << "" # ff.remote_path
-			f << ff.name
-			f << ff.hash
-			f << ff.mtime
-			f << ff.remote_mtime
-			f << ff.size
-			f << ff.options.join(",")
-			f << tags2strh(ff.tags)
 	
 	func has_id(id: string) -> bool
 		for f in files

@@ -80,6 +80,7 @@ func bash_escape2(s: string) -> string
 
 func make_all_dirs(path: Path)
 #	var parents = path.all_parents()
+#	print(path.all_parents())
 	var parts = str(path).explode("/")
 	var dir: string
 	for i=>p in parts
