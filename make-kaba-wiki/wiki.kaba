@@ -156,8 +156,18 @@ func func_pre(f: Function) -> string
 	return pre
 
 
+func meta_class(c: Class) -> string
+	if c.is_namespace()
+		return "namespace"
+	if c.is_interface()
+		return "interface"
+	if c.is_struct()
+		return "struct"
+	return "class"
+
+
 func render_class(ns: string, c: Class) -> string
-	var wiki = "== Kaba class {{c.name}} ==\n\n"
+	var wiki = "== Kaba {{meta_class(c)}} {{c.name}} ==\n\n"
 	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
 	
 	var funcs = filter_funcs(c.functions, c)
@@ -172,7 +182,7 @@ func render_class(ns: string, c: Class) -> string
 	
 	wiki += "\n=== Syntax ===\n\n"
 	wiki += "<code lang=\"kaba\">\n"
-	wiki += "class {{c.name}}{{class_extension(c)}}\n"
+	wiki += "{{meta_class(c)}} {{c.name}}{{class_extension(c)}}\n"
 	for e in elements
 		wiki += "{{SHIFT}}var {{e.name}}: {{e.type.name}}\n"
 
@@ -237,7 +247,7 @@ func render_class(ns: string, c: Class) -> string
 	if len(classes) > 0
 		wiki += "\n=== Nested classes ===\n\n"
 		for cc in classes
-			wiki += "* <tt>class [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]</tt>\n"
+			wiki += "* <tt>{{meta_class(cc)}} [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]</tt>\n"
 	
 	if len(funcs) > 0
 		wiki += "\n=== Functions ===\n\n"
@@ -279,7 +289,7 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 	if len(classes) > 0
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
-			wiki += "* <tt>class '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
+			wiki += "* <tt>{{meta_class(c)}} '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
 
 	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
