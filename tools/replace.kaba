@@ -5,16 +5,16 @@ func test_replace(filename: Path, what: string, by: string, allow: bool)
 	var n = 0
 	var pos0 = 0
 	while true
-		let p = s.find(what, pos0)
-		if p < 0
+		for p in s.find(what, pos0)
+			if n == 0
+				print(filename)
+			print("    " + s[p-5:p+len(what) + 5])
+			s = s[:p] + by + s[p + len(what):]
+			print(">>  " + s[p-5:p+len(by) + 5])
+			n ++
+			pos0 = p + 1
+		else
 			break
-		if n == 0
-			print(filename)
-		print("    " + s[p-5:p+len(what) + 5])
-		s = s[:p] + by + s[p + len(what):]
-		print(">>  " + s[p-5:p+len(by) + 5])
-		n ++
-		pos0 = p + 1
 	if n > 0 and allow
 		fs.write_text(filename, s)
 

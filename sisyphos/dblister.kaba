@@ -90,7 +90,7 @@ var lister: DBLister
 
 
 func is_filter(s: string) -> bool
-	return s.find("=", 0) > 0
+	return s.find("=", 0).has_value()
 
 func find_by_path_or_filter(arg: string) -> LocalFile[]
 	if is_filter(arg)

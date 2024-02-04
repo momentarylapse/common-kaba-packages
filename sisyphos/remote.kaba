@@ -207,8 +207,7 @@ func remote_upload(out f: LocalFile)
 	if r[:2] != "ok"
 		log_error("error", "upload... {{r}}")
 		return
-	let nnn = r[3:].find("\n", 0)
-	if nnn >= 0
+	for nnn in r[3:].find("\n", 0)
 		log_warn("remote warning", "{{r[4+nnn:]}}")
 	f.id = r[3:].explode("\n")[0]
 	if conf.verbosity >= 2

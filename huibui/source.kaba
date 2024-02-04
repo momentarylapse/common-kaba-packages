@@ -8,21 +8,21 @@ class SourceParser
 	func mut parse()
 		var pos0 = 0
 		while true
-			var pos = source.find("_(\"", pos0)
-			if pos < 0
+			for pos in source.find("_(\"", pos0)
+				pos += 3
+				var length = 0
+				for i in 0:1024
+					if source[pos + i] == '\\'
+						i ++
+						continue
+					if source[pos + i] == '"'     # "
+						length = i
+						break
+				handle(pos, length)
+				#print("    " + source.substr(pos, length))
+				pos0 = pos + length
+			else
 				break
-			pos += 3
-			var length = 0
-			for i in 0:1024
-				if source[pos + i] == '\\'
-					i ++
-					continue
-				if source[pos + i] == '"'     # "
-					length = i
-					break
-			handle(pos, length)
-			#print("    " + source.substr(pos, length))
-			pos0 = pos + length
 
 
 	func mut parse_source_code_dir(dir: Path)

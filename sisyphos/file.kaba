@@ -210,20 +210,19 @@ struct LocalFile
 		var r = structure
 		var p1 = 0
 		while true
-			var p0 = r.find("{", p1)
-			if p0 < 0
-				break
-			p1 = r.find("}", p0)
-			if p1 < 0
-				break
-			var kkey = r[p0+1:p1]
-			var xkey = kkey.explode("|")
-			var val = get_tag(xkey[0])
-			if len(xkey) >= 2
-				val = str_format(val, xkey[1])
+			for p0 in r.find("{", p1)
+				for _p1 in r.find("}", p0)
+					p1 = _p1
+					var kkey = r[p0+1:p1]
+					var xkey = kkey.explode("|")
+					var val = get_tag(xkey[0])
+					if len(xkey) >= 2
+						val = str_format(val, xkey[1])
 			
-			r = r[:p0] + val + r[p1+1:]
-			p1 = p0 + len(val)
+					r = r[:p0] + val + r[p1+1:]
+					p1 = p0 + len(val)
+					continue
+			break
 		return r.replace("?", "").replace(":", "")
 	func match(mtags: Tag[]) -> bool
 		for mt in mtags

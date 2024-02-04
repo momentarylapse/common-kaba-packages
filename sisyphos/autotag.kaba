@@ -11,16 +11,16 @@ func video_guess_tags_by_name(out f: LocalFile)
 	let n = f.path.basename_no_ext()
 	if len(n) < 8
 		return
-	let off_x = n.find("x", 0)
-	if off_x < 0 or off_x > 2
-		return
-	if n[off_x+3:off_x+6] != " - "
-		return
-	if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
-		return
-	f.tag_set(["season", n[:off_x]])
-	f.tag_set(["episode", str(int(n[off_x+1:off_x+3]))])
-	f.tag_set(["name", n[off_x+6:]])
+	for off_x in n.find("x", 0)
+		if off_x > 2
+			return
+		if n[off_x+3:off_x+6] != " - "
+			return
+		if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
+			return
+		f.tag_set(["season", n[:off_x]])
+		f.tag_set(["episode", str(int(n[off_x+1:off_x+3]))])
+		f.tag_set(["name", n[off_x+6:]])
 
 func audio_guess_tags(out f: LocalFile)
 	let s = shell_exec("tsunami --info \"{{bash_escape(str(f.path))}}\"").explode("\n")

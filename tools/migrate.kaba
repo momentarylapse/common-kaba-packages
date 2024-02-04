@@ -97,7 +97,7 @@ func migrate_file_decl(filename: os.Path)
 		var options: string[]
 		let type = glue_type(tokens, ptl)
 		if "=" in tokens
-			let p = l.find("=", 0)
+			let p = l.find("=", 0)!
 			options.add("{{ind}}var {{tokens[ptl]}}: {{type}} {{l[p:]}}")
 			options.add("{{ind}}var {{tokens[ptl]}} {{l[p:]}}")
 		else if "," in tokens
@@ -161,12 +161,12 @@ func migrate_file_for(filename: os.Path)
 			
 		print(l)
 		let ind = "\t".repeat(count_indent(l))
-		let p = l.find("in", 0)
-		let o = "{{ind}}for {{tokens[3]}}=>{{tokens[1]}} {{l[p:]}}"
-		print("=>{{o}}")
-		let x = read_char()
+		for p in l.find("in", 0)
+			let o = "{{ind}}for {{tokens[3]}}=>{{tokens[1]}} {{l[p:]}}"
+			print("=>{{o}}")
+			let x = read_char()
 		
-		lines_out.add(o)
+			lines_out.add(o)
 	let ss = lines_out.join("\n")
 	if ss != s
 		os.fs.write_text(filename, ss)

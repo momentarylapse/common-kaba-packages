@@ -102,11 +102,10 @@ func make_all_dirs(path: Path)
 	
 func get_tag(parts: string[], key: string) -> string
 	for p in parts
-		if p.find("=", 0) < 0
-			continue
-		var kv = p.explode("=")
-		if kv[0] == key
-			return kv[1]
+		for i in p.find("=", 0)
+			var kv = p.explode("=")
+			if kv[0] == key
+				return kv[1]
 	return ""
 
 
@@ -144,7 +143,7 @@ struct ConfigDirSync
 			if o[:10] == "structure="
 				return o[10:].explode("/")
 	func quality() -> string
-		if options.find("quality=medium", 0) >= 0
+		for i in options.find("quality=medium", 0)
 			return MEDIUM
 		return PERFECT
 

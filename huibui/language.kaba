@@ -139,7 +139,7 @@ func lang_id_add(out ids: LangID[], id: string, title: string, tooltip: string, 
 	if id == "?" or id == ""
 		return
 	var cid = id
-	if cid.find("/", 0) < 0
+	if not cid.find("/", 0).has_value()
 		#if ns != id
 		cid = "{{ns}}/{{id}}"
 	for i in ids

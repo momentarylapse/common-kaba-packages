@@ -11,13 +11,10 @@ enum Type
 	ANYHIT
 
 func tag_contents(all: string, tag: string) -> string
-	var i0 = all.find("<{{tag}}>", 0)
-	if i0 < 0
-		return ""
-	var i1 = all.find("</{{tag}}>", i0)
-	if i1 < 0
-		return ""
-	return all[i0+len(tag)+2:i1]
+	for i0 in all.find("<{{tag}}>", 0)
+		for i1 in all.find("</{{tag}}>", i0)
+			return all[i0+len(tag)+2:i1]
+	return ""
 
 var cur_dir: Path
 

@@ -91,7 +91,7 @@ class Parser
 			return AddVariable(name)
 		else if char_type(c[0]) == CharType.NUMBER
 			next()
-			if c.find(".") >= 0
+			for i in c.find(".")
 				return AddFloat(c)
 			return AddNumber(c)
 		else if char_type(c[0]) == CharType.LETTER

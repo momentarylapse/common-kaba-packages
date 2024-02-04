@@ -216,8 +216,7 @@ func find_dep(out f: SourceFile, filename: Path)
 
 	let lines = s.explode("\n")
 	for l in lines
-		let p = l.find("#include \"", 0)
-		if p >= 0
+		for p in l.find("#include \"", 0)
 			let q = l.find("\"", p + 11)
 			var d = filename.parent() | l[p+10:q]
 			d = d.canonical()

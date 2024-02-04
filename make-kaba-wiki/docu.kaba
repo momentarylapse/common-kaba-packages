@@ -7,15 +7,11 @@ var report_missing = false
 func parse_doc_string(s: string) -> string
 	var ss = s
 	while true
-		let p = ss.find("<class>", 0)
-		if p < 0
-			break
-		let p2 = ss.find("</class>", p)
-		if p2 < 0
-			break
-		let c = ss[p+7:p2]
-		let xx = c.explode(".")
-		ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
+		for p in ss.find("<class>", 0)
+			for p2 in ss.find("</class>", p)
+				let c = ss[p+7:p2]
+				let xx = c.explode(".")
+				ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 	return ss.unescape()
 
 func doc_get(ns: string, name: string, is_class: bool, key: string) -> string

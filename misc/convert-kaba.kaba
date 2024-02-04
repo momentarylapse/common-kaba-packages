@@ -123,7 +123,7 @@ func process(p: Path, dry: bool)
 				#print(ll)
 				pass
 			else
-				if l.find("(", 0) > 0 and l.find("=", 0) < 0
+				if l.find("(", 0).has_value() and not l.find("=", 0).has_value()
 					# func header?
 					var lll = ll[:ind] + convert_func(ll[ind:])
 					if lll != ll
