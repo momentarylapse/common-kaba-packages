@@ -12,6 +12,8 @@ func parse_doc_string(s: string) -> string
 				let c = ss[p+7:p2]
 				let xx = c.explode(".")
 				ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
+				continue
+		break
 	return ss.unescape()
 
 func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
