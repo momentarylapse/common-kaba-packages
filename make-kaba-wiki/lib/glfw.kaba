@@ -24,21 +24,21 @@ use time
 
 func extern _glfwInit() -> int
 func extern _glfwVulkanSupported() -> int
-func extern _glfwCreateWindow(width: int, height: int, title: char*, monitor: void*, share: void*) -> void*
+func extern _glfwCreateWindow(width: int, height: int, title: i8*, monitor: void*, share: void*) -> void*
 func extern _glfwWindowShouldClose(window: void*) -> int
 func extern _glfwSetWindowUserPointer(window: void*, p: void*)
 func extern _glfwGetWindowUserPointer(window: void*) -> void&
 func extern _glfwSetKeyCallback(window: void*, f: void*) -> void*
 func extern _glfwSetCursorPosCallback(window: void*, f: void*) -> void*
 func extern _glfwSetMouseButtonCallback(window: void*, f: void*) -> void*
-func extern _glfwGetCursorPos(window: void*, x: float64*, y: float64*)
+func extern _glfwGetCursorPos(window: void*, x: f64*, y: f64*)
 func extern _glfwWindowHint(hint: int, value: int)
 func extern _glfwPollEvents()
 func extern _glfwTerminate()
 func extern _glfwJoystickPresent(j: int) -> int
 func extern _glfwJoystickIsGamepad(j: int) -> int
-func extern _glfwGetJoystickName(j: int) -> char[0]*
-func extern _glfwGetGamepadName(j: int) -> char[0]*
+func extern _glfwGetJoystickName(j: int) -> i8[0]*
+func extern _glfwGetGamepadName(j: int) -> i8[0]*
 func extern _glfwGetGamepadState(j: int, p: void*) -> int
 
 let GLFW_CLIENT_API = 0x00022001
@@ -57,7 +57,7 @@ func init(opts: string[])
 func end()
 	_glfwTerminate()
 
-func cp2s(_p: char[0]*) -> string
+func cp2s(_p: i8[0]*) -> string
 	for p in _p
 		var s: string
 		for i in 0:256
@@ -120,7 +120,7 @@ func _on_button(w: void*, a: int, action: int, c: int)
 			win.input.button[1] = false
 			win.on_right_button_up()
 
-func _on_cursor(w: void*, xx: float64, yy: float64)
+func _on_cursor(w: void*, xx: f64, yy: f64)
 	var x = float(xx)
 	var y = float(yy)
 #	print("ON CURSOR   {{x}}  {{y}}")
@@ -163,7 +163,7 @@ class Window
 			on_idle()
 	func virtual on_idle()
 	func get_mouse() -> complex
-		var xx, yy: float64
+		var xx, yy: f64
 		_glfwGetCursorPos(win, &xx, &yy)
 		return complex(float(xx), float(yy))
 	func virtual on_key_down(key: int)

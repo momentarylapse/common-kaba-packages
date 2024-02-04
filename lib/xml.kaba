@@ -2,9 +2,9 @@ use os
 
 
 class xml
-	func static _is_whitespace(c: char) -> bool
+	func static _is_whitespace(c: i8) -> bool
 		return (c == ' ' or c == 9 or c == 10 or c == 13)
-	func static _is_special(c: char) -> bool
+	func static _is_special(c: i8) -> bool
 		return (c == '<' or c == '>' or c == '?' or c == '=' or c == '/')
 	func static _skip_ws(s: string, i0: int) -> int
 		for i in i0:len(s)

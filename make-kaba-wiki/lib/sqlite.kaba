@@ -18,20 +18,20 @@ let _SQLITE_OPEN_READWRITE = 2
 let _SQLITE_OPEN_CREATE = 4
 
 func extern sqlite3_libversion_number() -> int
-func extern _sqlite3_open_v2(fn: char*, db: void*, flags: int, zzz: void*) -> int
+func extern _sqlite3_open_v2(fn: i8*, db: void*, flags: int, zzz: void*) -> int
 func extern _sqlite3_close(db: void*) -> int
 func extern _sqlite3_finalize(r: void*) -> int
-func extern _sqlite3_prepare(db: void*, sql: char*, len: int, res: void*, zzz: void*) -> int
+func extern _sqlite3_prepare(db: void*, sql: i8*, len: int, res: void*, zzz: void*) -> int
 func extern _sqlite3_column_count(r: void*) -> int
-func extern _sqlite3_column_text(r: void*, c: int) -> char[0]&
+func extern _sqlite3_column_text(r: void*, c: int) -> i8[0]&
 func extern _sqlite3_column_int(r: void*, c: int) -> int
-func extern _sqlite3_column_double(r: void*, c: int) -> float64
+func extern _sqlite3_column_double(r: void*, c: int) -> f64
 func extern _sqlite3_step(r: void*) -> int
-func extern _sqlite3_errmsg(db: void*) -> char[0]&
-func extern _sqlite3_column_name(r: void*, c: int) -> char[0]&
+func extern _sqlite3_errmsg(db: void*) -> i8[0]&
+func extern _sqlite3_column_name(r: void*, c: int) -> i8[0]&
 func extern _sqlite3_column_type(r: void*, c: int) -> int
 
-func _cstr2str(cs: char[0]&) -> string
+func _cstr2str(cs: i8[0]&) -> string
 	var s: string
 	for j in 0:10000
 		if cs[j] == 0

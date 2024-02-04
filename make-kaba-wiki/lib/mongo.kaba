@@ -34,8 +34,8 @@ let KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 
 func extern _mongoc_init()
 func extern _mongoc_cleanup()
-func extern _mongoc_client_new(uri: char*) -> void*
-func extern _mongoc_client_get_collection(client: void*, db: char*, col: char*) -> void*
+func extern _mongoc_client_new(uri: i8*) -> void*
+func extern _mongoc_client_get_collection(client: void*, db: i8*, col: i8*) -> void*
 func extern _mongoc_collection_find_with_opts(col: void*, filter: void*, _opts: void*, _prefs: void*) -> void*
 func extern _mongoc_collection_aggregate(col: void*, flags: int, pipeline: void*, x: void*, y: void*) -> void*
 func extern _mongoc_collection_insert_one(col: void*, doc: void*, _opts: void*, _reply: void*, _err: void*) -> bool
@@ -47,25 +47,25 @@ func extern _mongoc_cursor_destroy(cur: void*)
 func extern _mongoc_collection_destroy(col: void*)
 func extern _mongoc_client_destroy(client: void*)
 
-func extern _bson_new_from_json(json: char*, len: int, err: void*) -> void*
-func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> char[0]&
-func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> char[0]&
+func extern _bson_new_from_json(json: i8*, len: int, err: void*) -> void*
+func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> i8[0]&
+func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> i8[0]&
 func extern _bson_free(str: void*)
 func extern _bson_destroy(bson: void*)
-func extern _bson_new_from_data(data: char*, length: int) -> void*
+func extern _bson_new_from_data(data: i8*, length: int) -> void*
 func extern _bson_iter_init(i: void*, bson: void*) -> bool
 func extern _bson_iter_next(i: void*) -> bool
-func extern _bson_iter_key(i: void*) -> char[0]&
+func extern _bson_iter_key(i: void*) -> i8[0]&
 func extern _bson_iter_int32(i: void*) -> int
-func extern _bson_iter_int64(i: void*) -> int64
-func extern _bson_iter_double(i: void*) -> float64
-func extern _bson_iter_utf8(i: void*, __len: void*) -> char[0]&
+func extern _bson_iter_int64(i: void*) -> i64
+func extern _bson_iter_double(i: void*) -> f64
+func extern _bson_iter_utf8(i: void*, __len: void*) -> i8[0]&
 func extern _bson_iter_array(i: void*, len: int*, a: void*)
 func extern _bson_iter_oid(i: void*) -> void*
-func extern _bson_oid_to_string(oid: void*, str: char*)
+func extern _bson_oid_to_string(oid: void*, str: i8*)
 func extern _bson_iter_type(i: void*) -> int
 
-func char_to_str(p: char[0]&) -> string
+func char_to_str(p: i8[0]&) -> string
 	var t: string
 	for i in 0:10000
 		if p[i] == 0
@@ -83,7 +83,7 @@ func json_to_bson(json: string) -> void*
 
 func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
-	var x: char[0]& = _bson_as_relaxed_extended_json(bson, nil)
+	var x: i8[0]& = _bson_as_relaxed_extended_json(bson, nil)
 	var t = char_to_str(x)
 	_bson_free(x)
 	return t
@@ -97,7 +97,7 @@ func bson_iter_str_array(i: void*) -> string[]
 	var r: string[]
 	var itarray: int[160]
 	var length = 0
-	var array: char*
+	var array: i8*
 	_bson_iter_array(i, &length, &array)
 	var bson = _bson_new_from_data(array, length)
 	_bson_iter_init(&itarray, bson)
@@ -121,7 +121,7 @@ func bson_iter_to_any(iter: void*) -> any
 		var r: any
 		var itarray: int[160]
 		var length = 0
-		var array: char*
+		var array: i8*
 		_bson_iter_array(iter, &length, &array)
 		var bson = _bson_new_from_data(array, length)
 		_bson_iter_init(&itarray, bson)

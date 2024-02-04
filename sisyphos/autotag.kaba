@@ -3,7 +3,7 @@ use config.*
 use tag.*
 use os.*
 
-func is_number(c: char) -> bool
+func is_number(c: i8) -> bool
 	return c >= '0' and c <= '9'
 
 # 1x23 - NAME.ext

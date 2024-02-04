@@ -47,11 +47,11 @@ func extern _psmove_connect() -> PSMove*
 func extern _psmove_connect_by_id(i: int) -> PSMove*
 func extern _psmove_connection_type(p: PSMove*) -> int
 func extern _psmove_disconnect(move: PSMove*)
-func extern _psmove_get_serial(p: PSMove*) -> char[0]*
+func extern _psmove_get_serial(p: PSMove*) -> i8[0]*
 func extern _psmove_pair(move: PSMove*) -> int
-func extern _psmove_set_leds(p: PSMove*, r: char, g: char, b: char)
+func extern _psmove_set_leds(p: PSMove*, r: i8, g: i8, b: i8)
 func extern _psmove_update_leds(p: PSMove*) -> int
-func extern _psmove_set_rumble(p: PSMove*, rumble: char)
+func extern _psmove_set_rumble(p: PSMove*, rumble: i8)
 func extern _psmove_enable_orientation(p: PSMove*, m: int)
 func extern _psmove_has_orientation(p: PSMove*) -> int
 func extern _psmove_reset_orientation(p: PSMove*)

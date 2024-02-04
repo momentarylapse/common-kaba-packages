@@ -5,10 +5,10 @@ const KABA_LINK = "/usr/lib64/libz.so
 	_uncompress:uncompress
 "
 
-func extern _compressBound(l: int) -> int64
+func extern _compressBound(l: int) -> i64
 func extern _deflate() -> int
-func extern _compress(dest: void*, dest_len: int64*, source: void*, source_len: int) -> int
-func extern _uncompress(dest: void*, dest_len: int64*, source: void*, source_len: int) -> int
+func extern _compress(dest: void&, dest_len: i64&, source: void&, source_len: int) -> int
+func extern _uncompress(dest: void&, dest_len: i64&, source: void&, source_len: int) -> int
 
 func compress(s: string) -> string
 	let ll = _compressBound(len(s)) + 1024
@@ -19,7 +19,7 @@ func compress(s: string) -> string
 	return o
 
 func uncompress(s: string, len_max: int) -> string
-	let ll: int64 = len_max + 1024
+	let ll: i64 = len_max + 1024
 	var o: string
 	o.resize(ll)
 	let r = _uncompress(&o[0], &ll, &s[0], len(s))

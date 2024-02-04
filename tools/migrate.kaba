@@ -2,7 +2,7 @@ use os
 use kaba
 use cli.terminal.*
 
-func is_letter(c: char) -> bool
+func is_letter(c: i8) -> bool
 	return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or (c == '_')
 
 func count_indent(l: string) -> int
@@ -136,13 +136,13 @@ func migrate_file_decl(filename: os.Path)
 		pass
 	let ss = lines_out.join("\n")
 	if ss != s
-		fs.write_text(filename, ss)
+		os.fs.write_text(filename, ss)
 		print("================================= saved")
 
 
 func migrate_file_for(filename: os.Path)
 	print(filename)
-	let s = fs.read_text(filename)
+	let s = os.fs.read_text(filename)
 	let lines = s.explode("\n")
 	var lines_out: string[]
 	
@@ -169,20 +169,20 @@ func migrate_file_for(filename: os.Path)
 		lines_out.add(o)
 	let ss = lines_out.join("\n")
 	if ss != s
-		fs.write_text(filename, ss)
+		os.fs.write_text(filename, ss)
 		print("================================= saved")
 
 func migrate(arg: string[])
 	setraw()
-	let dir = Path(arg[0])
-	let list = fs.search(dir, "*.kaba", "fr")
+	let dir = os.Path(arg[0])
+	let list = os.fs.search(dir, "*.kaba", "fr")
 	for e in list
 		migrate_file_decl(dir | e)
 
 func migrate_for(arg: string[])
 	setraw()
-	let dir = Path(arg[0])
-	let list = fs.search(dir, "*.kaba", "fr")
+	let dir = os.Path(arg[0])
+	let list = os.fs.search(dir, "*.kaba", "fr")
 	for e in list
 		migrate_file_for(dir | e)
 

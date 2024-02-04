@@ -39,7 +39,7 @@ func try_match(a: string, b: string, offset_a: int, offset_b: int) -> Mapping
 	m.a0 = -1
 	return m
 
-func is_printable_ascii(c: char) -> bool
+func is_printable_ascii(c: i8) -> bool
 	return c >= 0x20 and c <= 0x7e
 
 func hex(s: string) -> string
