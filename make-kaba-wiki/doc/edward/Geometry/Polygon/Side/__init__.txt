@@ -1,0 +1,8 @@
+description = ""
+param:edge = ""
+param:edge_direction = ""
+param:normal = ""
+param:normal_index = ""
+param:skin_vertex = ""
+param:triangulation = ""
+param:vertex = ""

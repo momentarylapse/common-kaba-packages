@@ -1,2 +1,7 @@
 description = ""
+param:frame = ""
+param:frames_per_sec_const = ""
+param:frames_per_sec_factor = ""
+param:name = ""
 param:self = ""
+param:type = ""
