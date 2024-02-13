@@ -1,6 +1,6 @@
 use os
 
-let KABA_LINK = "/usr/lib/libc.so.6
+let KABA_LINK = "libc
 	_tcgetattr:tcgetattr
 	_tcsetattr:tcsetattr"
 
@@ -82,15 +82,18 @@ func clear_scr()
 	print(ESC + "[2J")
 
 class Key
-	#const BACKSPACE: string = [0x1b, 0x5b, 0x44]
-	const UP: string = [0x1b, 0x5b, 0x41]
-	const DOWN: string = [0x1b, 0x5b, 0x42]
-	const RIGHT: string = [0x1b, 0x5b, 0x43]
-	const LEFT: string = [0x1b, 0x5b, 0x44]
-	const END: string = [0x1b, 0x5b, 0x46]
-	const HOME: string = [0x1b, 0x5b, 0x48]
-	const DELETE: string = [0x1b, 0x5b, 0x33, 0x7e]
-	const BACKSPACE : string = [0x7f]
+	#let BACKSPACE = [0x1b, 0x5b, 0x44]
+	let UP = [0x1b, 0x5b, 0x41]
+	let DOWN = [0x1b, 0x5b, 0x42]
+	let RIGHT = [0x1b, 0x5b, 0x43]
+	let LEFT = [0x1b, 0x5b, 0x44]
+	let END = [0x1b, 0x5b, 0x46]
+	let HOME = [0x1b, 0x5b, 0x48]
+	let DELETE = [0x1b, 0x5b, 0x33, 0x7e]
+	let BACKSPACE = [0x7f]
+	let ETX = [0x03]
+	let EOT = [0x04]
+	let CARRIAGE_RETURN = [0x0d]
 
 func move_cursor(dx: int, dy: int)
 	if dx > 0
@@ -103,17 +106,17 @@ class BreakSignal extends Exception
 
 func read_char() -> string
 	while true
-		var s = os.stdin.read(4)
+		let s = os.stdin.read(4)
 		#print(s.hex())
 		if len(s) == 0
 			continue
-		if s == [0x03]
+		if s == Key.ETX
 			unsetraw()
 			raise(new Exception("break"))
-		if s == [0x04]
+		if s == Key.EOT
 			unsetraw()
 			raise(new Exception("end"))
-		return s
+		return s.utf8()
 
 func fancy_read_command(prompt: string, out history: string[]) -> string
 	var ppp = _print_postfix
@@ -124,19 +127,19 @@ func fancy_read_command(prompt: string, out history: string[]) -> string
 	var cursor_pos = 0
 	var hist_index = len(history)
 	while true
-		var s = os.stdin.read(4)
-		#print(s.hex())
+		let s = os.stdin.read(4)
+	#	print(s.hex())
 		if len(s) == 0
 			continue
-		if s == [0x03]
+		if s == Key.ETX
 			unsetraw()
 			_print_postfix = ppp
 			raise(new Exception("break"))
-		if s == [0x04]
+		if s == Key.EOT
 			unsetraw()
 			_print_postfix = ppp
 			raise(new Exception("end"))
-		else if s == [0x0d]#"\n"
+		else if s == Key.CARRIAGE_RETURN #"\n"
 			print("\n")
 			if current != ""
 				history.add(current)
@@ -194,7 +197,7 @@ func fancy_read_command(prompt: string, out history: string[]) -> string
 				move_cursor(-len(current[cursor_pos+1:])-1, 0)
 				current = current[:cursor_pos] + current[cursor_pos+1:]
 		else if len(s) == 1
-			print(s + current[cursor_pos:])
+			print(s.utf8() + current[cursor_pos:])
 			move_cursor(-len(current[cursor_pos:]), 0)
-			current = current[:cursor_pos] + s + current[cursor_pos:]
+			current = current[:cursor_pos] + s.utf8() + current[cursor_pos:]
 			cursor_pos ++

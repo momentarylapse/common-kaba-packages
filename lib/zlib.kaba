@@ -1,4 +1,4 @@
-const KABA_LINK = "/usr/lib64/libz.so
+const KABA_LINK = "libz
 	_deflate:deflate
 	_compressBound:compressBound
 	_compress:compress

@@ -1,4 +1,4 @@
-let KABA_LINK = "/usr/lib/libpsmoveapi.so
+let KABA_LINK = "libpsmoveapi
 	_psmove_init:psmove_init
 	_psmove_count_connected:psmove_count_connected
 	_psmove_reinit:psmove_reinit
@@ -20,7 +20,7 @@ let KABA_LINK = "/usr/lib/libpsmoveapi.so
 	_psmove_reset_orientation:psmove_reset_orientation
 	_psmove_get_accelerometer_frame:psmove_get_accelerometer_frame
 	_psmove_get_gyroscope_frame:psmove_get_gyroscope_frame
-/usr/lib/libpsmoveapi_tracker.so
+libpsmoveapi_tracker
 	_psmove_tracker_new:psmove_tracker_new
 	_psmove_tracker_free:psmove_tracker_free
 	_psmove_tracker_set_mirror:psmove_tracker_set_mirror

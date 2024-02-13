@@ -1,4 +1,4 @@
-let KABA_LINK = "/usr/lib64/libsqlite3.so
+let KABA_LINK = "libsqlite3
 	_sqlite3_open_v2:sqlite3_open_v2
 	_sqlite3_close:sqlite3_close
 	sqlite3_libversion_number:sqlite3_libversion_number
@@ -59,14 +59,13 @@ class Database
 		var q = query(sql)
 		q.step()
 	
-	func load_doc(table: string, id: any) -> any
+	func load_doc(table: string, id: any) -> any?
 		var sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
 		var q = query(sql)
-		if !q.has_more()
-			raise(new Exception("{{id}} not found in {{table}}"))
-		var r = q.get_column()
-		return r
+	#	if not q.has_more()
+	#		return nil #raise(new Exception("{{id}} not found in {{table}}"))
+		return q.get_column()
 	
 	#any save_doc(string table, any id)
 	#	var q = query("select * from " + table + " where id = " + str(id))
@@ -94,22 +93,22 @@ class Query as shared
 	
 	func mut get_column_text() -> string[]
 		var r: string[]
-		if !has_more()
+		if not has_more()
 			return r
-		var n = _sqlite3_column_count(res)
+		let n = _sqlite3_column_count(res)
 		for i in 0:n
 			r.add(_cstr2str(_sqlite3_column_text(res, i)))
 		needs_step = true
 		return r
 
-	func mut get_column() -> any
+	func mut get_column() -> any?
+		if not has_more()
+			return nil
 		var r: any
-		if !has_more()
-			return r
-		var n = _sqlite3_column_count(res)
+		let n = _sqlite3_column_count(res)
 		for i in 0:n
-			var key = _cstr2str(_sqlite3_column_name(res, i))
-			var t = _sqlite3_column_type(res, i)
+			let key = _cstr2str(_sqlite3_column_name(res, i))
+			let t = _sqlite3_column_type(res, i)
 			if t == 1 # int
 				r[key] = _sqlite3_column_int(res, i)
 			else if t == 2 # double
@@ -122,45 +121,47 @@ class Query as shared
 
 	func column_names() -> string[]
 		var r: string[]
-		var n = _sqlite3_column_count(res)
+		let n = _sqlite3_column_count(res)
 		for i in 0:n
 			r.add(_cstr2str(_sqlite3_column_name(res, i)))
 		return r
-		
+	
 
-func sqlite_open(filename: string) -> xfer[Database]
+func open(filename: string) -> xfer[Database]
 	var f = filename
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE, nil)
-	if !db.db
+	if not db.db
 		raise(new Exception("can't open database {{filename}}"))
 	return give(db)
 
-func sqlite_create(filename: string) -> xfer[Database]
+
+func create(filename: string) -> xfer[Database]
 	var f = filename
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE + _SQLITE_OPEN_CREATE, nil)
-	if !db.db
+	if not db.db
 		raise(new Exception("can't create database {{filename}}"))
 	return give(db)
 
 
-func __main()
-	var db = sqlite_create("test.sqlite3")
-	db.run("create table michi (id text, a integer, b text)")
-	db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
-	db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
-	db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
-
 func main()
-	var db = sqlite_open("test.sqlite3")
 	if true
+		var db = create("test.sqlite3")
+		db.run("create table michi (id text, a integer, b text)")
+		db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
+		db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
+		db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
+
+	if true
+		var db = open("test.sqlite3")
+	#	if true
 		var q = db.query("select * from michi")
 #		var q = db.query("SELECT * FROM sqlite_master where type='table'")
 #		print(q.column_names())
 		while q.has_more()
 			print(q.get_column())
-	#print(db.load_doc("michi", "1002"))
+		#print(db.load_doc("michi", "1002"))
 

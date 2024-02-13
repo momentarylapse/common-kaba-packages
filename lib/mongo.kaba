@@ -1,4 +1,4 @@
-let KABA_LINK = "/usr/lib64/libmongoc-1.0.so
+let KABA_LINK = "libmongoc-1.0
 	_mongoc_init:mongoc_init
 	_mongoc_cleanup:mongoc_cleanup
 	_mongoc_client_new:mongoc_client_new
@@ -13,7 +13,7 @@ let KABA_LINK = "/usr/lib64/libmongoc-1.0.so
 	_mongoc_cursor_destroy:mongoc_cursor_destroy
 	_mongoc_collection_destroy:mongoc_collection_destroy
 	_mongoc_client_destroy:mongoc_client_destroy
-/usr/lib64/libbson-1.0.so
+libbson-1.0
 	_bson_new_from_json:bson_new_from_json
 	_bson_as_canonical_extended_json:bson_as_canonical_extended_json
 	_bson_as_relaxed_extended_json:bson_as_relaxed_extended_json

@@ -1,4 +1,4 @@
-let KABA_LINK = "/usr/lib64/libglfw.so
+let KABA_LINK = "libglfw
 	_glfwInit:glfwInit
 	_glfwVulkanSupported:glfwVulkanSupported
 	_glfwWindowHint:glfwWindowHint

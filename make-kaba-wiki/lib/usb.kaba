@@ -1,4 +1,4 @@
-let KABA_LINK = "/usr/lib64/libusb-1.0.so
+let KABA_LINK = "libusb-1.0
 	_libusb_init:libusb_init
 	_libusb_exit:libusb_exit
 	_libusb_set_debug:libusb_set_debug
@@ -99,7 +99,7 @@ struct DeviceInfo
 	var bus, port, address: int
 	var _class, sub_class, protocoll, max_package_size, num_configs: int
 	var vid, pid: int
-	func str() -> string
+	func __str__() -> string
 		return "{{bus}}:{{address}}  0x{{vid|4x}}:{{pid|4x}}  {{_class}}  {{sub_class}}"
 
 func REPORT_ERROR(r: int, msg: string)
@@ -166,7 +166,7 @@ struct Device
 		#print(b)
 		print("[config]")
 		print("  value: {{desc.config_value()}}")
-		var num_if = desc.num_interfaces()
+		let num_if = desc.num_interfaces()
 		for i in 0:num_if
 			print("  [interface]")
 			var ii = &desc.interface[i]
@@ -201,7 +201,7 @@ class Context
 	func enumerate() -> xfer[Device][]
 		var r: owned[Device][]
 		var list: _device*[0]*
-		var n = _libusb_get_device_list(c, &list)
+		let n = _libusb_get_device_list(c, &list)
 		for ll in list
 			for i in 0:n
 				var dev = new Device(ll[i])
@@ -234,7 +234,7 @@ class Handle
 	func release_interface(i: int)
 		_libusb_release_interface(h, i)
 	func kernel_driver_active(i: int) -> bool
-		var r = _libusb_kernel_driver_active(h, i)
+		let r = _libusb_kernel_driver_active(h, i)
 		CHECK(r, "kernel driver?!?")
 		return r == 1
 	func detach_kernel_driver(i: int)
@@ -245,39 +245,39 @@ class Handle
 		CHECK(_libusb_set_interface_alt_setting(h, i, alt), "can not set alt")
 		
 	
-	func interrupt_transfer(endpoint: int, data: string, timeout: int) -> int
+	func interrupt_transfer(endpoint: int, data: bytes, timeout: int) -> int
 		var transferred: int
 		CHECK(_libusb_interrupt_transfer(h, endpoint, &data[0], len(data), &transferred, timeout), "interrupt transfer")
 		return transferred
-	func interrupt_read(endpoint: int, max_size: int, timeout: int) -> string
-		var data: string
+	func interrupt_read(endpoint: int, max_size: int, timeout: int) -> bytes
+		var data: bytes
 		data.resize(max_size)
-		var transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
+		let transferred = interrupt_transfer(endpoint | 0x80, data, timeout)
 		data.resize(transferred)
 		return data
 	
 	# endpoint = 0
-	func control_transfer(req: int[], data: string, timeout: int) -> int
-		var r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
+	func control_transfer(req: int[], data: bytes, timeout: int) -> int
+		let r = _libusb_control_transfer(h, req[0],req[1],req[2],req[3], &data[0], len(data), timeout)
 		CHECK(r, "control transfer")
 		return r
-	func control_write(req: int[], data: string) -> int
+	func control_write(req: int[], data: bytes) -> int
 		return control_transfer(req, data, 1000)
-	func control_read(req: int[], max_size: int) -> string
-		var data: string
+	func control_read(req: int[], max_size: int) -> bytes
+		var data: bytes
 		data.resize(max_size)
-		var r = control_transfer(req, data, 1000)
+		let r = control_transfer(req, data, 1000)
 		data.resize(r)
 		return str(r)
 
-func init_usb() -> xfer[Context]
+func init() -> xfer[Context]
 	var c = new Context()
 	CHECK(_libusb_init(&c.c), "can not init library")
 	return give(c)
 
 
-func _main()
-	var c = init_usb()
+func main()
+	var c = init()
 	var devs = c.enumerate()
 	for d in devs
 		print(str(d.get_info()))
