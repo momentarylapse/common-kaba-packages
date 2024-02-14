@@ -12,6 +12,8 @@ func main()
 			let s = terminal.fancy_read_command(">>> ", history)
 			if s != ""
 				kaba.default_context.execute_single_command(s)
-		except Exception as e
+		except terminal.BreakSignal as e
 			print("exit")
 			break
+		except Exception as e
+			print("ERROR: {{e}}")

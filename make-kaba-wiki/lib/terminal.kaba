@@ -112,10 +112,10 @@ func read_char() -> string
 			continue
 		if s == Key.ETX
 			unsetraw()
-			raise(new Exception("break"))
+			raise(new BreakSignal("break"))
 		if s == Key.EOT
 			unsetraw()
-			raise(new Exception("end"))
+			raise(new BreakSignal("end"))
 		return s.utf8()
 
 func fancy_read_command(prompt: string, out history: string[]) -> string
@@ -134,11 +134,11 @@ func fancy_read_command(prompt: string, out history: string[]) -> string
 		if s == Key.ETX
 			unsetraw()
 			_print_postfix = ppp
-			raise(new Exception("break"))
+			raise(new BreakSignal("break"))
 		if s == Key.EOT
 			unsetraw()
 			_print_postfix = ppp
-			raise(new Exception("end"))
+			raise(new BreakSignal("end"))
 		else if s == Key.CARRIAGE_RETURN #"\n"
 			print("\n")
 			if current != ""
