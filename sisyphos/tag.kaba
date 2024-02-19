@@ -3,15 +3,15 @@ use config.*
 struct Tag
 	var key: string
 	var value: string
-	func const __str__() -> string
+	func __str__() -> string
 		return "{{key}}='{{bash_escape(value)}}'"
-	func const strh() -> string
+	func strh() -> string
 		return key + "=" + value.hex()
-	func const __lt__(o: Tag) -> bool
+	func __lt__(o: Tag) -> bool
 		if key == o.key
 			return value < o.value
 		return key < o.key
-	func const match(filter: Tag) -> bool
+	func match(filter: Tag) -> bool
 		return key == filter.key and value.match(filter.value)
 
 func tags_sort(tags: Tag[]) -> Tag[]

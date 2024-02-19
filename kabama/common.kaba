@@ -43,7 +43,7 @@ struct Term as shared
 #			c.params.add(p.copy())
 #		return c
 
-	func const __str__() -> string
+	func __str__() -> string
 		if type == Type.OPERATOR
 			var a = str(params[0])
 			var b = str(params[1])
