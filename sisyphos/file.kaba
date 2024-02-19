@@ -141,7 +141,7 @@ struct LocalFile
 		if tt.key == "name"
 			set_name(tt.value)
 			return
-		for t in tags
+		for mut t in tags
 			if t.key == tt.key
 				if t.value == tt.value
 					return

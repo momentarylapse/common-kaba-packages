@@ -44,7 +44,7 @@ class Lines
 			l.show()
 
 class LiteralParser
-	func const getWord(source: string, i0: int) -> string
+	func getWord(source: string, i0: int) -> string
 		var r: string
 		for j in i0:len(source)
 			if isWhitespace(source[j])
@@ -54,7 +54,7 @@ class LiteralParser
 			r.add(source[j])
 		return r
 
-	func const getNumber(source: string, i0: int) -> string
+	func getNumber(source: string, i0: int) -> string
 		var r: string
 		for j in i0:len(source)
 			if !isNumber(source[j]) and (source[j] != '.')
@@ -62,7 +62,7 @@ class LiteralParser
 			r.add(source[j])
 		return r
 		
-	func const getString(source: string, i0: int) -> string
+	func getString(source: string, i0: int) -> string
 		var r: string
 		r.add(source[i0])
 		for j in i0+1:len(source)
@@ -76,7 +76,7 @@ class LiteralParser
 					break
 		return r
 
-	func const getOperator(source: string, i0: int) -> string
+	func getOperator(source: string, i0: int) -> string
 		var r: string
 		r.add(source[i0])
 		if len(source) > i0 + 1
@@ -85,7 +85,7 @@ class LiteralParser
 					r.add(source[i0 + 1])
 		return r
 	
-	func parseLine(source: string) -> Line
+	func mut parseLine(source: string) -> Line
 		var l: Line
 		l.indent = 0
 		for i in 0:len(source)
@@ -108,7 +108,7 @@ class LiteralParser
 			i += len(temp)-1
 		return l
 
-	func parse(source: string) -> Lines
+	func mut parse(source: string) -> Lines
 		var r: Lines
 		var lines = source.explode("\n")
 		var line_no = 0

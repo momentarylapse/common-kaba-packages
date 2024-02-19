@@ -181,9 +181,9 @@ class PsMoveManager
 			psmoves.add(new MyPSMoveController(p, &self))
 
 	func mut update()
-		if !tracker
+		if not tracker
 			return
-		for m in psmoves
+		for mut m in psmoves
 			m.update()
 
 		_psmove_tracker_update_image(tracker)

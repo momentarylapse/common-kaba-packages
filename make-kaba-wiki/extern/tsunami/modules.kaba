@@ -178,6 +178,18 @@ class MidiSource extends Module
 	#extern void set_beat_source(BeatPort *source)
 
 
+class MidiEventStreamer extends MidiSource
+	func extern override __init__()
+	func extern override read(out midi: MidiEventBuffer) -> int
+	func extern override reset_state()
+	func extern mut set_data(midi: MidiEventBuffer)
+	func extern mut set_pos(offset: int)
+	
+	var loop: bool
+	var offset: int
+	var midi: MidiEventBuffer
+
+
 class PitchDetector extends MidiSource
 	var frequency, volume: float
 	var pitch: int
@@ -206,6 +218,7 @@ class Synthesizer extends Module
 	var freq: float[MAX_PITCH]
 	var delta_phi: float[MAX_PITCH]
 	var active_pitch: int[]
+	var instrument: Instrument
 	var auto_generate_stereo: bool
 	var render_by_ref: bool
 	var events: MidiEventBuffer
@@ -216,6 +229,7 @@ class Synthesizer extends Module
 	func extern override mut reset_state()
 	func extern virtual mut create_pitch_renderer(pitch: int) -> xfer[PitchRenderer]
 	func extern mut set_sample_rate(sample_rate: int)
+	func extern mut set_instrument(i: Instrument)
 
 
 class DummySynthesizer extends Synthesizer

@@ -189,7 +189,7 @@ by-hash <hash1> <hash2>")
 	var db = new Database()
 	if arg[0] == "find" and len(arg) >= 2
 		var files = db.find(filter_to_json(arg[1]))
-		for f in files
+		for mut f in files
 			if len(arg) >= 3
 				if arg[2] == "medium"
 					db.mediumify(f)

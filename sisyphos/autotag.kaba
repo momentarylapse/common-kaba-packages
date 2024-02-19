@@ -62,7 +62,7 @@ func auto_tag(out f: LocalFile)
 		else if ext == "jpg"
 			var s = shell_exec("exiv2 -pv \"{{bash_escape(str(f.path))}}\"").explode("\n")
 			var model, make, time: string
-			for l in s
+			for mut l in s
 				for i in 0:20
 					l = l.replace("  ", " ")
 				let xx = l.explode(" ")

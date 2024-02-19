@@ -28,7 +28,7 @@ struct Language
 			print(t.orig)
 			print("\t{{t.trans}}")
 	func mut add_id(id: string, title: string, tooltip: string)
-		for i in ids
+		for mut i in ids
 			if i.id == id
 				if len(title) > 0
 					i.title = title
@@ -41,7 +41,7 @@ struct Language
 		i.tooltip = tooltip
 		ids.add(i)
 	func mut add_text(orig: string, trans: string)
-		for t in texts
+		for mut t in texts
 			if t.orig == orig
 				if len(trans) > 0
 					t.trans = trans

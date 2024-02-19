@@ -226,9 +226,9 @@ func find_dep(out f: SourceFile, filename: Path)
 					find_dep(f, d)
 
 func parse_dependencies()
-	for f in sources
+	for mut f in sources
 		f.dep.clear()
-	for f in sources
+	for mut f in sources
 		if conf.verbose
 			print(rel(f.filename))
 		find_dep(f, f.filename)

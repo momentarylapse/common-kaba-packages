@@ -139,9 +139,9 @@ class Window
 		var key: bool[256]
 		var x, y, dx, dy: float
 		func __init__()
-			for b in button
+			for mut b in button
 				b = false
-			for k in key
+			for mut k in key
 				k = false
 	var input: Input
 	func __init__(title: string, w: int, h: int)
@@ -195,9 +195,9 @@ struct GamepadState
 	var _buttons: bool[16]
 	var axes: float[6]
 	func __init__()
-		for b in _buttons
+		for mut b in _buttons
 			b = false
-		for a in axes
+		for mut a in axes
 			a = 0
 
 struct Gamepad extends GamepadState as shared
@@ -231,7 +231,7 @@ struct Gamepad extends GamepadState as shared
 	func mut update()
 		state_prev = self
 		_glfwGetGamepadState(index, &self)
-		for a in axes
+		for mut a in axes
 			if abs(a) < deadzone
 				a = 0
 			else if a > 0

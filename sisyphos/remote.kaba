@@ -280,7 +280,7 @@ func remote_get_meta(files: LocalFile[]) -> RemoteFile[]
 func remote_download_meta(out files: LocalFile[])
 	var rfiles = remote_get_meta(files)
 	for rf in rfiles
-		for lf in files
+		for mut lf in files
 			if rf.id == lf.id
 				log_ok("meta", rel_path(lf.path))
 				if conf.pull_tags_only_add
@@ -302,7 +302,7 @@ func remote_sync_by_id(out files: LocalFile[])
 			files_wanted.add(f)
 	let rfiles = remote_get_meta(files_wanted)
 	for rf in rfiles
-		for lf in files
+		for mut lf in files
 			if lf.id == rf.id
 				sync_file(rf, lf)
 
@@ -350,7 +350,7 @@ func remote_sync_pure_locals_by_hash(out files: LocalFile[])
 	for rf in rfiles
 		if conf.verbosity >= 2
 			print(rf.hash)
-		for lf in files
+		for mut lf in files
 			if lf.hash == rf.hash
 				sync_file(rf, lf)
 

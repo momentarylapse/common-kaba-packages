@@ -3,7 +3,7 @@ use common.*
 # always copy
 func subst_variable(_t: shared![Term], _var: string, by: shared![Term]) -> shared![Term]
 	var t = _t.shallow_copy()
-	for p in t.params
+	for mut p in t.params
 		p = subst_variable(p, _var, by)
 	
 	if t.type == Type.VARIABLE
@@ -48,7 +48,7 @@ func rule_match(t: shared![Term], m: shared![Term], out mm: Matching) -> bool
 func subst(_t: shared![Term], pattern: shared![Term], substitution: shared![Term], max_recursion: int) -> shared![Term]
 	var mm: Matching
 	var t: shared![Term] = _t.shallow_copy()
-	for p in t.params
+	for mut p in t.params
 		p = subst(p, pattern, substitution, max_recursion)
 		
 	if rule_match(t, pattern, mm)

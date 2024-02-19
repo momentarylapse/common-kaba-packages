@@ -12,7 +12,7 @@ func _action_tag_add(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	let t = str2tag(tag)
-	for f in files
+	for mut f in files
 		show_file(f, working_dir, "")
 		f.tag_add(t)
 	db.save(files)
@@ -28,7 +28,7 @@ func _action_tag_set(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	let t = str2tag(tag)
-	for f in files
+	for mut f in files
 		show_file(f, working_dir, "")
 		f.tag_set(t)
 	db.save(files)
@@ -44,7 +44,7 @@ func _action_tag_rm(path: Path, tag: string)
 	set_working_dir(path)
 	var files = lister.find(path)
 	let t = str2tag(tag)
-	for f in files
+	for mut f in files
 		show_file(f, working_dir, "")
 		f.tag_rm(t)
 	db.save(files)
@@ -82,7 +82,7 @@ func action_tag_get(arg: string[])
 func _action_tag_auto(path: Path)
 	set_working_dir(path)
 	var files = lister.find(path)
-	for f in files
+	for mut f in files
 		show_file(f, working_dir, "")
 		auto_tag(f)
 	db.save(files)

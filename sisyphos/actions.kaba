@@ -96,7 +96,7 @@ func structure_file(out f: LocalFile, structure: string)
 func _action_structure_auto(dir: Path)
 	set_working_dir(dir)
 	var files = db.get_in_dir(dir, conf.recursive)
-	for f in files
+	for mut f in files
 		let pe = conf.get_cfg(f.path)
 		for e in pe
 			structure_file(f, str(e.dir | e.structure))

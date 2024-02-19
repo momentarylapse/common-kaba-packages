@@ -113,7 +113,7 @@ func build()
 			else
 				#print("{{i}} -> pool")
 				while not t
-					for tt in threads
+					for mut tt in threads
 						if tt.is_done()
 							tt.join()
 							# TODO allow multiple run()s
@@ -126,7 +126,7 @@ func build()
 				tt.cxx_flags = cxx_flags
 				tt.run()
 		
-		for t in threads
+		for mut t in threads
 			t.join()
 	
 #	for t in threads

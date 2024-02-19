@@ -122,7 +122,7 @@ func action_add(arg: string[])
 func swap_translate_lang(out own: Language, l: Language, target: Path)
 	# own.ids are ok
 	# own.texts need ...
-	for t in own.texts
+	for mut t in own.texts
 		t.trans = t.orig
 		t.orig = ""
 		for tt in l.texts
@@ -137,11 +137,11 @@ func swap_translate_gui(out r: Resource, l: Language, ns: string)
 		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
 			r.title = i.title
 			r.tooltip = i.tooltip
-	for c in r.children
+	for mut c in r.children
 		swap_translate_gui(c, l, ns)
 
 func swap_translate_guis(l: Language)
-	for i=>r in resources
+	for mut i=>r in resources
 		print("----------")
 		print(resource_files[i])
 		print(r.str(0))
