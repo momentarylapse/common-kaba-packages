@@ -1,0 +1,3 @@
+description = "Initialize a ray from two points on the line"
+param:a = "First point"
+param:b = "Second point"
