@@ -2,4 +2,6 @@ link = freetype2
 include = freetype2/ft2build.h
 pkg = freetype2
 vcpkg = freetype
+cmake.package = Freetype
+cmake.target = Freetype.Freetype
 

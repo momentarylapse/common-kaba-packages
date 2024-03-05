@@ -3,4 +3,6 @@ include = AL/al.h
 dir = /usr/include/AL
 pkg = openal
 ###vcpkg = [openal-soft,freealut]  testme!
+cmake.package = OpenAL
+cmake.target = OpenAL::OpenAL
 

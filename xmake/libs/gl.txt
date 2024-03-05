@@ -1,5 +1,6 @@
 link = GL
 include = GL/gl.h
 pkg = gl
-cmake = OpenGL
+cmake.package = OpenGL
+cmake.target = OpenGL::OpenGL
 

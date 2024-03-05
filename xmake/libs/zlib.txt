@@ -3,4 +3,6 @@ include = zlib.h
 pkg = zlib
 meson = zlib
 vcpkg = zlib
+cmake.package = ZLIB
+cmake.target = ZLIB::ZLIB
 

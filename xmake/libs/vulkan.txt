@@ -2,4 +2,6 @@ link = vulkan
 include = vulkan/vulkan.h
 pkg = vulkan
 vcpkg = [vulkan,vulkan-headers]
+cmake.package = Vulkan
+cmake.target = Vulkan::Vulkan
 

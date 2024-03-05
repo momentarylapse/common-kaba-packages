@@ -2,4 +2,6 @@ link = [BulletSoftBody,BulletDynamics,BulletCollision,LinearMath]
 include = bullet/btBulletDynamicsCommon.h
 pkg = bullet
 vcpkg = bullet3
+cmake.package = Bullet
+cmake.target = Bullet
 
