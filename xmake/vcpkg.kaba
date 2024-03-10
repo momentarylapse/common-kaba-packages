@@ -1,0 +1,47 @@
+use os
+use project.*
+use library.*
+
+
+func create_vcpkg()
+	var req: string[]
+	
+	for g in conf.lib_groups
+		if g.optional
+			for l in g.libs
+				if not conf.ignored(l)
+					req += lib.get(l).vcpkg
+		else
+			for l in g.libs
+				req += lib.get(l).vcpkg
+	
+	req = req |> filter(l => l[:3] != "gtk")
+	
+	if len(req) == 0
+		return
+
+
+	let vcpkg = "{
+  \"dependencies\": [
+    \"" + sort(req, "").join("\",\n    \"") + "\"
+  ]
+}
+"
+
+	os.fs.write_text(conf.root | "vcpkg.json", vcpkg)
+		
+	os.fs.write_text(conf.root | "vcpkg-configuration.json", "{
+  \"default-registry\": {
+    \"kind\": \"git\",
+    \"baseline\": \"000d1bda1ffa95a73e0b40334fa4103d6f4d3d48\",
+    \"repository\": \"https://github.com/microsoft/vcpkg\"
+  },
+  \"registries\": [
+    {
+      \"kind\": \"artifact\",
+      \"location\": \"https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip\",
+      \"name\": \"microsoft\"
+    }
+  ]
+}
+")

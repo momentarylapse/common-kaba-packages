@@ -1,11 +1,15 @@
 use os
 use project.*
 use library.*
+use vcpkg.*
 
+
+func var_name(l: string) -> string
+	return l.upper().replace("-", "").replace(".", "")
 
 func cmake_link_mandatory_lib(l: string) -> string
 	let ll = lib.get(l)
-	let varx = l.upper()
+	let varx = var_name(l)
 	#deps.add("{{varx}}_LIBRARIES")
 	if len(ll.pkg) > 0
 		return "
@@ -15,7 +19,8 @@ pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
 target_include_directories({{conf.binary_file}} PUBLIC ${"+varx+"_INCLUDE_DIRS})
 target_link_directories({{conf.binary_file}} PUBLIC ${"+varx+"_LIBRARY_DIRS})
 list(APPEND DEPS ${"+varx+"_LIBRARIES})
-target_compile_definitions({{conf.binary_file}} PUBLIC ${"+varx+"_CFLAGS_OTHER} {{ll.define()}}=1)"
+target_compile_options({{conf.binary_file}} PUBLIC ${"+varx+"_CFLAGS_OTHER})
+target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=1)"
 	else
 		print("ERROR: no pkg for {{l}}")
 		return ""
@@ -23,7 +28,7 @@ target_compile_definitions({{conf.binary_file}} PUBLIC ${"+varx+"_CFLAGS_OTHER} 
 
 func cmake_link_mandatory_group(g: LibGroup) -> string
 	let lls = [for l in g.libs  lib.get(l)]
-	let varxs = [for l in g.libs  l.upper()]
+	let varxs = g.libs |> var_name
 	#deps.add("{{varx}}_LIBRARIES")
 	let cvar = varxs.join("_OR_")
 	let label = g.libs.join(" or ")
@@ -59,7 +64,8 @@ if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
 	target_include_directories({{conf.binary_file}} PUBLIC ${"+v+"_INCLUDE_DIRS})
 	target_link_directories({{conf.binary_file}} PUBLIC ${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	target_compile_definitions({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER} {{lls[i].define()}}=1)"
+	target_compile_options({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER})
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{lls[i].define()}}=1)"
 		else
 			print("ERROR: no pkg for {{lls[i]}}")
 		s += "
@@ -71,11 +77,11 @@ func cmake_link_optional_lib(l: string) -> string
 	let ll = lib.get(l)
 	#deps.add("{{varx}}_LIBRARIES")
 	
-	let var_enabled = "LIB_{{l.upper()}}_ENABLED"
+	let var_enabled = "LIB_{{var_name(l)}}_ENABLED"
 	
 	if len(ll.pkg) > 0
 		# => pkg
-		let varx = [for p in ll.pkg p.upper()]
+		let varx = ll.pkg |> var_name
 		var r = "
 
 # lib: {{l}} (optional)
@@ -90,7 +96,7 @@ if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
 	target_include_directories({{conf.binary_file}} PUBLIC ${"+v+"_INCLUDE_DIRS})
 	target_link_directories({{conf.binary_file}} PUBLIC ${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	target_compile_definitions({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER})"
+	target_compile_options({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER})"
 		r += "
 else()
 	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
@@ -141,7 +147,7 @@ endif()"
 
 target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)"
 
-func create_cmake()
+func create_cmake(with_vs2022: bool)
 	
 	print("-- cmake --")
 	 
@@ -162,8 +168,11 @@ func create_cmake()
 		
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
 	
-	os.fs.write_text(conf.root | "CMakePresets.json", "
-﻿{
+	
+	if not with_vs2022
+		return
+	
+	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
 	\"version\": 3,
 	\"configurePresets\": [
 		{
@@ -201,8 +210,25 @@ func create_cmake()
 		}
 	]
 }
+".replace("\t", "    "))
+
+	os.fs.create_directory(conf.root | ".vs")
+	os.fs.write_text(conf.root | ".vs" | "launch.vs.json", "{
+  \"version\": \"0.2.1\",
+  \"defaults\": {},
+  \"configurations\": [
+    {
+      \"type\": \"default\",
+      \"project\": \"CMakeLists.txt\",
+      \"projectTarget\": \"{{conf.binary_file}}.exe\",
+      \"name\": \"{{conf.binary_file}}.exe\",
+      \"currentDir\": \"${workspaceRoot}\"
+    }
+  ]
+}
 ")
 
+	create_vcpkg()
 
 
 
@@ -261,11 +287,9 @@ find_package(PkgConfig REQUIRED)
 	
 	r += "
 
-if (!WIN32)
-	set(THREADS_PREFER_PTHREAD_FLAG ON)
-	find_package(Threads REQUIRED)
-	list(APPEND DEPS Threads::Threads)
-endif()
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+list(APPEND DEPS Threads::Threads)
 
 target_link_libraries({{conf.binary_file}} PRIVATE ${DEPS})"
 	return r
