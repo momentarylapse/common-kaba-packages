@@ -12,11 +12,10 @@ func cmake_link_mandatory_lib(l: string) -> string
 
 # lib: {{l}} mandatory
 pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
-include_directories(${"+varx+"_INCLUDE_DIRS})
-link_directories(${"+varx+"_LIBRARY_DIRS})
+target_include_directories({{conf.binary_file}} PUBLIC ${"+varx+"_INCLUDE_DIRS})
+target_link_directories({{conf.binary_file}} PUBLIC ${"+varx+"_LIBRARY_DIRS})
 list(APPEND DEPS ${"+varx+"_LIBRARIES})
-add_definitions(${"+varx+"_CFLAGS_OTHER})
-add_compile_definitions({{ll.define()}}=1)"
+target_compile_definitions({{conf.binary_file}} PUBLIC ${"+varx+"_CFLAGS_OTHER} {{ll.define()}}=1)"
 	else
 		print("ERROR: no pkg for {{l}}")
 		return ""
@@ -57,11 +56,10 @@ endif()"
 if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
 		if len(lls[i].pkg) > 0
 			s += "
-	include_directories(${"+v+"_INCLUDE_DIRS})
-	link_directories(${"+v+"_LIBRARY_DIRS})
+	target_include_directories({{conf.binary_file}} PUBLIC ${"+v+"_INCLUDE_DIRS})
+	target_link_directories({{conf.binary_file}} PUBLIC ${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	add_definitions(${"+v+"_CFLAGS_OTHER})
-	add_compile_definitions({{lls[i].define()}}=1)"
+	target_compile_definitions({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER} {{lls[i].define()}}=1)"
 		else
 			print("ERROR: no pkg for {{lls[i]}}")
 		s += "
@@ -89,18 +87,18 @@ pkg_check_modules({{v}} {{ll.pkg[i]}})"
 if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
 		for i=>v in varx
 			r += "
-	include_directories(${"+v+"_INCLUDE_DIRS})
-	link_directories(${"+v+"_LIBRARY_DIRS})
+	target_include_directories({{conf.binary_file}} PUBLIC ${"+v+"_INCLUDE_DIRS})
+	target_link_directories({{conf.binary_file}} PUBLIC ${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	add_definitions(${"+v+"_CFLAGS_OTHER})"
+	target_compile_definitions({{conf.binary_file}} PUBLIC ${"+v+"_CFLAGS_OTHER})"
 		r += "
 else()
 	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
 endif()
 if(${"+var_enabled+"})
-	add_compile_definitions({{ll.define()}}=1)
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=1)
 else()
-	add_compile_definitions({{ll.define()}}=0)
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)
 endif()"
 		return r
 
@@ -113,31 +111,35 @@ endif()"
 set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")
 find_package({{cn}})
 if({{cn}}_FOUND)
-	include_directories(${"+cn+"_INCLUDE_DIRS})
-	link_directories(${"+cn+"_LIBRARY_DIRS})
-	add_definitions(${"+cn+"_DEFINITIONS})
+	target_include_directories({{conf.binary_file}} PUBLIC ${"+cn+"_INCLUDE_DIRS})
+	target_link_directories({{conf.binary_file}} PUBLIC ${"+cn+"_LIBRARY_DIRS})
+	target_compile_definitions({{conf.binary_file}} PUBLIC ${"+cn+"_DEFINITIONS})
 	list(APPEND DEPS ${"+cn+"_LIBRARIES})
 else()
 	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
 endif()
 if(${"+var_enabled+"})
-	add_compile_definitions({{ll.define()}}=1)
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=1)
 else()
-	add_compile_definitions({{ll.define()}}=0)
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)
 #endif()"
 
 	else if l == "dl"
 		return "
 
 # lib: dl...
-list(APPEND DEPS ${CMAKE_DL_LIBS})
-add_compile_definitions({{ll.define()}}=1)"
+if(WIN32)
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)
+else()
+	list(APPEND DEPS ${CMAKE_DL_LIBS})
+	target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=1)
+endif()"
 
 
 	print("WARNING: lib {{l}} not in cmake")
 	return "
 
-add_compile_definitions({{ll.define()}}=0)"
+target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)"
 
 func create_cmake()
 	
@@ -218,16 +220,20 @@ find_package(PkgConfig REQUIRED)
 	
 	r += "
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-target_link_libraries({{conf.binary_file}} PRIVATE Threads::Threads ${DEPS})"
+if (!WIN32)
+	set(THREADS_PREFER_PTHREAD_FLAG ON)
+	find_package(Threads REQUIRED)
+	list(APPEND DEPS Threads::Threads)
+endif()
+
+target_link_libraries({{conf.binary_file}} PRIVATE ${DEPS})"
 	return r
 
 
 func create_cmake_install_base() -> string
 	var r = "
 
-add_compile_definitions(INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+target_compile_definitions({{conf.binary_file}} PUBLIC INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 
 install(TARGETS {{conf.binary_file}} DESTINATION bin)"
 	let list = conf.needs_installing()
