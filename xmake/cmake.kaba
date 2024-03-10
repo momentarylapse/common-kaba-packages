@@ -161,6 +161,47 @@ func create_cmake()
 		r += create_cmake_install_mime()
 		
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
+	
+	os.fs.write_text(conf.root | "CMakePresets.json", "
+﻿{
+	\"version\": 3,
+	\"configurePresets\": [
+		{
+			\"name\": \"windows-base\",
+			\"hidden\": true,
+			\"generator\": \"Ninja\",
+			\"binaryDir\": \"${sourceDir}/out/build/${presetName}\",
+			\"installDir\": \"${sourceDir}/out/install/${presetName}\",
+			\"toolchainFile\": \"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake\",
+			\"condition\": {
+				\"type\": \"equals\",
+				\"lhs\": \"${hostSystemName}\",
+				\"rhs\": \"Windows\"
+			}
+		},
+		{
+			\"name\": \"x64-debug\",
+			\"displayName\": \"x64 Debug\",
+			\"inherits\": \"windows-base\",
+			\"architecture\": {
+				\"value\": \"x64\",
+				\"strategy\": \"external\"
+			},
+			\"cacheVariables\": {
+				\"CMAKE_BUILD_TYPE\": \"Debug\"
+			}
+		},
+		{
+			\"name\": \"x64-release\",
+			\"displayName\": \"x64 Release\",
+			\"inherits\": \"x64-debug\",
+			\"cacheVariables\": {
+				\"CMAKE_BUILD_TYPE\": \"Release\"
+			}
+		}
+	]
+}
+")
 
 
 
@@ -282,4 +323,3 @@ if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
 endif()
 "
 	return r
-
