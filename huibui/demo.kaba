@@ -40,13 +40,13 @@ func action_demo(arg: string[])
 	
 	if r.type in ["Dialog", "Window"]
 		var dlg: shared![DemoDialog] = new DemoDialog(source)
-		hui.run(dlg)
+		hui.fly_and_wait(dlg)
 	else if r.type == "Toolbar"
 		var dlg: shared![ToolbarDemoDialog] = new ToolbarDemoDialog(source)
-		hui.run(dlg)
+		hui.fly_and_wait(dlg)
 	else if r.type == "Menu"
 		var dlg: shared![MenuDemoDialog] = new MenuDemoDialog(source)
-		hui.run(dlg)
+		hui.fly_and_wait(dlg)
 	else
 		print("don't know how to show a {{r.type}}")
 
