@@ -1,0 +1,4 @@
+link = pipewire
+include = pipewire-0.3/pipewire/pipewire.h
+pkg = libpipewire-0.3
+
