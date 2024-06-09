@@ -98,7 +98,7 @@ Grid ? '' vertical
 		set_string("out", to_text())
 	
 	func on_copy()
-		hui.copy_to_clipboard(to_text())
+		hui.clipboard.copy(to_text())
 	
 	func mut on_clear()
 		strokes.clear()
@@ -106,5 +106,5 @@ Grid ? '' vertical
 		redraw("area")
 
 func main()
-	hui.run(new Sketcher())
+	hui.fly_and_wait(new Sketcher())
 

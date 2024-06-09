@@ -129,5 +129,5 @@ Toolbar toolbar ''
 		panel.redraw()
 
 func main(arg: string[])
-	hui.run(new CircuitEditor(arg))
+	hui.fly_and_wait(new CircuitEditor(arg))
 

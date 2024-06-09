@@ -30,4 +30,4 @@ class KabamaWindow extends hui.Window
 		event("eval", on_eval)
 	
 func main()
-	hui.run(new KabamaWindow())
+	hui.fly_and_wait(new KabamaWindow())
