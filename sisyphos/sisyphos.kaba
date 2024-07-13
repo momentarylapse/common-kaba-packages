@@ -67,11 +67,13 @@ func main(arg: string[])
 	try
 		conf.load()
 	except Exception as e
-		error_out(e)
+		print("FAILED TO LOAD CONFIG")
+		#error_out(e)
 	try
 		db.load()
 	except Exception as e
-		error_out(e)
+		print("FAILED TO READ DATABASE")
+		#error_out(e)
 	
 	set_working_dir(make_path("./"))
 	
