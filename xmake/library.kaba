@@ -10,23 +10,24 @@ struct Library
 	var vcpkg: string[]
 	var meson: string[]
 	var cmake: string[]
+	var cmake_code: string#?  FIXME kaba bug
 	var includes: string[]
 	var dir_override: string
 	var flags: string
-	#void __init__(string _name, string[] _libs)
-	#	name = _name
-	#	libs = _libs
+
 	func test() -> bool
 		for i in includes
 			if not os.fs.exists(Path("/usr/include") | i)
 				return false
 		return true
+
 	func compiler_flags() -> string
 		if len(pkg) > 0
 			return "`pkg-config --cflags --libs {{pkg.join(" ")}}`"
 		if len(dir_override) > 0
 			return "-I{{dir_override}}"
 		return flags
+
 	func linker_flags() -> string
 		if len(pkg) > 0
 			return "`pkg-config --cflags {{pkg.join(" ")}}`"
@@ -35,10 +36,12 @@ struct Library
 			if len(l) > 0
 				r += " -l{{l}}"
 		return r
+
 	func meson_libs() -> string[]
 		if len(meson) > 0
 			return meson
 		return libs
+
 	func define() -> string
 		return "HAS_LIB_{{name.upper()}}"
 
@@ -50,26 +53,35 @@ struct LibraryManager
 		var lib_dir = hui.app_directory | "apps/xmake/libs"
 		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
-			var c: os.Configuration
-			c.load(lib_dir | e)
-			var l: Library
-			l.name = e.basename()[:-4]
-			if len(c["link"]) > 0
-				l.libs = any2sa(c["link"])
-			if len(c["include"]) > 0
-				l.includes = any2sa(c["include"])
-			if len(c["pkg"]) > 0
-				l.pkg = any2sa(c["pkg"])
-			if len(c["meson"]) > 0
-				l.meson = any2sa(c["meson"])
-			if len(c["cmake"]) > 0
-				l.cmake = any2sa(c["cmake"])
-			if len(c["vcpkg"]) > 0
-				l.vcpkg = any2sa(c["vcpkg"])
-			if len(c["flags"]) > 0
-				l.flags = str(c["flags"])
-			l.dir_override = str(c["dir"])
-			libraries.add(l)
+			libraries.add(load_lib(lib_dir | e))
+
+	func load_lib(file: os.Path) -> Library
+		var c: os.Configuration
+		c.load(file)
+		var l: Library
+		l.name = file.basename_no_ext()
+		if len(c["link"]) > 0
+			l.libs = any2sa(c["link"])
+		if len(c["include"]) > 0
+			l.includes = any2sa(c["include"])
+		if len(c["pkg"]) > 0
+			l.pkg = any2sa(c["pkg"])
+		if len(c["meson"]) > 0
+			l.meson = any2sa(c["meson"])
+		if len(c["cmake"]) > 0
+			l.cmake = any2sa(c["cmake"])
+		if len(c["cmake.code"]) > 0
+			l.cmake_code = str(c["cmake"])
+		if len(c["vcpkg"]) > 0
+			l.vcpkg = any2sa(c["vcpkg"])
+		if len(c["flags"]) > 0
+			l.flags = str(c["flags"])
+		l.dir_override = str(c["dir"])
+		
+		let code_file = file.parent() | (file.basename_no_ext() + ".cmakecode")
+		if os.fs.exists(code_file)
+			l.cmake_code = os.fs.read_text(code_file)
+		return l
 
 	func get(name: string) -> Library&
 		for l in libraries

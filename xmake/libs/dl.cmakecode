@@ -1,0 +1,6 @@
+if(WIN32)
+	target_compile_definitions(:target: PUBLIC :define:=0)
+else()
+	list(APPEND DEPS ${CMAKE_DL_LIBS})
+	target_compile_definitions(:target: PUBLIC :define:=1)
+endif()

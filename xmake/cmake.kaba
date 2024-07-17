@@ -22,7 +22,7 @@ list(APPEND DEPS ${"+varx+"_LIBRARIES})
 target_compile_options({{conf.binary_file}} PUBLIC ${"+varx+"_CFLAGS_OTHER})
 target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=1)"
 	else
-		print("ERROR: no pkg for {{l}}")
+		print("ERROR: no pkg for mandatory lib {{l}}")
 		return ""
 
 
@@ -79,6 +79,14 @@ func cmake_link_optional_lib(l: string) -> string
 	
 	let var_enabled = "LIB_{{var_name(l)}}_ENABLED"
 	
+	#for _code in ll.cmake_code
+	if len(ll.cmake_code) > 0
+		let code = ll.cmake_code.replace(":target:", str(conf.binary_file)).replace(":define:", ll.define())
+		return "
+
+# lib: {{l}} (optional)
+{{code}}"
+
 	if len(ll.pkg) > 0
 		# => pkg
 		let varx = ll.pkg |> var_name
@@ -146,6 +154,7 @@ endif()"
 	return "
 
 target_compile_definitions({{conf.binary_file}} PUBLIC {{ll.define()}}=0)"
+
 
 func create_cmake(with_vs2022: bool)
 	
