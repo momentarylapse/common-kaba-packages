@@ -17,7 +17,7 @@ then
 	mkdir current
 	mv *.txt current
 
-	python upload.py
+	python3 upload.py
 
 	# save version
 	rm -rf previous
