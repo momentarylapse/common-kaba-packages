@@ -24,7 +24,7 @@ use time
 
 func extern _glfwInit() -> int
 func extern _glfwVulkanSupported() -> int
-func extern _glfwCreateWindow(width: int, height: int, title: i8*, monitor: void*, share: void*) -> void*
+func extern _glfwCreateWindow(width: int, height: int, title: u8*, monitor: void*, share: void*) -> void*
 func extern _glfwWindowShouldClose(window: void*) -> int
 func extern _glfwSetWindowUserPointer(window: void*, p: void*)
 func extern _glfwGetWindowUserPointer(window: void*) -> void&
@@ -37,8 +37,8 @@ func extern _glfwPollEvents()
 func extern _glfwTerminate()
 func extern _glfwJoystickPresent(j: int) -> int
 func extern _glfwJoystickIsGamepad(j: int) -> int
-func extern _glfwGetJoystickName(j: int) -> i8[0]*
-func extern _glfwGetGamepadName(j: int) -> i8[0]*
+func extern _glfwGetJoystickName(j: int) -> u8[0]*
+func extern _glfwGetGamepadName(j: int) -> u8[0]*
 func extern _glfwGetGamepadState(j: int, p: void*) -> int
 
 let GLFW_CLIENT_API = 0x00022001
@@ -57,7 +57,7 @@ func init(opts: string[])
 func end()
 	_glfwTerminate()
 
-func cp2s(_p: i8[0]*) -> string
+func cp2s(_p: u8[0]*) -> string
 	for p in _p
 		var s: string
 		for i in 0:256

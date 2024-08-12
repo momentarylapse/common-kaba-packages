@@ -2,7 +2,7 @@ use os
 use kaba
 use cli.terminal.*
 
-func is_letter(c: i8) -> bool
+func is_letter(c: u8) -> bool
 	return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or (c == '_')
 
 func count_indent(l: string) -> int

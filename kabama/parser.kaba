@@ -2,7 +2,7 @@ use common.*
 
 class SyntaxError extends Exception
 
-func char_type(c: i8) -> CharType
+func char_type(c: u8) -> CharType
 	if (c >= 'a') and (c <= 'z')
 		return CharType.LETTER
 	if (c >= 'A') and (c <= 'Z')

@@ -4,13 +4,13 @@ let CHAR_TAB = 0x09
 
 var verbose: bool
 
-func isWhitespace(c: i8) -> bool
+func isWhitespace(c: u8) -> bool
 	return (c == ' ') or (c == CHAR_TAB) or (c == CHAR_NL)
 
-func isNumber(c: i8) -> bool
+func isNumber(c: u8) -> bool
 	return (c >= '0') and (c <= '9')
 
-func isOperator(c: i8) -> bool
+func isOperator(c: u8) -> bool
 	return (c == '(') or (c == ')') or (c == '=') or (c == '+') or (c == '-') or (c == '*') or (c == '/') or (c == '%') or (c == '.') or (c == ',') or (c == '[') or (c == ']') or (c == '{') or (c == '}') or (c == '!') or (c == '<') or (c == '>') or (c == ':')
 
 
