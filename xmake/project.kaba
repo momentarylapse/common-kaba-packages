@@ -8,7 +8,7 @@ struct Profile
 func any2sa(a: any) -> string[]
 	if a.type == string
 		return [str(a)]
-	return [for s in a.as_array() str(s)]
+	return [for s in a.as_list() str(s)]
 
 func sa2any(a: string[]) -> any
 	var r: any

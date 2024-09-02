@@ -75,10 +75,10 @@ class xml
 	
 	func static _doc_set(out doc: any, k: string, c: any)
 		if k in doc.keys()
-			if doc[k].type != any[]
+			if doc[k]!.type() != any[]
 				doc[k] = dyn([doc[k]])
 				#print(doc)
-			doc[k].add(c)
+			doc[k]!.add(c)
 			#print(doc)
 		else
 			doc[k] = c
@@ -165,7 +165,7 @@ class xml
 		return root
 
 	func static _encode_part(key: string, doc: any, pre: string) -> string
-		if doc.type in [int, float, string]
+		if doc.type() in [int, float, string]
 			# string
 			return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
 		else if doc.type == any{}
@@ -173,14 +173,14 @@ class xml
 			var s: string
 			s += "{{pre}}<{{key}}>\n"
 			for k in doc.keys()
-				s += _encode_part(k, doc[k], pre + "\t")
+				s += _encode_part(k, doc[k]!, pre + "\t")
 			s += "{{pre}}</{{key}}>\n"
 			return s
 		else if doc.type == any[]
 			# array
 			var s: string
 			for i in 0:len(doc)
-				s += _encode_part(key, doc[i], pre)
+				s += _encode_part(key, doc[i]!, pre)
 			return s
 		else
 			return "???{{doc.type}}\n"
@@ -190,7 +190,7 @@ class xml
 		if doc.type != any{}
 			raise(new Exception("doc must be a dict"))
 		for k in doc.keys()
-			s += _encode_part(k, doc[k], "")
+			s += _encode_part(k, doc[k]!, "")
 		return s
 
 func main()
