@@ -10,6 +10,7 @@ struct Resource
 	var x, y: int
 	var children: Resource[]
 	#void reset()
+	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
 	func extern show(indent: int)
 	func extern str(indent: int) -> string
 	
