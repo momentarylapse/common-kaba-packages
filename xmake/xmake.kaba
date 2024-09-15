@@ -36,7 +36,7 @@ func action_update(a: string[])
 	if len(missing) > 0
 		print("ERROR: necessary libraries missing: {{missing}}")
 	
-	find_sources(conf.root | conf.source_dir)
+	conf.find_sources()
 
 	if not conf.dry_run
 		if "make" in conf.build_systems
@@ -53,13 +53,13 @@ func action_update(a: string[])
 func action_build(a: string[])
 	#print("building {{conf.root}}")
 	conf.load()
-	find_sources(conf.root)
+	conf.find_sources()
 	build()
 
 func action_clear(a: string[])
 	#print("clearing {{conf.root}}")
 	conf.load()
-	find_sources(conf.root)
+	conf.find_sources()
 	build_clear()
 
 

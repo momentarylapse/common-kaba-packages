@@ -16,9 +16,29 @@ func sa2any(a: string[]) -> any
 		r.add(s)
 	return r
 
+func pa2any(a: Path[]) -> any
+	var r: any
+	for s in a
+		r.add(str(s))
+	return r
+
 struct LibGroup
 	var optional = false
 	var libs: string[]
+
+
+struct BuildTarget
+	var name: string
+	var binary_file: Path
+	var exclusive_source: Path[]
+	var default = true
+
+
+func find_targets(c: os.Configuration) -> string[]
+	return c.keys()
+		|> filter(x => x[:6] == "build:")
+		|> (func(x: string) x[6:x.find(".")!])
+		|> unique
 
 # project
 struct Config
@@ -34,9 +54,7 @@ struct Config
 	var name: string
 	
 	# build
-	var binary_file: Path
 	var source_dir: Path
-	var main_file: string
 	var build_systems = ["cmake"]
 	var lib_groups: LibGroup[]
 	var ignore_libs: string[]
@@ -49,7 +67,9 @@ struct Config
 	var flags_linker: string
 	var include_directories: string[]
 	
-	# inctall
+	var targets: BuildTarget[]
+	
+	# install
 	var icons: string[]
 	var desktop_file: Path
 	var mime_files: string[]
@@ -65,15 +85,25 @@ struct Config
 		var c: os.Configuration
 		c.load(conf.root | "xmake.conf")
 		install_source = "static"
+		
+		var target_names = find_targets(c)
+		if len(target_names) == 0
+			target_names = ["default"]
+		print("targets: {{target_names}}")
+		for n in target_names
+			var t: BuildTarget
+			t.name = n
+			targets.add(t)
+		
 		for k in c.keys()
 			if k in ["project.name"]
 				name = str(c[k])
 			else if k in ["build.source-directory", "build.source"]
 				source_dir = str(c[k])
 			else if k in ["build.binary"]
-				binary_file = str(c[k])
+				targets[0].binary_file = str(c[k])
 			else if k == "build.main"
-				main_file = str(c[k])
+				targets[0].exclusive_source = [str(c[k])]
 			else if k == "build.language"
 				language = c.get_str(k, "c++17")
 			else if k == "build.flags"
@@ -110,14 +140,28 @@ struct Config
 				p.libs_optional = any2sa(c[k])
 				profiles.add(p)
 			else
-				raise(new Exception("unknown tag: {{k}}"))
+				var found = false
+				for mut t in targets
+					if k == "build:{{t.name}}.binary"
+						t.binary_file = str(c[k])
+						found = true
+					if k == "build:{{t.name}}.source"
+						t.exclusive_source.add(str(c[k]))
+						found = true
+					if k == "build:{{t.name}}.default"
+						t.default = bool(c[k])
+						found = true
+				if not found
+					raise(new Exception("unknown tag: {{k}}"))
+				
+
 	func mut save()
 		var c: os.Configuration
 		c["project.name"] = name
-		c["build.source-directory"] = str(source_dir)
-		c["build.binary"] = str(binary_file)
-		if len(main_file) > 0
-			c["build.main"] = main_file
+		c["build.source"] = str(source_dir)
+	#	c["build.binary"] = str(binary_file)
+	#	if len(main_file) > 0
+	#		c["build.main"] = main_file
 		c["build.system"] = sa2any(build_systems)
 		c["build.language"] = language
 		c["build.optimization"] = optimization
@@ -127,6 +171,13 @@ struct Config
 		c["build.libraries"] = encode_libs(lib_groups)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
+		
+		for t in targets
+			c["build:{{t.name}}.binary"] = str(t.binary_file)
+			c["build:{{t.name}}.source"] = pa2any(t.exclusive_source)
+			if not t.default
+				c["build:{{t.name}}.default"] = false
+			
 		c["install.source"] = str(install_source)
 		c["install.icons"] = sa2any(icons)
 		c["install.desktop-file"] = str(desktop_file)
@@ -156,6 +207,18 @@ struct Config
 		if not force_build_dir.is_empty()
 			return force_build_dir
 		return root | "build"
+		
+		
+	func find_sources()
+		let dir = root | source_dir
+		let files = os.fs.search(dir, "*.cpp", "fr")
+		for f in files
+			#if not test_source_dir.is_empty()
+			#	if (source_dir|f) in test_source_dir
+			#		continue
+			var s: SourceFile
+			s.filename = dir | f
+			sources.add(s)
 
 var conf: Config
 
@@ -233,10 +296,4 @@ func parse_dependencies()
 			print(rel(f.filename))
 		find_dep(f, f.filename)
 
-func find_sources(dir: Path)
-	let files = os.fs.search(dir, "*.cpp", "fr")
-	for f in files
-		var s: SourceFile
-		s.filename = dir | f
-		sources.add(s)
 

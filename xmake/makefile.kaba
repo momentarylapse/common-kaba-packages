@@ -58,9 +58,10 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 	 defines += " -D'INSTALL_PREFIX=\"$(prefix)\"'"
 
 func collect_objects(from: Path) -> string[]
+	raise(new Exception("Makefile system not supported anymore!"))
 	var obj: string[]
 	for s in sources
-		if rel(s.filename) != rel(conf.root | conf.main_file)
+	##	if rel(s.filename) != rel(conf.root | conf.main_file)
 			obj.add(str(s.object().relative_to(from)))
 	return obj
 
@@ -74,7 +75,7 @@ func create_makefile(p: Profile, postfix: string)
 
 	print("-- makefile {{p.name}} --")
 	var f = os.fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt")
-	f << "BIN = ../{{conf.binary_file}}"
+	f << "BIN = ../{{conf.targets[0].binary_file}}"
 	f << "CPP = g++"
 	var cflags, lflags, defines: string
 	collect_global_flags(p, cflags, lflags, defines)
@@ -89,7 +90,7 @@ func create_makefile(p: Profile, postfix: string)
 	var obj = collect_objects(conf.root | conf.source_dir)
 	f << "OBJ = " + obj.join(" \\\n ")
 	f << ""
-	var main_ob = relsrc(conf.root | conf.main_file.replace(".cpp", ".o"))
+	var main_ob = "" ######relsrc(conf.root | conf.main_file.replace(".cpp", ".o"))
 	f << "$(BIN) : $(OBJ) {{main_ob}}"
 	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
 	f << ""
