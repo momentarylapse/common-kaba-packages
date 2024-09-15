@@ -224,7 +224,7 @@ EndGlobal
   <ItemGroup>"
   
   
-	for s in sources
+	for s in _sources
 		f += "
     <ClCompile Include=\"{{win_path(rel(s.filename))}}\" />"
 	f += "
@@ -252,7 +252,7 @@ EndGlobal
 <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
   <ItemGroup>"
 
-	for s in sources
+	for s in _sources
 		f += "
     <ClCompile Include=\"{{win_path(rel(s.filename))}}\">
       <Filter>{{win_path(rel(s.filename.parent()))[:-1]}}</Filter>

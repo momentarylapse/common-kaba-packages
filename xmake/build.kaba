@@ -90,7 +90,7 @@ func build()
 	let cxx_flags = "{{conf.flags_compiler}} {{cflags}} {{global_flags}}"
 	let cxx_flags_linking = "{{conf.flags_linker}} {{lflags}} {{global_flags}}"
 	
-	let needs_building = [for s in sources s if not is_completely_built(s)]
+	let needs_building = [for s in _sources s if not is_completely_built(s)]
 	#print("total {{len(sources)}}, build {{len(needs_building)}}")
 	
 	
@@ -166,7 +166,7 @@ func build()
 
 
 func build_clear()
-	for s in sources
+	for s in _sources
 		try
 			os.fs.delete(s.object())
 			#print(s.object())

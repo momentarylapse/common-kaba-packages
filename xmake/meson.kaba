@@ -62,9 +62,9 @@ threaddep = dependency('threads')"
 	f << "
 
 sources = ["
-	for i=>s in sources
+	for i=>s in _sources
 		var e: string
-		if i < len(sources) - 1
+		if i < len(_sources) - 1
 			e = ","
 		f << "	'{{rel(s.filename)}}'{{e}}"
 	f << "]

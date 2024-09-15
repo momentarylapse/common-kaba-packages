@@ -209,7 +209,7 @@ struct Config
 		return root | "build"
 		
 		
-	func find_sources()
+	func _find_sources()
 		let dir = root | source_dir
 		let files = os.fs.search(dir, "*.cpp", "fr")
 		for f in files
@@ -218,7 +218,35 @@ struct Config
 			#		continue
 			var s: SourceFile
 			s.filename = dir | f
-			sources.add(s)
+			_sources.add(s)
+		
+		
+	func find_common_sources() -> Path[]
+		var exclusive: Path[]
+		for t in targets
+			let xx = find_exclusive_sources(t)
+			for x in xx
+				exclusive.add(x)
+		
+		
+		var r: Path[]
+		let dir = root | source_dir
+		let files = os.fs.search(dir, "*.cpp", "fr")
+		for f in files
+			if not ((dir | f) in exclusive)
+				r.add(dir | f)
+		return r
+	
+	func find_exclusive_sources(t: BuildTarget) -> Path[]
+		var r: Path[]
+		for x in t.exclusive_source
+			if os.fs.is_directory(root | x)
+				let files = os.fs.search(root | x, "*.cpp", "fr")
+				for f in files
+					r.add(root | x | f)
+			else if os.fs.exists(root | x)
+				r.add(root | x)
+		return r
 
 var conf: Config
 
@@ -261,7 +289,7 @@ struct SourceFile
 		dep.add(d)
 		return true
 
-var sources: SourceFile[]
+var _sources: SourceFile[]
 
 func rel(filename: Path) -> Path
 	return filename.relative_to(conf.root)
@@ -289,9 +317,9 @@ func find_dep(out f: SourceFile, filename: Path)
 					find_dep(f, d)
 
 func parse_dependencies()
-	for mut f in sources
+	for mut f in _sources
 		f.dep.clear()
-	for mut f in sources
+	for mut f in _sources
 		if conf.verbose
 			print(rel(f.filename))
 		find_dep(f, f.filename)

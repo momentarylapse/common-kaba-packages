@@ -60,7 +60,7 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 func collect_objects(from: Path) -> string[]
 	raise(new Exception("Makefile system not supported anymore!"))
 	var obj: string[]
-	for s in sources
+	for s in _sources
 	##	if rel(s.filename) != rel(conf.root | conf.main_file)
 			obj.add(str(s.object().relative_to(from)))
 	return obj
@@ -96,7 +96,7 @@ func create_makefile(p: Profile, postfix: string)
 	f << ""
 	f << "all : $(BIN)"
 	f << ""
-	for s in sources
+	for s in _sources
 		var a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
 		for d in s.dep
 			a += " {{relsrc(d)}}"

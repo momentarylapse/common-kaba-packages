@@ -261,7 +261,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)"
 		r += "
 set(CMAKE_BUILD_TYPE Debug)"
 	
-	let files = [for s in sources  str(rel(s.filename))].join("\n\t")
+	let common_sources = conf.find_common_sources()
+	let files = [for s in common_sources  str(rel(s))].join("\n\t")
 	r += "
 set(SOURCE_COMMON
 	{{files}}
@@ -300,10 +301,14 @@ list(APPEND DEPS Threads::Threads)"
 
 
 	for t in conf.targets
+		let xsources = conf.find_exclusive_sources(t)
+		let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
 		r += "
 
 # target {{t.name}}
-add_executable({{t.binary_file}} ${SOURCE_COMMON})
+add_executable({{t.binary_file}}
+	${SOURCE_COMMON}
+	{{xfiles}})
 target_include_directories({{t.binary_file}} PRIVATE ${INCLUDE_DIRECTORIES})
 target_link_directories({{t.binary_file}} PUBLIC ${LINK_DIRECTORIES})
 target_compile_options({{t.binary_file}} PUBLIC ${COMPILE_OPTIONS})
