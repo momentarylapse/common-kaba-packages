@@ -1,13 +1,13 @@
 use os
 use project.*
 use library.*
-use vcpkg.*
+use vcpkg
 
 
 func var_name(l: string) -> string
 	return l.upper().replace("-", "").replace(".", "")
 
-func cmake_link_mandatory_lib(l: string) -> string
+func link_mandatory_lib(l: string) -> string
 	let ll = lib.get(l)
 	let varx = var_name(l)
 	#deps.add("{{varx}}_LIBRARIES")
@@ -26,7 +26,7 @@ list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
 		return ""
 
 
-func cmake_link_mandatory_group(g: LibGroup) -> string
+func link_mandatory_group(g: LibGroup) -> string
 	let lls = [for l in g.libs  lib.get(l)]
 	let varxs = g.libs |> var_name
 	#deps.add("{{varx}}_LIBRARIES")
@@ -73,7 +73,7 @@ endif()"
 	return s
 
 
-func cmake_link_optional_lib(l: string) -> string
+func link_optional_lib(l: string) -> string
 	let ll = lib.get(l)
 	#deps.add("{{varx}}_LIBRARIES")
 	
@@ -156,24 +156,193 @@ endif()"
 list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)"
 
 
-func create_cmake(with_vs2022: bool)
+
+
+func create_base() -> string
+	let debug = conf.build_type == "debug"
+	
+	var r = "# created by xmake
+
+cmake_minimum_required(VERSION 3.21)
+project({{conf.name}})
+set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
+set(CMAKE_CXX_STANDARD_REQUIRED True)"
+	if debug
+		r += "
+set(CMAKE_BUILD_TYPE Debug)"
+	
+#	let common_sources = conf.find_common_sources()
+#	let files = [for s in common_sources  str(rel(s))].join("\n\t")
+#	r += "
+#set(SOURCE_COMMON
+#	{{files}}
+#)"
+
+#	if len(conf.include_directories) > 0
+#		let dirs = conf.include_directories.join(" ")
+#		r += "
+#list(APPEND INCLUDE_DIRECTORIES {{dirs}})"
+	return r
+
+
+
+func create_libs() -> string
+	var r = "
+
+#=======================================================================================
+#    libs
+#=======================================================================================
+
+find_package(PkgConfig REQUIRED)
+"
+
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
+		if g.optional
+			for l in g.libs
+				r += link_optional_lib(l)
+		else
+			if len(g.libs) > 1
+				r += link_mandatory_group(g)
+			else
+				r += link_mandatory_lib(g.libs[0])
+
+	
+	r += "
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+list(APPEND DEPS Threads::Threads)"
+	return r
+
+
+func create_target(t: BuildTarget) -> string
+	let xsources = conf.find_sources(t)
+	let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
+	
+	var deps = "${DEPS}"
+	for d in t.dependencies
+		if conf.find_target(d.libs[0])
+			deps += " {{d.libs[0]}}"
+	
+	var r = "
+
+#=======================================================================================
+#    target {{t.name}}
+#=======================================================================================
+"
+	if t.is_library
+		r += "
+add_library({{t.binary_file}}"
+	else
+		r += "
+add_executable({{t.binary_file}}"
+	r += "
+	{{xfiles}})
+target_include_directories({{t.binary_file}} PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_directories({{t.binary_file}} PUBLIC ${LINK_DIRECTORIES})
+target_compile_options({{t.binary_file}} PUBLIC ${COMPILE_OPTIONS})
+target_compile_definitions({{t.binary_file}} PUBLIC ${COMPILE_DEFINITIONS} INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+target_link_libraries({{t.binary_file}} PUBLIC {{deps}})"
+	for i in t.include_directories
+		r += "
+target_include_directories({{t.binary_file}} PUBLIC {{i}})"
+	
+	if not t.default
+		r += "
+set_target_properties({{t.binary_file}} PROPERTIES EXCLUDE_FROM_ALL TRUE)"
+	return r
+
+
+
+
+func create_install_base() -> string
+	var r = "
+
+#=======================================================================================
+#    install
+#=======================================================================================
+"
+
+	for t in conf.targets
+		if t.default and not t.is_library
+			r += "
+install(TARGETS {{t.binary_file}} DESTINATION bin)"
+	let list = conf.needs_installing()
+	for e in list
+		if os.fs.is_directory(conf.root | e)
+			r += "
+install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
+		else
+			r += "
+install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
+	return r
+
+
+func create_install_desktop() -> string
+	return "
+
+# install .desktop file
+set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+install(FILES /tmp/{{conf.desktop_file.basename()}} DESTINATION share/applications)"
+
+
+func create_install_icons() -> string
+	var r = "
+
+# install icons"
+	for i in conf.icons
+		let x = i.explode(":")
+		if len(x) >= 3
+			r += "
+install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
+	return r
+
+
+func create_install_mime() -> string
+	var r = "
+
+# install mime
+find_program(XDG_MIME_EXECUTABLE xdg-mime)
+if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
+	for m in conf.mime_files
+		r += "
+	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
+	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
+	r += "
+endif()
+"
+	return r
+
+
+
+
+
+
+func create(with_vs2022: bool)
 	
 	print("-- cmake --")
 	 
-	var r = create_cmake_base()
+	var r = create_base()
 	
-	r += create_cmake_libs()
+	r += create_libs()
 	
-	r += create_cmake_install_base()
+	
+
+	for t in conf.targets
+		r += create_target(t)
+	
+	r += create_install_base()
 
 	if conf.desktop_file != ""
-		r += create_cmake_install_desktop()
+		r += create_install_desktop()
 
 #	if len(conf.icons) > 0
-#		r += create_cmake_install_icons()
+#		r += create_install_icons()
 
 	if len(conf.mime_files) > 0
-		r += create_cmake_install_mime()
+		r += create_install_mime()
 		
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
 	
@@ -221,6 +390,8 @@ func create_cmake(with_vs2022: bool)
 }
 ".replace("\t", "    "))
 
+	let t = conf.main_target()
+
 	os.fs.create_directory(conf.root | ".vs")
 	os.fs.write_text(conf.root | ".vs" | "launch.vs.json", "{
   \"version\": \"0.2.1\",
@@ -229,15 +400,15 @@ func create_cmake(with_vs2022: bool)
     {
       \"type\": \"default\",
       \"project\": \"CMakeLists.txt\",
-      \"projectTarget\": \"{{conf.targets[0].binary_file}}.exe\",
-      \"name\": \"{{conf.targets[0].binary_file}}.exe\",
+      \"projectTarget\": \"{{t.binary_file}}.exe\",
+      \"name\": \"{{t.binary_file}}.exe\",
       \"currentDir\": \"${workspaceRoot}\"
     }
   ]
 }
 ")
 
-	create_vcpkg()
+	vcpkg.create()
 
 
 
@@ -246,130 +417,3 @@ func create_cmake(with_vs2022: bool)
 #execute_process(COMMAND ${XDG-MIME_EXECUTABLE} install --novendor basket.xml)
 #execute_process(COMMAND ${XDG-DESKTOP-MENU_EXECUTABLE} install --novendor basket.desktop)
 #execute_process(COMMAND ${XDG-MIME_EXECUTABLE} default basket.desktop "application/x-basket-item")
-
-
-func create_cmake_base() -> string
-	let debug = conf.build_type == "debug"
-	
-	var r = "# created by xmake
-
-cmake_minimum_required(VERSION 3.21)
-project({{conf.name}})
-set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
-set(CMAKE_CXX_STANDARD_REQUIRED True)"
-	if debug
-		r += "
-set(CMAKE_BUILD_TYPE Debug)"
-	
-	let common_sources = conf.find_common_sources()
-	let files = [for s in common_sources  str(rel(s))].join("\n\t")
-	r += "
-set(SOURCE_COMMON
-	{{files}}
-)"
-
-	if len(conf.include_directories) > 0
-		let dirs = conf.include_directories.join(" ")
-		r += "
-list(APPEND INCLUDE_DIRECTORIES {{dirs}})"
-	return r
-
-
-
-func create_cmake_libs() -> string
-	var r = "
-
-find_package(PkgConfig REQUIRED)
-"
-
-	for g in conf.lib_groups
-		if g.optional
-			for l in g.libs
-				r += cmake_link_optional_lib(l)
-		else
-			if len(g.libs) > 1
-				r += cmake_link_mandatory_group(g)
-			else
-				r += cmake_link_mandatory_lib(g.libs[0])
-
-	
-	r += "
-
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-find_package(Threads REQUIRED)
-list(APPEND DEPS Threads::Threads)"
-
-
-	for t in conf.targets
-		let xsources = conf.find_exclusive_sources(t)
-		let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
-		r += "
-
-# target {{t.name}}
-add_executable({{t.binary_file}}
-	${SOURCE_COMMON}
-	{{xfiles}})
-target_include_directories({{t.binary_file}} PRIVATE ${INCLUDE_DIRECTORIES})
-target_link_directories({{t.binary_file}} PUBLIC ${LINK_DIRECTORIES})
-target_compile_options({{t.binary_file}} PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions({{t.binary_file}} PUBLIC ${COMPILE_DEFINITIONS})
-target_link_libraries({{t.binary_file}} PRIVATE ${DEPS})"
-		if not t.default
-			r += "
-set_target_properties({{t.binary_file}} PROPERTIES EXCLUDE_FROM_ALL TRUE)"
-	return r
-
-
-func create_cmake_install_base() -> string
-	# TODO multi-target
-	var r = "
-
-target_compile_definitions({{conf.targets[0].binary_file}} PUBLIC INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
-
-install(TARGETS {{conf.targets[0].binary_file}} DESTINATION bin)"
-	let list = conf.needs_installing()
-	for e in list
-		if os.fs.is_directory(conf.root | e)
-			r += "
-install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
-		else
-			r += "
-install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
-	return r
-
-
-func create_cmake_install_desktop() -> string
-	return "
-
-# install .desktop file
-set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
-configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
-install(FILES /tmp/{{conf.desktop_file.basename()}} DESTINATION share/applications)"
-
-
-func create_cmake_install_icons() -> string
-	var r = "
-
-# install icons"
-	for i in conf.icons
-		let x = i.explode(":")
-		if len(x) >= 3
-			r += "
-install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
-	return r
-
-
-func create_cmake_install_mime() -> string
-	var r = "
-
-# install mime
-find_program(XDG_MIME_EXECUTABLE xdg-mime)
-if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
-	for m in conf.mime_files
-		r += "
-	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
-	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
-	r += "
-endif()
-"
-	return r

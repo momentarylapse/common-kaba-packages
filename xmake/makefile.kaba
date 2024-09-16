@@ -18,7 +18,8 @@ func create_all_makefiles()
 		return
 	var p: Profile
 	p.name = "default"
-	for g in conf.lib_groups
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
 		if g.optional
 			for l in g.libs
 				if (lib.has(l) or conf.force_all_libraries) and !conf.ignored(l)
@@ -32,7 +33,8 @@ func append(out a: string[], b: string[])
 
 func collect_global_flags(p: Profile, out cflags: string, out lflags: string, out defines: string)
 	var pkg: string[]
-	for g in conf.lib_groups
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
 		if g.optional
 			for l in g.libs
 				if l in p.libs_optional
@@ -73,66 +75,66 @@ func create_makefile(p: Profile, postfix: string)
 
 	raise(new Exception("Makefile deprecated!"))
 
-	print("-- makefile {{p.name}} --")
-	var f = os.fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt")
-	f << "BIN = ../{{conf.targets[0].binary_file}}"
-	f << "CPP = g++"
-	var cflags, lflags, defines: string
-	collect_global_flags(p, cflags, lflags, defines)
-	var x: string
-	if conf.build_type == "debug"
-		x = "-g"
-	f << "prefix = /usr/local"
-	f << cl("GLOBALFLAGS = {{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}")
-	f << cl("CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)")
-	f << cl("CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)")
-	f << ""
-	var obj = collect_objects(conf.root | conf.source_dir)
-	f << "OBJ = " + obj.join(" \\\n ")
-	f << ""
-	var main_ob = "" ######relsrc(conf.root | conf.main_file.replace(".cpp", ".o"))
-	f << "$(BIN) : $(OBJ) {{main_ob}}"
-	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
-	f << ""
-	f << "all : $(BIN)"
-	f << ""
-	for s in _sources
-		var a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
-		for d in s.dep
-			a += " {{relsrc(d)}}"
-		f << a
-		f << "\t$(CPP) -c {{relsrc(s.filename)}} -o $@ $(CXXFLAGS)"
-		f << ""
-
-	# install
-	f << "install :"
-	var datadir = "$(prefix)/share/{{conf.name}}"
-	f << "	mkdir -p {{datadir}}"
-	if conf.desktop_file != ""
-		f << "	xdg-desktop-menu install ../{{conf.desktop_file}}"
-	for m in conf.mime_files
-		f << "	xdg-mime install ../{{m}}"
-	for i=>icon in conf.icons
-		var xx = icon.explode(":")
-		var e: string
-		if i < len(conf.icons) - 1
-			e += " --noupdate"
-		if len(xx) == 3
-			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} ../{{xx[0]}} {{xx[2]}}{{e}}"
-#	if conf.icon != ""
-#		f << "	cp -f " + conf.icon + " " + datadir
-	var list = conf.needs_installing()
-	for e in list
-		if os.fs.is_directory(conf.root | e)
-			f << "	cp -ruf '../{{e}}' {{datadir}}"
-		else
-			f << "	cp -uf '../{{e}}' {{datadir}}"
-	f << "	cp $(BIN) $(prefix)/bin"
-	f << ""
-
-	# clean
-	f << "clean :"
-	f << "\trm -f $(BIN)"
-	f << "\tfind . -name \"*.o\" -exec rm -f {} \\;"
-	f << "\tfind . -name \"*.a\" -exec rm -f {} \\;"
-	f << ""
+#	print("-- makefile {{p.name}} --")
+#	var f = os.fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt")
+#	f << "BIN = ../{{conf.targets[0].binary_file}}"
+#	f << "CPP = g++"
+#	var cflags, lflags, defines: string
+#	collect_global_flags(p, cflags, lflags, defines)
+#	var x: string
+#	if conf.build_type == "debug"
+#		x = "-g"
+#	f << "prefix = /usr/local"
+#	f << cl("GLOBALFLAGS = {{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}")
+#	f << cl("CXXFLAGS = {{conf.flags_compiler}} {{cflags}} $(GLOBALFLAGS)")
+#	f << cl("CXXFLAGSLINKING = {{conf.flags_linker}} {{lflags}} $(GLOBALFLAGS)")
+#	f << ""
+#	var obj = collect_objects(conf.root | conf.source_dir)
+#	f << "OBJ = " + obj.join(" \\\n ")
+#	f << ""
+#	var main_ob = "" ######relsrc(conf.root | conf.main_file.replace(".cpp", ".o"))
+#	f << "$(BIN) : $(OBJ) {{main_ob}}"
+#	f << "\t$(CPP) $(OBJ) {{main_ob}} -o $(BIN) $(CXXFLAGSLINKING)"
+#	f << ""
+#	f << "all : $(BIN)"
+#	f << ""
+#	for s in _sources
+#		var a = "{{relsrc(s.object())}} : {{relsrc(s.filename)}}"
+#		for d in s.dep
+#			a += " {{relsrc(d)}}"
+#		f << a
+#		f << "\t$(CPP) -c {{relsrc(s.filename)}} -o $@ $(CXXFLAGS)"
+#		f << ""
+#
+#	# install
+#	f << "install :"
+#	var datadir = "$(prefix)/share/{{conf.name}}"
+#	f << "	mkdir -p {{datadir}}"
+#	if conf.desktop_file != ""
+#		f << "	xdg-desktop-menu install ../{{conf.desktop_file}}"
+#	for m in conf.mime_files
+#		f << "	xdg-mime install ../{{m}}"
+#	for i=>icon in conf.icons
+#		var xx = icon.explode(":")
+#		var e: string
+#		if i < len(conf.icons) - 1
+#			e += " --noupdate"
+#		if len(xx) == 3
+#			f << "	xdg-icon-resource install --context mimetypes --size {{xx[1]}} ../{{xx[0]}} {{xx[2]}}{{e}}"
+##	if conf.icon != ""
+##		f << "	cp -f " + conf.icon + " " + datadir
+#	var list = conf.needs_installing()
+#	for e in list
+#		if os.fs.is_directory(conf.root | e)
+#			f << "	cp -ruf '../{{e}}' {{datadir}}"
+#		else
+#			f << "	cp -uf '../{{e}}' {{datadir}}"
+#	f << "	cp $(BIN) $(prefix)/bin"
+#	f << ""
+#
+#	# clean
+#	f << "clean :"
+#	f << "\trm -f $(BIN)"
+#	f << "\tfind . -name \"*.o\" -exec rm -f {} \\;"
+#	f << "\tfind . -name \"*.a\" -exec rm -f {} \\;"
+#	f << ""

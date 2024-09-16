@@ -10,6 +10,11 @@ func any2sa(a: any) -> string[]
 		return [str(a)]
 	return [for s in a.as_list()! str(s)]
 
+func any2pa(a: any) -> Path[]
+	if a.type() == string
+		return [str(a)]
+	return [for s in a.as_list()! Path(str(s))]
+
 func sa2any(a: string[]) -> any
 	var r: any
 	for s in a
@@ -29,19 +34,24 @@ struct LibGroup
 
 struct BuildTarget
 	var name: string
+	var is_library = false
 	var binary_file: Path
-	var exclusive_source: Path[]
+	var source: Path[]
+	var source_exclude: Path[]
 	var default = true
+	var dependencies: LibGroup[]
+	var include_directories: string[]
+	func __init__()
 
 
 func extract_target_name(x: string) -> string
-	for i in x.find(".")
-		return x[6:i]
+	for i in x[13:].find(".")
+		return x[13:13+i]
 	return ""
 
 func find_targets(c: os.Configuration) -> string[]
 	return c.keys()
-		|> filter(x => x[:6] == "build:")
+		|> filter(x => x[:13] == "build.target:")
 		|> extract_target_name
 		|> unique
 
@@ -59,10 +69,7 @@ struct Config
 	var name: string
 	
 	# build
-	var source_dir: Path
 	var build_systems = ["cmake"]
-	var lib_groups: LibGroup[]
-	var ignore_libs: string[]
 	var profiles: Profile[]
 	var language = "c++17"
 	var optimization = "2"
@@ -70,7 +77,6 @@ struct Config
 	var flags_global: string
 	var flags_compiler: string
 	var flags_linker: string
-	var include_directories: string[]
 	
 	var targets: BuildTarget[]
 	
@@ -82,17 +88,19 @@ struct Config
 	var installs_additional: string[]
 	
 	func ignored(l: string) -> bool
-		return l in ignore_libs
+		return false
+		#return l in ignore_libs
 	
 	func mut parse_targets(c: os.Configuration)
 		
 		var target_names = find_targets(c)
 		if len(target_names) == 0
-			target_names = ["default"]
+			raise(new Exception("no [build.target:...] found"))
 		print("targets: {{target_names}}")
 		for n in target_names
 			var t: BuildTarget
 			t.name = n
+			t.binary_file = n
 			targets.add(t)
 	
 	func mut load()
@@ -107,12 +115,6 @@ struct Config
 		for k in c.keys()
 			if k in ["project.name"]
 				name = str(c[k])
-			else if k in ["build.source-directory", "build.source"]
-				source_dir = str(c[k])
-			else if k in ["build.binary"]
-				targets[0].binary_file = str(c[k])
-			else if k == "build.main"
-				targets[0].exclusive_source = [str(c[k])]
 			else if k == "build.language"
 				language = c.get_str(k, "c++17")
 			else if k == "build.flags"
@@ -127,12 +129,6 @@ struct Config
 #				flags_linker = c[k]
 			else if k == "build.system"
 				build_systems = any2sa(c[k])
-			else if k == "build.libraries"
-				lib_groups = parse_libs(c[k])
-			#else if k == "build.libraries-optional"
-			#	libs_optional = c[k].explode(",")
-			else if k == "build.include-directories"
-				include_directories = any2sa(c[k])
 			else if k == "install.source"
 				install_source = str(c[k])
 			else if k == "install.icons"
@@ -151,15 +147,36 @@ struct Config
 			else
 				var found = false
 				for mut t in targets
-					if k == "build:{{t.name}}.binary"
+					let pre = "build.target:{{t.name}}"
+					if k == "{{pre}}.binary"
 						t.binary_file = str(c[k])
 						found = true
-					if k == "build:{{t.name}}.source"
-						t.exclusive_source.add(str(c[k]))
-						found = true
-					if k == "build:{{t.name}}.default"
+					#else if k == "{{pre}}.source"
+					#	t.exclusive_source.add(str(c[k]))
+					#	found = true
+					else if k == "{{pre}}.default"
 						t.default = bool(c[k])
 						found = true
+					else if k == "{{pre}}.type"
+						t.is_library = (str(c[k]) == "library")
+						found = true
+					else if k == "{{pre}}.source"
+						t.source = any2pa(c[k])
+						found = true
+					else if k == "{{pre}}.source-exclude"
+						t.source_exclude = any2pa(c[k])
+						found = true
+					else if k == "{{pre}}.binary"
+						t.binary_file = str(c[k])
+						found = true
+					else if k == "{{pre}}.dependencies"
+						t.dependencies = parse_libs(c[k])
+						found = true
+					else if k == "{{pre}}.include-directories"
+						t.include_directories = any2sa(c[k])
+						found = true
+					##else if k == "build.main"
+					##	targets[0].exclusive_source = [str(c[k])]
 				if not found
 					raise(new Exception("unknown tag: {{k}}"))
 				
@@ -167,25 +184,29 @@ struct Config
 	func mut save()
 		var c: os.Configuration
 		c["project.name"] = name
-		c["build.source"] = str(source_dir)
+	#	c["build.source"] = str(source_dir)
 	#	c["build.binary"] = str(binary_file)
 	#	if len(main_file) > 0
 	#		c["build.main"] = main_file
 		c["build.system"] = sa2any(build_systems)
 		c["build.language"] = language
 		c["build.optimization"] = optimization
-		c["build-type"] = build_type
+		c["build.type"] = build_type
 		c["build.flags"] = flags_global
-		c["build.include-directories"] = sa2any(include_directories)
-		c["build.libraries"] = encode_libs(lib_groups)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		
 		for t in targets
-			c["build:{{t.name}}.binary"] = str(t.binary_file)
-			c["build:{{t.name}}.source"] = pa2any(t.exclusive_source)
+			let pre = "build.target:{{t.name}}"
+			if t.is_library
+				c["{{pre}}.type"] = "library"
+			c["{{pre}}.binary"] = str(t.binary_file)
+			c["{{pre}}.source"] = pa2any(t.source)
+			c["{{pre}}.source-exclude"] = pa2any(t.source_exclude)
+			c["{{pre}}.include-directories"] = sa2any(t.include_directories)
+			c["{{pre}}.dependencies"] = encode_libs(t.dependencies)
 			if not t.default
-				c["build:{{t.name}}.default"] = false
+				c["{{pre}}.default"] = false
 			
 		c["install.source"] = str(install_source)
 		c["install.icons"] = sa2any(icons)
@@ -217,38 +238,43 @@ struct Config
 			return force_build_dir
 		return root | "build"
 		
+	func main_target() -> BuildTarget
+		for t in targets
+			if not t.is_library
+				return t
+		raise(new Exception("no executable main target found"))
 		
 	func _find_sources()
-		let dir = root | source_dir
-		let files = os.fs.search(dir, "*.cpp", "fr")
-		for f in files
-			#if not test_source_dir.is_empty()
-			#	if (source_dir|f) in test_source_dir
-			#		continue
-			var s: SourceFile
-			s.filename = dir | f
-			_sources.add(s)
+		#let dir = root | source_dir
+		#let files = os.fs.search(dir, "*.cpp", "fr")
+		#for f in files
+		#	#if not test_source_dir.is_empty()
+		#	#	if (source_dir|f) in test_source_dir
+		#	#		continue
+		#	var s: SourceFile
+		#	s.filename = dir | f
+		#	_sources.add(s)
 		
 		
-	func find_common_sources() -> Path[]
-		var exclusive: Path[]
-		for t in targets
-			let xx = find_exclusive_sources(t)
-			for x in xx
-				exclusive.add(x)
-		
-		
-		var r: Path[]
-		let dir = root | source_dir
-		let files = os.fs.search(dir, "*.cpp", "fr")
-		for f in files
-			if not ((dir | f) in exclusive)
-				r.add(dir | f)
-		return r
+#	func find_common_sources() -> Path[]
+#		var exclusive: Path[]
+#		for t in targets
+#			let xx = find_exclusive_sources(t)
+#			for x in xx
+#				exclusive.add(x)
+#		
+#		
+#		var r: Path[]
+#		let dir = root | source_dir
+#		let files = os.fs.search(dir, "*.cpp", "fr")
+#		for f in files
+#			if not ((dir | f) in exclusive)
+#				r.add(dir | f)
+#		return r
 	
-	func find_exclusive_sources(t: BuildTarget) -> Path[]
+	func _find_sources(pattern: Path[]) -> Path[]
 		var r: Path[]
-		for x in t.exclusive_source
+		for x in pattern
 			if os.fs.is_directory(root | x)
 				let files = os.fs.search(root | x, "*.cpp", "fr")
 				for f in files
@@ -256,6 +282,25 @@ struct Config
 			else if os.fs.exists(root | x)
 				r.add(root | x)
 		return r
+	
+	func find_sources(t: BuildTarget) -> Path[]
+		var sources = _find_sources(t.source)
+		var exclude = _find_sources(t.source_exclude)
+		return sources |> filter(x => not (x in exclude))
+	
+	func dependencies() -> LibGroup[]
+		var r: Ret
+		for t in targets
+			for d in t.dependencies
+				if find_target(d.libs[0]) == nil
+					r.add(d)
+		return r
+	
+	func find_target(name: string) -> BuildTarget*
+		for t in targets
+			if t.name == name
+				return &t
+		return nil
 
 var conf: Config
 
@@ -303,8 +348,8 @@ var _sources: SourceFile[]
 func rel(filename: Path) -> Path
 	return filename.relative_to(conf.root)
 
-func relsrc(filename: Path) -> Path
-	return filename.relative_to(conf.root | conf.source_dir)
+#func relsrc(filename: Path) -> Path
+#	return filename.relative_to(conf.root | conf.source_dir)
 
 
 func find_dep(out f: SourceFile, filename: Path)

@@ -51,7 +51,8 @@ func create_visual_studio(version: int)
 
 	
 	var xdef: string[]
-	for g in conf.lib_groups
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
 		for l in g.libs
 			if g.optional and not lib.vs_might_have(l)
 				xdef.add("{{lib.define(l)}}=0")
@@ -267,24 +268,26 @@ EndGlobal
     <ClInclude Include=\"{{win_path(i)}}\">
       <Filter>{{win_path(i.parent())[:-1]}}</Filter>
     </ClInclude>"
+    
+    	raise(new Exception("TODO: visualstudio backend"))
 
-	rand_seed(win_path(conf.source_dir).hash())
-	f += "
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include=\"{{win_path(conf.source_dir)}}\">
-      <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
-    </Filter>"
-
-	var fdirs = os.fs.search(conf.root | conf.source_dir, "", "dr")
-	for d in fdirs
-		var dir = win_path(conf.source_dir | d)
-		rand_seed(dir.hash())
-		f += "
-    <Filter Include=\"{{dir}}\">
-      <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
-    </Filter>"
-
+#	rand_seed(win_path(conf.source_dir).hash())
+#	f += "
+#  </ItemGroup>
+#  <ItemGroup>
+#    <Filter Include=\"{{win_path(conf.source_dir)}}\">
+#      <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
+#    </Filter>"
+#
+#	var fdirs = os.fs.search(conf.root | conf.source_dir, "", "dr")
+#	for d in fdirs
+#		var dir = win_path(conf.source_dir | d)
+#		rand_seed(dir.hash())
+#		f += "
+#    <Filter Include=\"{{dir}}\">
+#      <UniqueIdentifier>{{create_guid()}}</UniqueIdentifier>
+#    </Filter>"
+#
 	f += "
   </ItemGroup>
 </Project>"

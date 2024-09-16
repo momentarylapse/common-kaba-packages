@@ -3,10 +3,11 @@ use project.*
 use library.*
 
 
-func create_vcpkg()
+func create()
 	var req: string[]
 	
-	for g in conf.lib_groups
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
 		if g.optional
 			for l in g.libs
 				if not conf.ignored(l)

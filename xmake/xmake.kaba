@@ -1,10 +1,10 @@
 use library.*
 use project.*
 use makefile.*
-use visualstudio.*
-use meson.*
-use cmake.*
-use vcpkg.*
+use visualstudio
+use meson
+use cmake
+use vcpkg
 use build.*
 use os
 
@@ -28,7 +28,8 @@ func action_update(a: string[])
 	conf.load()
 	
 	var missing = []#conf.libs |> filter(l => not lib.test(l))
-	for g in conf.lib_groups
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
 		if g.optional
 			for l in g.libs
 				if not conf.ignored(l)
@@ -42,13 +43,13 @@ func action_update(a: string[])
 		if "make" in conf.build_systems
 			create_all_makefiles()
 		if "meson" in conf.build_systems
-			create_meson()
+			meson.create()
 		if "vs2019" in conf.build_systems
-			create_visual_studio(2019)
+			visualstudio.create_visual_studio(2019)
 		if "cmake" in conf.build_systems
-			create_cmake(false)
+			cmake.create(false)
 		if "cmake+vs2022" in conf.build_systems
-			create_cmake(true)
+			cmake.create(true)
 
 func action_build(a: string[])
 	#print("building {{conf.root}}")
@@ -87,7 +88,7 @@ func action_clear(a: string[])
 
 func action_create_vcpkg(a: string[])
 	conf.load()
-	create_vcpkg()
+	vcpkg.create()
 
 
 func main(arg: string[])
@@ -103,7 +104,7 @@ func main(arg: string[])
 	p.info("xmake", "the build tool for lazy people")
 	p.option("-v/--verbose", "verbose output", func() conf.verbose = true)
 	p.option("--dry", "dry run", func() conf.dry_run = true)
-	p.option("--ignore-lib", "LIB", "", func(o: string) conf.ignore_libs.add(o))
+###	p.option("--ignore-lib", "LIB", "", func(o: string) conf.ignore_libs.add(o))
 	p.option("--all", "enable all libraries", func() conf.force_all_libraries = true)
 	p.option("--rebuild", "clear before build", func() conf.force_rebuild = true)
 	p.option("--profile", "PROFILE", "", func(o: string) conf.force_profile = o)
