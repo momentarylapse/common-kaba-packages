@@ -34,10 +34,15 @@ struct BuildTarget
 	var default = true
 
 
+func extract_target_name(x: string) -> string
+	for i in x.find(".")
+		return x[6:i]
+	return ""
+
 func find_targets(c: os.Configuration) -> string[]
 	return c.keys()
 		|> filter(x => x[:6] == "build:")
-		|> (func(x: string) x[6:x.find(".")!])
+		|> extract_target_name
 		|> unique
 
 # project
@@ -79,12 +84,7 @@ struct Config
 	func ignored(l: string) -> bool
 		return l in ignore_libs
 	
-	func mut load()
-		if not os.fs.exists(conf.root | "xmake.conf")
-			raise(new Exception("no xmake.conf found"))
-		var c: os.Configuration
-		c.load(conf.root | "xmake.conf")
-		install_source = "static"
+	func mut parse_targets(c: os.Configuration)
 		
 		var target_names = find_targets(c)
 		if len(target_names) == 0
@@ -94,6 +94,15 @@ struct Config
 			var t: BuildTarget
 			t.name = n
 			targets.add(t)
+	
+	func mut load()
+		if not os.fs.exists(conf.root | "xmake.conf")
+			raise(new Exception("no xmake.conf found"))
+		var c: os.Configuration
+		c.load(conf.root | "xmake.conf")
+		install_source = "static"
+		
+		parse_targets(c)
 		
 		for k in c.keys()
 			if k in ["project.name"]
