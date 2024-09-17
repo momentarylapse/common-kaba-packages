@@ -240,9 +240,9 @@ struct Config
 		
 	func main_target() -> BuildTarget
 		for t in targets
-			if not t.is_library
+			if not t.is_library and t.default
 				return t
-		raise(new Exception("no executable main target found"))
+		raise(new Exception("no main target found (executable and default)"))
 		
 	func _find_sources()
 		#let dir = root | source_dir
