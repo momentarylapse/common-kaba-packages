@@ -65,7 +65,7 @@ if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
 	list(APPEND LINK_DIRECTORIES ${"+v+"_LIBRARY_DIRS})
 	list(APPEND DEPS ${"+v+"_LIBRARIES})
 	list(APPEND COMPILE_OPTIONS ${"+v+"_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS{{lls[i].define()}}=1)"
+	list(APPEND COMPILE_DEFINITIONS {{lls[i].define()}}=1)"
 		else
 			print("ERROR: no pkg for {{lls[i]}}")
 		s += "
