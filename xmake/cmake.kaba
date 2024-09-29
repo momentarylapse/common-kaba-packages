@@ -92,7 +92,7 @@ if({{v}}_FOUND)
 endif()"
 	s += "
 if({{cvar}}_FOUND)
-	if(NOT ${GTK3_OR_GTK4} IN_LIST {{cvar}}_FOUND)
+	if(NOT ${"+cvar+"} IN_LIST {{cvar}}_FOUND)
 		list(GET {{cvar}}_FOUND 0 X)
 		set({{cvar}} ${X} CACHE STRING \"choose\" FORCE)
 		message(WARNING \"Choice for {{cvar}} invalid, using ${"+cvar+"} instead\")
