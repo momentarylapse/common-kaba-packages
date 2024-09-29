@@ -1,6 +1,6 @@
 link = X11
 include = X11/Xlib.h
 pkg = x11
-cmake.package = X11
-cmake.target = X11::X11
+_cmake.package = X11
+_cmake.target = X11::X11
 

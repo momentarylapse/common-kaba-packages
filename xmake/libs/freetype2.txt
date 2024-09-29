@@ -4,4 +4,5 @@ pkg = freetype2
 vcpkg = freetype
 cmake.package = Freetype
 cmake.target = Freetype::Freetype
+cmake.variable = FREETYPE_FOUND
 

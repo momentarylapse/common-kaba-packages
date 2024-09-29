@@ -4,4 +4,5 @@ pkg = glfw3
 vcpkg = glfw3
 cmake.package = glfw3
 cmake.target = glfw
+cmake.variable = glfw3_FOUND
 

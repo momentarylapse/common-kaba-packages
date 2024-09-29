@@ -9,7 +9,9 @@ struct Library
 	var pkg: string[]
 	var vcpkg: string[]
 	var meson: string[]
-	var cmake: string[]
+	var cmake_packages: string[]
+	var cmake_targets: string[]
+	var cmake_variable: string?
 	var cmake_code: string#?  FIXME kaba bug
 	var includes: string[]
 	var dir_override: string
@@ -68,8 +70,12 @@ struct LibraryManager
 			l.pkg = any2sa(c["pkg"])
 		if len(c["meson"]) > 0
 			l.meson = any2sa(c["meson"])
-		if len(c["cmake"]) > 0
-			l.cmake = any2sa(c["cmake"])
+		if len(c["cmake.package"]) > 0
+			l.cmake_packages = any2sa(c["cmake.package"])
+		if len(c["cmake.target"]) > 0
+			l.cmake_targets = any2sa(c["cmake.target"])
+		if len(c["cmake.variable"]) > 0
+			l.cmake_variable = str(c["cmake.variable"])
 		if len(c["cmake.code"]) > 0
 			l.cmake_code = str(c["cmake"])
 		if len(c["vcpkg"]) > 0

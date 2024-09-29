@@ -7,25 +7,71 @@ use vcpkg
 func var_name(l: string) -> string
 	return l.upper().replace("-", "").replace(".", "")
 
+
+func lib_discover(ll: Library, indent: string, is_required: bool) -> string
+	var flag = ""
+	if is_required
+		flag = " REQUIRED"
+	var s = ""
+	if len(ll.cmake_packages) > 0
+		for i=>p in ll.cmake_packages
+			s += "
+{{indent}}find_package({{p}}{{flag}})"
+	else if len(ll.pkg) > 0
+		for i=>p in ll.pkg
+			let varx = var_name(p)
+			s += "
+{{indent}}pkg_check_modules({{varx}}{{flag}} {{p}})"
+	return s[1:]
+
+	raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+
+
+func lib_guard(ll: Library) -> string
+	if ll.name == "gl"
+		return "OPENGL_FOUND AND NOT APPLE"
+	if len(ll.cmake_packages) > 0
+		for v in ll.cmake_variable
+			return v
+		return var_name(ll.name) + "_FOUND"
+	else if len(ll.pkg) > 0
+		let varx = ll.pkg |> var_name
+		return ([for v in varx "{{v}}_FOUND"].join(" AND "))
+	return ""
+
+
+func lib_add_data(ll: Library, indent: string) -> string
+	var s = ""
+	if len(ll.cmake_packages) > 0
+		s = "
+{{indent}}list(APPEND DEPS {{ll.cmake_targets.join(" " )}})
+{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+	else if len(ll.pkg) > 0
+		for p in ll.pkg
+			let varx = var_name(p)
+			s += "
+{{indent}}list(APPEND INCLUDE_DIRECTORIES ${"+varx+"_INCLUDE_DIRS})
+{{indent}}list(APPEND LINK_DIRECTORIES ${"+varx+"_LIBRARY_DIRS})
+{{indent}}list(APPEND DEPS ${"+varx+"_LIBRARIES})
+{{indent}}list(APPEND COMPILE_OPTIONS ${"+varx+"_CFLAGS_OTHER})"
+		s += "
+{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+	else
+		raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+	return s[1:]
+
+
 func link_mandatory_lib(l: string) -> string
 	let ll = lib.get(l)
-	let varx = var_name(l)
-	#deps.add("{{varx}}_LIBRARIES")
-	if len(ll.pkg) > 0
-		return "
-
-# lib: {{l}} mandatory
-pkg_check_modules({{varx}} REQUIRED {{ll.pkg[0]}})
-list(APPEND INCLUDE_DIRECTORIES ${"+varx+"_INCLUDE_DIRS})
-list(APPEND LINK_DIRECTORIES ${"+varx+"_LIBRARY_DIRS})
-list(APPEND DEPS ${"+varx+"_LIBRARIES})
-list(APPEND COMPILE_OPTIONS ${"+varx+"_CFLAGS_OTHER})
-list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
-	else
-		print("ERROR: no pkg for mandatory lib {{l}}")
-		return ""
+	return "
 
 
+# lib: {{l}} (mandatory)
+{{lib_discover(ll, "", true)}}
+{{lib_add_data(ll, "")}}"
+
+
+# a|b|c
 func link_mandatory_group(g: LibGroup) -> string
 	let lls = [for l in g.libs  lib.get(l)]
 	let varxs = g.libs |> var_name
@@ -34,13 +80,13 @@ func link_mandatory_group(g: LibGroup) -> string
 	let label = g.libs.join(" or ")
 	var s = "
 
+
 # lib: {{label}} (mandatory)
 set({{cvar}} \"{{g.libs[0]}}\" CACHE STRING \"Use {{label}}?\")"
 
 	for i=>v in varxs
-		if len(lls[i].pkg) > 0
-			s += "
-pkg_check_modules({{v}} {{lls[i].pkg[0]}})
+		s += "
+{{lib_discover(lls[i], "", false)}}
 if({{v}}_FOUND)
 	list(APPEND {{cvar}}_FOUND \"{{g.libs[i]}}\")
 endif()"
@@ -58,19 +104,11 @@ endif()"
 	
 	for i=>v in varxs
 		s += "
-if({{cvar}} STREQUAL \"{{g.libs[i]}}\")"
-		if len(lls[i].pkg) > 0
-			s += "
-	list(APPEND INCLUDE_DIRECTORIES ${"+v+"_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${"+v+"_LIBRARY_DIRS})
-	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${"+v+"_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS {{lls[i].define()}}=1)"
-		else
-			print("ERROR: no pkg for {{lls[i]}}")
-		s += "
+if({{cvar}} STREQUAL \"{{g.libs[i]}}\")
+{{lib_add_data(lls[i], "	")}}
 endif()"
 	return s
+
 
 
 func link_optional_lib(l: string) -> string
@@ -84,62 +122,14 @@ func link_optional_lib(l: string) -> string
 		let code = ll.cmake_code.replace(":define:", ll.define())
 		return "
 
+
 # lib: {{l}} (optional)
 {{code}}"
 
-	if len(ll.pkg) > 0
-		# => pkg
-		let varx = ll.pkg |> var_name
-		var r = "
 
-# lib: {{l}} (optional)
-set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")"
-		for i=>v in varx
-			r += "
-pkg_check_modules({{v}} {{ll.pkg[i]}})"
-		r += "
-if(" + ([for v in varx "{{v}}_FOUND"].join(" AND ")) + ")"
-		for i=>v in varx
-			r += "
-	list(APPEND INCLUDE_DIRECTORIES ${"+v+"_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${"+v+"_LIBRARY_DIRS})
-	list(APPEND DEPS ${"+v+"_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${"+v+"_CFLAGS_OTHER})"
-		r += "
-else()
-	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
-endif()
-if(${"+var_enabled+"})
-	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)
-endif()"
-		return r
-
-	else if len(ll.cmake) > 0
-		# => cmake
-		let cn = ll.cmake[0]
+	if l == "dl"
 		return "
 
-# lib: {{l}} (optional)
-set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")
-find_package({{cn}})
-if({{cn}}_FOUND)
-	list(APPEND INCLUDE_DIRECTORIES ${"+cn+"_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${"+cn+"_LIBRARY_DIRS})
-	list(APPEND COMPILE_DEFINITIONS ${"+cn+"_DEFINITIONS})
-	list(APPEND DEPS ${"+cn+"_LIBRARIES})
-else()
-	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
-endif()
-if(${"+var_enabled+"})
-	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)
-else()
-	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)
-#endif()"
-
-	else if l == "dl"
-		return "
 
 # lib: dl...
 if(WIN32)
@@ -148,6 +138,26 @@ else()
 	list(APPEND DEPS ${CMAKE_DL_LIBS})
 	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)
 endif()"
+
+
+
+
+	var r = "
+
+
+# lib: {{l}} (optional)
+set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")
+{{lib_discover(ll, "", false)}}
+if({{lib_guard(ll)}})
+else()
+	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
+endif()
+if(${"+var_enabled+"})
+{{lib_add_data(ll, "	")}}
+else()
+	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)
+endif()"
+	return r
 
 
 	print("WARNING: lib {{l}} not in cmake")
