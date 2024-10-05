@@ -2,4 +2,3 @@ link =
 include = shaderc/shaderc.h
 pkg = shaderc
 vcpkg = shaderc
-
