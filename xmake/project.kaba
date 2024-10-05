@@ -77,6 +77,7 @@ struct Config
 	var flags_global: string
 	var flags_compiler: string
 	var flags_linker: string
+	var features: string[]
 	
 	var targets: BuildTarget[]
 	
@@ -129,6 +130,8 @@ struct Config
 #				flags_linker = c[k]
 			else if k == "build.system"
 				build_systems = any2sa(c[k])
+			else if k == "build.features"
+				features = any2sa(c[k])
 			else if k == "install.source"
 				install_source = str(c[k])
 			else if k == "install.icons"
@@ -193,6 +196,7 @@ struct Config
 		c["build.optimization"] = optimization
 		c["build.type"] = build_type
 		c["build.flags"] = flags_global
+		c["build.features"] = sa2any(features)
 		for p in profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		
