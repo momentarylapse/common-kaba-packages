@@ -169,13 +169,13 @@ list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)"
 
 
 func create_base() -> string
-	let debug = conf.build_type == "debug"
+	let debug = conf.build.type == "debug"
 	
 	var r = "# created by xmake
 
 cmake_minimum_required(VERSION 3.21)
-project({{conf.name}})
-set(CMAKE_CXX_STANDARD {{conf.language[3:]}})
+project({{conf.project.name}})
+set(CMAKE_CXX_STANDARD {{conf.build.language[3:]}})
 set(CMAKE_CXX_STANDARD_REQUIRED True)"
 	if debug
 		r += "
@@ -224,7 +224,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)"
 
-	if "gitversion" in conf.features
+	if "gitversion" in conf.build.features
 		r += "
 
 # git version
@@ -278,6 +278,11 @@ set_target_properties({{t.binary_file}} PROPERTIES EXCLUDE_FROM_ALL TRUE)"
 	return r
 
 
+func dir_no_slash(p: os.Path) -> string
+	let s = str(p)
+	if s.tail(1) == "/"
+		return s[:-1]
+	return s
 
 
 func create_install_base() -> string
@@ -296,10 +301,14 @@ install(TARGETS {{t.binary_file}} DESTINATION bin)"
 	for e in list
 		if os.fs.is_directory(conf.root | e)
 			r += "
-install(DIRECTORY \"{{e}}\" DESTINATION share/{{conf.name}})"
+install(DIRECTORY \"{{dir_no_slash(e)}}\" DESTINATION share/{{conf.project.name}})"
 		else
 			r += "
-install(FILES \"{{e}}\" DESTINATION share/{{conf.name}})"
+install(FILES \"{{e}}\" DESTINATION share/{{conf.project.name}})"
+	if bool(conf.project.icon)
+		# assuming svg for now...
+		r += "
+install(FILES \"{{conf.project.icon}}\" DESTINATION share/icons/hicolor/scalable/apps)"
 	return r
 
 
@@ -308,15 +317,15 @@ func create_install_desktop() -> string
 
 # install .desktop file
 set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
-configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.desktop_file}}\" /tmp/{{conf.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
-install(FILES /tmp/{{conf.desktop_file.basename()}} DESTINATION share/applications)"
+configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.install.desktop_file}}\" /tmp/{{conf.install.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+install(FILES /tmp/{{conf.install.desktop_file.basename()}} DESTINATION share/applications)"
 
 
 func create_install_icons() -> string
 	var r = "
 
 # install icons"
-	for i in conf.icons
+	for i in conf.install.icons
 		let x = i.explode(":")
 		if len(x) >= 3
 			r += "
@@ -330,7 +339,7 @@ func create_install_mime() -> string
 # install mime
 find_program(XDG_MIME_EXECUTABLE xdg-mime)
 if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
-	for m in conf.mime_files
+	for m in conf.install.mime_files
 		r += "
 	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
 	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
@@ -518,25 +527,25 @@ func create()
 	
 	r += create_install_base()
 
-	if conf.desktop_file != ""
+	if conf.install.desktop_file != ""
 		r += create_install_desktop()
 
 #	if len(conf.icons) > 0
 #		r += create_install_icons()
 
-	if len(conf.mime_files) > 0
+	if len(conf.install.mime_files) > 0
 		r += create_install_mime()
 		
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
 	
 
-	if "gitversion" in conf.features
+	if "gitversion" in conf.build.features
 		create_git_version()
 	
-	if "vs2022" in conf.features
+	if "vs2022" in conf.build.features
 		create_vs2022_stuff()
 
-	if "vcpkg" in conf.features
+	if "vcpkg" in conf.build.features
 		vcpkg.create()
 
 

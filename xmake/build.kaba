@@ -60,7 +60,7 @@ class TX extends thread.Thread
 
 
 func get_profile(name: string) -> Profile
-	for p in conf.profiles
+	for p in conf.build.profiles
 		if p.name == name
 			return p
 	var p: Profile
@@ -85,11 +85,11 @@ func build()
 	var cflags, lflags, defines: string
 	collect_global_flags(p, cflags, lflags, defines)
 	var x: string
-	if conf.build_type == "debug"
+	if conf.build.type == "debug"
 		x = "-g"
-	let global_flags = "{{conf.flags_global}} -O{{conf.optimization}} {{x}} -std={{conf.language}} {{defines}}"
-	let cxx_flags = "{{conf.flags_compiler}} {{cflags}} {{global_flags}}"
-	let cxx_flags_linking = "{{conf.flags_linker}} {{lflags}} {{global_flags}}"
+	let global_flags = "{{conf.build.flags_global}} -O{{conf.build.optimization}} {{x}} -std={{conf.build.language}} {{defines}}"
+	let cxx_flags = "{{conf.build.flags_compiler}} {{cflags}} {{global_flags}}"
+	let cxx_flags_linking = "{{conf.build.flags_linker}} {{lflags}} {{global_flags}}"
 	
 	let needs_building = [for s in _sources s if not is_completely_built(s)]
 	#print("total {{len(sources)}}, build {{len(needs_building)}}")

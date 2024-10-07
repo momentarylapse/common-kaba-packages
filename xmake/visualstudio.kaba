@@ -18,7 +18,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	var pguid, sguid: string
 	try
-		var f = os.fs.read_text(conf.root | "{{conf.name}}.sln")
+		var f = os.fs.read_text(conf.root | "{{conf.project.name}}.sln")
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -65,14 +65,14 @@ func create_visual_studio(version: int)
 	
 	var includes = os.fs.search("./", "*.h", "rf")
 	
-	var CPPVER = conf.language.replace("c++", "stdcpp")
+	var CPPVER = conf.build.language.replace("c++", "stdcpp")
 	
 	var f = "
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"{{conf.name}}\", \"{{conf.name}}.vcxproj\", \"{{PGUID}}\"
+Project(\"{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}\") = \"{{conf.project.name}}\", \"{{conf.project.name}}.vcxproj\", \"{{PGUID}}\"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,7 +99,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	os.fs.write(conf.root | "{{conf.name}}.sln", f.replace("\n", "\r\n"))
+	os.fs.write(conf.root | "{{conf.project.name}}.sln", f.replace("\n", "\r\n"))
 	
 	var toolset = "v142"
 	if version == 2022
@@ -244,7 +244,7 @@ EndGlobal
 </Project>
 "
 
-	os.fs.write_text(conf.root | "{{conf.name}}.vcxproj", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj", f.replace("\n", "\r\n"))
 	
 	
 	
@@ -293,4 +293,4 @@ EndGlobal
 </Project>"
   
   
-	os.fs.write_text(conf.root | "{{conf.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

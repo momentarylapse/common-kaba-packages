@@ -56,6 +56,30 @@ func find_targets(c: os.Configuration) -> string[]
 		|> extract_target_name
 		|> unique
 
+
+struct ProjectInfo
+	var name: string
+	var prefix: string
+	var description: string
+	var icon: Path
+
+struct BuildInfo
+	var systems = ["cmake"]
+	var profiles: Profile[]
+	var language = "c++17"
+	var optimization = "2"
+	var type = "debug"
+	var flags_global: string
+	var flags_compiler: string
+	var flags_linker: string
+	var features: string[]
+
+struct InstallInfo
+	var source: Path[]
+	var icons: string[]
+	var desktop_file: Path
+	var mime_files: string[]
+
 # project
 struct Config
 	var root: Path
@@ -67,27 +91,15 @@ struct Config
 	var force_threads = -1
 	var force_build_dir: Path
 	
-	var name: string
+	# project
+	var project: ProjectInfo
 	
 	# build
-	var build_systems = ["cmake"]
-	var profiles: Profile[]
-	var language = "c++17"
-	var optimization = "2"
-	var build_type = "debug"
-	var flags_global: string
-	var flags_compiler: string
-	var flags_linker: string
-	var features: string[]
-	
+	var build: BuildInfo
 	var targets: BuildTarget[]
 	
 	# install
-	var icons: string[]
-	var desktop_file: Path
-	var mime_files: string[]
-	var install_source: Path
-	var installs_additional: string[]
+	var install: InstallInfo
 	
 	func ignored(l: string) -> bool
 		return false
@@ -110,77 +122,81 @@ struct Config
 			raise(new Exception("no xmake.conf found"))
 		var c: os.Configuration
 		c.load(conf.root | "xmake.conf")
-		install_source = "static"
+		install.source = ["static/"]
 		
 		parse_targets(c)
 		
-		for k in c.keys()
+		for k=>v in c.dict
 			if k in ["project.name"]
-				name = str(c[k])
+				project.name = str(v)
+			else if k in ["project.prefix"]
+				project.prefix = str(v)
+			else if k in ["project.description"]
+				project.description = str(v)
+			else if k in ["project.icon"]
+				project.icon = str(v)
 			else if k == "build.language"
-				language = c.get_str(k, "c++17")
+				build.language = str(v)
 			else if k == "build.flags"
-				flags_global = str(c[k])
+				build.flags_global = str(v)
 			else if k == "build.optimization"
-				optimization = c.get_str(k, "2")
+				build.optimization = str(v)
 			else if k == "build.type"
-				build_type = c.get_str(k, "debug")
+				build.type = str(v)
 			#else if k == "compiler-flags"
 #				flags_compiler = c[k]
 #			else if k == "linker-flags"
 #				flags_linker = c[k]
 			else if k == "build.system"
-				build_systems = any2sa(c[k])
+				build.systems = any2sa(v)
 			else if k == "build.features"
-				features = any2sa(c[k])
+				build.features = any2sa(v)
 			else if k == "install.source"
-				install_source = str(c[k])
+				install.source = any2pa(v)
 			else if k == "install.icons"
-				icons = any2sa(c[k])
+				install.icons = any2sa(v)
 			else if k == "install.desktop-file"
-				desktop_file = str(c[k])
+				install.desktop_file = str(v)
 			else if k == "install.mime-files"
-				mime_files = any2sa(c[k])
-			else if k == "install.additional"
-				installs_additional = any2sa(c[k])
+				install.mime_files = any2sa(v)
 			else if k[:14] == "build.profile-"
 				var p: Profile
 				p.name = k[14:]
-				p.libs_optional = any2sa(c[k])
-				profiles.add(p)
+				p.libs_optional = any2sa(v)
+				build.profiles.add(p)
 			else
 				var found = false
 				for mut t in targets
 					let pre = "build.target:{{t.name}}"
 					if k == "{{pre}}.binary"
-						t.binary_file = str(c[k])
+						t.binary_file = str(v)
 						found = true
 					#else if k == "{{pre}}.source"
-					#	t.exclusive_source.add(str(c[k]))
+					#	t.exclusive_source.add(str(v))
 					#	found = true
 					else if k == "{{pre}}.default"
-						t.default = bool(c[k])
+						t.default = bool(v)
 						found = true
 					else if k == "{{pre}}.type"
-						t.is_library = (str(c[k]) == "library")
+						t.is_library = (str(v) == "library")
 						found = true
 					else if k == "{{pre}}.source"
-						t.source = any2pa(c[k])
+						t.source = any2pa(v)
 						found = true
 					else if k == "{{pre}}.source-exclude"
-						t.source_exclude = any2pa(c[k])
+						t.source_exclude = any2pa(v)
 						found = true
 					else if k == "{{pre}}.binary"
-						t.binary_file = str(c[k])
+						t.binary_file = str(v)
 						found = true
 					else if k == "{{pre}}.dependencies"
-						t.dependencies = parse_libs(c[k])
+						t.dependencies = parse_libs(v)
 						found = true
 					else if k == "{{pre}}.include-directories"
-						t.include_directories = any2sa(c[k])
+						t.include_directories = any2sa(v)
 						found = true
 					else if k == "{{pre}}.features"
-						t.features = any2sa(c[k])
+						t.features = any2sa(v)
 						found = true
 					##else if k == "build.main"
 					##	targets[0].exclusive_source = [str(c[k])]
@@ -190,18 +206,18 @@ struct Config
 
 	func mut save()
 		var c: os.Configuration
-		c["project.name"] = name
+		c["project.name"] = project.name
 	#	c["build.source"] = str(source_dir)
 	#	c["build.binary"] = str(binary_file)
 	#	if len(main_file) > 0
 	#		c["build.main"] = main_file
-		c["build.system"] = sa2any(build_systems)
-		c["build.language"] = language
-		c["build.optimization"] = optimization
-		c["build.type"] = build_type
-		c["build.flags"] = flags_global
-		c["build.features"] = sa2any(features)
-		for p in profiles
+		c["build.system"] = sa2any(build.systems)
+		c["build.language"] = build.language
+		c["build.optimization"] = build.optimization
+		c["build.type"] = build.type
+		c["build.flags"] = build.flags_global
+		c["build.features"] = sa2any(build.features)
+		for p in build.profiles
 			c["profile-{{p.name}}"] = sa2any(p.libs_optional)
 		
 		for t in targets
@@ -216,27 +232,33 @@ struct Config
 			if not t.default
 				c["{{pre}}.default"] = false
 			
-		c["install.source"] = str(install_source)
-		c["install.icons"] = sa2any(icons)
-		c["install.desktop-file"] = str(desktop_file)
-		c["install.mime-files"] = sa2any(mime_files)
-		c["install.additional"] = sa2any(installs_additional)
+		c["install.source"] = pa2any(install.source)
+		c["install.icons"] = sa2any(install.icons)
+		c["install.desktop-file"] = str(install.desktop_file)
+		c["install.mime-files"] = sa2any(install.mime_files)
+		#c["install.additional"] = sa2any(installs_additional)
 		c.save(conf.root | "xmake.conf")
 	
 	func needs_installing() -> Path[]
 		var r: Path[]
-		let list = os.fs.search(install_source, "*.*", "fd")
-		var ignore = mime_files
-		ignore.add(str(desktop_file))
-		for e in list
-			if not (str(install_source | e) in ignore)
-				r.add(install_source | e)
-		for i in installs_additional
-			r.add(i)
+		var ignore = install.mime_files
+		ignore.add(str(install.desktop_file))
+		
+		for s in install.source
+			if str(s)[-1:] == "*"
+				let sdir = str(s)[:-1] as Path
+				let list = os.fs.search(sdir, "*.*", "fd")
+				for e in list
+					if not (str(sdir | e) in ignore)
+						r.add(sdir | e)
+			else
+				r.add(s)
+		#for i in installs_additional
+		#	r.add(i)
 		return r
 		
 	func has_explicit_default_profile() -> bool
-		for p in conf.profiles
+		for p in conf.build.profiles
 			if p.name == "default"
 				return true
 		return false

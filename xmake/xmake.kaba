@@ -40,15 +40,15 @@ func action_update(a: string[])
 	conf._find_sources()
 
 	if not conf.dry_run
-		if "make" in conf.build_systems
+		if "make" in conf.build.systems
 			create_all_makefiles()
-		if "meson" in conf.build_systems
+		if "meson" in conf.build.systems
 			meson.create()
-		if "vs2019" in conf.build_systems
+		if "vs2019" in conf.build.systems
 			visualstudio.create_visual_studio(2019)
-		if "cmake" in conf.build_systems
+		if "cmake" in conf.build.systems
 			cmake.create()
-		if "cmake+vs2022" in conf.build_systems
+		if "cmake+vs2022" in conf.build.systems
 			raise(new Exception("cmake+vs2022 deprecated. Use cmake + features=[vs2022]"))
 
 func action_build(a: string[])

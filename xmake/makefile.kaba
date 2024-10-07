@@ -7,7 +7,7 @@ func create_all_makefiles()
 	parse_dependencies()
 
 	# fixed profiles
-	for p in conf.profiles
+	for p in conf.build.profiles
 		if p.name == "default"
 			create_makefile(p, "")
 		else
