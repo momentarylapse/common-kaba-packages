@@ -47,9 +47,9 @@ func action_update(a: string[])
 		if "vs2019" in conf.build_systems
 			visualstudio.create_visual_studio(2019)
 		if "cmake" in conf.build_systems
-			cmake.create(false)
+			cmake.create()
 		if "cmake+vs2022" in conf.build_systems
-			cmake.create(true)
+			raise(new Exception("cmake+vs2022 deprecated. Use cmake + features=[vs2022]"))
 
 func action_build(a: string[])
 	#print("building {{conf.root}}")

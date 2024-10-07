@@ -250,12 +250,17 @@ func create_target(t: BuildTarget) -> string
 #    target {{t.name}}
 #=======================================================================================
 "
+
+	var tflags = ""
+	if "gui" in t.features
+		tflags += " WIN32"
+
 	if t.is_library
 		r += "
 add_library({{t.binary_file}}"
 	else
 		r += "
-add_executable({{t.binary_file}}"
+add_executable({{t.binary_file}}{{tflags}}"
 	r += "
 	{{xfiles}})
 target_include_directories({{t.binary_file}} PUBLIC ${INCLUDE_DIRECTORIES})
@@ -437,40 +442,7 @@ endif ()
 ")
 
 
-
-
-func create(with_vs2022: bool)
-	
-	print("-- cmake --")
-	 
-	var r = create_base()
-	
-	r += create_libs()
-	
-	
-
-	for t in conf.targets
-		r += create_target(t)
-	
-	r += create_install_base()
-
-	if conf.desktop_file != ""
-		r += create_install_desktop()
-
-#	if len(conf.icons) > 0
-#		r += create_install_icons()
-
-	if len(conf.mime_files) > 0
-		r += create_install_mime()
-		
-	os.fs.write_text(conf.root | "CMakeLists.txt", r)
-	
-	if "gitversion" in conf.features
-		create_git_version()
-	
-	
-	if not with_vs2022
-		return
+func create_vs2022_stuff()
 	
 	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
 	\"version\": 3,
@@ -530,7 +502,42 @@ func create(with_vs2022: bool)
 }
 ")
 
-	vcpkg.create()
+
+func create()
+	
+	print("-- cmake --")
+	 
+	var r = create_base()
+	
+	r += create_libs()
+	
+	
+
+	for t in conf.targets
+		r += create_target(t)
+	
+	r += create_install_base()
+
+	if conf.desktop_file != ""
+		r += create_install_desktop()
+
+#	if len(conf.icons) > 0
+#		r += create_install_icons()
+
+	if len(conf.mime_files) > 0
+		r += create_install_mime()
+		
+	os.fs.write_text(conf.root | "CMakeLists.txt", r)
+	
+
+	if "gitversion" in conf.features
+		create_git_version()
+	
+	if "vs2022" in conf.features
+		create_vs2022_stuff()
+
+	if "vcpkg" in conf.features
+		vcpkg.create()
 
 
 
