@@ -60,6 +60,7 @@ func find_targets(c: os.Configuration) -> string[]
 struct ProjectInfo
 	var name: string
 	var prefix: string
+	var company: string
 	var description: string
 	var icon: Path
 
@@ -131,6 +132,8 @@ struct Config
 				project.name = str(v)
 			else if k in ["project.prefix"]
 				project.prefix = str(v)
+			else if k in ["project.company"]
+				project.company = str(v)
 			else if k in ["project.description"]
 				project.description = str(v)
 			else if k in ["project.icon"]

@@ -199,8 +199,9 @@ set(CMAKE_BUILD_TYPE Debug)"
 func create_libs() -> string
 	var r = "
 
+
 #=======================================================================================
-#    libs
+#    libraries
 #=======================================================================================
 
 find_package(PkgConfig REQUIRED)
@@ -235,6 +236,40 @@ list(APPEND DEPS git-version)"
 	return r
 
 
+func create_macos_bundle() -> string
+	return "
+
+
+#=======================================================================================
+#    MacOS bundle icon
+#=======================================================================================
+
+if (APPLE)
+	add_custom_command(OUTPUT {{conf.project.name}}.icns
+		COMMAND [ -e {{conf.project.name}}.iconset ] || mkdir {{conf.project.name}}.iconset
+		COMMAND sips -z 16 16 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_16x16.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_16x16@2x.png
+		COMMAND sips -z 32 32 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_32x32.png
+		COMMAND sips -z 64 64 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_32x32@2x.png
+		COMMAND sips -z 128 128 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_128x128.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_128x128@2x.png
+		COMMAND sips -z 256 256 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_256x256.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_256x256@2x.png
+		COMMAND sips -z 512 512 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_512x512.png
+		COMMAND sips -z 1024 1024 ${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}} --out {{conf.project.name}}.iconset/icon_512x512@2x.png
+		COMMAND iconutil -c icns {{conf.project.name}}.iconset
+		DEPENDS \"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}}\"
+		VERBATIM)
+
+
+	set(MACOSX_BUNDLE_ICON_FILE {{conf.project.name}}.icns)
+	set_source_files_properties({{conf.project.name}}.icns
+		PROPERTIES
+		MACOSX_PACKAGE_LOCATION \"Resources\")
+endif()"
+
+
+# TODO bundle with multi-targets...
 func create_target(t: BuildTarget) -> string
 	let xsources = conf.find_sources(t)
 	let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
@@ -246,20 +281,25 @@ func create_target(t: BuildTarget) -> string
 	
 	var r = "
 
+
 #=======================================================================================
 #    target {{t.name}}
-#=======================================================================================
-"
+#======================================================================================="
 
 	var tflags = ""
 	if "gui" in t.features
 		tflags += " WIN32"
+	if "macosbundle" in conf.build.features
+		tflags += " MACOSX_BUNDLE
+	{{conf.project.name}}.icns"
 
 	if t.is_library
 		r += "
+
 add_library({{t.binary_file}}"
 	else
 		r += "
+
 add_executable({{t.binary_file}}{{tflags}}"
 	r += "
 	{{xfiles}})
@@ -286,64 +326,110 @@ func dir_no_slash(p: os.Path) -> string
 
 
 func create_install_base() -> string
+	# https://cmake.org/cmake/help/latest/prop_tgt/MACOSX_BUNDLE_INFO_PLIST.html
 	var r = "
+
 
 #=======================================================================================
 #    install
-#=======================================================================================
-"
+#======================================================================================="
+
+	if "macosbundle" in conf.build.features
+		r += "
+		
+if (APPLE)
+	set_target_properties(sgribthmaker
+		PROPERTIES
+		BUNDLE True
+		MACOSX_BUNDLE_BUNDLE_NAME {{conf.project.name}}
+		MACOSX_BUNDLE_GUI_IDENTIFIER \"{{conf.project.company}}\"
+		MACOSX_BUNDLE_BUNDLE_VERSION \"0.1\"
+		MACOSX_BUNDLE_SHORT_VERSION_STRING \"0.1\"
+		RESOURCE \"${resource_files}\")
+	set(RESOURCE_DESTINATION bin/{{conf.project.name}}.app/Contents/Resources)
+else ()
+	set(RESOURCE_DESTINATION share/{{conf.project.name}})
+endif ()"
+	else
+		r += "
+
+set(RESOURCE_DESTINATION share/{{conf.project.name}})"
+
+	r += "
+
+# binaries"
 
 	for t in conf.targets
 		if t.default and not t.is_library
 			r += "
 install(TARGETS {{t.binary_file}} DESTINATION bin)"
+
+	r += "	
+
+# resources"
 	let list = conf.needs_installing()
 	for e in list
 		if os.fs.is_directory(conf.root | e)
 			r += "
-install(DIRECTORY \"{{dir_no_slash(e)}}\" DESTINATION share/{{conf.project.name}})"
+install(DIRECTORY \"{{dir_no_slash(e)}}\" DESTINATION ${RESOURCE_DESTINATION})"
 		else
 			r += "
-install(FILES \"{{e}}\" DESTINATION share/{{conf.project.name}})"
+install(FILES \"{{e}}\" DESTINATION ${RESOURCE_DESTINATION})"
 	if bool(conf.project.icon)
 		# assuming svg for now...
 		r += "
-install(FILES \"{{conf.project.icon}}\" DESTINATION share/icons/hicolor/scalable/apps)"
+
+if (UNIX AND NOT APPLE)
+	# icon
+	install(FILES \"{{conf.project.icon}}\" DESTINATION share/icons/hicolor/scalable/apps)
+endif ()"
 	return r
 
 
 func create_install_desktop() -> string
 	return "
 
-# install .desktop file
-set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
-configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.install.desktop_file}}\" /tmp/{{conf.install.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
-install(FILES /tmp/{{conf.install.desktop_file.basename()}} DESTINATION share/applications)"
+
+if (UNIX AND NOT APPLE)
+	# install .desktop file
+	set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+	configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.install.desktop_file}}\" /tmp/{{conf.install.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+	install(FILES /tmp/{{conf.install.desktop_file.basename()}} DESTINATION share/applications)
+endif ()"
 
 
 func create_install_icons() -> string
+	if len(conf.install.icons) == 0
+		return ""
+		
 	var r = "
 
-# install icons"
+
+if (UNIX AND NOT APPLE)
+	# install icons"
 	for i in conf.install.icons
 		let x = i.explode(":")
 		if len(x) >= 3
 			r += "
-install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
+	install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
+	r += "
+endif ()"
 	return r
 
 
 func create_install_mime() -> string
 	var r = "
 
-# install mime
-find_program(XDG_MIME_EXECUTABLE xdg-mime)
-if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
+if (UNIX AND NOT APPLE)
+	# install mime
+	find_program(XDG_MIME_EXECUTABLE xdg-mime)
+	if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
 	for m in conf.install.mime_files
 		r += "
-	install(CODE \"message(STATUS \\\"installing mime file\\\")\")
-	install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
+		install(CODE \"message(STATUS \\\"installing mime file\\\")\")
+		install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
 	r += "
+	endif()
 endif()
 "
 	return r
@@ -520,6 +606,8 @@ func create()
 	
 	r += create_libs()
 	
+	if "macosbundle" in conf.build.features
+		r += create_macos_bundle()
 	
 
 	for t in conf.targets
