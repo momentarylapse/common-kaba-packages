@@ -1,0 +1,45 @@
+use project.*
+use os
+
+func find_best_png_icon() -> os.Path
+	if conf.project.icon.extension() == "png"
+		return conf.project.icon
+	let list = os.fs.search("static/icons/hicolor/64x64/apps", "*.png", "f")
+	if len(list) == 0
+		raise(new Exception("no suitable *.png icon found for MacOS app bundle"))
+	return os.Path("static/icons/hicolor/64x64/apps") | list[0]
+	
+
+
+func create_macos_bundle() -> string
+	var input = "${CMAKE_CURRENT_SOURCE_DIR}/{{find_best_png_icon()}}"
+	return "
+
+
+#=======================================================================================
+#    MacOS bundle icon
+#=======================================================================================
+
+if (APPLE)
+	add_custom_command(OUTPUT {{conf.project.name}}.icns
+		COMMAND [ -e {{conf.project.name}}.iconset ] || mkdir {{conf.project.name}}.iconset
+		COMMAND sips -z 16 16 {{input}} --out {{conf.project.name}}.iconset/icon_16x16.png
+		COMMAND sips -z 32 32 {{input}} --out {{conf.project.name}}.iconset/icon_16x16@2x.png
+		COMMAND sips -z 32 32 {{input}} --out {{conf.project.name}}.iconset/icon_32x32.png
+		COMMAND sips -z 64 64 {{input}} --out {{conf.project.name}}.iconset/icon_32x32@2x.png
+		COMMAND sips -z 128 128 {{input}} --out {{conf.project.name}}.iconset/icon_128x128.png
+		COMMAND sips -z 256 256 {{input}} --out {{conf.project.name}}.iconset/icon_128x128@2x.png
+		COMMAND sips -z 256 256 {{input}} --out {{conf.project.name}}.iconset/icon_256x256.png
+		COMMAND sips -z 512 512 {{input}} --out {{conf.project.name}}.iconset/icon_256x256@2x.png
+		COMMAND sips -z 512 512 {{input}} --out {{conf.project.name}}.iconset/icon_512x512.png
+		COMMAND sips -z 1024 1024 {{input}} --out {{conf.project.name}}.iconset/icon_512x512@2x.png
+		COMMAND iconutil -c icns {{conf.project.name}}.iconset
+		DEPENDS \"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}}\"
+		VERBATIM)
+
+
+	set(MACOSX_BUNDLE_ICON_FILE {{conf.project.name}}.icns)
+	set_source_files_properties({{conf.project.name}}.icns
+		PROPERTIES
+		MACOSX_PACKAGE_LOCATION \"Resources\")
+endif()"

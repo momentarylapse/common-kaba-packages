@@ -1,0 +1,64 @@
+use project.*
+use os
+
+
+func create_vs2022_stuff()
+	
+	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
+	\"version\": 3,
+	\"configurePresets\": [
+		{
+			\"name\": \"windows-base\",
+			\"hidden\": true,
+			\"generator\": \"Ninja\",
+			\"binaryDir\": \"${sourceDir}/out/build/${presetName}\",
+			\"installDir\": \"${sourceDir}/out/install/${presetName}\",
+			\"toolchainFile\": \"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake\",
+			\"condition\": {
+				\"type\": \"equals\",
+				\"lhs\": \"${hostSystemName}\",
+				\"rhs\": \"Windows\"
+			}
+		},
+		{
+			\"name\": \"x64-debug\",
+			\"displayName\": \"x64 Debug\",
+			\"inherits\": \"windows-base\",
+			\"architecture\": {
+				\"value\": \"x64\",
+				\"strategy\": \"external\"
+			},
+			\"cacheVariables\": {
+				\"CMAKE_BUILD_TYPE\": \"Debug\"
+			}
+		},
+		{
+			\"name\": \"x64-release\",
+			\"displayName\": \"x64 Release\",
+			\"inherits\": \"x64-debug\",
+			\"cacheVariables\": {
+				\"CMAKE_BUILD_TYPE\": \"Release\"
+			}
+		}
+	]
+}
+".replace("\t", "    "))
+
+	let t = conf.main_target()
+
+	os.fs.create_directory(conf.root | ".vs")
+	os.fs.write_text(conf.root | ".vs" | "launch.vs.json", "{
+  \"version\": \"0.2.1\",
+  \"defaults\": {},
+  \"configurations\": [
+    {
+      \"type\": \"default\",
+      \"project\": \"CMakeLists.txt\",
+      \"projectTarget\": \"{{t.binary_file}}.exe\",
+      \"name\": \"{{t.binary_file}}.exe\",
+      \"currentDir\": \"${workspaceRoot}\"
+    }
+  ]
+}
+")
+

@@ -1,0 +1,208 @@
+use project.*
+use library.*
+
+
+func var_name(l: string) -> string
+	return l.upper().replace("-", "").replace(".", "")
+
+
+func lib_discover(ll: Library, indent: string, is_required: bool) -> string
+	var flag = ""
+	if is_required
+		flag = " REQUIRED"
+	var s = ""
+	if len(ll.cmake_packages) > 0
+		for i=>p in ll.cmake_packages
+			s += "
+{{indent}}find_package({{p}}{{flag}})"
+	else if len(ll.pkg) > 0
+		for i=>p in ll.pkg
+			let varx = var_name(p)
+			s += "
+{{indent}}pkg_check_modules({{varx}}{{flag}} {{p}})"
+	return s[1:]
+
+	raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+
+
+func lib_guard(ll: Library) -> string
+	if ll.name == "gl"
+		return "OPENGL_FOUND AND NOT APPLE"
+	if len(ll.cmake_packages) > 0
+		for v in ll.cmake_variable
+			return v
+		return var_name(ll.name) + "_FOUND"
+	else if len(ll.pkg) > 0
+		let varx = ll.pkg |> var_name
+		return ([for v in varx "{{v}}_FOUND"].join(" AND "))
+	return ""
+
+
+func lib_add_data(ll: Library, indent: string) -> string
+	var s = ""
+	if len(ll.cmake_packages) > 0
+		s = "
+{{indent}}list(APPEND DEPS {{ll.cmake_targets.join(" " )}})
+{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+	else if len(ll.pkg) > 0
+		for p in ll.pkg
+			let varx = var_name(p)
+			s += "
+{{indent}}list(APPEND INCLUDE_DIRECTORIES ${"+varx+"_INCLUDE_DIRS})
+{{indent}}list(APPEND LINK_DIRECTORIES ${"+varx+"_LIBRARY_DIRS})
+{{indent}}list(APPEND DEPS ${"+varx+"_LIBRARIES})
+{{indent}}list(APPEND COMPILE_OPTIONS ${"+varx+"_CFLAGS_OTHER})"
+		s += "
+{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+	else
+		raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+	return s[1:]
+
+
+func link_mandatory_lib(l: string) -> string
+	let ll = lib.get(l)
+	return "
+
+
+# lib: {{l}} (mandatory)
+{{lib_discover(ll, "", true)}}
+{{lib_add_data(ll, "")}}"
+
+
+# a|b|c
+func link_mandatory_group(g: LibGroup) -> string
+	let lls = [for l in g.libs  lib.get(l)]
+	let varxs = g.libs |> var_name
+	#deps.add("{{varx}}_LIBRARIES")
+	let cvar = varxs.join("_OR_")
+	let label = g.libs.join(" or ")
+	var s = "
+
+
+# lib: {{label}} (mandatory)
+set({{cvar}} \"{{g.libs[0]}}\" CACHE STRING \"Use {{label}}?\")"
+
+	for i=>v in varxs
+		s += "
+{{lib_discover(lls[i], "", false)}}
+if({{v}}_FOUND)
+	list(APPEND {{cvar}}_FOUND \"{{g.libs[i]}}\")
+endif()"
+	s += "
+if({{cvar}}_FOUND)
+	if(NOT ${"+cvar+"} IN_LIST {{cvar}}_FOUND)
+		list(GET {{cvar}}_FOUND 0 X)
+		set({{cvar}} ${X} CACHE STRING \"choose\" FORCE)
+		message(WARNING \"Choice for {{cvar}} invalid, using ${"+cvar+"} instead\")
+	endif()
+else()
+	message(SEND_ERROR \"Neither {{label}} found\") #  or/nor..
+	set({{cvar}} \"\")
+endif()"
+	
+	for i=>v in varxs
+		s += "
+if({{cvar}} STREQUAL \"{{g.libs[i]}}\")
+{{lib_add_data(lls[i], "	")}}
+endif()"
+	return s
+
+
+
+func link_optional_lib(l: string) -> string
+	let ll = lib.get(l)
+	#deps.add("{{varx}}_LIBRARIES")
+	
+	let var_enabled = "LIB_{{var_name(l)}}_ENABLED"
+	
+	#for _code in ll.cmake_code
+	if len(ll.cmake_code) > 0
+		let code = ll.cmake_code.replace(":define:", ll.define())
+		return "
+
+
+# lib: {{l}} (optional)
+{{code}}"
+
+
+	if l == "dl"
+		return "
+
+
+# lib: dl...
+if(WIN32)
+	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)
+else()
+	list(APPEND DEPS ${CMAKE_DL_LIBS})
+	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)
+endif()"
+
+
+
+
+	var r = "
+
+
+# lib: {{l}} (optional)
+set({{var_enabled}} true CACHE BOOL \"Use {{l}} library?\")
+{{lib_discover(ll, "", false)}}
+if({{lib_guard(ll)}})
+else()
+	set({{var_enabled}} false CACHE BOOL \"{{l}} library not found\" FORCE)
+endif()
+if(${"+var_enabled+"})
+{{lib_add_data(ll, "	")}}
+else()
+	list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)
+endif()"
+	return r
+
+
+	print("WARNING: lib {{l}} not in cmake")
+	return "
+
+list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=0)"
+
+
+
+
+func create_libs() -> string
+	var r = "
+
+
+#=======================================================================================
+#    libraries
+#=======================================================================================
+
+find_package(PkgConfig REQUIRED)
+"
+
+	let lib_groups = conf.dependencies()
+	for g in lib_groups
+		if g.optional
+			for l in g.libs
+				r += link_optional_lib(l)
+		else
+			if len(g.libs) > 1
+				r += link_mandatory_group(g)
+			else
+				r += link_mandatory_lib(g.libs[0])
+
+	
+	r += "
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+list(APPEND DEPS Threads::Threads)"
+
+	if "gitversion" in conf.build.features
+		r += "
+
+# git version
+include(.cmake/CheckGit.cmake)
+CheckGitSetup()
+list(APPEND DEPS git-version)"
+
+	return r
+	
+	

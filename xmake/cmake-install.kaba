@@ -1,0 +1,120 @@
+use project.*
+use os
+
+
+func dir_no_slash(p: os.Path) -> string
+	let s = str(p)
+	if s.tail(1) == "/"
+		return s[:-1]
+	return s
+
+
+func create_install_base() -> string
+	# https://cmake.org/cmake/help/latest/prop_tgt/MACOSX_BUNDLE_INFO_PLIST.html
+	var r = "
+
+
+#=======================================================================================
+#    install
+#======================================================================================="
+
+	if "macosbundle" in conf.build.features
+		r += "
+		
+if (APPLE)
+	set_target_properties({{conf.main_target().name}}
+		PROPERTIES
+		BUNDLE True
+		MACOSX_BUNDLE_BUNDLE_NAME {{conf.project.name}}
+		MACOSX_BUNDLE_GUI_IDENTIFIER \"{{conf.project.company}}\"
+		MACOSX_BUNDLE_BUNDLE_VERSION \"0.1\"
+		MACOSX_BUNDLE_SHORT_VERSION_STRING \"0.1\"
+		RESOURCE \"${resource_files}\")
+	set(RESOURCE_DESTINATION bin/{{conf.project.name}}.app/Contents/Resources)
+else ()
+	set(RESOURCE_DESTINATION share/{{conf.project.name}})
+endif ()"
+	else
+		r += "
+
+set(RESOURCE_DESTINATION share/{{conf.project.name}})"
+
+	r += "
+
+# binaries"
+
+	for t in conf.targets
+		if t.default and not t.is_library
+			r += "
+install(TARGETS {{t.binary_file}} DESTINATION bin)"
+
+	r += "	
+
+# resources"
+	let list = conf.needs_installing()
+	for e in list
+		if os.fs.is_directory(conf.root | e)
+			r += "
+install(DIRECTORY \"{{dir_no_slash(e)}}\" DESTINATION ${RESOURCE_DESTINATION})"
+		else
+			r += "
+install(FILES \"{{e}}\" DESTINATION ${RESOURCE_DESTINATION})"
+	if bool(conf.project.icon)
+		if conf.project.icon.extension() == "svg"
+			r += "
+
+if (UNIX AND NOT APPLE)
+	# icon
+	install(FILES \"{{conf.project.icon}}\" DESTINATION share/icons/hicolor/scalable/apps)
+endif ()"
+	return r
+
+
+func create_install_desktop() -> string
+	return "
+
+
+if (UNIX AND NOT APPLE)
+	# install .desktop file
+	set(INSTALL_PREFIX \"${CMAKE_INSTALL_PREFIX}\")
+	configure_file(\"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.install.desktop_file}}\" /tmp/{{conf.install.desktop_file.basename()}} NO_SOURCE_PERMISSIONS)
+	install(FILES /tmp/{{conf.install.desktop_file.basename()}} DESTINATION share/applications)
+endif ()"
+
+
+func create_install_icons() -> string
+	if len(conf.install.icons) == 0
+		return ""
+		
+	var r = "
+
+
+if (UNIX AND NOT APPLE)
+	# install icons"
+	for i in conf.install.icons
+		let x = i.explode(":")
+		if len(x) >= 3
+			r += "
+	install(FILES {{x[0]}} DESTINATION share/icons/hicolor/{{x[1]}}x{{x[1]}}/apps RENAME {{x[2]}}.png)"
+	r += "
+endif ()"
+	return r
+
+
+func create_install_mime() -> string
+	var r = "
+
+if (UNIX AND NOT APPLE)
+	# install mime
+	find_program(XDG_MIME_EXECUTABLE xdg-mime)
+	if(NOT XDG_MIME_EXECUTABLE STREQUAL \"XDG_MIME_EXECUTABLE_NOTFOUND\")"
+	for m in conf.install.mime_files
+		r += "
+		install(CODE \"message(STATUS \\\"installing mime file\\\")\")
+		install(CODE \"execute_process(COMMAND ${XDG_MIME_EXECUTABLE} install --novendor ${CMAKE_CURRENT_SOURCE_DIR}/{{m}})\")"
+	r += "
+	endif()
+endif()
+"
+	return r
+
