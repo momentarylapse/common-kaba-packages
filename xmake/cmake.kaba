@@ -62,9 +62,6 @@ func create_target(t: BuildTarget) -> string
 	var tflags = ""
 	if "gui" in t.features
 		tflags += " WIN32"
-	if "macosbundle" in conf.build.features
-		tflags += " MACOSX_BUNDLE
-	${MACOSX_BUNDLE_ICON_FILE}"
 
 	if t.is_library
 		r += "
@@ -100,13 +97,12 @@ func create()
 	var r = create_base()
 	
 	r += create_libs()
-	
-	if "macosbundle" in conf.build.features
-		r += create_macos_bundle()
-	
 
 	for t in conf.targets
 		r += create_target(t)
+	
+	if "macosbundle" in conf.build.features
+		r += create_macos_bundle()
 	
 	r += create_install_base()
 

@@ -18,24 +18,7 @@ func create_install_base() -> string
 #    install
 #======================================================================================="
 
-	if "macosbundle" in conf.build.features
-		r += "
-		
-if (APPLE)
-	set_target_properties({{conf.main_target().name}}
-		PROPERTIES
-		BUNDLE True
-		MACOSX_BUNDLE_BUNDLE_NAME {{conf.project.name}}
-		MACOSX_BUNDLE_GUI_IDENTIFIER \"{{conf.project.company}}\"
-		MACOSX_BUNDLE_BUNDLE_VERSION \"0.1\"
-		MACOSX_BUNDLE_SHORT_VERSION_STRING \"0.1\"
-		RESOURCE \"${resource_files}\")
-	set(RESOURCE_DESTINATION bin/{{conf.project.name}}.app/Contents/Resources)
-else ()
-	set(RESOURCE_DESTINATION share/{{conf.project.name}})
-endif ()"
-	else
-		r += "
+	r += "
 
 set(RESOURCE_DESTINATION share/{{conf.project.name}})"
 

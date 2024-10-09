@@ -12,12 +12,52 @@ func find_best_png_icon() -> os.Path
 
 
 func create_macos_bundle() -> string
+
+	os.fs.create_directory(conf.root | ".cmake")
+
+	os.fs.write_text(conf.root | ".cmake/Info.plist", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>{{conf.project.name}}</string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
+	<key>CFBundleIconFile</key>
+	<string>{{conf.project.name}}.icns</string>
+	<key>CFBundleIdentifier</key>
+	<string>{{conf.project.company}}</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleLongVersionString</key>
+	<string></string>
+	<key>CFBundleName</key>
+	<string>{{conf.project.name}}</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>0.1</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>0.1</string>
+	<key>CSResourcesFileMapped</key>
+	<true/>
+	<key>NSHumanReadableCopyright</key>
+	<string></string>
+</dict>
+</plist>
+")
+
+
 	var input = "${CMAKE_CURRENT_SOURCE_DIR}/{{find_best_png_icon()}}"
-	return "
+	var r = "
 
 
 #=======================================================================================
-#    MacOS bundle icon
+#    MacOS bundle
 #=======================================================================================
 
 if (APPLE)
@@ -37,9 +77,21 @@ if (APPLE)
 		DEPENDS \"${CMAKE_CURRENT_SOURCE_DIR}/{{conf.project.icon}}\"
 		VERBATIM)
 
+	add_custom_target(bundle
+		COMMAND [ -e {{conf.project.name}}.app ] || mkdir {{conf.project.name}}.app
+		COMMAND [ -e {{conf.project.name}}.app/Contents ] || mkdir {{conf.project.name}}.app/Contents
+		COMMAND [ -e {{conf.project.name}}.app/Contents/MacOS ] || mkdir {{conf.project.name}}.app/Contents/MacOS
+		COMMAND cp -f {{conf.main_target().name}} {{conf.project.name}}.app/Contents/MacOS
+		COMMAND [ -e {{conf.project.name}}.app/Contents/Resources ] || mkdir {{conf.project.name}}.app/Contents/Resources
+		COMMAND cp -rf {{conf.project.name}}.icns {{conf.project.name}}.app/Contents/Resources"
+	let list = conf.needs_installing()
+	for e in list
+		r += "
+		COMMAND cp -rf \"${CMAKE_CURRENT_SOURCE_DIR}/{{e}}\" {{conf.project.name}}.app/Contents/Resources"
+	r += "
+		COMMAND cp -rf \"${CMAKE_CURRENT_SOURCE_DIR}/.cmake/Info.plist\" {{conf.project.name}}.app/Contents
+		DEPENDS {{conf.project.name}} {{conf.project.name}}.icns
+		VERBATIM)
 
-	set(MACOSX_BUNDLE_ICON_FILE {{conf.project.name}}.icns)
-	set_source_files_properties({{conf.project.name}}.icns
-		PROPERTIES
-		MACOSX_PACKAGE_LOCATION \"Resources\")
 endif()"
+	return r
