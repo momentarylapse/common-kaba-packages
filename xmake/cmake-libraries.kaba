@@ -85,7 +85,7 @@ set({{cvar}} \"{{g.libs[0]}}\" CACHE STRING \"Use {{label}}?\")"
 	for i=>v in varxs
 		s += "
 {{lib_discover(lls[i], "", false)}}
-if({{v}}_FOUND)
+if({{lib_guard(lls[i])}})
 	list(APPEND {{cvar}}_FOUND \"{{g.libs[i]}}\")
 endif()"
 	s += "
