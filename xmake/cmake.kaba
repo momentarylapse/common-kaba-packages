@@ -39,12 +39,19 @@ set(CMAKE_BUILD_TYPE Debug)"
 	return r
 
 
+func find_extra_sources(t: BuildTarget) -> os.Path[]
+	var r: Ret
+	for s in t.source
+		let res = os.fs.search(conf.root | s, "*.rc", "f")
+		for f in res
+			r.add(conf.root | s | f)
+	return r
 
 
 
 # TODO bundle with multi-targets...
 func create_target(t: BuildTarget) -> string
-	let xsources = conf.find_sources(t)
+	let xsources = conf.find_sources(t) | find_extra_sources(t)
 	let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
 	
 	var deps = "${DEPS}"

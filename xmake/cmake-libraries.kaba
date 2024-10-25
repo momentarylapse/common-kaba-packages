@@ -27,7 +27,7 @@ func lib_discover(ll: Library, indent: string, is_required: bool) -> string
 
 func lib_guard(ll: Library) -> string
 	if ll.name == "gl"
-		return "OPENGL_FOUND AND NOT APPLE"
+		return "OPENGL_FOUND AND NOT APPLE AND NOT WIN32" # :(
 	if len(ll.cmake_packages) > 0
 		for v in ll.cmake_variable
 			return v
