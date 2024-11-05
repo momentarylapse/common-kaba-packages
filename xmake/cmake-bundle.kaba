@@ -8,7 +8,12 @@ func find_best_png_icon() -> os.Path
 	if len(list) == 0
 		raise(new Exception("no suitable *.png icon found for MacOS app bundle"))
 	return os.Path("static/icons/hicolor/64x64/apps") | list[0]
-	
+
+func no_ending_slash(p: os.Path) -> string
+	let s = str(p)
+	if s.tail(1) == "/"
+		return s[:-1]
+	return s
 
 
 func create_macos_bundle() -> string
@@ -87,7 +92,7 @@ if (APPLE)
 	let list = conf.needs_installing()
 	for e in list
 		r += "
-		COMMAND cp -rf \"${CMAKE_CURRENT_SOURCE_DIR}/{{e}}\" {{conf.project.name}}.app/Contents/Resources"
+		COMMAND cp -rf \"${CMAKE_CURRENT_SOURCE_DIR}/{{no_ending_slash(e)}}\" {{conf.project.name}}.app/Contents/Resources"
 	r += "
 		COMMAND cp -rf \"${CMAKE_CURRENT_SOURCE_DIR}/.cmake/Info.plist\" {{conf.project.name}}.app/Contents
 		DEPENDS {{conf.project.name}} {{conf.project.name}}.icns
