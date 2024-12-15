@@ -5,9 +5,16 @@ class Theme
 	let fg = color.BLACK
 	let grid = color(0.7, 0.7, 0.7, 1)
 
+struct Range
+	var min, max: f32
+	func length() -> f32
+		return max - min
+	func static from_data(x: f32[]) -> Range
+		return [min(x), max(x)]
+
 let BORDER = 10.0
 
-var xrange, yrange: f32[]? #f32[2]?
+var xrange, yrange: Range?
 
 struct Tick
 	value: f32
@@ -15,9 +22,9 @@ struct Tick
 	label: string
 
 
-func get_ticks(range: f32[2], total_pixels: f32, spacing0: f32) -> Tick[]
+func get_ticks(range: Range, total_pixels: f32, spacing0: f32) -> Tick[]
 	var r: Tick[]
-	let d0 = (range[1] - range[0]) / total_pixels * spacing0
+	let d0 = len(range) / total_pixels * spacing0
 	
 	let ld0 = log(d0) / log(10.0)
 	var ldi = i32(ld0 + 0.5)
@@ -25,18 +32,20 @@ func get_ticks(range: f32[2], total_pixels: f32, spacing0: f32) -> Tick[]
 		ldi = i32(ld0 - 0.5)
 	let d = pow(10.0, ldi)
 	
-	let x0 = (i32(range[0] / d) - 1) * d
+	let x0 = (i32(range.min / d) - 1) * d
 	
-	for x in x0:range[1]:d
+	for x in x0:range.max:d
 		r.add([x, 1.0, "{{x|0.1}}"])
 	
 	return r
 
+struct DataSet
+	var x, y: f32[]
 
 class Window extends hui.Window
-	var x, y: f32[]
 	var width, height: f32
-	var _xrange, _yrange: f32[2]
+	var data_sets: DataSet[]
+	var _xrange, _yrange: Range
 
 	func __init__()
 		super.__init__("plot", 800, 600)
@@ -47,9 +56,27 @@ class Window extends hui.Window
 		
 		event_x("area", "hui:draw", on_draw)
 	
+	func mut add_plot(x: f32[], y: f32[])
+		data_sets.add([x, y])
+	
 	func project(p: vec2) -> vec2
-		return [BORDER + (p.x - _xrange[0]) / (_xrange[1] - _xrange[0]) * (width - 2*BORDER),
-			height - BORDER - (p.y - _yrange[0]) / (_yrange[1] - _yrange[0]) * (height - 2*BORDER)]
+		return [BORDER + (p.x - _xrange.min) / len(_xrange) * (width - 2*BORDER),
+			height - BORDER - (p.y - _yrange.min) / len(_yrange) * (height - 2*BORDER)]
+	
+	func mut optimize_view()
+		_xrange = [0,1]
+		_yrange = [0,1]
+		for d in data_sets
+			let rx = Range.from_data(d.x)
+			let ry = Range.from_data(d.y)
+			_xrange.min = min(_xrange.min, min(d.x))
+			_xrange.max = max(_xrange.max, max(d.x))
+			_yrange.min = min(_yrange.min, min(d.y))
+			_yrange.max = max(_yrange.max, max(d.y))
+		for r in xrange
+			_xrange = r
+		for r in yrange
+			_yrange = r
 	
 	func override on_draw(p: hui.Painter)
 		width = p.width
@@ -57,16 +84,7 @@ class Window extends hui.Window
 		p.set_color(Theme.bg)
 		p.draw_rect([0, width, 0, height])
 		
-		_xrange[0] = min(x)
-		_xrange[1] = max(x)
-		_yrange[0] = min(y)
-		_yrange[1] = max(y)
-		for r in xrange
-			_xrange[0] = r[0]
-			_xrange[1] = r[1]
-		for r in yrange
-			_yrange[0] = r[0]
-			_yrange[1] = r[1]
+		optimize_view()
 		
 		let tx = get_ticks(_xrange, width - 2*BORDER, 100)
 		let ty = get_ticks(_yrange, height - 2*BORDER, 30)
@@ -94,9 +112,10 @@ class Window extends hui.Window
 		
 		var points: vec2[]
 		
-		for i=>yy in y
-			let xx = x[i]
-			points.add(project([xx, yy]))
+		for d in data_sets
+			for i=>yy in d.y
+				let xx = d.x[i]
+				points.add(project([xx, yy]))
 		
 		p.clip([BORDER, width-BORDER, BORDER, height-BORDER])
 		p.set_color(Theme.fg)
@@ -107,8 +126,7 @@ class Window extends hui.Window
 
 func plot(x: f32[], y: f32[])
 	var w = new shared Window()
-	w.x = x
-	w.y = y
+	w.add_plot(x, y)
 	
 	hui.fly_and_wait(w)
 
