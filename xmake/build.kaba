@@ -73,9 +73,10 @@ func get_profile(name: string) -> Profile
 					p.libs_optional.add(l)
 	return p
 
-func build()
+
+func build_old()
 	if conf.force_rebuild
-		build_clear()
+		build_clear_old()
 
 
 	let p = get_profile(conf.force_profile)
@@ -164,19 +165,36 @@ func build()
 		#print(e)
 		return
 
+func build()
+	print("q00")
+	if conf.force_rebuild
+		build_clear()
+	
+	print("q0")
+	let dir = "build" as Path
+	print("q1")
+	if not os.fs.exists(dir)
+		print("no...")
+		os.fs.create_directory(dir)
+		os.shell_execute("cd {{dir}};cmake .. -GNinja;cd ..", true)
+
+	print("q")
+	os.shell_execute("cd {{dir}};ninja;cd ..", true)
+
 
 
 func build_clear()
+	let dir = "build" as Path
+	if os.fs.exists(dir)
+		os.shell_execute("cd {{dir}};ninja clean;cd ..", true)
+
+func build_clear_old()
 	for s in _sources
-		try
+		if os.fs.exists(s.object())
 			os.fs.delete(s.object())
 			#print(s.object())
-		except
-			pass
-	var binary_file = conf.targets[0].binary_file
-	try
+	let binary_file = conf.targets[0].binary_file
+	if os.fs.exists(binary_file)
 		os.fs.delete(binary_file)
-	except
-		pass
 	
 	
