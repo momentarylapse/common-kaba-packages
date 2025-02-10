@@ -1,0 +1,2 @@
+description = "Kills the program if the condition is false."
+param:b = "The condition."

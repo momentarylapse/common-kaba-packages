@@ -1,3 +1,4 @@
 description = ""
 param:cmd = ""
+param:verbose = ""
 return = ""

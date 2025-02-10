@@ -1,0 +1,3 @@
+description = "Unsigned 16bit integer."
+element:high = ""
+element:low = ""

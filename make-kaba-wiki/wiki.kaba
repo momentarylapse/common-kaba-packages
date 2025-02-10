@@ -69,6 +69,8 @@ func render_var(ns: string, v: Variable) -> string
 
 
 func class_extension(c: Class) -> string
+	if c.is_template()
+		return "[X]"
 	if len(c.param) > 0
 		# dirty hack...
 		if &c == string
@@ -290,6 +292,13 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 		wiki += "\n=== Classes ===\n\n"
 		for c in classes
 			wiki += "* <tt>{{meta_class(c)}} '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
+		if ns == "base"
+			wiki += "* <tt>class X[] = @List[X]</tt>\n"
+			wiki += "* <tt>class X{} = @Dict[X]</tt>\n"
+			wiki += "* <tt>class X[N] = @Array[X, N]</tt>\n"
+			wiki += "* <tt>class X* = ptr[X]</tt>\n"
+			wiki += "* <tt>class X& = ref[X]</tt>\n"
+			wiki += "* <tt>class X? = @Optional[X]</tt>\n"
 
 	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0

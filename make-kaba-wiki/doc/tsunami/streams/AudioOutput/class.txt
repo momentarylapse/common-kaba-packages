@@ -1,4 +1,5 @@
 description = ""
+element:input = ""
 element:name = ""
 element:out_changed = ""
 element:out_play_end_of_stream = ""
