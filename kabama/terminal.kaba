@@ -69,7 +69,7 @@ func unsetraw()
 	var t: Termios
 	t.iflag = 0x4500
 	t.oflag = 5
-	t.cflag = 0xbf
+	t.cflag = 0x00bf
 	t.lflag = 0x8a3b
 	t = _t_pre_raw
 	#print("{{t}}\n")
