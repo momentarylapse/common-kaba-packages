@@ -42,6 +42,7 @@ struct BuildTarget
 	var dependencies: LibGroup[]
 	var include_directories: string[]
 	var features: string[]
+	var compiler_definitions: string[]
 	func __init__()
 
 
@@ -200,6 +201,9 @@ struct Config
 						found = true
 					else if k == "{{pre}}.features"
 						t.features = any2sa(v)
+						found = true
+					else if k == "{{pre}}.definitions"
+						t.compiler_definitions = any2sa(v)
 						found = true
 					##else if k == "build.main"
 					##	targets[0].exclusive_source = [str(c[k])]
