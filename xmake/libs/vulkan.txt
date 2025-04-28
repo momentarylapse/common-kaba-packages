@@ -4,6 +4,7 @@ pkg = vulkan
 vcpkg = [vulkan,vulkan-headers]
 
 # yes, but it might screw up shaderc :(
-_cmake.package = Vulkan
-_cmake.target = Vulkan::Vulkan
+cmake.package = Vulkan
+cmake.components = [shaderc_combined]
+cmake.target = ["Vulkan::Vulkan", "Vulkan::shaderc_combined"]
 

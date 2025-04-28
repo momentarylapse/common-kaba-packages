@@ -7,19 +7,22 @@ func var_name(l: string) -> string
 
 
 func lib_discover(ll: Library, indent: string, is_required: bool) -> string
-	var flag = ""
+	var flags = ""
 	if is_required
-		flag = " REQUIRED"
+		flags = " REQUIRED"
+	var components = ""
+	if len(ll.cmake_components) > 0
+		components = " COMPONENTS {{ll.cmake_components.join("")}}"
 	var s = ""
 	if len(ll.cmake_packages) > 0
 		for i=>p in ll.cmake_packages
 			s += "
-{{indent}}find_package({{p}}{{flag}})"
+{{indent}}find_package({{p}}{{flags}}{{components}})"
 	else if len(ll.pkg) > 0
 		for i=>p in ll.pkg
 			let varx = var_name(p)
 			s += "
-{{indent}}pkg_check_modules({{varx}}{{flag}} {{p}})"
+{{indent}}pkg_check_modules({{varx}}{{flags}} {{p}})"
 	return s[1:]
 
 	raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))

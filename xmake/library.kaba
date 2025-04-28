@@ -10,6 +10,7 @@ struct Library
 	var vcpkg: string[]
 	var meson: string[]
 	var cmake_packages: string[]
+	var cmake_components: string[]
 	var cmake_targets: string[]
 	var cmake_variable: string?
 	var cmake_code: string#?  FIXME kaba bug
@@ -72,6 +73,8 @@ struct LibraryManager
 			l.meson = any2sa(c["meson"])
 		if len(c["cmake.package"]) > 0
 			l.cmake_packages = any2sa(c["cmake.package"])
+		if len(c["cmake.components"]) > 0
+			l.cmake_components = any2sa(c["cmake.components"])
 		if len(c["cmake.target"]) > 0
 			l.cmake_targets = any2sa(c["cmake.target"])
 		if len(c["cmake.variable"]) > 0
@@ -83,6 +86,9 @@ struct LibraryManager
 		if len(c["flags"]) > 0
 			l.flags = str(c["flags"])
 		l.dir_override = str(c["dir"])
+		
+		if len(l.cmake_packages) > 1 and len(l.cmake_components) > 0
+			print("WARNING: lib {{file.basename_no_ext()}} has multiple packages and also components...")
 		
 		let code_file = file.parent() | (file.basename_no_ext() + ".cmakecode")
 		if os.fs.exists(code_file)
