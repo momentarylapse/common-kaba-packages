@@ -1,0 +1,5 @@
+vcpkg = glslang
+cmake.package = glslang
+cmake.target = [glslang::glslang,glslang::glslang-default-resource-limits]
+cmake.variable = glslang_FOUND
+
