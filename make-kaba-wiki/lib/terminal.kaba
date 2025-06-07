@@ -1,9 +1,5 @@
 use os
 
-let KABA_LINK = "libc
-	_tcgetattr:tcgetattr
-	_tcsetattr:tcsetattr"
-
 struct Termios
 	var iflag, oflag, cflag, lflag: int
 	var cc: int[32]

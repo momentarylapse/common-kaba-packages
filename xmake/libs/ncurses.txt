@@ -1,3 +1,5 @@
-cmake.package = Curses
-cmake.target = Curses
+pkg = ncurses
+
+_cmake.package = Curses
+_cmake.target = Curses
 
