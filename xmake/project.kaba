@@ -31,10 +31,15 @@ struct LibGroup
 	var optional = false
 	var libs: string[]
 
+enum BuildType
+	BINARY
+	LIBRARY
+	STATIC_LIBRARY
+	SHARED_LIBRARY
 
 struct BuildTarget
 	var name: string
-	var is_library = false
+	var type = BuildType.BINARY
 	var binary_file: Path
 	var source: Path[]
 	var source_exclude: Path[]
@@ -44,6 +49,8 @@ struct BuildTarget
 	var features: string[]
 	var compiler_definitions: string[]
 	func __init__()
+	func is_library() -> bool
+		return type != BuildType.BINARY
 
 
 func extract_target_name(x: string) -> string
@@ -182,7 +189,12 @@ struct Config
 						t.default = bool(v)
 						found = true
 					else if k == "{{pre}}.type"
-						t.is_library = (str(v) == "library")
+						if str(v) == "library"
+							t.type = BuildType.LIBRARY
+						else if str(v) == "static-library"
+							t.type = BuildType.STATIC_LIBRARY
+						else if str(v) == "shared-library"
+							t.type = BuildType.SHARED_LIBRARY
 						found = true
 					else if k == "{{pre}}.source"
 						t.source = any2pa(v)
@@ -229,8 +241,12 @@ struct Config
 		
 		for t in targets
 			let pre = "build.target:{{t.name}}"
-			if t.is_library
+			if t.type == BuildType.LIBRARY
 				c["{{pre}}.type"] = "library"
+			else if t.type == BuildType.STATIC_LIBRARY
+				c["{{pre}}.type"] = "static-library"
+			else if t.type == BuildType.SHARED_LIBRARY
+				c["{{pre}}.type"] = "shared-library"
 			c["{{pre}}.binary"] = str(t.binary_file)
 			c["{{pre}}.source"] = pa2any(t.source)
 			c["{{pre}}.source-exclude"] = pa2any(t.source_exclude)
@@ -277,7 +293,7 @@ struct Config
 		
 	func main_target() -> BuildTarget
 		for t in targets
-			if not t.is_library and t.default
+			if t.type == BuildType.BINARY and t.default
 				return t
 		raise(new Exception("no main target found (executable and default)"))
 		

@@ -70,10 +70,15 @@ func create_target(t: BuildTarget) -> string
 	if "gui" in t.features
 		tflags += " WIN32"
 
-	if t.is_library
+	if t.is_library()
+		var type = ""
+		if t.type == BuildType.STATIC_LIBRARY
+			type = " STATIC"
+		else if t.type == BuildType.SHARED_LIBRARY
+			type = " SHARED"
 		r += "
 
-add_library({{t.binary_file}}"
+add_library({{t.binary_file}}{{type}}"
 	else
 		r += "
 

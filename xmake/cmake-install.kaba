@@ -27,7 +27,7 @@ set(RESOURCE_DESTINATION share/{{conf.project.name}})"
 # binaries"
 
 	for t in conf.targets
-		if t.default and not t.is_library
+		if t.default and t.type == BuildType.BINARY
 			r += "
 install(TARGETS {{t.binary_file}} DESTINATION bin)"
 
