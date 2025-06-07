@@ -295,6 +295,9 @@ struct Config
 		for t in targets
 			if t.type == BuildType.BINARY and t.default
 				return t
+		for t in targets
+			if t.default
+				return t
 		raise(new Exception("no main target found (executable and default)"))
 		
 	func _find_sources()

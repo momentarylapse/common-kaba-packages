@@ -1,0 +1,3 @@
+cmake.package = Curses
+cmake.target = Curses
+
