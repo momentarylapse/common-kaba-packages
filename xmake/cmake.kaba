@@ -90,6 +90,11 @@ target_link_directories({{t.binary_file}} PUBLIC ${LINK_DIRECTORIES})
 target_compile_options({{t.binary_file}} PUBLIC ${COMPILE_OPTIONS})
 target_compile_definitions({{t.binary_file}} PUBLIC ${COMPILE_DEFINITIONS} {{t.compiler_definitions.join(" ")}} INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 target_link_libraries({{t.binary_file}} PUBLIC {{deps}})"
+	if t.type == BuildType.SHARED_LIBRARY
+		r += "
+if (NOT WIN32)
+	target_compile_options({{t.binary_file}} PUBLIC -fvisibility=hidden)
+endif()"
 	for i in t.include_directories
 		r += "
 target_include_directories({{t.binary_file}} PUBLIC {{i}})"
