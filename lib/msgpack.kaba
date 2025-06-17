@@ -1,0 +1,149 @@
+use kaba
+
+func decode(b: bytes) -> any
+	var offset = 0
+	return decode_part(b, offset)
+
+func reversed(b: bytes) -> bytes
+	var r = b
+	for i=>x in b
+		r[len(b) - i - 1] = x
+	return r
+
+func to_uint(b: bytes) -> i32
+	if len(b) == 1
+		return i32(b[0])
+	if len(b) == 2
+		return i32(b[0]) << 8 | i32(b[1])
+	if len(b) == 4
+		return i32(b[0]) << 24 | i32(b[1]) << 16 | i32(b[2]) << 8 | i32(b[3])
+	return 0
+
+func signify_uint(u: i32, l: i32) -> i32
+	if (u & (0x00000080 << ((l-1) * 8))) != 0
+		return u | (0xffffffff << (l * 8))
+	return u
+
+func decode_part(b: bytes, out offset: i32) -> any
+	if len(b) <= offset
+		return nil
+	
+	let c = b[offset]
+	offset ++
+		
+	if c == 0xc0
+		return nil
+	
+	# bool
+	if c == 0xc2
+		return false	
+	if c == 0xc3
+		return true
+	
+	# int
+	if (c & 0x80) == 0x00
+		return i32(c)
+	if (c & 0xe0) == 0xe0
+		return i32(c) | 0xffffff00
+	if c == 0xcc
+		# u8
+		offset ++
+		return to_uint(b[offset-1:offset])
+	if c == 0xcd
+		# u16
+		offset += 2
+		return to_uint(b[offset-2:offset])
+	if c == 0xce
+		# u32
+		offset += 4
+		return to_uint(b[offset-4:offset])
+	if c == 0xd0
+		# i8
+		offset ++
+		return signify_uint(to_uint(b[offset-1:offset]), 1)
+	if c == 0xd1
+		# i16
+		offset +=2
+		return signify_uint(to_uint(b[offset-2:offset]), 2)
+	if c == 0xd2
+		# i32
+		offset +=4
+		return signify_uint(to_uint(b[offset-4:offset]), 4)
+	
+	# float
+	if c == 0xca
+		# f32
+		offset += 4
+		let x = reversed(b[offset-4:offset])
+		return *(&x[0] as f32&)
+	if c == 0xcb
+		# f64
+		offset += 8
+		let x = reversed(b[offset-8:offset])
+		return f32(*(&x[0] as f64&))
+	
+	# str/bin
+	if (c & 0xa0) == 0xa0
+		# str5
+		let l = i32(c & 0x1f)
+		offset += l
+		return b[offset-l:offset]
+	#if c in [0xd9, 0xc4]
+	if c == 0xd9 or c == 0xc4
+		# str8
+		let l = i32(b[offset])
+		offset ++
+		offset += l
+		return b[offset-l:offset]
+	#if c in [0xda, 0xc5]
+	if c == 0xda or c == 0xc5
+		# str16
+		let l = i32(b[offset])*256 + i32(b[offset+1])
+		offset += 2
+		offset += l
+		return b[offset-l:offset]
+	
+	# "ext"
+	if c == 0xc7
+		let l = i32(b[offset])
+		offset ++
+		let n = i32(b[offset])
+		offset += l + 1
+		let a = b[offset - l:offset] as any
+		return dyn([n, a])
+		#return b[offset - l:offset]
+		
+	raise(new Exception("unhandled msgpack tag  {{c}}"))
+	return nil
+
+
+func encode(a: any) -> bytes
+	var r: bytes
+	let type = a.type()
+	if type == string
+		let s = str(a) as bytes
+		if len(s) < 256
+			return [0xd9, u8(len(s))] | s
+		raise(new Exception("TODO: implement string encode for len>255"))
+	#	if len(s) < 65536
+	#		return [0xd9] | s
+	if type == i32
+		return [0xd2] | reversed(as_binary(&i32(a), 4))
+	raise(new Exception("TODO: implement encoding for ... {{type}}"))
+
+
+func encode_ext(b: bytes, type: i32) -> bytes
+	return [0xc7, u8(len(b)), u8(type)] | b
+
+
+func main()
+	print(decode([0x05]))
+	print(decode([0xcc, 0xff]))
+	print(decode([0xcd, 0x00, 0xff]))
+	print(decode([0xce, 0x00, 0x00, 0x00, 0xff]))
+	print(decode([0xff]))
+	print(decode([0xd0, 0xff]))
+	print(decode([0xd1, 0xff, 0xff]))
+	print(decode([0xd2, 0xff, 0xff, 0xff, 0xff]))
+	print(decode([0xca, 0x3f, 0x80, 0x00, 0x00]))
+	print(decode(encode(13)))
