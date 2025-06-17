@@ -1,0 +1,3 @@
+cmake.package = SQLite3
+cmake.target = SQLite::SQLite3
+
