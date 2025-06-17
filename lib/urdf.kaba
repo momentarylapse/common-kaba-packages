@@ -1,0 +1,87 @@
+use xml
+use os
+
+func read_vec3(a: any) -> vec3
+	let s = str(a)
+	let xx = s.parse_tokens("")
+	if len(xx) < 3
+		return vec3.0
+	return [f32(xx[0][:8]), f32(xx[1][:8]), f32(xx[2][:8])]
+
+struct Edge
+	enum Type
+		FIXED
+		PRISMATIC
+		REVOLUTE
+		FLOATING
+	type: Type
+	parent, child: string
+	pos, rpy = vec3.0
+	axis = vec3.0
+	
+	func matrix() -> mat4
+		# tested against https://mymodelrobot.appspot.com
+		#return mat4.translation(pos) * mat4.rotation_x(rpy.x) * mat4.rotation_y(rpy.y) * mat4.rotation_z(rpy.z)
+		
+		# tested against idat
+		# consistent with https://urdfpy.readthedocs.io/en/latest/generated/urdfpy.rpy_to_matrix.html
+		return mat4.translation(pos) * mat4.rotation_z(rpy.z) * mat4.rotation_y(rpy.y) * mat4.rotation_x(rpy.x)
+
+struct Tree
+	nodes: string[]
+	edges: Edge[]
+	
+	func is_root_node(n: string) -> bool
+		for e in edges
+			if e.child == n
+				return false
+		return true
+	
+	func root_nodes() -> string[]
+		return nodes |> filter(n => is_root_node(n))
+
+	func default_matrices() -> mat4{}
+		var matrices: mat4{}
+		for n in root_nodes()
+			matrices[n] = mat4.ID
+			_update_child_matrices(matrices, n)
+		return matrices
+	
+	func _update_child_matrices(out matrices: mat4{}, n: string)
+		for e in edges
+			if e.parent == n
+				matrices[e.child] = matrices[n]! * e.matrix()
+				_update_child_matrices(matrices, e.child)
+		
+
+func parse(fn: os.Path) -> Tree
+	var tree: Ret
+	let x = xml.parse(os.fs.read_text(fn))
+	for l in x["robot"]!["link"]!.as_list()!
+		tree.nodes.add(str(l["name"]))
+	for j in x["robot"]!["joint"]!.as_list()!
+		if j.type() != any{}
+			continue
+		var edge: Edge
+		edge.parent = str(j["parent"]!["link"]!)
+		edge.child = str(j["child"]!["link"]!)
+		if j.has("origin")
+			edge.pos = read_vec3(j["origin"]!["xyz"]!)
+			edge.rpy = read_vec3(j["origin"]!["rpy"]!)
+		if str(j["type"]) == "fixed"
+			edge.type = Edge.Type.FIXED
+		else if str(j["type"]) == "prismatic"
+			edge.type = Edge.Type.PRISMATIC
+			edge.axis = read_vec3(j["axis"]!["xyz"]!)
+		else if str(j["type"]) == "revolute"
+			edge.type = Edge.Type.REVOLUTE
+			edge.axis = read_vec3(j["axis"]!)
+		else if str(j["type"]) == "floating"
+			edge.type = Edge.Type.FLOATING
+		else
+			print(j)
+		tree.edges.add(edge)
+	#print(tree.edges)
+	return tree
+
+

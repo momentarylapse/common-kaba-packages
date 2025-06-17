@@ -1,6 +1,8 @@
 BASE=~/.kaba
-if [ ! -d $BASE/lib ]
+DEST=$BASE/modules
+
+if [ ! -d "$DEST" ]
 then
-	mkdir $BASE/lib
+	mkdir "$DEST"
 fi
-cp *.kaba $BASE/lib/
+cp *.kaba "$DEST/"

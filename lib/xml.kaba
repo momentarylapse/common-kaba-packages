@@ -9,7 +9,7 @@ func _is_special(c: u8) -> bool
 	return (c == '<' or c == '>' or c == '?' or c == '=' or c == '/')
 
 
-func _skip_ws(s: string, i0: int) -> int
+func _skip_ws(s: string, i0: i32) -> i32
 	for i in i0:len(s)
 		if not _is_whitespace(s[i])
 			return i
@@ -24,14 +24,14 @@ func _decode_str(s: string) -> string
 	return s
 
 
-func _next(s: string, out i0: int) -> string
+func _next(s: string, out i0: i32) -> string
 	i0 = _skip_ws(s, i0)
 	var r = _peek(s, i0)
 	i0 += len(r)
 	return r
 
 
-func _peek(s: string, i0: int) -> string
+func _peek(s: string, i0: i32) -> string
 	var i = i0
 	i = _skip_ws(s, i)
 	var r: string
@@ -51,7 +51,7 @@ func _peek(s: string, i0: int) -> string
 	return ""
 
 
-func _parse_tag(out tag_key: string, s: string, out i0: int) -> (any,bool)
+func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (any,bool)
 	if _next(s, i0) != "<"
 		raise(new Exception("< expected"))
 
@@ -95,7 +95,7 @@ func _doc_set(out doc: any, k: string, c: any)
 		doc[k] = c
 
 
-func _parse_inside_part(s: string, key: string, out i0: int, out part: any) -> string
+func _parse_inside_part(s: string, key: string, out i0: i32, out part: any) -> string
 	#print(">> INSIDE {{key}}")
 	#print(part)
 	var content: string
@@ -155,7 +155,7 @@ func _parse_inside_part(s: string, key: string, out i0: int, out part: any) -> s
 		#print("AGAIN! in {{key}}")
 	#print("<< OUTSIDE {{key}}")
 
-func _parse_tag_complete(out key: string, s: string, out i: int) -> any
+func _parse_tag_complete(out key: string, s: string, out i: i32) -> any
 
 	var (t,selfclosing) = _parse_tag(key, s, i)
 	if not selfclosing
@@ -179,7 +179,7 @@ func parse(s: string) -> any
 
 
 func _encode_part(key: string, doc: any, pre: string) -> string
-	if doc.type() in [int, float, string]
+	if doc.type() in [i32, f32, string]
 		# string
 		return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
 	else if doc.type == any{}

@@ -1,0 +1,205 @@
+use net
+
+let GREETING = [0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x7f]
+let PONG = [0x04, 0x05, 0x04, 0x50, 0x4f, 0x4e, 0x47]
+
+enum Mode
+	NONE
+	SUB
+	PUB
+	XSUB
+	XPUB
+
+func die(s: string)
+	raise(new Exception(s))
+
+func expect(a: bytes, b: bytes, context: string)
+	if a != b
+		die("{{context}} - received wrong")
+
+func read_string_u8(p: bytes, out offset: i32) -> string
+	let size = i32(p[offset])
+	#print(size)
+	offset ++
+	let s = p[offset:offset+size].utf8()
+	offset += size
+	return s
+
+struct Packet
+	id: bytes
+	payload: bytes
+
+class Socket
+	socket: owned[net.Socket]
+	buffer: string #bytes
+	mode = Mode.NONE
+	
+	on_ready: Socket->void = nil
+	on_receive: Packet->void = nil
+	on_subscribe: bytes->void = nil
+	
+	func mut connect(host: string, port: i32, _mode: Mode)
+		mode = _mode
+		print("connecting...")
+		socket = net.Socket.connect(host, port)
+	
+		print("handshake...")
+		expect(socket!.read(10), GREETING, "greeting")
+		socket!.write(GREETING)
+	
+		# protocol version
+		expect(socket!.read(1), [0x03], "protocol version")
+		socket!.write([0x03])
+	
+		let _r = socket!.read(53)
+		socket!.write(_r)
+		
+		socket!.set_blocking(false)
+	
+	func mut iterate()
+		for s in socket
+			if not s.can_read()
+				return
+			# FIXME: s.read() exceptions...
+			buffer += s.read(1000)
+			let l = handle_packet(buffer)
+			if l > 0
+				buffer = buffer[l:]
+
+	func mut subscribe(id: bytes)
+		#print("SUB")
+		let payload = [0x09] | "SUBSCRIBE" | id
+		socket!.write([0x04, u8(len(payload))] | payload)
+		
+
+	func handle_packet(p: bytes) -> i32
+		#print(p.hex())
+		if len(p) < 8
+			return 0
+		if p[0] == 0x01 # data...
+			let keysize = i32(p[1])
+			if len(p) < keysize + 4
+				return 0
+			#print(p.hex())
+			if p[keysize + 2] != 0x00
+				die("expected 0x00 after key")
+			let valuesize = i32(p[keysize + 3])
+			if len(p) < 4 + keysize + valuesize
+				return 0
+			#print("DATA  {{keysize}}  {{valuesize}}")
+			
+			var packet = Packet(p[2:2+keysize], p[4+keysize:4+keysize+valuesize])
+			if on_receive
+				on_receive(packet)
+			return 4 + keysize + valuesize
+		else if p[0] == 0x04 # flags: command
+			let size = i32(p[1])
+			if size > len(p) - 2
+				return 0
+			handle_packet_command(p[:size+2])
+			return 2 + size
+		else
+			print(p)
+			die("unhandled flags {{p[0]}}")
+
+#	func handle_packet_data(p: bytes)
+#		print("DATA: {{p}}")
+#		var offset = 0
+#		let total_size = len(p)
+	#	offset ++
+	#	let command = p[offset:offset+command_size].utf8()
+	#	offset += command_size
+	#	print("command: {{command}}")
+
+	func handle_packet_command(p: bytes)
+		var offset = 2
+		let command_size = i32(p[offset])
+		offset ++
+		let command = p[offset:offset+command_size].utf8()
+		offset += command_size
+	#	print("command: {{command}}")
+		#expect(p[3:8], "READY", "handshake")
+			
+		if command == "READY"
+			let key = read_string_u8(p, offset)
+		#	print(p[offset:offset+4])
+		#	print(offset)
+			
+			offset += 3 # _u32()...
+			let value = read_string_u8(p, offset)
+		#	print("  {{key}} = {{value}}")
+			
+			expect(key, "Socket-Type", "handshake-key")
+			if mode == Mode.XPUB or mode == Mode.PUB
+				if value != "XSUB" and value != "SUB"
+					die("expected XSUB / SUB, got {{value}}")
+				#expect(value, "XSUB", "handshake-value")
+			if mode == Mode.XSUB or mode == Mode.SUB
+				if value != "XPUB" and value != "PUB"
+					die("expected XPUB / PUB, got {{value}}")
+				#expect(value, "XPUB", "handshake-value")
+		
+			var type: bytes
+			if mode == Mode.XPUB
+				type = "XPUB"
+			else if mode == Mode.XSUB
+				type = "XSUB"
+			else if mode == Mode.PUB
+				type = "PUB"
+			else if mode == Mode.SUB
+				type = "SUB"
+			var responce: bytes #= p
+			responce = [0x04, (len(type) + 22) as u8, 0x05] | "READY" | [0x0b] | "Socket-Type" | [0x00, 0x00, 0x00, len(type) as u8] | type
+		#	if mode == Mode.XPUB
+		#		responce[len(p)-3] = 'P' # XSUB -> XPUB
+		#	else if mode == Mode.XSUB
+		#		responce[len(p)-3] = 'S' # XPUB -> XSUB
+		#	print("===>  {{responce}}")
+			socket!.write(responce)
+			if on_ready
+				print("-> on_ready()")
+				on_ready(self)
+		else if command == "SUBSCRIBE"
+			if on_subscribe
+				on_subscribe(p[offset:])
+			#print("  {{stream}}")
+		else if command == "PING"
+			socket!.write(PONG)
+		else
+			print(p)
+			print(len(p))
+			die("unhandled command  {{command}}")
+	
+
+	func mut send(id: bytes, payload: bytes)
+		let r = socket!.write([0x01, len(id) as u8] | id | [0x00, len(payload) as u8] | payload)
+
+func parse_mode(m: string) -> Mode
+	if m == "pub"
+		return Mode.PUB
+	if m == "xpub"
+		return Mode.XPUB
+	if m == "sub"
+		return Mode.SUB
+	if m == "xsub"
+		return Mode.XSUB
+	return Mode.NONE
+
+func main(args: string[])
+	var s: Socket
+	
+	if "xpub" in args
+		s.connect("127.0.0.1", 5555, Mode.XPUB)
+	if "pub" in args
+		s.connect("127.0.0.1", 5555, Mode.PUB)
+	if "xsub" in args or "sub" in args
+		s.connect("127.0.0.1", 5555, parse_mode(args[0]))
+		s.on_ready = func(out s: Socket)
+			print("ON READY!!!")
+			s.subscribe("test")
+			print("ok")
+		s.on_receive = func(p: Packet)
+			print("RECEIVED:   id={{p.id.utf8()}}  data={{p.payload.utf8()}}")
+
+	while true
+		s.iterate()

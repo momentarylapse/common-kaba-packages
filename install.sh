@@ -1,5 +1,10 @@
-for X in circuit cli huibui k2k kabama lib sisyphos shadercomp tools xmake
+for X in *
 do
+	if [ ! -f $X/install.sh ]
+	then
+		continue
+	fi
+
 	echo $X
 	cd $X
 	bash install.sh
