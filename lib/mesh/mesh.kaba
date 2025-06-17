@@ -1,0 +1,43 @@
+use os
+use kaba
+use common.*
+use format_3ds.*
+use format_ply.*
+use format_mcm.*
+use format_stl.*
+use format_obj.*
+
+let EXPORT_IMPORTS = true
+
+
+
+func load(fn: os.Path) -> Mesh
+	let ext = fn.extension()
+	if ext == "3ds"
+		return load_3ds(fn)
+	if ext == "ply"
+		return load_ply(fn)
+	if ext == "mcm"
+		return load_mcm(fn)
+	if ext == "stl"
+		return load_stl(fn)
+	if ext == "obj"
+		return load_obj(fn)
+	raise(new Exception("unknown file extension: {{ext}}"))
+
+func save(m: Mesh, fn: os.Path)
+	let ext = fn.extension()
+	if ext == "3ds"
+		save_3ds(m, fn)
+	else if ext == "ply"
+		save_ply(m, fn)
+	else
+		raise(new Exception("unhandled file extension: {{ext}}"))
+
+func main(arg: string[])
+	for a in arg
+		let m = load(a)
+		print(len(m.vertices))
+		print(len(m.indices))
+		#print(load_3ds(a))
+	

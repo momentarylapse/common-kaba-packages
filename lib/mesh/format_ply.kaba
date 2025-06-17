@@ -1,0 +1,147 @@
+use os
+use kaba
+use common.*
+
+func load_ply(fn: os.Path) -> Mesh
+	var m: Mesh
+	var f = os.fs.open(fn, "rt")
+	var binary = false
+	var num_vertices: i32?
+	var num_faces: i32?
+	
+	var vertex_total_binary_size = 0
+	var vertex_properties: (string, kaba.Class&, i32)[]
+	
+	while true #not f.is_end()
+		var s: string
+		f >> s
+		#print(s)
+		if s[:6] == "format"
+			if s == "format binary_little_endian 1.0"
+				binary = true
+			else if s == "format ascii 1.0"
+				binary = false
+			else
+				raise(new Exception("unknown {{s}}"))
+		else if s[:14] == "element vertex"
+			num_vertices = i32(s[15:])
+		else if s[:12] == "element face"
+			num_faces = i32(s[13:])
+		else if s[:8] == "property"
+			for _ in num_faces
+				pass
+			else
+				for __ in num_vertices
+					let x = s.explode(" ")
+					var t = f32
+					if x[1] == "float"
+						t := f32
+					else if x[1] == "double"
+						t := f64
+					else if x[1] == "int" or x[1] == "uint"
+						t := i32
+					else
+						raise(new Exception("unknown property type {{s}}"))
+					vertex_properties.add([x[2], t, vertex_total_binary_size])
+					vertex_total_binary_size += t.size
+		else if s == "end_header"
+			break
+	
+#	print(vertex_total_binary_size)
+#	print(vertex_properties)
+#	print(num_vertices)
+#	print(num_faces)
+	
+	if binary
+		let pos0 = f.pos()
+		f = os.fs.open(fn, "rb")
+		f.seek(pos0)
+		
+		m.vertices.resize(num_vertices!)
+		let b = f.read(num_vertices! * vertex_total_binary_size)
+		for p in vertex_properties
+			if p[0] == "x"
+				if p[1] == f32
+					for mut i=>v in m.vertices
+						as_binary(&v.pos, 12) = b[i * vertex_total_binary_size + p[2]:i * vertex_total_binary_size + p[2]+12]
+			if p[0] == "nx"
+				if p[1] == f32
+					for mut i=>v in m.vertices
+						as_binary(&v.n, 12) = b[i * vertex_total_binary_size + p[2]:i * vertex_total_binary_size + p[2]+12]
+			if p[0] == "s"
+				if p[1] == f32
+					for mut i=>v in m.vertices
+						as_binary(&v.u, 8) = b[i * vertex_total_binary_size + p[2]:i * vertex_total_binary_size + p[2]+8]
+		
+		for i in 0:num_faces!
+			var n = 0
+			as_binary(&n, 1) = f.read(1)
+			if n != 3
+				raise(new Exception("only triangles allowed!"))
+			var va, vb, vc: i32
+			f >> va
+			f >> vb
+			f >> vc
+			m.indices.add(va)
+			m.indices.add(vb)
+			m.indices.add(vc)
+	else
+		for i in 0:num_vertices!
+			var s: string
+			f >> s
+			let x = s.explode(" ")
+			
+			var v = Vertex(vec3.0, vec3.0, 0, 0)
+			for k=>p in vertex_properties
+				if p[0] == "x"
+					v.pos = [f32(x[k]), f32(x[k+1]), f32(x[k+2])]
+				else if p[0] == "nx"
+					v.n = [f32(x[k]), f32(x[k+1]), f32(x[k+2])]
+				else if p[0] == "s"
+					v.u = f32(x[k])
+				else if p[0] == "t"
+					v.v = f32(x[k])
+			m.vertices.add(v)
+			
+		for i in 0:num_faces!
+			var s: string
+			f >> s
+			let x = s.explode(" ")
+			if i32(x[0]) != 3
+				raise(new Exception("only triangles allowed!"))
+			m.indices.add(i32(x[1]))
+			m.indices.add(i32(x[2]))
+			m.indices.add(i32(x[3]))
+			
+	
+	return m
+
+
+func save_ply(m: Mesh, fn: os.Path)
+	var f = os.fs.open(fn, "wb")
+	let s = "ply
+format binary_little_endian 1.0
+element vertex {{m.vertices.num}}
+property float x
+property float y
+property float z
+property float nx
+property float ny
+property float nz
+property float s
+property float t
+element face {{m.indices.num / 3}}
+property list uchar int vertex_index
+end_header
+"
+	f.write(s)
+	for v in m.vertices
+		f << v.pos
+		f << v.n
+		f << v.u
+		f << v.v
+	for i in 0:m.indices.num/3
+		f.write([0x03])
+		f << m.indices[i*3]
+		f << m.indices[i*3 + 1]
+		f << m.indices[i*3 + 2]

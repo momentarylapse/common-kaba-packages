@@ -1,0 +1,125 @@
+use os
+use common.*
+
+func read16(out s: os.FileStream) -> i32
+	let a = s.read(2)
+	return i32(a[0]) + (i32(a[1]) << 8)
+
+func read_cstr(out f: os.FileStream) -> string
+	var r: string
+	while true
+		let cc = f.read(1)
+		if cc[0] == 0
+			return r
+		r.add(cc[0])
+
+func load_3ds(fn: os.Path) -> Mesh
+	var m: Mesh
+	var f = os.fs.open(fn, "rb")
+	var chunk_ends: i32[]
+	while true
+		let t = read16(f)
+		var size: i32
+		f >> size
+		print("{{"  ".repeat(len(chunk_ends))}}{{as_binary(&t, 2).hex()}} : {{size}}")
+		let next_end = f.pos() + size - 6
+		chunk_ends.add(next_end)
+		if t == 0x4d4d
+			continue
+		if t == 0x0002
+			let b = f.read(size - 6)
+			print(b)
+		if t == 0x3d3d
+			continue
+		if t == 0x3e3d
+			continue
+		if t == 0x4000
+			print(read_cstr(f))
+			continue
+		if t == 0x4100
+#			print("Mesh")
+			continue
+		if t == 0x4110
+			print("Vertices")
+			let n = read16(f)
+			print(n)
+			for i in 0:n
+				var v: Vertex
+				as_binary(&v.pos, 12) = f.read(12)
+				m.vertices.add(v)
+			continue
+		if t == 0x4120
+			print("Triangles")
+			let n = read16(f)
+			for i in 0:n
+				m.indices.add(read16(f))
+				m.indices.add(read16(f))
+				m.indices.add(read16(f))
+				read16(f)
+			#continue
+			# nope, there might be more stuff...
+		f.set_pos(chunk_ends[-1])
+		chunk_ends.resize(len(chunk_ends)-1)
+		#f.seek(size - 6)
+		if f.pos() > f.size() - 100
+			break
+			
+	return m
+
+
+func save_3ds(_m: Mesh, fn: os.Path)
+	var m = _m
+	let bb = m.bounding_box()
+	for mut v in m.vertices
+		v.pos -= bb.center()
+		v.pos *= 0.002
+	print(m.bounding_box())
+	
+	var f = os.fs.open(fn, "wb")
+	let nv = len(m.vertices)
+	let nf = len(m.indices)/3
+	let size_vertices = 6 + 2 + nv*12
+	let size_faces = 6 + 2 + nf*8
+	
+	# main
+	f.write([0x4d, 0x4d])
+	f << 6 + 10 + 6 + 6 + 5 + 6 + size_vertices + size_faces
+	
+	# M3D version
+	f.write([0x02, 0x00])
+	f << 10
+	f << 3
+	
+	# 3d editor
+	f.write([0x3d, 0x3d])
+	f << 6 + 6 + 5 + 6 + size_vertices + size_faces
+	
+	# object
+	f.write([0x00, 0x40])
+	f << 6 + 5 + 6 + size_vertices + size_faces
+	f.write([0x43, 0x75, 0x62, 0x65, 0x00]) # "Cube"
+	
+	# triangular mesh
+	f.write([0x00, 0x41])
+	f << 6 + size_vertices + size_faces
+	
+	# vertices
+	f.write([0x10, 0x41])
+	f << size_vertices
+	f.write(as_binary(&nv, 2))
+	for v in m.vertices
+		#f << v.pos
+		f.write(as_binary(&v.pos, 12))
+	
+	# faces
+	f.write([0x20, 0x41])
+	f << size_faces
+	f.write(as_binary(&nf, 2))
+	for i in 0:nf
+		f.write(as_binary(&m.indices[i*3], 2))
+		f.write(as_binary(&m.indices[i*3+1], 2))
+		f.write(as_binary(&m.indices[i*3+2], 2))
+		f.write([0,0])
+	
+	
+	

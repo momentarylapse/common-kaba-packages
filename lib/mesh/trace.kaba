@@ -1,0 +1,213 @@
+use mesh
+use common.Mesh
+use cloud
+
+#let VEPS = vec3(1e-6, 1e-6, 1e-6)
+let VEPS = vec3(0.01,0.01,0.01)
+
+#var n_tests = 0
+var n_sub_tests = 0
+var n_tria_tests = 0
+var n_box_misses = 0
+
+struct DigestedBox
+	var box: cloud.Box
+	var planes: plane[6]
+	func mut update()
+		planes[0] = plane.from_point_normal(box.vmin + VEPS, [-1,0,0])
+		planes[1] = plane.from_point_normal(box.vmax - VEPS, [1,0,0])
+		planes[2] = plane.from_point_normal(box.vmin + VEPS, [0,-1,0])
+		planes[3] = plane.from_point_normal(box.vmax - VEPS, [0,1,0])
+		planes[4] = plane.from_point_normal(box.vmin + VEPS, [0,0,-1])
+		planes[5] = plane.from_point_normal(box.vmax - VEPS, [0,0,1])
+
+	func ray_intersects(r: ray) -> bool
+		for pl in planes
+			for p in r.intersect_plane(pl)
+				#print("{{p}}  {{b}}")
+				if box.inside(p)
+	#				print("HIT")
+					return true
+		n_box_misses ++
+		return false
+	
+	func in_reach(p: vec3, max_dist: float) -> bool
+		for pl in planes
+			if pl.distance(p) > max_dist
+				return false
+		return true
+
+func middle(list: float[]) -> float
+	return list[len(list)/2]
+	
+class TraceWorld
+	data: Mesh
+	var allow_split = true
+	
+	struct Triangle
+		a, b, c: vec3
+	
+	struct DigestedTriangle
+		rab, rbc, rca: ray
+		pl: plane
+	
+	struct SubWorld
+		triangles: Triangle[]
+		digested_triangles: DigestedTriangle[]
+		box: DigestedBox
+		subs: SubWorld[]
+		
+		func mut clear()
+			digested_triangles.clear()
+			#points.clear()
+			
+		func points() -> vec3[]
+			var r: Ret
+			for t in triangles
+				r.add(t.a)
+				r.add(t.b)
+				r.add(t.c)
+			return r
+		
+		func mut try_split()
+			if len(triangles) < 200
+				return
+			let s = box.box.size()
+			if s.x > s.y and s.x > s.z
+				#let xx = box.box.center().x
+				let xx = points() |> (func(p: vec3) p.x) |> sort |> middle
+				split(plane.from_point_normal([xx,0,0], [1,0,0]))
+			else if s.y > s.z
+				#let yy = box.box.center().x
+				let yy = points() |> (func(p: vec3) p.y) |> sort |> middle
+				split(plane.from_point_normal([0,yy,0], [0,1,0]))
+			else
+				#let zz = box.box.center().x
+				let zz = points() |> (func(p: vec3) p.z) |> sort |> middle
+				split(plane.from_point_normal([0,0,zz], [0,0,1]))
+		
+		func mut split(pl: plane)
+			subs.resize(2)
+			for i=>t in triangles
+				let da = pl.distance(t.a)
+				let db = pl.distance(t.b)
+				let dc = pl.distance(t.c)
+				if da < 0 or db < 0 or dc < 0
+					subs[0].triangles.add(t)
+					subs[0].digested_triangles.add(digested_triangles[i])
+				#if da > 0 or db > 0 or dc > 0
+				else
+					subs[1].triangles.add(t)
+					subs[1].digested_triangles.add(digested_triangles[i])
+			if len(subs[0].triangles) > len(triangles) * 0.95
+				subs = []
+				return
+			if len(subs[1].triangles) > len(triangles) * 0.95
+				subs = []
+				return
+#			print("split  -> {{len(subs[0].triangles)}}   {{len(subs[1].triangles)}}   ++ {{len(subs[0].triangles) + len(subs[1].triangles) - len(triangles)}}")
+			subs[0].box.box = cloud.bounding_box(subs[0].points())
+			subs[1].box.box = cloud.bounding_box(subs[1].points())
+			subs[0].box.update()
+			subs[1].box.update()
+			triangles.clear()
+			digested_triangles.clear()
+			
+			subs[0].try_split()
+			subs[1].try_split()
+			
+		
+		func trace(p0: vec3, dir: vec3, _max_dist: float) -> vec3?
+			let r = ray(p0, p0 + dir)
+			n_sub_tests ++
+			if not box.ray_intersects(r)
+				return nil
+			var max_dist = _max_dist
+			var p_best: vec3?
+			for t in digested_triangles
+				n_tria_tests ++
+				let rrab = ray.dot(r, t.rab)
+				let rrbc = ray.dot(r, t.rbc)
+				let rrca = ray.dot(r, t.rca)
+				if rrab*rrbc <= 0 or rrab*rrca <= 0
+					continue
+				for p in r.intersect_plane(t.pl)
+					let d = vec3.dot(p - p0, dir)
+					if d > 0 and d < max_dist
+						max_dist = d
+						p_best = p
+			for s in subs
+				let _p = s.trace(p0, dir, max_dist)
+				for p in _p # s.trace(p0, dir, max_dist)  FIXME
+					let d = vec3.dot(p - p0, dir)
+					if d > 0 and d < max_dist
+						max_dist = d
+						p_best = p
+			return p_best
+
+
+		func distance(p: vec3, _max_dist: float) -> float
+			var max_dist = _max_dist
+			# check box...
+			
+			for t in triangles
+				max_dist = min(max_dist, len(p - t.a))
+				max_dist = min(max_dist, len(p - t.b))
+				max_dist = min(max_dist, len(p - t.c))
+			
+			for s in subs
+				max_dist = min(max_dist, s.distance(p, max_dist))
+			
+			return max_dist
+		
+	
+	sub: SubWorld
+	#triangles: Triangle[]
+	subs: SubWorld[]
+	
+	func mut clear()
+		data.vertices.clear()
+		data.indices.clear()
+		sub.clear()
+		n_sub_tests = 0
+		n_tria_tests = 0
+		n_box_misses = 0
+	
+	func mut add(m: Mesh, mat: mat4)
+		let nv0 = len(data.vertices)
+		for v in m.vertices
+			data.vertices.add([mat * v.pos, v.n, 0, 0])
+		for i in m.indices
+			data.indices.add(i + nv0)
+	
+	func mut digest()
+		#print("digesting...")
+		sub.clear()
+		
+		for i in 0:len(data.indices) / 3
+			let a = data.vertices[data.indices[i*3]].pos
+			let b = data.vertices[data.indices[i*3+1]].pos
+			let c = data.vertices[data.indices[i*3+2]].pos
+			sub.triangles.add([a, b, c])
+			let rab = ray(a, b)
+			let rbc = ray(b, c)
+			let rca = ray(c, a)
+			let pl = plane.from_points(a, b, c)
+			sub.digested_triangles.add([rab, rbc, rca, pl])
+	#	print(len(sub.digested_triangles))
+		
+	#	for v in data.vertices
+	#		sub.points.add(v.pos)
+		sub.box.box = cloud.bounding_box(sub.points()) #data.vertices |> func(
+		sub.box.update()
+		#print(box)
+		
+		if allow_split
+			sub.try_split()
+		
+	
+	func trace(p0: vec3, dir: vec3, _max_dist: float) -> vec3?
+		return sub.trace(p0, dir, _max_dist)
+	
+	func distance(p: vec3, _max_dist: float) -> float
+		return sub.distance(p, _max_dist)

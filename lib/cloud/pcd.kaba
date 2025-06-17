@@ -1,0 +1,237 @@
+use os
+use doc
+use kaba
+use cloud.Point
+
+func load(filename: os.Path) -> Point[]
+	if filename.extension() == "pcd"
+		return load_pcd(filename)
+	if filename.extension() == "ply"
+		return load_ply(filename)
+	if filename.extension() == "asc"
+		return load_asc(filename)
+	if filename.extension() == "txt"
+		return load_txt(filename)
+	raise(new Exception("unhandled extension"))
+
+func load_pcd(filename: os.Path) -> Point[]
+	let f = os.fs.open(filename, "rt")
+	var n = 0
+	var points: Point[]
+	var fields: string[]
+	var types: string[]
+	var sizes: i32[]
+	var has_intensity = false
+	while true #not f.stream.is_end()
+		var s: string
+		f >> s
+		if s[:1] == "#"
+			continue
+		let x = s.explode(" ")
+		if x[0] == "VERSION"
+			let v = x[1]
+		else if x[0] == "POINTS"
+			n = i32(x[1])
+			points.resize(n)
+		else if x[0] == "FIELDS"
+			fields = x[1:]
+			if fields[:3] != ["x", "y", "z"]
+				raise(new Exception("unhandled fields: {{s}}"))
+			if len(fields) >= 4
+				has_intensity = (fields[3] == "intensity")
+		else if x[0] == "TYPE"
+			types = x[1:]
+		else if x[0] == "SIZE"
+			sizes = [for y in x[1:]  i32(y)]
+		else if x[0] == "DATA"
+			if x[1] == "ascii"
+				for i in 0:n
+					f >> s
+					let p = s.explode(" ")
+					points[i] = [[f32(p[0]), f32(p[1]), f32(p[2])], 1.0]
+					if has_intensity and len(p) >= 4
+						points[i].intensity = f32(p[3])
+			else if x[1] == "binary"
+				if len(fields) > 4
+					raise(new Exception("too many fields"))
+				if types == ["F", "F", "F", "F"]
+					#if sizes != [4, 4, 4, 4]
+					#	raise(new Exception("unhandled types: {{sizes}}  ([4,4,4] expected)"))
+					let data = os.fs.read(filename)#[:f.stream.pos()]
+					let p0 = data.find("binary")! + 7
+					as_binary(&points[0], n * sizeof(Point)) = data[p0:]
+				else if types == ["F", "F", "F"]
+					#if sizes != [4, 4, 4]
+					#	raise(new Exception("unhandled types: {{sizes}}  ([4,4,4] expected)"))
+					let data = os.fs.read(filename)#[:f.stream.pos()]
+					var p0 = data.find("binary")! + 7
+					var temp: vec3[]
+					temp.resize(n)
+					as_binary(&temp[0], n * sizeof(vec3)) = data[p0:]
+					
+					for i in 0:n
+						points[i].pos = temp[i]
+						points[i].intensity = 1
+				else
+					raise(new Exception("unhandled types: {{types}}  ([F,F,F] or [F,F,F,F] expected)"))
+			break
+	
+#	print("max intensity:")
+#	print(points |> (func(p: Point) p.intensity) |> max)
+	return points
+
+
+struct Field
+	name: string
+	type: kaba.Class& # = f32
+	index: i32
+	byte_offset: i32
+
+func parse_ply_type(s: string) -> kaba.Class&
+	if s == "double"
+		return f64
+	if s == "float"
+		return f32
+	if s == "uchar"
+		return i8
+	raise(new Exception("unknown property type: {{s}}"))
+
+func load_ply(filename: os.Path) -> Point[]
+	let f = os.fs.open(filename, "rt")
+	var n = 0
+	var points: Ret
+	var fields: Field[]
+	var is_binary = false
+	var vertex_byte_size = 0
+	var coord: Field
+	var intensity: Field?
+	
+	# load header
+	while true #not f.stream.is_end()
+		var s: string
+		f >> s
+		if s[:1] == "#"
+			continue
+		let x = s.explode(" ")
+		if x[0] == "format"
+			is_binary = x[1].find("binary").has_value()
+		else if x[0] == "element"
+			if x[1] == "vertex"
+				n = i32(x[2])
+				points.resize(n)
+		else if x[0] == "property"
+			let type = parse_ply_type(x[1])
+			fields.add([x[2], type, len(fields), vertex_byte_size])
+			vertex_byte_size += type.size
+			
+			if x[2] == "x"
+				coord = fields[len(fields) - 1]
+		else if x[0] == "end_header"
+			break
+
+	# load points
+	if is_binary
+		# binary
+		let data = os.fs.read(filename)#[:f.stream.pos()]
+		let p0 = data.find("end_header")! + 11
+		if vertex_byte_size == sizeof(Point) and intensity.has_value()
+			#print("direct f32[3]+f32")
+			as_binary(&points[0], n * sizeof(Point)) = data[p0:]
+			#print(as_binary(&points[0], n * sizeof(vec3))[:1000].hex())
+			#print(len(data) - p0 - 11 - n * sizeof(vec3))
+		else
+			if coord.type == f32
+				#print("f32[3] with padding...")
+				for i in 0:n
+					let offset = p0 + i * vertex_byte_size + coord.byte_offset
+					as_binary(&points[i].pos, sizeof(vec3)) = data[offset:offset + sizeof(vec3)]
+					points[i].intensity = 1.0
+			else if coord.type == f64
+				#print("f64[3] with padding...")
+				for i in 0:n
+					let offset = p0 + i * vertex_byte_size + coord.byte_offset
+			
+					points[i].pos.x = f32(*(&data[offset] as f64&))
+					points[i].pos.y = f32(*(&data[offset + 8] as f64&))
+					points[i].pos.z = f32(*(&data[offset + 16] as f64&))
+					points[i].intensity = 1.0
+					
+	else
+		# ascii
+		var s: string
+		for i in 0:n
+			f >> s
+			let p = s.explode(" ")
+			points[i].pos = [f32(p[0]), f32(p[1]), f32(p[2])]
+			if len(p) >= 4
+				points[i].intensity = f32(p[3])
+			else
+				points[i].intensity = 1.0
+	return points
+	
+func load_asc(filename: os.Path) -> Point[]
+	let x = os.fs.read_text(filename)
+	var points: Ret
+	for l in x.explode("\n")
+		let s = l.explode(" ")
+		if len(s) >= 3
+			points.add([[f32(s[0]), f32(s[1]), f32(s[2])], f32(s[3])])
+		else if len(s) >= 3
+			points.add([[f32(s[0]), f32(s[1]), f32(s[2])], 1.0])
+	return points
+
+func load_txt(filename: os.Path) -> Point[]
+	let s = os.fs.read_text(filename)
+	var points: Ret
+	for l in s.explode("\n")
+		let rr = l.explode(" ")
+		if len(rr) >= 4
+			points.add([vec3(f32(rr[0]), f32(rr[1]), f32(rr[2])) * 0.001, f32(rr[3])])
+		else if len(rr) >= 3
+			points.add([vec3(f32(rr[0]), f32(rr[1]), f32(rr[2])) * 0.001, 1.0])
+	return points
+
+func quick_file(filename: os.Path) -> os.Path
+	let ff = str(filename)[:-4] + ".binary.pcd"
+	if os.fs.exists(ff)
+		return ff
+	return filename
+
+
+func save_pcd(points: Point[], filename: os.Path)
+	var f = os.fs.open(filename, "wb")
+	f.write("# .PCD v0.7 - Point Cloud Data file format
+VERSION 0.7
+FIELDS x y z intensity
+SIZE 4 4 4 4
+TYPE F F F F
+COUNT 1 1 1 1
+WIDTH {{len(points)}}
+HEIGHT 1
+VIEWPOINT 0 0 0 1 0 0 0
+POINTS {{len(points)}}
+DATA binary\n")
+	f.write(as_binary(&points[0], len(points)*sizeof(points[0])))
+
+
+
+func save_ply(points: Point[], filename: os.Path)
+	var f = os.fs.open(filename, "wb")
+	f.write("ply
+format binary_little_endian 1.0
+comment Created by Kaba
+element vertex {{len(points)}}
+property float x
+property float y
+property float z
+property float intensity
+end_header\n")
+	f.write(as_binary(&points[0], len(points)*sizeof(points[0])))
+
+func save(points: Point[], filename: os.Path)
+	if filename.extension() == "pcd"
+		save_pcd(points, filename)
+	else if filename.extension() == "ply"
+		save_ply(points, filename)
+	else
+		raise(new Exception("unhandled extension {{filename.extension()}}"))

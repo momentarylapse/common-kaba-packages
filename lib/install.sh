@@ -5,4 +5,6 @@ if [ ! -d "$DEST" ]
 then
 	mkdir "$DEST"
 fi
+
 cp *.kaba "$DEST/"
+cp -r cloud mesh "$DEST/"

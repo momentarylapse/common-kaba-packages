@@ -1,0 +1,111 @@
+use os
+use common.*
+
+struct MCMHeader
+	magic: i32
+	version: i32
+	reserved: i32
+	num_buffers: i32
+	num_vertex_specs: i32
+	num_index_specs: i32
+	vertex_data_sets_offset: i32
+	index_spec_offset: i32
+	bb_min, bb_max: vec3
+
+struct MCMBufferHeader
+	type: i32
+	offset: i32
+	size: i32
+	reserved: i32
+
+struct MCMIndexBufferInfo
+	mode: i32 # triangles=2
+	type: i32 # u8=1, u16=2, u32=3
+	buffer: i32
+	offset: i32
+	count: i32
+	vertex_data_set: i32
+	material: u8[32]
+
+struct MCMVertexDataSet
+	num_vertex_specs: i32
+	vertex_specs_offset: i32
+	num_vertices: i32
+	reserved: i32
+
+struct MCMVertexAttributeInfo
+	semantic: i32
+	type: i32
+	components: i32
+	offset: i32
+	stride: i32
+	buffer: i32
+	normalized: bool
+
+func load_mcm(fn: os.Path) -> Mesh
+	var m: Mesh
+	
+	var f = os.fs.open(fn, "rb")
+	var h: MCMHeader
+	as_binary(&h, sizeof(h)) = f.read(sizeof(h))
+	# f1.54.8e.8e # magic
+	# 01.00.00.00 # version
+	
+	var buffer_headers: MCMBufferHeader[]
+	buffer_headers.resize(h.num_buffers)
+	as_binary(&buffer_headers[0], sizeof(MCMBufferHeader) * h.num_buffers) = f.read(sizeof(MCMBufferHeader) * h.num_buffers)
+#	for b in buffer_headers
+#		print(b)
+	
+	# assume 1 index buffer...
+	if h.num_index_specs >= 1
+		var iinfo: MCMIndexBufferInfo
+		f.set_pos(h.index_spec_offset)
+		as_binary(&iinfo, sizeof(iinfo)) = f.read(sizeof(iinfo))
+		#print(iinfo)
+		
+		# read indices
+		f.set_pos(buffer_headers[iinfo.buffer].offset)
+		m.indices.resize(iinfo.count)
+		if iinfo.type == 3
+			as_binary(&m.indices[0], 4 * iinfo.count) = f.read(4 * iinfo.count)
+		else
+			raise(new Exception("mcm: only i32 indices supported..."))
+		
+		# read vertex data
+		f.set_pos(h.vertex_data_sets_offset) # + iinfo.vertex_data_set * ...
+		var vds: MCMVertexDataSet
+		as_binary(&vds, sizeof(vds)) = f.read(sizeof(vds))
+		
+		var vais: MCMVertexAttributeInfo[]
+		vais.resize(vds.num_vertex_specs)
+		as_binary(&vais[0], sizeof(vais[0]) * len(vais)) = f.read(sizeof(vais[0]) * len(vais))
+		
+		for vai in vais
+			#print(vai)
+			if vai.semantic == 0xe7dccea2
+				# position
+				f.set_pos(buffer_headers[vai.buffer].offset)
+				let n = buffer_headers[vai.buffer].size / sizeof(vec3)
+				if vai.type != 1 # f32
+					raise(new Exception("mcm: only f32 vertex positions supported"))
+				if vai.components != 3
+					raise(new Exception("mcm: only vertex positions with 3 components supported"))
+				if vai.offset != 0 or vai.stride != 0
+					raise(new Exception("mcm: only vertex positions with offset=0 and stride=0 supported"))
+				
+		#		print(n)
+				m.vertices.resize(n)
+				for i in 0:n
+					as_binary(&m.vertices[i].pos, sizeof(vec3)) = f.read(sizeof(vec3))
+			
+			if vai.semantic == 0x11c36e42
+				# normal
+				# type: half=8
+				pass
+			if vai.semantic == 0x7dd0ace6
+				# uv
+				pass
+	
+	
+	return m

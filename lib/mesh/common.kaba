@@ -1,0 +1,31 @@
+struct Vertex
+	var pos: vec3
+	var n: vec3
+	var u,v: f32
+
+struct Box
+	var min, max: vec3
+	func center() -> vec3
+		return (min + max) / 2
+	func size() -> vec3
+		return max - min
+
+struct Mesh
+	var vertices: Vertex[]
+	var indices: i32[]
+	
+	func bounding_box() -> Box
+		var bb: Box
+		if len(vertices) > 0
+			bb.min = vertices[0].pos
+			bb.max = vertices[0].pos
+		for v in vertices
+			# TODO vec3.min()
+			bb.min.x = min(bb.min.x, v.pos.x)
+			bb.min.y = min(bb.min.y, v.pos.y)
+			bb.min.z = min(bb.min.z, v.pos.z)
+			bb.max.x = max(bb.max.x, v.pos.x)
+			bb.max.y = max(bb.max.y, v.pos.y)
+			bb.max.z = max(bb.max.z, v.pos.z)
+		return bb
+		

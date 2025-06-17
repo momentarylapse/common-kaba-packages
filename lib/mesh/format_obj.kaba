@@ -1,0 +1,50 @@
+use os
+use common.*
+
+# https://en.wikipedia.org/wiki/Wavefront_.obj_file
+
+func load_obj(fn: os.Path) -> Mesh
+	var m: Mesh
+	
+	var vertices: vec3[]
+	var normals: vec3[]
+	
+	var f = os.fs.open(fn, "rt")
+	while true#not f.is_end()
+		var s: string
+		try
+			f >> s
+		except
+			break
+		if s[:1] == "#"
+			continue
+		else if s[:2] == "g "
+			continue
+		else if s[:2] == "v "
+			let x = s[2:].explode(" ")
+			if len(x) >= 3
+				vertices.add([f32(x[0]), f32(x[1]), f32(x[2])])
+		else if s[:3] == "vn "
+			let x = s[3:].explode(" ")
+			if len(x) >= 3
+				normals.add([f32(x[0]), f32(x[1]), f32(x[2])])
+		else if s[:3] == "vt "
+			continue
+			#let x = s[3:].explode(" ")
+		else if s[:2] == "f "
+			let x = s[2:].explode(" ")
+			if len(x) == 3
+				for y in x
+					let a = y.explode("/")
+					if len(a) >= 3
+						m.vertices.add([vertices[i32(a[0])-1], normals[i32(a[2])-1], 0, 0])
+					else if len(a) == 1
+						m.vertices.add([vertices[i32(a[0])-1], vec3(0,0,1), 0, 0])
+					else
+						print(s)
+		else
+			break
+	m.indices = range(len(m.vertices))
+	
+	return m
+
