@@ -1,0 +1,2 @@
+pkg = libbson-1.0
+
