@@ -50,7 +50,7 @@ struct Matrix
 	func mut _diagonalize(out b: f64[])
 		for i in 0:m
 			var f = *get(i,i)
-			if f == 0
+			if abs(f) < 0.0000001
 				f = 0.0000001 as f64
 			#print f
 			for j in i:n
@@ -253,7 +253,7 @@ func outer_product(A: SparseRowMatrix, B: SparseRowMatrix) -> SparseRowMatrix
 
 # ok
 func _test_solve()
-#func main()
+func main()
 	let M = Matrix([[2.,1.],[-1.,2.]])
 	print(M)
 	let x = solve(M, [1.0,1.0])

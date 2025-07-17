@@ -50,7 +50,7 @@ struct Matrix
 	func mut _diagonalize(out b: f32[])
 		for i in 0:m
 			var f = *get(i,i)
-			if f == 0
+			if abs(f) < 0.0000001
 				f = 0.0000001
 			#print f
 			for j in i:n

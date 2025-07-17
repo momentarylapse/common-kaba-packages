@@ -1,8 +1,8 @@
-use linalg.*
+use linalg64.*
 
 
 struct Node
-	var phi = 0.0
+	var phi = 0.0 as f64
 	var pos: vec2
 	func __init__()
 	func __init__(p: vec2)
@@ -18,16 +18,16 @@ enum EdgeType
 
 
 # ARGH
-func empty() -> f32[]
-	var r: f32[]
+func empty() -> f64[]
+	var r: f64[]
 	return r
 
 struct Edge
 	var type: EdgeType
 	var a, b: i32 # node ids
-	var I, U: f32
-	var param: f32[4]
-	func __init__(_type: EdgeType, n: i32[], p: f32[])
+	var I, U: f64
+	var param: f64[4]
+	func __init__(_type: EdgeType, n: i32[], p: f64[])
 		type = _type
 		a = n[0]
 		b = n[1]
@@ -37,15 +37,15 @@ struct Edge
 	func __assign__(o: Edge)
 		pass
 	# 1/R
-	func virtual g(dt: f32) -> f32
+	func virtual g(dt: f64) -> f64
 		return 0.0
 	# "actively produced" current...
-	func virtual I_off(dt: f32) -> f32
+	func virtual I_off(dt: f64) -> f64
 		return 0.0
-	func virtual mut update(nodes: Node[], dt: f32)
+	func virtual mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
-	func virtual mut iterate(dt: f32)
+	func virtual mut iterate(dt: f64)
 		pass
 	func virtual mut reset_state()
 	func virtual param_names() -> string[]
@@ -54,48 +54,48 @@ struct Edge
 class Cable extends Edge
 	func __init__(n: i32[])
 		super.__init__(EdgeType.CABLE, n, empty())
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		return 1000
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 
 class Source extends Edge
-	func __init__(n: i32[], i: f32)
+	func __init__(n: i32[], i: f64)
 		super.__init__(EdgeType.SOURCE, n, [i, 10000.0])
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		return 1 / param[1]
-	func override I_off(dt: f32) -> f32
+	func override I_off(dt: f64) -> f64
 		return -param[0]
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt) + param[0]
 	func override param_names() -> string[]
 		return ["I", "R"]
 
 class Resistor extends Edge
-	func __init__(n: i32[], R: f32)
+	func __init__(n: i32[], R: f64)
 		super.__init__(EdgeType.RESISTOR, n, [R])
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		return 1 / param[0]
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = U * g(dt)
 	func override param_names() -> string[]
 		return ["R"]
 
 class Capacitor extends Edge
-	var U_prev = 0.0
-	func __init__(n: int[], C: f32)
+	var U_prev = 0.0 as f64
+	func __init__(n: int[], C: f64)
 		super.__init__(EdgeType.CAPACITOR, n, [C])
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		return param[0] / dt
-	func override I_off(dt: f32) -> f32
+	func override I_off(dt: f64) -> f64
 		return U_prev * param[0] / dt
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = (U - U_prev) * g(dt)
-	func override mut iterate(dt: f32)
+	func override mut iterate(dt: f64)
 		U_prev = U
 	func override param_names() -> string[]
 		return ["C"]
@@ -103,17 +103,17 @@ class Capacitor extends Edge
 		U_prev = 0
 
 class Inductor extends Edge
-	var I_prev = 0.0
-	func __init__(n: i32[], L: f32)
+	var I_prev = 0.0 as f64
+	func __init__(n: i32[], L: f64)
 		super.__init__(EdgeType.INDUCTOR, n, [L])
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		return dt / param[0]
-	func override I_off(dt: f32) -> f32
+	func override I_off(dt: f64) -> f64
 		return -I_prev
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_prev + U * g(dt)
-	func override mut iterate(dt: f32)
+	func override mut iterate(dt: f64)
 		I_prev = I
 	func override param_names() -> string[]
 		return ["L"]
@@ -122,12 +122,12 @@ class Inductor extends Edge
 
 #let DIODE_DEFAULT_VT = 0.02585
 #let DIODE_DEFAULT_IS = 0.0000000001
-let DIODE_DEFAULT_PARAMS = [0.02585, -23.0258, 1.5]
+let DIODE_DEFAULT_PARAMS = [f64(0.02585), f64(-23.0258), f64(1.5)]
 
 class Diode extends Edge
-	var u_low, u_high: f32
-	var i_low, i_high: f32
-	var g_low, g_high: f32
+	var u_low, u_high: f64
+	var i_low, i_high: f64
+	var g_low, g_high: f64
 	func __init__(n: int[])
 		super.__init__(EdgeType.DIODE, n, DIODE_DEFAULT_PARAMS)
 		U = param[0]
@@ -140,33 +140,33 @@ class Diode extends Edge
 		i_low = I_sch(u_low) - u_low*g_low
 	func override param_names() -> string[]
 		return ["V_t", "ln(I_s)", "q"]
-	func I_sch(u: f32) -> f32
+	func I_sch(u: f64) -> f64
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	func I_id(u: f32) -> f32
+	func I_id(u: f64) -> f64
 		if u > u_high
 			return u*g_high + i_high
 		if u < u_low
 			return u*g_low + i_low
 		return exp(param[1]) * (exp(u / param[2] / param[0]) - 1)
-	func override g(dt: f32) -> f32
+	func override g(dt: f64) -> f64
 		if U > u_high
 			return g_high
 		if U < u_low
 			return g_low
 		return exp(param[1] + U / param[2] / param[0]) / (param[2]*param[0])
-	func override I_off(dt: f32) -> f32
+	func override I_off(dt: f64) -> f64
 		if U > u_high
 			return -i_high
 		if U < u_low
 			return -i_low
 		return g(dt) * U - I_id(U)
-	func override mut update(nodes: Node[], dt: f32)
+	func override mut update(nodes: Node[], dt: f64)
 		U = nodes[a].phi - nodes[b].phi
 		I = I_id(U)
 
 class SimResult
-	var U, I: f32[][]
-	var phi: f32[][]
+	var U, I: f64[][]
+	var phi: f64[][]
 	func mut clear()
 		U.clear()
 		I.clear()
@@ -209,7 +209,7 @@ class Circuit as @noauto
 			s += "{{e.U}}\t{{e.I}}\t"
 		print(s)
 
-	func create_G(out G: Matrix, dt: f32)
+	func create_G(out G: Matrix, dt: f64)
 		var n = len(nodes)-1
 		G.clear(n,n)
 		for e in edges
@@ -228,7 +228,7 @@ class Circuit as @noauto
 			if b >= 0
 				G.get(b, b) += g
 	
-	func create_I(out I: f32[], I_in: f32, dt: f32)
+	func create_I(out I: f64[], I_in: f64, dt: f64)
 		var n = len(nodes)-1
 		I = []
 		I.resize(n)
@@ -249,7 +249,7 @@ class Circuit as @noauto
 			if b >= 0
 				I[b] -= I_off
 
-	func mut optimizer_step(I_in: f32, dt: f32)
+	func mut optimizer_step(I_in: f64, dt: f64)
 		var n = len(nodes)-1
 		var G: Matrix
 		create_G(G, dt)
@@ -257,7 +257,7 @@ class Circuit as @noauto
 	#	print(G)
 		
 		
-		var I: f32[]
+		var I: f64[]
 		create_I(I, I_in, dt)
 	#	print("I {{I}}")
 	
@@ -276,7 +276,7 @@ class Circuit as @noauto
 		for mut e in edges
 			e.update(nodes, dt)
 	
-	func mut time_step(I_in: f32, dt: f32)
+	func mut time_step(I_in: f64, dt: f64)
 		
 		#print("-----")
 		for i in 0:15
@@ -286,16 +286,16 @@ class Circuit as @noauto
 		for mut e in edges
 			e.iterate(dt)
 	
-	func get_xxxx() -> f32
+	func get_xxxx() -> f64
 		var Uin = nodes[node_input].phi
 		var Uout = nodes[_out].phi
 		var factor = Uout / Uin
 		#print(factor)
 		return factor
 	
-	func mut simulate(t_max: f32, dt: f32, amp: f32, omega: f32, type: i32, out res: SimResult)
+	func mut simulate(t_max: f64, dt: f64, amp: f64, omega: f64, type: i32, out res: SimResult)
 		#for t in 0:t_max:dt
-		var t = 0.0
+		var t = 0.0 as f64
 		while t < t_max
 		
 			# input
@@ -312,7 +312,7 @@ class Circuit as @noauto
 			time_step(input, dt)
 			
 			# result
-			var I, U, phi: f32[]
+			var I, U, phi: f64[]
 			for e in edges
 				I.add(e.I)
 				U.add(e.U)
