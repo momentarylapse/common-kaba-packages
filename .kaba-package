@@ -1,0 +1,38 @@
+module	lib/cloud
+module	lib/linalg.kaba
+module	lib/linalg64.kaba
+module	lib/mesh
+module	lib/msgpack.kaba
+module	lib/opt.kaba
+module	lib/plot.kaba
+module	lib/psmove.kaba
+module	lib/urdf.kaba
+module	lib/usb.kaba
+module	lib/vulkanx.kaba
+module	lib/xml.kaba
+module	lib/zmq.kaba
+app	circuit
+	run	circuit.kaba
+	run	gui.kaba
+app	cli
+	run	cli.kaba
+app	huibui
+	run	huibui.kaba
+app	k2k
+app	kabama
+	run	kabama.kaba
+	run	gui.kaba
+app	make-kaba-wiki
+app	misc
+app	package
+	run	package.kaba
+app	shadercomp
+	run	shadercomp.kaba
+app	sisyphos
+	run	sisyphos.kaba
+app	tools
+	run	bindiff.kaba
+	run	replace.kaba
+	run	test-compile.kaba
+app	xmake
+	run	xmake.kaba

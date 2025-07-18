@@ -1,0 +1,161 @@
+use os
+use hui
+use kaba
+
+struct Source
+	type: string
+	name: string
+	url: string
+	
+	func base_path() -> os.Path
+		if type == "repo"
+			return conf.repos_base | name
+		if type == "local"
+			return url
+		return ""
+
+enum State
+	INTERNAL
+	INSTALLED
+	NOT_INSTALLED
+	NOT_MANAGED
+
+struct Package
+	type: string
+	name: string
+	source: os.Path
+	
+	func state() -> State
+		if type == "internal"
+			return State.INTERNAL
+		if type == "unmanaged"
+			return State.NOT_MANAGED
+		if os.fs.is_directory(conf.modules_base | name)
+			return State.INSTALLED
+		if os.fs.exists(conf.modules_base | (name + ".kaba"))
+			return State.INSTALLED
+	#	if os.fs.exists(conf.modules_base | os.Path(x[1]).basename())
+	#		return State.INSTALLED
+				
+		if os.fs.is_directory(conf.apps_base | name)
+			return State.INSTALLED
+		return State.NOT_INSTALLED
+
+struct Config
+	var kaba_base: os.Path
+	var modules_base: os.Path
+	var apps_base: os.Path
+	var package_base: os.Path
+	var repos_base: os.Path
+	var sources: Source[]
+	var packages: Package[]
+var conf: Config
+
+func load_basic_config()
+	conf.kaba_base = hui.app_directory
+	conf.modules_base = conf.kaba_base | "modules"
+	conf.apps_base = conf.kaba_base | "apps"
+	conf.package_base = conf.kaba_base | "packages"
+	conf.repos_base = conf.package_base | "repos"
+	
+	if not os.fs.is_directory(conf.package_base)
+		os.fs.create_directory(conf.package_base)
+	if not os.fs.is_directory(conf.repos_base)
+		os.fs.create_directory(conf.repos_base)
+	
+	if os.fs.exists(conf.package_base | "sources")
+		let s = os.fs.read_text(conf.package_base | "sources")
+		for l in s.explode("\n")
+			let x = l.explode("\t")
+			if len(x) >= 3
+				conf.sources.add([x[0], x[1].replace("/", "."), x[2]])
+
+func load_module_list()
+	
+	# internal
+	for p in kaba.default_context.packages
+		conf.packages.add(["internal", p.name, ""])
+
+	# from sources
+	for s in conf.sources
+		let base = s.base_path()
+		if base == ""
+			continue
+		if not os.fs.is_directory(base)
+			continue
+		
+		if not os.fs.exists(base | ".kaba-package")
+			continue
+		let ss = os.fs.read_text(base | ".kaba-package")
+		for l in ss.explode("\n")
+			let x = l.explode("\t")
+			if len(x) < 2
+				continue
+			if x[0] == ""
+				continue
+			var name = os.Path(x[1]).basename().replace(".kaba", "")
+			
+			conf.packages.add([x[0], name, base | x[1]])
+	
+	# unmanaged
+	find_unmanaged_modules()
+
+func is_managed_package(name: string) -> bool
+	for p in conf.packages
+		if p.name == name and p.type in ["module", "app"]
+			return true
+	return false
+		
+func find_unmanaged_modules()
+	let list = os.fs.search(conf.modules_base, "*", "d")
+	for e in list
+		if not is_managed_package(str(e))
+			conf.packages.add(["unmanaged", str(e), conf.modules_base | e])
+	let list2 = os.fs.search(conf.apps_base, "*", "d")
+	for e in list2
+		if not is_managed_package(str(e))
+			conf.packages.add(["unmanaged", str(e), conf.modules_base | e])
+
+
+func action_update(args: string[])
+	for s in conf.sources
+		if s.type != "repo"
+			continue
+		
+		print("updating package {{s.name}}")
+		let base = conf.repos_base | s.name
+		if not os.fs.is_directory(base)
+			os.fs.create_directory(base)
+		let git = base | ".git" # FIXME bug in kaba!!!!
+		if not os.fs.is_directory(base | ".git")
+			os.shell_execute("cd {{base}}; git clone {{s.url}} .")
+		os.shell_execute("cd {{base}}; git pull")
+	
+
+
+
+func action_list(args: string[])
+	load_module_list()
+
+	for p in conf.packages |> sort("name")
+		let state = p.state()
+		var s = ""
+		if state == State.INTERNAL
+			s = "{{os.terminal.GRAY}}internal{{os.terminal.END}}"
+		if state == State.INSTALLED
+			s = "{{os.terminal.GREEN}}installed{{os.terminal.END}}"
+		if state == State.NOT_MANAGED
+			s = "{{os.terminal.RED}}unmanaged{{os.terminal.END}}"
+		print("{{p.name|-12}} {{s}}")
+
+
+
+func main(args: string[])
+	load_basic_config()
+
+	var p: os.CommandLineParser
+	p.info("package", "kaba package manager")
+	
+	p.cmd("update", "", "update database / repositories", action_update)
+	p.cmd("list", "", "list available modules", action_list)
+	p.parse(args)
