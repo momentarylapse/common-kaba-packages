@@ -1,0 +1,183 @@
+use gl
+use visualization
+use cloud
+
+class PointCloudRenderer
+	var bounds: cloud.Box
+	
+	# "regular" clouds
+	var cloud_shader: owned![gl.Shader]
+	var cloud_intensity_shader: owned![gl.Shader]
+	var cloud_vb: owned![gl.VertexBuffer]
+	var cloud_max_intensity = 1.0
+	enum ColorMode
+		AUTO
+		INTENSITY
+	var color_mode = PointCloudRenderer.ColorMode.AUTO
+	
+	# clouds with explicit color
+	var cloud_color_shader: owned![gl.Shader]
+	var cloud_color_vb: owned![gl.VertexBuffer]
+	var cloud_color_buf: (vec3,color)[]
+	var cloud_color_dirty = false
+	
+	var matrix = mat4.ID
+	
+	var R = 2.0
+	
+	func mut draw()
+		gl.set_z(false, false)
+		gl.set_model_matrix(matrix)
+		gl.set_cull(gl.CullMode.NONE)
+		
+		gl.set_shader(cloud_shader)
+		cloud_shader.set_int("color_mode", int(color_mode))
+		cloud_shader.set_float("max_intensity", cloud_max_intensity)
+		cloud_shader.set_float("dx", R / gl.target.width())
+		cloud_shader.set_float("dy", R / gl.target.height())
+		cloud_shader.set_floats("vmin", &bounds.vmin.x, 3)
+		cloud_shader.set_floats("vmax", &bounds.vmax.x, 3)
+		gl.draw_points(cloud_vb)
+		
+		if cloud_color_dirty
+			cloud_color_vb.update(cloud_color_buf)
+			cloud_color_dirty = false
+		
+		gl.set_shader(cloud_color_shader)
+		cloud_color_shader.set_float("dx", R / gl.target.width())
+		cloud_color_shader.set_float("dy", R / gl.target.height())
+		gl.draw_points(cloud_color_vb)
+		
+		gl.set_cull(gl.CullMode.BACK)
+		gl.set_z(true, true)
+	
+	func set_good_camera(out r: visualization.RenderWindow, points: vec3[])
+		r.cam_pos = cloud.center_of_mass(cloud.random_sample(points, 1000))
+		r.cam_ang = quaternion([2.1,0,0])
+		r.cam_radius = 50
+		
+	func mut set_points(points: vec3[])
+		set_points(points |> (func(p: vec3) cloud.Point(p, 1.0)))
+		
+	func mut set_points(points: cloud.Point[])
+		bounds = cloud.bounding_box(cloud.get_points(points))
+		cloud_max_intensity = points |> (func(p: cloud.Point) p.intensity) |> max
+		
+		# argh, somehow glNamedBufferData() seems to fail _sometimes_
+		cloud_vb = new gl.VertexBuffer("3f,f")
+		# ...
+		
+		cloud_vb.update(points)
+	
+	func mut add_color_point(p: vec3, c: color)
+		cloud_color_buf.add([p,c])
+		cloud_color_dirty = true
+		
+	func mut init_data(out ctx: gl.Context)
+	
+		let code_geo = "
+<GeometryShader>
+layout(points) in;
+layout(triangle_strip, max_vertices = 4) out;
+layout(location = 1) in vec3 in_color[];
+layout(location = 1) out vec3 out_color;
+uniform float dx = 0.01;
+uniform float dy = 0.01;
+void main() {
+	vec4 p = gl_in[0].gl_Position;
+	p /= p.w;
+	out_color = in_color[0];
+	gl_Position = p + vec4(-dx,-dy,0,0);
+	EmitVertex();
+	gl_Position = p + vec4( dx,-dy,0,0);
+	EmitVertex();
+	gl_Position = p + vec4(-dx, dy,0,0);
+	EmitVertex();
+	gl_Position = p + vec4( dx, dy,0,0);
+	EmitVertex();
+	EndPrimitive();
+}
+</GeometryShader>"
+
+		let code_frag = "
+<FragmentShader>
+layout(location = 1) in vec3 in_color;
+out vec4 color;
+void main() {
+	color = vec4(in_color,1);
+	float f = 0.8;
+	color = f * color + (1-f) * vec4(1);
+}
+</FragmentShader>"
+	
+		cloud_vb = new gl.VertexBuffer("3f,1f")
+		cloud_shader = ctx.create_shader("
+<Layout>
+	version = 420
+</Layout>
+
+<VertexShader>
+struct Matrix {
+	mat4 model;
+	mat4 view;
+	mat4 project;
+};
+uniform Matrix matrix;
+uniform vec3 vmin;
+uniform vec3 vmax;
+uniform int color_mode;
+uniform float max_intensity = 1.0;
+layout(location = 0) in vec3 in_pos;
+layout(location = 1) in float in_intensity;
+layout(location = 1) out vec3 out_color;
+
+const int hm_n = 4;
+const float[] hm_f = {0.0, 0.1, 0.4, 0.8, 1.0};
+const vec3[] hm_c = {vec3(0.5,0.5,0.5), vec3(0.1,0.1,0.8), vec3(0.1,1.0,0.1), vec3(1.0,0.1,0.1), vec3(1,1,1)};
+
+vec3 heatmap(float f) {
+	for (int i=0; i<hm_n-1; i++) {
+		if (f < hm_f[i+1])
+			return mix(hm_c[i], hm_c[i+1], (f - hm_f[i]) / (hm_f[i+1] - hm_f[i]));
+	}
+	return hm_c[hm_n-1];
+}
+
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_pos, 1);
+	if (color_mode == 0)
+		// auto
+		out_color = (in_pos.xyz - vmin) / (vmax - vmin);
+	else
+		// intensity
+		out_color = heatmap(sqrt(in_intensity / max_intensity));
+}
+</VertexShader>
+
+{{code_geo}}
+{{code_frag}}")
+
+		cloud_color_vb = new gl.VertexBuffer("3f,4f")
+		cloud_color_shader = ctx.create_shader("
+<Layout>
+	version = 420
+</Layout>
+
+<VertexShader>
+struct Matrix {
+	mat4 model;
+	mat4 view;
+	mat4 project;
+};
+uniform Matrix matrix;
+layout(location = 0) in vec3 in_pos;
+layout(location = 1) in vec4 in_color;
+layout(location = 1) out vec3 out_color;
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_pos, 1);
+	out_color = in_color.rgb;
+}
+</VertexShader>
+
+{{code_geo}}
+{{code_frag}}")

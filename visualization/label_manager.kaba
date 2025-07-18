@@ -1,0 +1,30 @@
+use gl
+use visualization.RenderWindow
+
+class LabelManager
+	struct Label
+		pos: vec2
+		pos_wanted: vec2
+		text: string
+		color: color
+	labels: Label[]
+	func mut add(pos: vec2, text: string, color: color)
+		labels.add([pos, pos, text, color])
+	func mut optimize()
+		for mut i=>l in labels
+			l.pos = l.pos_wanted + vec2(f32(i % 7) * 0.01, f32(i) * 0.003)
+		for step in 0:10
+			for mut i=>l in labels
+				for k in i+1:len(labels)
+					let d = labels[k].pos - l.pos
+					if len(d) < 25
+						let dd = d / len(d) * (25 - len(d))
+						l.pos -= dd
+						labels[k].pos += dd
+	func mut draw(out r: RenderWindow)
+		optimize()
+		r.set_mode_2d()
+		for l in labels
+			gl.set_material(color.BLACK, 0, 0, l.color)
+			r.draw_str(l.pos, l.text)
+		labels.clear()

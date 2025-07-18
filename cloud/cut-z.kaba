@@ -1,0 +1,35 @@
+use os
+use cloud
+use cloud.pcd
+
+func cut_out(arg: string[])
+	let dir0 = os.Path(arg[0])
+	let dir1 = os.Path(arg[1])
+	let z0 = float(arg[2].replace("m", "-")) #-10
+	let z1 = float(arg[3].replace("m", "-")) #-2.0
+	print("{{z0}}  {{z1}}")
+	#return
+			
+	let files = os.fs.search(dir0, "*.pcd", "f")
+	for f in files
+		for i in str(f).find("binary")
+			continue
+		print(f)
+		let p = pcd.load(pcd.quick_file(dir0 | f))
+		let q = cloud.filter_box(p, [[-1000,-1000,z1], [1000,1000,1000]])
+		let s = cloud.filter_box(p, [[-1000,-1000,-1000], [1000,1000,z0]])
+		var points = q
+		for x in s
+			points.add([[x.pos.x, x.pos.y, x.pos.z + z1 - z0], x.intensity])
+		pcd.save(points, dir1 | f)
+		#break
+
+func main(arg: string[])
+	#print(arg)
+
+	var p = new os.CommandLineParser()
+	p.info("cut-z", "cut out z-range to simulate full hatches")
+#	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
+	p.cmd("", "SOURCE_DIR DEST_DIR Z0 Z1", "cut", func(a: string[]) cut_out(a))
+	p.parse(arg)
+	

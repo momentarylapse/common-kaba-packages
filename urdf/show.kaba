@@ -1,0 +1,151 @@
+use urdf
+use hui
+use gl
+use os
+use image
+use visualization
+use visualization.label_manager.LabelManager
+
+enum GraphMode
+	SIMPLE
+	REAL
+
+func edge_color(t: urdf.Edge.Type) -> color
+	if t == urdf.Edge.Type.FIXED
+		return [1,0.1,0.1, 1]
+	if t == urdf.Edge.Type.FLOATING
+		return [0.8,0.8,0.1, 1]
+	if t == urdf.Edge.Type.REVOLUTE
+		return [0.2,0.9,0.2, 1]
+	if t == urdf.Edge.Type.PRISMATIC
+		return [0.3,0.3,1, 1]
+	return color.GRAY
+
+class MyWindow extends visualization.RenderWindow
+	tree: urdf.Tree
+	graph_mode = GraphMode.REAL
+	var show_labels = true
+	var show_frames = false
+	label_manager: LabelManager
+	
+	matrices: mat4{}
+	
+
+	func __init__(t: urdf.Tree)
+		super.__init__("Cloud explorer")
+		set_options("", "headerbar")
+		set_title("urdf explorer") # hui bug :P
+		
+		set_target(":header:")
+		
+		tree = t
+#		print(tree)
+		
+		matrices = tree.default_matrices()
+		
+		on_post_init(init_data)
+	
+	func mut draw_node(n: string)
+		let matrix = matrices[n]!
+		
+		for e in tree.edges
+			if e.parent == n
+				draw_node(e.child)
+				gl.set_material(color.BLACK, 0, 0, edge_color(e.type))
+				let child_matrix = matrices[e.child]!
+				draw_lines([matrix * vec3.0, child_matrix * vec3.0])
+
+		if show_frames
+			let l = cam_radius * 0.05
+			gl.set_material(color.BLACK, 0, 0, [0.8,0,0,1])
+			draw_lines([matrix * vec3.0, matrix * [l,0,0]])
+			gl.set_material(color.BLACK, 0, 0, [0,0.7,0,1])
+			draw_lines([matrix * vec3.0, matrix * [0,l,0]])
+			gl.set_material(color.BLACK, 0, 0, [0.2,0.2,1,1])
+			draw_lines([matrix * vec3.0, matrix * [0,0,l]])
+				
+		let pp = (projection_matrix * matrix).project(vec3.0)
+		#print(pp)
+		if show_labels
+			label_manager.add([pp.x, pp.y], n, [0.8,0.8,0.8,1])
+		set_mode_2d()
+		gl.set_material(color.BLACK, 0, 0, color.BLACK)
+		draw_image(tex_white, [pp.x-3,pp.x+3,pp.y-3,pp.y+3])
+		set_mode_3d()
+		
+	
+	func override mut draw_content()
+		draw_magic_grid([0.5,0.5,0.5,1])
+	
+		var y0 = 0
+		for n in tree.root_nodes()
+			draw_node(n)
+	
+		set_mode_2d()
+		set_font(14, false, false)
+		gl.set_material(color.BLACK, 0, 0, color.WHITE)
+		#draw_str([0,0], "{{large_num(len(points))}} points  {{len(current)}} files")
+		gl.set_material(color.BLACK, 0, 0, color.GRAY)
+		set_font(10, false, false)
+		draw_str([0,20], "cam: {{cam_pos}}")
+		label_manager.draw(self)
+		
+		let types = [urdf.Edge.Type.FIXED, urdf.Edge.Type.FLOATING, urdf.Edge.Type.PRISMATIC, urdf.Edge.Type.REVOLUTE]
+		for i=>t in types #urdf.Edge.Type.all()
+			gl.set_material(color.BLACK, 0, 0, edge_color(t))
+#			for c in ctx
+#				c.default_frame_buffer
+			draw_str([20, 200 + i*20], str(t))
+		
+	func mut update_matrix_simple(n: string, level: i32, out y0: i32)
+		matrices[n] = mat4.translation([level, y0, 0])
+		y0 ++
+		for e in tree.edges
+			if e.parent == n
+				update_matrix_simple(e.child, level + 1, y0)
+	
+	func mut update_matrices_simple()
+		var y0 = 0
+		for n in tree.root_nodes()
+			update_matrix_simple(n, 0, y0)
+			
+	func mut init_data()
+		print("main.init_data")
+	
+	func override mut on_key_down_x(k: i32)
+		if k == hui.KEY_1
+			graph_mode = GraphMode.SIMPLE
+			update_matrices_simple()
+		if k == hui.KEY_2
+			graph_mode = GraphMode.REAL
+			matrices = tree.default_matrices()
+		if k == hui.KEY_F
+			show_frames = not show_frames
+			force_redraw()
+		if k == hui.KEY_L
+			show_labels = not show_labels
+			force_redraw()
+	
+
+class Config
+	#var dir: Path
+var cfg: Config
+
+func explore(arg: string[])
+	var w: shared[MyWindow] = new MyWindow(urdf.parse(arg[0]))
+	hui.fly_and_wait(w)
+
+func main(arg: string[])
+	var p = new os.CommandLineParser()
+	p.info("show-urdf", "view a urdf file")
+	#p.option("--algo", "ALGO", "select algo A/B/C/D/E", 
+##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
+	p.cmd("", "URDF_FILE", "show urdf file", func(a: string[]) explore(a))
+	p.parse(arg)
+	
+
+
+#func main(arg: string[])
+#	for a in arg
+#		print(parse(a))
+

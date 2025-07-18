@@ -102,7 +102,7 @@ func load_module_list()
 
 func is_managed_package(name: string) -> bool
 	for p in conf.packages
-		if p.name == name and p.type in ["module", "app"]
+		if p.name == name and p.type in ["module", "app", "package"]
 			return true
 	return false
 		

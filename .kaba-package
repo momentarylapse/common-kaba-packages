@@ -1,38 +1,45 @@
-module	lib/cloud
+package	cloud
+	run	convert.kaba
+	run	cut-z.kaba
+	run	view.kaba
+package	mesh
+	run	convert.kaba
+	run	view.kaba
+package	urdf
+	run	show.kaba
+package	visualization
 module	lib/linalg.kaba
 module	lib/linalg64.kaba
-module	lib/mesh
 module	lib/msgpack.kaba
 module	lib/opt.kaba
 module	lib/plot.kaba
 module	lib/psmove.kaba
-module	lib/urdf.kaba
 module	lib/usb.kaba
 module	lib/vulkanx.kaba
 module	lib/xml.kaba
 module	lib/zmq.kaba
-app	circuit
+package	circuit
 	run	circuit.kaba
 	run	gui.kaba
-app	cli
+package	cli
 	run	cli.kaba
-app	huibui
+package	huibui
 	run	huibui.kaba
-app	k2k
-app	kabama
+package	k2k
+package	kabama
 	run	kabama.kaba
 	run	gui.kaba
-app	make-kaba-wiki
-app	misc
-app	package
+package	make-kaba-wiki
+package	misc
+package	package
 	run	package.kaba
-app	shadercomp
+package	shadercomp
 	run	shadercomp.kaba
-app	sisyphos
+package	sisyphos
 	run	sisyphos.kaba
-app	tools
+package	tools
 	run	bindiff.kaba
 	run	replace.kaba
 	run	test-compile.kaba
-app	xmake
+package	xmake
 	run	xmake.kaba

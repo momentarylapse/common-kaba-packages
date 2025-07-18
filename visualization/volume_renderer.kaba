@@ -1,0 +1,101 @@
+use gl
+use visualization
+use cloud.*
+
+class VolumeRenderer
+	bounds: Box
+	
+	shader: owned[gl.Shader]
+	tex: owned[gl.VolumeTexture]
+	
+	NX, NY, NZ: i32
+	data: f32[]
+	
+	
+	func mut draw(out r: visualization.RenderWindow)
+
+		for s in shader
+			gl.set_shader(&s)
+			s.set_floats("bb_min", &bounds.vmin.x, 3)
+			s.set_floats("bb_max", &bounds.vmax.x, 3)
+#			s.set_int("NX", NX)
+#			s.set_int("NY", NY)
+#			s.set_int("NZ", NZ)
+		gl.set_alpha(gl.Alpha.SOURCE_ALPHA, gl.Alpha.SOURCE_INV_ALPHA)
+		gl.bind_texture(0, tex)
+		r.draw_cube(bounds.vmin, bounds.vmax)
+		gl.disable_alpha()
+	
+	func mut set(box: Box, data: f32[], n: i32[])
+		NX = n[0]
+		NY = n[1]
+		NZ = n[2]
+		bounds = box
+		tex = new gl.VolumeTexture(NX, NY, NZ, "r:f32")
+		for t in tex
+			t.write_float(data)
+			t.set_options("magfilter=linear")
+		
+	func mut init_data(out ctx: gl.Context)
+		shader = ctx.create_shader("<Layout>
+        version = 330 core
+</Layout>
+
+
+<VertexShader>
+struct Matrix {
+	mat4 model;
+	mat4 view;
+	mat4 project;
+};
+uniform Matrix matrix;
+layout(location = 0) in vec3 in_pos;
+layout(location = 0) out vec4 out_pos;
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_pos, 1);
+	out_pos = matrix.model * vec4(in_pos, 1);
+	
+}
+</VertexShader>
+
+
+
+<FragmentShader>
+#extension GL_ARB_separate_shader_objects : enable
+
+struct Matrix { mat4 model, view, project; };
+/*layout(binding = 0)*/ uniform Matrix matrix;
+
+layout(location = 0) in vec4 in_pos;
+uniform sampler3D tex0;
+out vec4 out_color;
+
+uniform vec3 bb_min, bb_max;
+
+void main() {
+	vec3 p = in_pos.xyz / in_pos.w;
+
+	vec3 cam_pos = (inverse(matrix.view) * vec4(0,0,0,1)).xyz;
+	vec3 dir = normalize(p - cam_pos);
+	
+	vec3 bb_d = (bb_max - bb_min);
+	float dt = length(bb_d) * 0.002;
+	vec3 dp = dir * dt;
+	
+	float acc = 0.01;
+	for (int i=0; i<1000; i++) {
+		vec3 q = (p - bb_min) / (bb_max - bb_min);
+		if ((q.x > 1.01) || (q.y > 1.01) || (q.z > 1.01))
+			break;
+		if ((q.x < -0.01) || (q.y < -0.01) || (q.z < -0.01))
+			break;
+		
+		float f = texture(tex0, q).r;
+		acc += f * dt * (1 - acc);
+		
+		p += dp;
+	}
+        out_color = vec4(1,1,1,min(acc,1));
+        //out_color = vec4(acc,acc,acc,0.7);
+}
+</FragmentShader>")

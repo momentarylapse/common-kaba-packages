@@ -1,0 +1,546 @@
+use hui
+use gl
+use image.Image
+
+use helper.progress.*
+use cloud.Box
+
+const IDLE_DT = 0.1
+
+
+struct Light
+	proj: mat4
+	pos: vec3
+	_dummy1: f32
+	dir: vec3
+	_dummy2: f32
+	col: color
+	radius, theta, harshness: f32
+	
+
+class RenderWindow extends hui.Window
+	cam_pos = vec3.0
+	cam_ang = quaternion.ID
+	cam_radius = 10.
+	cam_speed = 0.5
+	cam_ortho = false
+	background_color = color.BLACK
+	
+	ctx: owned[gl.Context]
+	image_shader: owned![gl.Shader]
+	def_shader_3d: owned![gl.Shader]
+	lines_shader: owned![gl.Shader]
+	initialized = false
+	
+	vb_lines: owned![gl.VertexBuffer]
+	
+	text_tex: owned![gl.Texture]
+	tex_white: owned![gl.Texture]
+	
+	ubo_lights: owned![gl.UniformBuffer]
+	var light_enabled = false
+	
+	post_projection_matrix = mat4.ID
+	projection_matrix: mat4
+	
+	message: string
+	message_ttl = -1.0
+	font: (f32,bool,bool)
+	
+	cb_init_data: void->void = nil
+	
+	# interface
+	#func virtual mut init_data()
+	func virtual mut draw_content()
+	func virtual mut on_cam_change()
+	func virtual mut on_key_down_x(k: i32)
+	func virtual mut on_mouse_move_x(m: vec2) -> bool
+		return true
+
+	func __init__(title: string)
+		super.__init__(title, 1024, 768)
+		event_x("nix-area", "hui:realize", realize)
+		set_maximized(true)
+		set_options("", "borderwidth=0")
+		from_source("
+Grid ? ''
+	DrawingArea nix-area '' opengl mainwindowcontrol expandx
+	Grid side-panel '' visible=no noexpandx")
+		background_color = [0.2,0.2,0.2, 1]
+		
+		set_default_font()
+		
+		#helper.progress.
+		main_win = &self
+		
+		#show()
+	
+	func mut realize()
+		print("REALIZE")
+		ctx = gl.init(["verbose"])
+		init()
+		print("FINISHED")
+		initialized = true
+		
+	func mut on_post_init(f: void->void)
+		print("set init callback")
+		cb_init_data = f
+		if initialized
+			print("-> direct call")
+			cb_init_data()
+	
+	func project(p: vec3) -> vec3
+		return projection_matrix.project(p)
+	
+	func create_projection_matrix() -> mat4
+		let w = gl.target.width()
+		let h = gl.target.height()
+		if cam_ortho
+			return mat4.translation([0,0,0.5]) * mat4.scale(2/cam_radius*h/w, 2/cam_radius, 1/cam_radius*0.1)
+		
+		let c = vec2(w/2, h/2)
+		let s1 = vec2(h, h)
+		let t = mat4.translation([c.x / w * 2 - 1, 1 - c.y / h * 2, 0])
+		let p = mat4.perspective(pi/2, 1, cam_radius*0.001, cam_radius*10000, true)
+		let s = mat4.scale(2*s1.x/w,2*s1.y/h,-1)
+		return post_projection_matrix * (mat4.translation([0,0,0.5]) * mat4.scale(1,1,0.5) * t * p * mat4.scale(1,1,-1) * s)
+	
+	func mut draw_gl()
+		if not initialized
+			return
+		for c in ctx
+			gl.start_frame_hui(c)
+		
+			gl.clear(background_color)
+			set_mode_3d()
+		
+			draw_content()
+		
+			set_mode_2d()
+			if message_ttl > 0
+				draw_message()
+		
+			gl.end_frame_hui()
+	
+	func mut draw_message()
+		let f = clamp(message_ttl, 0.0, 1.0)
+		gl.set_material(color.BLACK, 0, 0, [1,1,1,f])
+		set_font(24, true, false)
+		let w = gl.target.width()
+		let h = gl.target.height()
+		draw_str([w/2 - 5*len(message),h/2], message)
+		set_default_font()
+	
+	func mut set_message(m: string)
+		message = m
+		message_ttl = 3.0
+	
+	func mut on_idle()
+		if message_ttl > 0
+			message_ttl -= IDLE_DT
+			force_redraw()
+	
+	func mut force_redraw()
+		redraw("nix-area")
+	
+	func override on_key_down(key_code: i32)
+		var k = key_code & 0x000000ff
+		var d = cam_speed
+		if (key_code & hui.KEY_SHIFT) > 0
+			d *= 5
+		if k in [hui.KEY_UP]#, hui.KEY_W]
+			cam_pos += cam_ang * [0,0,d]
+		if k in [hui.KEY_DOWN]#, hui.KEY_S]
+			cam_pos += cam_ang * [0,0,-d]
+		if k in [hui.KEY_LEFT]#, hui.KEY_A]
+			cam_pos += cam_ang * [-d,0,0]
+		if k in [hui.KEY_RIGHT]#, hui.KEY_D]
+			cam_pos += cam_ang * [d,0,0]
+		if key_code == hui.KEY_CONTROL + hui.KEY_P
+			cam_ortho = not cam_ortho
+			if cam_ortho
+				set_message("view: orthogonal")
+			else
+				set_message("view: projective")
+		if key_code == hui.KEY_CONTROL + hui.KEY_Z
+			cam_ang = quaternion([0,1,0],pi)
+			set_message("view: Z")
+		if key_code == hui.KEY_CONTROL + hui.KEY_X
+			cam_ang = quaternion([0,1,0],pi/2) * quaternion([0,0,1],pi/2)
+			set_message("view: X")
+		if key_code == hui.KEY_CONTROL + hui.KEY_Y
+			cam_ang = quaternion([1,0,0],pi/2)
+			set_message("view: Y")
+		if key_code == hui.KEY_L
+			light_enabled = !light_enabled
+			set_message("light: {{light_enabled}}")
+		on_cam_change()
+		on_key_down_x(key_code)
+		force_redraw()
+	
+	func override on_mouse_move(mouse: vec2)
+		var e = hui.get_event()
+		if not on_mouse_move_x(mouse)
+			return
+		let sx = post_projection_matrix.e[0][0]
+		if e.button_m#r # FIXME indurad Debian 12 hack?!?
+			# rotate around focus point
+			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
+			on_cam_change()
+			redraw("nix-area")
+		else if e.button_r#m
+			# rotate around eye
+			cam_pos -= cam_ang * [0,0,cam_radius]
+			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
+			cam_pos += cam_ang * [0,0,cam_radius]
+			on_cam_change()
+			redraw("nix-area")
+		else if e.button_l
+			# move
+			cam_pos += (cam_ang * [-e.dmouse.x*0.001*sx, e.dmouse.y*0.001, 0]) * cam_radius
+			on_cam_change()
+			redraw("nix-area")
+	
+	func override on_mouse_wheel(scroll: vec2)
+		#print(scroll)
+		cam_radius *= exp(scroll.y*0.08)
+		on_cam_change()
+		redraw("nix-area")
+	
+	func mut init()
+		for c in ctx
+	
+			def_shader_3d = c.create_shader("<Layout>
+	version = 330 core
+</Layout>
+<VertexShader>
+#import vertex-default-nix
+</VertexShader>
+<FragmentShader>
+#extension GL_ARB_separate_shader_objects : enable
+
+struct Matrix { mat4 model, view, project; };
+/*layout(binding = 0)*/ uniform Matrix matrix;
+struct Material { vec4 albedo, emission; float roughness, metal; };
+/*layout(binding = 2)*/ uniform Material material;
+struct Light { mat4 proj; vec4 pos, dir, color; float radius, theta, harshness; };
+uniform int num_lights = 0;
+//layout(binding = 1, std140)
+layout(std140) uniform LightData { Light light[32]; };
+
+layout(location = 0) in vec4 in_pos;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
+uniform sampler2D tex0;
+out vec4 out_color;
+
+vec4 basic_lighting(Light l, vec3 n, vec4 tex_col) {
+	float attenuation = 1.0;
+	vec3 LD = (matrix.view * vec4(l.dir.xyz, 0)).xyz;
+	vec3 LP = (matrix.view * vec4(l.pos.xyz, 1)).xyz;
+	if (l.radius > 0) {
+		LD = normalize(in_pos.xyz - LP);
+		attenuation = min(l.radius / length(in_pos.xyz - LP), 1);
+	}
+	float d = max(-dot(n, LD), 0) * attenuation;
+	vec4 color = material.albedo * material.roughness * l.color * (1 - l.harshness) / 2;
+	color += material.albedo * l.color * l.harshness * d;
+	color *= tex_col;
+	if ((d > 0) && (material.roughness < 0.8)) {
+		vec3 e = normalize(in_pos.xyz); // eye dir
+		vec3 rl = reflect(LD, n);
+		float ee = max(-dot(e, rl), 0);
+		float shininess = 5 / (1.1 - material.roughness);
+		color += (1 - material.roughness) * l.color * l.harshness * pow(ee, shininess);
+	}
+	return color;
+}
+
+void main() {
+	vec3 n = normalize(in_normal);
+	vec4 tex_col = texture(tex0, in_uv);
+	out_color = material.emission * tex_col;
+	for (int i=0; i<num_lights; i++)
+		out_color += basic_lighting(light[i], n, tex_col);
+	out_color.a = material.albedo.a * tex_col.a;
+}
+</FragmentShader>")
+			def_shader_3d.link_uniform_block("LightData", 13)
+#			def_shader_3d := c.default_shader_3d
+	
+			image_shader = c.create_shader("
+<Layout>
+	version = 420
+</Layout>
+
+<VertexShader>
+struct Matrix {
+	mat4 model;
+	mat4 view;
+	mat4 project;
+};
+uniform Matrix matrix;
+uniform vec3 vmin;
+uniform vec3 vmax;
+layout(location = 0) in vec3 in_pos;
+layout(location = 1) in vec3 in_normal;
+layout(location = 2) in vec2 in_uv;
+layout(location = 1) out vec2 out_uv;
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_pos, 1);
+	out_uv = in_uv;
+}
+</VertexShader>
+
+<FragmentShader>
+uniform sampler2D tex0;
+layout(location = 1) in vec2 in_uv;
+struct Material { vec4 albedo, emission; float roughness, metal; };
+/*layout(binding = 2)*/ uniform Material material;
+out vec4 color;
+void main() {
+	color = texture(tex0, in_uv) * material.emission;
+}
+</FragmentShader>
+")
+
+			vb_lines = new gl.VertexBuffer("3f")
+	
+			lines_shader = c.create_shader("
+<Layout>
+	version = 420
+</Layout>
+
+<VertexShader>
+struct Matrix {
+	mat4 model;
+	mat4 view;
+	mat4 project;
+};
+uniform Matrix matrix;
+layout(location = 0) in vec3 in_pos;
+void main() {
+	gl_Position = matrix.project * matrix.view * matrix.model * vec4(in_pos, 1);
+}
+</VertexShader>
+
+
+<FragmentShader>
+out vec4 color;
+struct Material { vec4 albedo, emission; float roughness, metal; };
+/*layout(binding = 2)*/ uniform Material material;
+void main() {
+	color = material.emission;
+}
+</FragmentShader>
+")
+
+			ubo_lights = new gl.UniformBuffer(sizeof(Light))
+
+
+			text_tex = new gl.Texture(500, 50, "rgba:i8")
+			tex_white = new gl.Texture(8, 8, "rgba:i8")
+			var im: Image
+			im.create(8,8,color.WHITE)
+			tex_white.write(im)
+	
+			print("init child...")
+			if cb_init_data
+				cb_init_data()
+		
+			event("nix-area", draw_gl)
+		
+			hui.run_repeated(IDLE_DT, on_idle)
+	
+	func mut set_default_shader_3d()
+		gl.set_shader(def_shader_3d)
+		if light_enabled
+			def_shader_3d.set_int("num_lights", 1)
+		else
+			def_shader_3d.set_int("num_lights", 0)
+		
+		var l: Light
+		l.col = color.WHITE
+		l.dir = cam_ang * [0,0,1]
+		l.pos = cam_pos
+		l.radius = -1
+		l.theta = -1
+		l.harshness = 0.5
+		ubo_lights.update(&l, sizeof(l))
+		gl.bind_uniform_buffer(13, ubo_lights)
+	
+	func mut draw_cube(a: vec3, b: vec3)
+		#gl.set_model_matrix(mat4.ID)
+		#set_default_shader_3d()
+		for c in ctx
+			c.vb_temp.create_cube(a, b)
+			#gl.set_wire(true)
+			gl.draw_triangles(c.vb_temp)
+			#gl.set_wire(false)
+		
+	func mut draw_cube(p: vec3, r: f32)
+		draw_cube(p - [r,r,r], p + [r,r,r])
+	
+	func mut draw_lines(v: vec3[])
+		vb_lines.update(v)
+		gl.set_shader(lines_shader)
+		gl.draw_lines(vb_lines, false)
+	
+	func mut draw_wire_cube(box: Box)
+		gl.set_model_matrix(mat4.ID)
+		let d = box.vmax - box.vmin
+		let dx = vec3(d.x, 0, 0)
+		let dy = vec3(0, d.y, 0)
+		let dz = vec3(0, 0, d.z)
+		let p = [for i in 0:8   box.vmin + (i % 2) * dx + ((i >> 1) % 2) * dy + ((i >> 2) % 2) * dz]
+		let index = [0,1, 2,3, 4,5, 6,7, 0,2, 1,3, 4,6, 5,7, 0,4, 1,5, 2,6, 3,7]
+		draw_lines([for i in index p[i]])
+		
+	func mut draw_wire_cube(p: vec3, r: f32)
+		draw_wire_cube([p - [r,r,r], p + [r,r,r]])
+		
+	
+	func mut set_mode_2d()
+		gl.set_projection_ortho_pixel()
+		gl.set_view_matrix(mat4.ID)
+		gl.set_model_matrix(mat4.ID)
+		gl.set_cull(gl.CullMode.NONE)
+		gl.set_z(false, false)
+	
+	func mut set_mode_3d()
+		gl.set_cull(gl.CullMode.BACK)
+		gl.set_z(true, true)
+		gl.bind_texture(0, tex_white)
+		let p = create_projection_matrix()
+		#if cam_ortho
+		gl.set_projection_matrix(p)
+		#else
+		#	gl.set_projection_perspective()
+		let v = mat4.rotation(cam_ang.bar()) * mat4.translation(-(cam_pos - cam_ang * [0,0,cam_radius]))
+		gl.set_view_matrix(v)
+		gl.set_model_matrix(mat4.ID)
+		
+		# pixel projection...
+		let w = gl.target.width()
+		let h = gl.target.height()
+		projection_matrix = mat4.translation([w/2, h/2, 0]) * mat4.scale(w/2, -h/2, 1) * p * v
+
+	func mut draw_image(tex: gl.Texture*, dest: rect, flip: bool = false)
+		for c in ctx
+			gl.set_shader(image_shader)
+			gl.bind_texture(0, tex)
+			if flip
+				gl.set_model_matrix(mat4.translation([dest.center().x, dest.center().y, 0]) * mat4.scale(dest.width()/2, dest.height()/2, 1) * mat4.scale(-1,1,1) * mat4.rotation_z(-pi/2))
+				c.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+			else
+				gl.set_model_matrix(mat4.ID)
+				c.vb_temp.create_quad(dest, rect.ID)
+			gl.draw_triangles(c.vb_temp)
+
+
+	func mut draw_str(pos: vec2, text: string)
+		var im: Image
+		im.create(500, 50, [0,0,0,0])
+		let p = im.start_draw()
+		p.set_color(color.WHITE)
+		p.set_font("Sans", font.e0, font.e1, font.e2)
+		p.draw_str([10,10], text)
+		text_tex.write(im)
+		gl.set_alpha(gl.Alpha.SOURCE_ALPHA, gl.Alpha.SOURCE_INV_ALPHA)
+		draw_image(text_tex, [pos.x,pos.x+500, pos.y,pos.y+50], false)
+		gl.disable_alpha()
+	
+	func mut set_font(size: f32, bold: bool, italic: bool)
+		font = [size, bold, italic]
+	func mut set_default_font()
+		font = [13.0, false, false]
+		
+	
+	func mut draw_magic_grid(col2: color)
+		set_default_shader_3d()
+		gl.set_model_matrix(mat4.ID)
+		let x0 = -10.0
+		let x1 = 10.0
+		let dx = 1.0
+		
+		var e1 = vec3.EX
+		var e2 = vec3.EZ
+		if abs((cam_ang * vec3.EZ).z) > 0.7
+			e1 = vec3.EX
+			e2 = vec3.EY
+		if abs((cam_ang * vec3.EZ).x) > 0.7
+			e1 = vec3.EY
+			e2 = vec3.EZ
+		
+		var v: vec3[]
+		for x in x0:x1+dx/2:dx
+			v.add(x * e1 + x0 * e2)
+			v.add(x * e1 + x1 * e2)
+		for y in x0:x1+dx/2:dx
+			v.add(y * e2 + x0 * e1)
+			v.add(y * e2 + x1 * e1)
+		gl.set_material(color.BLACK, 0, 0, color.interpolate(col2, background_color, 0.7))
+		draw_lines(v)
+		
+		v.clear()
+		v.add(x0 * e2)
+		v.add(x1 * e2)
+		v.add(x0 * e1)
+		v.add(x1 * e1)
+		gl.set_material(color.BLACK, 0, 0, col2)
+		draw_lines(v)
+
+
+
+func histogram_to_texture(hist: f32[], out tex: gl.Texture, W: i32, marks: (f32,i32)[], c: color = color.RED)
+	let N = len(hist)
+	let D = N / 2
+	#let W = 256
+	let H = W / 2
+	let S = f32(W) / f32(N)
+	
+
+	var im: Image
+	im.create(W, H, [0.5,0.5,0.5, 0.3])
+			
+	var p = im.start_draw()
+	p.set_line_width(1)
+	for m in marks
+		if m.e1 == 0
+			p.set_color(color.WHITE)
+		else
+			p.set_color([0.4,0.4,0.4, 1])
+		p.draw_line([m.e0*S, 0], [m.e0*S, D*S])
+		#p.draw_line([m*S, 0], [m*S, D*S])
+	p.set_color(c)
+	#p.set_antialiasing(true)
+	var lines: vec2[]
+	var m = max(hist)*1.1
+	for i=>h in hist
+		lines.add([i*S, (1-h/m) * D*S - 1])
+		lines.add([(i+1)*S, (1-h/m) * D*S - 1])
+		#p.draw_line([i*S, (1-h/m) * D*S - 1], [(i+1)*S, (1-h/m) * D*S - 1])
+#	lines.add([0,D*S])
+#	p.set_line_width(2)
+	p.draw_lines(lines)
+	#p.set_fill(true)
+	#p.draw_polygon(lines)
+#	for i in 0:D
+#		im.set_pixel(ix1, i, [0.3,0.3,0.3, 1])
+#	for i in 0:D
+#		im.set_pixel(ix2, i, [0.3,0.3,0.3, 1])
+#	for h,i in histx
+#		im.set_pixel(i, (1-h*10) * D, color.RED)
+
+	tex.write(im)
+	tex.set_options("wrap=clamp")
+
+func color_map(f: f32) -> color
+	let S0 = 0.3
+	let S1 = 0.7
+	if f < S0
+		return [f/S0,0,0,1]
+	if f < S1
+		return [1,(f-S0)/(S1-S0),0,1]
+	return [1,1,(f-S1) / (1-S1),1]
+

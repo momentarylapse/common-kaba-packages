@@ -1,0 +1,63 @@
+func partial_sums(list: float[]) -> float[]
+	var r: float[]
+	var s = 0.0
+	for l in list
+		s += l
+		r.add(s)
+	return r
+
+func smoothen(list: float[], D: int) -> float[]
+	let s = partial_sums(list)
+	#let r = s - s[D:]
+	var r: float[]
+	for i=>l in list
+		r.add((s[min(i+D, len(list))] - s[i]) / float(D))
+	return r
+
+
+
+func sorted_count_smaller(data: float[], x: float) -> int
+	var (i0, i1) = (0, len(data) - 1)
+	while i1 > i0+1
+		let im = (i0+i1)/2
+		#print("{{i0}} {{i1}}     {{im}}   {{data[im]}}  {{x}}")
+		if data[im] > x
+			i1 = im
+		else
+			i0 = im
+	return i0
+
+# x0 < x1
+func sorted_count_between(data: float[], x0: float, x1: float) -> int
+	return sorted_count_smaller(data, x1) - sorted_count_smaller(data, x0)
+
+
+
+func majority_vote(points: float[], R: float) -> float
+	if len(points) == 0
+		return 0
+	var votes: float[]
+	votes.resize(len(points))
+	for i=>p in points
+		for j=>q in points
+			votes[i] += exp(- ((p-q)^2) / (R^2))
+	return points[argmax(votes)]
+
+
+func top10percent(data: float[]) -> float
+	let d = data |> sort
+	return d[int(len(d) * 0.9)]
+
+func bottom10percent(data: float[]) -> float
+	let d = data |> sort
+	return d[int(len(d) * 0.1)]
+
+func variance(data: float[]) -> float
+	let mu = sum(data) / len(data)
+	return ((data - mu) |> sqr |> sum) / len(data)
+
+
+# "unit test"
+func main()
+	for i in 0:100
+		print(sorted_count_smaller(range(100.), i) - i)

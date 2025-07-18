@@ -1,0 +1,44 @@
+use cloud.pcd
+use cloud.Point
+use os
+
+func parse_vec3(s: string) -> vec3
+	let rr = s.explode(",")
+	if len(rr) < 3
+		raise(new Exception("parameter 'A,B,C' expected"))
+	return vec3(float(rr[0]), float(rr[1]), float(rr[2]))
+
+var rotation: vec3?
+var translation: vec3?
+var flip: vec3?
+var scale: vec3?
+
+func convert_file(source: os.Path, dest: os.Path)
+	print("CONVERT  {{source}}  ->  {{dest}}")
+	var points = pcd.load(source)
+	for v in flip
+		points = [for p in points  Point(p.pos - vec3.dot(v, p.pos) * v * 2, p.intensity)]
+	for s in scale
+		let m = mat4.scale(s)
+		points = [for p in points  Point(m*p.pos, p.intensity)]
+	for v in rotation
+		let m = mat4.rotation(v * pi/180)
+		points = [for p in points  Point(m*p.pos, p.intensity)]
+	for t in translation
+		let m = mat4.translation(t)
+		points = [for p in points  Point(m*p.pos, p.intensity)]
+	pcd.save(points, dest)
+
+func action_convert(args: string[])
+	convert_file(args[0], args[1])
+
+func main(arg: string[])
+	var p = new os.CommandLineParser()
+	p.info("convert", "convert clouds (mostly ply/asc -> pcd)")
+#	p.option("-h/--help", "", func() p.show()) # FIXME kaba
+	p.option("--rotate", "ANGLES", "'x,y,z' in degree", func(a: string) rotation = parse_vec3(a))
+	p.option("--translate", "OFFSET", "'x,y,z'", func(a: string) translation = parse_vec3(a))
+	p.option("--flip", "AXIS", "flip axis 'x,y,z'", func(a: string) flip = parse_vec3(a).normalized())
+	p.option("--scale", "FACTIR", "scale 'x,y,z'", func(a: string) scale = parse_vec3(a))
+	p.cmd("", "SOURCE DEST", "", action_convert)
+	p.parse(arg)
