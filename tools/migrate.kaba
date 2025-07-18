@@ -1,11 +1,11 @@
 use os
 use kaba
-use cli.terminal.*
+use terminal.*
 
 func is_letter(c: u8) -> bool
 	return (c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z') or (c == '_')
 
-func count_indent(l: string) -> int
+func count_indent(l: string) -> i32
 	for i=>c in l
 		if c != '\t'
 			return i
@@ -15,7 +15,7 @@ func count_indent(l: string) -> int
 
 var in_asm: bool
 
-func potential_type_length(tokens: string[]) -> int
+func potential_type_length(tokens: string[]) -> i32
 	if not is_letter(tokens[0][0])
 		return 0
 	if len(tokens) > 4
@@ -65,7 +65,7 @@ func is_old_decl(tokens: string[]) -> bool
 	return true
 
 
-func glue_type(tokens: string[], ptl: int) -> string
+func glue_type(tokens: string[], ptl: i32) -> string
 	var t = tokens[0]
 	for x in tokens[1:ptl]
 		if x == "shared"

@@ -142,10 +142,10 @@ class DynamicValue
 		return str(s)
 	func render() -> string
 		return s.render()
-	func __int__() -> int
-		return int(weak(s))
-	func __float__() -> float
-		return float(weak(s))
+	func __i32__() -> i32
+		return i32(weak(s))
+	func __f32__() -> f32
+		return f32(weak(s))
 	func __bool__() -> bool
 		return bool(weak(s))
 	func selfref mut get_element(i: DynamicValue) -> DynamicValue*
@@ -200,9 +200,9 @@ class DynamicValue
 		if b.type == TType.BOOL
 			setBool(bool(b))
 		else if b.type == TType.INT
-			setInt(int(b))
+			setInt(i32(b))
 		else if b.type == TType.FLOAT
-			setFloat(float(b))
+			setFloat(f32(b))
 		else if b.type == TType.STRING
 			setString(str(b))
 		else if b.type == TType.ARRAY
@@ -223,9 +223,9 @@ class DynamicValue
 	func mut __iadd__(b: DynamicValue)
 		if b.type == TType.INT
 			if type == TType.INT
-				setInt(int(weak(s)) + int(b))
+				setInt(i32(weak(s)) + i32(b))
 			else if type == TType.FLOAT
-				setInt(int(weak(s)) + float(b))
+				setInt(i32(weak(s)) + f32(b))
 		else if b.type == TType.FLOAT
 			if type == TType.INT
 				setFloat(float(weak(s)) + int(b))
@@ -312,9 +312,9 @@ class DynamicValueState
 		return "nil"
 	func virtual render() -> string
 		return str(self)
-	func virtual __int__() -> int
+	func virtual __i32__() -> i32
 		return 0
-	func virtual __float__() -> float
+	func virtual __f32__() -> f32
 		return 0.0
 	func virtual __bool__() -> bool
 		return false
@@ -330,9 +330,9 @@ class DynamicValueStateInt extends DynamicValueState
 		return "int"
 	func override __str__() -> string
 		return str(v)
-	func override __int__() -> int
+	func override __i32__() -> i32
 		return v
-	func override __float__() -> float
+	func override __f32__() -> f32
 		return v
 	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateInt()
@@ -358,9 +358,9 @@ class DynamicValueStateFloat extends DynamicValueState
 		return "float"
 	func override __str__() -> string
 		return str(v)
-	func override __int__() -> int
+	func override __i32__() -> i32
 		return v
-	func override __float__() -> float
+	func override __f32__() -> f32
 		return v
 	func override copy() -> xfer[DynamicValueState]
 		var c = new DynamicValueStateFloat()
@@ -375,10 +375,10 @@ class DynamicValueStateString extends DynamicValueState
 		return v
 	func override render() -> string
 		return "'{{v}}'"
-	func override __int__() -> int
-		return int(v)
-	func override __float__() -> float
-		return float(v)
+	func override __i32__() -> i32
+		return i32(v)
+	func override __f32__() -> f32
+		return f32(v)
 	func override __bool__() -> bool
 		return len(v) > 0
 	func override copy() -> xfer[DynamicValueState]

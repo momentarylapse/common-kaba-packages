@@ -41,7 +41,7 @@ class Socket
 	func mut connect(host: string, port: i32, _mode: Mode)
 		mode = _mode
 		print("connecting...")
-		socket = net.Socket.connect(host, port)
+		socket = net.connect(host, port)
 	
 		print("handshake...")
 		expect(socket!.read(10), GREETING, "greeting")

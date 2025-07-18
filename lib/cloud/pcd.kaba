@@ -1,5 +1,4 @@
 use os
-use doc
 use kaba
 use cloud.Point
 

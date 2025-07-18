@@ -98,7 +98,7 @@ func solve(A: Matrix, b: f64[]) -> f64[]
 		for j in i+1:A.n
 			s += mm.get(i, j) * x[j]
 		let f = *mm.get(i, i)
-		if abs(f) > 0.00001
+		if abs(f) > 0.0000001
 			x[i] = (bb[i] - s) # / f
 		else
 			x[i] = 0

@@ -1,7 +1,6 @@
 use kaba.*
 use os
 use time
-use doc
 use common.*
 use docu.*
 # use "mongo"

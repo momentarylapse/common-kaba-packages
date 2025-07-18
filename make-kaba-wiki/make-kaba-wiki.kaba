@@ -2,7 +2,6 @@ use kaba.*
 use os
 use time
 use common.*
-use doc
 use wiki
 use docu
 
