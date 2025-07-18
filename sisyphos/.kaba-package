@@ -1,0 +1,3 @@
+requires sqlite
+run sisyphos.kaba
+

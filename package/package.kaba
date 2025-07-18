@@ -49,6 +49,7 @@ struct Config
 	var repos_base: os.Path
 	var sources: Source[]
 	var packages: Package[]
+	var verbose = false
 var conf: Config
 
 func load_basic_config()
@@ -88,7 +89,7 @@ func load_module_list()
 			continue
 		let ss = os.fs.read_text(base | ".kaba-package")
 		for l in ss.explode("\n")
-			let x = l.explode("\t")
+			let x = l.explode(" ")
 			if len(x) < 2
 				continue
 			if x[0] == ""
@@ -100,12 +101,14 @@ func load_module_list()
 	# unmanaged
 	find_unmanaged_modules()
 
+
 func is_managed_package(name: string) -> bool
 	for p in conf.packages
 		if p.name == name and p.type in ["module", "app", "package"]
 			return true
 	return false
-		
+
+
 func find_unmanaged_modules()
 	let list = os.fs.search(conf.modules_base, "*", "d")
 	for e in list
@@ -155,6 +158,7 @@ func main(args: string[])
 
 	var p: os.CommandLineParser
 	p.info("package", "kaba package manager")
+	p.option("-v", "verbose", func() conf.verbose = true)
 	
 	p.cmd("update", "", "update database / repositories", action_update)
 	p.cmd("list", "", "list available modules", action_list)
