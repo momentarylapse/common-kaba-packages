@@ -1,10 +1,10 @@
 BASE=~/.kaba
-if [ ! -d $BASE/apps ]
+if [ ! -d $BASE/packages ]
 then
-	mkdir $BASE/apps
+	mkdir $BASE/packages
 fi
-if [ ! -d $BASE/apps/package ]
+if [ ! -d $BASE/packages/package ]
 then
-	mkdir $BASE/apps/package
+	mkdir $BASE/packages/package
 fi
-cp *.kaba $BASE/apps/package
+cp *.kaba $BASE/packages/package

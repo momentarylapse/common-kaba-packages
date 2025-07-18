@@ -17,74 +17,58 @@ struct Source
 enum State
 	INTERNAL
 	INSTALLED
+	INSTALLED_DIFF
 	NOT_INSTALLED
 	NOT_MANAGED
 
 struct Package
-	type: string
 	name: string
+	installed: os.Path
 	source: os.Path
+	state: State
 	
-	func state() -> State
-		if type == "internal"
-			return State.INTERNAL
-		if type == "unmanaged"
-			return State.NOT_MANAGED
-		if os.fs.is_directory(conf.modules_base | name)
-			return State.INSTALLED
-		if os.fs.exists(conf.modules_base | (name + ".kaba"))
-			return State.INSTALLED
-	#	if os.fs.exists(conf.modules_base | os.Path(x[1]).basename())
-	#		return State.INSTALLED
-				
-		if os.fs.is_directory(conf.apps_base | name)
-			return State.INSTALLED
-		return State.NOT_INSTALLED
 
 struct Config
 	var kaba_base: os.Path
-	var modules_base: os.Path
-	var apps_base: os.Path
-	var package_base: os.Path
+	var packages_base: os.Path
 	var repos_base: os.Path
 	var sources: Source[]
 	var packages: Package[]
 	var verbose = false
 var conf: Config
 
+
 func load_basic_config()
 	conf.kaba_base = hui.app_directory
-	conf.modules_base = conf.kaba_base | "modules"
-	conf.apps_base = conf.kaba_base | "apps"
-	conf.package_base = conf.kaba_base | "packages"
-	conf.repos_base = conf.package_base | "repos"
+	conf.packages_base = conf.kaba_base | "packages"
+	conf.repos_base = conf.kaba_base | "repos"
 	
-	if not os.fs.is_directory(conf.package_base)
-		os.fs.create_directory(conf.package_base)
+	if not os.fs.is_directory(conf.packages_base)
+		os.fs.create_directory(conf.packages_base)
 	if not os.fs.is_directory(conf.repos_base)
 		os.fs.create_directory(conf.repos_base)
 	
-	if os.fs.exists(conf.package_base | "sources")
-		let s = os.fs.read_text(conf.package_base | "sources")
+	if os.fs.exists(conf.kaba_base | "sources")
+		let s = os.fs.read_text(conf.kaba_base | "sources")
 		for l in s.explode("\n")
-			let x = l.explode("\t")
+			let x = l.replace("\t", " ").explode(" ")
 			if len(x) >= 3
 				conf.sources.add([x[0], x[1].replace("/", "."), x[2]])
 
-func load_module_list()
-	
-	# internal
-	for p in kaba.default_context.packages
-		conf.packages.add(["internal", p.name, ""])
 
-	# from sources
+func find_internal_packages() -> Package[]
+	var r: Package[]
+	for p in kaba.default_context.packages
+		r.add([p.name, "", "", State.INTERNAL])
+	return r
+
+
+func find_source_packages() -> Package[]
+	var r: Package[]
 	for s in conf.sources
 		let base = s.base_path()
 		if base == ""
 			continue
-		if not os.fs.is_directory(base)
-			continue
-		
 		if not os.fs.exists(base | ".kaba-package")
 			continue
 		let ss = os.fs.read_text(base | ".kaba-package")
@@ -96,28 +80,61 @@ func load_module_list()
 				continue
 			var name = os.Path(x[1]).basename().replace(".kaba", "")
 			
-			conf.packages.add([x[0], name, base | x[1]])
-	
-	# unmanaged
-	find_unmanaged_modules()
+			r.add([name, "", base | x[1], State.NOT_INSTALLED])
+	return r
 
 
-func is_managed_package(name: string) -> bool
-	for p in conf.packages
-		if p.name == name and p.type in ["module", "app", "package"]
-			return true
-	return false
-
-
-func find_unmanaged_modules()
-	let list = os.fs.search(conf.modules_base, "*", "d")
+func find_installed_packages() -> Package[]
+	var r: Package[]
+	let list = os.fs.search(conf.packages_base, "*", "d")
 	for e in list
-		if not is_managed_package(str(e))
-			conf.packages.add(["unmanaged", str(e), conf.modules_base | e])
-	let list2 = os.fs.search(conf.apps_base, "*", "d")
-	for e in list2
-		if not is_managed_package(str(e))
-			conf.packages.add(["unmanaged", str(e), conf.modules_base | e])
+		r.add([str(e), conf.packages_base | e, "", State.INSTALLED])
+	return r
+
+
+func list_find(list: Package[], name: string) -> Package*
+	for p in list
+		if p.name == name
+			return &p
+	return nil
+
+
+func file_equal(a: os.Path, b: os.Path) -> bool
+	if not os.fs.exists(a) or not os.fs.exists(b)
+		return false
+	let sa = os.fs.read(a)
+	let sb = os.fs.read(b)
+	return sa == sb
+
+
+func check_package(p: Package) -> bool
+	if str(p.source)[-5:] == ".kaba"
+		return file_equal(p.source, p.installed)
+	
+	######## TODO CHECK DIR....
+	return true
+
+
+func load_module_list()
+	let internal = find_internal_packages()
+	let from_sources = find_source_packages()
+	var installed = find_installed_packages()
+	
+	conf.packages = internal
+	
+	for mut p in installed
+		for pp in list_find(from_sources, p.name)
+			p.state = State.INSTALLED
+			p.source = pp.source
+		else
+			p.state = State.NOT_MANAGED
+		conf.packages.add(p)
+		
+	for p in from_sources
+		for pp in list_find(installed, p.name)
+			pass
+		else
+			conf.packages.add(p)
 
 
 func action_update(args: string[])
@@ -133,24 +150,114 @@ func action_update(args: string[])
 		if not os.fs.is_directory(base | ".git")
 			os.shell_execute("cd {{base}}; git clone {{s.url}} .")
 		os.shell_execute("cd {{base}}; git pull")
-	
-
 
 
 func action_list(args: string[])
 	load_module_list()
 
 	for p in conf.packages |> sort("name")
-		let state = p.state()
 		var s = ""
-		if state == State.INTERNAL
+		if p.state == State.INTERNAL
 			s = "{{os.terminal.GRAY}}internal{{os.terminal.END}}"
-		if state == State.INSTALLED
+		if p.state == State.INSTALLED
 			s = "{{os.terminal.GREEN}}installed{{os.terminal.END}}"
-		if state == State.NOT_MANAGED
+			if not check_package(p)
+				s += "  {{os.terminal.RED}}*needs update*{{os.terminal.END}}"
+		if p.state == State.NOT_MANAGED
 			s = "{{os.terminal.RED}}unmanaged{{os.terminal.END}}"
 		print("{{p.name|-12}} {{s}}")
+		#print("{{p.name|-12}} {{s}}  {{p.installed}} <=> {{p.source}}")
 
+func delete_directory(dir: os.Path)
+#	let list = os.fs.search(dir, "*", "rf")
+#	for e in list
+#		let f = dir | e
+#		#if conf.verbose
+#		#	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{f}}")
+#		os.fs.delete(f)
+#	let listd = os.fs.search(dir, "*", "rd")
+#	print(listd)
+#	for e in listd
+#		let f = dir | e
+#		#if conf.verbose
+#		#	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{f}}")
+#		os.fs.delete_directory(f)
+#	os.fs.delete_directory(dir)
+	os.shell_execute("rm -rf '{{dir}}'")
+
+func remove_package(p: Package)
+	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.installed}}")
+	delete_directory(p.installed)
+
+
+func allow_install_file(f: os.Path) -> bool
+	let pp = f.all_parents()
+	var b = str(f)
+	if len(pp) > 0
+		b = str(pp[len(pp) - 1]).replace("/", "")
+	#print("{{f}}  {{b}}")
+	if b in ["src", "build", "CMakeLists.txt", "CMakePresets.json", ".vs", "xmake.conf", "vcpkg-configuration.json", "vcpkg.json"]
+		return false
+	
+	return true
+
+func install_package(p: Package)
+	if p.state == State.INSTALLED
+		remove_package(p)
+		
+	let dest = conf.packages_base | p.name
+		
+	if os.fs.is_directory(dest)
+		delete_directory(p.installed)
+	os.fs.create_directory(dest)
+
+	if os.fs.exists(p.source | "xmake.conf")
+		if os.fs.is_directory(p.source | "build")
+			delete_directory(p.source | "build")
+		print("build...")
+		os.shell_execute("cd '{{p.source}}'; mkdir build; cd build; cmake .. -GNinja && ninja && cp libmodule* '{{dest}}'", true)
+			
+	let listd = os.fs.search(p.source, "*", "rd")
+	for e in listd
+		if allow_install_file(e)
+			os.fs.create_directory(dest | e)
+		
+	let list = os.fs.search(p.source, "*", "rf")
+	for e in list
+		if allow_install_file(e)
+			let a = p.source | e
+			let b = dest | e
+			if conf.verbose
+				print("{{os.terminal.YELLOW}}copy{{os.terminal.END}} {{a}}  ->  {{b}}")
+			os.fs.copy(a, b)
+
+
+func action_install(args: string[])
+	load_module_list()
+	for name in args
+		for p in list_find(conf.packages, name)
+			if p.state == State.INTERNAL
+				print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}}")
+			else if p.state == State.NOT_MANAGED
+				print("{{os.terminal.RED}}no source for package{{os.terminal.END}}")
+			else
+				install_package(p)
+		else
+			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
+
+
+func action_remove(args: string[])
+	load_module_list()
+	for name in args
+		for p in list_find(conf.packages, name)
+			if p.state == State.INTERNAL
+				print("{{os.terminal.RED}}internal packages can not be remove{{os.terminal.END}}")
+			else if p.state == State.NOT_INSTALLED
+				print("{{os.terminal.RED}}package is not installed{{os.terminal.END}}")
+			else
+				remove_package(p)
+		else
+			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
 
 
 func main(args: string[])
@@ -161,5 +268,7 @@ func main(args: string[])
 	p.option("-v", "verbose", func() conf.verbose = true)
 	
 	p.cmd("update", "", "update database / repositories", action_update)
-	p.cmd("list", "", "list available modules", action_list)
+	p.cmd("list", "", "list available packages", action_list)
+	p.cmd("install", "NAME", "install package", action_install)
+	p.cmd("remove", "NAME", "remove package", action_remove)
 	p.parse(args)
