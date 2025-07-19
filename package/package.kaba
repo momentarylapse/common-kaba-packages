@@ -247,7 +247,13 @@ func install_package(p: Package)
 		os.fs.create_directory(build_dir)
 		print("build...")
 		let source_dir = p.base_source | p.build_dir
-		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+		try
+			let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+		except
+			print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
+			delete_directory(build_dir)
+			delete_directory(p.base_installed)
+			return
 		delete_directory(build_dir)
 
 

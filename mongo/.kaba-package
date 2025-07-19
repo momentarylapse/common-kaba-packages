@@ -1,2 +1,4 @@
-build xmake
+version 0.2
+build xmake ./ modulemongo
+root api
 
