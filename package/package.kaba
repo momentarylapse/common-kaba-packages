@@ -14,18 +14,17 @@ struct Source
 			return url
 		return ""
 
-enum State
+enum Location
 	INTERNAL
 	INSTALLED
-	INSTALLED_DIFF
-	NOT_INSTALLED
-	NOT_MANAGED
+	REMOTE
 
 struct Package
 	name: string
+	version: string
 	installed: os.Path
 	source: os.Path
-	state: State
+	location: Location
 	
 
 struct Config
@@ -33,7 +32,8 @@ struct Config
 	var packages_base: os.Path
 	var repos_base: os.Path
 	var sources: Source[]
-	var packages: Package[]
+	var packages_installed: Package[]
+	var packages_remote: Package[]
 	var verbose = false
 var conf: Config
 
@@ -59,11 +59,32 @@ func load_basic_config()
 func find_internal_packages() -> Package[]
 	var r: Package[]
 	for p in kaba.default_context.packages
-		r.add([p.name, "", "", State.INTERNAL])
+		# TODO version!
+		r.add([p.name, "0.1", "", "", Location.INTERNAL])
 	return r
 
+func read_package(name: string, dir: os.Path, location: Location) -> Package
+	var p: Package
+	p.name = name
+	p.version = "0.1"
+	if location == Location.INSTALLED
+		p.installed = dir
+	else
+		p.source = dir
+		
+	if os.fs.exists(dir | ".kaba-package")
+		let ss = os.fs.read_text(dir | ".kaba-package")
+		for l in ss.explode("\n")
+			let x = l.explode(" ")
+			if len(x) < 2
+				continue
+			if x[0] == "version"
+				p.version = x[1]
+	p.location = location
+	return p
 
-func find_source_packages() -> Package[]
+
+func find_remote_packages() -> Package[]
 	var r: Package[]
 	for s in conf.sources
 		let base = s.base_path()
@@ -80,7 +101,7 @@ func find_source_packages() -> Package[]
 				continue
 			var name = os.Path(x[1]).basename().replace(".kaba", "")
 			
-			r.add([name, "", base | x[1], State.NOT_INSTALLED])
+			r.add(read_package(name, base | x[1], Location.REMOTE))
 	return r
 
 
@@ -88,7 +109,7 @@ func find_installed_packages() -> Package[]
 	var r: Package[]
 	let list = os.fs.search(conf.packages_base, "*", "d")
 	for e in list
-		r.add([str(e), conf.packages_base | e, "", State.INSTALLED])
+		r.add(read_package(str(e), conf.packages_base | e, Location.INSTALLED))
 	return r
 
 
@@ -117,24 +138,30 @@ func check_package(p: Package) -> bool
 
 func load_module_list()
 	let internal = find_internal_packages()
-	let from_sources = find_source_packages()
 	var installed = find_installed_packages()
+	conf.packages_remote = find_remote_packages()
 	
-	conf.packages = internal
+	conf.packages_installed = installed
+	for p in internal
+		conf.packages_installed.add(p)
 	
-	for mut p in installed
-		for pp in list_find(from_sources, p.name)
-			p.state = State.INSTALLED
-			p.source = pp.source
-		else
-			p.state = State.NOT_MANAGED
-		conf.packages.add(p)
-		
-	for p in from_sources
-		for pp in list_find(installed, p.name)
-			pass
-		else
-			conf.packages.add(p)
+#	conf.packages = internal
+#	
+#	for mut p in installed
+#		for pp in list_find(from_sources, p.name)
+#			p.state = State.INSTALLED
+#			p.source = pp.source
+#			if p.version != pp.version
+#				p.state = State.INSTALLED_DIFF
+#		else
+#			p.state = State.NOT_MANAGED
+#		conf.packages.add(p)
+#		
+#	for p in from_sources
+#		for pp in list_find(installed, p.name)
+#			pass
+#		else
+#			conf.packages.add(p)
 
 
 func action_update(args: string[])
@@ -154,19 +181,27 @@ func action_update(args: string[])
 
 func action_list(args: string[])
 	load_module_list()
+	
+	var packages = conf.packages_installed
+	for p in conf.packages_remote
+		for pp in list_find(conf.packages_installed, p.name)
+			pass
+		else
+			packages.add(p)
 
-	for p in conf.packages |> sort("name")
+	for p in packages |> sort("name")
 		var s = ""
-		if p.state == State.INTERNAL
+		if p.location == Location.INTERNAL
 			s = "{{os.terminal.GRAY}}internal{{os.terminal.END}}"
-		if p.state == State.INSTALLED
+		if p.location == Location.INSTALLED
 			s = "{{os.terminal.GREEN}}installed{{os.terminal.END}}"
-			if not check_package(p)
-				s += "  {{os.terminal.RED}}*needs update*{{os.terminal.END}}"
-		if p.state == State.NOT_MANAGED
-			s = "{{os.terminal.RED}}unmanaged{{os.terminal.END}}"
-		print("{{p.name|-12}} {{s}}")
-		#print("{{p.name|-12}} {{s}}  {{p.installed}} <=> {{p.source}}")
+			for pp in list_find(conf.packages_remote, p.name)
+				if pp.version != p.version
+					s = "{{os.terminal.RED}}installed, can upgraded to {{pp.version}}{{os.terminal.END}}"
+			else
+				s = "{{os.terminal.RED}}unmanaged{{os.terminal.END}}"
+		print("{{p.name|16}}  {{p.version|-4}} {{s}}")
+
 
 func delete_directory(dir: os.Path)
 #	let list = os.fs.search(dir, "*", "rf")
@@ -202,8 +237,9 @@ func allow_install_file(f: os.Path) -> bool
 	return true
 
 func install_package(p: Package)
-	if p.state == State.INSTALLED
-		remove_package(p)
+# TODO REMOVE
+#	if p.state == State.INSTALLED
+#		remove_package(p)
 		
 	let dest = conf.packages_base | p.name
 		
@@ -235,13 +271,13 @@ func install_package(p: Package)
 func action_install(args: string[])
 	load_module_list()
 	for name in args
-		for p in list_find(conf.packages, name)
-			if p.state == State.INTERNAL
+		for p in list_find(conf.packages_installed, name)
+			if p.location == Location.INTERNAL
 				print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}}")
-			else if p.state == State.NOT_MANAGED
-				print("{{os.terminal.RED}}no source for package{{os.terminal.END}}")
-			else
-				install_package(p)
+				return
+				
+		for p in list_find(conf.packages_remote, name)
+			install_package(p)
 		else
 			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
 
@@ -249,11 +285,10 @@ func action_install(args: string[])
 func action_remove(args: string[])
 	load_module_list()
 	for name in args
-		for p in list_find(conf.packages, name)
-			if p.state == State.INTERNAL
+		for p in list_find(conf.packages_installed, name)
+			if p.location == Location.INTERNAL
 				print("{{os.terminal.RED}}internal packages can not be remove{{os.terminal.END}}")
-			else if p.state == State.NOT_INSTALLED
-				print("{{os.terminal.RED}}package is not installed{{os.terminal.END}}")
+				return
 			else
 				remove_package(p)
 		else

@@ -1,4 +1,5 @@
 requires hui
+requires terminal
 run kabama.kaba
 run gui.kaba
 
