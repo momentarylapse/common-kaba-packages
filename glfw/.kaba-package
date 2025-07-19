@@ -1,4 +1,3 @@
 version 0.2
-build xmake ./ moduleglfw
-root api
+build xmake sharedlib moduleglfw
 

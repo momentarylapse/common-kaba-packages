@@ -1,4 +1,3 @@
-version 0.2
-build xmake ./ modulemongo
-root api
+version 0.3
+build xmake sharedlib modulemongo
 

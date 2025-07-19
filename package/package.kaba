@@ -227,7 +227,7 @@ func allow_install_file(f: os.Path) -> bool
 	if len(pp) > 0
 		b = str(pp[len(pp) - 1]).replace("/", "")
 	#print("{{f}}  {{b}}")
-	if b in ["src", "build", "CMakeLists.txt", "CMakePresets.json", ".vs", "xmake.conf", "vcpkg-configuration.json", "vcpkg.json"]
+	if b in ["src", "build", "CMakeLists.txt", "CMakePresets.json", ".vs", "xmake.conf", "vcpkg-configuration.json", "vcpkg.json", "sharedlib"]
 		return false
 	
 	return true
