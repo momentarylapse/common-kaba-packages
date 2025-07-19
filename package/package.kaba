@@ -118,7 +118,7 @@ func find_remote_packages() -> Package[]
 			let x = l.explode(" ")
 			if len(x) < 2
 				continue
-			if x[0] == ""
+			if x[0] != "package"
 				continue
 			var name = os.Path(x[1]).basename().replace(".kaba", "")
 			let p = read_package(name, base | x[1], Location.REMOTE)

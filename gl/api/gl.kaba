@@ -1,0 +1,168 @@
+use os
+use image
+	
+
+class Context
+	gl_version: string
+	gl_renderer: string
+	glsl_version: string
+	extensions: string[]
+	default_framebuffer: FrameBuffer&
+	tex_white: Texture&
+	default_shader_2d: Shader&
+	default_shader_3d: Shader&
+	vb_temp: VertexBuffer&
+	vb_temp_i: VertexBuffer&
+	
+	func extern mut load_shader(filename: os.Path) -> xfer[Shader]
+	func extern mut create_shader(source: string) -> xfer[Shader]
+
+class VertexBuffer
+	func extern __init__()
+	func extern __delete__()
+	func extern mut update(vertices: @DynamicArray)
+	func extern mut update_index(indices: @DynamicArray)
+	func extern mut create_quad(dest: rect, source: rect)
+	func extern mut create_cube(a: vec3, b: vec3)
+	func extern count() -> i32
+
+
+class Texture as shared
+	var width: i32
+	var height: i32
+	func extern __init__(width: i32, height: i32, format: string)
+	func extern __delete__()
+	func extern mut set_options(op: string)
+	func extern mut write(image: image.Image)
+	func extern read(image: image.Image)
+	func extern read_float(out data: f32[])
+	func extern mut write_float(data: f32[])
+	func extern static load(filename: os.Path) -> xfer[Texture]
+
+class VolumeTexture extends Texture
+	func extern __init__(nx: i32, ny: i32, nz: i32, format: string)
+#	func extern override __delete__()
+
+class ImageTexture extends Texture
+	func extern override __init__(width: i32, height: i32, format: string)
+
+class DepthBuffer extends Texture
+	func extern override __init__(width: i32, height: i32, format: string)
+
+class CubeMap extends Texture
+	func extern __init__(size: i32, format: string)
+
+class FrameBuffer as shared
+	func extern __init__(attachments: shared![Texture][])
+	func extern __delete__()
+	func extern area() -> rect
+	func extern mut clear_color(index: i32, c: color)
+	func extern mut clear_depth(z: f32)
+	func extern mut update(attachments: shared![Texture][])
+	func extern mut update(attachments: shared![Texture][], face: i32 = 0)
+	func extern read(out image: image.Image)
+	var width: i32
+	var height: i32
+	var color_attachments: shared![Texture][]
+	var depth_buffer: DepthBuffer&
+	# var _shared_count_...
+	
+
+class Shader as shared
+	func extern __delete__()
+	func extern location(name: string) -> i32
+	func extern mut link_uniform_block(name: string, binding: i32)
+	func extern mut set_float_l(loc: i32, f: f32)
+	func extern mut set_matrix_l(loc: i32, m: mat4)
+	func extern mut set_color_l(loc: i32, c: color)
+	func extern mut set_int_l(loc: i32, i: i32)
+	func extern mut set_floats_l(loc: i32, data: f32*, num: i32)
+	func extern mut set_float(name: string, f: f32)
+	func extern mut set_matrix(name: string, m: mat4)
+	func extern mut set_color(name: string, c: color)
+	func extern mut set_int(name: string, i: i32)
+	func extern mut set_floats(name: string, data: f32*, num: i32)
+	func extern dispatch(nx: i32, ny: i32, nz: i32)
+
+
+class Buffer
+	func extern mut update(data: void&, size: i32)
+	func extern mut update(data: @DynamicArray, offset: i32)
+	func extern read(data: void&, size: i32)
+	func extern read(out data: @DynamicArray)
+
+class UniformBuffer extends Buffer
+	func extern __init__(size: i32)
+	func extern __delete__()
+
+class ShaderStorageBuffer extends Buffer
+	func extern __init__(size: i32)
+	func extern __delete__()
+
+
+enum Alpha
+	ZERO
+	ONE
+	SOURCE_COLOR
+	SOURCE_INV_COLOR
+	SOURCE_ALPHA
+	SOURCE_INV_ALPHA
+	DEST_COLOR
+	DEST_INV_COLOR
+	DEST_ALPHA
+	DEST_INV_ALPHA
+
+enum StencilOp
+	NONE
+	INCREASE
+	DECREASE
+	SET
+	MASK_EQUAL
+	MASK_NOT_EQUAL
+	MASK_LESS
+	MASK_LESS_EQUAL
+	MASK_GREATER
+	MASK_GREATER_EQUAL
+	RESET
+
+enum CullMode
+	NONE
+	BACK
+	FRONT
+
+func extern init(flags: string[]) -> xfer[Context]
+
+func extern start_frame_hui(ctx: Context)
+func extern end_frame_hui()
+
+func extern bind_frame_buffer(fb: FrameBuffer)
+func extern set_viewport(r: rect)
+func extern clear_color(c: color)
+func extern clear_z(z: f32)
+func extern clear(c: color)
+func extern set_model_matrix(m: mat4)
+func extern draw_triangles(vb: VertexBuffer&)
+func extern draw_lines(vb: VertexBuffer&, contiguous: bool)
+func extern draw_points(vb: VertexBuffer&)
+func extern disable_alpha()
+func extern set_alpha(source: Alpha, dest: Alpha)
+func extern set_stencil(mode: StencilOp, param: i32)
+func extern set_projection_perspective()
+func extern set_projection_perspective(center: vec2, size_1: vec2, zmin: f32, zmax: f32)
+func extern set_projection_matrix(m: mat4)
+func extern set_view_matrix(m: mat4)
+func extern set_scissor(r: rect)
+func extern set_z(write: bool, read: bool)
+func extern set_cull(mode: CullMode)
+func extern set_wire(enabled: bool)
+func extern set_material(albedo: color, roughness: f32, metal: f32, emission: color)
+func extern bind_textures(t: Texture*[])
+func extern bind_texture(binding: i32, t: Texture*)
+func extern set_shader(s: Shader&)
+func extern bind_uniform_buffer(binding: i32, buf: UniformBuffer&)
+func extern bind_storage_buffer(binding: i32, buf: ShaderStorageBuffer&)
+func extern bind_image(binding: i32, t: Texture*, level: i32, layer: i32, writable: bool) # -> ref
+func extern screen_shot_to_image(out im: image.Image)
+
+var target: rect
+
