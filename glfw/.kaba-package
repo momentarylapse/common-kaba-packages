@@ -1,3 +1,4 @@
-build xmake moduleglfw
-copy api
+version 0.2
+build xmake ./ moduleglfw
+root api
 

@@ -1,3 +1,4 @@
-build xmake modulesqlite
-copy api
+version 0.2
+build xmake ./ modulesqlite
+root api
 

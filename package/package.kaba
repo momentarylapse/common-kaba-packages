@@ -2,6 +2,9 @@ use os
 use hui
 use kaba
 
+let REPO_FILE = ".kaba-repo"
+let PACKAGE_FILE = ".kaba-package"
+
 struct Source
 	type: string
 	name: string
@@ -22,8 +25,12 @@ enum Location
 struct Package
 	name: string
 	version: string
-	installed: os.Path
-	source: os.Path
+	base_installed: os.Path
+	base_source: os.Path # location of the source package
+	root_source: os.Path # actual root of files to copy in source (might be child of base_source)
+	build_mode: string?
+	build_dir: string
+	build_target: string
 	location: Location
 	
 
@@ -32,6 +39,7 @@ struct Config
 	var packages_base: os.Path
 	var repos_base: os.Path
 	var sources: Source[]
+	var packages_internal: Package[]
 	var packages_installed: Package[]
 	var packages_remote: Package[]
 	var verbose = false
@@ -59,27 +67,40 @@ func load_basic_config()
 func find_internal_packages() -> Package[]
 	var r: Package[]
 	for p in kaba.default_context.packages
-		# TODO version!
-		r.add([p.name, "0.1", "", "", Location.INTERNAL])
+		var pp: Package
+		pp.name = p.name
+		pp.version = "0.1" # TODO
+		pp.location = Location.INTERNAL
+		r.add(pp)
 	return r
+
 
 func read_package(name: string, dir: os.Path, location: Location) -> Package
 	var p: Package
 	p.name = name
 	p.version = "0.1"
+	
+	p.base_installed = conf.packages_base | name
 	if location == Location.INSTALLED
-		p.installed = dir
+		p.base_installed = dir
 	else
-		p.source = dir
+		p.base_source = dir
+		p.root_source = dir
 		
-	if os.fs.exists(dir | ".kaba-package")
-		let ss = os.fs.read_text(dir | ".kaba-package")
+	if os.fs.exists(dir | PACKAGE_FILE)
+		let ss = os.fs.read_text(dir | PACKAGE_FILE)
 		for l in ss.explode("\n")
 			let x = l.explode(" ")
 			if len(x) < 2
 				continue
 			if x[0] == "version"
 				p.version = x[1]
+			else if x[0] == "root"
+				p.root_source = p.base_source | x[1]
+			else if x[0] == "build" and len(x) >= 4
+				p.build_mode = x[1]
+				p.build_dir = x[2]
+				p.build_target = x[3]
 	p.location = location
 	return p
 
@@ -90,9 +111,9 @@ func find_remote_packages() -> Package[]
 		let base = s.base_path()
 		if base == ""
 			continue
-		if not os.fs.exists(base | ".kaba-package")
+		if not os.fs.exists(base | REPO_FILE)
 			continue
-		let ss = os.fs.read_text(base | ".kaba-package")
+		let ss = os.fs.read_text(base | REPO_FILE)
 		for l in ss.explode("\n")
 			let x = l.explode(" ")
 			if len(x) < 2
@@ -100,8 +121,11 @@ func find_remote_packages() -> Package[]
 			if x[0] == ""
 				continue
 			var name = os.Path(x[1]).basename().replace(".kaba", "")
-			
-			r.add(read_package(name, base | x[1], Location.REMOTE))
+			let p = read_package(name, base | x[1], Location.REMOTE)
+			for pp in list_find(r, name)
+				print("   MULTIPLE SOURCES FOR {{name}}:  {{p.base_source}}  {{pp.base_source}}")
+			else
+				r.add(p)
 	return r
 
 
@@ -128,40 +152,10 @@ func file_equal(a: os.Path, b: os.Path) -> bool
 	return sa == sb
 
 
-func check_package(p: Package) -> bool
-	if str(p.source)[-5:] == ".kaba"
-		return file_equal(p.source, p.installed)
-	
-	######## TODO CHECK DIR....
-	return true
-
-
 func load_module_list()
-	let internal = find_internal_packages()
-	var installed = find_installed_packages()
+	conf.packages_internal = find_internal_packages()
+	conf.packages_installed = find_installed_packages()
 	conf.packages_remote = find_remote_packages()
-	
-	conf.packages_installed = installed
-	for p in internal
-		conf.packages_installed.add(p)
-	
-#	conf.packages = internal
-#	
-#	for mut p in installed
-#		for pp in list_find(from_sources, p.name)
-#			p.state = State.INSTALLED
-#			p.source = pp.source
-#			if p.version != pp.version
-#				p.state = State.INSTALLED_DIFF
-#		else
-#			p.state = State.NOT_MANAGED
-#		conf.packages.add(p)
-#		
-#	for p in from_sources
-#		for pp in list_find(installed, p.name)
-#			pass
-#		else
-#			conf.packages.add(p)
 
 
 func action_update(args: string[])
@@ -183,6 +177,8 @@ func action_list(args: string[])
 	load_module_list()
 	
 	var packages = conf.packages_installed
+	for p in conf.packages_internal
+		packages.add(p)
 	for p in conf.packages_remote
 		for pp in list_find(conf.packages_installed, p.name)
 			pass
@@ -197,10 +193,10 @@ func action_list(args: string[])
 			s = "{{os.terminal.GREEN}}installed{{os.terminal.END}}"
 			for pp in list_find(conf.packages_remote, p.name)
 				if pp.version != p.version
-					s = "{{os.terminal.RED}}installed, can upgraded to {{pp.version}}{{os.terminal.END}}"
+					s = "{{os.terminal.RED}}installed, version {{p.version}}, source version {{pp.version}}{{os.terminal.END}}"
 			else
-				s = "{{os.terminal.RED}}unmanaged{{os.terminal.END}}"
-		print("{{p.name|16}}  {{p.version|-4}} {{s}}")
+				s = "{{os.terminal.RED}}installed, but no source{{os.terminal.END}}"
+		print("{{p.name|16}}  {{s}}")
 
 
 func delete_directory(dir: os.Path)
@@ -221,8 +217,8 @@ func delete_directory(dir: os.Path)
 	let r = os.shell_execute("rm -rf '{{dir}}'")
 
 func remove_package(p: Package)
-	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.installed}}")
-	delete_directory(p.installed)
+	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.base_installed}}")
+	delete_directory(p.base_installed)
 
 
 func allow_install_file(f: os.Path) -> bool
@@ -237,44 +233,50 @@ func allow_install_file(f: os.Path) -> bool
 	return true
 
 func install_package(p: Package)
-# TODO REMOVE
-#	if p.state == State.INSTALLED
-#		remove_package(p)
-		
-	let dest = conf.packages_base | p.name
-		
-	if os.fs.is_directory(dest)
-		delete_directory(p.installed)
-	os.fs.create_directory(dest)
+	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
+	if os.fs.is_directory(p.base_installed)
+		delete_directory(p.base_installed)
+	os.fs.create_directory(p.base_installed)
 
-	if os.fs.exists(p.source | "xmake.conf")
-		if os.fs.is_directory(p.source | "build")
-			delete_directory(p.source | "build")
+
+	# build shared library?
+	for m in p.build_mode
+		let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
+		if os.fs.is_directory(build_dir)
+			delete_directory(build_dir)
+		os.fs.create_directory(build_dir)
 		print("build...")
-		let r = os.shell_execute("cd '{{p.source}}'; mkdir build; cd build; cmake .. -GNinja && ninja && cp libmodule* '{{dest}}'", true)
-			
-	let listd = os.fs.search(p.source, "*", "rd")
+		let source_dir = p.base_source | p.build_dir
+		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+		delete_directory(build_dir)
+
+
+	# copy files
+	let listd = os.fs.search(p.root_source, "*", "rd")
 	for e in listd
 		if allow_install_file(e)
-			os.fs.create_directory(dest | e)
+			os.fs.create_directory(p.base_installed | e)
 		
-	let list = os.fs.search(p.source, "*", "rf")
+	let list = os.fs.search(p.root_source, "*", "rf")
 	for e in list
 		if allow_install_file(e)
-			let a = p.source | e
-			let b = dest | e
+			let a = p.root_source | e
+			let b = p.base_installed | e
 			if conf.verbose
 				print("{{os.terminal.YELLOW}}copy{{os.terminal.END}} {{a}}  ->  {{b}}")
 			os.fs.copy(a, b)
+	
+	# package info file might be skipped if root!=base...
+	if os.fs.exists(p.base_source | PACKAGE_FILE)
+		os.fs.copy(p.base_source | PACKAGE_FILE, p.base_installed | PACKAGE_FILE)
 
 
 func action_install(args: string[])
 	load_module_list()
 	for name in args
-		for p in list_find(conf.packages_installed, name)
-			if p.location == Location.INTERNAL
-				print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}}")
-				return
+		for p in list_find(conf.packages_internal, name)
+			print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}}")
+			return
 				
 		for p in list_find(conf.packages_remote, name)
 			install_package(p)
@@ -285,12 +287,12 @@ func action_install(args: string[])
 func action_remove(args: string[])
 	load_module_list()
 	for name in args
+		for p in list_find(conf.packages_internal, name)
+			print("{{os.terminal.RED}}internal packages can not be removed{{os.terminal.END}}")
+			return
+		
 		for p in list_find(conf.packages_installed, name)
-			if p.location == Location.INTERNAL
-				print("{{os.terminal.RED}}internal packages can not be remove{{os.terminal.END}}")
-				return
-			else
-				remove_package(p)
+			remove_package(p)
 		else
 			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
 
