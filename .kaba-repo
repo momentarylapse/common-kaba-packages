@@ -16,6 +16,7 @@ package msgpack
 package ncurses
 package opt
 package package
+package pdf
 package plot
 package psmove
 package shadercomp

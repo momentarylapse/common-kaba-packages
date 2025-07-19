@@ -1,0 +1,11 @@
+use os
+use image
+
+class Parser
+	func extern __init__()
+	func extern __delete__()
+	func extern mut set_page_size(width: f32, height: f32)
+	func extern mut add_page() -> xfer[image.Image.Painter]
+	func extern save(filename: os.Path)
+
+func add_font_directory(dir: os.Path)
