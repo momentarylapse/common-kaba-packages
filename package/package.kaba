@@ -148,8 +148,8 @@ func action_update(args: string[])
 			os.fs.create_directory(base)
 		let git = base | ".git" # FIXME bug in kaba!!!!
 		if not os.fs.is_directory(base | ".git")
-			os.shell_execute("cd {{base}}; git clone {{s.url}} .")
-		os.shell_execute("cd {{base}}; git pull")
+			let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")
+		let r = os.shell_execute("cd {{base}}; git pull")
 
 
 func action_list(args: string[])
@@ -183,7 +183,7 @@ func delete_directory(dir: os.Path)
 #		#	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{f}}")
 #		os.fs.delete_directory(f)
 #	os.fs.delete_directory(dir)
-	os.shell_execute("rm -rf '{{dir}}'")
+	let r = os.shell_execute("rm -rf '{{dir}}'")
 
 func remove_package(p: Package)
 	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.installed}}")
@@ -215,7 +215,7 @@ func install_package(p: Package)
 		if os.fs.is_directory(p.source | "build")
 			delete_directory(p.source | "build")
 		print("build...")
-		os.shell_execute("cd '{{p.source}}'; mkdir build; cd build; cmake .. -GNinja && ninja && cp libmodule* '{{dest}}'", true)
+		let r = os.shell_execute("cd '{{p.source}}'; mkdir build; cd build; cmake .. -GNinja && ninja && cp libmodule* '{{dest}}'", true)
 			
 	let listd = os.fs.search(p.source, "*", "rd")
 	for e in listd
