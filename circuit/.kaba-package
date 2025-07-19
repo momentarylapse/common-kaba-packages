@@ -1,4 +1,6 @@
-requires	linalg
-run	circuit.kaba
-run	gui.kaba
+version 0.2
+requires linalg
+requires linalg64
+run circuit.kaba
+run gui.kaba
 
