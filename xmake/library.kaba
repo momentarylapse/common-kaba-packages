@@ -53,7 +53,7 @@ struct LibraryManager
 	var libraries: Library[]
 
 	func mut init()
-		var lib_dir = hui.app_directory | "apps/xmake/libs"
+		var lib_dir = hui.app_directory | "packages/xmake/libs"
 		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
 			libraries.add(load_lib(lib_dir | e))
