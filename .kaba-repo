@@ -28,6 +28,7 @@ package tools
 package urdf
 package usb
 package visualization
+package vulkan
 package vulkanx
 package xmake
 package xml

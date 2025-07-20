@@ -164,5 +164,5 @@ func extern bind_storage_buffer(binding: i32, buf: ShaderStorageBuffer&)
 func extern bind_image(binding: i32, t: Texture*, level: i32, layer: i32, writable: bool) # -> ref
 func extern screen_shot_to_image(out im: image.Image)
 
-var target: rect
+var extern target: rect
 

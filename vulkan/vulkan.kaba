@@ -1,0 +1,220 @@
+use image
+use os
+
+
+class Instance
+	func extern mut __delete__()
+	func extern mut create_glfw_surface(window: void*) -> void*
+	func extern mut create_headless_surface() -> void*
+
+
+class Queue
+	func extern mut submit(cb: CommandBuffer*, wait_sem: Semaphore*[], signal_sem: Semaphore*[], fence: Fence*)
+
+
+class Device
+	var graphics_queue: Queue
+	var present_queue: Queue
+	var compute_queue: Queue
+	var command_pool: CommandPool*
+	func extern mut wait_idle()
+	func extern static create_simple(instance: Instance*, surface: void*, op: string[]) -> xfer[Device]
+
+
+class Buffer
+
+class Pipeline
+
+
+enum AccessFlags
+	NONE
+	SHADER_WRITE_BIT
+	TRANSFER_READ_BIT
+	TRANSFER_WRITE_BIT
+
+
+enum ImageLayout
+	UNDEFINED
+	GENERAL
+	TRANSFER_SRC_OPTIMAL
+	TRANSFER_DST_OPTIMAL
+	PRESENT_SRC
+
+
+enum PipelineBindPoint
+	GRAPHICS
+	RAY_TRACING
+	COMPUTE
+
+
+class VertexBuffer
+	var vertex: Buffer
+	var index: Buffer
+	func extern mut __init__(format: string)
+	func extern mut __delete__()
+	func extern mut update(vertices: @DynamicArray)
+	func extern mut update_index(indices: i32[])
+	func extern mut create_quad(dest: rect, source: rect)
+
+
+class Texture as shared
+	var width: i32
+	var height: i32
+	var view: void*
+	func extern mut __init__()
+	func extern mut __init__(w: i32, h: i32, format: string)
+	func extern mut __delete__()
+	func extern mut write(image: image.Image)
+	func extern mut write(data: void&, nx: i32, ny: i32, nz: i32, format: string)
+	func extern static load(filename: os.Path) -> xfer[Texture]
+
+
+class VolumeTexture extends Texture
+	func extern mut __init__(nx: i32, ny: i32, nz: i32, format: string)
+
+class CubeMap extends Texture
+	func extern mut __init__(size: i32, format: string)
+
+class StorageTexture extends Texture
+	func extern mut __init__(nx: i32, ny: i32, nz: i32, format: string)
+
+
+class DepthBuffer extends Texture
+	func extern mut __init__(w: i32, h: i32, format: string, with_sampler: bool)
+	func extern override __delete__()
+
+class FrameBuffer as shared
+	var width: i32
+	var height: i32
+	func extern mut __init__(rp: RenderPass*, attachments: shared![Texture][])
+	func extern mut __delete__()
+	func extern area() -> rect
+
+
+class Shader as shared
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern static load(filename: os.Path) -> xfer[Shader]
+
+class UniformBuffer extends Buffer
+	func extern mut __init__(size: i32)
+	func extern mut __delete__()
+	func extern mut update(source: void&)
+
+
+class DescriptorPool
+	func extern mut __init__(s: string, max_sets: i32)
+	func extern mut __delete__()
+	func extern create_set(bindings: string) -> xfer[DescriptorSet]
+
+
+class DescriptorSet
+	func extern mut __delete__()
+	func extern mut update()
+	func extern mut set_texture(binding: i32, tex: Texture*)
+	func extern mut set_storage_image(binding: i32, tex: Texture*)
+	func extern mut set_uniform_buffer(binding: i32, buf: Buffer*)
+	func extern mut set_acceleration_structure(binding: i32, ac: AccelerationStructure*)
+
+
+class GraphicsPipeline extends Pipeline
+	func extern mut __init__(shader: Shader*, rp: RenderPass*, subpass: i32, topology: string, format: string)
+	func extern mut __delete__()
+	func extern mut set_wireframe(w: bool)
+	func extern mut set_line_width(w: f32)
+	func extern mut set_blend(alpha: f32)
+	func extern mut set_blend(src: i32, dst: i32)
+	func extern mut set_z(test: bool, write: bool)
+	func extern mut set_dynamic(mode: i32[])
+	func extern mut rebuild()
+
+
+class ComputePipeline extends Pipeline
+	func extern mut __init__(shader: Shader*)
+
+
+class RayPipeline extends Pipeline
+	func extern mut __init__(layout: string, shader: Shader*[], recursion_depth: i32)
+	func extern mut create_sbt()
+
+
+class RenderPass
+	var clear_color: color[]
+	var clear_z: f32
+	func extern mut __init__(formats: string[], options: string[])
+	func extern mut __delete__()
+	func extern mut rebuild()
+	func extern mut add_subpass(color_att: i32[], depth_att: i32[])
+	func extern mut add_dependency(src: i32, src_opt: string, dst: i32, dst_opt: string)
+
+
+class SwapChain
+	var width: i32
+	var height: i32
+	var format: i32
+	func extern static create_for_glfw(device: Device*, win: void*) -> xfer[SwapChain]
+	func extern static create(device: Device*, width: i32, height: i32) -> xfer[SwapChain]
+	func extern mut __delete__()
+	func extern mut create_depth_buffer() -> xfer[DepthBuffer]
+	func extern mut create_render_pass(depth_buffer: DepthBuffer*, options: string[]) -> xfer[RenderPass]
+	func extern mut create_frame_buffers(render_pass: RenderPass*, depth_buffer: DepthBuffer*) -> xfer[FrameBuffer]
+	func extern mut create_textures() -> xfer[Texture][]
+	func extern mut present(image_index: i32, wait_sem: Semaphore*[]) -> bool
+	func extern mut acquire_image(signal_sem: Semaphore*) -> i32?
+
+
+class Fence
+	func extern mut __init__(device: Device*)
+	func extern mut __delete__()
+	func extern mut wait()
+	func extern mut reset()
+
+
+class Semaphore
+	func extern mut __init__(device: Device*)
+	func extern mut __delete__()
+
+
+class CommandPool
+#	func extern mut __delete__()
+	func extern mut create_command_buffer() -> xfer[CommandBuffer]
+
+class CommandBuffer
+	func extern mut __delete__()
+	func extern mut begin()
+	func extern mut end()
+	func extern mut set_bind_point(bp: PipelineBindPoint)
+	func extern mut clear(area: rect, colors: color[], z: f32?)
+	func extern mut bind_pipeline(p: Pipeline*)
+	func extern mut draw(vb: VertexBuffer*)
+	func extern mut begin_render_pass(rp: RenderPass*, fb: FrameBuffer*)
+	func extern mut next_subpass()
+	func extern mut end_render_pass()
+	func extern mut push_constant(offset: i32, size: i32, data: void&)
+	func extern mut bind_descriptor_set(index: i32, set: DescriptorSet*)
+	func extern mut set_scissor(r: rect)
+	func extern mut set_viewport(r: rect)
+	func extern mut dispatch(nx: i32, ny: i32, nz: i32)
+	func extern mut barrier(t: Texture*[], mode: i32)
+	func extern mut image_barrier(t: Texture*, src_access: AccessFlags, dst_access: AccessFlags,
+		old_layout: ImageLayout, new_layout: ImageLayout)
+	func extern mut copy_image(src: Texture*, dst: Texture*, extend: i32[])
+	func extern mut trace_rays(nx: i32, ny: i32, nz: i32)
+
+
+class AccelerationStructure
+	func extern static create_top(device: Device*, instances: @DynamicArray, matrices: mat4[]) -> xfer[AccelerationStructure]
+	func extern static create_bottom(device: Device*, vb: VertexBuffer) -> xfer[AccelerationStructure]
+
+
+
+
+func extern create_window(title: string, w: i32, h: i32) -> void&
+func extern window_handle(w: void&) -> bool
+func extern window_close(w: void&)
+
+func extern init(op: string[]) -> xfer[Instance]
+
+var extern default_device: Device*
+	
+	
