@@ -2,6 +2,7 @@ package alex
 package circuit
 package cli
 package cloud
+package fft
 #package gl
 package glfw
 package huibui
@@ -28,7 +29,7 @@ package tools
 package urdf
 package usb
 package visualization
-package vulkan
+#package vulkan
 package vulkanx
 package xmake
 package xml

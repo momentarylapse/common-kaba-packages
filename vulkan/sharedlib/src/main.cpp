@@ -42,7 +42,7 @@ xfer<vulkan::Device> __vulkan_device_create_simple(vulkan::Instance *instance, v
 KABA_LINK_GROUP_END
 
 class VulkanTexture : vulkan::Texture {
-	public:
+public:
 	void __init__() {
 		new(this) vulkan::Texture();
 	}
