@@ -24,6 +24,7 @@ package psmove
 package shadercomp
 package sisyphos
 package sqlite
+package statistics
 package terminal
 package tools
 package urdf

@@ -1,4 +1,4 @@
-func partial_sums(list: float[]) -> float[]
+func partial_sums(list: f32[]) -> f32[]
 	var r: float[]
 	var s = 0.0
 	for l in list
@@ -6,17 +6,17 @@ func partial_sums(list: float[]) -> float[]
 		r.add(s)
 	return r
 
-func smoothen(list: float[], D: int) -> float[]
+func smoothen(list: f32[], D: i32) -> f32[]
 	let s = partial_sums(list)
 	#let r = s - s[D:]
-	var r: float[]
+	var r: f32[]
 	for i=>l in list
-		r.add((s[min(i+D, len(list))] - s[i]) / float(D))
+		r.add((s[min(i+D, len(list))] - s[i]) / f32(D))
 	return r
 
 
 
-func sorted_count_smaller(data: float[], x: float) -> int
+func sorted_count_smaller(data: f32[], x: f32) -> i32
 	var (i0, i1) = (0, len(data) - 1)
 	while i1 > i0+1
 		let im = (i0+i1)/2
@@ -28,15 +28,15 @@ func sorted_count_smaller(data: float[], x: float) -> int
 	return i0
 
 # x0 < x1
-func sorted_count_between(data: float[], x0: float, x1: float) -> int
+func sorted_count_between(data: f32[], x0: float, x1: f32) -> i32
 	return sorted_count_smaller(data, x1) - sorted_count_smaller(data, x0)
 
 
 
-func majority_vote(points: float[], R: float) -> float
+func majority_vote(points: f32[], R: f32) -> f32
 	if len(points) == 0
 		return 0
-	var votes: float[]
+	var votes: f32[]
 	votes.resize(len(points))
 	for i=>p in points
 		for j=>q in points
@@ -44,18 +44,34 @@ func majority_vote(points: float[], R: float) -> float
 	return points[argmax(votes)]
 
 
-func top10percent(data: float[]) -> float
+func top10percent(data: f32[]) -> f32
 	let d = data |> sort
 	return d[int(len(d) * 0.9)]
 
-func bottom10percent(data: float[]) -> float
+func bottom10percent(data: f32[]) -> f32
 	let d = data |> sort
 	return d[int(len(d) * 0.1)]
 
-func variance(data: float[]) -> float
+func variance(data: f32[]) -> f32
 	let mu = sum(data) / len(data)
 	return ((data - mu) |> sqr |> sum) / len(data)
 
+
+
+
+func find_peaks(_h: f32[], sigma: f32) -> (f32[],f32[])
+	var h = _h
+	var peaks: f32[]
+	let thres = max(h) * 0.1
+	for k in 0:2
+		let m = argmax(h)
+		if h[m] < thres
+			break
+		peaks.add(m)
+		for mut i=>x in h
+			x *= 1 - exp(-(i - m)^2 / 2 / sigma^2)
+		#break
+	return peaks, h
 
 # "unit test"
 func main()

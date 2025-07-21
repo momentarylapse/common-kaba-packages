@@ -1,29 +1,29 @@
 
-func histogram(data: float[], fmin: float, fmax: float, N: int) -> float[]
-	var hist: float[]
+func histogram(data: f32[], fmin: f32, fmax: f32, N: i32) -> f32[]
+	var hist: f32[]
 	hist.resize(N)
 	
 	for f in data
 		var ff = (f - fmin) / (fmax - fmin)
-		var index = clamp(int(ff * N), 0, N-1)
+		var index = clamp(i32(ff * N), 0, N-1)
 		hist[index] += 1.0
 	
 	return hist / sum(hist)
 
 
-func histogram_radial(points: vec3[], p0: vec3, R: float, N: int) -> float[]
-	var hist: float[]
+func histogram_radial(points: vec3[], p0: vec3, R: f32, N: i32) -> f32[]
+	var hist: f32[]
 	hist.resize(N)
 	for p in points
 		var d: vec2 = [p.x - p0.x, p.y - p0.y]
 		var r = len(d)
-		var index = clamp(int(r * N / R), 0, N-1)
+		var index = clamp(i32(r * N / R), 0, N-1)
 		hist[index] += 1.0/r
 	return hist / sum(hist)
 
 
 
-func find_cutoff(hist: float[], max_sum: float) -> int
+func find_cutoff(hist: f32[], max_sum: f32) -> i32
 	var s = 0.0
 	for i=>f in hist
 		s += f

@@ -2,7 +2,7 @@ use hui
 use gl
 use image.Image
 
-use helper.progress.*
+use progress.*
 use cloud.Box
 
 const IDLE_DT = 0.1
