@@ -67,4 +67,4 @@ set(RESOURCE_DESTINATION share/moudulemongo)
 # binaries	
 
 # resources
-install(DIRECTORY "static" DESTINATION ${RESOURCE_DESTINATION})
+install(FILES "static/" DESTINATION ${RESOURCE_DESTINATION})
