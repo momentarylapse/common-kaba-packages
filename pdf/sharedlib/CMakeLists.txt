@@ -14,6 +14,12 @@ set(CMAKE_BUILD_TYPE Debug)
 find_package(PkgConfig REQUIRED)
 
 
+
+# lib: zlib (mandatory)
+find_package(ZLIB REQUIRED)
+list(APPEND DEPS ZLIB::ZLIB)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
@@ -28,6 +34,7 @@ add_library(modulepdf SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
+	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
 	src/lib/doc/pdf.cpp
 	src/lib/doc/ttf.cpp
