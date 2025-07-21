@@ -32,9 +32,10 @@ struct Package
 	build_dir: string
 	build_target: string
 	location: Location
+	func mut __init__() # kaba ARM workaround...
 	
 
-struct Config
+class Config
 	var kaba_base: os.Path
 	var packages_base: os.Path
 	var repos_base: os.Path
