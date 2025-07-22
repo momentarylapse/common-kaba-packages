@@ -1,5 +1,4 @@
 use os.*
-use hui
 
 #const string SERVER = "michi.is-a-geek.org"
 #const string SERVER = "myu"
@@ -193,7 +192,7 @@ struct Config
 	var default_structure = "{name}.{ext}"
 
 	func mut load()
-		var f = fs.open(hui.app_directory | "sisyphos/config", "rt")
+		var f = fs.open(app_directory_dynamic | "sisyphos/config", "rt")
 		var n, m: int
 		f >> n
 		for i in 0:n
@@ -217,8 +216,8 @@ struct Config
 			f >> ig
 			ignore.add(ig)
 	func save()
-		make_all_dirs(hui.app_directory | "sisyphos")
-		var f = fs.open(hui.app_directory | "sisyphos/config", "wt")
+		make_all_dirs(app_directory_dynamic | "sisyphos")
+		var f = fs.open(app_directory_dynamic | "sisyphos/config", "wt")
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)

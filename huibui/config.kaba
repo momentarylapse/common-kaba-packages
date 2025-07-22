@@ -1,4 +1,3 @@
-use hui
 use os
 use os.Path
 
@@ -41,7 +40,7 @@ class Config
 			
 			source_code_dir = dir | source_code_dir
 			export_dir = dir | export_dir
-			hui.app_directory_static = export_dir
+			os.app_directory_static = export_dir
 		except
 			pass
 

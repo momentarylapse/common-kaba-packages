@@ -3,9 +3,9 @@ package circuit
 package cli
 package cloud
 package fft
-#package gl
+package gl
 package glfw
-#package hui
+package hui
 package huibui
 package k2k
 package kabama
