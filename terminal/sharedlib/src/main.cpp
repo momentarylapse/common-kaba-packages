@@ -1,7 +1,5 @@
-#include <cstdio>
-
-#include "lib/base/base.h"
-#include "KabaExporter.h"
+#include <lib/base/base.h>
+#include <lib/kabaexport/KabaExporter.h>
 #include <termios.h>
 
 
@@ -9,8 +7,6 @@ extern "C" {
 
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
-	printf("<terminal export>\n");
-
 	e->declare_class_size("Termios", sizeof(termios));
 	e->declare_class_element("Termios.iflag", &termios::c_iflag);
 	e->declare_class_element("Termios.oflag", &termios::c_oflag);
@@ -48,8 +44,8 @@ void export_symbols(kaba::Exporter* e) {
 	e->declare_enum("Flags.PARENB", PARENB);
 	e->declare_enum("Flags.CS8", CS8);
 
-	e->link("_tcgetattr", (void*)&tcgetattr);
-	e->link("_tcsetattr", (void*)&tcsetattr);
+	e->link_func("_tcgetattr", &tcgetattr);
+	e->link_func("_tcsetattr", &tcsetattr);
 }
 }
 

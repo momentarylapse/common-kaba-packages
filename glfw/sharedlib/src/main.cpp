@@ -1,6 +1,5 @@
-#include "lib/base/base.h"
-#include "KabaExporter.h"
-#include <stdio.h>
+#include <lib/base/base.h>
+#include <lib/kabaexport/KabaExporter.h>
 #include <GLFW/glfw3.h>
 
 
@@ -9,25 +8,24 @@ extern "C" {
 
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
-	//printf("<glfw export>\n");
-	e->link("_glfwInit", (void*)&glfwInit);
-	e->link("_glfwVulkanSupported", (void*)&glfwVulkanSupported);
-	e->link("_glfwCreateWindow", (void*)&glfwCreateWindow);
-	e->link("_glfwWindowShouldClose", (void*)&glfwWindowShouldClose);
-	e->link("_glfwSetWindowUserPointer", (void*)&glfwSetWindowUserPointer);
-	e->link("_glfwGetWindowUserPointer", (void*)&glfwGetWindowUserPointer);
-	e->link("_glfwSetKeyCallback", (void*)&glfwSetKeyCallback);
-	e->link("_glfwSetCursorPosCallback", (void*)&glfwSetCursorPosCallback);
-	e->link("_glfwSetMouseButtonCallback", (void*)&glfwSetMouseButtonCallback);
-	e->link("_glfwGetCursorPos", (void*)&glfwGetCursorPos);
-	e->link("_glfwWindowHint", (void*)&glfwWindowHint);
-	e->link("_glfwPollEvents", (void*)&glfwPollEvents);
-	e->link("_glfwTerminate", (void*)&glfwTerminate);
-	e->link("_glfwJoystickPresent", (void*)&glfwJoystickPresent);
-	e->link("_glfwJoystickIsGamepad", (void*)&glfwJoystickIsGamepad);
-	e->link("_glfwGetJoystickName", (void*)&glfwGetJoystickName);
-	e->link("_glfwGetGamepadName", (void*)&glfwGetGamepadName);
-	e->link("_glfwGetGamepadState", (void*)&glfwGetGamepadState);
+	e->link_func("_glfwInit", &glfwInit);
+	e->link_func("_glfwVulkanSupported", &glfwVulkanSupported);
+	e->link_func("_glfwCreateWindow", &glfwCreateWindow);
+	e->link_func("_glfwWindowShouldClose", &glfwWindowShouldClose);
+	e->link_func("_glfwSetWindowUserPointer", &glfwSetWindowUserPointer);
+	e->link_func("_glfwGetWindowUserPointer", &glfwGetWindowUserPointer);
+	e->link_func("_glfwSetKeyCallback", &glfwSetKeyCallback);
+	e->link_func("_glfwSetCursorPosCallback", &glfwSetCursorPosCallback);
+	e->link_func("_glfwSetMouseButtonCallback", &glfwSetMouseButtonCallback);
+	e->link_func("_glfwGetCursorPos", &glfwGetCursorPos);
+	e->link_func("_glfwWindowHint", &glfwWindowHint);
+	e->link_func("_glfwPollEvents", &glfwPollEvents);
+	e->link_func("_glfwTerminate", &glfwTerminate);
+	e->link_func("_glfwJoystickPresent", &glfwJoystickPresent);
+	e->link_func("_glfwJoystickIsGamepad", &glfwJoystickIsGamepad);
+	e->link_func("_glfwGetJoystickName", &glfwGetJoystickName);
+	e->link_func("_glfwGetGamepadName", &glfwGetGamepadName);
+	e->link_func("_glfwGetGamepadState", &glfwGetGamepadState);
 }
 }
 

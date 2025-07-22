@@ -1,6 +1,5 @@
-#include "lib/base/base.h"
-#include "lib/kabaexport/KabaExporter.h"
-#include <stdio.h>
+#include <lib/base/base.h>
+#include <lib/kabaexport/KabaExporter.h>
 #include <bson/bson.h>
 #include <mongoc/mongoc.h>
 
@@ -9,7 +8,6 @@ extern "C" {
 
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
-	printf("<mongo export>\n");
 	e->link_func("_mongoc_init", &mongoc_init);
 	e->link_func("_mongoc_cleanup", &mongoc_cleanup);
 	e->link_func("_mongoc_client_new", &mongoc_client_new);
