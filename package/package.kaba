@@ -70,7 +70,7 @@ func find_internal_packages() -> Package[]
 	for p in kaba.default_context.packages
 		var pp: Package
 		pp.name = p.name
-		pp.version = "0.1" # TODO
+		pp.version = "0" # TODO
 		pp.location = Location.INTERNAL
 		r.add(pp)
 	return r
@@ -79,7 +79,7 @@ func find_internal_packages() -> Package[]
 func read_package(name: string, dir: os.Path, location: Location) -> Package
 	var p: Package
 	p.name = name
-	p.version = "0.1"
+	p.version = "0"
 	
 	p.base_installed = conf.packages_base | name
 	if location == Location.INSTALLED
@@ -172,6 +172,21 @@ func action_update(args: string[])
 		if not os.fs.is_directory(base | ".git")
 			let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")
 		let r = os.shell_execute("cd {{base}}; git pull")
+
+
+func action_upgrade(args: string[])
+	action_update(args)
+	load_module_list()
+	
+	var needs_upgrade: string[]
+	for p in conf.packages_installed
+		for pp in list_find(conf.packages_remote, p.name)
+			if pp.version != p.version
+				needs_upgrade.add(p.name)
+	
+	for name in needs_upgrade
+		for p in list_find(conf.packages_remote, name)
+			install_package(p)
 
 
 func action_list(args: string[])
@@ -312,6 +327,7 @@ func main(args: string[])
 	p.option("-v", "verbose", func() conf.verbose = true)
 	
 	p.cmd("update", "", "update database / repositories", action_update)
+	p.cmd("upgrade", "", "update all outdated packages", action_upgrade)
 	p.cmd("list", "", "list available packages", action_list)
 	p.cmd("install", "NAME", "install package", action_install)
 	p.cmd("remove", "NAME", "remove package", action_remove)
