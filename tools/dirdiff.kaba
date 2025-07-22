@@ -1,0 +1,18 @@
+use os
+
+func diff(a: os.Path, b: os.Path)
+	for e in os.fs.search(a, "*", "fr")
+		if not os.fs.exists(b | e)
+			print("{{os.terminal.RED}}missing{{os.terminal.END}} " + str(b | e))
+	for e in os.fs.search(b, "*", "fr")
+		if not os.fs.exists(a | e)
+			print("{{os.terminal.RED}}missing{{os.terminal.END}} " + str(a | e))
+
+func main(arg: string[])
+	var p: os.CommandLineParser
+	var pp = &p
+	p.info("bindiff", "compare directories")
+	p.cmd("help", "", "show help", func (a: string[]) pp.show())
+	p.cmd("", "DIR1 DIR2", "show diff", func (a: string[]) diff(a[0], a[1]))
+	p.parse(arg)
+	#p.show_help()

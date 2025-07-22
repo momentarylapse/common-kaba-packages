@@ -1,3 +1,4 @@
+version 1
 run bindiff.kaba
 run replace.kaba
 run test-compile.kaba
