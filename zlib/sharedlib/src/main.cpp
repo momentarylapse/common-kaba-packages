@@ -1,6 +1,5 @@
-#include "lib/base/base.h"
-#include "KabaExporter.h"
-#include <stdio.h>
+#include <lib/base/base.h>
+#include <lib/kabaexport/KabaExporter.h>
 #include <zlib.h>
 
 
@@ -9,11 +8,10 @@ extern "C" {
 
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
-	//printf("<zlib export>\n");
-	e->link("_compressBound", (void*)&compressBound);
-	e->link("_deflate", (void*)&deflate);
-	e->link("_compress", (void*)&compress);
-	e->link("_uncompress", (void*)&uncompress);
+	e->link_func("_compressBound", &compressBound);
+	e->link_func("_deflate", &deflate);
+	e->link_func("_compress", &compress);
+	e->link_func("_uncompress", &uncompress);
 }
 }
 
