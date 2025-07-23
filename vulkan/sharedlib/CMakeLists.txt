@@ -103,6 +103,7 @@ add_library(modulevulkan SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
+	src/lib/vulkan/_kaba_export.cpp
 	src/lib/vulkan/AccelerationStructure.cpp
 	src/lib/vulkan/Buffer.cpp
 	src/lib/vulkan/CommandBuffer.cpp

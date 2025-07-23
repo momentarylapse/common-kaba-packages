@@ -58,7 +58,7 @@ class FrameBuffer as shared
 	func extern area() -> rect
 	func extern mut clear_color(index: i32, c: color)
 	func extern mut clear_depth(z: f32)
-	func extern mut update(attachments: shared![Texture][])
+#	func extern mut update(attachments: shared![Texture][])
 	func extern mut update(attachments: shared![Texture][], face: i32 = 0)
 	func extern read(out image: image.Image)
 	var width: i32
