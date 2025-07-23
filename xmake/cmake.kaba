@@ -88,7 +88,7 @@ add_executable({{t.binary_file}}{{tflags}}"
 target_include_directories({{t.binary_file}} PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories({{t.binary_file}} PUBLIC ${LINK_DIRECTORIES})
 target_compile_options({{t.binary_file}} PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions({{t.binary_file}} PUBLIC ${COMPILE_DEFINITIONS} {{t.compiler_definitions.join(" ")}} INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
+target_compile_definitions({{t.binary_file}} PUBLIC ${COMPILE_DEFINITIONS} {{t.compiler_definitions.join(" ")}} SOURCE_ROOT=\"${CMAKE_SOURCE_DIR}\" INSTALL_PREFIX=\"${CMAKE_INSTALL_PREFIX}\")
 target_link_libraries({{t.binary_file}} PUBLIC {{deps}})"
 	if t.type == BuildType.SHARED_LIBRARY
 		r += "
