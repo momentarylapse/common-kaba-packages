@@ -99,6 +99,8 @@ struct Config
 	var force_profile: string
 	var force_threads = -1
 	var force_build_dir: Path
+	var home_directory: Path
+	var install_prefix: Path
 	
 	# project
 	var project: ProjectInfo
@@ -119,13 +121,25 @@ struct Config
 		var target_names = find_targets(c)
 		if len(target_names) == 0
 			raise(new Exception("no [build.target:...] found"))
-		print("targets: {{target_names}}")
+		#print("targets: {{target_names}}")
 		for n in target_names
 			var t: BuildTarget
 			t.name = n
 			t.binary_file = n
 			targets.add(t)
-	
+
+	func mut detect_environment()
+		# FIXME...
+		var x = os.fs.current_directory()
+		let p = x.all_parents()
+		if len(p) >= 2
+			if p[len(p) - 2] == "/home"
+				if len(p) >= 3
+					home_directory = p[len(p) - 3]
+				else
+					home_directory = x
+				install_prefix = home_directory | ".local"
+
 	func mut load()
 		if not os.fs.exists(conf.root | "xmake.conf")
 			raise(new Exception("no xmake.conf found"))

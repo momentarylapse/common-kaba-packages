@@ -57,6 +57,13 @@ func action_build(a: string[])
 	conf._find_sources()
 	build()
 
+func action_install(a: string[])
+	#print("building {{conf.root}}")
+	conf.load()
+	conf._find_sources()
+	build()
+	install()
+
 func action_clear(a: string[])
 	#print("clearing {{conf.root}}")
 	conf.load()
@@ -95,12 +102,14 @@ func main(arg: string[])
 	lib.init()
 	conf.verbose = false
 	conf.root = os.Path("./").absolute().canonical()
+	conf.detect_environment()
 	
 	#conf.ignore_libs
 	
 	#bool build
 	
 	var p: os.CommandLineParser
+	var pp = &p
 	p.info("xmake", "the build tool for lazy people")
 	p.option("-v/--verbose", "verbose output", func() conf.verbose = true)
 	p.option("--dry", "dry run", func() conf.dry_run = true)
@@ -109,15 +118,18 @@ func main(arg: string[])
 	p.option("--rebuild", "clear before build", func() conf.force_rebuild = true)
 	p.option("--profile", "PROFILE", "", func(o: string) conf.force_profile = o)
 	p.option("-j/--threads", "THREADS", "number of build threads", func(o: string) conf.force_threads = int(o))
-	p.option("--out", "BUILD_DIR", "", func(o: string) conf.force_build_dir = o)
+	p.option("--build-dir", "BUILD_DIR", "", func(o: string) conf.force_build_dir = o)
+	p.option("--prefix", "INSTALL_PREFIX_DIR", "", func(o: string) conf.install_prefix = o)
 	
-	p.cmd("has", "LIBRARY", "check if available", action_has)
-	p.cmd("list", "", "list available libs", action_list)
+	p.cmd("--help", "", "show help", func(a: string[]) pp.show())
+	p.cmd("lib has", "LIBRARY", "check if available", action_has)
+	p.cmd("lib list", "", "list available libs", action_list)
 	p.cmd("init", "", "create new project", action_init)
 	p.cmd("build", "", "build project", action_build)
+	p.cmd("install", "", "build and install project", action_install)
 	p.cmd("clear", "", "clear build files", action_clear)
 	p.cmd("update", "", "update build files", action_update)
 #	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
 	p.cmd("vcpkg", "", "create vcpkg config files", action_create_vcpkg)
-	#p.cmd("", "", "default: build", action_build)
+	p.cmd("", "", "default: build", action_build)
 	p.parse(arg)
