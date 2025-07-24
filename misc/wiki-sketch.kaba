@@ -3,7 +3,7 @@ use hui
 struct Stroke
 	var p: vec2[]
 	
-	func length() -> float
+	func length() -> f32
 		var l = 0.0
 		for i in 1:len(p)
 			l += len(p[i-1] - p[i])
@@ -34,7 +34,7 @@ struct Stroke
 class Sketcher extends hui.Window
 	var strokes: Stroke[]
 	var cur: Stroke
-	var w, h: int
+	var w, h: i32
 	func __init__()
 		super.__init__("Sketcher", 800, 600)
 		from_source("
@@ -45,6 +45,11 @@ Grid ? '' vertical
 		Button copy '' image=hui:copy
 		Button clear '' image=hui:delete")
 		
+		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:left-button-down", func() on_left_button_down(hui.get_event().mouse))
+		event_x("area", "hui:left-button-up", func() on_left_button_up(hui.get_event().mouse))
+		event_x("area", "hui:mouse-move", func() on_mouse_move(hui.get_event().mouse))
+		event_x("area", "hui:key-down", func() on_key_down(hui.get_event().key))
 		event("copy", on_copy)
 		event("clear", on_clear)
 		
@@ -64,7 +69,7 @@ Grid ? '' vertical
 			cur.p.add(m)
 			redraw("area")
 
-	func override mut on_key_down(key: int)
+	func override mut on_key_down(key: i32)
 		if key == hui.KEY_CONTROL + hui.KEY_Z
 			if len(strokes) > 0
 				#strokes = strokes[:len(strokes)-1]

@@ -2,22 +2,13 @@
 #include "config.h"
 #include "../kabaexport/KabaExporter.h"
 #include "../base/callable.h"
+#include <stdio.h>
 
 
 #define KABA_EXPORT_HUI
 
 
 namespace hui{
-#ifdef KABA_EXPORT_HUI_MINIMAL
-	typedef int Menu;
-	typedef int Toolbar;
-	class Panel : public Sharable<base::Empty> {
-	};
-	using Window = Panel;
-	using Dialog = Panel;
-	typedef int Event;
-	typedef int Painter;
-#endif
 #ifdef KABA_EXPORT_HUI
 	xfer<hui::Menu> create_menu_from_source(const string &source, hui::Panel*);
 #endif
@@ -25,11 +16,6 @@ namespace hui{
 
 
 #ifdef KABA_EXPORT_HUI
-	static hui::Event *_event;
-	static hui::Panel *_panel;
-	#define GetDAPanel(x)			int_p(&_panel->x)-int_p(_panel)
-	#define GetDAWindow(x)			int_p(&_win->x)-int_p(_win)
-	#define GetDAEvent(x)	int_p(&_event->x)-int_p(_event)
 
 	// capturing all function pointers as pointers or references!!!
 
@@ -74,6 +60,16 @@ namespace hui{
 			this->Painter::~Painter();
 		}
 	};
+	
+	
+	auto hui_fly(shared<hui::Window>& win) {
+		return hui::fly(win);
+	}
+	auto hui_fly_and_wait(shared<hui::Window>& win) {
+		printf("..... %p\n", &win);
+		printf("..... %p\n", win.get());
+		return hui::fly_and_wait(win);
+	}
 #endif
 
 void _dummy() {}
@@ -218,8 +214,8 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_func("run_later", &hui_run_later_kaba);
 	e->link_func("run_repeated", &hui_run_repeated_kaba);
 	e->link_func("cancel_runner", &hui::cancel_runner);
-	e->link_func("fly", &hui::fly);
-	e->link_func("fly_and_wait", &hui::fly_and_wait);
+	e->link_func("fly", &hui_fly);
+	e->link_func("fly_and_wait", &hui_fly_and_wait);
 	/*e->link_func("HuiAddKeyCode", &hui::AddKeyCode);
 	e->link_func("HuiAddCommand", &hui::AddCommand);*/
 	e->link_func("get_event", &hui::get_event);
@@ -359,6 +355,7 @@ void export_package_hui(kaba::Exporter* e) {
 	add_enum("NUM_KEYS", TypeInt32,hui::NUM_KEYS);
 	add_enum("KEY_ANY", TypeInt32, hui::KEY_ANY);
 #endif
+
 	e->link("app_config", &hui::config);
 }
 
