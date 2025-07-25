@@ -370,10 +370,6 @@ void Window::_wait_till_closed() {
 }
 
 void fly_and_wait(shared<Window> win) {
-msg_write("fly and wait");
-msg_write(p2s(win.get()));
-msg_write(p2s(&win->_pointer_ref_counter));
-msg_write(win->_pointer_ref_counter);
 	win->show();
 	//int uid = unique_id;
 

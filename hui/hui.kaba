@@ -149,7 +149,7 @@ func extern run_later(dt: f32, f: void->void) -> i32
 func extern run_repeated(dt: f32, f: void->void) -> i32
 func extern cancel_runner(id: i32)
 func extern fly(win: shared[Window]) -> future[void]
-func extern fly_and_wait(win: shared[Window]) -> future[void]
+func extern fly_and_wait(win: shared[Window])
 # add_key_code(...)
 func extern get_event() -> Event&
 func extern do_single_main_loop()
