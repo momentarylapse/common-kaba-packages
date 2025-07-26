@@ -133,7 +133,7 @@ struct Config
 		var x = os.fs.current_directory()
 		let p = x.all_parents()
 		if len(p) >= 2
-			if p[len(p) - 2] == "/home"
+			if p[len(p) - 2] in [Path("/home"), Path("/Users")]
 				if len(p) >= 3
 					home_directory = p[len(p) - 3]
 				else
