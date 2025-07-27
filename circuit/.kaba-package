@@ -1,4 +1,4 @@
-version 0.2
+version 1
 requires linalg
 requires linalg64
 run circuit.kaba

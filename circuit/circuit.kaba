@@ -175,7 +175,7 @@ class SimResult
 
 # node #0 is grounded!
 # node #1 gets input current!
-class Circuit as @noauto
+class Circuit #as @noauto
 	var nodes: Node[]
 	var edges: owned![Edge][]
 	var _out: i32
