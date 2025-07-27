@@ -31,6 +31,7 @@ struct Package
 	build_dir: string
 	build_target: string
 	location: Location
+	requires: string[]
 	func mut __init__() # kaba ARM workaround...
 	
 
@@ -95,6 +96,8 @@ func read_package(name: string, dir: os.Path, location: Location) -> Package
 				continue
 			if x[0] == "version"
 				p.version = x[1]
+			else if x[0] == "requires"
+				p.requires.add(x[1])
 			else if x[0] == "root"
 				p.root_source = p.base_source | x[1]
 			else if x[0] == "build" and len(x) >= 4
@@ -170,7 +173,7 @@ func action_update(args: string[])
 		let git = base | ".git" # FIXME bug in kaba!!!!
 		if not os.fs.is_directory(base | ".git")
 			let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")
-		let r = os.shell_execute("cd {{base}}; git pull")
+		let r = os.shell_execute("cd {{base}}; git pull --rebase")
 
 
 func action_upgrade(args: string[])
@@ -186,6 +189,18 @@ func action_upgrade(args: string[])
 	for name in needs_upgrade
 		for p in list_find(conf.packages_remote, name)
 			install_package(p)
+
+
+func is_installed_latest(name: string) -> bool
+	for p in list_find(conf.packages_internal, name)
+		return true
+	for p in list_find(conf.packages_installed, name)
+		for pp in list_find(conf.packages_remote, p.name)
+			return pp.version == p.version
+		# no remote? ...not sure
+		return true
+	# not installed
+	return false
 
 
 func action_list(args: string[])
@@ -211,7 +226,14 @@ func action_list(args: string[])
 					s = "{{os.terminal.RED}}installed, version {{p.version}}, source version {{pp.version}}{{os.terminal.END}}"
 			else
 				s = "{{os.terminal.RED}}installed, but no source{{os.terminal.END}}"
+			for r in p.requires
+				if not is_installed_latest(r)
+					s += " {{os.terminal.RED}}requires {{r}}{{os.terminal.END}}"
+		if conf.verbose
+			s = "{{p.version|3}} {{s}}"
 		print("{{p.name|16}}  {{s}}")
+		if conf.verbose and len(p.requires) > 0
+			print("                      {{os.terminal.GRAY}}requires:{{os.terminal.END}} " + p.requires.join(", "))
 
 
 func delete_directory(dir: os.Path)
@@ -247,7 +269,16 @@ func allow_install_file(f: os.Path) -> bool
 	
 	return true
 
-func install_package(p: Package)
+func install_package(p: Package) -> bool
+	for r in p.requires
+		if not is_installed_latest(r)
+			for rr in list_find(conf.packages_remote, r)
+				if not install_package(rr)
+					return false
+			else
+				print("{{os.terminal.RED}}MISSING DEPENDENCY{{os.terminal.END}} {{p.name}} -> {{r}}")
+				return false
+
 	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
 	if os.fs.is_directory(p.base_installed)
 		delete_directory(p.base_installed)
@@ -268,7 +299,7 @@ func install_package(p: Package)
 			print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
 			delete_directory(build_dir)
 			delete_directory(p.base_installed)
-			return
+			return false
 		delete_directory(build_dir)
 
 
@@ -290,6 +321,7 @@ func install_package(p: Package)
 	# package info file might be skipped if root!=base...
 	if os.fs.exists(p.base_source | PACKAGE_FILE)
 		os.fs.copy(p.base_source | PACKAGE_FILE, p.base_installed | PACKAGE_FILE)
+	return true
 
 
 func action_install(args: string[])
