@@ -109,7 +109,7 @@ Grid ? ''
 		if not initialized
 			return
 		for c in ctx
-			gl.start_frame_hui(c)
+			gl.start_frame_hui(c, hui.get_event())
 		
 			gl.clear(background_color)
 			set_mode_3d()
@@ -183,12 +183,12 @@ Grid ? ''
 		if not on_mouse_move_x(mouse)
 			return
 		let sx = post_projection_matrix.e[0][0]
-		if e.button_m#r # FIXME indurad Debian 12 hack?!?
+		if e.button_r#m # FIXME indurad Debian 12 hack?!?
 			# rotate around focus point
 			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
 			on_cam_change()
 			redraw("nix-area")
-		else if e.button_r#m
+		else if e.button_m#r
 			# rotate around eye
 			cam_pos -= cam_ang * [0,0,cam_radius]
 			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
@@ -348,7 +348,7 @@ void main() {
 			if cb_init_data
 				cb_init_data()
 		
-			event("nix-area", draw_gl)
+			event_x("nix-area", "hui:draw-gl", draw_gl)
 		
 			hui.run_repeated(IDLE_DT, on_idle)
 	

@@ -63,7 +63,7 @@ class Panel extends Object as shared
 	func extern mut add_string(id: string, s: string)
 	func extern get_string(id: string) -> string
 	func extern mut set_float(id: string, f: f32)
-	func extern get_string(id: string) -> f32
+	func extern get_float(id: string) -> f32
 	func extern mut enable(id: string, enabled: bool)
 	func extern is_enabled(id: string) -> bool
 	func extern mut check(id: string, checked: bool)
@@ -120,6 +120,8 @@ class Window extends Panel
 	func extern mut get_key(key: i32) -> bool
 	func extern virtual mut on_mouse_move(m: vec2)
 	func extern virtual mut on_mouse_wheel(d: vec2)
+	func extern virtual mut on_mouse_enter(m: vec2)
+	func extern virtual mut on_mouse_leave()
 	func extern virtual mut on_left_button_down(m: vec2)
 	func extern virtual mut on_middle_button_down(m: vec2)
 	func extern virtual mut on_right_button_down(m: vec2)

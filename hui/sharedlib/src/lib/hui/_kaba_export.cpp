@@ -171,8 +171,10 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_class_func("Window.set_cursor_pos", &hui::Window::set_cursor_pos);
 	e->link_class_func("Window.get_mouse", &hui::Window::get_mouse);
 	e->link_class_func("Window.get_key", &hui::Window::get_key);
-	e->link_virtual("Window.on_mouse_move", &hui::Window::on_mouse_move, &win); // const or mutable?!?!?
+	e->link_virtual("Window.on_mouse_move", &hui::Window::on_mouse_move, &win);
 	e->link_virtual("Window.on_mouse_wheel", &hui::Window::on_mouse_wheel, &win);
+	e->link_virtual("Window.on_mouse_enter", &hui::Window::on_mouse_enter, &win);
+	e->link_virtual("Window.on_mouse_leave", &hui::Window::on_mouse_leave, &win);
 	e->link_virtual("Window.on_left_button_down", &hui::Window::on_left_button_down, &win);
 	e->link_virtual("Window.on_middle_button_down", &hui::Window::on_middle_button_down, &win);
 	e->link_virtual("Window.on_right_button_down", &hui::Window::on_right_button_down, &win);

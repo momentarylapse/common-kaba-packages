@@ -132,7 +132,7 @@ enum CullMode
 
 func extern init(flags: string[]) -> xfer[Context]
 
-func extern start_frame_hui(ctx: Context)
+func extern start_frame_hui(ctx: Context, event: void&) # hui.Event&
 func extern end_frame_hui()
 
 func extern bind_frame_buffer(fb: FrameBuffer)
@@ -149,6 +149,9 @@ func extern set_alpha(source: Alpha, dest: Alpha)
 func extern set_stencil(mode: StencilOp, param: i32)
 func extern set_projection_perspective()
 func extern set_projection_perspective(center: vec2, size_1: vec2, zmin: f32, zmax: f32)
+func extern set_projection_ortho_relative()
+func extern set_projection_ortho_pixel()
+func extern set_projection_ortho_ext(center: vec2, map_size: vec2, zmin: f32, zmax: f32)
 func extern set_projection_matrix(m: mat4)
 func extern set_view_matrix(m: mat4)
 func extern set_scissor(r: rect)

@@ -57,7 +57,7 @@ DrawingArea area '' grab-focus")
 		event_x("area", "hui:mouse-move", on_mouse_move)
 		event_x("area", "hui:key-down", on_key_down)
 	
-	func redraw()
+	func mut redraw()
 		redraw("area")	
 		
 
