@@ -18,7 +18,7 @@ class Context
 	func extern mut create_shader(source: string) -> xfer[Shader]
 
 class VertexBuffer
-	func extern __init__()
+	func extern __init__(format: string)
 	func extern __delete__()
 	func extern mut update(vertices: @DynamicArray)
 	func extern mut update_index(indices: @DynamicArray)
