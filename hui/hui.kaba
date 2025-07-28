@@ -166,7 +166,7 @@ func extern open_document(filename: os.Path)
 func extern make_gui_image(image: image.Image) -> string
 
 
-class Clipboard
+class clipboard
 	func static extern paste() -> future[string]
 	func static extern copy(text: string)
 

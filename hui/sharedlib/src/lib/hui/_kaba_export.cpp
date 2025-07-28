@@ -223,13 +223,13 @@ void export_package_hui(kaba::Exporter* e) {
 	e->link_func("make_gui_image", &hui::set_image);
 
 
-	e->link_func("Clipboard.paste", &hui::clipboard::paste);
-	e->link_func("Clipboard.copy", &hui::clipboard::copy);
+	e->link_func("clipboard.paste", &hui::clipboard::paste);
+	e->link_func("clipboard.copy", &hui::clipboard::copy);
 
 	e->declare_class_size("Event", sizeof(hui::Event));
 	e->declare_class_element("Event.id", &hui::Event::id);
 	e->declare_class_element("Event.message", &hui::Event::message);
-	e->declare_class_element("Event.m", &hui::Event::m);
+	e->declare_class_element("Event.mouse", &hui::Event::m);
 	e->declare_class_element("Event.pressure", &hui::Event::pressure);
 	e->declare_class_element("Event.scroll", &hui::Event::scroll);
 	e->declare_class_element("Event.key", &hui::Event::key_code);

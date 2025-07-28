@@ -9,7 +9,7 @@ __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	hui::Application::allowed = false;
 	hui::_MakeUsable_();
-	printf("export hui...\n");
+	//printf("export hui...\n");
 	export_package_hui(e);
 }
 }
