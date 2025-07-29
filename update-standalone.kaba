@@ -1,0 +1,29 @@
+use os
+
+func upgrade(dir: os.Path)
+	for sub in os.fs.search(dir, "*", "d")
+		if os.fs.exists(sub)
+			print(sub)
+			let source = sub
+			let dest = dir | sub
+			os.fs.copy(source | ".kaba-package", dest | ".kaba-package")
+			for f in os.fs.search(source, "*.kaba", "fr")
+				if os.fs.exists(dest | f)
+					if os.fs.read_text(source | f) == os.fs.read_text(dest | f)
+						print("  {{str(f)|16}} {{os.terminal.GREEN}}ok{{os.terminal.END}}")
+					else
+						print("  {{str(f)|16}} {{os.terminal.YELLOW}}diff{{os.terminal.END}}")
+						os.fs.copy(source | f, dest | f)
+				else
+					print("  {{str(f)|16}} {{os.terminal.YELLOW}}missing{{os.terminal.END}}")
+					os.fs.copy(source | f, dest | f)
+			for f in os.fs.search(dest, "*.kaba", "fr")
+				if not os.fs.exists(source | f)
+					print("  {{str(f)|16}} {{os.terminal.YELLOW}}obsolete{{os.terminal.END}}")
+					os.fs.delete(dest | f)
+					
+	
+
+func main(arg: string[])
+	for a in arg
+		upgrade(a)
