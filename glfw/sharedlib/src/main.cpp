@@ -4,8 +4,6 @@
 
 
 extern "C" {
-
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->link_func("_glfwInit", &glfwInit);
@@ -19,6 +17,8 @@ void export_symbols(kaba::Exporter* e) {
 	e->link_func("_glfwSetMouseButtonCallback", &glfwSetMouseButtonCallback);
 	e->link_func("_glfwGetCursorPos", &glfwGetCursorPos);
 	e->link_func("_glfwWindowHint", &glfwWindowHint);
+	e->link_func("_glfwMakeContextCurrent", &glfwMakeContextCurrent);
+	e->link_func("_glfwSwapBuffers", &glfwSwapBuffers);
 	e->link_func("_glfwPollEvents", &glfwPollEvents);
 	e->link_func("_glfwTerminate", &glfwTerminate);
 	e->link_func("_glfwJoystickPresent", &glfwJoystickPresent);
