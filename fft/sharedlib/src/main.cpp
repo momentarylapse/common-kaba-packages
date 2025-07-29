@@ -8,4 +8,11 @@ void export_symbols(kaba::Exporter* e) {
 }
 }
 
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
+}
+}
+
 

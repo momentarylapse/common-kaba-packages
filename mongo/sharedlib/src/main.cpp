@@ -5,7 +5,6 @@
 
 
 extern "C" {
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->link_func("_mongoc_init", &mongoc_init);
@@ -40,6 +39,13 @@ void export_symbols(kaba::Exporter* e) {
 	e->link_func("_bson_iter_oid", &bson_iter_oid);
 	e->link_func("_bson_oid_to_string", &bson_oid_to_string);
 	e->link_func("_bson_iter_type", &bson_iter_type);
+}
+}
+
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
 }
 }
 

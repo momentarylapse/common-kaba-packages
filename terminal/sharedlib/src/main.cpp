@@ -4,7 +4,6 @@
 
 
 extern "C" {
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->declare_class_size("Termios", sizeof(termios));
@@ -46,6 +45,13 @@ void export_symbols(kaba::Exporter* e) {
 
 	e->link_func("_tcgetattr", &tcgetattr);
 	e->link_func("_tcsetattr", &tcsetattr);
+}
+}
+
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
 }
 }
 

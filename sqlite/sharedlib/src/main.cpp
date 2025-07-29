@@ -4,7 +4,6 @@
 
 
 extern "C" {
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->link_func("sqlite3_libversion_number", &sqlite3_libversion_number);
@@ -20,6 +19,13 @@ void export_symbols(kaba::Exporter* e) {
 	e->link_func("_sqlite3_errmsg", &sqlite3_errmsg);
 	e->link_func("_sqlite3_column_name", &sqlite3_column_name);
 	e->link_func("_sqlite3_column_type", &sqlite3_column_type);
+}
+}
+
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
 }
 }
 

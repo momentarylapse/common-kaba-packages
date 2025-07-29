@@ -4,8 +4,6 @@
 #include <ncurses.h>
 
 extern "C" {
-
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->link_func("_initscr", &initscr);
@@ -36,6 +34,13 @@ void export_symbols(kaba::Exporter* e) {
 	e->link_func("_keypad", &keypad);
 	
 	e->link_func("_setlocale", &setlocale);
+}
+}
+
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
 }
 }
 

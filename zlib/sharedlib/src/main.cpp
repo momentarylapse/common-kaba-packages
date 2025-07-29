@@ -4,14 +4,19 @@
 
 
 extern "C" {
-
-
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::Exporter* e) {
 	e->link_func("_compressBound", &compressBound);
 	e->link_func("_deflate", &deflate);
 	e->link_func("_compress", &compress);
 	e->link_func("_uncompress", &uncompress);
+}
+}
+
+// required for linking the shared library!
+namespace os::app {
+int main(const Array<string>&) {
+	return 0;
 }
 }
 
