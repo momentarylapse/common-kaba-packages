@@ -25,6 +25,12 @@ endif()
 
 
 
+# lib: zlib (mandatory)
+find_package(ZLIB REQUIRED)
+list(APPEND DEPS ZLIB::ZLIB)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
+
+
 # lib: glfw (mandatory)
 find_package(glfw3 REQUIRED)
 list(APPEND DEPS glfw)
@@ -92,6 +98,7 @@ add_library(modulevulkan SHARED
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -125,7 +132,7 @@ add_library(modulevulkan SHARED
 target_include_directories(modulevulkan PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulevulkan PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(modulevulkan PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(modulevulkan PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(modulevulkan PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(modulevulkan PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(modulevulkan PUBLIC -fvisibility=hidden)

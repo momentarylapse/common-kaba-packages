@@ -3,6 +3,7 @@
     "glfw3",
     "shaderc",
     "vulkan",
-    "vulkan-headers"
+    "vulkan-headers",
+    "zlib"
   ]
 }
