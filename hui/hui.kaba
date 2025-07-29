@@ -78,10 +78,10 @@ class Panel extends Object as shared
 	func extern get_selection(id: string) -> i32[]
 	func extern mut set_image(id: string, image: string)
 	func extern mut set_cell(id: string, row: i32, column: i32, s: string)
-	func extern mut get_cell(id: string, row: i32, column: i32) -> string
+	func extern get_cell(id: string, row: i32, column: i32) -> string
 	func extern mut set_options(id: string, options: string)
 	func extern mut reset(id: string)
-	func extern mut redraw(id: string)
+	func extern redraw(id: string)
 	func extern mut expand(id: string, row: i32, expand: bool)
 	func extern mut expand(id: string, expand: bool)
 	func extern is_expanded(id: string, row: i32 = -1) -> bool
@@ -116,8 +116,8 @@ class Window extends Panel
 #	//																										TypeIRect,"r");
 #	//add_func("getInterior", TypeIRect, 1, TypePointer,"win");
 	func extern mut set_cursor_pos(x: i32, y: i32)
-	func extern mut get_mouse(out x: i32, out y: i32, button: i32, change: i32) -> bool
-	func extern mut get_key(key: i32) -> bool
+	func extern get_mouse(out x: i32, out y: i32, button: i32, change: i32) -> bool
+	func extern get_key(key: i32) -> bool
 	func extern virtual mut on_mouse_move(m: vec2)
 	func extern virtual mut on_mouse_wheel(d: vec2)
 	func extern virtual mut on_mouse_enter(m: vec2)
@@ -146,7 +146,7 @@ class Dialog extends Window
 
 
 # user interface
-func extern set_idle_function(idle_func: void->void)
+func extern set_idle_function(f: void->void)
 func extern run_later(dt: f32, f: void->void) -> i32
 func extern run_repeated(dt: f32, f: void->void) -> i32
 func extern cancel_runner(id: i32)
