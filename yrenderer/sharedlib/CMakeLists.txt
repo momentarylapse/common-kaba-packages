@@ -1,0 +1,225 @@
+# created by xmake
+
+cmake_minimum_required(VERSION 3.21)
+project(mouduleyrenderer)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_BUILD_TYPE Debug)
+
+
+#=======================================================================================
+#    libraries
+#=======================================================================================
+
+find_package(PkgConfig REQUIRED)
+
+
+
+# lib: dl (optional)
+if(WIN32)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=0)
+else()
+	list(APPEND DEPS ${CMAKE_DL_LIBS})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_DL=1)
+endif()
+
+
+
+# lib: zlib (mandatory)
+find_package(ZLIB REQUIRED)
+list(APPEND DEPS ZLIB::ZLIB)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
+
+
+# lib: glfw (mandatory)
+find_package(glfw3 REQUIRED)
+list(APPEND DEPS glfw)
+list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
+
+
+# lib: vulkan or gl (mandatory)
+set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
+pkg_check_modules(VULKAN vulkan)
+if(VULKAN_FOUND)
+	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
+endif()
+find_package(OpenGL)
+if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+	list(APPEND VULKAN_OR_GL_FOUND "gl")
+endif()
+if(VULKAN_OR_GL_FOUND)
+	if(NOT ${VULKAN_OR_GL} IN_LIST VULKAN_OR_GL_FOUND)
+		list(GET VULKAN_OR_GL_FOUND 0 X)
+		set(VULKAN_OR_GL ${X} CACHE STRING "choose" FORCE)
+		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
+	endif()
+else()
+	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
+	set(VULKAN_OR_GL "")
+endif()
+if(VULKAN_OR_GL STREQUAL "vulkan")
+	list(APPEND INCLUDE_DIRECTORIES ${VULKAN_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${VULKAN_LIBRARY_DIRS})
+	list(APPEND DEPS ${VULKAN_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${VULKAN_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
+endif()
+if(VULKAN_OR_GL STREQUAL "gl")
+	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
+endif()
+
+
+# lib: shaderc (optional)
+set(LIB_SHADERC_ENABLED true CACHE BOOL "Use shaderc library?")
+pkg_check_modules(SHADERC shaderc)
+if(SHADERC_FOUND)
+else()
+	set(LIB_SHADERC_ENABLED false CACHE BOOL "shaderc library not found" FORCE)
+endif()
+if(${LIB_SHADERC_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${SHADERC_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${SHADERC_LIBRARY_DIRS})
+	list(APPEND DEPS ${SHADERC_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${SHADERC_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=0)
+endif()
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+list(APPEND DEPS Threads::Threads)
+
+
+#=======================================================================================
+#    target moduleyrenderer
+#=======================================================================================
+
+add_library(moduleyrenderer SHARED
+	src/lib/any/any.cpp
+	src/lib/base/array.cpp
+	src/lib/base/pointer.cpp
+	src/lib/base/strings.cpp
+	src/lib/image/color.cpp
+	src/lib/image/image.cpp
+	src/lib/image/image_bmp.cpp
+	src/lib/image/image_jpg.cpp
+	src/lib/image/image_png.cpp
+	src/lib/image/image_tga.cpp
+	src/lib/image/ImagePainter.cpp
+	src/lib/math/Box.cpp
+	src/lib/math/complex.cpp
+	src/lib/math/interpolation.cpp
+	src/lib/math/mat3.cpp
+	src/lib/math/mat4.cpp
+	src/lib/math/math.cpp
+	src/lib/math/plane.cpp
+	src/lib/math/quaternion.cpp
+	src/lib/math/random.cpp
+	src/lib/math/ray.cpp
+	src/lib/math/rect.cpp
+	src/lib/math/vec2.cpp
+	src/lib/math/vec3.cpp
+	src/lib/math/vec4.cpp
+	src/lib/nix/_kaba_export.cpp
+	src/lib/nix/nix.cpp
+	src/lib/nix/nix_buffer.cpp
+	src/lib/nix/nix_draw.cpp
+	src/lib/nix/nix_framebuffer.cpp
+	src/lib/nix/nix_light.cpp
+	src/lib/nix/nix_shader.cpp
+	src/lib/nix/nix_textures.cpp
+	src/lib/nix/nix_vertexbuffer.cpp
+	src/lib/nix/nix_view.cpp
+	src/lib/os/app.cpp
+	src/lib/os/CommandLineParser.cpp
+	src/lib/os/config.cpp
+	src/lib/os/date.cpp
+	src/lib/os/file.cpp
+	src/lib/os/filesystem.cpp
+	src/lib/os/formatter.cpp
+	src/lib/os/msg.cpp
+	src/lib/os/path.cpp
+	src/lib/os/stream.cpp
+	src/lib/os/terminal.cpp
+	src/lib/os/time.cpp
+	src/lib/profiler/Profiler.cpp
+	src/lib/vulkan/_kaba_export.cpp
+	src/lib/vulkan/AccelerationStructure.cpp
+	src/lib/vulkan/Buffer.cpp
+	src/lib/vulkan/CommandBuffer.cpp
+	src/lib/vulkan/DescriptorSet.cpp
+	src/lib/vulkan/Device.cpp
+	src/lib/vulkan/FrameBuffer.cpp
+	src/lib/vulkan/helper.cpp
+	src/lib/vulkan/Instance.cpp
+	src/lib/vulkan/Pipeline.cpp
+	src/lib/vulkan/Queue.cpp
+	src/lib/vulkan/RenderPass.cpp
+	src/lib/vulkan/Semaphore.cpp
+	src/lib/vulkan/Shader.cpp
+	src/lib/vulkan/SwapChain.cpp
+	src/lib/vulkan/Texture.cpp
+	src/lib/vulkan/VertexBuffer.cpp
+	src/lib/vulkan/vulkan.cpp
+	src/lib/yrenderer/helper/Bindable.cpp
+	src/lib/yrenderer/helper/ComputeTask.cpp
+	src/lib/yrenderer/helper/CubeMapSource.cpp
+	src/lib/yrenderer/helper/jitter.cpp
+	src/lib/yrenderer/helper/LightMeter.cpp
+	src/lib/yrenderer/helper/Pipeline.cpp
+	src/lib/yrenderer/helper/PipelineManager.cpp
+	src/lib/yrenderer/post/HDRResolver.cpp
+	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
+	src/lib/yrenderer/regions/RegionRenderer.cpp
+	src/lib/yrenderer/regions/RegionRendererGL.cpp
+	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
+	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/CameraParams.cpp
+	src/lib/yrenderer/scene/Light.cpp
+	src/lib/yrenderer/scene/MeshEmitter.cpp
+	src/lib/yrenderer/scene/RenderViewData.cpp
+	src/lib/yrenderer/scene/SceneRenderer.cpp
+	src/lib/yrenderer/scene/SceneView.cpp
+	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
+	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
+	src/lib/yrenderer/target/TargetRenderer.cpp
+	src/lib/yrenderer/target/TextureRendererGL.cpp
+	src/lib/yrenderer/target/TextureRendererVulkan.cpp
+	src/lib/yrenderer/target/WindowRendererGL.cpp
+	src/lib/yrenderer/target/WindowRendererVulkan.cpp
+	src/lib/yrenderer/target/XhuiRenderer.cpp
+	src/lib/yrenderer/_kaba_export.cpp
+	src/lib/yrenderer/base-gl.cpp
+	src/lib/yrenderer/base-vulkan.cpp
+	src/lib/yrenderer/base.cpp
+	src/lib/yrenderer/Material.cpp
+	src/lib/yrenderer/Renderer.cpp
+	src/lib/yrenderer/ShaderManager.cpp
+	src/lib/yrenderer/TextureManager.cpp
+	src/main.cpp)
+target_include_directories(moduleyrenderer PUBLIC ${INCLUDE_DIRECTORIES})
+target_link_directories(moduleyrenderer PUBLIC ${LINK_DIRECTORIES})
+target_compile_options(moduleyrenderer PUBLIC ${COMPILE_OPTIONS})
+target_compile_definitions(moduleyrenderer PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_link_libraries(moduleyrenderer PUBLIC ${DEPS})
+if (NOT WIN32)
+	target_compile_options(moduleyrenderer PUBLIC -fvisibility=hidden)
+endif()
+target_include_directories(moduleyrenderer PUBLIC src)
+
+
+#=======================================================================================
+#    install
+#=======================================================================================
+
+set(RESOURCE_DESTINATION share/mouduleyrenderer)
+
+# binaries	
+
+# resources
+install(FILES "static/" DESTINATION ${RESOURCE_DESTINATION})

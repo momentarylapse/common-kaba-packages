@@ -35,6 +35,7 @@ package vulkan
 package vulkanx
 package xmake
 package xml
+package yrenderer
 package zlib
 package zmq
 

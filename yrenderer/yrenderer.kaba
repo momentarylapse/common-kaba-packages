@@ -1,0 +1,261 @@
+use image.Image
+use os
+
+
+struct ivec3
+	x, y, z: i32
+
+struct Box
+	min, max: vec3
+
+
+#----------------------------------------------------------------
+# ygfx
+
+enum PrimitiveTopology
+	TRIANGLES
+	LINES
+	LINESTRIP
+	POINTS
+	PATCHES
+
+struct Vertex
+	var p, n: vec3
+	var u, v: f32
+
+struct VertexFx
+	pos: vec3
+	col: color
+	u, v: f32
+
+struct PointVertex
+	pos: vec3
+	radius: f32
+	col: color
+
+class FrameBuffer
+	var width, height: i32
+	func extern __init__(att: shared![Texture][])
+	func extern selfref depth_buffer() -> shared[DepthBuffer]
+	func extern selfref color_attachments() -> shared![Texture][]
+
+class Shader as shared
+	func extern set_float(name: string, f: f32)
+	func extern set_floats(name: string, f: f32&, num: i32)
+
+class Texture as shared
+	var width, height: i32
+	func extern __init__(w: i32, h: i32, format: string = "rgba:i8")
+	func extern __delete__()
+	func extern mut write(im: Image)
+	func extern mut write_float(data: @DynamicArray)
+	func extern mut read(out im: Image)
+	func extern mut set_options(op: string)
+
+class CubeMap extends Texture
+	func extern __init__(size: i32, format: string)
+class DepthBuffer extends Texture
+	func extern override __init__(w: i32, h: i32, format: string)
+class ImageTexture extends Texture
+	func extern override __init__(w: i32, h: i32, format: string)
+class StorageTexture extends Texture
+	func extern __init__(nx: i32, ny: i32, nz: i32, format: string)
+class VolumeTexture extends Texture
+	func extern __init__(nx: i32, ny: i32, nz: i32, format: string)
+
+
+
+class Buffer
+	func extern mut update(data: @DynamicArray)
+	func extern mut update_chunk(data: void*, size: i32)
+	func extern mut read(mut data: @DynamicArray)
+	func extern mut read_chunk(data: void*, size: i32)
+
+class VertexBuffer
+	func extern __init__(format: string = "3f,3f,2f")
+	func extern mut update(data: @DynamicArray)
+
+class UniformBuffer extends Buffer
+	func extern __init__(size: i32)
+
+class ShaderStorageBuffer extends Buffer
+	func extern __init__(size: i32)
+
+
+#----------------------------------------------------------------
+# yrenderer
+
+
+##var extern tex_white: shared![Texture] # TODO use engine.context.tex_white?
+
+##func extern load_shader(filename: os.Path) -> shared![Shader]
+##func extern create_shader(source: string) -> xfer[Shader]
+##func extern load_texture(filename: os.Path) -> shared![Texture]
+
+
+
+# "yrenderer.Context"
+class Context as @noauto
+	var context: void& # "ygfx.Context"
+	var tex_white: shared![Texture]
+
+
+func extern api_init(window: void*) -> Context&
+
+
+struct RenderParams
+	func extern __assign__(o: RenderParams)
+
+
+class RenderViewData
+	func extern __init__(ctx: Context&)
+	func extern set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
+
+class Renderer
+	func extern add_child(r: Renderer&)
+	func extern virtual prepare(params: RenderParams)
+	func extern virtual draw(params: RenderParams)
+
+
+class RenderTask extends Renderer
+	var active: bool
+	func virtual render(params: RenderParams)
+
+
+class ComputeTask extends RenderTask
+	nx: i32
+	ny: i32
+	nz: i32
+	shader_data: any
+	func extern __init__(ctx: Context&, name: string, shader: shared![Shader], n: i32[])
+	func override extern render(params: RenderParams)
+	func extern bind_texture(index: i32, tex: Texture&)
+	func extern bind_image(index: i32, tex: Texture&)
+	func extern bind_uniform_buffer(index: i32, buf: UniformBuffer&)
+	func extern bind_storage_buffer(index: i32, buf: ShaderStorageBuffer&)
+
+
+class WindowRenderer extends Renderer
+	func extern __init__(ctx: Context&, window: void*)
+	func extern start_frame() -> bool
+	func extern end_frame(params: RenderParams)
+	func extern create_params(aspect_ration: f32) -> RenderParams
+
+
+class MeshEmitter extends Object as shared
+	func extern __init__(ctx: Context&, name: string)
+	func extern virtual emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
+	func extern virtual emit_transparent(params: RenderParams, rvd: RenderViewData)
+	var ctx: Context&
+
+
+class CubeEmitter extends MeshEmitter
+	func extern __init__(ctx: Context&)
+	func extern set_cube(cube: Box)
+
+
+class SceneRenderer extends Renderer
+	func extern mut __init__(ctx: Context&, type: i32, scene_view: SceneView&)
+	func extern mut set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
+	func extern mut add_emitter(emitters: shared![MeshEmitter])
+
+	var background_color: color?
+
+
+class RegionRenderer
+	struct Region
+		var dest: rect
+		var z: int
+		var renderer: Renderer&
+	var regions: Region[]
+	func extern add_region(r: Renderer&, dest: rect, z: int)
+
+
+#class ShadowRenderer
+#	struct Cascade
+#		depth_buffer: DepthBuffer&
+#	cascades: Cascade[2]
+
+#struct RayTracingData
+#	buffer_meshes: UniformBuffer*
+#	num_meshes: i32
+
+class SceneView
+	#var main_camera_params: CameraParams
+	var surfel_buffer: owned[UniformBuffer]
+	var num_surfels: i32
+	var probe_cells: ivec3
+	var probe_min: vec3
+	var probe_max: vec3
+##	var ray_tracing_data: RayTracingData*
+	func extern __init__()
+	func __delete__()
+		pass
+
+
+class LightMeter
+	var histogram: i32[]
+	var brightness: f32
+
+
+class HDRResolver
+	var texture: shared![Texture]
+	var depth_buffer: shared![DepthBuffer]
+	
+	class BloomLevel
+		tex_out: shared![Texture]
+	var bloom_levels: BloomLevel[4]
+	
+	var light_meter: LightMeter&
+
+
+class Material
+	var albedo: color
+	var roughness: float
+	var metal: float
+	var emission: color
+	var textures: shared![Texture][]
+#	var shader: shared![Shader][6]
+	var cast_shadow: bool
+		shader_path: os.Path
+	struct Pass
+	var pass0: Pass
+	struct Friction
+		sliding: f32
+		_static: f32
+		rolling: f32
+		jump: f32
+	var friction: Friction
+#	func extern __delete__()
+#	func extern mut add_uniform(name: string, p: float*, size: int)
+
+struct YLight
+	var pos: vec3
+	var ang: quaternion
+	var color: color
+	var radius: f32
+	var theta: f32
+	var harshness: f32
+	var enabled: bool
+	var allow_shadow: bool
+	var user_shadow_control: bool
+	var user_shadow_theta: f32
+	var shadow_dist_min: f32
+	var shadow_dist_max: f32
+
+
+class CameraParams
+	var pos: vec3
+	var ang: quaternion
+	
+	var fov: f32
+	var min_depth, max_depth: f32
+
+
+
+
+class CubeMapSource
+	var min_depth, max_depth: f32
+	var cube_map: shared[CubeMap]
+	var resolution: i32
+	var update_rate: i32

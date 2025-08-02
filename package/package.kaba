@@ -44,6 +44,7 @@ class Config
 	var packages_installed: Package[]
 	var packages_remote: Package[]
 	var verbose = false
+	var keep_build_dir = false
 var conf: Config
 
 
@@ -288,19 +289,22 @@ func install_package(p: Package) -> bool
 	# build shared library?
 	for m in p.build_mode
 		let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
-		if os.fs.is_directory(build_dir)
-			delete_directory(build_dir)
-		os.fs.create_directory(build_dir)
+		if not conf.keep_build_dir
+			if os.fs.is_directory(build_dir)
+				delete_directory(build_dir)
+			os.fs.create_directory(build_dir)
 		print("build...")
 		let source_dir = p.base_source | p.build_dir
 		try
 			let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
 		except
 			print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
-			delete_directory(build_dir)
+			if not conf.keep_build_dir
+				delete_directory(build_dir)
 			delete_directory(p.base_installed)
 			return false
-		delete_directory(build_dir)
+		if not conf.keep_build_dir
+			delete_directory(build_dir)
 
 
 	# copy files
@@ -356,6 +360,7 @@ func main(args: string[])
 	var p: os.CommandLineParser
 	p.info("package", "kaba package manager")
 	p.option("-v", "verbose", func() conf.verbose = true)
+	p.option("-k", "keep build dir", func() conf.keep_build_dir = true)
 	
 	p.cmd("update", "", "update database / repositories", action_update)
 	p.cmd("upgrade", "", "update all outdated packages", action_upgrade)
