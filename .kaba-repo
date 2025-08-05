@@ -33,6 +33,7 @@ package usb
 package visualization
 package vulkan
 package vulkanx
+package xhui
 package xmake
 package xml
 package yrenderer

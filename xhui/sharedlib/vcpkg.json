@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "freetype",
+    "glew",
+    "glfw3",
+    "opengl",
+    "shaderc",
+    "vulkan",
+    "vulkan-headers",
+    "zlib"
+  ]
+}
