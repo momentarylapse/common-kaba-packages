@@ -1,5 +1,6 @@
-version 1
+version 2
 run bindiff.kaba
 run replace.kaba
 run test-compile.kaba
+run sync-libs.kaba
 

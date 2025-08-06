@@ -1,0 +1,65 @@
+use os
+
+enum EntryType
+	LIB
+	PACKAGES
+
+struct Entry
+	dir: os.Path
+	type: EntryType
+
+func load_list() -> Entry[]
+	var list: Entry[]
+	let s = os.fs.read_text(os.app_directory_dynamic | "sync-libs")
+	for l in s.explode("\n")
+		let x = l.explode(" ")
+		if len(x) >= 2
+			if x[0] == "lib"
+				list.add([x[1] as os.Path, EntryType.LIB])
+			else if x[0] == "packages"
+				list.add([x[1] as os.Path, EntryType.PACKAGES])
+	return list
+
+func sync_overwrite(source: os.Path, dest: os.Path)
+	#print("  {{source.basename()}}")
+	for f in os.fs.search(source, "*", "fr")
+		let label = source.basename() + "/" + str(f)
+		if os.fs.exists(dest | f)
+			if os.fs.read_text(source | f) != os.fs.read_text(dest | f)
+				print("  {{os.terminal.ORANGE}}OLD{{os.terminal.END}} {{label}}")
+				os.fs.copy(source | f, dest | f)
+		else
+			print("  {{os.terminal.ORANGE}}MISSING{{os.terminal.END}} {{label}}")
+			os.fs.copy(source | f, dest | f)
+			# TODO create directories...
+			
+			
+	for f in os.fs.search(dest, "*", "fr")
+		let label = source.basename() + "/" + str(f)
+		if not os.fs.exists(dest | f)
+			print("  {{os.terminal.ORANGE}}DEPRECATED{{os.terminal.END}} {{label}}")
+			os.fs.delete(dest | f)
+
+func sync_packages(repo: Entry, lib: Entry)
+	print("-- sync packages {{repo.dir}} --")
+	for p in os.fs.search(repo.dir, "*", "d")
+		if not os.fs.exists(repo.dir | p | ".kaba-package")
+			continue
+		if not os.fs.exists(repo.dir | p | "sharedlib")
+			continue
+		print(p)
+		for l in os.fs.search(repo.dir | p | "sharedlib/src/lib", "*", "d")
+			sync_overwrite(lib.dir | l, repo.dir | p | "sharedlib/src/lib" | l)
+
+func main()
+	let list = load_list()
+	var lib: Entry* = nil
+	for e in list
+		if e.type == EntryType.LIB
+			lib = &e
+	
+	for e in list
+		if e.type == EntryType.PACKAGES
+			sync_packages(e, lib!)
+			
+	

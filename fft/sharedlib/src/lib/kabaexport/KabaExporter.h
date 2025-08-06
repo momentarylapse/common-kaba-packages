@@ -1,8 +1,10 @@
 #pragma once
 
-#include <lib/base/base.h>
-#if __has_include(<lib/kaba/lib/extern.h>)
-#include <lib/kaba/lib/extern.h>
+#include "../base/base.h"
+#if __has_include("../kaba/lib/extern.h")
+#include "../kaba/lib/extern.h"
+#include "../kaba/lib/lib.h"
+#include "../kaba/dynamic/exception.h"
 
 #else
 
@@ -71,6 +73,19 @@ void generic_delete(T* t) {
 template<class T>
 void generic_assign(T& a, const T& b) {
 	a = b;
+}
+
+template<class T>
+class generic_virtual : public T {
+public:
+	void __delete__() {
+		this->~T();
+	}
+};
+
+template<class T, class... Args>
+void generic_init_ext(T* me, Args... args) {
+	new(me) T(args...);
 }
 }
 

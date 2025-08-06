@@ -60,5 +60,16 @@ void XhuiRenderer::draw(Painter* p) {
 }
 
 }
+#else
+
+namespace yrenderer {
+	RenderParams XhuiRenderer::extract_params(Painter*) {
+		return {};
+	}
+	void XhuiRenderer::before_draw(Painter*) {}
+	void XhuiRenderer::render(const RenderParams&) {}
+	void XhuiRenderer::draw(Painter*) {}
+}
+
 
 #endif
