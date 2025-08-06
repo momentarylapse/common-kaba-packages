@@ -6,6 +6,7 @@
 #if __has_include(<lib/xhui/Painter.h>)
 #include <lib/xhui/Painter.h>
 #include <lib/xhui/Context.h>
+#include <lib/ygraphics/graphics-impl.h>
 
 namespace yrenderer {
 
@@ -24,7 +25,7 @@ RenderParams XhuiRenderer::extract_params(Painter* p) {
 	return params;
 }
 
-void XhuiRenderer::prepare(Painter* p) {
+void XhuiRenderer::before_draw(Painter* p) {
 	const auto params = extract_params(p);
 
 	for (auto c: children)
@@ -52,7 +53,7 @@ void XhuiRenderer::render(const RenderParams& params) {
 #endif
 }
 
-void XhuiRenderer::render(Painter* p) {
+void XhuiRenderer::draw(Painter* p) {
 	const auto params = extract_params(p);
 
 	render(params);

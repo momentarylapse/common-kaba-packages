@@ -58,6 +58,9 @@ struct CameraParams
 	var min_depth, max_depth: f32
 
 
+#---------------------------
+# context
+
 # "yrenderer.Context"
 class Context as @noauto
 	var context: void& # "ygfx.Context"
@@ -69,7 +72,8 @@ class Context as @noauto
 	func extern load_shader_module(path: os.Path)
 
 
-func extern api_init(window: void*) -> Context&
+func extern api_init_glfw(window: void*) -> xfer[Context] # p: GLFWwindow*
+func extern api_init_xhui(p: void*) -> xfer[Context] # p: xhui.Painter*
 
 
 struct RenderParams
@@ -79,6 +83,10 @@ struct RenderParams
 class RenderViewData
 	func extern __init__(ctx: Context&)
 	func extern set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
+
+
+#---------------------------
+# interfaces
 
 class Renderer
 	func extern add_child(r: Renderer&)
@@ -104,11 +112,22 @@ class ComputeTask extends RenderTask
 	func extern bind_storage_buffer(index: i32, buf: ShaderStorageBuffer&)
 
 
+#---------------------------
+# targets
+
+# glfw
 class WindowRenderer extends Renderer
 	func extern __init__(ctx: Context&, window: void*)
 	func extern start_frame() -> bool
 	func extern end_frame(params: RenderParams)
 	func extern create_params(aspect_ration: f32) -> RenderParams
+
+
+class XhuiRenderer extends RenderTask
+	func extern __init__(ctx: Context&)
+	func extern before_draw(p: void*) # xhui.Painter*
+	func extern draw(p: void*) # xhui.Painter*
+	func extern extract_params(p: void*) -> RenderParams
 
 
 class TextureRenderer extends Renderer
@@ -117,6 +136,9 @@ class TextureRenderer extends Renderer
 	var clear_z: bool
 	var clear_colors: color[]
 
+
+#---------------------------
+# scene
 
 class MeshEmitter extends Object as shared
 	func extern __init__(ctx: Context&, name: string)
@@ -138,15 +160,6 @@ class SceneRenderer extends Renderer
 	func extern mut add_emitter(emitters: shared![MeshEmitter])
 
 	var background_color: color?
-
-
-class RegionRenderer
-	struct Region
-		var dest: rect
-		var z: int
-		var renderer: Renderer&
-	var regions: Region[]
-	func extern add_region(r: Renderer&, dest: rect, z: int)
 
 
 #class ShadowRenderer
@@ -171,6 +184,18 @@ class SceneView
 		pass
 	func extern mut choose_lights(lights: YLight&[])
 	func extern mut choose_shadows()
+
+
+#---------------------------
+# other...
+
+class RegionRenderer
+	struct Region
+		var dest: rect
+		var z: int
+		var renderer: Renderer&
+	var regions: Region[]
+	func extern add_region(r: Renderer&, dest: rect, z: int)
 
 
 class LightMeter

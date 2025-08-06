@@ -87,6 +87,21 @@ else()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=0)
 endif()
 
+
+# lib: freetype2 (optional)
+set(LIB_FREETYPE2_ENABLED true CACHE BOOL "Use freetype2 library?")
+find_package(Freetype)
+if(FREETYPE_FOUND)
+else()
+	set(LIB_FREETYPE2_ENABLED false CACHE BOOL "freetype2 library not found" FORCE)
+endif()
+if(${LIB_FREETYPE2_ENABLED})
+	list(APPEND DEPS Freetype::Freetype)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=1)
+else()
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=0)
+endif()
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
@@ -163,6 +178,52 @@ add_library(moduleyrenderer SHARED
 	src/lib/vulkan/Texture.cpp
 	src/lib/vulkan/VertexBuffer.cpp
 	src/lib/vulkan/vulkan.cpp
+	src/lib/xhui/controls/Button.cpp
+	src/lib/xhui/controls/CheckBox.cpp
+	src/lib/xhui/controls/ColorButton.cpp
+	src/lib/xhui/controls/ComboBox.cpp
+	src/lib/xhui/controls/Control.cpp
+	src/lib/xhui/controls/DrawingArea.cpp
+	src/lib/xhui/controls/Edit.cpp
+	src/lib/xhui/controls/Expander.cpp
+	src/lib/xhui/controls/FileSelector.cpp
+	src/lib/xhui/controls/Grid.cpp
+	src/lib/xhui/controls/Group.cpp
+	src/lib/xhui/controls/HeaderBar.cpp
+	src/lib/xhui/controls/Image.cpp
+	src/lib/xhui/controls/Label.cpp
+	src/lib/xhui/controls/ListView.cpp
+	src/lib/xhui/controls/MenuBar.cpp
+	src/lib/xhui/controls/MultilineEdit.cpp
+	src/lib/xhui/controls/Overlay.cpp
+	src/lib/xhui/controls/RadioButton.cpp
+	src/lib/xhui/controls/Separator.cpp
+	src/lib/xhui/controls/Slider.cpp
+	src/lib/xhui/controls/SpinButton.cpp
+	src/lib/xhui/controls/TabControl.cpp
+	src/lib/xhui/controls/ToggleButton.cpp
+	src/lib/xhui/controls/Toolbar.cpp
+	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
+	src/lib/xhui/dialogs/FileSelectionDialog.cpp
+	src/lib/xhui/dialogs/MenuPopup.cpp
+	src/lib/xhui/dialogs/QuestionDialog.cpp
+	src/lib/xhui/draw/font.cpp
+	src/lib/xhui/_kaba_export.cpp
+	src/lib/xhui/Application.cpp
+	src/lib/xhui/ContextGL.cpp
+	src/lib/xhui/ContextVulkan.cpp
+	src/lib/xhui/Dialog.cpp
+	src/lib/xhui/language.cpp
+	src/lib/xhui/Menu.cpp
+	src/lib/xhui/Painter.cpp
+	src/lib/xhui/PainterGL.cpp
+	src/lib/xhui/PainterVulkan.cpp
+	src/lib/xhui/Panel.cpp
+	src/lib/xhui/Resource.cpp
+	src/lib/xhui/Theme.cpp
+	src/lib/xhui/Window.cpp
+	src/lib/xhui/xhui.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
