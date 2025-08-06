@@ -44,11 +44,9 @@ namespace hui{
 				event_x(id, msg, [&ff]{ ff(); });
 			}
 		}
-	};
-	class KabaPainterWrapper : public xhui::Painter {
-	public:
-		virtual void __delete__() {
-			this->Painter::~Painter();
+		void _kaba_event_xp(const string &id, const string &msg, void *f) {
+			auto &ff = *(Callable<void(Painter*)>*)f;
+			event_xp(id, msg, [&ff](Painter *p){ ff(p); });
 		}
 	};
 #endif
@@ -194,7 +192,7 @@ void export_package_xhui(kaba::Exporter* e) {
 
 		e->link_class_func("Panel.event", &KabaPanelWrapper::_kaba_event);
 		e->link_class_func("Panel.event_x", &KabaPanelWrapper::_kaba_event_x);
-		e->link_class_func("Panel.event_xp", &KabaPanelWrapper::_kaba_event_x);
+		e->link_class_func("Panel.event_xp", &KabaPanelWrapper::_kaba_event_xp);
 		e->link_class_func("Panel.remove_event_handler", &xhui::Panel::remove_event_handler);
 
 		e->link_virtual("Panel._draw", &xhui::Panel::_draw, &panel);
@@ -241,7 +239,7 @@ void export_package_xhui(kaba::Exporter* e) {
 
 	xhui::Painter painter(nullptr);
 	e->link_func("Painter.__init__", &_dummy); // dummy
-	e->link_virtual("Painter.__delete__", &KabaPainterWrapper::__delete__, &painter); // dummy
+	e->link_virtual("Painter.__delete__", &kaba::generic_virtual<xhui::Painter>::__delete__, &painter);
 
 	
 	// user interface

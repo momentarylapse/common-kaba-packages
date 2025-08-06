@@ -1,0 +1,35 @@
+use os
+use kaba
+use common.*
+use install.*
+
+
+func action_update(args: string[])
+	for s in conf.sources
+		if s.type != "repo"
+			continue
+		
+		print("updating package {{s.name}}")
+		let base = conf.repos_base | s.name
+		if not os.fs.is_directory(base)
+			os.fs.create_directory(base)
+		let git = base | ".git" # FIXME bug in kaba!!!!
+		if not os.fs.is_directory(base | ".git")
+			let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")
+		let r = os.shell_execute("cd {{base}}; git pull --rebase")
+
+
+func action_upgrade(args: string[])
+	action_update(args)
+	load_module_list()
+	
+	var needs_upgrade: string[]
+	for p in conf.packages_installed
+		for pp in list_find(conf.packages_remote, p.name)
+			if pp.version != p.version
+				needs_upgrade.add(p.name)
+	
+	for name in needs_upgrade
+		for p in list_find(conf.packages_remote, name)
+			install_package(p)
+

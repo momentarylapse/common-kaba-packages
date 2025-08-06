@@ -1,0 +1,128 @@
+use os
+use kaba
+use common.*
+use remove.*
+
+
+func allow_install_file(f: os.Path) -> bool
+	let pp = f.all_parents()
+	var b = str(f)
+	if len(pp) > 0
+		b = str(pp[len(pp) - 1]).replace("/", "")
+	#print("{{f}}  {{b}}")
+	if b in ["src", "build", "CMakeLists.txt", "CMakePresets.json", ".vs", "xmake.conf", "vcpkg-configuration.json", "vcpkg.json", "sharedlib"]
+		return false
+	
+	return true
+
+# TODO keep list of "requested" packages, since we currently forget about failed packages!
+
+func build_package(p: Package) -> bool
+	let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
+	if not conf.keep_build_dir
+		if os.fs.is_directory(build_dir)
+			delete_directory(build_dir)
+	if not os.fs.is_directory(build_dir)
+		os.fs.create_directory(build_dir)
+
+	print("{{os.terminal.YELLOW}}build{{os.terminal.END}} {{p.name}}")
+	let source_dir = p.base_source | p.build_dir
+	try
+		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+	except
+		print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
+		if not conf.keep_build_dir
+			delete_directory(build_dir)
+		delete_directory(p.base_installed)
+		return false
+	if not conf.keep_build_dir
+		delete_directory(build_dir)
+	return true
+
+
+func install_package(p: Package) -> bool
+	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
+
+	if os.fs.is_directory(p.base_installed)
+		delete_directory(p.base_installed)
+	os.fs.create_directory(p.base_installed)
+
+	# build shared library?
+	for m in p.build_mode
+		if not build_package(p)
+			return false
+
+	# copy files
+	let listd = os.fs.search(p.root_source, "*", "rd")
+	for e in listd
+		if allow_install_file(e)
+			os.fs.create_directory(p.base_installed | e)
+		
+	let list = os.fs.search(p.root_source, "*", "rf")
+	for e in list
+		if allow_install_file(e)
+			let a = p.root_source | e
+			let b = p.base_installed | e
+			if conf.verbose
+				print("{{os.terminal.YELLOW}}copy{{os.terminal.END}} {{a}}  ->  {{b}}")
+			os.fs.copy(a, b)
+	
+	# package info file might be skipped if root!=base...
+	if os.fs.exists(p.base_source | PACKAGE_FILE)
+		os.fs.copy(p.base_source | PACKAGE_FILE, p.base_installed | PACKAGE_FILE)
+	return true
+
+
+enum IterStatus
+	DONE
+	MORE
+	ERROR
+
+func fullfull_dependencies_step(out list: Package&[]) -> IterStatus
+	for p in list
+		for r in p.requires
+			if not is_installed_latest(r)
+				for rr in list_find(conf.packages_remote, r)
+					list.add(&rr)
+					return IterStatus.MORE
+				else
+					print("{{os.terminal.RED}}MISSING DEPENDENCY{{os.terminal.END}} {{p.name}} -> {{r}}")
+					return IterStatus.ERROR
+	return IterStatus.DONE
+
+
+func fullfull_dependencies(out list: Package&[]) -> bool
+	while true
+		match fullfull_dependencies_step(list)
+			IterStatus.MORE => continue
+			IterStatus.DONE => return true
+			IterStatus.ERROR => return false
+
+
+func action_install(args: string[])
+	load_module_list()
+	
+	# sources
+	var to_install: Package&[]
+	var missing_sources = false
+	for name in args
+		for p in list_find(conf.packages_internal, name)
+			print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}} {{name}}")
+			return
+		for p in list_find(conf.packages_remote, name)
+			to_install.add(&p)
+		else
+			print("{{os.terminal.RED}}no package source found{{os.terminal.END}} {{name}}")
+			missing_sources = true
+	if missing_sources
+		return
+	
+	# dependencies
+	if not fullfull_dependencies(to_install)
+		return
+	
+	# install
+	for p in to_install
+		if not install_package(p)
+			return
+

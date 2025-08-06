@@ -1,0 +1,22 @@
+use os
+use kaba
+use common.*
+
+
+func remove_package(p: Package)
+	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.base_installed}}")
+	delete_directory(p.base_installed)
+
+
+func action_remove(args: string[])
+	load_module_list()
+	for name in args
+		for p in list_find(conf.packages_internal, name)
+			print("{{os.terminal.RED}}internal packages can not be removed{{os.terminal.END}}")
+			return
+		
+		for p in list_find(conf.packages_installed, name)
+			remove_package(p)
+		else
+			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
+

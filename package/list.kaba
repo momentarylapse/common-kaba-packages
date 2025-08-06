@@ -1,0 +1,38 @@
+use os
+use kaba
+use common.*
+
+
+
+func action_list(args: string[])
+	load_module_list()
+	
+	var packages = conf.packages_installed
+	for p in conf.packages_internal
+		packages.add(p)
+	for p in conf.packages_remote
+		for pp in list_find(conf.packages_installed, p.name)
+			pass
+		else
+			packages.add(p)
+
+	for p in packages |> sort("name")
+		var s = ""
+		if p.location == Location.INTERNAL
+			s = "{{os.terminal.GRAY}}internal{{os.terminal.END}}"
+		if p.location == Location.INSTALLED
+			s = "{{os.terminal.GREEN}}installed{{os.terminal.END}}"
+			for pp in list_find(conf.packages_remote, p.name)
+				if pp.version != p.version
+					s = "{{os.terminal.RED}}installed, version {{p.version}}, source version {{pp.version}}{{os.terminal.END}}"
+			else
+				s = "{{os.terminal.RED}}installed, but no source{{os.terminal.END}}"
+			for r in p.requires
+				if not is_installed_latest(r)
+					s += " {{os.terminal.RED}}requires {{r}}{{os.terminal.END}}"
+		if conf.verbose
+			s = "{{p.version|3}} {{s}}"
+		print("{{p.name|16}}  {{s}}")
+		if conf.verbose and len(p.requires) > 0
+			print("                      {{os.terminal.GRAY}}requires:{{os.terminal.END}} " + p.requires.join(", "))
+
