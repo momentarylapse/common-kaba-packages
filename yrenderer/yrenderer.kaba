@@ -143,7 +143,6 @@ class TextureRenderer extends Renderer
 class MeshEmitter extends Object as shared
 	func extern __init__(ctx: Context&, name: string)
 	func extern virtual emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
-	func extern virtual emit_transparent(params: RenderParams, rvd: RenderViewData)
 	var ctx: Context&
 
 
@@ -187,6 +186,34 @@ class SceneView
 
 
 #---------------------------
+# path
+
+class RenderPath extends Renderer
+	var view: CameraParams
+	var ambient_occlusion_radius: f32
+	var background_color: color?
+#	var shadow_renderer: owned![ShadowRenderer]
+
+	static light_sources_module: string
+	static lighting_method: string
+	static shadow_method: string
+
+	func extern mut set_lights(lights: YLight&[])
+	func extern mut set_view(view: CameraParams)
+	func extern virtual mut add_background_emitter(emitter: shared![MeshEmitter])
+	func extern virtual mut add_opaque_emitter(emitter: shared![MeshEmitter])
+	func extern virtual mut add_transparent_emitter(emitter: shared![MeshEmitter])
+
+
+class RenderPathForward extends RenderPath
+	func extern mut __init__(ctx: Context&, shadow_resolution: i32)
+
+
+class RenderPathDeferred extends RenderPath
+	func extern mut __init__(ctx: Context&, width: i32, height: i32, shadow_resolution: i32)
+
+
+#---------------------------
 # other...
 
 class RegionRenderer
@@ -204,7 +231,7 @@ class LightMeter
 
 
 class HDRResolver extends Renderer
-	func extern __init__(ctx: Context&, tex: shared![Texture], depth: shared![DepthBuffer])
+	func extern __init__(ctx: Context&, width: i32, height: i32)
 	var texture: shared![Texture]
 	var depth_buffer: shared![DepthBuffer]
 	var exposure: f32

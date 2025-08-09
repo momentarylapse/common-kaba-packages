@@ -233,12 +233,19 @@ add_library(moduleyrenderer SHARED
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
 	src/lib/yrenderer/post/MultisampleResolver.cpp
+	src/lib/yrenderer/post/PostProcessor.cpp
+	src/lib/yrenderer/post/PostProcessorGL.cpp
+	src/lib/yrenderer/post/PostProcessorVulkan.cpp
 	src/lib/yrenderer/post/ThroughShaderRenderer.cpp
 	src/lib/yrenderer/regions/RegionRenderer.cpp
 	src/lib/yrenderer/regions/RegionRendererGL.cpp
 	src/lib/yrenderer/regions/RegionRendererVulkan.cpp
 	src/lib/yrenderer/scene/mesh/CubeEmitter.cpp
+	src/lib/yrenderer/scene/pass/CubeMapRenderer.cpp
 	src/lib/yrenderer/scene/pass/ShadowRenderer.cpp
+	src/lib/yrenderer/scene/path/RenderPath.cpp
+	src/lib/yrenderer/scene/path/RenderPathDeferred.cpp
+	src/lib/yrenderer/scene/path/RenderPathForward.cpp
 	src/lib/yrenderer/scene/CameraParams.cpp
 	src/lib/yrenderer/scene/Light.cpp
 	src/lib/yrenderer/scene/MeshEmitter.cpp

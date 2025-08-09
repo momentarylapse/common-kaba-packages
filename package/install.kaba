@@ -17,6 +17,16 @@ func allow_install_file(f: os.Path) -> bool
 
 # TODO keep list of "requested" packages, since we currently forget about failed packages!
 
+func build_options() -> string
+	if os.fs.exists(os.app_directory_dynamic | "xmake/prefer")
+		let s = os.fs.read_text(os.app_directory_dynamic | "xmake/prefer")
+		var opt = ""
+		for x in s.explode("\n")
+			if len(x) > 0 and x.head(1) != "#"
+				opt += " -D{{x}}"
+		return opt
+	return ""
+
 func build_package(p: Package) -> bool
 	let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
 	if not conf.keep_build_dir
@@ -28,7 +38,8 @@ func build_package(p: Package) -> bool
 	print("{{os.terminal.YELLOW}}build{{os.terminal.END}} {{p.name}}")
 	let source_dir = p.base_source | p.build_dir
 	try
-		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+		let opt = build_options()
+		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} {{opt}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
 	except
 		print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
 		if not conf.keep_build_dir
