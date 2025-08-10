@@ -1,0 +1,13 @@
+class Crypto
+	#var n: Vli
+	#var k: Vli
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: Crypto)
+	func extern pure __str__() -> string
+	func extern mut from_str(s: string)
+	func extern pure encrypt(s: bytes) -> bytes
+	func extern pure decrypt(s: bytes, cut: bool) -> bytes
+	
+
+func extern create_keys(out c1: Crypto, out c2: Crypto, type: string, bits: i32)

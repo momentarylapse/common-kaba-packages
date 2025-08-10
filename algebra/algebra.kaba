@@ -1,0 +1,32 @@
+
+class Vli
+	var sign: bool
+	var data: i32[]
+	
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: Vli)
+	func extern mut __assign__(s: string)
+	func extern mut __assign__(i: i32)
+	func extern pure __str__() -> string
+	
+	func extern compare(o: Vli) -> i32
+	func extern mut idiv(div: Vli, out rem: Vli)
+	func extern div(div: Vli, out rem: Vli) -> Vli
+	func extern pow(exp: Vli) -> Vli
+	func extern pow_mode(exp: Vli, mod: Vli) -> Vli
+	func extern gcd(v: Vli) -> Vli
+	
+	func extern __eq__(o: Vli) -> bool
+	func extern __neq__(o: Vli) -> bool
+	func extern __lt__(o: Vli) -> bool
+	func extern __gt__(o: Vli) -> bool
+	func extern __le__(o: Vli) -> bool
+	func extern __ge__(o: Vli) -> bool
+	func extern __add__(o: Vli) -> Vli
+	func extern __sub__(o: Vli) -> Vli
+	func extern __mul__(o: Vli) -> Vli
+	func extern mut __iadd__(o: Vli) -> Vli
+	func extern mut __isub__(o: Vli) -> Vli
+	func extern mut __imul__(o: Vli) -> Vli
+

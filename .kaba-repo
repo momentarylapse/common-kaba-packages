@@ -1,7 +1,9 @@
 #package alex
+package algebra
 package circuit
 package cli
 package cloud
+package crypto
 package fft
 package gl
 package glfw
