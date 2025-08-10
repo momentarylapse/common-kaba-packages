@@ -7,8 +7,8 @@ class LegacyParticle extends BaseClass
 	var time_to_live: float
 	var suicidal: bool
 	var texture: shared![Texture]
-	var color: color
-	var source: rect
+	var color: Color
+	var source: Rect
 	var enabled: bool
 	func extern __init__(p: vec3, r: float, t: shared![Texture], ttl: float)
 	func extern override __delete__()
@@ -23,7 +23,7 @@ class Particle
 	var radius: float
 	var time_to_live: float
 	var suicidal: bool
-	var color: color
+	var color: Color
 	var enabled: bool
 
 class Beam extends Particle
@@ -34,11 +34,11 @@ class ParticleGroup extends Component
 #	var update_dt = 0.1
 	#var texture: shared![Texture]
 	var texture: Texture&
-	var source: rect
+	var source: Rect
 	
 	func extern override __init__()
-	func extern mut emit(pos: vec3, col: color, radius: float, ttl: float) -> Particle&
-	func extern mut emit_beam(pos: vec3, length: vec3, col: color, radius: float, ttl: float) -> Beam&
+	func extern mut emit(pos: vec3, col: Color, radius: float, ttl: float) -> Particle&
+	func extern mut emit_beam(pos: vec3, length: vec3, col: Color, radius: float, ttl: float) -> Beam&
 	func extern mut iterate_particles(dt: float)
 	func extern override mut on_iterate(dt: float)
 	func extern virtual mut on_iterate_particle(out p: Particle, dt: float)

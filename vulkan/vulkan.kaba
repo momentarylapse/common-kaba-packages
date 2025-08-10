@@ -54,7 +54,7 @@ class VertexBuffer
 	func extern mut __delete__()
 	func extern mut update(vertices: @DynamicArray)
 	func extern mut update_index(indices: i32[])
-	func extern mut create_quad(dest: rect, source: rect)
+	func extern mut create_quad(dest: Rect, source: Rect)
 
 
 class Texture as shared
@@ -88,7 +88,7 @@ class FrameBuffer as shared
 	var height: i32
 	func extern mut __init__(rp: RenderPass*, attachments: shared![Texture][])
 	func extern mut __delete__()
-	func extern area() -> rect
+	func extern area() -> Rect
 
 
 class Shader as shared
@@ -139,7 +139,7 @@ class RayPipeline extends Pipeline
 
 
 class RenderPass
-	var clear_color: color[]
+	var clear_color: Color[]
 	var clear_z: f32
 	func extern mut __init__(formats: string[], options: string[])
 	func extern mut __delete__()
@@ -184,7 +184,7 @@ class CommandBuffer
 	func extern mut begin()
 	func extern mut end()
 	func extern mut set_bind_point(bp: PipelineBindPoint)
-	func extern mut clear(area: rect, colors: color[], z: f32?)
+	func extern mut clear(area: Rect, colors: Color[], z: f32?)
 	func extern mut bind_pipeline(p: Pipeline*)
 	func extern mut draw(vb: VertexBuffer*)
 	func extern mut begin_render_pass(rp: RenderPass*, fb: FrameBuffer*)
@@ -192,8 +192,8 @@ class CommandBuffer
 	func extern mut end_render_pass()
 	func extern mut push_constant(offset: i32, size: i32, data: void&)
 	func extern mut bind_descriptor_set(index: i32, set: DescriptorSet*)
-	func extern mut set_scissor(r: rect)
-	func extern mut set_viewport(r: rect)
+	func extern mut set_scissor(r: Rect)
+	func extern mut set_viewport(r: Rect)
 	func extern mut dispatch(nx: i32, ny: i32, nz: i32)
 	func extern mut barrier(t: Texture*[], mode: i32)
 	func extern mut image_barrier(t: Texture*, src_access: AccessFlags, dst_access: AccessFlags,

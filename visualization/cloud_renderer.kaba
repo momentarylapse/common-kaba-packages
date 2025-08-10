@@ -3,7 +3,7 @@ use visualization
 use cloud
 
 class PointCloudRenderer
-	var bounds: cloud.Box
+	var bounds: Box
 	
 	# "regular" clouds
 	var cloud_shader: owned![gl.Shader]
@@ -18,7 +18,7 @@ class PointCloudRenderer
 	# clouds with explicit color
 	var cloud_color_shader: owned![gl.Shader]
 	var cloud_color_vb: owned![gl.VertexBuffer]
-	var cloud_color_buf: (vec3,color)[]
+	var cloud_color_buf: (vec3,Color)[]
 	var cloud_color_dirty = false
 	
 	var matrix = mat4.ID
@@ -35,8 +35,8 @@ class PointCloudRenderer
 		cloud_shader.set_float("max_intensity", cloud_max_intensity)
 		cloud_shader.set_float("dx", R / gl.target.width())
 		cloud_shader.set_float("dy", R / gl.target.height())
-		cloud_shader.set_floats("vmin", &bounds.vmin.x, 3)
-		cloud_shader.set_floats("vmax", &bounds.vmax.x, 3)
+		cloud_shader.set_floats("vmin", &bounds.min.x, 3)
+		cloud_shader.set_floats("vmax", &bounds.max.x, 3)
 		gl.draw_points(cloud_vb)
 		
 		if cloud_color_dirty
@@ -53,7 +53,7 @@ class PointCloudRenderer
 	
 	func set_good_camera(out r: visualization.RenderWindow, points: vec3[])
 		r.cam_pos = cloud.center_of_mass(cloud.random_sample(points, 1000))
-		r.cam_ang = quaternion([2.1,0,0])
+		r.cam_ang = Quaternion([2.1,0,0])
 		r.cam_radius = 50
 		
 	func mut set_points(points: vec3[])
@@ -69,7 +69,7 @@ class PointCloudRenderer
 		
 		cloud_vb.update(points)
 	
-	func mut add_color_point(p: vec3, c: color)
+	func mut add_color_point(p: vec3, c: Color)
 		cloud_color_buf.add([p,c])
 		cloud_color_dirty = true
 		

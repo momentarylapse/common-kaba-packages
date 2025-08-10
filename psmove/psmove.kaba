@@ -1,3 +1,4 @@
+# TODO sharedlib...
 let KABA_LINK = "libpsmoveapi
 	_psmove_init:psmove_init
 	_psmove_count_connected:psmove_count_connected
@@ -92,8 +93,8 @@ class MyPSMoveController
 	var psmove: PSMove*
 	var pos, dpos, pos_last: vec3
 	var acc, rot, mag: vec3
-	var col: color
-	var ang, dang: quaternion
+	var col: Color
+	var ang, dang: Quaternion
 	var trigger, rumble: float
 	var button: bool[8]
 	var manager: PsMoveManager&
@@ -106,11 +107,11 @@ class MyPSMoveController
 		for t in manager.tracker
 			while _psmove_tracker_enable(&t, m) != 2 # Tracker_CALIBRATED
 				pass
-		col = color.BLACK
+		col = Color.BLACK
 		rumble = 0
 		trigger = 0
-		ang = quaternion.ID
-		dang = quaternion.ID
+		ang = Quaternion.ID
+		dang = Quaternion.ID
 
 	func mut update()
 		if !psmove
@@ -127,7 +128,7 @@ class MyPSMoveController
 
 		var mat = _psmove_fusion_get_modelview_matrix(manager.fusion, psmove)
 		var s = mat4.scale(1,  1,  -1)
-		var q = quaternion(s * (*mat) * s)
+		var q = Quaternion(s * (*mat) * s)
 		dang = ang * q
 		ang = q.bar()
 		#ang = quaternion::rotation_m( *mat)
@@ -152,7 +153,7 @@ class MyPSMoveController
 
 	func mut reset_orientation()
 		_psmove_reset_orientation(psmove)
-		ang = quaternion.ID
+		ang = Quaternion.ID
 
 class PsMoveManager
 	var tracker: PSMoveTracker* = nil

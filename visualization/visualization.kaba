@@ -3,7 +3,6 @@ use gl
 use image.Image
 
 use progress.*
-use cloud.Box
 
 const IDLE_DT = 0.1
 
@@ -14,17 +13,17 @@ struct Light
 	_dummy1: f32
 	dir: vec3
 	_dummy2: f32
-	col: color
+	col: Color
 	radius, theta, harshness: f32
 	
 
 class RenderWindow extends hui.Window
 	cam_pos = vec3.0
-	cam_ang = quaternion.ID
+	cam_ang = Quaternion.ID
 	cam_radius = 10.
 	cam_speed = 0.5
 	cam_ortho = false
-	background_color = color.BLACK
+	background_color = Color.BLACK
 	
 	ctx: owned[gl.Context]
 	image_shader: owned![gl.Shader]
@@ -124,7 +123,7 @@ Grid ? ''
 	
 	func mut draw_message()
 		let f = clamp(message_ttl, 0.0, 1.0)
-		gl.set_material(color.BLACK, 0, 0, [1,1,1,f])
+		gl.set_material(Color.BLACK, 0, 0, [1,1,1,f])
 		set_font(24, true, false)
 		let w = gl.target.width()
 		let h = gl.target.height()
@@ -163,13 +162,13 @@ Grid ? ''
 			else
 				set_message("view: projective")
 		if key_code == hui.KEY_CONTROL + hui.KEY_Z
-			cam_ang = quaternion([0,1,0],pi)
+			cam_ang = Quaternion([0,1,0],pi)
 			set_message("view: Z")
 		if key_code == hui.KEY_CONTROL + hui.KEY_X
-			cam_ang = quaternion([0,1,0],pi/2) * quaternion([0,0,1],pi/2)
+			cam_ang = Quaternion([0,1,0],pi/2) * Quaternion([0,0,1],pi/2)
 			set_message("view: X")
 		if key_code == hui.KEY_CONTROL + hui.KEY_Y
-			cam_ang = quaternion([1,0,0],pi/2)
+			cam_ang = Quaternion([1,0,0],pi/2)
 			set_message("view: Y")
 		if key_code == hui.KEY_L
 			light_enabled = !light_enabled
@@ -185,13 +184,13 @@ Grid ? ''
 		let sx = post_projection_matrix.e[0][0]
 		if e.button_r#m # FIXME indurad Debian 12 hack?!?
 			# rotate around focus point
-			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
+			cam_ang = cam_ang * Quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
 			on_cam_change()
 			redraw("nix-area")
 		else if e.button_m#r
 			# rotate around eye
 			cam_pos -= cam_ang * [0,0,cam_radius]
-			cam_ang = cam_ang * quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
+			cam_ang = cam_ang * Quaternion([e.dmouse.y*0.003, e.dmouse.x*0.003*sx, 0])
 			cam_pos += cam_ang * [0,0,cam_radius]
 			on_cam_change()
 			redraw("nix-area")
@@ -341,7 +340,7 @@ void main() {
 			text_tex = new gl.Texture(500, 50, "rgba:i8")
 			tex_white = new gl.Texture(8, 8, "rgba:i8")
 			var im: Image
-			im.create(8,8,color.WHITE)
+			im.create(8,8,Color.WHITE)
 			tex_white.write(im)
 	
 			print("init child...")
@@ -360,7 +359,7 @@ void main() {
 			def_shader_3d.set_int("num_lights", 0)
 		
 		var l: Light
-		l.col = color.WHITE
+		l.col = Color.WHITE
 		l.dir = cam_ang * [0,0,1]
 		l.pos = cam_pos
 		l.radius = -1
@@ -388,11 +387,11 @@ void main() {
 	
 	func mut draw_wire_cube(box: Box)
 		gl.set_model_matrix(mat4.ID)
-		let d = box.vmax - box.vmin
+		let d = box.max - box.min
 		let dx = vec3(d.x, 0, 0)
 		let dy = vec3(0, d.y, 0)
 		let dz = vec3(0, 0, d.z)
-		let p = [for i in 0:8   box.vmin + (i % 2) * dx + ((i >> 1) % 2) * dy + ((i >> 2) % 2) * dz]
+		let p = [for i in 0:8   box.min + (i % 2) * dx + ((i >> 1) % 2) * dy + ((i >> 2) % 2) * dz]
 		let index = [0,1, 2,3, 4,5, 6,7, 0,2, 1,3, 4,6, 5,7, 0,4, 1,5, 2,6, 3,7]
 		draw_lines([for i in index p[i]])
 		
@@ -425,16 +424,16 @@ void main() {
 		let h = gl.target.height()
 		projection_matrix = mat4.translation([w/2, h/2, 0]) * mat4.scale(w/2, -h/2, 1) * p * v
 
-	func mut draw_image(tex: gl.Texture*, dest: rect, flip: bool = false)
+	func mut draw_image(tex: gl.Texture*, dest: Rect, flip: bool = false)
 		for c in ctx
 			gl.set_shader(image_shader)
 			gl.bind_texture(0, tex)
 			if flip
 				gl.set_model_matrix(mat4.translation([dest.center().x, dest.center().y, 0]) * mat4.scale(dest.width()/2, dest.height()/2, 1) * mat4.scale(-1,1,1) * mat4.rotation_z(-pi/2))
-				c.vb_temp.create_quad(rect.ID_SYM, rect.ID)
+				c.vb_temp.create_quad(Rect.ID_SYM, Rect.ID)
 			else
 				gl.set_model_matrix(mat4.ID)
-				c.vb_temp.create_quad(dest, rect.ID)
+				c.vb_temp.create_quad(dest, Rect.ID)
 			gl.draw_triangles(c.vb_temp)
 
 
@@ -442,7 +441,7 @@ void main() {
 		var im: Image
 		im.create(500, 50, [0,0,0,0])
 		let p = im.start_draw()
-		p.set_color(color.WHITE)
+		p.set_color(Color.WHITE)
 		p.set_font("Sans", font.e0, font.e1, font.e2)
 		p.draw_str([10,10], text)
 		text_tex.write(im)
@@ -456,7 +455,7 @@ void main() {
 		font = [13.0, false, false]
 		
 	
-	func mut draw_magic_grid(col2: color)
+	func mut draw_magic_grid(col2: Color)
 		set_default_shader_3d()
 		gl.set_model_matrix(mat4.ID)
 		let x0 = -10.0
@@ -479,7 +478,7 @@ void main() {
 		for y in x0:x1+dx/2:dx
 			v.add(y * e2 + x0 * e1)
 			v.add(y * e2 + x1 * e1)
-		gl.set_material(color.BLACK, 0, 0, color.interpolate(col2, background_color, 0.7))
+		gl.set_material(Color.BLACK, 0, 0, Color.mix(col2, background_color, 0.7))
 		draw_lines(v)
 		
 		v.clear()
@@ -487,12 +486,12 @@ void main() {
 		v.add(x1 * e2)
 		v.add(x0 * e1)
 		v.add(x1 * e1)
-		gl.set_material(color.BLACK, 0, 0, col2)
+		gl.set_material(Color.BLACK, 0, 0, col2)
 		draw_lines(v)
 
 
 
-func histogram_to_texture(hist: f32[], out tex: gl.Texture, W: i32, marks: (f32,i32)[], c: color = color.RED)
+func histogram_to_texture(hist: f32[], out tex: gl.Texture, W: i32, marks: (f32,i32)[], c: Color = Color.RED)
 	let N = len(hist)
 	let D = N / 2
 	#let W = 256
@@ -507,7 +506,7 @@ func histogram_to_texture(hist: f32[], out tex: gl.Texture, W: i32, marks: (f32,
 	p.set_line_width(1)
 	for m in marks
 		if m.e1 == 0
-			p.set_color(color.WHITE)
+			p.set_color(Color.WHITE)
 		else
 			p.set_color([0.4,0.4,0.4, 1])
 		p.draw_line([m.e0*S, 0], [m.e0*S, D*S])
@@ -535,7 +534,7 @@ func histogram_to_texture(hist: f32[], out tex: gl.Texture, W: i32, marks: (f32,
 	tex.write(im)
 	tex.set_options("wrap=clamp")
 
-func color_map(f: f32) -> color
+func color_map(f: f32) -> Color
 	let S0 = 0.3
 	let S1 = 0.7
 	if f < S0

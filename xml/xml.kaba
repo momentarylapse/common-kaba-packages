@@ -51,7 +51,7 @@ func _peek(s: string, i0: i32) -> string
 	return ""
 
 
-func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (any,bool)
+func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (Any,bool)
 	if _next(s, i0) != "<"
 		raise(new Exception("< expected"))
 
@@ -62,7 +62,7 @@ func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (any,bool)
 		tag_key += _next(s, i0)
 	#print("TAG: " + tag_key[:20])
 
-	var tag: any
+	var tag: Any
 	var selfclosing = false
 	while true
 		let n = _next(s, i0)
@@ -84,9 +84,9 @@ func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (any,bool)
 	return (tag,selfclosing)
 
 
-func _doc_set(out doc: any, k: string, c: any)
+func _doc_set(out doc: Any, k: string, c: Any)
 	if k in doc.keys()
-		if doc[k]!.type() != any[]
+		if doc[k]!.type() != Any[]
 			doc[k] = dyn([*doc[k]!])
 			#print(doc)
 		doc[k]!.add(c)
@@ -95,7 +95,7 @@ func _doc_set(out doc: any, k: string, c: any)
 		doc[k] = c
 
 
-func _parse_inside_part(s: string, key: string, out i0: i32, out part: any) -> string
+func _parse_inside_part(s: string, key: string, out i0: i32, out part: Any) -> string
 	#print(">> INSIDE {{key}}")
 	#print(part)
 	var content: string
@@ -155,7 +155,7 @@ func _parse_inside_part(s: string, key: string, out i0: i32, out part: any) -> s
 		#print("AGAIN! in {{key}}")
 	#print("<< OUTSIDE {{key}}")
 
-func _parse_tag_complete(out key: string, s: string, out i: i32) -> any
+func _parse_tag_complete(out key: string, s: string, out i: i32) -> Any
 
 	var (t,selfclosing) = _parse_tag(key, s, i)
 	if not selfclosing
@@ -163,13 +163,13 @@ func _parse_tag_complete(out key: string, s: string, out i: i32) -> any
 	return t
 
 
-func parse(s: string) -> any
+func parse(s: string) -> Any
 	var i = 0
 
 	var key: string
 	var header = _parse_tag(key, s, i)
 
-	var root: any
+	var root: Any
 	var t = _parse_tag_complete(key, s, i)
 	root[key] = t
 
@@ -178,11 +178,11 @@ func parse(s: string) -> any
 	return root
 
 
-func _encode_part(key: string, doc: any, pre: string) -> string
+func _encode_part(key: string, doc: Any, pre: string) -> string
 	if doc.type() in [i32, f32, string]
 		# string
 		return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
-	else if doc.type == any{}
+	else if doc.type == Any{}
 		# dict
 		var s: string
 		s += "{{pre}}<{{key}}>\n"
@@ -190,7 +190,7 @@ func _encode_part(key: string, doc: any, pre: string) -> string
 			s += _encode_part(k, doc[k]!, pre + "\t")
 		s += "{{pre}}</{{key}}>\n"
 		return s
-	else if doc.type == any[]
+	else if doc.type == Any[]
 		# array
 		var s: string
 		for i in 0:len(doc)
@@ -200,9 +200,9 @@ func _encode_part(key: string, doc: any, pre: string) -> string
 		return "???{{doc.type}}\n"
 
 
-func encode(doc: any) -> string
+func encode(doc: Any) -> string
 	var s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-	if doc.type != any{}
+	if doc.type != Any{}
 		raise(new Exception("doc must be a dict"))
 	for k in doc.keys()
 		s += _encode_part(k, doc[k]!, "")

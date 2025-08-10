@@ -37,38 +37,16 @@ func random_sample(points: Point[], n: i32) -> Point[]
 func center_of_mass(points: vec3[]) -> vec3
 	return sum(points) / len(points)
 
-struct Box
-	vmin, vmax: vec3
 	
-	func center() -> vec3
-		return (vmin + vmax) / 2
+func map_rel(b: Box, p: vec3, nx: i32, ny: i32, nz: i32) -> (i32,i32,i32)
+	return [(p.x - b.min.x) / (b.max.x - b.min.x) * nx,
+		(p.y - b.min.y) / (b.max.y - b.min.y) * ny,
+		(p.z - b.min.z) / (b.max.z - b.min.z) * nz]
 	
-	func size() -> vec3
-		return vmax - vmin
-	
-	func inside(p: vec3) -> bool
-		if p.x < vmin.x or p.x > vmax.x
-			return false
-		if p.y < vmin.y or p.y > vmax.y
-			return false
-		if p.z < vmin.z or p.z > vmax.z
-			return false
-		return true
-	
-	func map_rel(p: vec3, nx: i32, ny: i32, nz: i32) -> (i32,i32,i32)
-		return [(p.x - vmin.x) / (vmax.x - vmin.x) * nx,
-			(p.y - vmin.y) / (vmax.y - vmin.y) * ny,
-			(p.z - vmin.z) / (vmax.z - vmin.z) * nz]
-	
-	func map_abs(i: (i32,i32,i32), nx: i32, ny: i32, nz: i32) -> vec3
-		return vmin + [f32(i.e0) * (vmax.x - vmin.x) / f32(nx),
-		               f32(i.e1) * (vmax.y - vmin.y) / f32(ny),
-		               f32(i.e2) * (vmax.z - vmin.z) / f32(nz)]
-	
-	func map_abs(p: vec3) -> vec3
-		return vmin + [p.x * (vmax.x - vmin.x),
-		               p.y * (vmax.y - vmin.y),
-		               p.z * (vmax.z - vmin.z)]
+func map_abs(b: Box, i: (i32,i32,i32), nx: i32, ny: i32, nz: i32) -> vec3
+	return b.min + [f32(i.e0) * (b.max.x - b.min.x) / f32(nx),
+	               f32(i.e1) * (b.max.y - b.min.y) / f32(ny),
+	               f32(i.e2) * (b.max.z - b.min.z) / f32(nz)]
 
 func bounding_box(points: vec3[]) -> Box
 	if len(points) == 0
@@ -101,8 +79,8 @@ func moment2(points: vec3[], p0: vec3) -> mat3
 
 func filter_box(points: vec3[], box: Box) -> vec3[]
 	return points
-		|> filter(p => box.inside(p))
+		|> filter(p => box.is_inside(p))
 
 func filter_box(points: Point[], box: Box) -> Point[]
 	return points
-		|> filter(p => box.inside(p.pos))
+		|> filter(p => box.is_inside(p.pos))

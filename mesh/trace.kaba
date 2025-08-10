@@ -11,21 +11,21 @@ var n_tria_tests = 0
 var n_box_misses = 0
 
 struct DigestedBox
-	var box: cloud.Box
-	var planes: plane[6]
+	var box: Box
+	var planes: Plane[6]
 	func mut update()
-		planes[0] = plane.from_point_normal(box.vmin + VEPS, [-1,0,0])
-		planes[1] = plane.from_point_normal(box.vmax - VEPS, [1,0,0])
-		planes[2] = plane.from_point_normal(box.vmin + VEPS, [0,-1,0])
-		planes[3] = plane.from_point_normal(box.vmax - VEPS, [0,1,0])
-		planes[4] = plane.from_point_normal(box.vmin + VEPS, [0,0,-1])
-		planes[5] = plane.from_point_normal(box.vmax - VEPS, [0,0,1])
+		planes[0] = Plane.from_point_normal(box.min + VEPS, [-1,0,0])
+		planes[1] = Plane.from_point_normal(box.max - VEPS, [1,0,0])
+		planes[2] = Plane.from_point_normal(box.min + VEPS, [0,-1,0])
+		planes[3] = Plane.from_point_normal(box.max - VEPS, [0,1,0])
+		planes[4] = Plane.from_point_normal(box.min + VEPS, [0,0,-1])
+		planes[5] = Plane.from_point_normal(box.max - VEPS, [0,0,1])
 
-	func ray_intersects(r: ray) -> bool
+	func ray_intersects(r: Ray) -> bool
 		for pl in planes
 			for p in r.intersect_plane(pl)
 				#print("{{p}}  {{b}}")
-				if box.inside(p)
+				if box.is_inside(p)
 	#				print("HIT")
 					return true
 		n_box_misses ++
@@ -48,8 +48,8 @@ class TraceWorld
 		a, b, c: vec3
 	
 	struct DigestedTriangle
-		rab, rbc, rca: ray
-		pl: plane
+		rab, rbc, rca: Ray
+		pl: Plane
 	
 	struct SubWorld
 		triangles: Triangle[]
@@ -76,17 +76,17 @@ class TraceWorld
 			if s.x > s.y and s.x > s.z
 				#let xx = box.box.center().x
 				let xx = points() |> (func(p: vec3) p.x) |> sort |> middle
-				split(plane.from_point_normal([xx,0,0], [1,0,0]))
+				split(Plane.from_point_normal([xx,0,0], [1,0,0]))
 			else if s.y > s.z
 				#let yy = box.box.center().x
 				let yy = points() |> (func(p: vec3) p.y) |> sort |> middle
-				split(plane.from_point_normal([0,yy,0], [0,1,0]))
+				split(Plane.from_point_normal([0,yy,0], [0,1,0]))
 			else
 				#let zz = box.box.center().x
 				let zz = points() |> (func(p: vec3) p.z) |> sort |> middle
-				split(plane.from_point_normal([0,0,zz], [0,0,1]))
+				split(Plane.from_point_normal([0,0,zz], [0,0,1]))
 		
-		func mut split(pl: plane)
+		func mut split(pl: Plane)
 			subs.resize(2)
 			for i=>t in triangles
 				let da = pl.distance(t.a)
@@ -118,7 +118,7 @@ class TraceWorld
 			
 		
 		func trace(p0: vec3, dir: vec3, _max_dist: float) -> vec3?
-			let r = ray(p0, p0 + dir)
+			let r = Ray(p0, p0 + dir)
 			n_sub_tests ++
 			if not box.ray_intersects(r)
 				return nil
@@ -126,9 +126,9 @@ class TraceWorld
 			var p_best: vec3?
 			for t in digested_triangles
 				n_tria_tests ++
-				let rrab = ray.dot(r, t.rab)
-				let rrbc = ray.dot(r, t.rbc)
-				let rrca = ray.dot(r, t.rca)
+				let rrab = Ray.dot(r, t.rab)
+				let rrbc = Ray.dot(r, t.rbc)
+				let rrca = Ray.dot(r, t.rca)
 				if rrab*rrbc <= 0 or rrab*rrca <= 0
 					continue
 				for p in r.intersect_plane(t.pl)
@@ -189,10 +189,10 @@ class TraceWorld
 			let b = data.vertices[data.indices[i*3+1]].pos
 			let c = data.vertices[data.indices[i*3+2]].pos
 			sub.triangles.add([a, b, c])
-			let rab = ray(a, b)
-			let rbc = ray(b, c)
-			let rca = ray(c, a)
-			let pl = plane.from_points(a, b, c)
+			let rab = Ray(a, b)
+			let rbc = Ray(b, c)
+			let rca = Ray(c, a)
+			let pl = Plane.from_points(a, b, c)
 			sub.digested_triangles.add([rab, rbc, rca, pl])
 	#	print(len(sub.digested_triangles))
 		

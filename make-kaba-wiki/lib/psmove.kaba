@@ -92,7 +92,7 @@ class MyPSMoveController
 	var psmove: PSMove*
 	var pos, dpos, pos_last: vec3
 	var acc, rot, mag: vec3
-	var col: color
+	var col: Color
 	var ang, dang: quaternion
 	var trigger, rumble: float
 	var button: bool[8]

@@ -10,7 +10,7 @@ enum GraphMode
 	SIMPLE
 	REAL
 
-func edge_color(t: urdf.Edge.Type) -> color
+func edge_color(t: urdf.Edge.Type) -> Color
 	if t == urdf.Edge.Type.FIXED
 		return [1,0.1,0.1, 1]
 	if t == urdf.Edge.Type.FLOATING
@@ -19,7 +19,7 @@ func edge_color(t: urdf.Edge.Type) -> color
 		return [0.2,0.9,0.2, 1]
 	if t == urdf.Edge.Type.PRISMATIC
 		return [0.3,0.3,1, 1]
-	return color.GRAY
+	return Color.GRAY
 
 class MyWindow extends visualization.RenderWindow
 	tree: urdf.Tree
@@ -51,17 +51,17 @@ class MyWindow extends visualization.RenderWindow
 		for e in tree.edges
 			if e.parent == n
 				draw_node(e.child)
-				gl.set_material(color.BLACK, 0, 0, edge_color(e.type))
+				gl.set_material(Color.BLACK, 0, 0, edge_color(e.type))
 				let child_matrix = matrices[e.child]!
 				draw_lines([matrix * vec3.0, child_matrix * vec3.0])
 
 		if show_frames
 			let l = cam_radius * 0.05
-			gl.set_material(color.BLACK, 0, 0, [0.8,0,0,1])
+			gl.set_material(Color.BLACK, 0, 0, [0.8,0,0,1])
 			draw_lines([matrix * vec3.0, matrix * [l,0,0]])
-			gl.set_material(color.BLACK, 0, 0, [0,0.7,0,1])
+			gl.set_material(Color.BLACK, 0, 0, [0,0.7,0,1])
 			draw_lines([matrix * vec3.0, matrix * [0,l,0]])
-			gl.set_material(color.BLACK, 0, 0, [0.2,0.2,1,1])
+			gl.set_material(Color.BLACK, 0, 0, [0.2,0.2,1,1])
 			draw_lines([matrix * vec3.0, matrix * [0,0,l]])
 				
 		let pp = (projection_matrix * matrix).project(vec3.0)
@@ -69,7 +69,7 @@ class MyWindow extends visualization.RenderWindow
 		if show_labels
 			label_manager.add([pp.x, pp.y], n, [0.8,0.8,0.8,1])
 		set_mode_2d()
-		gl.set_material(color.BLACK, 0, 0, color.BLACK)
+		gl.set_material(Color.BLACK, 0, 0, Color.BLACK)
 		draw_image(tex_white, [pp.x-3,pp.x+3,pp.y-3,pp.y+3])
 		set_mode_3d()
 		
@@ -83,16 +83,16 @@ class MyWindow extends visualization.RenderWindow
 	
 		set_mode_2d()
 		set_font(14, false, false)
-		gl.set_material(color.BLACK, 0, 0, color.WHITE)
+		gl.set_material(Color.BLACK, 0, 0, Color.WHITE)
 		#draw_str([0,0], "{{large_num(len(points))}} points  {{len(current)}} files")
-		gl.set_material(color.BLACK, 0, 0, color.GRAY)
+		gl.set_material(Color.BLACK, 0, 0, Color.GRAY)
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
 		label_manager.draw(self)
 		
 		let types = [urdf.Edge.Type.FIXED, urdf.Edge.Type.FLOATING, urdf.Edge.Type.PRISMATIC, urdf.Edge.Type.REVOLUTE]
 		for i=>t in types #urdf.Edge.Type.all()
-			gl.set_material(color.BLACK, 0, 0, edge_color(t))
+			gl.set_material(Color.BLACK, 0, 0, edge_color(t))
 #			for c in ctx
 #				c.default_frame_buffer
 			draw_str([20, 200 + i*20], str(t))

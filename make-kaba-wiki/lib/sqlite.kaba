@@ -59,7 +59,7 @@ class Database
 		var q = query(sql)
 		q.step()
 	
-	func load_doc(table: string, id: any) -> any?
+	func load_doc(table: string, id: Any) -> Any?
 		var sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
 		var q = query(sql)
@@ -101,10 +101,10 @@ class Query as shared
 		needs_step = true
 		return r
 
-	func mut get_column() -> any?
+	func mut get_column() -> Any?
 		if not has_more()
 			return nil
-		var r: any
+		var r: Any
 		let n = _sqlite3_column_count(res)
 		for i in 0:n
 			let key = _cstr2str(_sqlite3_column_name(res, i))

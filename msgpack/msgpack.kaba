@@ -1,6 +1,6 @@
 use kaba
 
-func decode(b: bytes) -> any
+func decode(b: bytes) -> Any
 	var offset = 0
 	return decode_part(b, offset)
 
@@ -24,7 +24,7 @@ func signify_uint(u: i32, l: i32) -> i32
 		return u | (0xffffffff << (l * 8))
 	return u
 
-func decode_part(b: bytes, out offset: i32) -> any
+func decode_part(b: bytes, out offset: i32) -> Any
 	if len(b) <= offset
 		return nil
 	
@@ -109,7 +109,7 @@ func decode_part(b: bytes, out offset: i32) -> any
 		offset ++
 		let n = i32(b[offset])
 		offset += l + 1
-		let a = b[offset - l:offset] as any
+		let a = b[offset - l:offset] as Any
 		return dyn([n, a])
 		#return b[offset - l:offset]
 		
@@ -117,7 +117,7 @@ func decode_part(b: bytes, out offset: i32) -> any
 	return nil
 
 
-func encode(a: any) -> bytes
+func encode(a: Any) -> bytes
 	var r: bytes
 	let type = a.type()
 	if type == string

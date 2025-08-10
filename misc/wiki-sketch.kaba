@@ -79,10 +79,10 @@ Grid ? '' vertical
 	func override mut on_draw(p: hui.Painter)
 		w = p.width
 		h = p.height
-		p.set_color(color.WHITE)
-		p.draw_rect(rect(0, w, 0, h))
+		p.set_color(Color.WHITE)
+		p.draw_rect(Rect(0, w, 0, h))
 		
-		p.set_color(color.BLACK)
+		p.set_color(Color.BLACK)
 		draw_stroke(p, cur)
 		for s in strokes
 			draw_stroke(p, s)

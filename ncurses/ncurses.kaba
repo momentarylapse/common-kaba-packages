@@ -8,7 +8,7 @@ enum Attr
 	BLINK = 1<<(11+8)
 	BOLD = 1<<(13+8)
 
-enum Color
+enum XColor
 	BLACK
 	RED
 	GREEN
@@ -18,7 +18,7 @@ enum Color
 	CYAN
 	WHITE
 
-func static pair(n: Color) -> int
+func static pair(n: XColor) -> int
 	return (int(n)<<8) & int(Attr.COLOR)
 
 enum Key
@@ -34,7 +34,7 @@ func extern curs_set(mode: int) -> int
 func extern has_colors() -> bool
 func extern start_color() -> int
 func extern use_default_colors() -> int
-func extern init_pair(i: int, a: Color, b: Color) -> int
+func extern init_pair(i: int, a: XColor, b: XColor) -> int
 func extern _waddnstr(w: void*, p: u8*, n: int) -> int
 #func extern _waddnwstr(w: void*, p: int*, n: int) -> int
 func extern _wrefresh(w: void*) -> int
@@ -112,7 +112,7 @@ func main()
 	stdwin.keypad(true)
 	var w = stdwin.width()
 	var h = stdwin.height()
-	init_pair(1, Color.RED, Color.BLACK)
+	init_pair(1, XColor.RED, XColor.BLACK)
 	stdwin.print("hallo {{w}} {{h}} {{has_colors()}}")
 ##	stdwin.printw(" abc ö⼭ z")
 	stdwin.move(0, h-1)
@@ -133,7 +133,7 @@ func main()
 	#ww.attron(1<<8)
 	#ww.attron(1<<11)
 	ww.print("hi test")
-	ww.attron(pair(Color.RED))
+	ww.attron(pair(XColor.RED))
 	ww.print("red")
 	#ww.addch('A' | Color.pair(1))
 	ww.refresh()

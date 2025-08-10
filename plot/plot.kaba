@@ -1,9 +1,9 @@
 use hui
 
 class Theme
-	let bg = color(0.95,0.95,0.95,1)#color.WHITE
-	let fg = color.BLACK
-	let grid = color(0.7, 0.7, 0.7, 1)
+	let bg = Color(0.95,0.95,0.95,1)#color.WHITE
+	let fg = Color.BLACK
+	let grid = Color(0.7, 0.7, 0.7, 1)
 
 struct Range
 	var min, max: f32
@@ -98,7 +98,7 @@ class Window extends hui.Window
 			p.set_color(Theme.grid)
 			p.draw_line([pp.x, BORDER], [pp.x, height - BORDER])
 			if t.weight > 0.8
-				p.set_color(color.BLACK)
+				p.set_color(Color.BLACK)
 				p.draw_str([pp.x, height-BORDER], t.label)
 			
 		for t in ty
@@ -106,7 +106,7 @@ class Window extends hui.Window
 			p.set_color(Theme.grid)
 			p.draw_line([BORDER, pp.y], [width - BORDER, pp.y])
 			if t.weight > 0.8
-				p.set_color(color.BLACK)
+				p.set_color(Color.BLACK)
 				p.draw_str([BORDER, pp.y], t.label)
 		
 		

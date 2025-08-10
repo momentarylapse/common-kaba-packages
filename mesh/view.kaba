@@ -6,13 +6,13 @@ use mesh
 use mesh.common.Mesh
 
 class Theme
-	let bg = color(0.2,0.2,0.2, 1)
-	let grid = color(0.5,0.5,0.5, 1)
-	let arm_mesh = color(0.5,0.5,0.5, 1)
-	let arm_label = color(1,1,1,1)
-	let arm_dot = color(0,0,0,1)
-	let tunnel_mesh = color(0.4,0.4,0.4, 1)
-	let tunnel_mesh_inside = color(0.3,0.3,0.3, 1)
+	let bg = Color(0.2,0.2,0.2, 1)
+	let grid = Color(0.5,0.5,0.5, 1)
+	let arm_mesh = Color(0.5,0.5,0.5, 1)
+	let arm_label = Color(1,1,1,1)
+	let arm_dot = Color(0,0,0,1)
+	let tunnel_mesh = Color(0.4,0.4,0.4, 1)
+	let tunnel_mesh_inside = Color(0.3,0.3,0.3, 1)
 
 	
 func create_vb(m: Mesh) -> xfer[gl.VertexBuffer]
@@ -34,7 +34,7 @@ class MyWindow extends visualization.RenderWindow
 		set_title("Mesh Viewer") # hui bug :P
 		
 		background_color = Theme.bg
-		cam_ang = quaternion([pi/2,0,0])
+		cam_ang = Quaternion([pi/2,0,0])
 		light_enabled = true
 		
 		on_post_init(init_data)
@@ -46,7 +46,7 @@ class MyWindow extends visualization.RenderWindow
 		draw_magic_grid(Theme.grid)
 		
 		set_default_shader_3d()
-		gl.set_material(color.WHITE, 0, 0, Theme.arm_mesh)
+		gl.set_material(Color.WHITE, 0, 0, Theme.arm_mesh)
 		gl.set_wire(wireframe)
 		gl.set_model_matrix(mat4.ID)
 		gl.draw_triangles(vb)
@@ -58,7 +58,7 @@ class MyWindow extends visualization.RenderWindow
 	
 		set_mode_2d()
 		set_font(14, false, false)
-		gl.set_material(color.WHITE, 0, 0, color.GRAY)
+		gl.set_material(Color.WHITE, 0, 0, Color.GRAY)
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
 	
@@ -69,11 +69,11 @@ class MyWindow extends visualization.RenderWindow
 		let R = 0.02
 		gl.set_model_matrix(mat4.ID)
 		set_default_shader_3d()
-		gl.set_material(color.BLACK, 0, 0, [1,0.1,0.1,1])
+		gl.set_material(Color.BLACK, 0, 0, [1,0.1,0.1,1])
 		draw_cube(p0 + [R,-R,-R], p0 + [L,R,R])
-		gl.set_material(color.BLACK, 0, 0, [0.1,1,0.1,1])
+		gl.set_material(Color.BLACK, 0, 0, [0.1,1,0.1,1])
 		draw_cube(p0 + [-R,R,-R], p0 + [R,L,R])
-		gl.set_material(color.BLACK, 0, 0, [0.2,0.2,1,1])
+		gl.set_material(Color.BLACK, 0, 0, [0.2,0.2,1,1])
 		draw_cube(p0 + [-R,-R,R], p0 + [R,R,L])
 
 

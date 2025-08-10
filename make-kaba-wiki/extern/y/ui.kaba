@@ -66,7 +66,7 @@ class Node as shared
 		
 		#CENTER = int(Node.Align.CENTER_H | Node.Align.CENTER_V)
 		
-	func extern __init__(r: rect)
+	func extern __init__(r: Rect)
 	func extern virtual __delete__()
 	func extern mut __del_override__()
 		
@@ -86,11 +86,11 @@ class Node as shared
 	var pos: vec2
 	var x, y: float
 	var width, height: float
-	func extern set_area(r: rect)
-	var _eff_area: rect
-	var margin: rect
+	func extern set_area(r: Rect)
+	var _eff_area: Rect
+	var margin: Rect
 	var dz: float
-	var color: color
+	var color: Color
 	var align: Align
 	var visible: bool
 	var children: shared![Node][]
@@ -102,14 +102,14 @@ class VBox extends Node
 	func extern __init__()
 		
 class Picture extends Node
-	func extern __init__(r: rect, tex: shared![Texture], source: rect = rect.ID)
+	func extern __init__(r: Rect, tex: shared![Texture], source: Rect = rect.ID)
 	func extern override __delete__()
-	var source: rect
+	var source: Rect
 	var texture: shared![Texture]
 	var blur: float
 	var angle: float
 	var shader: shared[Shader]
-	var shader_data: any
+	var shader_data: Any
 
 class Text extends Picture
 	func extern __init__(t: string, font_size: float, p: vec2 = vec2.0)

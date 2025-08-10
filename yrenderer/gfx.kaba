@@ -5,10 +5,6 @@ use os
 struct ivec3
 	x, y, z: i32
 
-struct Box
-	min, max: vec3
-
-
 #----------------------------------------------------------------
 # ygfx
 
@@ -25,13 +21,13 @@ struct Vertex
 
 struct VertexFx
 	pos: vec3
-	col: color
+	col: Color
 	u, v: f32
 
 struct PointVertex
 	pos: vec3
 	radius: f32
-	col: color
+	col: Color
 
 class FrameBuffer
 	var width, height: i32

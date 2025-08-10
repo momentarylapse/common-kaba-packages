@@ -38,13 +38,13 @@ class Control extends Object as shared
 	func extern virtual set_float(f: f32)
 	func extern virtual check(checked: bool)
 	func extern virtual expand(expanded: bool)
-	func extern virtual set_color(c: color)
+	func extern virtual set_color(c: Color)
 	func extern virtual get_string() -> string
 	func extern virtual get_cell(row: i32, col: i32)
 	func extern virtual get_int() -> i32
 	func extern virtual get_float() -> f32
 	func extern virtual is_checked() -> bool
-	func extern virtual get_color() -> color
+	func extern virtual get_color() -> Color
 	func extern virtual get_selection() -> i32[]
 	func extern virtual enable(enabled: bool)
 	func extern virtual set_option(key: string, valu: string)
@@ -69,7 +69,7 @@ class Control extends Object as shared
 	func extern virtual _draw(p: Painter)
 	func extern virtual get_greed_factor() -> vec2
 	func extern virtual get_content_min_size() -> vec2
-	func extern virtual negotiate_area(available: rect)
+	func extern virtual negotiate_area(available: Rect)
 
 
 class Panel extends Control
@@ -127,8 +127,8 @@ class Panel extends Control
 #	func extern mut delete_control(id: string)
 #	func extern mut set_int(id: string, i: i32)
 #	func extern get_int(id: string) -> i32
-#	func extern mut set_color(id: string, c: color)
-#	func extern get_color(id: string) -> color
+#	func extern mut set_color(id: string, c: Color)
+#	func extern get_color(id: string) -> Color
 #	func extern mut set_selection(id: string, sel: i32[])
 #	func extern get_selection(id: string) -> i32[]
 #	func extern mut set_image(id: string, image: string)
@@ -147,7 +147,7 @@ class Panel extends Control
 
 
 	func extern override _draw(p: Painter)
-	func extern override negotiate_area(available: rect)
+	func extern override negotiate_area(available: Rect)
 	func extern override get_content_min_size() -> vec2
 	func extern override get_greed_factor() -> vec2
 	func extern override get_children(f: i32) -> Control&[]

@@ -56,9 +56,9 @@ class MyWindow extends visualization.RenderWindow
 		
 		set_mode_2d()
 		set_font(14, false, false)
-		gl.set_material(color.BLACK, 0, 0, color.WHITE)
+		gl.set_material(Color.BLACK, 0, 0, Color.WHITE)
 		draw_str([0,0], "{{large_num(len(points))}} points  {{len(current)}} files")
-		gl.set_material(color.BLACK, 0, 0, color.GRAY)
+		gl.set_material(Color.BLACK, 0, 0, Color.GRAY)
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
 			

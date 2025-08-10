@@ -1,7 +1,7 @@
 use xml
 use os
 
-func read_vec3(a: any) -> vec3
+func read_vec3(a: Any) -> vec3
 	let s = str(a)
 	let xx = s.parse_tokens("")
 	if len(xx) < 3
@@ -60,7 +60,7 @@ func parse(fn: os.Path) -> Tree
 	for l in x["robot"]!["link"]!.as_list()!
 		tree.nodes.add(str(l["name"]))
 	for j in x["robot"]!["joint"]!.as_list()!
-		if j.type() != any{}
+		if j.type() != Any{}
 			continue
 		var edge: Edge
 		edge.parent = str(j["parent"]!["link"]!)

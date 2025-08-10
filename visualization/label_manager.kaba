@@ -6,9 +6,9 @@ class LabelManager
 		pos: vec2
 		pos_wanted: vec2
 		text: string
-		color: color
+		color: Color
 	labels: Label[]
-	func mut add(pos: vec2, text: string, color: color)
+	func mut add(pos: vec2, text: string, color: Color)
 		labels.add([pos, pos, text, color])
 	func mut optimize()
 		for mut i=>l in labels
@@ -25,6 +25,6 @@ class LabelManager
 		optimize()
 		r.set_mode_2d()
 		for l in labels
-			gl.set_material(color.BLACK, 0, 0, l.color)
+			gl.set_material(Color.BLACK, 0, 0, l.color)
 			r.draw_str(l.pos, l.text)
 		labels.clear()

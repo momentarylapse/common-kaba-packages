@@ -22,7 +22,7 @@ class VertexBuffer
 	func extern __delete__()
 	func extern mut update(vertices: @DynamicArray)
 	func extern mut update_index(indices: @DynamicArray)
-	func extern mut create_quad(dest: rect, source: rect)
+	func extern mut create_quad(dest: Rect, source: Rect)
 	func extern mut create_cube(a: vec3, b: vec3)
 	func extern count() -> i32
 
@@ -55,8 +55,8 @@ class CubeMap extends Texture
 class FrameBuffer as shared
 	func extern __init__(attachments: shared![Texture][])
 	func extern __delete__()
-	func extern area() -> rect
-	func extern mut clear_color(index: i32, c: color)
+	func extern area() -> Rect
+	func extern mut clear_color(index: i32, c: Color)
 	func extern mut clear_depth(z: f32)
 #	func extern mut update(attachments: shared![Texture][])
 	func extern mut update(attachments: shared![Texture][], face: i32 = 0)
@@ -74,12 +74,12 @@ class Shader as shared
 	func extern mut link_uniform_block(name: string, binding: i32)
 	func extern mut set_float_l(loc: i32, f: f32)
 	func extern mut set_matrix_l(loc: i32, m: mat4)
-	func extern mut set_color_l(loc: i32, c: color)
+	func extern mut set_color_l(loc: i32, c: Color)
 	func extern mut set_int_l(loc: i32, i: i32)
 	func extern mut set_floats_l(loc: i32, data: f32*, num: i32)
 	func extern mut set_float(name: string, f: f32)
 	func extern mut set_matrix(name: string, m: mat4)
-	func extern mut set_color(name: string, c: color)
+	func extern mut set_color(name: string, c: Color)
 	func extern mut set_int(name: string, i: i32)
 	func extern mut set_floats(name: string, data: f32*, num: i32)
 	func extern dispatch(nx: i32, ny: i32, nz: i32)
@@ -136,10 +136,10 @@ func extern start_frame_hui(ctx: Context, event: void&) # hui.Event&
 func extern end_frame_hui()
 
 func extern bind_frame_buffer(fb: FrameBuffer)
-func extern set_viewport(r: rect)
-func extern clear_color(c: color)
+func extern set_viewport(r: Rect)
+func extern clear_color(c: Color)
 func extern clear_z(z: f32)
-func extern clear(c: color)
+func extern clear(c: Color)
 func extern set_model_matrix(m: mat4)
 func extern draw_triangles(vb: VertexBuffer&)
 func extern draw_lines(vb: VertexBuffer&, contiguous: bool)
@@ -154,11 +154,11 @@ func extern set_projection_ortho_pixel()
 func extern set_projection_ortho_ext(center: vec2, map_size: vec2, zmin: f32, zmax: f32)
 func extern set_projection_matrix(m: mat4)
 func extern set_view_matrix(m: mat4)
-func extern set_scissor(r: rect)
+func extern set_scissor(r: Rect)
 func extern set_z(write: bool, read: bool)
 func extern set_cull(mode: CullMode)
 func extern set_wire(enabled: bool)
-func extern set_material(albedo: color, roughness: f32, metal: f32, emission: color)
+func extern set_material(albedo: Color, roughness: f32, metal: f32, emission: Color)
 func extern bind_textures(t: Texture*[])
 func extern bind_texture(binding: i32, t: Texture*)
 func extern set_shader(s: Shader&)
@@ -167,5 +167,5 @@ func extern bind_storage_buffer(binding: i32, buf: ShaderStorageBuffer&)
 func extern bind_image(binding: i32, t: Texture*, level: i32, layer: i32, writable: bool) # -> ref
 func extern screen_shot_to_image(out im: image.Image)
 
-var extern target: rect
+var extern target: Rect
 

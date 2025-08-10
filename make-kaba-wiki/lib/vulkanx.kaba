@@ -8,7 +8,7 @@ class Vertex
 	u,v: float
 
 
-func create_quad(r: rect) -> xfer[VertexBuffer]
+func create_quad(r: Rect) -> xfer[VertexBuffer]
 	var vb = new VertexBuffer("3f,3f,2f")
 	vb.create_quad(r, rect.ID)
 	return give(vb)
@@ -52,7 +52,7 @@ class Renderer
 	func virtual mut end_frame()
 		pass
 	
-	func area() -> rect
+	func area() -> Rect
 		return rect(0, width, 0, height)
 
 

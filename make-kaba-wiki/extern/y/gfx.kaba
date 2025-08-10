@@ -14,13 +14,13 @@ struct Vertex
 
 struct VertexFx
 	pos: vec3
-	col: color
+	col: Color
 	u, v: float
 
 struct PointVertex
 	pos: vec3
 	radius: float
-	col: color
+	col: Color
 
 class FrameBuffer
 	var width, height: int

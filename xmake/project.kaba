@@ -5,24 +5,24 @@ struct Profile
 	var name: string
 	var libs_optional: string[]
 
-func any2sa(a: any) -> string[]
+func any2sa(a: Any) -> string[]
 	if a.type() == string
 		return [str(a)]
 	return [for s in a.as_list()! str(s)]
 
-func any2pa(a: any) -> Path[]
+func any2pa(a: Any) -> Path[]
 	if a.type() == string
 		return [str(a)]
 	return [for s in a.as_list()! Path(str(s))]
 
-func sa2any(a: string[]) -> any
-	var r: any
+func sa2any(a: string[]) -> Any
+	var r: Any
 	for s in a
 		r.add(s)
 	return r
 
-func pa2any(a: Path[]) -> any
-	var r: any
+func pa2any(a: Path[]) -> Any
+	var r: Any
 	for s in a
 		r.add(str(s))
 	return r
@@ -374,7 +374,7 @@ struct Config
 
 var conf: Config
 
-func parse_libs(s: any) -> LibGroup[]
+func parse_libs(s: Any) -> LibGroup[]
 	var r: LibGroup[]
 	for x in any2sa(s)
 		var g: LibGroup
@@ -387,8 +387,8 @@ func parse_libs(s: any) -> LibGroup[]
 		r.add(g)
 	return r
 
-func encode_libs(lib_groups: LibGroup[]) -> any
-	var a: any
+func encode_libs(lib_groups: LibGroup[]) -> Any
+	var a: Any
 	for g in lib_groups
 		if g.optional
 			a.add(g.libs.join("|") + "?")

@@ -199,17 +199,17 @@ class Model extends Data
 		var alpha_z_buffer: bool
 
 		var user_color: bool
-		var ambient: color
-		var diffuse: color
-		var specular: color
-		var emission: color
+		var ambient: Color
+		var diffuse: Color
+		var specular: Color
+		var emission: Color
 		var shininess: float
 		func __assign__(other: Material)
 
 	struct Effect
 		var kind, surface, vertex: int
 		var size, speed, intensity: int
-		var colors: color[3]
+		var colors: Color[3]
 		var inv_quad: bool
 		var file: string
 		func __assign__(other: Effect)

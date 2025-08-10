@@ -14,10 +14,10 @@ let EXPORT_IMPORTS = true
 
 
 struct YLight
-	func extern mut init(c: color, r: f32, t: f32)
+	func extern mut init(c: Color, r: f32, t: f32)
 	var pos: vec3
-	var ang: quaternion
-	var color: color
+	var ang: Quaternion
+	var color: Color
 	var radius: f32
 	var theta: f32
 	var harshness: f32
@@ -30,10 +30,10 @@ struct YLight
 
 
 class Material
-	var albedo: color
-	var roughness: float
-	var metal: float
-	var emission: color
+	var albedo: Color
+	var roughness: f32
+	var metal: f32
+	var emission: Color
 	var textures: shared![Texture][]
 #	var shader: shared![Shader][6]
 	var cast_shadow: bool
@@ -52,7 +52,7 @@ class Material
 
 struct CameraParams
 	var pos: vec3
-	var ang: quaternion
+	var ang: Quaternion
 	
 	var fov: f32
 	var min_depth, max_depth: f32
@@ -103,7 +103,7 @@ class ComputeTask extends RenderTask
 	nx: i32
 	ny: i32
 	nz: i32
-	shader_data: any
+	shader_data: Any
 	func extern __init__(ctx: Context&, name: string, shader: shared![Shader], n: i32[])
 	func override extern render(params: RenderParams)
 	func extern bind_texture(index: i32, tex: Texture&)
@@ -132,9 +132,9 @@ class XhuiRenderer extends RenderTask
 
 class TextureRenderer extends Renderer
 	func extern __init__(ctx: Context&, name: string, textures: shared![Texture][], options: string[])
-	func extern mut set_area(area: rect)
+	func extern mut set_area(area: Rect)
 	var clear_z: bool
-	var clear_colors: color[]
+	var clear_colors: Color[]
 
 
 #---------------------------
@@ -158,7 +158,7 @@ class SceneRenderer extends Renderer
 	func extern mut set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
 	func extern mut add_emitter(emitters: shared![MeshEmitter])
 
-	var background_color: color?
+	var background_color: Color?
 
 
 #class ShadowRenderer
@@ -191,7 +191,7 @@ class SceneView
 class RenderPath extends Renderer
 	var view: CameraParams
 	var ambient_occlusion_radius: f32
-	var background_color: color?
+	var background_color: Color?
 #	var shadow_renderer: owned![ShadowRenderer]
 
 	static light_sources_module: string
@@ -218,11 +218,11 @@ class RenderPathDeferred extends RenderPath
 
 class RegionRenderer
 	struct Region
-		var dest: rect
+		var dest: Rect
 		var z: int
 		var renderer: Renderer&
 	var regions: Region[]
-	func extern add_region(r: Renderer&, dest: rect, z: int)
+	func extern add_region(r: Renderer&, dest: Rect, z: int)
 
 
 class LightMeter

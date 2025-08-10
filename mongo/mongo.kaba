@@ -73,7 +73,7 @@ func bson_iter_str_array(i: void*) -> string[]
 
 
 
-func bson_iter_to_any(iter: void*) -> any
+func bson_iter_to_any(iter: void*) -> Any
 	var t = _bson_iter_type(iter)
 	if t == 2 # str utf8
 		return bson_iter_str(iter)
@@ -84,7 +84,7 @@ func bson_iter_to_any(iter: void*) -> any
 	else if t == 1 # double
 		return float(_bson_iter_double(iter))
 	else if t == 4 # array
-		var r: any
+		var r: Any
 		var itarray: int[160]
 		var length = 0
 		var array: u8*
@@ -102,19 +102,19 @@ func bson_iter_to_any(iter: void*) -> any
 		s.resize(24)
 		return s
 	else if t == 10 # null
-		var r: any
+		var r: Any
 		return r
 	raise(new Exception("UNKNOWN TYPE: {{t}}"))
 
 
-func bson_iter_map_to_any(iter: void*) -> any
-	var r: any
+func bson_iter_map_to_any(iter: void*) -> Any
+	var r: Any
 	while _bson_iter_next(iter)
 		var key = bson_iter_key(iter)
 		r[key] = bson_iter_to_any(iter)
 	return r
 
-func bson_to_any(doc: void*) -> any
+func bson_to_any(doc: void*) -> Any
 	var iter: int[160]
 	_bson_iter_init(&iter, doc)
 	return bson_iter_map_to_any(&iter)
@@ -146,26 +146,26 @@ class Collection as shared
 	func __delete__()
 		if col
 			_mongoc_collection_destroy(col)
-	func find(filter: any) -> xfer[Result]
+	func find(filter: Any) -> xfer[Result]
 		var b = json_to_bson(repr(filter))
 		return new Result(_mongoc_collection_find_with_opts(col, b, nil, nil))
-	func aggregate(pattern: any) -> xfer[Result]
+	func aggregate(pattern: Any) -> xfer[Result]
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
-	func insert(doc: any)
+	func insert(doc: Any)
 		var b = json_to_bson(repr(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
 			raise(new Exception("can not insert"))
-	func replace(filter: any, doc: any)
+	func replace(filter: Any, doc: Any)
 		var b = json_to_bson(repr(filter))
 		var d = json_to_bson(repr(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
 			raise(new Exception("can not replace"))
-	func delete_one(filter: any)
+	func delete_one(filter: Any)
 		var b = json_to_bson(repr(filter))
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
 			raise(new Exception("can not delete"))
-	func delete_many(filter: any)
+	func delete_many(filter: Any)
 		var b = json_to_bson(repr(filter))
 		var reply: int[160]
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
@@ -186,7 +186,7 @@ class Result as shared
 		# bson_to_json(doc)
 	func json() -> string
 		return bson_to_json(doc)
-	func get() -> any
+	func get() -> Any
 		return bson_to_any(doc)
 
 

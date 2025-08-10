@@ -43,7 +43,7 @@ class Terrain extends Component
 	# ...
 
 class Light extends Component
-	var color: color
+	var color: Color
 	var radius: float
 	var theta: float
 	var harshness: float
@@ -56,13 +56,13 @@ class Light extends Component
 	func extern mut set_direction(dir: vec3)
 
 #	class Spherical extends Light
-#		func extern __init__(pos: vec3, c: color, radius: float)
+#		func extern __init__(pos: vec3, c: Color, radius: float)
 #
 #	class Parallel extends Light
-#		func extern __init__(ang: quaternion, c: color)
+#		func extern __init__(ang: quaternion, c: Color)
 #
 #	class Cone extends Light
-#		func extern __init__(pos: vec3, ang: quaternion, c: color, radius: float, theta: float)
+#		func extern __init__(pos: vec3, ang: quaternion, c: Color, radius: float, theta: float)
 
 
 class Camera extends Component
@@ -87,7 +87,7 @@ class Camera extends Component
 
 
 class Fog
-	var color: color
+	var color: Color
 	var distance: float
 	var enabled: bool
 
@@ -105,7 +105,7 @@ class Link extends BaseClass
 class World
 	var ego: Entity*
 	
-	var background: color
+	var background: Color
 	var skyboxes: Model&[]
 	
 	var fog: Fog
@@ -122,9 +122,9 @@ class World
 	
 	func extern mut load_soon(filename: os.Path)
 	
-	func extern mut selfref create_light_parallel(ang: quaternion, c: color) -> Light&
-	func extern mut selfref create_light_point(pos: vec3, c: color, radius: float) -> Light&
-	func extern mut selfref create_light_cone(pos: vec3, ang: quaternion, c: color, radius: float, theta: float) -> Light&
+	func extern mut selfref create_light_parallel(ang: quaternion, c: Color) -> Light&
+	func extern mut selfref create_light_point(pos: vec3, c: Color, radius: float) -> Light&
+	func extern mut selfref create_light_cone(pos: vec3, ang: quaternion, c: Color, radius: float, theta: float) -> Light&
 	func extern mut selfref add_particle(p: xfer[LegacyParticle]) -> LegacyParticle&
 	func extern mut selfref add_sound(s: xfer[Sound])
 	func extern mut selfref create_object(filename: os.Path, pos: vec3, ang: quaternion) -> Entity&

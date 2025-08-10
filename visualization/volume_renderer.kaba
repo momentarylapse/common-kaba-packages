@@ -16,14 +16,14 @@ class VolumeRenderer
 
 		for s in shader
 			gl.set_shader(&s)
-			s.set_floats("bb_min", &bounds.vmin.x, 3)
-			s.set_floats("bb_max", &bounds.vmax.x, 3)
+			s.set_floats("bb_min", &bounds.min.x, 3)
+			s.set_floats("bb_max", &bounds.max.x, 3)
 #			s.set_int("NX", NX)
 #			s.set_int("NY", NY)
 #			s.set_int("NZ", NZ)
 		gl.set_alpha(gl.Alpha.SOURCE_ALPHA, gl.Alpha.SOURCE_INV_ALPHA)
 		gl.bind_texture(0, tex)
-		r.draw_cube(bounds.vmin, bounds.vmax)
+		r.draw_cube(bounds.min, bounds.max)
 		gl.disable_alpha()
 	
 	func mut set(box: Box, data: f32[], n: i32[])
