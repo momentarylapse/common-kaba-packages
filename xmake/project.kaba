@@ -364,6 +364,8 @@ struct Config
 			for d in t.dependencies
 				if find_target(d.libs[0]) == nil
 					r.add(d)
+			# FIXME there should be only ONE source of dependencies...
+			break
 		return r
 	
 	func find_target(name: string) -> BuildTarget*

@@ -1,0 +1,4 @@
+cmake.package = Armadillo
+cmake.target = "${ARMADILLO_LIBRARIES}"
+#Armadillo::Armadillo  ...somehow not working...
+
