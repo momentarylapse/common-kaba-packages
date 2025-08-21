@@ -24,6 +24,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)"
 	if debug
 		r += "
 set(CMAKE_BUILD_TYPE Debug)"
+
+	if i32(conf.build.language[3:]) <= 17
+		r += "
+
+if(WIN32)
+	list(APPEND COMPILE_OPTIONS /permissive-)
+endif()"
 	
 #	let common_sources = conf.find_common_sources()
 #	let files = [for s in common_sources  str(rel(s))].join("\n\t")
