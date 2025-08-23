@@ -10,8 +10,7 @@
 
 #include <lib/ygraphics/graphics-impl.h>
 #include <lib/yrenderer/Context.h>
-
-extern float global_shadow_box_size; // :(
+#include <lib/yrenderer/helper/Bindable.h>
 
 namespace yrenderer {
 using namespace ygfx;
@@ -57,8 +56,7 @@ void RenderViewData::update_light_ubo() {
 	for (const auto [i,l]: enumerate(scene_view->shadow_indices)) {
 		auto ll = scene_view->lights[l];
 		// from reference cam
-		// FIXME.... argh
-		ll->shadow_projection = ll->suggest_shadow_projection(scene_view->main_camera_params, global_shadow_box_size);
+		ll->shadow_projection = ll->suggest_shadow_projection(scene_view->main_camera_params, scene_view->shadow_box_size);
 		if constexpr (true)
 			light_meta_data.shadow_proj[ll->light.shadow_index] = ll->shadow_projection * ubo.v.inverse();
 		else
@@ -78,8 +76,7 @@ void RenderData::set_material_x(const SceneView& scene_view, const Material& mat
 		shader->set_floats("eye_pos", &scene_view.main_camera_params.pos.x, 3); // NAH....
 	else
 		shader->set_floats("eye_pos", &vec3::ZERO.x, 3);
-	for (auto &u: material.uniforms)
-		shader->set_floats(u.name, u.p, u.size/4);
+	apply_shader_data(RenderParams{}, shader, material.shader_data);
 
 	auto& pass = material.pass(pass_no);
 	nix::set_z(pass.z_buffer, pass.z_test);

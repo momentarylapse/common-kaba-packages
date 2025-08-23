@@ -26,6 +26,11 @@ enum class ControlType {
 	Window
 };
 
+enum class Orientation {
+	HORIZONTAL,
+	VERTICAL,
+};
+
 class Control : public Sharable<VirtualBase> {
 	friend class Window;
 	friend class Panel;
@@ -99,6 +104,7 @@ public:
 
 	float min_width_user, min_height_user;
 	SizeMode size_mode_x, size_mode_y;
+	vec2 greed_factor = vec2(1, 1); // if expanding...
 	bool can_grab_focus = false;
 	bool ignore_hover = false;
 	bool visible = true;

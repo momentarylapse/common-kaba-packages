@@ -38,11 +38,8 @@ list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
 
 
 # lib: vulkan (mandatory)
-pkg_check_modules(VULKAN REQUIRED vulkan)
-list(APPEND INCLUDE_DIRECTORIES ${VULKAN_INCLUDE_DIRS})
-list(APPEND LINK_DIRECTORIES ${VULKAN_LIBRARY_DIRS})
-list(APPEND DEPS ${VULKAN_LIBRARIES})
-list(APPEND COMPILE_OPTIONS ${VULKAN_CFLAGS_OTHER})
+find_package(Vulkan REQUIRED COMPONENTS shaderc_combined)
+list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
 list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
 
 
@@ -74,6 +71,7 @@ list(APPEND DEPS Threads::Threads)
 
 add_library(modulevulkan SHARED
 	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp

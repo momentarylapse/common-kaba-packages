@@ -1,10 +1,11 @@
 use os
 use os.Path
+use hui
 use config.*
 use resource.*
 use language.*
 
-func write_resource(out f: os.FileStream, r: Resource)
+func write_resource(out f: os.FileStream, r: hui.Resource)
 	f << r.type
 	if r.id.head(1) == "/"
 		f << r.id[1:]
@@ -38,7 +39,7 @@ func write_language(out f: os.FileStream, l: Language)
 		f << t.orig.escape()
 		f << t.trans.escape()
 
-func export_resources(res: Resource[], own: Language, langs: Language[])
+func export_resources(res: hui.Resource[], own: Language, langs: Language[])
 	var f = os.fs.open(conf.export_dir | "hui_resources.txt", "wt")
 	f << "t7"
 	f << "# Number Of Resources"

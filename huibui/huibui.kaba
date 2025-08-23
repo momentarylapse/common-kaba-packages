@@ -1,5 +1,6 @@
 use os
 use os.Path
+use hui
 use config.*
 use language.*
 use resource.*
@@ -8,14 +9,14 @@ use demo.*
 use export.*
 	
 
-func get_ids(out l: Language, r: Resource, ns: string)
+func get_ids(out l: Language, r: hui.Resource, ns: string)
 	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
 	
 	for c in r.children
 		get_ids(l, c, ns)
 
 
-func find_all_ids(out lang: Language, res: Resource[])
+func find_all_ids(out lang: Language, res: hui.Resource[])
 	for r in res
 		get_ids(lang, r, r.id)
 	
@@ -132,7 +133,7 @@ func swap_translate_lang(out own: Language, l: Language, target: Path)
 	own.filename = target
 	own.save()
 
-func swap_translate_gui(out r: Resource, l: Language, ns: string)
+func swap_translate_gui(out r: hui.Resource, l: Language, ns: string)
 	for i in l.ids
 		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
 			r.title = i.title

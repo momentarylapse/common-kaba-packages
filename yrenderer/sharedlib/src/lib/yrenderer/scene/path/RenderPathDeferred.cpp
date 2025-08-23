@@ -13,6 +13,7 @@
 #include <lib/yrenderer/post/ThroughShaderRenderer.h>
 #include <lib/yrenderer/Context.h>
 #include <lib/os/msg.h>
+#include <lib/any/conversion.h>
 #include <lib/math/random.h>
 #include <lib/math/vec4.h>
 #include <lib/math/vec2.h>
@@ -166,7 +167,7 @@ void RenderPathDeferred::render_out_from_gbuffer(FrameBuffer *source, const Rend
 	else
 		data.dict_set("eye_pos", vec3_to_any(view.pos)); // NAH
 #endif
-	data.dict_set("ambient_occlusion_radius:8", ambient_occlusion_radius);
+	data.dict_set("ambient_occlusion_radius:8", Any(ambient_occlusion_radius));
 	out_renderer->bind_uniform_buffer(13, ssao_sample_buffer);
 
 	auto& rvd = scene_renderer->rvd;

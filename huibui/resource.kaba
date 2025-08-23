@@ -1,31 +1,32 @@
 use config.*
 use os
+use hui
 
-struct Resource
-	var type: string
-	var id: string
-	var title: string
-	var tooltip: string
-	var options: string[]
-	var x, y: int
-	var children: Resource[]
-	#void reset()
-	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
-	func extern show(indent: int)
-	func extern str(indent: int) -> string
-	
-func extern ParseResource(buffer: string, literally: bool) -> Resource
+#struct Resource
+#	var type: string
+#	var id: string
+#	var title: string
+#	var tooltip: string
+#	var options: string[]
+#	var x, y: int
+#	var children: Resource[]
+#	#void reset()
+#	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
+#	func extern show(indent: int)
+#	func extern str(indent: int) -> string
+#	
+#func extern ParseResource(buffer: string, literally: bool) -> Resource
 
-var resources: Resource[]
+var resources: hui.Resource[]
 var resource_files: os.Path[]
 
 
-func load_all_huis(literally: bool) -> Resource[]
-	var res: Resource[]
+func load_all_huis(literally: bool) -> hui.Resource[]
+	var res: hui.Resource[]
 	var files = os.fs.search(conf.dir, "*.hui", "f")
 	for f in files
 		var source = os.fs.read_text(conf.dir | f)
-		var r = ParseResource(source, literally)
+		var r = hui.parse_resource(source, literally)
 		if r.type in ["Dialog", "Window", "Menu", "Toolbar"]
 			resource_files.add(conf.dir | f)
 			res.add(r)

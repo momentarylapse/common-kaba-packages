@@ -23,15 +23,6 @@ list(APPEND DEPS ${LIBBSON10_LIBRARIES})
 list(APPEND COMPILE_OPTIONS ${LIBBSON10_CFLAGS_OTHER})
 list(APPEND COMPILE_DEFINITIONS HAS_LIB_BSON=1)
 
-
-# lib: mongo (mandatory)
-pkg_check_modules(LIBMONGOC10 REQUIRED libmongoc-1.0)
-list(APPEND INCLUDE_DIRECTORIES ${LIBMONGOC10_INCLUDE_DIRS})
-list(APPEND LINK_DIRECTORIES ${LIBMONGOC10_LIBRARY_DIRS})
-list(APPEND DEPS ${LIBMONGOC10_LIBRARIES})
-list(APPEND COMPILE_OPTIONS ${LIBMONGOC10_CFLAGS_OTHER})
-list(APPEND COMPILE_DEFINITIONS HAS_LIB_MONGO=1)
-
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
@@ -55,7 +46,6 @@ if (NOT WIN32)
 	target_compile_options(modulebson PUBLIC -fvisibility=hidden)
 endif()
 target_include_directories(modulebson PUBLIC src)
-target_include_directories(modulebson PUBLIC src/lib)
 
 
 #=======================================================================================

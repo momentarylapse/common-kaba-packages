@@ -102,6 +102,9 @@ target_link_libraries({{t.binary_file}} PUBLIC {{deps}})"
 if (NOT WIN32)
 	target_compile_options({{t.binary_file}} PUBLIC -fvisibility=hidden)
 endif()"
+	if not (str(t.source[0]) in t.include_directories)
+		r += "
+target_include_directories({{t.binary_file}} PUBLIC {{t.source[0]}})"
 	for i in t.include_directories
 		r += "
 target_include_directories({{t.binary_file}} PUBLIC {{i}})"

@@ -31,6 +31,7 @@ list(APPEND DEPS Threads::Threads)
 
 add_library(modulepdf SHARED
 	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
@@ -60,6 +61,7 @@ add_library(modulepdf SHARED
 	src/lib/math/vec2.cpp
 	src/lib/math/vec3.cpp
 	src/lib/math/vec4.cpp
+	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
 	src/lib/os/date.cpp
@@ -75,7 +77,7 @@ add_library(modulepdf SHARED
 target_include_directories(modulepdf PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulepdf PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(modulepdf PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(modulepdf PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(modulepdf PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(modulepdf PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(modulepdf PUBLIC -fvisibility=hidden)

@@ -39,7 +39,7 @@ list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
 
 # lib: vulkan or gl (mandatory)
 set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
-pkg_check_modules(VULKAN vulkan)
+find_package(Vulkan COMPONENTS shaderc_combined)
 if(VULKAN_FOUND)
 	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
 endif()
@@ -58,10 +58,7 @@ else()
 	set(VULKAN_OR_GL "")
 endif()
 if(VULKAN_OR_GL STREQUAL "vulkan")
-	list(APPEND INCLUDE_DIRECTORIES ${VULKAN_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${VULKAN_LIBRARY_DIRS})
-	list(APPEND DEPS ${VULKAN_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${VULKAN_CFLAGS_OTHER})
+	list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
 endif()
 if(VULKAN_OR_GL STREQUAL "gl")
@@ -113,6 +110,7 @@ list(APPEND DEPS Threads::Threads)
 
 add_library(moduleyrenderer SHARED
 	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
@@ -159,6 +157,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
+	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
 	src/lib/vulkan/_kaba_export.cpp
 	src/lib/vulkan/AccelerationStructure.cpp

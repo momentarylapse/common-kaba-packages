@@ -41,6 +41,7 @@ list(APPEND DEPS Threads::Threads)
 
 add_library(modulegl SHARED
 	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
@@ -91,7 +92,7 @@ add_library(modulegl SHARED
 target_include_directories(modulegl PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulegl PUBLIC ${LINK_DIRECTORIES})
 target_compile_options(modulegl PUBLIC ${COMPILE_OPTIONS})
-target_compile_definitions(modulegl PUBLIC ${COMPILE_DEFINITIONS}  INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
+target_compile_definitions(modulegl PUBLIC ${COMPILE_DEFINITIONS}  SOURCE_ROOT="${CMAKE_SOURCE_DIR}" INSTALL_PREFIX="${CMAKE_INSTALL_PREFIX}")
 target_link_libraries(modulegl PUBLIC ${DEPS})
 if (NOT WIN32)
 	target_compile_options(modulegl PUBLIC -fvisibility=hidden)

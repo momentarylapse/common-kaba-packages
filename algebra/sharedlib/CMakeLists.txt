@@ -28,6 +28,7 @@ add_library(modulealgebra SHARED
 	src/lib/algebra/crypto.cpp
 	src/lib/algebra/vli.cpp
 	src/lib/any/any.cpp
+	src/lib/any/conversion.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
