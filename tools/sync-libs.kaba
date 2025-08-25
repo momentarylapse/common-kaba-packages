@@ -51,6 +51,9 @@ func sync_packages(repo: Entry, lib: Entry)
 		for l in os.fs.search(repo.dir | p | "sharedlib/src/lib", "*", "d")
 			sync_overwrite(lib.dir | l, repo.dir | p | "sharedlib/src/lib" | l)
 
+
+func action_sync()
+
 func main()
 	let list = load_list()
 	var lib: Entry* = nil
