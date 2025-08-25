@@ -20,49 +20,106 @@ func load_list() -> Entry[]
 				list.add([x[1] as os.Path, EntryType.PACKAGES])
 	return list
 
-func sync_overwrite(source: os.Path, dest: os.Path)
+struct Global
+	entries: Entry[]
+	lib: Entry* = nil
+
+func init() -> Global
+	var g: Global
+	g.entries = load_list()
+	for e in g.entries
+		if e.type == EntryType.LIB
+			g.lib = &e
+	if not g.lib
+		raise(new Exception("no 'lib' entry found in '~/.kaba/sync-libs'"))
+	return g
+
+
+func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 	#print("  {{source.basename()}}")
 	for f in os.fs.search(source, "*", "fr")
 		let label = source.basename() + "/" + str(f)
 		if os.fs.exists(dest | f)
 			if os.fs.read_text(source | f) != os.fs.read_text(dest | f)
-				print("  {{os.terminal.ORANGE}}OLD{{os.terminal.END}} {{label}}")
-				os.fs.copy(source | f, dest | f)
+				print("  {{os.terminal.ORANGE}}CHANGED{{os.terminal.END}} {{label}}")
+				if cmd == "pull"
+					os.fs.copy(source | f, dest | f)
+				if cmd == "push"
+					os.fs.copy(dest | f, source | f)
+				if cmd == "diff"
+					print("diff '{{source}}/{{f}}' '{{dest}}/{{f}}'")
+					print(os.shell_execute("diff '{{source}}/{{f}}' '{{dest}}/{{f}}'"))
 		else
-			print("  {{os.terminal.ORANGE}}MISSING{{os.terminal.END}} {{label}}")
-			os.fs.copy(source | f, dest | f)
+			print("  {{os.terminal.ORANGE}}ONLY REMOTE{{os.terminal.END}} {{label}}")
+			if cmd == "pull"
+				os.fs.copy(source | f, dest | f)
+			if cmd == "push"
+				os.fs.delete(source | f)
 			# TODO create directories...
 			
 			
 	for f in os.fs.search(dest, "*", "fr")
 		let label = source.basename() + "/" + str(f)
-		if not os.fs.exists(dest | f)
-			print("  {{os.terminal.ORANGE}}DEPRECATED{{os.terminal.END}} {{label}}")
-			os.fs.delete(dest | f)
+		if not os.fs.exists(source | f)
+			print("  {{os.terminal.ORANGE}}ONLY LOCAL{{os.terminal.END}} {{label}}")
+			if cmd == "pull"
+				os.fs.delete(dest | f)
+			if cmd == "push"
+				os.fs.copy(dest | f, source | f)
 
-func sync_packages(repo: Entry, lib: Entry)
-	print("-- sync packages {{repo.dir}} --")
-	for p in os.fs.search(repo.dir, "*", "d")
-		if not os.fs.exists(repo.dir | p | ".kaba-package")
-			continue
-		if not os.fs.exists(repo.dir | p | "sharedlib")
-			continue
-		print(p)
-		for l in os.fs.search(repo.dir | p | "sharedlib/src/lib", "*", "d")
-			sync_overwrite(lib.dir | l, repo.dir | p | "sharedlib/src/lib" | l)
+func sync_xmake_project(dir: os.Path, lib: Entry, cmd: string)
+	print("> xmake {{dir}}")
+	for l in os.fs.search(dir | "src/lib", "*", "d")
+		sync_dir(lib.dir | l, dir | "src/lib" | l, cmd)
+
+func sync_kaba_package(dir: os.Path, lib: Entry, cmd: string)
+	print("> kaba package {{dir}}")
+	if os.fs.exists(dir | "sharedlib")
+		sync_xmake_project(dir | "sharedlib", lib, cmd)
+
+func sync_kaba_repo(dir: os.Path, lib: Entry, cmd: string)
+	print("> kaba repo {{dir}}")
+	for p in os.fs.search(dir, "*", "d")
+		if is_kaba_package(dir | p)
+			sync_kaba_package(dir | p, lib, cmd)
 
 
-func action_sync()
+func is_xmake_project(dir: os.Path) -> bool
+	return os.fs.exists(dir | "xmake.conf")
 
-func main()
-	let list = load_list()
-	var lib: Entry* = nil
-	for e in list
-		if e.type == EntryType.LIB
-			lib = &e
+func is_kaba_package(dir: os.Path) -> bool
+	return os.fs.exists(dir | ".kaba-package")
+
+func is_kaba_repo(dir: os.Path) -> bool
+	return os.fs.exists(dir | ".kaba-repo")
+
+
+func action_sync(g: Global, dir: os.Path, cmd: string)
+	if is_xmake_project(dir)
+		sync_xmake_project(dir, g.lib!, cmd)
+	if is_kaba_package(dir)
+		sync_kaba_package(dir, g.lib!, cmd)
+	if is_kaba_repo(dir)
+		sync_kaba_repo(dir, g.lib!, cmd)
+
+
+func main(args: string[])
+	let g = init()
+	var dir = os.fs.current_directory()
+	var command = "summary"
 	
-	for e in list
-		if e.type == EntryType.PACKAGES
-			sync_packages(e, lib!)
+	for a in args
+		if a in ["summary", "push", "pull", "diff", "meld", "ALL"]
+			command = a
+		else
+			dir = a
+	
+	
+	match command
+		"ALL" =>
+			for e in g.entries
+				if e.type == EntryType.PACKAGES
+					sync_kaba_repo(e.dir, g.lib!, "diff")
+		else => action_sync(g, dir, command)
 			
 	
