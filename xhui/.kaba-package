@@ -1,4 +1,4 @@
-version 0.3
+version 0.4
 requires vulkan
 build xmake sharedlib modulexhui
 

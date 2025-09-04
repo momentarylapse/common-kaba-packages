@@ -1,3 +1,4 @@
+version 1
 requires hui
 requires terminal
 run kabama.kaba

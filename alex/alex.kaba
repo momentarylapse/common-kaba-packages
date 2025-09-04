@@ -1,4 +1,5 @@
 use mongo.*
+use bson.*
 #use "file.kaba"
 use os
 
