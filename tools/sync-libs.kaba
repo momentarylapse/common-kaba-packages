@@ -47,8 +47,9 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 				if cmd == "push"
 					os.fs.copy(dest | f, source | f)
 				if cmd == "diff"
-					print("diff '{{source}}/{{f}}' '{{dest}}/{{f}}'")
-					print(os.shell_execute("diff '{{source}}/{{f}}' '{{dest}}/{{f}}'"))
+					let _cmd = "diff --color=always '{{source}}/{{f}}' '{{dest}}/{{f}}'; a=8" # prevent error return value!
+					#print(_cmd)
+					print(os.shell_execute(_cmd))
 		else
 			print("  {{os.terminal.ORANGE}}ONLY REMOTE{{os.terminal.END}} {{label}}")
 			if cmd == "pull"
