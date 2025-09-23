@@ -1,4 +1,8 @@
 description = ""
+element:auto_exposure = ""
+element:auto_exposure_max = ""
+element:auto_exposure_min = ""
+element:auto_exposure_speed = ""
 element:bloom_factor = ""
 element:bloom_radius = ""
 element:enabled = ""

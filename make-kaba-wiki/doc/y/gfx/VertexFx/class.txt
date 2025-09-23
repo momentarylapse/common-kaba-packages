@@ -1,5 +1,6 @@
 description = ""
 element:col = ""
+element:color = ""
 element:pos = ""
 element:u = ""
 element:v = ""

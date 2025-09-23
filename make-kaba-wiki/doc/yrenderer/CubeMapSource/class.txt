@@ -1,0 +1,6 @@
+description = ""
+element:cube_map = ""
+element:max_depth = ""
+element:min_depth = ""
+element:resolution = ""
+element:update_rate = ""

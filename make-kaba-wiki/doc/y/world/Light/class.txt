@@ -1,6 +1,7 @@
 description = ""
 element:allow_shadow = ""
 element:color = ""
+element:dir = ""
 element:enabled = ""
 element:harshness = ""
 element:owner = ""

@@ -5,6 +5,7 @@ use common.*
 use wiki
 use docu
 
+
 func wiki_upload(name: string, wiki: string)
 	os.fs.write_text(name + ".txt", wiki)
 
@@ -15,15 +16,11 @@ func make_documentation()
 	for p in default_context.packages
 		make_module(p, p.name, "", [])
 
-	let external_packages = find_external()
+	let external_packages = find_external_packages()
 	for p in external_packages
 		for m in p.main
 			make_module(m, p.name, "", p.sub_modules)
 
-	let external_libs = find_external_libs()
-	for _p in external_libs
-		for p in _p
-			make_module(p, p.name, "", [])
 
 func get_func_alternatives(all: Function&[], f: Function) -> Function&[]
 	return all |> filter(ff => ff.name == f.name)
@@ -38,6 +35,7 @@ func make_class(c: Class, ns: string)
 	let classes = filter_classes(c.classes)
 	for cc in classes
 		make_class(cc, "{{ns}}.{{c.name}}")
+
 
 func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[])
 	var ns = name
@@ -64,8 +62,7 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shar
 
 
 func main(arg: string[])
-	find_external()
-	find_external_libs()
+	find_external_packages()
 	if len(arg) > 0
 		if arg[0] == "prepare"
 			docu.report_missing = true

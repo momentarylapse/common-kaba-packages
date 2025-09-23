@@ -1,0 +1,8 @@
+description = ""
+element:buffer = ""
+element:components = ""
+element:normalized = ""
+element:offset = ""
+element:semantic = ""
+element:stride = ""
+element:type = ""

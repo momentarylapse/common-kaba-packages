@@ -1,6 +1,7 @@
 description = ""
 param:format = ""
 param:pass = ""
+param:rp = ""
 param:shader = ""
 param:subpass = ""
 param:topology = ""

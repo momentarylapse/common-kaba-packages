@@ -1,0 +1,7 @@
+description = ""
+element:num_surfels = ""
+element:probe_cells = ""
+element:probe_max = ""
+element:probe_min = ""
+element:ray_tracing_data = ""
+element:surfel_buffer = ""

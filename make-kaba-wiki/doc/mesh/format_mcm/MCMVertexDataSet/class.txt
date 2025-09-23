@@ -1,0 +1,5 @@
+description = ""
+element:num_vertex_specs = ""
+element:num_vertices = ""
+element:reserved = ""
+element:vertex_specs_offset = ""

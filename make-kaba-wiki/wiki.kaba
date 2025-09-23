@@ -202,7 +202,7 @@ func render_class(ns: string, c: Class) -> string
 	if len(ops) > 0 or is_list(c)
 		wiki += "\n{{SHIFT}}# operators\n"
 		if is_list(c)
-			wiki += "{{SHIFT}}# {{c.name}}[int]  -> {{c.param[0].name}}\n"
+			wiki += "{{SHIFT}}# {{c.name}}[i32]  -> {{c.param[0].name}}\n"
 		for f in ops
 			var pre = func_pre(f)
 			var p: Class* = nil
@@ -215,7 +215,7 @@ func render_class(ns: string, c: Class) -> string
 			var ll = "{{SHIFT}}func {{pre}}{{f.name}}({{func_params(f)}}){{func_return(f)}}"
 			wiki += "{{ll|-40}}"
 			if f.name == "__subarray__"
-				wiki += " # {{c.name}}[int:int] -> {{f.return_type.name}}\n"
+				wiki += " # {{c.name}}[i32:i32] -> {{f.return_type.name}}\n"
 			else if f.name == "__get__"
 				for _p in p
 					wiki += " # {{c.name}}[{{_p.name}}] -> {{f.return_type.name}}\n"
@@ -238,7 +238,7 @@ func render_class(ns: string, c: Class) -> string
 	if len(consts) > 0
 		wiki += "\n{{SHIFT}}# constants\n"
 		for cc in consts
-			wiki += "{{SHIFT}}const {{cc.name}}: {{cc.type.name}}\n"
+			wiki += "{{SHIFT}}let {{cc.name}}: {{cc.type.name}}\n"
 	if len(classes) > 0
 		wiki += "\n{{SHIFT}}# nested classes\n"
 		for cc in classes
@@ -316,7 +316,7 @@ func render_module(p: Module, name: string, _ns: string, sub_modules: (string,sh
 	if len(consts) > 0
 		wiki += "\n=== Constants ===\n\n"
 		for c in consts
-			wiki += "* <tt>const '''{{c.name}}''': {{c.type.name}}</tt>\n"
+			wiki += "* <tt>let '''{{c.name}}''': {{c.type.name}}</tt>\n"
 	return wiki
 
 
@@ -334,16 +334,10 @@ func render_reference() -> string
 			wiki += " (auto import)"
 		wiki += "\n"
 
-	let external_packages = find_external()
-	wiki += "\n; external program apis\n\n"
+	let external_packages = find_external_packages()
+	wiki += "\n; external\n\n"
 	for p in external_packages
 		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
-
-	let external_libs = find_external_libs()
-	wiki += "\n; external libs\n\n"
-	for _p in external_libs
-		for p in _p
-			wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
 
 	wiki += "\n=== Statements ===\n\n"
 	let stats = statements |> sort("name")

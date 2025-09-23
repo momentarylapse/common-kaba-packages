@@ -16,13 +16,13 @@ func parse_doc_string(s: string) -> string
 		break
 	return ss.unescape()
 
+
 func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 	var p = os.Path("doc/" + ns.replace(".", "/"))
 	if is_class
 		p = p | name | "class.txt"
 	else
 		p = p | name + ".txt"
-	#print(p)
 	var conf: os.Configuration
 	conf.load(p)
 	if str(conf[key]) in ["nil", ""]
@@ -36,6 +36,7 @@ func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
 		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
 		return parse_doc_string(str(conf[key]))
 	return "..."
+
 
 func doc_get_class_description(ns: string, c: Class) -> string
 	return doc_get(ns, c.name, true, "description")
@@ -52,6 +53,7 @@ func doc_get_func_return(ns: string, f: Function) -> string
 func doc_get_func_param(ns: string, f: Function, p: string) -> string
 	return doc_get(ns, f.name, false, "param:{{p}}")
 
+
 func short_doc(s: string) -> string
 	if len(s) == 0
 		return s
@@ -60,17 +62,20 @@ func short_doc(s: string) -> string
 		x = x[:100] + "..."
 	return x
 
+
 func prepare_func(f: Function, ns: string, dir: os.Path)
 	doc_get_func_description(ns, f)
 	let params = func_notable_params(f)
 	for p in params
-		doc_get_func_param(ns, f, p.e0)
+		let x = doc_get_func_param(ns, f, p.e0)
 	if f.return_type.name != "void"
 		let x = doc_get_func_return(ns, f)
+
 
 func prepare_class(c: Class, ns: string, dir: os.Path)
 	if not os.fs.exists(dir)
 		os.fs.create_directory(dir)
+	print(c)
 	
 	let funcs = filter_funcs(c.functions, c)
 	let elements = filter_elements(c.elements)
@@ -79,13 +84,14 @@ func prepare_class(c: Class, ns: string, dir: os.Path)
 	
 	doc_get_class_description(ns, c)
 	for e in elements
-		doc_get_class_element(ns, c, e)
+		let r = doc_get_class_element(ns, c, e)
 	
 	for f in funcs
 		prepare_func(f, ns + "." + c.name, dir)
 	
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name, dir | cc.name)
+
 
 func prepare_module(p: Module, name: string, dir: os.Path)
 	if not os.fs.exists(dir)
@@ -106,19 +112,16 @@ func prepare_module(p: Module, name: string, dir: os.Path)
 
 
 func prepare(dir: os.Path)
+	print("PREPARE")
 	for p in default_context.packages
 		prepare_module(p, p.name, dir | p.name)
+	print("----")
 
-	let external_packages = find_external()
+	let external_packages = find_external_packages()
 	for p in external_packages
 		for m in p.main
 			prepare_module(m, p.name, dir | p.name)
 		for m in p.sub_modules
 			for mm in m[1]
 				prepare_module(mm, p.name + "." + m[0], dir | p.name | m[0])
-
-	let external_libs = find_external_libs()
-	for _p in external_libs
-		for p in _p
-			prepare_module(p, p.name, dir | p.name)
 

@@ -1,0 +1,4 @@
+description = ""
+param:material_dir = ""
+param:shader_dir = ""
+param:texture_dir = ""

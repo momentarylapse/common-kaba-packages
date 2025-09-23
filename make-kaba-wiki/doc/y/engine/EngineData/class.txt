@@ -1,4 +1,5 @@
 description = ""
+element:camera_renderers = ""
 element:collisions_enabled = ""
 element:console_enabled = ""
 element:context = ""

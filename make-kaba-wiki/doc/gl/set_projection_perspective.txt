@@ -1,1 +1,5 @@
 description = ""
+param:center = ""
+param:size_1 = ""
+param:zmax = ""
+param:zmin = ""

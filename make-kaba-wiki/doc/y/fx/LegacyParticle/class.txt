@@ -1,6 +1,7 @@
 description = ""
 element:color = ""
 element:enabled = ""
+element:owner = ""
 element:pos = ""
 element:radius = ""
 element:source = ""

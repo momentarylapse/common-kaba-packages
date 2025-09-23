@@ -1,0 +1,7 @@
+description = ""
+param:amp = ""
+param:dt = ""
+param:omega = ""
+param:res = ""
+param:t_max = ""
+param:type = ""

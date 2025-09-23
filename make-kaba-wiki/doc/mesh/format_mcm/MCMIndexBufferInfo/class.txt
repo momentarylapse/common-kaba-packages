@@ -1,0 +1,8 @@
+description = ""
+element:buffer = ""
+element:count = ""
+element:material = ""
+element:mode = ""
+element:offset = ""
+element:type = ""
+element:vertex_data_set = ""

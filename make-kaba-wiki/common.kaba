@@ -1,6 +1,7 @@
 use kaba.*
 use os.*
 
+
 func func_notable_params(f: Function) -> (string,Class*)[]
 	var r: (string,Class*)[]
 	for i=>p in f.param_type
@@ -13,7 +14,7 @@ func filter_funcs(funcs: Function&[], namespace: Class) -> Function&[]
 	return funcs
 		|> filter(f => f.namespace == &namespace)
 		|> filter(f => f.name != "main")
-		|> filter(f => not(f.name[:1] in ["@", "_", "-"]) or f.name == "__init__")
+		|> filter(f => not(f.name[:1] in ["@", "_", "-", ":"]) or f.name == "__init__")
 		|> sort("name")
 		|> sort("is_static!")
 
@@ -39,7 +40,6 @@ func filter_classes(classes: Class&[]) -> Class&[]
 		|> sort("name")
 
 
-
 struct ExternalPackage
 	name: string
 	main: shared[Module]
@@ -47,30 +47,28 @@ struct ExternalPackage
 	#sub_names: string[]
 	
 
-func find_external() -> ExternalPackage[]
+func find_external_packages_in(base_dir: Path) -> ExternalPackage[]
 	var r: ExternalPackage[]
-	let list = fs.search("extern", "", "d")
+	let list = fs.search(base_dir, "", "d")
 	for e in list
+		if not fs.exists(base_dir | e | "{{e}}.kaba")
+			continue
 		var p: ExternalPackage
 		p.name = str(e)
-		p.main = default_context.load_module("extern/{{e}}/{{e}}.kaba", true)
+		print("extern: {{e}}")
+		p.main = default_context.load_module(base_dir | e | "{{e}}.kaba", true)
 		
 		# sub-modules
-		let list2 = fs.search("extern/{{e}}", "*.kaba", "f")
+		let list2 = fs.search(base_dir | e, "*.kaba", "f")
 		for e2 in list2
 			if str(e2) != str(e) + ".kaba"
-				p.sub_modules.add([str(e2).replace(".kaba", ""), default_context.load_module("extern/{{e}}/{{e2}}", true)])
+				var xx = default_context.load_module(base_dir | e | e2, true)
+				p.sub_modules.add([str(e2).replace(".kaba", ""), xx])
 		#p.name = str(e)[:-5]
 		r.add(p)
 	return r
 
-func find_external_libs() -> shared[Module][]
-	var r: shared[Module][]
-	let list = fs.search("lib", "*.kaba", "f")
-	for e in list
-		var p = default_context.load_module("lib/{{e}}", true)
-		for pp in p
-			pp.name = str(e)[:-5]
-			r.add(p)
-	return r
+
+func find_external_packages() -> ExternalPackage[]
+	return find_external_packages_in(app_directory_dynamic | "repos" | "michi.common")
 

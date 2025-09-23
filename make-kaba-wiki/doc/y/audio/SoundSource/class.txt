@@ -1,0 +1,8 @@
+description = ""
+element:loop = ""
+element:max_distance = ""
+element:min_distance = ""
+element:owner = ""
+element:speed = ""
+element:suicidal = ""
+element:volume = ""

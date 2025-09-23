@@ -1,0 +1,8 @@
+description = ""
+element:NX = ""
+element:NY = ""
+element:NZ = ""
+element:bounds = ""
+element:data = ""
+element:shader = ""
+element:tex = ""

@@ -1,4 +1,5 @@
 description = ""
 param:col = ""
+param:color = ""
 param:pos = ""
 param:radius = ""
