@@ -48,7 +48,7 @@ func action_check(arg: string[])
 	var langs = load_prelangs()
 	
 	for l in langs
-		check_lang(l, own, false)
+		let r = check_lang(l, own, false)
 
 func action_export(arg: string[])
 

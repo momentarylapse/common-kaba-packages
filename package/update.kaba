@@ -31,5 +31,5 @@ func action_upgrade(args: string[])
 	
 	for name in needs_upgrade
 		for p in list_find(conf.packages_remote, name)
-			install_package(p)
+			let _ = install_package(p)
 

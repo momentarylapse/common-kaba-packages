@@ -117,7 +117,7 @@ class Window extends hui.Window
 				let xx = d.x[i]
 				points.add(project([xx, yy]))
 		
-		p.clip([BORDER, width-BORDER, BORDER, height-BORDER])
+		p.set_clip([BORDER, width-BORDER, BORDER, height-BORDER])
 		p.set_color(Theme.fg)
 		p.set_line_width(2.0)
 		p.set_antialiasing(true)

@@ -55,7 +55,7 @@ func load_3ds(fn: os.Path) -> Mesh
 				m.indices.add(read16(f))
 				m.indices.add(read16(f))
 				m.indices.add(read16(f))
-				read16(f)
+				let r = read16(f)
 			#continue
 			# nope, there might be more stuff...
 		f.set_pos(chunk_ends[-1])
@@ -109,7 +109,7 @@ func save_3ds(_m: Mesh, fn: os.Path)
 	f.write(as_binary(&nv, 2))
 	for v in m.vertices
 		#f << v.pos
-		f.write(as_binary(&v.pos, 12))
+		let r = f.write(as_binary(&v.pos, 12))
 	
 	# faces
 	f.write([0x20, 0x41])
@@ -119,7 +119,7 @@ func save_3ds(_m: Mesh, fn: os.Path)
 		f.write(as_binary(&m.indices[i*3], 2))
 		f.write(as_binary(&m.indices[i*3+1], 2))
 		f.write(as_binary(&m.indices[i*3+2], 2))
-		f.write([0,0])
+		let r = f.write([0,0])
 	
 	
 	

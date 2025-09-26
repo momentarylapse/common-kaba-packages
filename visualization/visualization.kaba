@@ -349,7 +349,7 @@ void main() {
 		
 			event_x("nix-area", "hui:draw-gl", draw_gl)
 		
-			hui.run_repeated(IDLE_DT, on_idle)
+			let id = hui.run_repeated(IDLE_DT, on_idle)
 	
 	func mut set_default_shader_3d()
 		gl.set_shader(def_shader_3d)
