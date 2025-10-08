@@ -6,14 +6,17 @@
 
 #include "../Painter.h"
 #include "../Theme.h"
-#include "../draw/font.h"
-#include "../../base/iter.h"
-#include "../../os/msg.h"
+#include <lib/ygraphics/font.h>
+#include <lib/base/iter.h>
+#include <lib/os/msg.h>
+#include <cmath>
 
 namespace xhui {
 
 
 //#define PERF_OUT
+
+constexpr float DEFAULT_LINE_NUMBER_WIDTH = 50.0f;
 
 
 FontFlags operator|(FontFlags a, FontFlags b) {
@@ -103,7 +106,7 @@ void Edit::on_mouse_move(const vec2& m, const vec2& d) {
 }
 
 vec2 Edit::viewport_size() const {
-	return vec2::max(cache.content_size - _area.size() + vec2(margin_x * 2, 0), vec2::ZERO);
+	return vec2::max(cache.content_size - _area.size() + vec2(margin_x * 2 + line_number_area_width, 0), vec2::ZERO);
 }
 
 
@@ -169,6 +172,12 @@ void Edit::on_key_down(int key) {
 	if (key == KEY_X + mod) {
 		clipboard::copy(get_range(selection_start, cursor_pos));
 		delete_selection();
+	}
+	if (key == KEY_A + mod) {
+		// select all
+		selection_start = 0;
+		cursor_pos = text.num;
+		request_redraw();
 	}
 	if (key == KEY_Z + mod and current_history_index > 0) {
 		auto& op = history[-- current_history_index];
@@ -258,11 +267,12 @@ void Edit::draw_text(Painter* p) {
 #endif
 
 	const auto clip0 = p->clip();
-	p->set_clip(_area);
+
+	p->set_clip(_area and clip0);
 	p->set_font(font_name, font_size, false, false);
 	face = p->face;
 
-	text_x0 = _area.x1 + margin_x - viewport_offset.x;
+	text_x0 = _area.x1 + margin_x + line_number_area_width - viewport_offset.x;
 
 	// update text dims
 	float inner_height = 0;
@@ -369,7 +379,6 @@ void Edit::draw_text(Painter* p) {
 		p->draw_line({pos.x, pos.y}, {pos.x, pos.y + cache.line_height[0]});
 	}
 
-	p->set_font(Theme::_default.font_name, Theme::_default.font_size, false, false);
 	p->set_clip(clip0);
 
 #ifdef PERF_OUT
@@ -411,6 +420,7 @@ void Edit::_replace_range(Index i0, Index i1, const string& t) {
 		return index;
 	};
 	cursor_pos = map_index(cursor_pos);
+	//scroll_into_view(cursor_pos);
 	selection_start = map_index(selection_start);
 	on_edit();
 	emit_event(event_id::Changed, true);
@@ -448,8 +458,8 @@ void Edit::scroll_into_view(Index index) {
 	if (!face)
 		return;
 	const auto xy = index_to_xy(index);
-	if (xy.x < _area.x1)
-		viewport_offset.x -= (_area.x1 - xy.x);
+	if (xy.x < _area.x1 + line_number_area_width)
+		viewport_offset.x -= (_area.x1 + line_number_area_width - xy.x);
 	else if (xy.x > _area.x2)
 		viewport_offset.x += (xy.x - _area.x2);
 	if (xy.y < _area.y1)
@@ -477,7 +487,7 @@ Edit::Index Edit::xy_to_index(const vec2& pos) const {
 	float dy = pos.y - cache.line_y0[0];
 
 	face->set_size(font_size * ui_scale);
-	int line_no = min((int)(dy / cache.line_height[0]), cache.lines.num - 1);
+	int line_no = clamp((int)(dy / cache.line_height[0]), 0, cache.lines.num - 1);
 	const auto& l = cache.lines[line_no];
 
 	if (dx > cache.line_width[line_no])
@@ -501,6 +511,13 @@ Edit::Index Edit::xy_to_index(const vec2& pos) const {
 void Edit::_draw(Painter *p) {
 	ui_scale = p->ui_scale;
 
+	if (markup_dirty) {
+		base::inplace_sort(markups, [] (const Markup& a, const Markup& b) {
+			return a.i0 <= b.i0;
+		});
+		markup_dirty = false;
+	}
+
 	// background
 	color bg = Theme::_default.background_button;
 	if (alt_background)
@@ -519,10 +536,37 @@ void Edit::_draw(Painter *p) {
 		p->set_color(bg);
 		p->draw_rect(_area.grow(-dr));
 	}
-	p->set_line_width(1);
 	p->set_roundness(0);
 
 	draw_text(p);
+
+	if (show_line_numbers) {
+		p->set_font("monospace", font_size, false, false);
+		//p->set_font(Theme::_default.font_name, Theme::_default.font_size, false, false);
+		line_number_area_width = DEFAULT_LINE_NUMBER_WIDTH;//p->get_str_width(str(cache.lines.num));
+
+
+		p->set_color(alt_background ? Theme::_default.background : color::mix(Theme::_default.background_active, bg, 0.7f));
+		p->draw_rect({_area.x1, _area.x1 + line_number_area_width, _area.y1, _area.y2});
+
+		int cursor_line = index_to_line_pos(cursor_pos).line;
+		float dy = -1;
+		for (const auto& [l, y0]: enumerate(cache.line_y0))
+			if (y0 + cache.line_height[l] > _area.y1 and y0 < _area.y2) {
+				p->set_color(Theme::_default.text_disabled);
+				if (l == cursor_line)
+					p->set_color(Theme::_default.text);
+				if (dy < 0) {
+					auto size = p->get_str_size("0");
+					dy = (cache.line_height[l] - size.y) / 2.0f;
+				}
+				p->draw_str({_area.x1, y0 + dy}, format("%3d", l+1));
+			}
+	}
+
+	p->set_font(Theme::_default.font_name, Theme::_default.font_size, false, false);
+	p->set_line_width(1);
+	p->set_roundness(0);
 }
 
 // TODO count utf8 chars
@@ -555,9 +599,7 @@ Edit::Index Edit::prior_index(Index index) const {
 
 void Edit::add_markup(const Markup& m) {
 	markups.add(m);
-	base::inplace_sort(markups, [] (const Markup& a, const Markup& b) {
-		return a.i0 <= b.i0;
-	});
+	markup_dirty = true;
 	request_redraw();
 }
 
@@ -566,7 +608,7 @@ void Edit::clean_markup(Index i0, Index i1) {
 	base::remove_if(markups, [i0, i1] (const Markup& m) {
 		return i0 <= m.i0 and i1 >= m.i1;
 	});
-	// shink?
+	// shrink?
 	for (auto& m: markups) {
 		if (m.i0 >= i0 and m.i0 <= i1)
 			m.i0 = i1;
@@ -582,6 +624,7 @@ void Edit::clean_markup(Index i0, Index i1) {
 		}
 	for (const auto& m: to_add)
 		add_markup(m);
+	markup_dirty = true;
 	request_redraw();
 }
 
@@ -605,6 +648,11 @@ void Edit::set_option(const string& key, const string& value) {
 		request_redraw();
 	} else if (key == "altbg") {
 		alt_background = true;
+		request_redraw();
+	} else if (key == "linenumbers") {
+		show_line_numbers = true;
+		line_number_area_width = DEFAULT_LINE_NUMBER_WIDTH;
+		request_redraw();
 	} else {
 		Control::set_option(key, value);
 	}

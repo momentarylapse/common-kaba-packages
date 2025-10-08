@@ -214,8 +214,8 @@ add_library(modulexhui SHARED
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
 	src/lib/xhui/dialogs/QuestionDialog.cpp
-	src/lib/xhui/draw/font.cpp
 	src/lib/xhui/_kaba_export.cpp
+	src/lib/xhui/Animator.cpp
 	src/lib/xhui/Application.cpp
 	src/lib/xhui/ContextGL.cpp
 	src/lib/xhui/ContextVulkan.cpp
@@ -230,6 +230,13 @@ add_library(modulexhui SHARED
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
+	src/lib/ygraphics/Context.cpp
+	src/lib/ygraphics/ContextGL.cpp
+	src/lib/ygraphics/ContextVulkan.cpp
+	src/lib/ygraphics/font.cpp
+	src/lib/ygraphics/Painter.cpp
+	src/lib/ygraphics/PainterGL.cpp
+	src/lib/ygraphics/PainterVulkan.cpp
 	src/main.cpp)
 target_include_directories(modulexhui PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulexhui PUBLIC ${LINK_DIRECTORIES})

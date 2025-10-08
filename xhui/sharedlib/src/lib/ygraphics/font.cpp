@@ -1,10 +1,10 @@
 #include "font.h"
-#include "../../image/image.h"
-#include "../../math/rect.h"
-#include "../../math/vec2.h"
-#include "../../os/msg.h"
-#include "../../os/path.h"
-#include "../../os/filesystem.h"
+#include <lib/image/image.h>
+#include <lib/math/rect.h>
+#include <lib/math/vec2.h>
+#include <lib/os/msg.h>
+#include <lib/os/path.h>
+#include <lib/os/filesystem.h>
 
 #if HAS_LIB_FREETYPE2
 #include <ft2build.h>
@@ -46,11 +46,14 @@ Face* load_face(const string& name, bool bold, bool italic) {
 	face->bold = bold;
 	face->italic = italic;
 
+	int flags = 0;
 	string type = "Regular";
-	if (bold)
+	if (bold) {
 		type = "Bold";
+		flags = FT_STYLE_FLAG_BOLD;
+	}
 
-	auto try_load_font = [face, &type] (const Path& filename) {
+	auto try_load_font = [face, &type, flags] (const Path& filename) {
 		if (!os::fs::exists(filename))
 			return false;
 		int error = FT_New_Face(ft2, filename.c_str(), -1, &face->face);
@@ -65,11 +68,13 @@ Face* load_face(const string& name, bool bold, bool italic) {
 			error = FT_New_Face(ft2, filename.c_str(), i, &face->face);
 			if (error)
 				continue;
-			if (string(face->face->style_name) == type)
-				break;
+			if (((int)face->face->style_flags & 0xffff) == flags) {
+				//msg_write(str(filename) + "   " + type);
+				return true;
+			}
 		}
 
-		return true;
+		return false;
 	};
 
 	string namex = name;
@@ -85,6 +90,7 @@ Face* load_face(const string& name, bool bold, bool italic) {
 	if (!try_load_font(format("/usr/share/fonts/Adwaita/%s-%s.ttf", name, type)))
 	if (!try_load_font(format("/usr/share/fonts/opentype/cantarell/%s-VF.otf", name)))
 	if (!try_load_font(format("/usr/share/fonts/truetype/freefont/%s.ttf", namex.replace(" ", ""))))
+	if (!try_load_font(format("/usr/share/fonts/truetype/dejavu/%s.ttf", namex.replace(" ", "-"))))
 	if (!try_load_font(format("static/%s-%s.ttf", name, type))) {
 		delete face;
 		return nullptr;
@@ -116,7 +122,7 @@ float Face::units_to_pixel(float units) const {
 #endif
 }
 
-TextDimensions Face::get_text_dimensions(const string &text) {
+TextDimensions Face::get_text_dimensions(const string &text) const {
 #if HAS_LIB_FREETYPE2
 	auto utf32 = text.utf8_to_utf32();
 	TextDimensions dim;
@@ -177,12 +183,12 @@ rect TextDimensions::inner_box(const vec2& p0) const {
 }
 
 
-float Face::get_text_width(const string &text) {
+float Face::get_text_width(const string &text) const {
 	auto dim = get_text_dimensions(text);
 	return dim.bounding_width;
 }
 
-void Face::render_text(const string &text, xhui::Align align, Image &im) {
+void Face::render_text(const string &text, Align align, Image &im) {
 #if HAS_LIB_FREETYPE2
 	auto utf32 = text.utf8_to_utf32();
 

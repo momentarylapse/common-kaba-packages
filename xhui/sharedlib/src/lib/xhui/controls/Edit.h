@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lib/base/optional.h>
-#include <lib/xhui/draw/font.h>
+#include <lib/ygraphics/font.h>
 
 #include "Control.h"
 
@@ -52,6 +52,8 @@ public:
 	bool multiline = false;
 	bool numerical = false;
 	bool show_focus_frame = true;
+	bool show_line_numbers = false;
+	float line_number_area_width = 0;
 	float margin_x, margin_y;
 	string font_name;
 	float font_size;
@@ -103,6 +105,7 @@ public:
 		color col;
 	};
 	Array<Markup> markups;
+	bool markup_dirty = false;
 	void add_markup(const Markup& m);
 	void clean_markup(Index i0, Index i1);
 
