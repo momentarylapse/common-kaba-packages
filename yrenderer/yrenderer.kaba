@@ -12,13 +12,20 @@ let EXPORT_IMPORTS = true
 ##func extern load_texture(filename: os.Path) -> shared![Texture]
 
 
+enum LightType
+	DIRECTIONAL
+	POINT
+	CONE
+	AMBIENT
+
 
 struct YLight
-	func extern mut init(c: Color, r: f32, t: f32)
+	func extern mut init(type: LightType, c: Color, theta: f32 = -1.0)
+	var type: LightType
 	var pos: vec3
 	var ang: Quaternion
 	var color: Color
-	var radius: f32
+	var power: f32
 	var theta: f32
 	var harshness: f32
 	var enabled: bool

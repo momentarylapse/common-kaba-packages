@@ -21,6 +21,7 @@
 #include <lib/yrenderer/ShaderManager.h>
 #include <lib/yrenderer/scene/CameraParams.h>
 #include <lib/ygraphics/graphics-impl.h>
+#include <cmath>
 
 
 using namespace yrenderer;
@@ -78,6 +79,14 @@ RenderPathDeferred::RenderPathDeferred(Context* ctx, int width, int height, int 
 		create_shadow_renderer(shadow_resolution);
 		create_cube_renderer();
 	}
+}
+
+void RenderPathDeferred::remove_all_emitters() {
+	scene_renderer_background->emitters.clear();
+	scene_renderer->emitters.clear();
+	scene_renderer_trans->emitters.clear();
+	shadow_renderer->remove_all_emitters();
+	cube_map_renderer->remove_all_emitters();
 }
 
 void RenderPathDeferred::add_background_emitter(shared<MeshEmitter> emitter) {

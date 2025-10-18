@@ -14,25 +14,27 @@
 #include <lib/yrenderer/Context.h>
 #include <lib/nix/nix.h>
 #include <lib/profiler/Profiler.h>
+#include <lib/ygraphics/Context.h>
 
 namespace yrenderer {
 
-WindowRenderer::WindowRenderer(Context* ctx, GLFWwindow* win) : TargetRenderer(ctx, "win") {
+WindowRenderer::WindowRenderer(Context* ctx, GLFWwindow* win, bool _gamma_correction) : TargetRenderer(ctx, "win") {
 	window = win;
+	gamma_correction = _gamma_correction;
 	if (ctx and window) {
 #if HAS_LIB_GLFW
 		glfwMakeContextCurrent(window);
 		//glfwGetFramebufferSize(window, &width, &height);
 #endif
 
-		_frame_buffer = ctx->context->default_framebuffer;
+		_frame_buffer = ctx->context->ctx->default_framebuffer;
 	}
 }
 
 
 bool WindowRenderer::start_frame() {
 #if HAS_LIB_GLFW
-	nix::start_frame_glfw(ctx->context, window);
+	nix::start_frame_glfw(ctx->context->ctx, window);
 	//jitter_iterate();
 	return true;
 #else
@@ -66,7 +68,7 @@ void WindowRenderer::draw(const RenderParams& params) {
 		c->prepare(sub_params);
 
 	bool prev_srgb = nix::get_srgb();
-	nix::set_srgb(true);
+	nix::set_srgb(gamma_correction);
 	nix::bind_frame_buffer(_frame_buffer);
 
 	for (auto c: children)
