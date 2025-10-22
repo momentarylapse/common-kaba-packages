@@ -1,3 +1,0 @@
-description = "Calculate the 3 angles of the orientation"
-param:self = ""
-return = "The 3 angles."

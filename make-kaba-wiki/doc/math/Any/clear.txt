@@ -1,1 +1,2 @@
-description = ""
+description = "Clear or drop the stored value."
+param:self = ""

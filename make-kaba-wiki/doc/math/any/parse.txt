@@ -1,3 +1,0 @@
-description = "Parse a string into an <tt>any</tt>."
-param:s = "The string to parse."
-return = "The output <tt>any</tt>."

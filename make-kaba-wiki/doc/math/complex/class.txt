@@ -1,3 +1,0 @@
-description = A complex number <math> z = x + iy </math>.
-element:x = The real component.
-element:y = The imaginary component.

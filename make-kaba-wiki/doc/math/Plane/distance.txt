@@ -1,3 +1,4 @@
-description = ""
-param:p = ""
-return = ""
+description = "Gives the minimal distance of a point to the plane."
+param:p = "The point."
+param:self = ""
+return = "The minimal distance."

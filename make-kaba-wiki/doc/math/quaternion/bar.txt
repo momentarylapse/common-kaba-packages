@@ -1,3 +1,0 @@
-description = "Get the conjugate <math>(w, -x, -y, -z)</math>.\nFor unit-quaternions this it also the inverse."
-param:self = ""
-return = "The conjugate."

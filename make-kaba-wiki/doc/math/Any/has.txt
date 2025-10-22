@@ -1,3 +1,4 @@
-description = ""
-param:key = ""
-return = ""
+description = "Checks, if a map contains an entry."
+param:key = "The key of the entry to check."
+param:self = ""
+return = "<tt>true</tt> if found."

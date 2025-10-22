@@ -1,2 +1,3 @@
-description = ""
-return = ""
+description = "Lists all keys of a map.\nIs empty, if not a map."
+param:self = ""
+return = "The keys."

@@ -1,2 +1,3 @@
-description = ""
-return = ""
+description = "The squared absolute value <math> \\\\|z\\\\|^2 = x^2 + y^2 </math>."
+param:self = ""
+return = "The squared absolute value."

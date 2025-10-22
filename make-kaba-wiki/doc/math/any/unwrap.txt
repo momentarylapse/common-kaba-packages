@@ -1,4 +1,0 @@
-description = "Unwrap the stored value into a binary representation."
-param:self = ""
-param:type = "Override the contained type."
-param:var = "The target memory to unwrap into."

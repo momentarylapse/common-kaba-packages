@@ -1,5 +1,0 @@
-description = ""
-param:ang = ""
-param:c = ""
-param:self = ""
-return = ""

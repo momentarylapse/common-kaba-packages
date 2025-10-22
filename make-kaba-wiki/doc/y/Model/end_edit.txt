@@ -1,3 +1,0 @@
-description = ""
-param:detail = ""
-param:self = ""

@@ -1,3 +1,3 @@
-description = ""
-param:pl = ""
-return = ""
+description = "Calculate the intersection point between a ray and a plane"
+param:pl = "The plane"
+return = "The intersection point, if ray and plane are not parallel"

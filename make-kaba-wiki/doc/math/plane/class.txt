@@ -1,9 +1,0 @@
-description = "A 3d plane <math>(a,b,c,d)</math>.\nAll points <math>(x,y,z)</math> in the plane are defined by <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>."
-element:_a = !
-element:_b = !
-element:_c = !
-element:a = !
-element:b = !
-element:c = !
-element:d = "The distance from the origin <math>(0,0,0)</math>."
-element:n = "The normal vector.\nThis is just a reinterpretation of <math>(a, b, c)</math> as a <class>math.vector</class>."

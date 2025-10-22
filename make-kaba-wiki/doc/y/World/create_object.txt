@@ -1,8 +1,0 @@
-description = ""
-param:ang = ""
-param:filename = ""
-param:name = nil
-param:overwrite_index = nil
-param:pos = ""
-param:self = ""
-return = ""

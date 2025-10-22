@@ -1,2 +1,0 @@
-description = "Normalizes a quaternion to unit length."
-param:self = ""

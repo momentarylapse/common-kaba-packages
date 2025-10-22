@@ -1,5 +1,0 @@
-description = "An axis-aligned rectangle in 2d."
-element:x1 = "Start of x range."
-element:x2 = "End of x range"
-element:y1 = "Start of y range."
-element:y2 = "End of y range."

@@ -1,2 +1,0 @@
-description = "Calculate the area of the rectangle."
-return = "The area <tt>width() * height()</tt>."

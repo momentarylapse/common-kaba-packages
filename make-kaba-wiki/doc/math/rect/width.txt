@@ -1,3 +1,0 @@
-description = "Calculate the width."
-param:self = ""
-return = "The width <math> x_2 - x_1 </math>."

@@ -1,3 +1,3 @@
-description = ""
-element:u = ""
-element:v = ""
+description = "Represents a line in Plücker coordinates"
+element:u = "Direction vector"
+element:v = "Cross product between direction vector and a point on the line"

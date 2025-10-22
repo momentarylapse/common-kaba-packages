@@ -1,3 +1,3 @@
-description = ""
-param:p = ""
-return = ""
+description = "Test if a point is inside the rectangle."
+param:p = "The test point."
+return = "<tt>true</tt> if inside or on the boundary, <tt>false</tt> if outside."

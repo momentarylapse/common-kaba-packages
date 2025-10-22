@@ -1,3 +1,0 @@
-description = "Calculate the height."
-param:self = ""
-return = "The height <math> y_2 - y_2 </math>."

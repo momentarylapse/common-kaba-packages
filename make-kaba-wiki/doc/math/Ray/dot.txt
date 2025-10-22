@@ -1,4 +1,4 @@
-description = ""
-param:r1 = ""
-param:r2 = ""
-return = ""
+description = "Dot product between two rays, i.e. the oriented, unnormalized distance between the lines"
+param:r1 = "First ray"
+param:r2 = "Second ray"
+return = "The dot product"

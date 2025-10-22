@@ -1,2 +1,2 @@
-description = ""
-element:data = ""
+description = "Can store an arbitrary value."
+element:data = "A pointer to the internal data."

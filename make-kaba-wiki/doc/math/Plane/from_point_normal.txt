@@ -1,4 +1,4 @@
-description = ""
-param:n = ""
-param:p = ""
-return = ""
+description = Find the plane containing a point and orthogonal to a normal vector.
+param:n = The normal vector.
+param:p = The point in the plane.
+return = The plane.

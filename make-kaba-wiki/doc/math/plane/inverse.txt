@@ -1,3 +1,0 @@
-description = "Create the plane with flipped normal vector."
-param:self = ""
-return = "The inverted plane."

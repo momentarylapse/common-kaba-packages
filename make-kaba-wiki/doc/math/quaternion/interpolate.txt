@@ -1,5 +1,0 @@
-description = "Spherical linear interpolation between orientations."
-param:q0 = "Start orientation."
-param:q1 = "End orientation"
-param:t = "Interpolation parameter <math>\in [0, 1]</math>"
-return = "The interpolated orientation."

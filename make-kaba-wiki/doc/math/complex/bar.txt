@@ -1,3 +1,0 @@
-description = "The complex conjugate, with flipped imaginary part: <math> \\\\bar z = x - iy </math>."
-param:self = ""
-return = "The complex conjugate."
