@@ -1,0 +1,4 @@
+pkg = wayland-client
+#cmake.package = Wayliand
+#cmake.target = ["Wayland::Wayland"]
+
