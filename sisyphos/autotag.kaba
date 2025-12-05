@@ -19,7 +19,7 @@ func video_guess_tags_by_name(out f: LocalFile)
 		if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
 			return
 		f.tag_set(["season", n[:off_x]])
-		f.tag_set(["episode", str(int(n[off_x+1:off_x+3]))])
+		f.tag_set(["episode", str(i32(n[off_x+1:off_x+3]))])
 		f.tag_set(["name", n[off_x+6:]])
 
 func audio_guess_tags(out f: LocalFile)
@@ -29,9 +29,9 @@ func audio_guess_tags(out f: LocalFile)
 	for _l in s
 		let l = _l.trim()
 		if l[:9] == "samples: "
-			samples = int(l[9:])
+			samples = i32(l[9:])
 		else if l[:13] == "sample-rate: "
-			sample_rate = int(l[13:])
+			sample_rate = i32(l[13:])
 		else if l[:13] == "tag: title = "
 			f.set_name(l[14:-1])
 		else if l[:14] == "tag: artist = "
@@ -39,7 +39,7 @@ func audio_guess_tags(out f: LocalFile)
 		else if l[:13] == "tag: album = "
 			f.tag_set(Tag("album", l[14:-1]))
 		else if l[:13] == "tag: track = "
-			f.tag_set(Tag("track", str(int(l[14:-1]))))
+			f.tag_set(Tag("track", str(i32(l[14:-1]))))
 	if samples >= 0
 		f.tag_set(Tag("length", str(samples / sample_rate)))
 
@@ -59,7 +59,7 @@ func auto_tag(out f: LocalFile)
 			if len(s) >= 2
 				f.tag_set(["width", s[0]])
 				f.tag_set(["height", s[1]])
-		else if ext == "jpg"
+		else if ext in ["jpg", "heic"]
 			var s = shell_exec("exiv2 -pv \"{{bash_escape(str(f.path))}}\"").explode("\n")
 			var model, make, time: string
 			for mut l in s

@@ -9,16 +9,16 @@ const CHANGED_META = "changed-meta"
 func str_format(s: string, fmt: string) -> string
 	var r = s
 	if len(fmt) >= 2 and fmt[:1] == "0"
-		var n = int(fmt)
+		var n = i32(fmt)
 		while len(r) < n
 			r = "0" + r
 	if len(fmt) >= 2 and fmt[:1] == " "
-		var n = int(fmt)
+		var n = i32(fmt)
 		while len(r) < n
 			r = " " + r
 	return r
 
-func nice_size(size: int) -> string
+func nice_size(size: i32) -> string
 	if size > 1000000000
 		return "{{size / 1000000000.0|.1}}G"
 	if size > 10000000
@@ -63,13 +63,13 @@ struct LocalFile
 	# remote
 	var id: string
 	var name: string
-	var remote_mtime: int
+	var remote_mtime: i32
 #	var remote_path: string
 	# local
 	var path: Path
 	var hash: string # can be "" if not local
-	var mtime: int
-	var size: int
+	var mtime: i32
+	var size: i32
 	var options: string[]
 	var tags: Tag[]
 	var local_id = -1

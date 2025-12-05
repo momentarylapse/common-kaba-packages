@@ -193,7 +193,7 @@ struct Config
 
 	func mut load()
 		var f = fs.open(app_directory_dynamic | "sisyphos/config", "rt")
-		var n, m: int
+		var n, m: i32
 		f >> n
 		for i in 0:n
 			var t: string
