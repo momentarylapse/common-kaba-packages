@@ -2,131 +2,13 @@ use file.*
 use config.*
 use tag.*
 use os.*
-
-func is_number(c: u8) -> bool
-	return c >= '0' and c <= '9'
-
-# 1x23 - NAME.ext
-func video_guess_tags_by_name(out f: LocalFile)
-	let n = f.path.basename_no_ext()
-	if len(n) < 8
-		return
-	for off_x in n.find("x", 0)
-		if off_x > 2
-			return
-		if n[off_x+3:off_x+6] != " - "
-			return
-		if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
-			return
-		f.tag_set(["season", n[:off_x]])
-		f.tag_set(["episode", str(i32(n[off_x+1:off_x+3]))])
-		f.tag_set(["name", n[off_x+6:]])
-
-func audio_guess_tags(out f: LocalFile)
-	let s = shell_exec("tsunami --info \"{{bash_escape(str(f.path))}}\"").explode("\n")
-	var samples = -1
-	var sample_rate = 44100
-	for _l in s
-		let l = _l.trim()
-		if l[:9] == "samples: "
-			samples = i32(l[9:])
-		else if l[:13] == "sample-rate: "
-			sample_rate = i32(l[13:])
-		else if l[:13] == "tag: title = "
-			f.set_name(l[14:-1])
-		else if l[:14] == "tag: artist = "
-			f.tag_set(Tag("artist", l[15:-1]))
-		else if l[:13] == "tag: album = "
-			f.tag_set(Tag("album", l[14:-1]))
-		else if l[:13] == "tag: track = "
-			f.tag_set(Tag("track", str(i32(l[14:-1]))))
-	if samples >= 0
-		f.tag_set(Tag("length", str(samples / sample_rate)))
+use filetags.get_tags
 
 
 func auto_tag(out f: LocalFile)
-	if not fs.exists(f.path)
-		return
-	let ext = f.path.extension()
-	#print(ext)
 	try
-		if ext == "pdf"
-			let s = shell_exec("pdfinfo \"{{bash_escape(str(f.path))}}\" | awk '/Pages/{print $2}'")
-			if len(s) > 0
-				f.tag_set(["pages", s])
-		else if ext in ["png", "bmp"] #, "jpg"]
-			let s = shell_exec("identify -format \"%w\n%h\" \"{{bash_escape(str(f.path))}}\"").explode("\n")
-			if len(s) >= 2
-				f.tag_set(["width", s[0]])
-				f.tag_set(["height", s[1]])
-		else if ext in ["jpg", "heic"]
-			var s = shell_exec("exiv2 -pv \"{{bash_escape(str(f.path))}}\"").explode("\n")
-			var model, make, time: string
-			for mut l in s
-				for i in 0:20
-					l = l.replace("  ", " ")
-				let xx = l.explode(" ")
-				if len(xx) < 6
-					continue
-				if xx[0] == "0xa002" # PixelXDimension
-					f.tag_set(["width", xx[5]])
-				if xx[0] == "0xa003" # PixelYDimension
-					f.tag_set(["height", xx[5]])
-				if xx[0] == "0x0110" # Model
-					model = xx[5:].join(" ")
-				if xx[0] == "0x010f" # Make
-					make = xx[5:].join(" ")
-				if xx[0] == "0x829a" # ExposureTime
-					f.tag_set(Tag("exposuretime", xx[5]))
-				if xx[0] == "0x829d"
-					print(xx[2] + " " + xx[5])
-					#f.tag_set(Tag("fnumber", xx[5]))
-				if xx[0] == "0x8827" # ISOSpeedRatings
-					f.tag_set(Tag("iso", xx[5]))
-				if xx[0] in ["0x0132", "0x9003"] # DateTime
-					time = xx[5] + " " + xx[6]
-			if len(time) == 19
-				if time[4] == ':'
-					f.tag_set(Tag("year", time[:4]))
-					f.tag_set(Tag("month", str(int(time[5:7]))))
-					f.tag_set(Tag("day", str(int(time[8:10]))))
-					f.tag_set(Tag("timeofday", time[11:]))
-			if len(make) > 0 and len(model) > 0
-				f.tag_set(Tag("camera", "{{make}} {{model}}"))
-		else if ext == "jpg--"
-			let s = shell_exec("exif -mi \"{{bash_escape(str(f.path))}}\" || echo --end--").explode("\n")
-			var model, make, time: string
-			for l in s
-				let xx = l.explode("\t")
-				if len(xx) < 2
-					continue
-				if xx[0] == "0xa002"
-					f.tag_set(Tag("width", str(int(xx[1]))))
-				if xx[0] == "0xa003"
-					f.tag_set(Tag("height", str(int(xx[1]))))
-				if xx[0] == "0x0110"
-					model = xx[1]
-				if xx[0] == "0x010f"
-					make = xx[1]
-				if xx[0] == "0x829a"
-					f.tag_set(Tag("exposuretime", xx[1]))
-				if xx[0] == "0x829d"
-					f.tag_set(Tag("fnumber", xx[1]))
-				if xx[0] == "0x8827"
-					f.tag_set(Tag("iso", xx[1]))
-				if xx[0] in ["0x0132", "0x9003"]
-					time = xx[1]
-			if len(time) == 19
-				if time[4] == ':'
-					f.tag_set(Tag("year", time[:4]))
-					f.tag_set(Tag("month", str(int(time[5:7]))))
-					f.tag_set(Tag("day", str(int(time[8:10]))))
-					f.tag_set(Tag("timeofday", time[11:]))
-			if len(make) > 0 and len(model) > 0
-				f.tag_set(Tag("camera", "{{make}} {{model}}"))
-		else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
-			audio_guess_tags(f)
-		else if ext in ["mp4", "avi", "flv"]
-			video_guess_tags_by_name(f)
+		let tags = get_tags(f.path)
+		for k=>v in tags
+			f.tag_set([k, v])
 	except Exception as e
 		error_out(e)

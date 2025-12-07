@@ -1,0 +1,155 @@
+use os.*
+
+
+func is_number(c: u8) -> bool
+	return c >= '0' and c <= '9'
+
+
+# needs to be surrounded by "..."
+func bash_escape(s: string) -> string
+	var r = s
+	r = r.replace("\\", "\\\\")
+	r = r.replace("\"", "\\\"")
+	r = r.replace("`", "\\`")
+	return r
+
+
+# 1x23 - NAME.ext
+func get_tags_video_by_name(path: Path) -> string{}
+	let n = path.basename_no_ext()
+	if len(n) < 8
+		return {}
+	for off_x in n.find("x", 0)
+		if off_x > 2
+			return {}
+		if n[off_x+3:off_x+6] != " - "
+			return {}
+		if not is_number(n[0]) or not is_number(n[off_x+1]) or not is_number(n[off_x+2])
+			return {}
+		return {"season": n[:off_x],
+			"episode": str(i32(n[off_x+1:off_x+3])),
+			"name": n[off_x+6:]}
+
+
+func get_tags_audio(path: Path) -> string{}
+	let s = shell_execute("tsunami --info \"{{bash_escape(str(path))}}\"").explode("\n")
+	var samples = -1
+	var sample_rate = 44100
+	var tags: string{}
+	for _l in s
+		let l = _l.trim()
+		if l[:9] == "samples: "
+			samples = i32(l[9:])
+		else if l[:13] == "sample-rate: "
+			sample_rate = i32(l[13:])
+		else if l[:13] == "tag: title = "
+			tags["name"] = l[14:-1]
+		else if l[:14] == "tag: artist = "
+			tags["artist"] = l[15:-1]
+		else if l[:13] == "tag: album = "
+			tags["album"] = l[14:-1]
+		else if l[:13] == "tag: track = "
+			tags["track"] = str(i32(l[14:-1]))
+	if samples >= 0
+		tags["length"] = str(samples / sample_rate)
+	return tags
+
+
+func get_tags_image_photo(path: Path) -> string{}
+	var s = shell_execute("exiv2 -pv \"{{bash_escape(str(path))}}\"").explode("\n")
+	var model, make, time: string
+	var tags: string{}
+	for mut l in s
+		for i in 0:20
+			l = l.replace("  ", " ")
+		let xx = l.explode(" ")
+		if len(xx) < 6
+			continue
+		if xx[0] == "0xa002" # PixelXDimension
+			tags["width"] = xx[5]
+		if xx[0] == "0xa003" # PixelYDimension
+			tags["height"] = xx[5]
+		if xx[0] == "0x0110" # Model
+			model = xx[5:].join(" ")
+		if xx[0] == "0x010f" # Make
+			make = xx[5:].join(" ")
+		if xx[0] == "0x829a" # ExposureTime
+			tags["exposuretime"] = xx[5]
+		if xx[0] == "0x829d"
+			print(xx[2] + " " + xx[5])
+			#tags["fnumber"] = xx[5]
+		if xx[0] == "0x8827" # ISOSpeedRatings
+			tags["iso"] = xx[5]
+		if xx[0] in ["0x0132", "0x9003"] # DateTime
+			time = xx[5] + " " + xx[6]
+	if len(time) == 19
+		if time[4] == ':'
+			tags["year"] = time[:4]
+			tags["month"] = str(i32(time[5:7]))
+			tags["day"] = str(i32(time[8:10]))
+			tags["timeofday"] = time[11:]
+	if len(make) > 0 and len(model) > 0
+		tags["camera"] = "{{make}} {{model}}"
+	return tags
+
+
+func __get_tags_image_photo_old(path: Path) -> string{}
+	var s = shell_execute("exif -mi \"{{bash_escape(str(path))}}\" || echo --end--").explode("\n")
+	var model, make, time: string
+	var tags: string{}
+	for mut l in s
+		for i in 0:20
+			l = l.replace("  ", " ")
+		let xx = l.explode(" ")
+		if len(xx) < 6
+			continue
+		if xx[0] == "0xa002" # PixelXDimension
+			tags["width"] = xx[5]
+		if xx[0] == "0xa003" # PixelYDimension
+			tags["height"] = xx[5]
+		if xx[0] == "0x0110" # Model
+			model = xx[5:].join(" ")
+		if xx[0] == "0x010f" # Make
+			make = xx[5:].join(" ")
+		if xx[0] == "0x829a" # ExposureTime
+			tags["exposuretime"] = xx[5]
+		if xx[0] == "0x829d"
+			print(xx[2] + " " + xx[5])
+			#tags["fnumber"] = xx[5]
+		if xx[0] == "0x8827" # ISOSpeedRatings
+			tags["iso"] = xx[5]
+		if xx[0] in ["0x0132", "0x9003"] # DateTime
+			time = xx[5] + " " + xx[6]
+	if len(time) == 19
+		if time[4] == ':'
+			tags["year"] = time[:4]
+			tags["month"] = str(i32(time[5:7]))
+			tags["day"] = str(i32(time[8:10]))
+			tags["timeofday"] = time[11:]
+	if len(make) > 0 and len(model) > 0
+		tags["camera"] = "{{make}} {{model}}"
+	return tags
+
+
+# throws exception...
+func get_tags(path: Path) -> string{}
+	if not fs.exists(path)
+		return {}
+	let ext = path.extension()
+	#print(ext)
+	if ext == "pdf"
+		let s = shell_execute("pdfinfo \"{{bash_escape(str(path))}}\" | awk '/Pages/{print $2}'")
+		if len(s) > 0
+			return {"pages": s}
+	else if ext in ["png", "bmp"] #, "jpg"]
+		let s = shell_execute("identify -format \"%w\n%h\" \"{{bash_escape(str(path))}}\"").explode("\n")
+		if len(s) >= 2
+			return {"width": s[0],
+				"height": s[1]}
+	else if ext in ["jpg", "heic"]
+		return get_tags_image_photo(path)
+	else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
+		return get_tags_audio(path)
+	else if ext in ["mp4", "avi", "flv"]
+		return get_tags_video_by_name(path)
+	return {}

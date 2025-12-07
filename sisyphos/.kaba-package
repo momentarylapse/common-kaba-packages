@@ -1,4 +1,5 @@
-version 2
+version 3
 requires sqlite
+requires filetags
 run sisyphos.kaba
 
