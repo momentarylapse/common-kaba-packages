@@ -8,7 +8,7 @@ func suggest_install_prefix() -> Path
 	return conf.home_directory | ".local"
 
 
-func build()
+func build() -> bool
 	if conf.force_rebuild
 		build_clear()
 	
@@ -19,7 +19,11 @@ func build()
 			raise(new Exception("failed to find suitable install prefix... use --prefix DIR instead"))
 		let r = os.shell_execute("cd {{dir}};cmake .. -GNinja -DCMAKE_INSTALL_PREFIX='{{conf.install_prefix}}';cd ..", true)
 
-	os.shell_execute("cd {{dir}};ninja;cd ..", true)
+	try
+		let _ = os.shell_execute("cd {{dir}} && ninja && cd ..", true)
+		return true
+	except
+		return false
 
 
 
@@ -29,8 +33,12 @@ func build_clear()
 		let r = os.shell_execute("cd {{dir}};ninja clean;cd ..", true)
 
 
-func install()
+func install() -> bool
 	let dir = "build" as Path
-	os.shell_execute("cd {{dir}};ninja install;cd ..", true)
+	try
+		os.shell_execute("cd {{dir}} && ninja install && cd ..", true)
+		return true
+	except
+		return false
 	
 	
