@@ -114,7 +114,7 @@ func prepare_module(p: Module, name: string, dir: os.Path)
 func prepare(dir: os.Path)
 	print("PREPARE")
 	for p in default_context.packages
-		prepare_module(p, p.name, dir | p.name)
+		prepare_module(p.main_module, p.name, dir | p.name)
 	print("----")
 
 	let external_packages = find_external_packages()

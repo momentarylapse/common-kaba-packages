@@ -14,7 +14,7 @@ func make_documentation()
 	wiki_upload("kaba reference", wiki.render_reference())
 
 	for p in default_context.packages
-		make_module(p, p.name, "", [])
+		make_module(p.main_module, p.name, "", [])
 
 	let external_packages = find_external_packages()
 	for p in external_packages
