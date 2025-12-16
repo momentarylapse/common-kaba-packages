@@ -1,4 +1,5 @@
 use os.*
+use kaba
 
 #const string SERVER = "michi.is-a-geek.org"
 #const string SERVER = "myu"
@@ -190,9 +191,12 @@ struct Config
 	var dry_run = false
 	var default_quality = "perfect"
 	var default_structure = "{name}.{ext}"
+	
+	func directory() -> Path
+		return kaba.this_package()!.directory_dynamic
 
 	func mut load()
-		var f = fs.open(app_directory_dynamic | "sisyphos/config", "rt")
+		var f = fs.open(directory() | "config", "rt")
 		var n, m: i32
 		f >> n
 		for i in 0:n
@@ -216,8 +220,8 @@ struct Config
 			f >> ig
 			ignore.add(ig)
 	func save()
-		make_all_dirs(app_directory_dynamic | "sisyphos")
-		var f = fs.open(app_directory_dynamic | "sisyphos/config", "wt")
+		make_all_dirs(directory())
+		var f = fs.open(directory() | "config", "wt")
 		f << len(dirs)
 		for e in dirs
 			f << str(e.dir)

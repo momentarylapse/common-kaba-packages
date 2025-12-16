@@ -33,7 +33,7 @@ class LocalFileDB
 	func mut load()
 		files.clear()
 		#Timer tt
-		let ss = fs.read_text(app_directory_dynamic | "sisyphos/db")
+		let ss = fs.read_text(conf.directory() | "db")
 		let lines = ss.explode("\n")
 		if lines[0] == "version=2"
 			load_v2(lines)
@@ -72,8 +72,8 @@ class LocalFileDB
 	func mut save_all()
 		#print("NOT SAVING :P")
 		#return
-		make_all_dirs(app_directory_dynamic | "sisyphos/")
-		var f = fs.open(app_directory_dynamic | "sisyphos/db", "wt")
+		make_all_dirs(conf.directory())
+		var f = fs.open(conf.directory() | "db", "wt")
 		f << "version=1"
 		f << len(files)
 		for ff in files

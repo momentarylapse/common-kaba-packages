@@ -49,8 +49,8 @@ var conf: Config
 
 
 func load_basic_config()
-	conf.kaba_base = os.app_directory_dynamic
-	conf.packages_base = conf.kaba_base | "packages"
+	conf.kaba_base = kaba.install_root()
+	conf.packages_base = kaba.packages_root()
 	conf.repos_base = conf.kaba_base | "repos"
 	
 	if not os.fs.is_directory(conf.packages_base)

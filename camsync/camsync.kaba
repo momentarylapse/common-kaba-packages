@@ -1,4 +1,5 @@
 use os.*
+use kaba
 
 
 struct Camera
@@ -42,9 +43,13 @@ func error_out(e: Exception*)
 	log_error("error", str(e))
 
 
+func directory() -> Path
+	return kaba.this_package()!.directory_dynamic
+
+
 func load_config() -> Camera[]
-	make_all_dirs(app_directory_dynamic | "camsync")
-	let path = app_directory_dynamic | "camsync/config"
+	make_all_dirs(directory())
+	let path = directory() | "config"
 	if not fs.exists(path)
 		var c: Configuration
 		c["example.source"] = ""
@@ -76,7 +81,7 @@ func main()
 			continue
 			
 		print("== camera: {{cam.name}} ==")
-		let path_imported = app_directory_dynamic | "camsync" | "{{cam.name}}-imported"
+		let path_imported = directory() | "{{cam.name}}-imported"
 
 		var imported = fs.read_text(path_imported).explode("\n")
 
