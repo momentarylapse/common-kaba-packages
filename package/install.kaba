@@ -92,7 +92,7 @@ enum IterStatus
 func fullfull_dependencies_step(out list: Package&[]) -> IterStatus
 	for p in list
 		for r in p.requires
-			if not is_installed_latest(r)
+			if not is_installed_latest(r) and not list_find(list, r)
 				for rr in list_find(conf.packages_remote, r)
 					list.add(&rr)
 					return IterStatus.MORE
@@ -102,6 +102,7 @@ func fullfull_dependencies_step(out list: Package&[]) -> IterStatus
 	return IterStatus.DONE
 
 
+# add missing requirements to an to-install list
 func fullfull_dependencies(out list: Package&[]) -> bool
 	while true
 		match fullfull_dependencies_step(list)

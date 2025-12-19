@@ -148,6 +148,13 @@ func list_find(list: Package[], name: string) -> Package*
 	return nil
 
 
+func list_find(list: Package&[], name: string) -> Package*
+	for p in list
+		if p.name == name
+			return &p
+	return nil
+
+
 func file_equal(a: os.Path, b: os.Path) -> bool
 	if not os.fs.exists(a) or not os.fs.exists(b)
 		return false
