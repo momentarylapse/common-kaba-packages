@@ -17,7 +17,7 @@ func build() -> bool
 		os.fs.create_directory(dir)
 		if conf.install_prefix.is_empty()
 			raise(new Exception("failed to find suitable install prefix... use --prefix DIR instead"))
-		let r = os.shell_execute("cd {{dir}};cmake .. -GNinja -DCMAKE_INSTALL_PREFIX='{{conf.install_prefix}}';cd ..", true)
+		let r = os.shell_execute("cd {{dir}};cmake '{{conf.root}}' -GNinja -DCMAKE_INSTALL_PREFIX='{{conf.install_prefix}}';cd ..", true)
 
 	try
 		let _ = os.shell_execute("cd {{dir}} && ninja && cd ..", true)

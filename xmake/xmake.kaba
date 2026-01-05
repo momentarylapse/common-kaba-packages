@@ -104,7 +104,7 @@ func action_create_vcpkg(a: string[])
 func main(arg: string[])
 	lib.init()
 	conf.verbose = false
-	conf.root = os.Path("./").absolute().canonical()
+	conf.detect_project()
 	conf.detect_environment()
 	
 	#conf.ignore_libs

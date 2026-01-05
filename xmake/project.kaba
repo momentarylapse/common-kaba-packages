@@ -139,6 +139,14 @@ struct Config
 				else
 					home_directory = x
 				install_prefix = home_directory | ".local"
+				
+	func mut detect_project()
+		root = os.Path("./").absolute().canonical()
+		if not os.fs.exists(conf.root | "xmake.conf")
+			if os.fs.exists(conf.root | ".kaba-package")
+				if os.fs.exists(conf.root | "sharedlib/xmake.conf")
+					conf.root = conf.root | "sharedlib"
+		
 
 	func mut load()
 		if not os.fs.exists(conf.root | "xmake.conf")
