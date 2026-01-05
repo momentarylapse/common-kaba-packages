@@ -8,6 +8,7 @@ struct Address
 
 class Socket
 	var uuid: i32
+	var handle: i32
 	
 	func extern mut __init__()
 	func extern mut __delete__()
