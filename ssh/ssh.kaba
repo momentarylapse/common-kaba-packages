@@ -1,0 +1,48 @@
+use net
+use os
+
+
+func extern _libssh2_trace(session: void*, mask: i32) -> i32
+func extern _libssh2_session_init_ex(a: void*, b: void*, c: void*, d: void*) -> void*
+func extern _libssh2_session_handshake(session: void*, s: i32) -> i32
+func extern _libssh2_hostkey_hash(session: void*, type: i32) -> u8[0]&
+func extern _libssh2_userauth_list(session: void*, user: u8*, length: i32) -> u8[0]&
+func extern _libssh2_userauth_publickey_fromfile_ex(session: void*, user: u8*, length: i32, pub: u8*, priv: u8*, passw: u8*) -> i32
+func extern _libssh2_channel_open_ex(session: void*, type: u8*, length: i32, win_size: i32, pack_size: i32, msg: u8*, msg_len: i32) -> void*
+
+let _LIBSSH2_HOSTKEY_HASH_SHA1 = 2
+let _LIBSSH2_CHANNEL_WINDOW_DEFAULT = 2*1024*1024
+let _LIBSSH2_CHANNEL_PACKET_DEFAULT = 32768
+
+
+func _c2s(s: u8[0]&) -> string
+	var r: string
+	for i in 0:128
+		if s[i] == 0
+			break
+		r.add(s[i])
+	return r
+
+
+func main()
+	print("SSH")
+	var session = _libssh2_session_init_ex(nil, nil, nil, nil)
+	print(p2s(session))
+	
+	_libssh2_trace(session, -1)
+	
+	var sock = net.connect("michi.is-a-geek.org", 22)
+	print(_libssh2_session_handshake(session, sock.handle))
+	print(_c2s(_libssh2_hostkey_hash(session, _LIBSSH2_HOSTKEY_HASH_SHA1)).hex())
+	let user = os.app.user_name
+	print(_c2s(_libssh2_userauth_list(session, &user[0], len(user))))
+	
+	var pub = str(os.fs.home_directory | ".ssh/id_rsa.pub")
+	pub.add(0)
+	var priv = str(os.fs.home_directory | ".ssh/id_rsa")
+	priv.add(0)
+	print(_libssh2_userauth_publickey_fromfile_ex(session, &user[0], len(user), &pub[0], &priv[0], nil))
+	
+	let ctype = "session"
+	var channel = _libssh2_channel_open_ex(session, &ctype[0], len(ctype), _LIBSSH2_CHANNEL_WINDOW_DEFAULT, _LIBSSH2_CHANNEL_PACKET_DEFAULT, nil, 0)
+	print(p2s(channel))

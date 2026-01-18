@@ -33,6 +33,7 @@ package psmove
 package shadercomp
 package sisyphos
 package sqlite
+package ssh
 package statistics
 package terminal
 package tools
