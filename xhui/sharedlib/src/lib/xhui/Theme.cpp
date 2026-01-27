@@ -13,7 +13,7 @@ void Theme::load_default() {
 	Configuration c;
 	if (!c.load(os::app::directory_dynamic | "default.theme"))
 		if (!c.load(os::app::directory_static | "default.theme"))
-			if (!c.load(os::app::directory_dynamic | "packages/xhui/default.theme")) // kaba package workaround...
+			if (!c.load(os::app::home_directory | ".kaba/packages/xhui/default.theme")) // kaba package workaround...
 				msg_error("failed to load default.theme");
 
 	_default.font_size = c.get_float("font.size", 12);
@@ -51,6 +51,7 @@ void Theme::load_default() {
 	_default.text = color::parse(c.get_str("colors.text", "#ffffff"));
 	_default.text_label = color::parse(c.get_str("colors.text-label", "#ffffff"));
 	_default.text_disabled = color::parse(c.get_str("colors.text-disabled", "#808080"));
+	_default.text_link = color::parse(c.get_str("colors.text-link", "#8080ff"));
 	_default.border = color::parse(c.get_str("colors.border", "#ffffff"));
 }
 

@@ -298,7 +298,7 @@ void AccelerationStructure::_create_bottom(VertexBuffer *vb) {
 	accelerationStructureBuildRangeInfo.primitiveOffset = 0;
 	accelerationStructureBuildRangeInfo.firstVertex = 0;
 	accelerationStructureBuildRangeInfo.transformOffset = 0;
-	std::vector<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = { &accelerationStructureBuildRangeInfo };
+	Array<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = { &accelerationStructureBuildRangeInfo };
 
 	// Build the acceleration structure on the device via a one-time command buffer submission
 	// Some implementations may support acceleration structure building on the host (VkPhysicalDeviceAccelerationStructureFeaturesKHR->accelerationStructureHostCommands), but we prefer device builds
@@ -309,7 +309,7 @@ void AccelerationStructure::_create_bottom(VertexBuffer *vb) {
 		cb->buffer,
 		1,
 		&info,
-		accelerationBuildStructureRangeInfos.data());
+		&accelerationBuildStructureRangeInfos[0]);
 	//vulkanDevice->flushCommandBuffer(cb->buffer, queue);
 
 	// multiple needs a memory barrier
@@ -328,7 +328,7 @@ void AccelerationStructure::_create_bottom(VertexBuffer *vb) {
 }
 
 
-void AccelerationStructure::_create_top(const Array<AccelerationStructure *> &blas, const Array<mat4> &matrices) {
+void AccelerationStructure::_create_top(const Array<AccelerationStructure*>& blas, const Array<mat4>& matrices) {
 	auto instances = create_instances(blas, matrices);
 
 	Buffer instance_buffer(device);
@@ -359,7 +359,7 @@ void AccelerationStructure::_create_top(const Array<AccelerationStructure *> &bl
 	accelerationStructureBuildGeometryInfo.geometryCount = 1;
 	accelerationStructureBuildGeometryInfo.pGeometries = &accelerationStructureGeometry;
 
-	uint32_t primitive_count = 1;
+	uint32_t primitive_count = blas.num;
 
 	VkAccelerationStructureBuildSizesInfoKHR accelerationStructureBuildSizesInfo{};
 	accelerationStructureBuildSizesInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_BUILD_SIZES_INFO_KHR;
@@ -396,11 +396,11 @@ void AccelerationStructure::_create_top(const Array<AccelerationStructure *> &bl
 	info.scratchData.deviceAddress = scratch.get_device_address();
 
 	VkAccelerationStructureBuildRangeInfoKHR accelerationStructureBuildRangeInfo{};
-	accelerationStructureBuildRangeInfo.primitiveCount = 1;
+	accelerationStructureBuildRangeInfo.primitiveCount = primitive_count;
 	accelerationStructureBuildRangeInfo.primitiveOffset = 0;
 	accelerationStructureBuildRangeInfo.firstVertex = 0;
 	accelerationStructureBuildRangeInfo.transformOffset = 0;
-	std::vector<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = { &accelerationStructureBuildRangeInfo };
+	Array<VkAccelerationStructureBuildRangeInfoKHR*> accelerationBuildStructureRangeInfos = { &accelerationStructureBuildRangeInfo };
 
 
 	auto cb = begin_single_time_commands();
@@ -408,7 +408,7 @@ void AccelerationStructure::_create_top(const Array<AccelerationStructure *> &bl
 		cb->buffer,
 		1,
 		&info,
-		accelerationBuildStructureRangeInfos.data());
+		&accelerationBuildStructureRangeInfos[0]);
 	end_single_time_commands(cb);
 
 
