@@ -3,7 +3,6 @@ requires kaba 45a7029ba7169c86688d4e13273d9fc1fd1c2244
 #package alex
 package algebra
 package bson
-package camsync
 package circuit
 package cli
 package cloud
