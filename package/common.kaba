@@ -71,7 +71,7 @@ func find_internal_packages() -> Package[]
 	for p in kaba.default_context.packages
 		var pp: Package
 		pp.name = p.name
-		pp.version = "0" # TODO
+		pp.version = p.version
 		pp.location = Location.INTERNAL
 		r.add(pp)
 	return r
@@ -114,6 +114,9 @@ func find_remote_packages() -> Package[]
 	for s in conf.sources
 		let base = s.base_path()
 		if base == ""
+			continue
+		if not os.fs.exists(base)
+			print("   REPO NOT FOUND: {{base}}")
 			continue
 		if not os.fs.exists(base | REPO_FILE)
 			continue
