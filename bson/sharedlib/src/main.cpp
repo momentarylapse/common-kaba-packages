@@ -23,6 +23,7 @@ void export_symbols(kaba::Exporter* e) {
 	e->link_func("_bson_iter_oid", &bson_iter_oid);
 	e->link_func("_bson_oid_to_string", &bson_oid_to_string);
 	e->link_func("_bson_iter_type", &bson_iter_type);
+	e->link_func("_bson_iter_recurse", &bson_iter_recurse);
 }
 }
 

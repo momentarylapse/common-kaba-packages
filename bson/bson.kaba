@@ -1,21 +1,27 @@
 
+struct Iter
+	var x: i64[32]
+
+
 func extern _bson_new_from_json(json: u8*, len: i32, err: void*) -> void*
 func extern _bson_as_canonical_extended_json(bson: void*, __len: void*) -> u8[0]&
 func extern _bson_as_relaxed_extended_json(bson: void*, __len: void*) -> u8[0]&
 func extern _bson_free(str: void*)
 func extern _bson_destroy(bson: void*)
 func extern _bson_new_from_data(data: u8*, length: i32) -> void*
-func extern _bson_iter_init(i: void*, bson: void*) -> bool
-func extern _bson_iter_next(i: void*) -> bool
-func extern _bson_iter_key(i: void*) -> u8[0]&
-func extern _bson_iter_int32(i: void*) -> i32
-func extern _bson_iter_int64(i: void*) -> i64
-func extern _bson_iter_double(i: void*) -> f64
-func extern _bson_iter_utf8(i: void*, __len: void*) -> u8[0]&
-func extern _bson_iter_array(i: void*, len: i32*, a: void*)
-func extern _bson_iter_oid(i: void*) -> void*
+func extern _bson_iter_init(i: Iter&, bson: void*) -> bool
+func extern _bson_iter_next(i: Iter&) -> bool
+func extern _bson_iter_key(i: Iter&) -> u8[0]&
+func extern _bson_iter_int32(i: Iter&) -> i32
+func extern _bson_iter_int64(i: Iter&) -> i64
+func extern _bson_iter_double(i: Iter&) -> f64
+func extern _bson_iter_utf8(i: Iter&, __len: void*) -> u8[0]&
+func extern _bson_iter_array(i: Iter&, len: i32&, a: void*)
+func extern _bson_iter_oid(i: Iter&) -> void*
 func extern _bson_oid_to_string(oid: void*, str: u8*)
-func extern _bson_iter_type(i: void*) -> i32
+func extern _bson_iter_type(i: Iter&) -> i32
+func extern _bson_iter_recurse(parent: Iter&, child: Iter&) -> bool
+
 
 func char_to_str(p: u8[0]&) -> string
 	var t: string
@@ -25,6 +31,7 @@ func char_to_str(p: u8[0]&) -> string
 		t.add(p[i])
 	return t
 
+
 func json_to_bson(json: string) -> void*
 	var t = json
 	t.add(0)
@@ -33,6 +40,7 @@ func json_to_bson(json: string) -> void*
 		raise(new Exception("invalid json: {{json}}"))
 	return b
 
+
 func bson_to_json(bson: void*) -> string
 	#char[0]* x = bson_as_canonical_extended_json(bson, nil)
 	var x: u8[0]& = _bson_as_relaxed_extended_json(bson, nil)
@@ -40,14 +48,16 @@ func bson_to_json(bson: void*) -> string
 	_bson_free(x)
 	return t
 
-func bson_iter_key(i: void*) -> string
+
+func bson_iter_key(i: Iter&) -> string
 	return char_to_str(_bson_iter_key(i))
-func bson_iter_str(i: void*) -> string
+func bson_iter_str(i: Iter&) -> string
 	return char_to_str(_bson_iter_utf8(i, nil))
 
-func bson_iter_str_array(i: void*) -> string[]
+
+func bson_iter_str_array(i: Iter&) -> string[]
 	var r: string[]
-	var itarray: i32[160]
+	var itarray: Iter
 	var length = 0
 	var array: u8*
 	_bson_iter_array(i, &length, &array)
@@ -59,24 +69,21 @@ func bson_iter_str_array(i: void*) -> string[]
 
 
 
-func bson_iter_to_any(iter: void*) -> Any
-	var t = _bson_iter_type(iter)
+func bson_iter_to_any(iter: Iter&) -> Any
+	let t = _bson_iter_type(iter)
+	#print("iter to any {{t}}")
 	if t == 2 # str utf8
 		return bson_iter_str(iter)
-	else if t == 16 # int
+	else if t == 16 # i32
 		return _bson_iter_int32(iter)
-	else if t == 18 # int64
-		return int(_bson_iter_int64(iter))
-	else if t == 1 # double
-		return float(_bson_iter_double(iter))
+	else if t == 18 # i64
+		return i32(_bson_iter_int64(iter))
+	else if t == 1 # f64
+		return f32(_bson_iter_double(iter))
 	else if t == 4 # array
 		var r: Any
-		var itarray: i32[160]
-		var length = 0
-		var array: u8*
-		_bson_iter_array(iter, &length, &array)
-		var bson = _bson_new_from_data(array, length)
-		_bson_iter_init(&itarray, bson)
+		var itarray: Iter
+		_bson_iter_recurse(&iter, &itarray)
 		while _bson_iter_next(&itarray)
 			r.add(bson_iter_to_any(&itarray))
 		return r
@@ -90,18 +97,23 @@ func bson_iter_to_any(iter: void*) -> Any
 	else if t == 10 # null
 		var r: Any
 		return r
+	else if t == 3 or t >= 250 # map
+		var it2: Iter
+		_bson_iter_recurse(&iter, &it2)
+		return bson_iter_map_to_any(&it2)
 	raise(new Exception("UNKNOWN TYPE: {{t}}"))
 
 
-func bson_iter_map_to_any(iter: void*) -> Any
+func bson_iter_map_to_any(iter: Iter&) -> Any
 	var r: Any
 	while _bson_iter_next(iter)
-		var key = bson_iter_key(iter)
+		let key = bson_iter_key(iter)
 		r[key] = bson_iter_to_any(iter)
 	return r
 
 func bson_to_any(doc: void*) -> Any
-	var iter: i32[160]
+	#print("BBB " + bson_to_json(doc))
+	var iter: Iter
 	_bson_iter_init(&iter, doc)
 	return bson_iter_map_to_any(&iter)
 
