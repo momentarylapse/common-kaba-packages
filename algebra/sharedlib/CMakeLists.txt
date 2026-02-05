@@ -25,39 +25,10 @@ list(APPEND DEPS Threads::Threads)
 
 add_library(modulealgebra SHARED
 	src/lib/algebra/_kaba_export.cpp
-	src/lib/algebra/crypto.cpp
-	src/lib/algebra/vli.cpp
-	src/lib/any/any.cpp
-	src/lib/any/conversion.cpp
+	src/lib/algebra/BigInt.cpp
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
-	src/lib/math/Box.cpp
-	src/lib/math/complex.cpp
-	src/lib/math/interpolation.cpp
-	src/lib/math/mat3.cpp
-	src/lib/math/mat4.cpp
-	src/lib/math/math.cpp
-	src/lib/math/plane.cpp
-	src/lib/math/quaternion.cpp
-	src/lib/math/random.cpp
-	src/lib/math/ray.cpp
-	src/lib/math/rect.cpp
-	src/lib/math/vec2.cpp
-	src/lib/math/vec3.cpp
-	src/lib/math/vec4.cpp
-	src/lib/os/app.cpp
-	src/lib/os/CommandLineParser.cpp
-	src/lib/os/config.cpp
-	src/lib/os/date.cpp
-	src/lib/os/file.cpp
-	src/lib/os/filesystem.cpp
-	src/lib/os/formatter.cpp
-	src/lib/os/msg.cpp
-	src/lib/os/path.cpp
-	src/lib/os/stream.cpp
-	src/lib/os/terminal.cpp
-	src/lib/os/time.cpp
 	src/main.cpp)
 target_include_directories(modulealgebra PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulealgebra PUBLIC ${LINK_DIRECTORIES})

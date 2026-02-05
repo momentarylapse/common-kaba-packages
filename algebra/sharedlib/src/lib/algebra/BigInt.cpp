@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "../base/base.h"
-#include "algebra.h"
-#include "../math/math.h"
+#include "BigInt.h"
 
 using uint64 = unsigned long long;
 
@@ -617,12 +616,18 @@ int BigInt::count_bits() const {
 	return bits;
 }
 
+namespace {
+	int _randi(int m) {
+		return int((float)rand() * m / (float)RAND_MAX);
+	}
+}
+
 BigInt BigInt::rand(int bits) {
 	BigInt v;
 	v.data.resize((bits-1)/32 + 1);
 	for (int i=0;i<v.data.num;i++)
 		for (int j=0;j<4;j++)
-			v.data[i] ^= randi(255) << (j*8);
+			v.data[i] ^= _randi(255) << (j*8);
 	if ((bits % 32) != 0)
 		v.data.back() &= 0xffffffff >> (32 - (bits % 32));
 	return v;

@@ -17,6 +17,7 @@ class BigInt
 	func extern compare(o: BigInt) -> i32
 	func extern mut idiv(div: BigInt, out rem: BigInt)
 	func extern div(div: BigInt, out rem: BigInt) -> BigInt
+	func extern pure count_bits() -> i32
 	
 	func extern __eq__(o: BigInt) -> bool
 	func extern __neq__(o: BigInt) -> bool
@@ -27,14 +28,13 @@ class BigInt
 	func extern __add__(o: BigInt) -> BigInt
 	func extern __sub__(o: BigInt) -> BigInt
 	func extern __mul__(o: BigInt) -> BigInt
-	func extern mut __iadd__(o: BigInt) -> BigInt
-	func extern mut __isub__(o: BigInt) -> BigInt
-	func extern mut __imul__(o: BigInt) -> BigInt
+	func extern mut __iadd__(o: BigInt)
+	func extern mut __isub__(o: BigInt)
+	func extern mut __imul__(o: BigInt)
 	
 	func extern static pow(x: BigInt, e: BigInt) -> BigInt
 	func extern static pow_mod(x: BigInt, e: BigInt, mod: BigInt) -> BigInt
 	func extern static rand(bits: i32) -> BigInt
-	func extern static count_bits(x: BigInt) -> i32
 	func extern static gcd(a: BigInt, b: BigInt) -> BigInt
 	func extern static miller_rabin_prime(p: BigInt, count: i32) -> bool
 	func extern static find_coprime(e: BigInt&, phi: BigInt&) -> bool

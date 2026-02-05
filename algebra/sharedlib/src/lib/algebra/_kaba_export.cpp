@@ -1,6 +1,5 @@
 #include "../base/base.h"
-#include "vli.h"
-#include "crypto.h"
+#include "BigInt.h"
 #include "../kabaexport/KabaExporter.h"
 
 class KabaBigInt : public BigInt {
