@@ -1,13 +1,85 @@
+use algebra.*
+
+
+
+func generate_prime(bits: i32) -> BigInt
+	var p: BigInt
+	while true
+		p = BigInt.rand(bits-1)
+		p = p * BigInt(2)
+		p += BigInt(1)
+		if BigInt.miller_rabin_prime(p, 30)
+			return p
+
+
+
+
+func bytes_to_number(s: bytes) -> BigInt
+	let nbytes = len(s)
+	var v: BigInt
+	v.data.resize((nbytes - 1) / 4 + 1)
+	as_binary(&v.data[0], nbytes) = s
+#	memcpy(v.data.data, t.data, nbytes)
+	return v
+
+func number_to_bytes(v: BigInt, nbytes: i32) -> bytes
+	var t = as_binary(&v.data[0], len(v.data)*4)
+	t.resize(nbytes)
+	#memcpy(t.data, v.data.data, v.data.num * 4)
+	return t
+
+
 class Crypto
-	#var n: Vli
-	#var k: Vli
-	func extern mut __init__()
-	func extern mut __delete__()
-	func extern mut __assign__(o: Crypto)
-	func extern pure __str__() -> string
-	func extern mut from_str(s: string)
-	func extern pure encrypt(s: bytes) -> bytes
-	func extern pure decrypt(s: bytes, cut: bool) -> bytes
+	var n: BigInt
+	var k: BigInt
+#	func mut __init__()
+#	func mut __delete__()
+#	func mut __assign__(o: Crypto)
+#	func pure __str__() -> string
+	func mut from_str(s: string)
+	func pure encrypt(s: bytes) -> bytes
+		print("enc")
+		var r: bytes
+		let nbytes = n.count_bits() / 8
+		var offset = 0
+		while true
+			print(".")
+			var m = bytes_to_number(s[offset:offset + nbytes])
+			print(m)
+			m = BigInt.pow_mod(m, k, n)
+			print(m)
+			r = r | number_to_bytes(m, nbytes + 1)
+			print(r)
+			offset += nbytes
+			if offset >= len(s)
+				return r
+	func pure decrypt(s: bytes, cut: bool) -> bytes
 	
 
-func extern create_keys(out c1: Crypto, out c2: Crypto, type: string, bits: i32)
+
+
+func CryptoRSACreateKey_trial(out c1: Crypto, out c2: Crypto, bits: i32)
+	let p = generate_prime(bits/2)
+	let q = generate_prime(bits/2)
+	let n = p * q
+	let phi = (p - BigInt(1)) * (q - BigInt(1))
+	var d, e: BigInt
+	if not BigInt.find_coprime(&e, &phi)
+		raise(new Exception("Crypto: no coprime found"))
+	if not BigInt.find_mod_inverse(&d, &e, &phi)
+		raise(new Exception("Crypto: no inverse"))
+	c1.n = n
+	c1.k = e
+	c2.n = n
+	c2.k = d
+
+func create_keys(out c1: Crypto, out c2: Crypto, type: string, bits: i32)
+	if type != "rsa"
+		return
+	for i in 0:100
+		try
+			CryptoRSACreateKey_trial(c1, c2, bits)
+			return
+		except
+			pass
+	raise(new Exception("Crypto: no key found..."))

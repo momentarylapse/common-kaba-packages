@@ -1,0 +1,15 @@
+use crypto.*
+
+func main()
+	var c1, c2, c3: Crypto
+	create_keys(c1, c2, "rsa", 64)
+	print(c1)
+	print(c2)
+	
+	var cypher = c1.encrypt("noch ein kleiner Test sdfhsdkfjhskdfjhlskdfjhlskdjfh")
+	print("----a")
+	var public_key = str(c2)
+	#print public_key
+	
+	c3.from_str(public_key)
+	print(c3.decrypt(cypher, true))
