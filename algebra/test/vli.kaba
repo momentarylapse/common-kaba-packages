@@ -1,0 +1,9 @@
+use algebra.*
+
+func main()
+	var a = BigInt(-31)
+	var b = BigInt(101)
+	a = BigInt.pow(a, b)
+	print(a >= b)
+	let r = a + b
+	print(r)

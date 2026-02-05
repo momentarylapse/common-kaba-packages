@@ -1,0 +1,9 @@
+use algebra.*
+
+func main()
+	var v = BigInt("999999998443")
+	var w = BigInt("29")
+	
+	var r: BigInt
+	v.idiv(w, r)
+	print("{{v}} mod {{r}}")

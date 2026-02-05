@@ -1,0 +1,12 @@
+use algebra.*
+
+func main()
+	var a = BigInt("7353404411")
+	var b = BigInt("7352204413")
+	
+	var r: BigInt
+	a.idiv(b, r)
+	print(a)
+	print(r)
+	
+	

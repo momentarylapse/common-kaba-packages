@@ -1,0 +1,13 @@
+use algebra.*
+
+func main()
+	var v = BigInt("10000000000")
+	var w = BigInt("3")
+	
+	var r: BigInt
+	v.idiv(w, r)
+	print("{{v}} mod {{r}}")
+	
+	v = BigInt("100000000000")
+	v.idiv(w, r)
+	print("{{v}} mod {{r}}")
