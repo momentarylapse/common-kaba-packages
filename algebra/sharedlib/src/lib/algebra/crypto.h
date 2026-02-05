@@ -11,7 +11,7 @@
 struct Crypto {
 	Crypto() {}
 	void _cdecl from_str(const string &s);
-	vli n, k;
+	BigInt n, k;
 	bytes _cdecl encrypt(const bytes &s) const;
 	bytes _cdecl decrypt(const bytes &s, bool cut = true) const;
 	string _cdecl str();

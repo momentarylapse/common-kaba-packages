@@ -11,7 +11,7 @@
 #ifndef _ALGEBRA_INCLUDED_
 #define _ALGEBRA_INCLUDED_
 
-struct vli;
+struct BigInt;
 
 
 #include "vli.h"

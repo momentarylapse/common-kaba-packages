@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "../base/base.h"
 #include "algebra.h"
+#include "../math/math.h"
 
 using uint64 = unsigned long long;
 
@@ -148,17 +149,17 @@ inline void _sub_(unsigned int &a, unsigned int b, bool &carry) {
 }
 
 
-vli::vli() {
+BigInt::BigInt() {
 	data.add(0);
 	sign = false;
 }
 
-vli::vli(const vli &v) {
+BigInt::BigInt(const BigInt &v) {
 	sign = v.sign;
 	data = v.data;
 }
 
-vli::vli(int v) {
+BigInt::BigInt(int v) {
 	if (v >= 0) {
 		sign = false;
 		data.add(v);
@@ -168,7 +169,7 @@ vli::vli(int v) {
 	}
 }
 
-vli::vli(const string &str) {
+BigInt::BigInt(const string &str) {
 	data.add(0);
 	sign = false;
 	int i0 = 0;
@@ -186,11 +187,11 @@ vli::vli(const string &str) {
 	}
 }
 
-vli::~vli() {
+BigInt::~BigInt() {
 	data.clear();
 }
 
-void vli::shift_units(int n) {
+void BigInt::shift_units(int n) {
 	if (n > 0)
 		if (data[data.num - 1] != 0) {
 			//data.insert(data.begin(), n, 0);
@@ -202,7 +203,7 @@ void vli::shift_units(int n) {
 		}
 }
 
-void vli::add_abs(const Array<unsigned int> &_data)
+void BigInt::add_abs(const Array<unsigned int> &_data)
 {
 	int nmin = min(data.num, _data.num);
 	int nmax = max(data.num, _data.num);
@@ -231,7 +232,7 @@ void vli::add_abs(const Array<unsigned int> &_data)
 		data.add(1);
 }
 
-void vli::sub_abs(const Array<unsigned int> &_data)
+void BigInt::sub_abs(const Array<unsigned int> &_data)
 {
 	if (data.num < _data.num){
 		printf("vli.sub_abs()...\n");
@@ -254,7 +255,7 @@ void vli::sub_abs(const Array<unsigned int> &_data)
 	normalize();
 }
 
-void vli::normalize()
+void BigInt::normalize()
 {
 	for (int i=data.num-1;i>=1;i--)
 		if (data[i] == 0)
@@ -265,13 +266,13 @@ void vli::normalize()
 		sign = false;
 }
 
-void vli::operator +=(const vli &v)
+void BigInt::operator +=(const BigInt &v)
 {
 	if (sign == v.sign){
 		add_abs(v.data);
 	}else{
 		if (compare_abs(v) < 0){
-			vli r = v;
+			BigInt r = v;
 			r.sub_abs(data);
 			r.sign = !sign and (r.data.back() != 0);
 			*this = r;
@@ -281,13 +282,13 @@ void vli::operator +=(const vli &v)
 	}
 }
 
-void vli::operator -=(const vli &v)
+void BigInt::operator -=(const BigInt &v)
 {
 	if (sign != v.sign){
 		add_abs(v.data);
 	}else{
 		if (compare_abs(v) < 0){
-			vli r = v;
+			BigInt r = v;
 			r.sub_abs(data);
 			r.sign = !sign and (r.data.back() != 0);
 			*this = r;
@@ -302,7 +303,7 @@ void vli::operator -=(const vli &v)
 	}
 }
 
-void vli::mul_ui(unsigned int v)
+void BigInt::mul_ui(unsigned int v)
 {
 	unsigned int oh = 0;
 	for (int i=0;i<data.num;i++){
@@ -319,11 +320,11 @@ void vli::mul_ui(unsigned int v)
 		data.add(oh);
 }
 
-vli vli::operator *(const vli &v) const
+BigInt BigInt::operator *(const BigInt &v) const
 {
-	vli r;
+	BigInt r;
 	for (int i=0;i<v.data.num;i++){
-		vli t = *this;
+		BigInt t = *this;
 		t.mul_ui(v.data[i]);
 		if (i > 0)
 			t.shift_units(i);
@@ -333,10 +334,9 @@ vli vli::operator *(const vli &v) const
 	return r;
 }
 
-void vli::div(unsigned int divisor, unsigned int &remainder)
-{
+void BigInt::div(unsigned int divisor, unsigned int &remainder) {
 	unsigned int last_rem = 0;
-	for (int i=data.num-1;i>=0;i--){
+	for (int i=data.num-1;i>=0;i--) {
 		unsigned int rem;
 		_div_(data[i], last_rem, divisor, rem);
 		last_rem = rem;
@@ -390,9 +390,9 @@ unsigned int div_fair(unsigned int al, unsigned int ah, unsigned int bl, unsigne
 	return (unsigned int)(a / b * 4294967296.0 + 0.4);
 }
 
-void vli::div(const vli &divisor, vli &remainder)
+void BigInt::div(const BigInt &divisor, BigInt &remainder)
 {
-	vlidb("div " + dump() + " / " + divisor.dump()); 
+	vlidb("div " + dump() + " / " + divisor.dump());
 	remainder = *this;
 	unsigned int div_hi = divisor.data[divisor.data.num - 1];
 	unsigned int div_lo = 0;
@@ -410,19 +410,19 @@ void vli::div(const vli &divisor, vli &remainder)
 			//printf("dddddd  %u   %u %u \n",guess, data[i], data[i + 1], div_hi);
 			guess  = div_fair(remainder.data[i], remainder.data[i + 1], div_lo, div_hi);
 			//guess2 = div_fair(remainder.data[i], remainder.data[i + 1], div_lo, div_hi);
-			
+
 			//_div_(guess, remainder.data[i + 1], div_hi, rrr);
 			//_div_(guess2, remainder.data[i + 1], div_hi, rrr);
 		}
 		vlidb(format("guess %08x   (%08x)\n", guess, guess2));
-		vli div_shift = divisor;
+		BigInt div_shift = divisor;
 		div_shift.shift_units(i - divisor.data.num + 1);
-		vli t = div_shift;
+		BigInt t = div_shift;
 		guess ++;
 		t.mul_ui(guess);
 		vlidb("t = " + t.dump());
 		vlidb("rem = " + remainder.dump());
-		
+
 		bool cont = false;
 		while (t.compare_abs(remainder) > 0){
 			vlidb("t >= rem");
@@ -457,7 +457,7 @@ void vli::div(const vli &divisor, vli &remainder)
 //	printf("----------\n");
 }
 
-bool vli::operator == (const vli &v) const
+bool BigInt::operator == (const BigInt &v) const
 {
 	if (sign != v.sign)
 		return false;
@@ -469,7 +469,7 @@ bool vli::operator == (const vli &v) const
 	return true;
 }
 
-int vli::compare_abs(const vli &v) const
+int BigInt::compare_abs(const BigInt &v) const
 {
 	//msg_write("cmp " + dump() + " == " + v.dump());
 	if (data.num != v.data.num)
@@ -485,7 +485,7 @@ int vli::compare_abs(const vli &v) const
 
 // < v => < 0
 // > v => > 0
-int vli::compare(const vli &v) const
+int BigInt::compare(const BigInt &v) const
 {
 	if (sign != v.sign)
 		return (sign ? -1 : 1);
@@ -494,14 +494,14 @@ int vli::compare(const vli &v) const
 	return compare_abs(v);
 }
 
-bool vli::operator < (const vli &v) const
+bool BigInt::operator < (const BigInt &v) const
 {
 	return (compare(v) < 0);
 }
 
-string vli::to_string() const
+string BigInt::to_string() const
 {
-	vli t = *this;
+	BigInt t = *this;
 	unsigned int rr;
 	string s;
 	while(true){
@@ -522,13 +522,13 @@ string vli::to_string() const
 }
 
 
-void vli::operator = (const vli &v)
+void BigInt::operator = (const BigInt &v)
 {
 	data = v.data;
 	sign = v.sign;
 }
 
-string vli::dump() const
+string BigInt::dump() const
 {
 	string s = format("%s%08x", (sign ? "-" : "+"), data.back());
 	for (int i=data.num-2;i>=0;i--)
@@ -536,14 +536,14 @@ string vli::dump() const
 	return s;
 }
 
-vli vli::pow(const vli &x, const vli &e) {
+BigInt BigInt::pow(const BigInt &x, const BigInt &e) {
 	// number of bits in highest unit of exponent
 	int nex = 0;
 	for (int i=0;i<32;i++)
 		if ((e.data.back() & (1 << i)) > 0)
 			nex = i + 1;
-	vli r = 1;
-	vli t = x;
+	BigInt r = 1;
+	BigInt t = x;
 	for (int u=0;u<e.data.num;u++) {
 		int nmax = (u == e.data.num - 1) ? nex : 32;
 		for (int i=0;i<nmax;i++) {
@@ -558,30 +558,30 @@ vli vli::pow(const vli &x, const vli &e) {
 }
 
 // r = ((base ^ e) % m)
-vli vli::pow_mod(const vli &x, const vli &e, const vli &m) {
+BigInt BigInt::pow_mod(const BigInt &x, const BigInt &e, const BigInt &m) {
 	// number of bits in highest unit of exponent
 	int nex = 0;
 	for (int i=0;i<32;i++)
 		if ((e.data.back() & (1 << i)) > 0)
 			nex = i + 1;
 
-	
-	vli r = 1;
-	vli t;
-	vli base2 = x;
+
+	BigInt r = 1;
+	BigInt t;
+	BigInt base2 = x;
 	base2.div(m, t); // t = (base % m)
 	for (int u=0;u<e.data.num;u++) {
 		int nmax = (u == e.data.num - 1) ? nex : 32;
 		for (int i=0;i<nmax;i++) {
 			if ((e.data[u] & (1 << i)) > 0) {
 				r *= t;
-				vli rr;
+				BigInt rr;
 				r.div(m, rr);
 				r = rr;
 			}
 			if ((i < nex - 1) or (u < e.data.num - 1)) {
 				t *= t;
-				vli tt;
+				BigInt tt;
 				t.div(m, tt);
 				t = tt;
 			}
@@ -591,11 +591,11 @@ vli vli::pow_mod(const vli &x, const vli &e, const vli &m) {
 	return r;
 }
 
-vli vli::gcd(const vli &_a, const vli &_b) {
-	vli a = _a;
-	vli b = _b;
-	vli vli0 = 0;
-	vli rem;
+BigInt BigInt::gcd(const BigInt &_a, const BigInt &_b) {
+	BigInt a = _a;
+	BigInt b = _b;
+	BigInt vli0 = 0;
+	BigInt rem;
 	while (b != vli0) {
 		a.div(b, rem);
 		a = b;
@@ -603,4 +603,145 @@ vli vli::gcd(const vli &_a, const vli &_b) {
 	}
 	a.sign = false;
 	return a;
+}
+
+
+
+int BigInt::count_bits() const {
+	int bits = 32 * (data.num - 1);
+	for (int i=31;i>=0;i--)
+		if ((data.back() & (1 << i)) != 0){
+			bits += i;
+			break;
+		}
+	return bits;
+}
+
+BigInt BigInt::rand(int bits) {
+	BigInt v;
+	v.data.resize((bits-1)/32 + 1);
+	for (int i=0;i<v.data.num;i++)
+		for (int j=0;j<4;j++)
+			v.data[i] ^= randi(255) << (j*8);
+	if ((bits % 32) != 0)
+		v.data.back() &= 0xffffffff >> (32 - (bits % 32));
+	return v;
+}
+
+bool BigInt::miller_rabin_prime(const BigInt &p, int count) {
+	// decompose
+	int s = 0;
+	BigInt d = p-1;
+	// TODO improve me!!!
+	while ((d.data[0] & 1) == 0) {
+		unsigned int rem;
+		d.div(2, rem);
+		s ++;
+	}
+	int bits = p.count_bits();
+
+	// trials...
+	BigInt p_mm = p - 1;
+	for (int i=0; i<count; i++) {
+		BigInt a;
+		do {
+			a = BigInt::rand(bits);
+		} while ((a > p) || (a <= 1));
+
+		BigInt rem;
+		BigInt t = BigInt::pow_mod(a, d, p);
+		if (t == 1)
+			continue;
+		if (t == p_mm)
+			continue;
+
+		bool passed = true;
+		for (int r=1;r<s;r++) {
+			t *= t;
+			t.div(p, rem);
+			t = rem;
+			if (t == p_mm) {
+				passed = false;
+				break;
+			}
+		}
+		if (!passed)
+			continue;
+		return false;
+
+	}
+	return true;
+}
+
+void BigInt::get_prime(BigInt &p, int bits) {
+	do {
+		p = BigInt::rand(bits-1);
+		p = p * 2;
+		p += 1;
+	} while (!miller_rabin_prime(p, 30));
+}
+
+bool BigInt::find_coprime(BigInt &e, BigInt &phi) {
+	int bits = phi.count_bits();
+	do {
+		e = BigInt::rand(bits);
+	} while (e >= phi);
+
+	while(e > 1) {
+		if (BigInt::gcd(e, phi) == 1)
+			return true;
+		e -= 1;
+	}
+	return false;
+}
+
+bool BigInt::find_mod_inverse(BigInt &d, BigInt &e, BigInt &phi) {
+	/*d = 1;
+	while(d < e){
+		vli n = d * e;
+		vli rem;
+		n._div(phi, rem);
+		if (rem == 1)
+			return true;
+		d += 1;
+	}
+	return false;*/
+
+	// via extended Euclidean algorithm
+	BigInt a = e;
+	BigInt b = phi;
+	BigInt x = 0;
+	BigInt y = 1;
+	BigInt last_x = 1;
+	BigInt last_y = 0;
+	BigInt vli0 = 0;
+	BigInt rem;
+	while (b != vli0) {
+		BigInt q;
+		a.div(b, rem);
+		q = a;
+
+		a = b;
+		b = rem;
+		BigInt temp = last_x;
+		last_x = x;
+		x = temp - q*x;
+		temp = last_y;
+		last_y = y;
+		BigInt yy = temp - q*y;
+		y = yy;
+	}
+	d = last_x;
+	while (d.sign)
+		d += phi;
+	while (d > phi)
+		d -= phi;
+
+	BigInt ttt = d * e;
+	ttt._div(phi, rem);
+	if (rem != 1) {
+		printf("--- 1=%s  (d=%s)\n", rem.to_string().c_str(), d.to_string().c_str());
+		return false;
+	}
+	return true;
 }
