@@ -1,22 +1,23 @@
 use common.*
 use parser.*
+use algebra.BigInt
 
 func add(a: string, b: string) -> string
 	#return i2s(s2i(a) + s2i(b))
-	let va = vli(a)
-	let vb = vli(b)
+	let va = BigInt(a)
+	let vb = BigInt(b)
 	return str(va + vb)
 
 func sub(a: string, b: string) -> string
 	#return i2s(s2i(a) - s2i(b))
-	let va = vli(a)
-	let vb = vli(b)
+	let va = BigInt(a)
+	let vb = BigInt(b)
 	return str(va - vb)
 
 func mul(a: string, b: string) -> string
 	#return i2s(s2i(a) * s2i(b))
-	let va = vli(a)
-	let vb = vli(b)
+	let va = BigInt(a)
+	let vb = BigInt(b)
 	return str(va * vb)
 
 #string mod(string a, string b)
@@ -26,17 +27,17 @@ func mul(a: string, b: string) -> string
 #	return rem.str()
 
 func exponent(a: string, b: string) -> string
-	let va = vli(a)
-	let vb = vli(b)
-	return str(vli.pow(va, vb))
+	let va = BigInt(a)
+	let vb = BigInt(b)
+	return str(BigInt.pow(va, vb))
 
 func gcd(a: string, b: string) -> string
-	let va = vli(a)
-	let vb = vli(b)
-	return str(vli.gcd(va, vb))
+	let va = BigInt(a)
+	let vb = BigInt(b)
+	return str(BigInt.gcd(va, vb))
 
 func number_is_even(n: string) -> bool
-	return (int(n[-1:]) % 2) == 0
+	return (i32(n[-1:]) % 2) == 0
 
 func append_terms(out a: shared![Term][], b: shared![Term][])
 	for x in b
@@ -114,16 +115,16 @@ func split_off_factor(out l: shared![Term][]) -> string[]
 
 # a/b kürzen
 func eval_number_division(a: string, b: string) -> xfer[Term]
-	var va = vli(a)
-	var vb = vli(b)
-	var rem: vli
-	let tt = va.div(vb, rem)
-	let vli0 = vli(0)
-	if rem == vli0
+	var va = BigInt(a)
+	var vb = BigInt(b)
+	var rem: BigInt
+	var tt = va.div(vb, rem)
+	let bi0 = BigInt(0)
+	if rem == bi0
 		return AddNumber(str(tt))
 	var g = gcd(a, b)
 	if g != "1"
-		var vg = vli(g)
+		var vg = BigInt(g)
 		va.idiv(vg, tt)
 		vb.idiv(vg, tt)
 		if vb.sign
