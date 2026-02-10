@@ -1,41 +1,43 @@
-class rat
-	var a, b: vli
+use algebra.*
+
+class Rational
+	var a, b: BigInt
 	func mut normalize()
-		var gcd = vli.gcd(a, b)
-		var rem: vli
+		var gcd = BigInt.gcd(a, b)
+		var rem: BigInt
 		self.a.idiv(gcd, rem)
 		self.b.idiv(gcd, rem)
-	func mut set(a: int, b: int)
-		self.a = vli(a)
-		self.b = vli(b)
-	func __assign__(i: int)
-		self.a = vli(i)
-		self.b = vli(1)
-	func __assign__(other: rat)
+	func mut set(a: i32, b: i32)
+		self.a = BigInt(a)
+		self.b = BigInt(b)
+	func __assign__(i: i32)
+		self.a = BigInt(i)
+		self.b = BigInt(1)
+	func __assign__(other: Rational)
 		self.a = other.a
 		self.b = other.b
 		self.normalize()
-	func mut __imul__(other: rat)
+	func mut __imul__(other: Rational)
 		self.a *= other.a
 		self.b *= other.b
 		self.normalize()
-	func mut __idiv__(other: rat)
+	func mut __idiv__(other: Rational)
 		self.a *= other.b
 		self.b *= other.a
 		self.normalize()
-	func mut __iadd__(other: rat)
+	func mut __iadd__(other: Rational)
 		self.a = self.a * other.b + other.a * self.b
 		self.b *= other.b
 		self.normalize()
-	func mut __isub__(other: rat)
+	func mut __isub__(other: Rational)
 		self.a = self.a * other.b - other.a * self.b
 		self.b *= other.b
 		self.normalize()
 	func __str__() -> string
-		return "(" + str(self.a) + " / " + str(self.b) + ")"
+		return "({{a}} / {{b}})"
 
 func main()
-	var r, s: rat
+	var r, s: Rational
 	r.set(3, 2)
 	s.set(5, 6)
 	r -= s
