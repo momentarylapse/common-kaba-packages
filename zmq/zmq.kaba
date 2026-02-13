@@ -72,7 +72,7 @@ class Socket
 		socket!.write([0x04, u8(len(payload))] | payload)
 		
 
-	func handle_packet(p: bytes) -> i32
+	func mut handle_packet(p: bytes) -> i32
 		#print(p.hex())
 		if len(p) < 8
 			return 0
@@ -111,7 +111,7 @@ class Socket
 	#	offset += command_size
 	#	print("command: {{command}}")
 
-	func handle_packet_command(p: bytes)
+	func mut handle_packet_command(p: bytes)
 		var offset = 2
 		let command_size = i32(p[offset])
 		offset ++
