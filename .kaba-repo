@@ -1,7 +1,8 @@
 version 3
-requires kaba 45a7029ba7169c86688d4e13273d9fc1fd1c2244
+requires kaba 1c7d52a1e61fa769119344882b11f1ca990eea9f
 #package alex
 package algebra
+package asciitools
 package bson
 package circuit
 package cli

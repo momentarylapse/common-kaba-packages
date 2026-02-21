@@ -1,0 +1,97 @@
+use ncurses.*
+use image.*
+use os
+
+func main(args: string[])
+	for a in args
+		show_image(a)
+
+let CHARS = [' ', '.', ':', '-', '+', '*', 'a', 'H', 'M', 'W']
+
+func to_ascii(c: Color) -> u8
+	let b = (c.r + c.g + c.b) / 3
+	let n = clamp(i32(b * f32(len(CHARS))), 0, len(CHARS)-1)
+	return CHARS[n]
+
+
+struct ViewPort
+	var scale: f32
+	var offset: vec2 # data pos at top-left screen corner
+	func screen_to_data_x(x: i32) -> i32
+		return i32(0.5 * f32(x) / scale) + offset.x
+	func screen_to_data_y(y: i32) -> i32
+		return i32(f32(y) / scale) + offset.y
+	func screen_to_data(p: vec2) -> vec2
+		return vec2(p.x/2, p.y) / scale + offset
+	func data_to_screen(p: vec2) -> vec2
+		let q = (p - offset)
+		return vec2(q.x*2, q.y) * scale
+	func mut zoom(f: f32, cx: i32, cy: i32)
+		let d0 = screen_to_data([cx, cy])
+		scale *= f
+		let d1 = screen_to_data([cx, cy])
+		offset += d0 - d1
+	func mut center_on(r: Rect, w: i32, h: i32)
+		scale = h / r.height()
+		offset = [0,0]
+		offset = - screen_to_data([w/2, h/2]) + vec2(r.width(), r.height())/2
+
+
+func draw_image(im: Image, vp: ViewPort, w: i32, h: i32)
+	for y in 0:h
+		stdwin.move(0, y)
+		let py = vp.screen_to_data_y(y)
+		var s = ""
+		for x in 0:w
+			let px = vp.screen_to_data_x(x)
+			if px >= 0 and px < im.width and py >= 0 and py < im.height
+				s.add(to_ascii(im.get_pixel(px, py)))
+			else
+				s.add("   ?"[((x+y) % 4) * (y%2)])
+		stdwin.print(s)
+
+func show_image(fn: os.Path)
+	let im = Image.load(fn)
+	if im.error
+		return
+
+	init()
+	raw()
+	noecho()
+	start_color()
+	use_default_colors()
+	curs_set(0)
+	stdwin.keypad(true)
+	
+	var w = stdwin.width()
+	var h = stdwin.height()
+	
+	
+	var vp: ViewPort
+	vp.center_on([0,im.width, 0,im.height], w, h)
+	
+	while true
+	
+		draw_image(im, vp, w, h)
+	
+	
+		stdwin.move(0, h-1)
+		stdwin.attron(int(Attr.REVERSE))
+		for x in 0:w
+			stdwin.print(" ")
+		stdwin.move(1, h-1)
+		stdwin.print("{{fn.basename()}}  {{im.width}} x {{im.height}}")
+		stdwin.attroff(int(Attr.REVERSE))
+		stdwin.refresh()
+		#let p = _stdscr
+	
+		var r = stdwin.getch()
+		match Key.from_int(r)
+			Key.PLUS => vp.zoom(1.1, w/2, h/2)
+			Key.MINUS => vp.zoom(1.0 / 1.1, w/2, h/2)
+			Key.UP => vp.offset.y -= h / vp.scale * 0.1
+			Key.DOWN => vp.offset.y += h / vp.scale * 0.1
+			Key.LEFT => vp.offset.x -= h / vp.scale * 0.1
+			Key.RIGHT => vp.offset.x += h / vp.scale * 0.1
+			else => break
+	endwin()

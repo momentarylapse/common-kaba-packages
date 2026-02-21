@@ -1,0 +1,3 @@
+requires ncurses
+run showimage.kaba
+
