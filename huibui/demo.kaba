@@ -18,7 +18,7 @@ class DemoDialog extends hui.Window
 class ToolbarDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Toolbar demo", 800, 300)
-		for t in toolbar(0)
+		for mut t in toolbar(0)
 			t.from_source(source)
 
 class MenuDemoDialog extends hui.Window

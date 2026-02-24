@@ -8,8 +8,8 @@ class SourceParser
 	func mut parse()
 		var pos0 = 0
 		while true
-			for pos in source.find("_(\"", pos0)
-				pos += 3
+			for _pos in source.find("_(\"", pos0)
+				let pos = _pos + 3
 				var length = 0
 				for i in 0:1024
 					if source[pos + i] == '\\'

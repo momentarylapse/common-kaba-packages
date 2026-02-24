@@ -99,7 +99,7 @@ class Window extends Panel
 	func extern mut show()
 	func extern mut hide()
 	func extern mut set_menu(menu: xfer[Menu])
-	func extern mut toolbar(index: i32) -> Toolbar*
+	func extern mut selfref toolbar(index: i32) -> Toolbar*
 	func extern mut set_maximized(max: bool)
 	func extern is_maximized() -> bool
 	func extern is_minimized() -> bool

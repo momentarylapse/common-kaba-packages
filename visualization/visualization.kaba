@@ -207,7 +207,7 @@ Grid ? ''
 		redraw("nix-area")
 	
 	func mut init()
-		for c in ctx
+		for mut c in ctx
 	
 			def_shader_3d = c.create_shader("<Layout>
 	version = 330 core
@@ -371,7 +371,7 @@ void main() {
 	func mut draw_cube(a: vec3, b: vec3)
 		#gl.set_model_matrix(mat4.ID)
 		#set_default_shader_3d()
-		for c in ctx
+		for mut c in ctx
 			c.vb_temp.create_cube(a, b)
 			#gl.set_wire(true)
 			gl.draw_triangles(c.vb_temp)
@@ -425,7 +425,7 @@ void main() {
 		projection_matrix = mat4.translation([w/2, h/2, 0]) * mat4.scale(w/2, -h/2, 1) * p * v
 
 	func mut draw_image(tex: gl.Texture*, dest: Rect, flip: bool = false)
-		for c in ctx
+		for mut c in ctx
 			gl.set_shader(image_shader)
 			gl.bind_texture(0, tex)
 			if flip

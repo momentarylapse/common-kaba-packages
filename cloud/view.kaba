@@ -64,7 +64,7 @@ class MyWindow extends visualization.RenderWindow
 			
 	func mut init_data()
 		print("main.init_data")
-		for c in ctx
+		for mut c in ctx
 			cloud_renderer.init_data(c)
 			update_cloud_renderer()
 	

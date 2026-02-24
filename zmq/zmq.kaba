@@ -57,7 +57,7 @@ class Socket
 		socket!.set_blocking(false)
 	
 	func mut iterate()
-		for s in socket
+		for mut s in socket
 			if not s.can_read()
 				return
 			# FIXME: s.read() exceptions...

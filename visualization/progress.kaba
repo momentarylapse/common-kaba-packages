@@ -8,23 +8,23 @@ class Progress
 	func __init__(title: string)
 		dlg = new hui.Dialog(title, 300, 50, main_win, false)
 		#set_options("", "")
-		for d in dlg
+		for mut d in dlg
 			d.add_progress_bar("", 0, 0, "progress")
 		hui.fly(dlg)
 		hui.do_single_main_loop()
 	
 	func __delete__()
-		for d in dlg
+		for mut d in dlg
 			d.destroy()
 		hui.do_single_main_loop()
 	
 	func mut set(f: float)
-		for d in dlg
+		for mut d in dlg
 			d.set_float("progress", f)
 		hui.do_single_main_loop()
 	
 	func mut set(t: string)
-		for d in dlg
+		for mut d in dlg
 			d.set_title(t)
 		hui.do_single_main_loop()
 
@@ -34,11 +34,11 @@ func start(title: string)
 	progress = new Progress(title)
 
 func set(f: float)
-	for p in progress
+	for mut p in progress
 		p.set(f)
 
 func set(t: string)
-	for p in progress
+	for mut p in progress
 		p.set(t)
 
 func end()

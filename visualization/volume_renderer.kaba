@@ -14,7 +14,7 @@ class VolumeRenderer
 	
 	func mut draw(out r: visualization.RenderWindow)
 
-		for s in shader
+		for mut s in shader
 			gl.set_shader(&s)
 			s.set_floats("bb_min", &bounds.min.x, 3)
 			s.set_floats("bb_max", &bounds.max.x, 3)
@@ -32,7 +32,7 @@ class VolumeRenderer
 		NZ = n[2]
 		bounds = box
 		tex = new gl.VolumeTexture(NX, NY, NZ, "r:f32")
-		for t in tex
+		for mut t in tex
 			t.write_float(data)
 			t.set_options("magfilter=linear")
 		
