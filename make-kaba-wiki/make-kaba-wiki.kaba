@@ -1,9 +1,9 @@
 use kaba.*
 use os
 use time
-use common.*
-use wiki
-use docu
+use .common.*
+use .wiki
+use .docu
 
 
 func wiki_upload(name: string, wiki: string)

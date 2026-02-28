@@ -1,9 +1,9 @@
 use os
 use os.Path
 use hui
-use config.*
-use resource.*
-use language.*
+use .config.*
+use .resource.*
+use .language.*
 
 func write_resource(out f: os.FileStream, r: hui.Resource)
 	f << r.type

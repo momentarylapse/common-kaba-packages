@@ -1,8 +1,8 @@
 use kaba.*
 use os
 use time
-use common.*
-use docu.*
+use .common.*
+use .docu.*
 # use "mongo"
 
 const SHIFT = "    "

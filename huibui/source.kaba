@@ -1,7 +1,7 @@
 use os
 use os.Path
-use config.*
-use language.*
+use .config.*
+use .language.*
 
 class SourceParser
 	var source: string

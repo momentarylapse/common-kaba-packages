@@ -1,4 +1,4 @@
-version 2
+version 3
 requires visualization
 run convert.kaba
 run view.kaba

@@ -1,5 +1,5 @@
 use os
-use common.*
+use .common.*
 
 struct MCMHeader
 	magic: i32

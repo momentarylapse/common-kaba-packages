@@ -1,12 +1,12 @@
 use os
 use os.Path
 use hui
-use config.*
-use language.*
-use resource.*
-use source.*
-use demo.*
-use export.*
+use .config.*
+use .language.*
+use .resource.*
+use .source.*
+use .demo.*
+use .export.*
 	
 
 func get_ids(out l: Language, r: hui.Resource, ns: string)

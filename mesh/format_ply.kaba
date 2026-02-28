@@ -1,6 +1,6 @@
 use os
 use kaba
-use common.*
+use .common.*
 
 func load_ply(fn: os.Path) -> Mesh
 	var m: Mesh

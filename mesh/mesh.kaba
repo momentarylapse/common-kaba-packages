@@ -1,11 +1,11 @@
 use os
 use kaba
-use common.*
-use format_3ds.*
-use format_ply.*
-use format_mcm.*
-use format_stl.*
-use format_obj.*
+use .common.*
+use .format_3ds.*
+use .format_ply.*
+use .format_mcm.*
+use .format_stl.*
+use .format_obj.*
 
 let EXPORT_IMPORTS = true
 

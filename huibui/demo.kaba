@@ -1,8 +1,8 @@
 use os
 use os.Path
 use hui
-use config.*
-use resource.*
+use .config.*
+use .resource.*
 
 class DemoDialog extends hui.Window
 	func __init__(source: string)

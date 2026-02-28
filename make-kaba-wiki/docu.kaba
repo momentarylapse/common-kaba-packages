@@ -1,6 +1,6 @@
 use kaba.*
 use os
-use common.*
+use .common.*
 
 var report_missing = false
 

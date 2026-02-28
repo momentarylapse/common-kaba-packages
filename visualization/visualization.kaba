@@ -2,7 +2,7 @@ use hui
 use gl
 use image.Image
 
-use progress.*
+use .progress.*
 
 const IDLE_DT = 0.1
 

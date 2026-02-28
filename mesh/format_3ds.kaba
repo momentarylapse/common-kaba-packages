@@ -1,5 +1,5 @@
 use os
-use common.*
+use .common.*
 
 func read16(out s: os.FileStream) -> i32
 	let a = s.read(2)
