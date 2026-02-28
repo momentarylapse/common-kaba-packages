@@ -1,5 +1,5 @@
-use project.*
-use library.*
+use .project.*
+use .library.*
 
 
 func var_name(l: string) -> string

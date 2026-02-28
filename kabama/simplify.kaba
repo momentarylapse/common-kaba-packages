@@ -1,5 +1,5 @@
-use common.*
-use parser.*
+use .common.*
+use .parser.*
 use algebra.BigInt
 
 func add(a: string, b: string) -> string

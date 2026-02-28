@@ -1,11 +1,11 @@
-use library.*
-use project.*
-use makefile.*
-use visualstudio
-use meson
-use cmake
-use vcpkg
-use build.*
+use .library.*
+use .project.*
+use .makefile.*
+use .visualstudio
+use .meson
+use .cmake
+use .vcpkg
+use .build.*
 use os
 
 

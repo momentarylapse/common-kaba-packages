@@ -1,6 +1,6 @@
 use os
 use os.Path
-use project.*
+use .project.*
 
 struct Library
 	var name: string

@@ -1,10 +1,10 @@
 use os
 use kaba
-use common.*
-use list.*
-use install.*
-use update.*
-use remove.*
+use .common.*
+use .list.*
+use .install.*
+use .update.*
+use .remove.*
 
 
 

@@ -1,7 +1,7 @@
 use os
 use kaba
-use common.*
-use install.*
+use .common.*
+use .install.*
 
 
 func action_update(args: string[])

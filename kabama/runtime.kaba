@@ -1,11 +1,11 @@
-use common.*
-use parser.*
-use simplify.*
-use expand.*
-use diff.*
-use subst.*
-use zeros.*
-use float.*
+use .common.*
+use .parser.*
+use .simplify.*
+use .expand.*
+use .diff.*
+use .subst.*
+use .zeros.*
+use .float.*
 
 
 class Runtime

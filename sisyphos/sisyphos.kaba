@@ -1,14 +1,14 @@
 use os
-use localdb.*
-use config.*
-use tag.*
-use actions.*
-use action_add.*
-use action_delete.*
-use action_list.*
-use action_transmit.*
-use action_tag.*
-use action_remote.*
+use .localdb.*
+use .config.*
+use .tag.*
+use .actions.*
+use .action_add.*
+use .action_delete.*
+use .action_list.*
+use .action_transmit.*
+use .action_tag.*
+use .action_remote.*
 
 
 func main(arg: string[])

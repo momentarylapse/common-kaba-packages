@@ -1,6 +1,6 @@
 use os
-use project.*
-use library.*
+use .project.*
+use .library.*
 
 
 func create()

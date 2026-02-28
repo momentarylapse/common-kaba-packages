@@ -1,7 +1,7 @@
 use os.*
-use config.*
-use tag.*
-use file.*
+use .config.*
+use .tag.*
+use .file.*
 
 func common_head(a: string, b: string) -> string
 	for i in 0:len(a)

@@ -1,6 +1,6 @@
-use file.*
-use config.*
-use tag.*
+use .file.*
+use .config.*
+use .tag.*
 use os.*
 use filetags.get_tags
 

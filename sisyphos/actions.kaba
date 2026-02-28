@@ -1,11 +1,11 @@
 use os.*
-use localdb.*
-use file.*
-use config.*
-use remote.*
-use tag.*
-use autotag.*
-use dblister.*
+use .localdb.*
+use .file.*
+use .config.*
+use .remote.*
+use .tag.*
+use .autotag.*
+use .dblister.*
 
 
 

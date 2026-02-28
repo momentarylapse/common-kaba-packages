@@ -1,6 +1,6 @@
-use project.*
-use makefile.*
-use library.*
+use .project.*
+use .makefile.*
+use .library.*
 use os
 use os.Path
 use thread

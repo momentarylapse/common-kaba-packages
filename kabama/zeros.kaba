@@ -1,6 +1,6 @@
-use common.*
-use subst.*
-use simplify.*
+use .common.*
+use .subst.*
+use .simplify.*
 
 func zeros(t: shared![Term], _var: string) -> shared![Term]
 	var z: shared![Term][]

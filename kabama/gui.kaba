@@ -1,5 +1,5 @@
 use hui
-use runtime.*
+use .runtime.*
 
 class KabamaWindow extends hui.Window
 	var r: Runtime

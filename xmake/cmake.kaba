@@ -1,12 +1,12 @@
 use os
-use project.*
-use library.*
-use vcpkg
-use cmake_libraries.*
-use cmake_install.*
-use cmake_bundle.*
-use cmake_visualstudio.*
-use cmake_gitversion.*
+use .project.*
+use .library.*
+use .vcpkg
+use .cmake_libraries.*
+use .cmake_install.*
+use .cmake_bundle.*
+use .cmake_visualstudio.*
+use .cmake_gitversion.*
 
 
 

@@ -1,7 +1,7 @@
 use os
 use os.Path
-use project.*
-use library.*
+use .project.*
+use .library.*
 
 func create_all_makefiles()
 	parse_dependencies()

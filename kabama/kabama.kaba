@@ -1,6 +1,6 @@
-use common.*
-use parser.*
-use runtime.*
+use .common.*
+use .parser.*
+use .runtime.*
 use terminal
 
 

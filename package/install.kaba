@@ -1,7 +1,7 @@
 use os
 use kaba
-use common.*
-use remove.*
+use .common.*
+use .remove.*
 
 
 func allow_install_file(f: os.Path) -> bool

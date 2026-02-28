@@ -1,6 +1,6 @@
 use os.*
-use config.*
-use tag.*
+use .config.*
+use .tag.*
 
 const NONLOCAL = "nonlocal"
 const CHANGED_FILE = "changed"

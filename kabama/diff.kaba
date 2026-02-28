@@ -1,6 +1,6 @@
-use common.*
-use parser.*
-use simplify.*
+use .common.*
+use .parser.*
+use .simplify.*
 
 
 func diff_function(f: string, params: shared![Term][]) -> xfer[Term]

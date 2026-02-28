@@ -1,4 +1,4 @@
-use project.*
+use .project.*
 use os
 
 func find_best_png_icon() -> os.Path
