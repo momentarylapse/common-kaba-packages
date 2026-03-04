@@ -7,22 +7,22 @@ class Painter extends image.Painter as @noauto
 	func extern override __delete__()
 
 
-#class Menu
-#	func extern mut __init__(p: Panel*)
-#	func extern mut popup(p: Panel*)
-#	func extern mut add(name: string, id: string)
+class Menu
+	func extern mut __init__() #(p: Panel*)
+	func extern mut popup(p: Panel*)
+	func extern mut add(name: string, id: string)
 #	func extern mut add_with_image(name: string, image: string, id: string)
 #	func extern mut add_checkable(name: string, id: string)
 #	func extern mut add_separator()
 #	func extern mut add_sub_menu(name: string, id: string, sub_menu: xfer[Menu])
-#	func extern mut enable(id: string, enabled: bool)
+	func extern mut enable(id: string, enabled: bool)
 #	func extern mut check(id: string, enabled: bool)
-#
-#
-#class Toolbar extends Object
-#	func extern mut set_by_id(id: string)
+
+
+class Toolbar extends Object
+	func extern mut set_by_id(id: string)
 #	func extern mut from_source(source: string)
-#
+
 
 
 # exposed mostly for internal development convenience
@@ -85,7 +85,8 @@ class Panel extends Control
 
 	func extern mut event(id: string, f: void->void) -> i32
 	func extern mut event_x(id: string, msg: string, f: void->void) -> i32
-	func extern mut event_xp(id: string, msg: string, f: Painter->void) -> i32
+	func extern mut event_x(id: string, msg: string, f: Painter->void) -> i32
+#	func extern mut event_xp(id: string, msg: string, f: Painter->void) -> i32
 	func extern mut remove_event_handler(uid: i32)
 
 	func extern mut from_source(source: string)
@@ -194,10 +195,10 @@ class Window extends Panel
 #func extern set_idle_function(f: void->void)
 func extern run_later(dt: f32, f: void->void) -> i32
 func extern run_repeated(dt: f32, f: void->void) -> i32
-#func extern cancel_runner(id: i32)
+func extern cancel_runner(id: i32)
 func extern run()
-#func extern fly(win: shared[Window]) -> future[void]
-#func extern fly_and_wait(win: shared[Window])
+func extern fly(win: shared[Window]) -> future[void]
+func extern fly_and_wait(win: shared[Window])
 ## add_key_code(...)
 #func extern get_event() -> Event&
 #func extern do_single_main_loop()
@@ -212,7 +213,7 @@ func extern run()
 ## func extern get_key_char(id: i32) -> string
 #func extern open_document(filename: os.Path)
 #func extern make_gui_image(image: image.Image) -> string
-#
+
 
 class clipboard
 	func static extern paste() -> future[string]
@@ -236,6 +237,22 @@ class Event
 	var column: i32
 #	func __delete__()
 	
+
+
+struct Resource
+	var type: string
+	var id: string
+	var title: string
+	var tooltip: string
+	var options: string[]
+	var x, y: i32
+	var children: Resource[]
+	#void reset()
+	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
+	func extern show(indent: i32)
+	func extern str(indent: i32) -> string
+	
+func extern parse_resource(buffer: string, literally: bool) -> Resource
 
 # key ids (int)
 # enum... FIXME

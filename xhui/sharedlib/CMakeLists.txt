@@ -210,6 +210,7 @@ add_library(modulexhui SHARED
 	src/lib/xhui/controls/ToggleButton.cpp
 	src/lib/xhui/controls/Toolbar.cpp
 	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/AboutDialog.cpp
 	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
@@ -227,6 +228,7 @@ add_library(modulexhui SHARED
 	src/lib/xhui/PainterVulkan.cpp
 	src/lib/xhui/Panel.cpp
 	src/lib/xhui/Resource.cpp
+	src/lib/xhui/TextLayout.cpp
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
