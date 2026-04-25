@@ -67,21 +67,21 @@ if(VULKAN_OR_GL STREQUAL "gl")
 endif()
 
 
-# lib: shaderc (optional)
-set(LIB_SHADERC_ENABLED true CACHE BOOL "Use shaderc library?")
-pkg_check_modules(SHADERC shaderc)
-if(SHADERC_FOUND)
+# lib: spirv (optional)
+set(LIB_SPIRV_ENABLED true CACHE BOOL "Use spirv library?")
+pkg_check_modules(SPIRV spirv)
+if(SPIRV_FOUND)
 else()
-	set(LIB_SHADERC_ENABLED false CACHE BOOL "shaderc library not found" FORCE)
+	set(LIB_SPIRV_ENABLED false CACHE BOOL "spirv library not found" FORCE)
 endif()
-if(${LIB_SHADERC_ENABLED})
-	list(APPEND INCLUDE_DIRECTORIES ${SHADERC_INCLUDE_DIRS})
-	list(APPEND LINK_DIRECTORIES ${SHADERC_LIBRARY_DIRS})
-	list(APPEND DEPS ${SHADERC_LIBRARIES})
-	list(APPEND COMPILE_OPTIONS ${SHADERC_CFLAGS_OTHER})
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=1)
+if(${LIB_SPIRV_ENABLED})
+	list(APPEND INCLUDE_DIRECTORIES ${SPIRV_INCLUDE_DIRS})
+	list(APPEND LINK_DIRECTORIES ${SPIRV_LIBRARY_DIRS})
+	list(APPEND DEPS ${SPIRV_LIBRARIES})
+	list(APPEND COMPILE_OPTIONS ${SPIRV_CFLAGS_OTHER})
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=1)
 else()
-	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SHADERC=0)
+	list(APPEND COMPILE_DEFINITIONS HAS_LIB_SPIRV=0)
 endif()
 
 
@@ -203,6 +203,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/xhui/controls/ToggleButton.cpp
 	src/lib/xhui/controls/Toolbar.cpp
 	src/lib/xhui/controls/Viewport.cpp
+	src/lib/xhui/dialogs/AboutDialog.cpp
 	src/lib/xhui/dialogs/ColorSelectionDialog.cpp
 	src/lib/xhui/dialogs/FileSelectionDialog.cpp
 	src/lib/xhui/dialogs/MenuPopup.cpp
