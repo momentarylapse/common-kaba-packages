@@ -12,6 +12,7 @@ use os
 func action_has(a: string[])
 	lib.test(a[0])
 
+
 func action_list(a: string[])
 	for l in sort(lib.libraries, "name")
 		if l.test()
@@ -19,8 +20,10 @@ func action_list(a: string[])
 		else
 			print("{{l.name|14}} {{os.terminal.RED}}not found{{os.terminal.END}}")
 
+
 func action_init(a: string[])
 	conf.save()
+
 
 func action_update(a: string[])
 	print("updating {{conf.root}}")
@@ -51,12 +54,24 @@ func action_update(a: string[])
 		if "cmake+vs2022" in conf.build.systems
 			raise(new Exception("cmake+vs2022 deprecated. Use cmake + features=[vs2022]"))
 
+
 func action_build(a: string[])
 	#print("building {{conf.root}}")
 	conf.load()
 	conf._find_sources()
 	if not build()
 		os.exit(1)
+
+
+func action_build_bundle(a: string[])
+	#print("building {{conf.root}}")
+	conf.load()
+	conf._find_sources()
+	if not build()
+		os.exit(1)
+	if not build_bundle()
+		os.exit(1)
+
 
 func action_install(a: string[])
 	#print("building {{conf.root}}")
@@ -67,7 +82,8 @@ func action_install(a: string[])
 	if not install()
 		os.exit(1)
 
-func action_clear(a: string[])
+
+func action_clean(a: string[])
 	#print("clearing {{conf.root}}")
 	conf.load()
 	conf._find_sources()
@@ -95,6 +111,7 @@ func action_clear(a: string[])
 #	for r in req
 #		cmd += " {{r}}:x64-windows"
 #	print(cmd)
+
 
 func action_create_vcpkg(a: string[])
 	conf.load()
@@ -129,8 +146,9 @@ func main(arg: string[])
 	p.cmd("lib list", "", "list available libs", action_list)
 	p.cmd("init", "", "create new project", action_init)
 	p.cmd("build", "", "build project", action_build)
+	p.cmd("bundle", "", "build bundle", action_build_bundle)
 	p.cmd("install", "", "build and install project", action_install)
-	p.cmd("clear", "", "clear build files", action_clear)
+	p.cmd("clean", "", "clean build files", action_clean)
 	p.cmd("update", "", "update build files", action_update)
 #	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
 	p.cmd("vcpkg", "", "create vcpkg config files", action_create_vcpkg)

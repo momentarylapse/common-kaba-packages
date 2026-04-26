@@ -33,6 +33,15 @@ func build_clear()
 		let r = os.shell_execute("cd {{dir}};ninja clean;cd ..", true)
 
 
+func build_bundle() -> bool
+	let dir = "build" as Path
+	try
+		os.shell_execute("cd {{dir}} && ninja bundle && cd ..", true)
+		return true
+	except
+		return false
+
+
 func install() -> bool
 	let dir = "build" as Path
 	try
