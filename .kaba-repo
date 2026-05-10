@@ -1,5 +1,5 @@
 version 3
-requires kaba 015aad446e05cd8da68953b75db059008596e368
+requires kaba 2eb969ff358b7ee025e16ac8a7dbe7455bd06a27 
 #package alex
 package algebra
 package asciitools
@@ -14,6 +14,7 @@ package gl
 package glfw
 package hui
 package huibui
+package iter
 package k2k
 package kabama
 package linalg

@@ -1,0 +1,7 @@
+use iter.*
+
+func main()
+	print(permutations(range(0)))
+	print(permutations(range(1)))
+	print(permutations(range(2)))
+	print(permutations(range(3)))

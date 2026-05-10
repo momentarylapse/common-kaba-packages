@@ -1,0 +1,9 @@
+use iter.*
+
+func main()
+	range(7) |> reversed |> print
+	range(7) |> accumulate |> print
+	range(7) |> pairs |> print
+	range(7) |> all_neighbors |> print
+	batched(range(17),3) |> print
+	batched(range(17),5) |> print

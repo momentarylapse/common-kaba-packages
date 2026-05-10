@@ -1,0 +1,68 @@
+func reversed[X](list: X[]) -> X[]
+	var r: Ret
+	r.resize(len(list))
+	for mut i=>x in r
+		x = list[len(list) - i - 1]
+	return r
+
+
+# "integrated" list
+func accumulate[X](list: X[]) -> X[]
+	var r: Ret
+	if len(list) == 0
+		return r
+	var acc = list[0]
+	r.resize(len(list))
+	for mut i=>x in r
+		x = acc
+		if i < len(list)
+			acc += list[i+1]
+	return r
+
+
+# drops rest!
+func batched[X](list: X[], n: i32) -> X[][]
+	var r: Ret
+	r.resize(len(list) / n)
+	for mut i=>b in r
+		b = list[i*n:(i+1)*n]
+	return r
+
+
+func permutations[X](list: X[]) -> X[][]
+	if len(list) == 0
+		return []
+	if len(list) == 1
+		return [list]
+	var r: Ret
+	for p in permutations(list[1:])
+		for i in 0:len(list)
+			r.add(p[:i] | list[:1] | p[i:])
+	# TODO optimize :P
+	return r
+
+
+# batched(list, 2)
+func pairs[X](list: X[]) -> (X,X)[]
+	var r: Ret
+	r.resize(len(list) / 2)
+	for mut i=>p in r
+		p[0] = list[i*2]
+		p[1] = list[i*2+1]
+	return r
+
+
+# pairwise()
+func all_neighbors[X](list: X[]) -> (X,X)[]
+	var r: Ret
+	if len(list) < 2
+		return r
+	r.resize(len(list) -1)
+	for mut i=>p in r
+		p[0] = list[i]
+		p[1] = list[i+1]
+	return r
+
+
+func merge[X](list1: X[], list2: X[]) -> X[]
+	return list1 | list2
