@@ -1,6 +1,6 @@
 #include "../base/base.h"
 #include "BigInt.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 
 class KabaBigInt : public BigInt {
 public:
@@ -12,8 +12,8 @@ public:
 	}
 };
 
-void export_package_algebra(kaba::Exporter* e) {
-	e->package_info("algebra", "0.2");
+void export_package_algebra(kaba::IExporter* e) {
+	e->package_info("algebra", "1.0");
 
 	e->declare_class_size("BigInt", sizeof(BigInt));
 	e->link_class_func("BigInt.__init__:BigInt", &kaba::generic_init<BigInt>);

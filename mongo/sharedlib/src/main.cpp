@@ -1,11 +1,13 @@
 #include <lib/base/base.h>
-#include <lib/kabaexport/KabaExporter.h>
+#include <lib/kapi/KabaExporter.h>
 #include <mongoc/mongoc.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
+	e->package_info("mongo", "4");
+
 	e->link_func("_mongoc_init", &mongoc_init);
 	e->link_func("_mongoc_cleanup", &mongoc_cleanup);
 	e->link_func("_mongoc_client_new", &mongoc_client_new);

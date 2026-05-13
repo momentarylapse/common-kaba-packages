@@ -1,7 +1,7 @@
 # created by xmake
 
 cmake_minimum_required(VERSION 3.21)
-project(mouduleyrenderer)
+project(moduleyrenderer)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)
@@ -121,6 +121,8 @@ add_library(moduleyrenderer SHARED
 	src/lib/image/image_png.cpp
 	src/lib/image/image_tga.cpp
 	src/lib/image/ImagePainter.cpp
+	src/lib/layout/Grid.cpp
+	src/lib/layout/Node.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
@@ -157,6 +159,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
+	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
 	src/lib/vulkan/_kaba_export.cpp
@@ -221,6 +224,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/xhui/PainterVulkan.cpp
 	src/lib/xhui/Panel.cpp
 	src/lib/xhui/Resource.cpp
+	src/lib/xhui/TextLayout.cpp
 	src/lib/xhui/Theme.cpp
 	src/lib/xhui/Window.cpp
 	src/lib/xhui/xhui.cpp
@@ -259,7 +263,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/yrenderer/scene/RenderViewData.cpp
 	src/lib/yrenderer/scene/SceneRenderer.cpp
 	src/lib/yrenderer/scene/SceneView.cpp
-	src/lib/yrenderer/target/HeadlessRendererVulkan.cpp
+	src/lib/yrenderer/target/HeadlessRenderer.cpp
 	src/lib/yrenderer/target/HuiWindowRendererGL.cpp
 	src/lib/yrenderer/target/HuiWindowRendererVulkan.cpp
 	src/lib/yrenderer/target/TargetRenderer.cpp
@@ -293,7 +297,7 @@ target_include_directories(moduleyrenderer PUBLIC src)
 #    install
 #=======================================================================================
 
-set(RESOURCE_DESTINATION share/mouduleyrenderer)
+set(RESOURCE_DESTINATION share/moduleyrenderer)
 
 # binaries	
 

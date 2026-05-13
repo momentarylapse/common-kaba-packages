@@ -138,6 +138,7 @@ FileSelector::FileSelector(const string& id) : Grid(id) {
 	auto g = new Grid(id + ":group");
 	Grid::add_child(g, 0, 0);
 	auto button_up = new Button(id+":up", "Up");
+	button_up->set_option("tooltip", "Go to parent directory");
 	button_up->size_mode_x = SizeMode::Shrink;
 	g->add_child(button_up, 0, 0);
 	directory_label = new Label(id + ":directory", "");
@@ -202,8 +203,12 @@ void FileSelector::set_option(const string& key, const string& value) {
 		list->set_option(key, value);
 	else if (key == "root")
 		root = value;
-	else
+	else if (key == "width") {
 		Grid::set_option(key, value);
+		list->set_option(key, value);
+	} else {
+		Grid::set_option(key, value);
+	}
 }
 
 } // xhui

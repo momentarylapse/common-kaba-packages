@@ -14,7 +14,7 @@ CubeEmitter::CubeEmitter(Context* ctx) : MeshEmitter(ctx, "cube") {
 	if (ctx) {
 		vb = new ygfx::VertexBuffer("3f,3f,2f");
 		set_cube(Box::ID_SYM);
-		material = new Material(ctx);
+		material = new Material();
 		material->textures.add(ctx->tex_white);
 	}
 	matrix = mat4::ID;
@@ -53,8 +53,8 @@ void CubeEmitter::set_cube(const Box& box) {
 }
 
 void CubeEmitter::emit(const RenderParams& params, RenderViewData& rvd, bool shadow_pass) {
-	auto shader = rvd.get_shader(material.get(), 0, "default", "");
-	auto& rd = rvd.start(params, matrix, shader, *material, 0, ygfx::PrimitiveTopology::TRIANGLES, vb.get());
+	auto shader = rvd.get_shader(material.get(), 0, "default", "", "");
+	auto& rd = rvd.start(params, matrix, shader, material.get(), 0, ygfx::PrimitiveTopology::TRIANGLES, vb.get());
 	rd.draw_triangles(params, vb.get());
 }
 

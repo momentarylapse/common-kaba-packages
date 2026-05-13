@@ -1,11 +1,13 @@
 #include <lib/base/base.h>
-#include <lib/kabaexport/KabaExporter.h>
+#include <lib/kapi/KabaExporter.h>
 #include <GLFW/glfw3.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
+	e->package_info("glfw", "3");
+
 	e->link_func("_glfwInit", &glfwInit);
 	e->link_func("_glfwVulkanSupported", &glfwVulkanSupported);
 	e->link_func("_glfwCreateWindow", &glfwCreateWindow);

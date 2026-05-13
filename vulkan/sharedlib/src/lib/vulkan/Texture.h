@@ -37,7 +37,9 @@ namespace vulkan {
 		void write(const Image &image);
 		void write_with_color_space(const Image &image, ColorSpace color_space);
 		void writex(const void *image, int nx, int ny, int nz, const string &format);
+		void write_float(const DynamicArray& data);
 		void read(void* data);
+		ColorSpace color_space() const;
 
 
 		void set_options(const string &op) const;

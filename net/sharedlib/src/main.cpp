@@ -5,7 +5,7 @@
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
 	NetInit();
 	export_package_net(e);
 }

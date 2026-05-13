@@ -90,6 +90,8 @@ protected:
 	static void _scroll_callback(GLFWwindow *window, double xoffset, double yoffset);
 	static void _refresh_callback(GLFWwindow *window);
 	static void _resize_callback(GLFWwindow* window, int width, int height);
+	static void _framebuffer_size_callback(GLFWwindow* window, int width, int height);
+	static void _content_scale_callback(GLFWwindow* window, float fx, float fy);
 
 
 	void _on_left_button_down(const vec2& m);
@@ -106,6 +108,7 @@ protected:
 	void _on_key_down(int key);
 	void _on_key_up(int key);
 	void _on_key_char(int character);
+	bool allow_event_propagation = true;
 
 	bool _refresh_requested = true;
 	void _on_draw();
@@ -146,6 +149,7 @@ public:
 	void set_key_code(const string& id, int key_code);
 
 	shared_array<Dialog> dialogs;
+	base::promise<void> end_run_promise;
 };
 
 class WindowX : public Window {
@@ -154,5 +158,8 @@ public:
 };
 
 Window* as_window(Control* c);
+
+void fly_and_wait(shared<Window> win);
+base::future<void> fly(shared<Window> win);
 
 }

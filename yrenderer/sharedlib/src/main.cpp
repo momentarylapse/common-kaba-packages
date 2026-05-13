@@ -1,13 +1,13 @@
-#include "lib/base/base.h"
-#include "lib/math/rect.h"
-#include "lib/ygraphics/graphics-impl.h"
-#include "lib/yrenderer/_kaba_export.h"
+#include <lib/base/base.h>
+#include <lib/math/rect.h>
+#include <lib/ygraphics/graphics-impl.h>
+#include <lib/yrenderer/_kaba_export.h>
 
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
 	export_package_yrenderer(e);
 }
 }

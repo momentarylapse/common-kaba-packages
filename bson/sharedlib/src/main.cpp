@@ -1,11 +1,13 @@
 #include <lib/base/base.h>
-#include <lib/kabaexport/KabaExporter.h>
+#include <lib/kapi/KabaExporter.h>
 #include <bson/bson.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
+	e->package_info("bson", "3");
+
 	e->link_func("_bson_new_from_json", &bson_new_from_json);
 	e->link_func("_bson_as_canonical_extended_json", &bson_as_canonical_extended_json);
 	e->link_func("_bson_as_relaxed_extended_json", &bson_as_relaxed_extended_json);

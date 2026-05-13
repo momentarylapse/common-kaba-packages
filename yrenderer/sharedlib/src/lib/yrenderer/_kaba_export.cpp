@@ -18,7 +18,7 @@
 #include "target/XhuiRenderer.h"
 #include "../ygraphics/graphics-impl.h"
 #include "../image/image.h"
-#include "../kabaexport/KabaExporter.h"
+#include "../kapi/KabaExporter.h"
 #include "../os/msg.h"
 #include "target/TextureRenderer.h"
 
@@ -29,11 +29,7 @@
 //using namespace yrenderer;
 using namespace ygfx;
 
-
-#pragma GCC push_options
-#pragma GCC optimize("no-omit-frame-pointer")
-#pragma GCC optimize("no-inline")
-#pragma GCC optimize("0")
+KABA_LINK_GROUP_BEGIN
 
 
 void framebuffer_init(FrameBuffer *fb, const shared_array<Texture> &tex) {
@@ -129,17 +125,7 @@ void texture_write(Texture *t, const Image &im) {
 }
 
 void texture_write_float(Texture *t, const DynamicArray& data) {
-#ifdef USING_VULKAN
-	int n_in = data.num * data.element_size / (int)sizeof(float);
-	int n_tex = t->width * t->height * t->depth;
-	if (n_in != n_tex) {
-		msg_error(format("Texture.write_float(): size mismatch (input: %d - texture: %d)", n_in, n_tex));
-		return;
-	}
-	t->writex(data.data, t->width, t->height, t->depth, "r:f32");
-#else
 	t->write_float(data);
-#endif
 }
 
 void texture_read(Texture* t, Image& im) {
@@ -198,7 +184,7 @@ void shader_set_floats(Shader *s, const string &name, float *f, int num) {
 #endif
 }
 
-#pragma GCC pop_options
+KABA_LINK_GROUP_END
 
 
 
@@ -210,11 +196,18 @@ shared_array<Texture> hdr_resolver_get_tex_bloom(yrenderer::HDRResolver &r) {
 }
 
 
-void _export_package_yrenderer_internal(kaba::Exporter* ext) {
+void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	using namespace yrenderer;
 
 	ext->declare_class_size("Material.Pass", sizeof(Material::RenderPassData));
 	ext->declare_class_element("Material.Pass.shader_path", &Material::RenderPassData::shader_path);
+	ext->declare_class_element("Material.Pass.cull_mode", &Material::RenderPassData::cull_mode);
+	ext->declare_class_element("Material.Pass.wire_mode", &Material::RenderPassData::wire_mode);
+	ext->declare_class_element("Material.Pass.z_write", &Material::RenderPassData::z_write);
+	ext->declare_class_element("Material.Pass.z_test", &Material::RenderPassData::z_test);
+	ext->declare_class_element("Material.Pass.mode", &Material::RenderPassData::mode);
+	ext->declare_class_element("Material.Pass.source", &Material::RenderPassData::source);
+	ext->declare_class_element("Material.Pass.destination", &Material::RenderPassData::destination);
 
 	ext->declare_class_size("Material.Friction", sizeof(Material::Friction));
 	ext->declare_class_element("Material.Friction.sliding", &Material::Friction::sliding);
@@ -496,8 +489,8 @@ void _export_package_yrenderer_internal(kaba::Exporter* ext) {
 	ext->link_func("api_init_xhui", &api_init_xhui);
 }
 
-void export_package_yrenderer(kaba::Exporter* ext) {
-	ext->package_info("yrenderer", "0.9");
+void export_package_yrenderer(kaba::IExporter* ext) {
+	ext->package_info("yrenderer", "0.10");
 	_export_package_yrenderer_internal(ext);
 }
 

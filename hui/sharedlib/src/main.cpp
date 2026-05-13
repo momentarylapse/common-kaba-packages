@@ -1,12 +1,12 @@
-#include "lib/base/base.h"
-#include "lib/hui/_kaba_export.h"
-#include "lib/hui/hui.h"
+#include <lib/base/base.h>
+#include <lib/hui/_kaba_export.h>
+#include <lib/hui/hui.h>
 #include <stdio.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
 	hui::Application::allowed = false;
 	hui::_MakeUsable_();
 	//printf("export hui...\n");

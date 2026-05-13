@@ -31,6 +31,9 @@ public:
 	//void on_mouse_enter() override;
 	//void on_mouse_leave() override;
 	void on_left_button_down(const vec2& m) override;
+	void on_left_button_up(const vec2& m) override;
+	void on_right_button_down(const vec2& m) override;
+	void on_right_button_up(const vec2& m) override;
 	void on_left_double_click(const vec2 &m) override;
 	void on_mouse_move(const vec2& m, const vec2& d) override;
 	void on_mouse_wheel(const vec2& d) override;
@@ -123,6 +126,7 @@ public:
 	Array<Operation> history;
 	int current_history_index = 0;
 	int save_history_index = 0;
+	bool user_editing = false;
 	void clear_history();
 	void prune_history();
 	void set_save_state();

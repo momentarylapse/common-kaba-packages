@@ -1,11 +1,13 @@
 #include <lib/base/base.h>
-#include <lib/kabaexport/KabaExporter.h>
+#include <lib/kapi/KabaExporter.h>
 #include <termios.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
+	e->package_info("terminal", "2");
+
 	e->declare_class_size("Termios", sizeof(termios));
 	e->declare_class_element("Termios.iflag", &termios::c_iflag);
 	e->declare_class_element("Termios.oflag", &termios::c_oflag);

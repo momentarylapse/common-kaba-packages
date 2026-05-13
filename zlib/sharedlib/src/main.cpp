@@ -1,11 +1,12 @@
 #include <lib/base/base.h>
-#include <lib/kabaexport/KabaExporter.h>
+#include <lib/kapi/KabaExporter.h>
 #include <zlib.h>
 
 
 extern "C" {
 __attribute__ ((visibility ("default")))
-void export_symbols(kaba::Exporter* e) {
+void export_symbols(kaba::IExporter* e) {
+	e->package_info("zlib", "2");
 	e->link_func("_compressBound", &compressBound);
 	e->link_func("_deflate", &deflate);
 	e->link_func("_compress", &compress);

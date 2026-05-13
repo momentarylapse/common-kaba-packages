@@ -23,10 +23,10 @@ TextureManager::TextureManager(ygfx::Context *_ctx, const Path &_texture_dir) {
 	}
 }
 
-Path TextureManager::texture_file(ygfx::Texture* t) const {
+Path TextureManager::get_filename(const ygfx::Texture* t) const {
 	for (auto&& [key, _t]: texture_map)
 		if (_t == t)
-			return key;
+			return key.relative_to(texture_dir);
 	return "";
 }
 
