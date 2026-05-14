@@ -30,6 +30,7 @@ package opt
 package package
 package pdf
 package plot
+package profiler
 package psmove
 package shadercomp
 package sisyphos
