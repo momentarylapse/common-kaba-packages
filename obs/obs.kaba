@@ -1,0 +1,45 @@
+# define "Nodes" by adding a member of this type
+class InternalNodeData
+	func extern mut __init__()
+	func extern mut __delete__()
+# TODO add traits to kaba!
+
+
+
+# pure events, no data
+class Source
+	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
+	func extern mut notify()
+
+class Sink
+	func __init__()
+	func extern mut __init2__(node: Object&, f: void->void)
+
+
+
+# internal...
+class XPSource
+	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
+	func extern mut _notify(p: void&)
+
+class XPSink
+	func __init__()
+	func extern mut __init0__(node: Object&, f: void&->void)
+
+
+
+# only works with call-by-reference data...
+class XSource[X] extends XPSource
+	func mut notify(x: X)
+		_notify(&x)
+
+class XSink[X] extends XPSink
+	func mut __init2__(node: Object&, f: X->void)
+		__init0__(node, f as (void&->void))
+
+
+func extern subscribe(source: Source, sink: Sink)
+func extern xpsubscribe(source: XPSource, sink: XPSink)
+func xsubscribe[X](source: XSource[X], sink: XSink[X])
+	xpsubscribe(source, sink)
+

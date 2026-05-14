@@ -113,8 +113,8 @@ class Panel extends Control
 #	func extern mut add_expander(title: string, x: i32, y: i32, id: string)
 #	func extern mut add_separator(title: string, x: i32, y: i32, id: string)
 #	func extern mut add_paned(title: string, x: i32, y: i32, id: string)
-#	func extern mut embed(panel: shared[Panel], id: string, x: i32, y: i32)
-#	func extern mut unembed(panel: shared[Panel])
+	func extern mut embed(target: string, x: i32, y: i32, panel: shared[Panel])
+	func extern mut unembed(panel: Panel*)
 #	func extern mut set_string(id: string, s: string)
 #	func extern mut add_string(id: string, s: string)
 #	func extern get_string(id: string) -> string

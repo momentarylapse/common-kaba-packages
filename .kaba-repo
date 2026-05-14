@@ -26,6 +26,7 @@ package mongo
 package msgpack
 package ncurses
 package net
+package obs
 package opt
 package package
 package pdf

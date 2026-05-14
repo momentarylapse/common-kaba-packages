@@ -1,0 +1,21 @@
+use obs
+
+
+class A extends Object
+	var ind: obs.InternalNodeData
+	var source = obs.Source(&self, &ind, "source")
+
+
+class B extends Object
+	var ind: obs.InternalNodeData
+	var sink: obs.Sink
+	func override __init__()
+		sink.__init2__(&self, func() print("hi!"))
+
+
+func main()
+	var a: A
+	var b: B
+	obs.subscribe(a.source, b.sink)
+	a.source.notify()
+

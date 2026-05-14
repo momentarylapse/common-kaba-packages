@@ -1,0 +1,22 @@
+use obs
+
+
+class A extends Object
+	var ind: obs.InternalNodeData
+	var source = obs.XPSource(&self, &ind, "source")
+
+
+class B extends Object
+	var ind: obs.InternalNodeData
+	var sink: obs.XPSink
+	func override __init__()
+		sink.__init0__(&self, func(p: void&) print("hi!  {{p2s(p)}}"))
+
+
+func main()
+	var a: A
+	var b: B
+	obs.xpsubscribe(a.source, b.sink)
+	print(p2s(&a))
+	a.source._notify(&a)
+
