@@ -17,5 +17,7 @@ func main()
 	var a: A
 	var b: B
 	obs.xsubscribe[string](a.source, b.sink)
-	a.source.notify("test")
+	let s = "test"
+	#print(p2s(&s))
+	a.source.notify(s)
 
