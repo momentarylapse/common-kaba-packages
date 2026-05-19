@@ -1,11 +1,11 @@
 use obs
 
 
-class A as obs.Node
+class A extends Object as obs.Node
 	var source = obs.Source(&self, &ind, "source")
 
 
-class B as obs.Node
+class B extends Object as obs.Node
 	var sink: obs.Sink
 	func override __init__()
 		sink.__init2__(&self, func() print("hi!"))
@@ -14,6 +14,7 @@ class B as obs.Node
 func main()
 	var a: A
 	var b: B
-	obs.subscribe(a.source, b.sink)
+	#obs.subscribe(a.source, b.sink)
+	a.source >> b.sink
 	a.source.notify()
 

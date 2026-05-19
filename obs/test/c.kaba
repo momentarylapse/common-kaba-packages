@@ -14,7 +14,8 @@ class B extends Object as obs.Node
 func main()
 	var a: A
 	var b: B
-	obs.xsubscribe[string](a.source, b.sink)
+	#obs.xsubscribe[string](a.source, b.sink)
+	a.source >> b.sink
 	let s = "test"
 	#print(p2s(&s))
 	a.source.notify(s)

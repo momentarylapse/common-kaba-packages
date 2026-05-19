@@ -13,6 +13,8 @@ class Source
 	# func extern mut __init__(node: Node&, name: string)
 	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
 	func extern mut notify()
+	func mut __rshift__(out sink: Sink)
+		subscribe(self, sink)
 
 class Sink
 	func __init__()
@@ -35,6 +37,8 @@ class XPSink
 class XSource[X] extends XPSource
 	func mut notify(x: X)
 		_notify(&x)
+	func mut __rshift__(out sink: XSink[X])
+		xsubscribe[X](self, sink)
 
 class XSink[X] extends XPSink
 	func mut __init2__(node: Object&, f: X->void)
