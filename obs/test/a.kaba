@@ -1,13 +1,11 @@
 use obs
 
 
-class A extends Object
-	var ind: obs.InternalNodeData
+class A as obs.Node
 	var source = obs.Source(&self, &ind, "source")
 
 
-class B extends Object
-	var ind: obs.InternalNodeData
+class B as obs.Node
 	var sink: obs.Sink
 	func override __init__()
 		sink.__init2__(&self, func() print("hi!"))

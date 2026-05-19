@@ -1,13 +1,16 @@
-# define "Nodes" by adding a member of this type
 class InternalNodeData
 	func extern mut __init__()
 	func extern mut __delete__()
-# TODO add traits to kaba!
 
+
+trait Node
+	var ind: InternalNodeData
 
 
 # pure events, no data
 class Source
+	# TODO trait parameter in kaba...
+	# func extern mut __init__(node: Node&, name: string)
 	func extern mut __init__(node: Object&, ind: InternalNodeData&, name: string)
 	func extern mut notify()
 

@@ -1,13 +1,11 @@
 use obs
 
 
-class A extends Object
-	var ind: obs.InternalNodeData
+class A extends Object as obs.Node
 	var source = obs.XPSource(&self, &ind, "source")
 
 
-class B extends Object
-	var ind: obs.InternalNodeData
+class B extends Object as obs.Node
 	var sink: obs.XPSink
 	func override __init__()
 		sink.__init0__(&self, func(p: void&) print("hi!  {{p2s(p)}}"))
