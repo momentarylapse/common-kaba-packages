@@ -1,12 +1,18 @@
 use os
+#use package
+
+let REPO_FILE = ".kaba-repo"
+
 
 enum EntryType
 	LIB
 	PACKAGES
 
+
 struct Entry
 	dir: os.Path
 	type: EntryType
+
 
 func load_list() -> Entry[]
 	var list: Entry[]
@@ -20,9 +26,35 @@ func load_list() -> Entry[]
 				list.add([x[1] as os.Path, EntryType.PACKAGES])
 	return list
 
+
+struct Package
+	name: string
+	dir: os.Path
+	forward: bool
+
+
 struct Global
 	entries: Entry[]
 	lib: Entry* = nil
+	packages: Package[]
+
+
+func load_repo(dir: os.Path) -> Package[]
+	var r: Package[]
+	let ss = os.fs.read_text(dir | REPO_FILE)
+	for l in ss.explode("\n")
+		let x = l.explode(" ")
+		if len(x) < 2
+			continue
+		if x[0] != "package"
+			continue
+		var p: Package
+		p.dir = dir | (x[1] as os.Path)
+		p.name = p.dir.basename()
+		p.forward = ("forward" in x)
+		r.add(p)
+	return r
+
 
 func init() -> Global
 	var g: Global
@@ -32,12 +64,24 @@ func init() -> Global
 			g.lib = &e
 	if not g.lib
 		raise(new Exception("no 'lib' entry found in '~/.kaba/sync-libs'"))
+	for e in g.entries
+		if e.type == EntryType.PACKAGES
+			let packages = load_repo(e.dir)
+#			for p in packages
+	#			pass
+		#		g.packages.add(p)
 	return g
 
 
 func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 	#print("  {{source.basename()}}")
 	for f in os.fs.search(source, "*", "fr")
+		# ignore:
+		if f in os.Path("test")
+			continue
+		if f.extension() in ["so", "dll", "gitignore"]
+			continue
+
 		let label = source.basename() + "/" + str(f)
 		if os.fs.exists(dest | f)
 			if os.fs.read_text(source | f) != os.fs.read_text(dest | f)
@@ -68,21 +112,37 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 			if cmd == "push"
 				os.fs.copy(dest | f, source | f)
 
+
 func sync_xmake_project(dir: os.Path, lib: Entry, cmd: string)
 	print("> xmake {{dir}}")
 	for l in os.fs.search(dir | "src/lib", "*", "d")
 		sync_dir(lib.dir | l, dir | "src/lib" | l, cmd)
+
 
 func sync_kaba_package(dir: os.Path, lib: Entry, cmd: string)
 	print("> kaba package {{dir}}")
 	if os.fs.exists(dir | "sharedlib")
 		sync_xmake_project(dir | "sharedlib", lib, cmd)
 
+
+func sync_kaba_package_forward(dir: os.Path, lib: Entry, cmd: string)
+	print("> kaba package {{dir}} (forward)")
+	let name = dir.basename()
+	let source = os.app_directory_dynamic | "packages" | name
+	if os.fs.exists(source)
+		sync_dir(source, dir, cmd)
+	else
+		print("  {{os.terminal.RED}}NOT INSTALLED{{os.terminal.END}} {{name}}")
+		
+
+
 func sync_kaba_repo(dir: os.Path, lib: Entry, cmd: string)
 	print("> kaba repo {{dir}}")
-	for p in os.fs.search(dir, "*", "d")
-		if is_kaba_package(dir | p)
-			sync_kaba_package(dir | p, lib, cmd)
+	for p in load_repo(dir)
+		if p.forward
+			sync_kaba_package_forward(p.dir, lib, cmd)
+		else
+			sync_kaba_package(p.dir, lib, cmd)
 
 
 func is_xmake_project(dir: os.Path) -> bool
@@ -92,7 +152,7 @@ func is_kaba_package(dir: os.Path) -> bool
 	return os.fs.exists(dir | ".kaba-package")
 
 func is_kaba_repo(dir: os.Path) -> bool
-	return os.fs.exists(dir | ".kaba-repo")
+	return os.fs.exists(dir | REPO_FILE)
 
 
 func action_sync(g: Global, dir: os.Path, cmd: string)

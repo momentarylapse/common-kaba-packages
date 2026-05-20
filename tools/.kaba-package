@@ -1,4 +1,5 @@
-version 4
+version 5
+requires package
 run bindiff.kaba
 run replace.kaba
 run test-compile.kaba
