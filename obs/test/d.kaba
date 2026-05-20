@@ -1,0 +1,16 @@
+use obs
+
+
+class A extends Object as obs.Node
+	var source = obs.Source(&self, &ind, "source")
+
+
+class B extends Object as obs.Node
+
+
+func main()
+	var a: A
+	var b: B
+	a.source >> b.create_sink(func() print("hi"))
+	a.source.notify()
+
