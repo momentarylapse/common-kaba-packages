@@ -1,3 +1,0 @@
-description = "Get a canonical version of a path. (removes <tt>'a/../b'</tt>)"
-param:self = "The path."
-return = "The canonical path."

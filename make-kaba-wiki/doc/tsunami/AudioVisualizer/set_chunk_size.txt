@@ -1,3 +1,0 @@
-description = ""
-param:chunk_size = ""
-param:self = ""

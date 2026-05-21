@@ -1,4 +1,0 @@
-description = ""
-param:colors = ""
-param:id = ""
-param:p = ""

@@ -1,4 +1,0 @@
-description = ""
-element:dir = ""
-element:files = ""
-element:initial_file = ""

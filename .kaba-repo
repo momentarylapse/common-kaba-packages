@@ -1,5 +1,5 @@
 version 3
-requires kaba 97f2e45edbd152b354f3a8f0a4318bb87267a365
+requires kaba 5523f10a0ce7e286cad6fdd604532c3b5132e5c1
 #package alex
 package algebra
 package asciitools

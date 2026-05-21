@@ -1,4 +1,0 @@
-description = ""
-element:cpu0 = ""
-element:gpu = ""
-element:total_time = ""

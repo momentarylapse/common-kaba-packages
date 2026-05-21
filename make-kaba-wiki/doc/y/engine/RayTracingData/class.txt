@@ -1,3 +1,0 @@
-description = ""
-element:buffer_meshes = ""
-element:num_meshes = ""

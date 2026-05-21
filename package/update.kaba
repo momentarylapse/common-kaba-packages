@@ -6,7 +6,7 @@ use .install.*
 
 func action_update(args: string[])
 	for s in conf.sources
-		if s.type != "repo"
+		if s.type != SourceType.REPO
 			continue
 		
 		print("updating package {{s.name}}")
@@ -21,7 +21,7 @@ func action_update(args: string[])
 
 func action_upgrade(args: string[])
 	action_update(args)
-	load_module_list()
+	load_package_list()
 	
 	var needs_upgrade: string[]
 	for p in conf.packages_installed

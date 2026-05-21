@@ -1,5 +1,0 @@
-description = ""
-param:id = ""
-param:name = ""
-param:self = ""
-param:sub_menu = ""

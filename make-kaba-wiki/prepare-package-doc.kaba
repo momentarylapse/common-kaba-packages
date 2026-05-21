@@ -1,0 +1,21 @@
+use kaba.*
+use os
+use .common.*
+use .docu
+
+
+func prepare_package(dir: os.Path)
+	print(dir)
+	for p in load_external_package(dir)
+		docu.prepare_external_package(p)
+	else
+		print("NOT A PACKAGE")
+
+
+func main(arg: string[])
+	docu.add_missing = true
+	for a in arg
+		prepare_package(a)
+	if arg == ["--all"]
+		docu.prepare()
+

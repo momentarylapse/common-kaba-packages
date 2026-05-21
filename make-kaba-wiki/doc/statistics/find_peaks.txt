@@ -1,4 +1,0 @@
-description = ""
-param:_h = ""
-param:sigma = ""
-return = ""

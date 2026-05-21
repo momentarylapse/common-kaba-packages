@@ -1,7 +1,0 @@
-description = ""
-element:id = ""
-element:playback = ""
-element:song = ""
-element:storage = ""
-element:view = ""
-element:win = ""

@@ -1,5 +1,0 @@
-description = ""
-param:offset = ""
-param:reserved = ""
-param:size = ""
-param:type = ""

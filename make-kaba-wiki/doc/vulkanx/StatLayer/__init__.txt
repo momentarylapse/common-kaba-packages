@@ -1,6 +1,0 @@
-description = ""
-param:pool = ""
-param:rp = ""
-param:self = ""
-param:shader = ""
-param:subpass = ""

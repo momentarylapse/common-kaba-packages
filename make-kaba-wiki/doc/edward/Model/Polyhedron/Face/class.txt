@@ -1,4 +1,0 @@
-description = ""
-element:index = ""
-element:num_vertices = ""
-element:plane = ""

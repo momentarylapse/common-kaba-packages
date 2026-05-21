@@ -1,3 +1,0 @@
-description = ""
-element:clear_color = ""
-element:clear_z = ""

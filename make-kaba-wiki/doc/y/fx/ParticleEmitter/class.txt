@@ -1,7 +1,0 @@
-description = ""
-element:owner = ""
-element:source = ""
-element:spawn_beams = ""
-element:spawn_dt = ""
-element:spawn_time_to_live = ""
-element:texture = ""

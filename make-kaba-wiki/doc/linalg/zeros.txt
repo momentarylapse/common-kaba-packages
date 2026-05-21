@@ -1,4 +1,0 @@
-description = ""
-param:m = ""
-param:n = ""
-return = ""

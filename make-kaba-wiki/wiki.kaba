@@ -3,9 +3,47 @@ use os
 use time
 use .common.*
 use .docu.*
-# use "mongo"
 
 const SHIFT = "    "
+
+func header1(s: string) -> string
+	return "= {{s}} =\n\n"
+
+func header2(s: string) -> string
+	return "== {{s}} ==\n\n"
+
+func header3(s: string) -> string
+	return "=== {{s}} ===\n\n"
+
+func header_4(s: string) -> string
+	return "; {{s}}\n\n"
+
+func paragraph(s: string) -> string
+	return "{{s}}\n\n"
+
+func list_begin() -> string
+	return ""
+
+func list_end() -> string
+	return "\n"
+
+func list_item(s: string) -> string
+	return "* {{s}}\n"
+
+func bold(s: string) -> string
+	return "'''{{s}}'''"
+
+func tt(s: string) -> string
+	return "<tt>{{s}}</tt>"
+
+func link(s: string, url: string) -> string
+	return "[[{{url}}|{{s}}]]"
+
+func code_begin() -> string
+	return "<code lang=\"kaba\">\n"
+
+func code_end() -> string
+	return "</code>\n\n"
 
 func param_pre(v: Variable) -> string
 	if v.is_mutable()
@@ -29,40 +67,39 @@ func render_func(ns: string, f: Function, alternatives: Function&[]) -> string
 	for n in f.namespace
 		name = "{{n.name}}.{{f.name}}"
 	
-	var wiki = "== Kaba function {{name}} ==\n\n"
+	var wiki = header2("Kaba function {{name}}")
 	
-	wiki += "{{doc_get_func_description(ns, f)}}\n\n"
+	wiki += paragraph(doc_get_func_description(ns, f))
 	
-	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<code lang=\"kaba\">\n"
+	wiki += header3("Syntax")
+	wiki += code_begin()
 	for ff in alternatives
 		var pre = func_pre(ff)
 		wiki += "func {{pre}}{{name}}({{func_params(ff)}}){{func_return(ff)}}\n"
-	wiki += "</code>\n"
+	wiki += code_end()
 	
 	let params = func_notable_params(f)
 	if len(params) > 0
-		wiki += "\n=== Parameters ===\n\n"
+		wiki += header3("Parameters")
 		for p in params
 			for t in p[1]
 				wiki += "; <tt>{{p[0]}}: {{t.name}}</tt>\n"
 				wiki += ": {{doc_get_func_param(ns, f, p[0])}}\n\n"
 
 	if f.return_type.name != "void"
-		wiki += "\n=== Return ===\n\n"
-		wiki += "{{doc_get_func_return(ns, f)}}\n\n"
+		wiki += header3("Return")
+		wiki += paragraph(doc_get_func_return(ns, f))
 	
 	return wiki
 
 
 
 func render_var(ns: string, v: Variable) -> string
-	var wiki = "== Kaba variable {{v.name}} ==\n"
-	
-	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<code lang=\"kaba\">\n"
+	var wiki = header2("Kaba variable {{v.name}}")
+	wiki += header3("Syntax")
+	wiki += code_begin()
 	wiki += "var {{v.name}}: {{v.type.name}}\n"
-	wiki += "</code>\n\n"
+	wiki += code_end()
 	
 	return wiki
 
@@ -168,8 +205,8 @@ func meta_class(c: Class) -> string
 
 
 func render_class(ns: string, c: Class) -> string
-	var wiki = "== Kaba {{meta_class(c)}} {{c.name}} ==\n\n"
-	wiki += "{{doc_get_class_description(ns, c)}}\n\n"
+	var wiki = header2("Kaba {{meta_class(c)}} {{c.name}}")
+	wiki += paragraph(doc_get_class_description(ns, c))
 	
 	var funcs = filter_funcs(c.functions, c)
 	let ctrs = [for f in funcs f if f.name == "__init__"]
@@ -181,8 +218,8 @@ func render_class(ns: string, c: Class) -> string
 	
 	let classes = filter_classes(c.classes)
 	
-	wiki += "\n=== Syntax ===\n\n"
-	wiki += "<code lang=\"kaba\">\n"
+	wiki += header3("Syntax")
+	wiki += code_begin()
 	wiki += "{{meta_class(c)}} {{c.name}}{{class_extension(c)}}\n"
 	for e in elements
 		wiki += "{{SHIFT}}var {{e.name}}: {{e.type.name}}\n"
@@ -243,22 +280,24 @@ func render_class(ns: string, c: Class) -> string
 		wiki += "\n{{SHIFT}}# nested classes\n"
 		for cc in classes
 			wiki += "{{SHIFT}}class {{cc.name}}\n"
-	wiki += "</code>\n\n"
+	wiki += code_end()
 	
 	if len(classes) > 0
-		wiki += "\n=== Nested classes ===\n\n"
+		wiki += header3("Nested classes")
+		wiki += list_begin()
 		for cc in classes
-			wiki += "* <tt>{{meta_class(cc)}} [[kaba.{{ns}}.{{c.name}}.{{cc.name}}|{{cc.name}}]]</tt>\n"
+			wiki += list_item(tt("{{meta_class(cc)}} " + link(cc.name, "kaba.{{ns}}.{{c.name}}.{{cc.name}}")))
+		wiki += list_end()
 	
 	if len(funcs) > 0
-		wiki += "\n=== Functions ===\n\n"
+		wiki += header3("Functions")
 		for f in funcs
 			var pre = func_pre(f)
 			wiki += "; <tt>func {{pre}}[[kaba.{{ns}}.{{c.name}}.{{f.name}}|{{f.name}}]]({{func_params(f)}}){{func_return(f)}}</tt>\n"
 			wiki += ": {{short_doc(doc_get_func_description(ns + "." + c.name, f))}}\n\n"
 	
 	if len(elements) > 0	
-		wiki += "\n=== Elements ===\n\n"
+		wiki += header3("Elements")
 		for e in elements
 			wiki += "; <tt>var {{e.name}}: {{e.type.name}}</tt>\n"
 			wiki += ": {{doc_get_class_element(ns, c, e)}}\n\n"
@@ -272,81 +311,103 @@ func render_class(ns: string, c: Class) -> string
 	return wiki
 
 
-func render_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[]) -> string
+func render_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[], doc_dir: os.Path) -> string
 	var ns = name
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
 
-	var wiki = "== Kaba package {{ns}} ==\n"
+	doc_start_module(name, doc_dir)
+
+	var wiki = header2("Kaba package {{ns}}")
 #	if p.used_by_default
 #		wiki = "== Kaba package {{ns}} (auto import) ==\n"
+
+	if ns == name
+		wiki += paragraph(doc_get_package_description(name))
 	
 	if len(sub_modules) > 0
-		wiki += "\n=== Modules ===\n\n"
+		wiki += header3("Modules")
+		wiki += list_begin()
 		for m in sub_modules
-			wiki += "* <tt>module '''[[kaba.{{ns}}.{{m.e0}}|{{m.e0}}]]'''</tt>\n"
+			wiki += list_item(tt("module " + link(m.e0, "kaba.{{ns}}.{{m.e0}}")))
+		wiki += list_end()
 
 	let classes = filter_classes(p.classes())
 	if len(classes) > 0
-		wiki += "\n=== Classes ===\n\n"
+		wiki += header3("Classes")
+		wiki += list_begin()
 		for c in classes
-			wiki += "* <tt>{{meta_class(c)}} '''[[kaba.{{ns}}.{{c.name}}|{{c.name}}]]'''{{class_extension(c)}}</tt>\n"
+			wiki += list_item(tt("{{meta_class(c)}} " + bold(link(c.name, "kaba.{{ns}}.{{c.name}}")) + class_extension(c)))
 		if ns == "base"
-			wiki += "* <tt>class X[] = @List[X]</tt>\n"
-			wiki += "* <tt>class X{} = @Dict[X]</tt>\n"
-			wiki += "* <tt>class X[N] = @Array[X, N]</tt>\n"
-			wiki += "* <tt>class X* = ptr[X]</tt>\n"
-			wiki += "* <tt>class X& = ref[X]</tt>\n"
-			wiki += "* <tt>class X? = @Optional[X]</tt>\n"
+			wiki += list_item(tt("class X[] = @List[X]"))
+			wiki += list_item(tt("class X{} = @Dict[X]"))
+			wiki += list_item(tt("class X[N] = @Array[X, N]"))
+			wiki += list_item(tt("class X* = ptr[X]"))
+			wiki += list_item(tt("class X& = ref[X]"))
+			wiki += list_item(tt("class X? = @Optional[X]"))
+		wiki += list_end()
 
 	let funcs = filter_funcs(p.functions(), p.base_class())
 	if len(funcs) > 0
-		wiki += "\n=== Functions ===\n\n"
+		wiki += header3("Functions")
+		wiki += list_begin()
 		for f in funcs
 			var pre = func_pre(f)
-			wiki += "* <tt>func {{pre}}'''[[kaba.{{ns}}.{{f.name}}|{{f.name}}]]'''({{func_params(f)}}){{func_return(f)}}<tt>\n"
+			wiki += list_item(tt("func {{pre}}" + bold(link(f.name, "kaba.{{ns}}.{{f.name}}")) + "({{func_params(f)}}){{func_return(f)}}"))
+		wiki += list_end()
 
 	let vars = p.variables() |> sort("name")
 	if len(vars) > 0
-		wiki += "\n=== Variables ===\n\n"
+		wiki += header3("Variables")
+		wiki += list_begin()
 		for v in vars
-			wiki += "* <tt>var static '''[[kaba.{{ns}}.{{v.name}}|{{v.name}}]]''': {{v.type.name}}</tt>\n"
+			wiki += list_item(tt("var static " + bold(link(v.name, "kaba.{{ns}}.{{v.name}}")) + ": {{v.type.name}}"))
+		wiki += list_end()
 
 	let consts = filter_consts(p.constants())
 	if len(consts) > 0
-		wiki += "\n=== Constants ===\n\n"
+		wiki += header3("Constants")
+		wiki += list_begin()
 		for c in consts
-			wiki += "* <tt>let '''{{c.name}}''': {{c.type.name}}</tt>\n"
+			wiki += list_item(tt("let {{bold(c.name)}}: {{c.type.name}}"))
+		wiki += list_end()
 	return wiki
 
 
 func render_reference() -> string
-	var wiki = "== Kaba reference ==\n"
+	var wiki = header2("Kaba reference")
+	wiki += paragraph("Version {{kaba_version}} from {{time.now()|%F}}")
 
-	wiki += "\nVersion {{kaba_version}} from {{time.now()|%F}}\n"
-
-	wiki += "\n=== Packages ===\n\n"
-	wiki += "\n; internal\n\n"
+	wiki += header3("Packages")
+	wiki += header_4("internal")
 	let packages = default_context.packages |> sort("name")
+	wiki += list_begin()
 	for p in packages
-		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>"
+		var suffix = ""
 		if p.auto_import
-			wiki += " (auto import)"
-		wiki += "\n"
+			suffix = " (auto import)"
+		wiki += list_item(tt(link(p.name, "kaba.{{p.name}}")) + suffix)
+	wiki += list_end()
 
 	let external_packages = find_external_packages()
-	wiki += "\n; external\n\n"
+	wiki += header_4("external")
+	wiki += list_begin()
 	for p in external_packages
-		wiki += "* <tt>[[kaba.{{p.name}}|{{p.name}}]]</tt>\n"
+		wiki += list_item(tt(link(p.name, "kaba.{{p.name}}")))
+	wiki += list_end()
 
-	wiki += "\n=== Statements ===\n\n"
+	wiki += header3("Statements")
 	let stats = statements |> sort("name")
+	wiki += list_begin()
 	for s in stats
 		if s.name[:1] != "-" and len(s.name) > 0
-			wiki += "* '''<tt>{{s.name}}</tt>'''\n"
+			wiki += list_item(tt(bold(s.name)))
+	wiki += list_end()
 
-	wiki += "\n=== Special functions ===\n\n"
+	wiki += header3("Special functions")
 	let specs = special_functions |> sort("name")
+	wiki += list_begin()
 	for s in specs
-		wiki += "* '''<tt>{{s.name}}(...)</tt>'''\n"
+		wiki += list_item(tt(bold("{{s.name}}(...)")))
+	wiki += list_end()
 	return wiki

@@ -1,8 +1,0 @@
-description = ""
-param:bindings = ""
-param:common = ""
-param:extensions = ""
-param:input = ""
-param:push_size = ""
-param:topology = ""
-param:version = ""

@@ -1,7 +1,0 @@
-description = ""
-param:edges = ""
-param:end_mode = ""
-param:pos = ""
-param:radius = ""
-param:rings = ""
-param:self = ""

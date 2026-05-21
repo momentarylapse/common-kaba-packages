@@ -1,5 +1,0 @@
-description = ""
-element:desktop_file = ""
-element:icons = ""
-element:mime_files = ""
-element:source = ""

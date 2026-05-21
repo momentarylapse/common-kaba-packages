@@ -1,4 +1,0 @@
-description = ""
-param:factor = ""
-param:mouse_rel = ""
-param:self = ""

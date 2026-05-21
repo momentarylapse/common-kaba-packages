@@ -1,8 +1,0 @@
-description = ""
-param:buffer = ""
-param:count = ""
-param:material = ""
-param:mode = ""
-param:offset = ""
-param:type = ""
-param:vertex_data_set = ""

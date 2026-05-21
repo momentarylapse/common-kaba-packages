@@ -1,0 +1,36 @@
+[time]
+	@info = "Time and date related functionality."
+
+[time.Date]
+	@info = ""
+	time = ""
+
+[time.Date.format]
+	@info = ""
+	@return = ""
+	f = ""
+
+[time.Timer]
+	@info = ""
+
+[time.Timer.__init__]
+	@info = ""
+
+[time.Timer.get]
+	@info = ""
+	@return = ""
+
+[time.Timer.peek]
+	@info = ""
+	@return = ""
+
+[time.Timer.reset]
+	@info = ""
+
+[time.now]
+	@info = ""
+	@return = ""
+
+[time.sleep]
+	@info = ""
+	duration = ""

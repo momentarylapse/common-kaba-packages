@@ -1,7 +1,0 @@
-description = ""
-param:fx = nil
-param:r = ""
-param:range = nil
-param:self = ""
-param:t = ""
-param:text = nil

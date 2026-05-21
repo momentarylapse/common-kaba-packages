@@ -1,0 +1,695 @@
+
+[yrenderer]
+	@info = ""
+
+[yrenderer.CameraParams]
+	@info = ""
+	ang = ""
+	fov = ""
+	max_depth = ""
+	min_depth = ""
+	pos = ""
+
+[yrenderer.CameraParams.__init__]
+	@info = ""
+	ang = ""
+	fov = ""
+	max_depth = ""
+	min_depth = ""
+	pos = ""
+
+[yrenderer.ComputeTask]
+	@info = ""
+	active = ""
+	nx = ""
+	ny = ""
+	nz = ""
+	shader_data = ""
+
+[yrenderer.ComputeTask.__init__]
+	@info = ""
+	ctx = ""
+	n = ""
+	name = ""
+	shader = ""
+
+[yrenderer.ComputeTask.bind_image]
+	@info = ""
+	index = ""
+	tex = ""
+
+[yrenderer.ComputeTask.bind_storage_buffer]
+	@info = ""
+	buf = ""
+	index = ""
+
+[yrenderer.ComputeTask.bind_texture]
+	@info = ""
+	index = ""
+	tex = ""
+
+[yrenderer.ComputeTask.bind_uniform_buffer]
+	@info = ""
+	buf = ""
+	index = ""
+
+[yrenderer.ComputeTask.render]
+	@info = ""
+	params = ""
+
+[yrenderer.Context]
+	@info = ""
+	context = ""
+	tex_white = ""
+
+[yrenderer.Context.create_managers]
+	@info = ""
+	material_dir = ""
+	shader_dir = ""
+	texture_dir = ""
+
+[yrenderer.Context.create_shader]
+	@info = ""
+	@return = ""
+	source = ""
+
+[yrenderer.Context.load_shader]
+	@info = ""
+	@return = ""
+	path = ""
+
+[yrenderer.Context.load_shader_module]
+	@info = ""
+	path = ""
+
+[yrenderer.Context.load_surface_shader]
+	@info = ""
+	@return = ""
+	geometry_module = ""
+	path = ""
+	render_path = ""
+	vertex_module = ""
+
+[yrenderer.CubeEmitter]
+	@info = ""
+	ctx = ""
+	material = ""
+	matrix = ""
+
+[yrenderer.CubeEmitter.__init__]
+	@info = ""
+	ctx = ""
+
+[yrenderer.CubeEmitter.set_cube]
+	@info = ""
+	cube = ""
+
+[yrenderer.CubeMapSource]
+	@info = ""
+	cube_map = ""
+	max_depth = ""
+	min_depth = ""
+	resolution = ""
+	update_rate = ""
+
+[yrenderer.CubeMapSource.__init__]
+	@info = ""
+
+[yrenderer.HDRResolver]
+	@info = ""
+	bloom_factor = ""
+	bloom_levels = ""
+	depth_buffer = ""
+	exposure = ""
+	light_meter = ""
+	texture = ""
+
+[yrenderer.HDRResolver.BloomLevel]
+	@info = ""
+	tex_out = ""
+
+[yrenderer.HDRResolver.BloomLevel.__init__]
+	@info = ""
+
+[yrenderer.HDRResolver.__init__]
+	@info = ""
+	ctx = ""
+	height = ""
+	width = ""
+
+[yrenderer.LightMeter]
+	@info = ""
+	brightness = ""
+	histogram = ""
+
+[yrenderer.LightMeter.__init__]
+	@info = ""
+
+[yrenderer.LightType]
+	@info = ""
+
+[yrenderer.LightType.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.LightType.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.LightType.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.Material]
+	@info = ""
+	albedo = ""
+	cast_shadow = ""
+	emission = ""
+	friction = ""
+	metal = ""
+	pass0 = ""
+	roughness = ""
+	shader_path = ""
+	textures = ""
+
+[yrenderer.Material.Friction]
+	@info = ""
+	jump = ""
+	rolling = ""
+	sliding = ""
+
+[yrenderer.Material.Friction.__init__]
+	@info = ""
+	jump = ""
+	rolling = ""
+	sliding = ""
+
+[yrenderer.Material.Pass]
+	@info = ""
+
+[yrenderer.Material.__init__]
+	@info = ""
+
+[yrenderer.MeshEmitter]
+	@info = ""
+	ctx = ""
+
+[yrenderer.MeshEmitter.__init__]
+	@info = ""
+	ctx = ""
+	name = ""
+
+[yrenderer.MeshEmitter.emit]
+	@info = ""
+	params = ""
+	rvd = ""
+	shadow_pass = ""
+
+[yrenderer.RegionRenderer]
+	@info = ""
+	regions = ""
+
+[yrenderer.RegionRenderer.Region]
+	@info = ""
+	dest = ""
+	renderer = ""
+	z = ""
+
+[yrenderer.RegionRenderer.Region.__init__]
+	@info = ""
+	dest = ""
+	renderer = ""
+	z = ""
+
+[yrenderer.RegionRenderer.__init__]
+	@info = ""
+
+[yrenderer.RegionRenderer.add_region]
+	@info = ""
+	dest = ""
+	r = ""
+	z = ""
+
+[yrenderer.RenderParams]
+	@info = ""
+
+[yrenderer.RenderPath]
+	@info = ""
+	ambient_occlusion_radius = ""
+	background_color = ""
+	view = ""
+
+[yrenderer.RenderPath.__init__]
+	@info = ""
+
+[yrenderer.RenderPath.add_background_emitter]
+	@info = ""
+	emitter = ""
+
+[yrenderer.RenderPath.add_opaque_emitter]
+	@info = ""
+	emitter = ""
+
+[yrenderer.RenderPath.add_transparent_emitter]
+	@info = ""
+	emitter = ""
+
+[yrenderer.RenderPath.set_lights]
+	@info = ""
+	lights = ""
+
+[yrenderer.RenderPath.set_view]
+	@info = ""
+	view = ""
+
+[yrenderer.RenderPathDeferred]
+	@info = ""
+	ambient_occlusion_radius = ""
+	background_color = ""
+	view = ""
+
+[yrenderer.RenderPathDeferred.__init__]
+	@info = ""
+	ctx = ""
+	height = ""
+	shadow_resolution = ""
+	width = ""
+
+[yrenderer.RenderPathForward]
+	@info = ""
+	ambient_occlusion_radius = ""
+	background_color = ""
+	view = ""
+
+[yrenderer.RenderPathForward.__init__]
+	@info = ""
+	ctx = ""
+	shadow_resolution = ""
+
+[yrenderer.RenderTask]
+	@info = ""
+	active = ""
+
+[yrenderer.RenderTask.__init__]
+	@info = ""
+
+[yrenderer.RenderTask.render]
+	@info = ""
+	params = ""
+
+[yrenderer.RenderViewData]
+	@info = ""
+
+[yrenderer.RenderViewData.__init__]
+	@info = ""
+	ctx = ""
+
+[yrenderer.RenderViewData.set_view]
+	@info = ""
+	cam = ""
+	params = ""
+	proj = ""
+
+[yrenderer.Renderer]
+	@info = ""
+
+[yrenderer.Renderer.__init__]
+	@info = ""
+
+[yrenderer.Renderer.add_child]
+	@info = ""
+	r = ""
+
+[yrenderer.Renderer.draw]
+	@info = ""
+	params = ""
+
+[yrenderer.Renderer.prepare]
+	@info = ""
+	params = ""
+
+[yrenderer.SceneRenderer]
+	@info = ""
+	background_color = ""
+
+[yrenderer.SceneRenderer.__init__]
+	@info = ""
+	ctx = ""
+	scene_view = ""
+	type = ""
+
+[yrenderer.SceneRenderer.add_emitter]
+	@info = ""
+	emitters = ""
+
+[yrenderer.SceneRenderer.set_view]
+	@info = ""
+	cam = ""
+	params = ""
+	proj = ""
+
+[yrenderer.SceneView]
+	@info = ""
+	num_surfels = ""
+	probe_cells = ""
+	probe_max = ""
+	probe_min = ""
+	surfel_buffer = ""
+
+[yrenderer.SceneView.__init__]
+	@info = ""
+
+[yrenderer.SceneView.choose_lights]
+	@info = ""
+	lights = ""
+
+[yrenderer.SceneView.choose_shadows]
+	@info = ""
+
+[yrenderer.TextureRenderer]
+	@info = ""
+	clear_colors = ""
+	clear_z = ""
+
+[yrenderer.TextureRenderer.__init__]
+	@info = ""
+	ctx = ""
+	name = ""
+	options = ""
+	textures = ""
+
+[yrenderer.TextureRenderer.set_area]
+	@info = ""
+	area = ""
+
+[yrenderer.WindowRenderer]
+	@info = ""
+
+[yrenderer.WindowRenderer.__init__]
+	@info = ""
+	ctx = ""
+	window = ""
+
+[yrenderer.WindowRenderer.create_params]
+	@info = ""
+	@return = ""
+	aspect_ration = ""
+
+[yrenderer.WindowRenderer.end_frame]
+	@info = ""
+	params = ""
+
+[yrenderer.WindowRenderer.start_frame]
+	@info = ""
+	@return = ""
+
+[yrenderer.XhuiRenderer]
+	@info = ""
+	active = ""
+
+[yrenderer.XhuiRenderer.__init__]
+	@info = ""
+	ctx = ""
+
+[yrenderer.XhuiRenderer.before_draw]
+	@info = ""
+	p = ""
+
+[yrenderer.XhuiRenderer.draw]
+	@info = ""
+	p = ""
+
+[yrenderer.XhuiRenderer.extract_params]
+	@info = ""
+	@return = ""
+	p = ""
+
+[yrenderer.YLight]
+	@info = ""
+	allow_shadow = ""
+	ang = ""
+	color = ""
+	enabled = ""
+	harshness = ""
+	pos = ""
+	power = ""
+	shadow_dist_max = ""
+	shadow_dist_min = ""
+	theta = ""
+	type = ""
+	user_shadow_control = ""
+	user_shadow_theta = ""
+
+[yrenderer.YLight.init]
+	@info = ""
+	c = ""
+	theta = ""
+	type = ""
+
+[yrenderer.api_init_glfw]
+	@info = ""
+	@return = ""
+	window = ""
+
+[yrenderer.api_init_xhui]
+	@info = ""
+	@return = ""
+	p = ""
+
+[yrenderer.gfx.Buffer]
+	@info = ""
+
+[yrenderer.gfx.Buffer.read]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.Buffer.read_chunk]
+	@info = ""
+	data = ""
+	size = ""
+
+[yrenderer.gfx.Buffer.update]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.Buffer.update_chunk]
+	@info = ""
+	data = ""
+	size = ""
+
+[yrenderer.gfx.CubeMap]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.CubeMap.__init__]
+	@info = ""
+	format = ""
+	size = ""
+
+[yrenderer.gfx.DepthBuffer]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.DepthBuffer.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[yrenderer.gfx.FrameBuffer]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.FrameBuffer.__init__]
+	@info = ""
+	att = ""
+
+[yrenderer.gfx.FrameBuffer.color_attachments]
+	@info = ""
+	@return = ""
+
+[yrenderer.gfx.FrameBuffer.depth_buffer]
+	@info = ""
+	@return = ""
+
+[yrenderer.gfx.ImageTexture]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.ImageTexture.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[yrenderer.gfx.PointVertex]
+	@info = ""
+	col = ""
+	pos = ""
+	radius = ""
+
+[yrenderer.gfx.PointVertex.__init__]
+	@info = ""
+	col = ""
+	pos = ""
+	radius = ""
+
+[yrenderer.gfx.PrimitiveTopology]
+	@info = ""
+
+[yrenderer.gfx.PrimitiveTopology.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.gfx.PrimitiveTopology.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.gfx.PrimitiveTopology.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.gfx.Shader]
+	@info = ""
+
+[yrenderer.gfx.Shader.__init__]
+	@info = ""
+
+[yrenderer.gfx.Shader.set_float]
+	@info = ""
+	f = ""
+	name = ""
+
+[yrenderer.gfx.Shader.set_floats]
+	@info = ""
+	f = ""
+	name = ""
+	num = ""
+
+[yrenderer.gfx.ShaderStorageBuffer]
+	@info = ""
+
+[yrenderer.gfx.ShaderStorageBuffer.__init__]
+	@info = ""
+	size = ""
+
+[yrenderer.gfx.StorageTexture]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.StorageTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[yrenderer.gfx.Texture]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.Texture.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[yrenderer.gfx.Texture.read]
+	@info = ""
+	im = ""
+
+[yrenderer.gfx.Texture.set_options]
+	@info = ""
+	op = ""
+
+[yrenderer.gfx.Texture.write]
+	@info = ""
+	im = ""
+
+[yrenderer.gfx.Texture.write_float]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.UniformBuffer]
+	@info = ""
+
+[yrenderer.gfx.UniformBuffer.__init__]
+	@info = ""
+	size = ""
+
+[yrenderer.gfx.Vertex]
+	@info = ""
+	n = ""
+	p = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.Vertex.__init__]
+	@info = ""
+	n = ""
+	p = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VertexBuffer]
+	@info = ""
+
+[yrenderer.gfx.VertexBuffer.__init__]
+	@info = ""
+	format = ""
+
+[yrenderer.gfx.VertexBuffer.update]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.VertexFx]
+	@info = ""
+	col = ""
+	pos = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VertexFx.__init__]
+	@info = ""
+	col = ""
+	pos = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VolumeTexture]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.VolumeTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[yrenderer.gfx.ivec3]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""
+
+[yrenderer.gfx.ivec3.__init__]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""

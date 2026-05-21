@@ -1,7 +1,0 @@
-description = ""
-param:h = nil
-param:r = ""
-param:self = ""
-param:w = nil
-param:x = nil
-param:y = nil

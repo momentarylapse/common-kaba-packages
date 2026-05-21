@@ -1,3 +1,0 @@
-description = ""
-element:files = ""
-element:to_delete = ""

@@ -1,8 +1,0 @@
-description = ""
-element:col = ""
-element:dir = ""
-element:harshness = ""
-element:pos = ""
-element:proj = ""
-element:radius = ""
-element:theta = ""

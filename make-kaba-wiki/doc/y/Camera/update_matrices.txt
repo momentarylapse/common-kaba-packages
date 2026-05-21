@@ -1,3 +1,0 @@
-description = ""
-param:aspect_ratio = ""
-param:self = ""

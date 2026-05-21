@@ -1,5 +1,0 @@
-description = ""
-param:ctx = ""
-param:name = ""
-param:options = ""
-param:textures = ""

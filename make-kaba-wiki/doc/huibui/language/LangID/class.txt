@@ -1,4 +1,0 @@
-description = ""
-element:id = ""
-element:title = ""
-element:tooltip = ""

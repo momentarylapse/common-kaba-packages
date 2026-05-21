@@ -1,3 +1,0 @@
-description = ""
-element:key = ""
-element:value = ""

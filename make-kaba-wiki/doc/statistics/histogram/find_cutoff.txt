@@ -1,4 +1,0 @@
-description = ""
-param:hist = ""
-param:max_sum = ""
-return = ""

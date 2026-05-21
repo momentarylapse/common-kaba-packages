@@ -1,5 +1,0 @@
-description = ""
-param:h = ""
-param:title = ""
-param:w = ""
-return = ""

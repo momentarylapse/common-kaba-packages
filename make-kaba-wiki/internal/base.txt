@@ -1,0 +1,508 @@
+
+[base]
+	@info = "Basic data types and functions."
+
+[base.Exception]
+	@info = ""
+
+[base.Exception.__init__]
+	@info = ""
+	message = ""
+
+[base.NoValueError]
+	@info = ""
+
+[base.NoValueError.__init__]
+	@info = ""
+
+[base.None]
+	@info = ""
+
+[base.Object]
+	@info = ""
+
+[base.Object.__init__]
+	@info = ""
+
+[base.Sharable]
+	@info = ""
+
+[base.as_binary]
+	@info = ""
+	@return = ""
+	length = ""
+	p = ""
+
+[base.assert]
+	@info = "Kills the program if the condition is false."
+	b = "The condition."
+
+[base.bool]
+	@info = "Can hold a True/False value."
+	num = ""
+
+[base.bool.__init__]
+	@info = ""
+
+[base.bool.add]
+	@info = ""
+	x = ""
+
+[base.bool.all]
+	@info = ""
+	@return = ""
+
+[base.bool.any]
+	@info = ""
+	@return = ""
+
+[base.bool.clear]
+	@info = ""
+
+[base.bool.insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.bool.remove]
+	@info = ""
+	index = ""
+
+[base.bool.resize]
+	@info = ""
+	num = ""
+
+[base.bool[]]
+	@info = ""
+	num = ""
+
+[base.bool[].__init__]
+	@info = ""
+
+[base.bool[].add]
+	@info = ""
+	x = ""
+
+[base.bool[].all]
+	@info = ""
+	@return = ""
+
+[base.bool[].any]
+	@info = ""
+	@return = ""
+
+[base.bool[].clear]
+	@info = ""
+
+[base.bool[].insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.bool[].remove]
+	@info = ""
+	index = ""
+
+[base.bool[].resize]
+	@info = ""
+	num = ""
+
+[base.bytes]
+	@info = ""
+	num = ""
+
+[base.bytes.__init__]
+	@info = ""
+
+[base.bytes.add]
+	@info = ""
+	x = ""
+
+[base.bytes.clear]
+	@info = ""
+
+[base.bytes.find]
+	@info = ""
+	@return = ""
+	start = ""
+	str = ""
+
+[base.bytes.hash]
+	@info = ""
+	@return = ""
+
+[base.bytes.hex]
+	@info = ""
+	@return = ""
+
+[base.bytes.insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.bytes.md5]
+	@info = "Md5 hash function."
+	@return = "Hash value, 32 character hex-string."
+
+[base.bytes.remove]
+	@info = ""
+	index = ""
+
+[base.bytes.resize]
+	@info = ""
+	num = ""
+
+[base.bytes.reverse]
+	@info = ""
+	@return = ""
+
+[base.bytes.utf8]
+	@info = ""
+	@return = ""
+
+[base.char]
+	@info = ""
+	@return = ""
+	c = ""
+
+[base.cstring]
+	@info = ""
+
+[base.f32]
+	@info = "A floating point number. 32 bit."
+	num = ""
+
+[base.f32.__init__]
+	@info = ""
+
+[base.f32.add]
+	@info = ""
+	x = ""
+
+[base.f32.clear]
+	@info = ""
+
+[base.f32.format]
+	@info = ""
+	@return = ""
+	fmt = ""
+
+[base.f32.insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.f32.remove]
+	@info = ""
+	index = ""
+
+[base.f32.resize]
+	@info = ""
+	num = ""
+
+[base.f32.str2]
+	@info = ""
+	@return = ""
+	decimals = ""
+
+[base.f32[]]
+	@info = ""
+	num = ""
+
+[base.f32[].__init__]
+	@info = ""
+
+[base.f32[].add]
+	@info = ""
+	x = ""
+
+[base.f32[].clear]
+	@info = ""
+
+[base.f32[].insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.f32[].remove]
+	@info = ""
+	index = ""
+
+[base.f32[].resize]
+	@info = ""
+	num = ""
+
+[base.f64]
+	@info = ""
+
+[base.f64.format]
+	@info = ""
+	@return = ""
+	fmt = ""
+
+[base.hex]
+	@info = ""
+	@return = ""
+	i = ""
+
+[base.i16]
+	@info = ""
+	high = ""
+	low = ""
+
+[base.i32]
+	@info = "An integer, a whole number. 32 bit."
+	num = ""
+
+[base.i32.__init__]
+	@info = ""
+
+[base.i32.add]
+	@info = ""
+	x = ""
+
+[base.i32.clear]
+	@info = ""
+
+[base.i32.format]
+	@info = ""
+	@return = ""
+	fmt = ""
+
+[base.i32.insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.i32.remove]
+	@info = ""
+	index = ""
+
+[base.i32.resize]
+	@info = ""
+	num = ""
+
+[base.i32[]]
+	@info = ""
+	num = ""
+
+[base.i32[].__init__]
+	@info = ""
+
+[base.i32[].add]
+	@info = ""
+	x = ""
+
+[base.i32[].clear]
+	@info = ""
+
+[base.i32[].insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.i32[].remove]
+	@info = ""
+	index = ""
+
+[base.i32[].resize]
+	@info = ""
+	num = ""
+
+[base.i64]
+	@info = ""
+
+[base.i64.format]
+	@info = ""
+	@return = ""
+	fmt = ""
+
+[base.i8]
+	@info = ""
+
+[base.owned]
+	@info = ""
+
+[base.owned!]
+	@info = ""
+
+[base.p2b]
+	@info = ""
+	@return = ""
+	p = ""
+
+[base.p2s]
+	@info = ""
+	@return = ""
+	p = ""
+
+[base.print]
+	@info = ""
+	str = ""
+
+[base.ptr]
+	@info = ""
+
+[base.raise]
+	@info = ""
+	e = ""
+
+[base.ref]
+	@info = ""
+
+[base.shared]
+	@info = ""
+
+[base.shared!]
+	@info = ""
+
+[base.string]
+	@info = "A chunk of text, a list of characters."
+	num = "The number of characters (bytes)."
+
+[base.string.__init__]
+	@info = ""
+
+[base.string.add]
+	@info = "Add a single character to the string."
+	x = "The character to add."
+
+[base.string.clear]
+	@info = ""
+
+[base.string.compare]
+	@info = ""
+	@return = ""
+	str = ""
+
+[base.string.decode]
+	@info = ""
+	@return = ""
+	b = ""
+
+[base.string.encode]
+	@info = ""
+	@return = ""
+
+[base.string.escape]
+	@info = "Add escapes to \"problematic\" characters (tab, linebreak, quotation, null).\n<tt>\"hello&lt;TAB&gt;world,&lt;LINEBREAK&gt;...".escape() -> \"hello\\tworld\\n,...\"</tt>."
+	@return = ""
+
+[base.string.explode]
+	@info = "Splits a string at each occurance of a sequence.\nAn empty string gives <tt>[\"\"]</tt>.\n<tt>\"hello|world|\".explode(\"|\") -> [\"hello\", \"world\", \"\"]</tt>"
+	@return = ""
+	str = ""
+
+[base.string.find]
+	@info = "Find a sub-string in text."
+	@return = "The location of the sub-string. Or <tt>-1</tt> if not found."
+	start = "Only start searching after this position in the source."
+	str = "The sub-string to find in the source."
+
+[base.string.format]
+	@info = "Formating helper, mostly used by string-interpolation."
+	@return = "Formated output."
+	fmt = "A format descriptor (<tt>\"%s\"</tt> or <tt>\" 10%s\"</tt>)."
+
+[base.string.hash]
+	@info = "Calculates a very simple hash, a number (more or less) unique to each text input."
+	@return = "The hash number."
+
+[base.string.head]
+	@info = "Selects characters from the beginning of a string."
+	@return = "The selected head."
+	size = "How many characters to select from the beginning?\\nA negative number <tt>-N</tt> selects until <tt>N</tt> characters before the end."
+
+[base.string.hex]
+	@info = "Hexadecimal representation of binary.\n<tt>\"abc\".hex() -> \"61.62.63\"</tt>"
+	@return = ""
+
+[base.string.icompare]
+	@info = ""
+	@return = ""
+	str = ""
+
+[base.string.insert]
+	@info = ""
+	index = ""
+	x = ""
+
+[base.string.lower]
+	@info = "Turn all characters to lower case.\n<tt>\"Hello\".lower() -> \"hello\"</tt>."
+	@return = ""
+
+[base.string.match]
+	@info = ""
+	@return = ""
+	glob = ""
+
+[base.string.parse_tokens]
+	@info = ""
+	@return = ""
+	splitters = ""
+
+[base.string.remove]
+	@info = ""
+	index = ""
+
+[base.string.repeat]
+	@info = "Glue several copies of a string together."
+	@return = "The glued copies."
+	n = "How often to repeat?"
+
+[base.string.replace]
+	@info = "Finds and replaces each occurance of a sequence within a string."
+	@return = "The result of the replacement."
+	by = "The sequence to replace it by."
+	sub = "The exact sequence to replace."
+
+[base.string.resize]
+	@info = "Resizes the string. Either cuts off or adds zero-characters at the end."
+	num = "How long to make the string?"
+
+[base.string.reverse]
+	@info = "Reverses the characters in text.\n<tt>\"abc\".reverse() -> \"cba\".\n<b>Warning: reverses bytes! Non-ascii characters will be corrupted!</b>"
+	@return = "Reversed text."
+
+[base.string.tail]
+	@info = "Returns the last couple of characters."
+	@return = "The last characters."
+	size = "How many characters.\nNumbers larger than <tt>len(self)</tt> will be clamped!"
+
+[base.string.trim]
+	@info = "Remove whitespace from start and end.\n<tt>\"  &lt;TAB&gt;hello world   \".trim() -> \"hello world\"</tt>"
+	@return = ""
+
+[base.string.unescape]
+	@info = ""
+	@return = ""
+
+[base.string.unhex]
+	@info = "Parse hexadecimal into binary.\n<tt>\"61.62.63\".unhex() -> \"abc\"</tt>."
+	@return = "Binary output."
+
+[base.string.upper]
+	@info = "Turn all characters to upper case.\n<tt>\"Hello\".upper() -> \"HELLO\"</tt>."
+	@return = "Upper case output."
+
+[base.string.utf8_length]
+	@info = "Count characters when interpreting as utf8."
+	@return = "Number of characters."
+
+[base.string.utf8_to_utf32]
+	@info = "Convert utf8 to utf32"
+	@return = "List of utf32 characters."
+
+[base.u16]
+	@info = "Unsigned 16bit integer."
+	high = ""
+	low = ""
+
+[base.u8]
+	@info = "Unsigned 8bit integer."
+
+[base.void]
+	@info = "The empty type."
+
+[base.xfer]
+	@info = "Ownership-transfer pointer."

@@ -1,3 +1,0 @@
-description = ""
-element:libs = ""
-element:optional = ""

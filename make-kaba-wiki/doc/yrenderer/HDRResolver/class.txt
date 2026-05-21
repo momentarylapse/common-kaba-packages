@@ -1,7 +1,0 @@
-description = ""
-element:bloom_factor = ""
-element:bloom_levels = ""
-element:depth_buffer = ""
-element:exposure = ""
-element:light_meter = ""
-element:texture = ""

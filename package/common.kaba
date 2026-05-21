@@ -4,17 +4,28 @@ use kaba
 let REPO_FILE = ".kaba-repo"
 let PACKAGE_FILE = ".kaba-package"
 
+func warn(m: string)
+	print("{{os.terminal.ORANGE}}{{os.terminal.BOLD}}WARNING:  {{m}}{{os.terminal.END}}")
+
+enum SourceType
+	UNKNOWN
+	REPO
+	LOCAL
+
 struct Source
-	type: string
+	type: SourceType
 	name: string
 	url: string
 	
 	func base_path() -> os.Path
-		if type == "repo"
-			return conf.repos_base | name
-		if type == "local"
-			return url
-		return ""
+		match type
+			SourceType.REPO =>
+				return conf.repos_base | name
+			SourceType.LOCAL =>
+				return url
+			else =>
+				return "???"
+		return "???"
 
 enum Location
 	INTERNAL
@@ -32,6 +43,7 @@ struct Package
 	build_target: string
 	location: Location
 	requires: string[]
+	forward: bool
 	func mut __init__() # kaba ARM workaround...
 	
 
@@ -52,6 +64,7 @@ func load_basic_config()
 	conf.kaba_base = kaba.install_root()
 	conf.packages_base = kaba.packages_root()
 	conf.repos_base = conf.kaba_base | "repos"
+	conf.sources = []
 	
 	if not os.fs.is_directory(conf.packages_base)
 		os.fs.create_directory(conf.packages_base)
@@ -63,7 +76,11 @@ func load_basic_config()
 		for l in s.explode("\n")
 			let x = l.replace("\t", " ").explode(" ")
 			if len(x) >= 3
-				conf.sources.add([x[0], x[1].replace("/", "."), x[2]])
+				let type = match x[0]
+					"repo" => SourceType.REPO
+					"local" => SourceType.LOCAL
+					else => SourceType.UNKNOWN
+				conf.sources.add([type, x[1].replace("/", "."), x[2]])
 
 
 func find_internal_packages() -> Package[]
@@ -81,6 +98,7 @@ func read_package(name: string, dir: os.Path, location: Location) -> Package
 	var p: Package
 	p.name = name
 	p.version = "0"
+	p.forward = false
 	
 	p.base_installed = conf.packages_base | name
 	if location == Location.INSTALLED
@@ -109,29 +127,37 @@ func read_package(name: string, dir: os.Path, location: Location) -> Package
 	return p
 
 
+func read_repo(dir: os.Path) -> Package[]
+	if not os.fs.exists(dir)
+		warn("REPO NOT FOUND: {{dir}}")
+		return []
+	if not os.fs.exists(dir | REPO_FILE)
+		warn("NOT A VALID REPO: {{dir}}  ('{{REPO_FILE}}' MISSING)")
+		return []
+	var r: Package[]
+	let ss = os.fs.read_text(dir | REPO_FILE)
+	for l in ss.explode("\n")
+		let x = l.explode(" ")
+		if len(x) < 2
+			continue
+		if x[0] != "package"
+			continue
+		if "forward" in x
+			continue
+		var name = os.Path(x[1]).basename().replace(".kaba", "")
+		let p = read_package(name, dir | x[1], Location.REMOTE)
+		for pp in list_find(r, name)
+			warn("MULTIPLE SOURCES FOR {{name}}:  {{p.base_source}}  {{pp.base_source}}")
+		else
+			r.add(p)
+	return r
+
+
 func find_remote_packages() -> Package[]
 	var r: Package[]
 	for s in conf.sources
-		let base = s.base_path()
-		if base == ""
-			continue
-		if not os.fs.exists(base)
-			print("   REPO NOT FOUND: {{base}}")
-			continue
-		if not os.fs.exists(base | REPO_FILE)
-			continue
-		let ss = os.fs.read_text(base | REPO_FILE)
-		for l in ss.explode("\n")
-			let x = l.explode(" ")
-			if len(x) < 2
-				continue
-			if x[0] != "package"
-				continue
-			var name = os.Path(x[1]).basename().replace(".kaba", "")
-			let p = read_package(name, base | x[1], Location.REMOTE)
-			for pp in list_find(r, name)
-				print("   MULTIPLE SOURCES FOR {{name}}:  {{p.base_source}}  {{pp.base_source}}")
-			else
+		if s.type == SourceType.REPO or s.type == SourceType.LOCAL
+			for p in read_repo(s.base_path())
 				r.add(p)
 	return r
 
@@ -166,7 +192,7 @@ func file_equal(a: os.Path, b: os.Path) -> bool
 	return sa == sb
 
 
-func load_module_list()
+func load_package_list()
 	conf.packages_internal = find_internal_packages()
 	conf.packages_installed = find_installed_packages()
 	conf.packages_remote = find_remote_packages()

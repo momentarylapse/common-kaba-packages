@@ -1,6 +1,0 @@
-description = ""
-param:f = ""
-param:func = ""
-param:id = ""
-param:self = ""
-return = ""

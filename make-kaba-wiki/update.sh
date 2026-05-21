@@ -1,4 +1,5 @@
 KABA=kaba
+BASE_DIR="/home/michi/.kaba/make-kaba-wiki" # ...
 
 if [ -n "$1" ]
 then
@@ -7,21 +8,17 @@ then
 fi
 
 # clean-up if needed
-rm -f *.txt
-rm -rf current
+rm -rf $BASE_DIR/current
 
 
 # make current version
-if $KABA make-kaba-wiki.kaba
+if $KABA make-kaba-wiki
 then
-	mkdir current
-	mv *.txt current
-
 	python3 upload.py
 
 	# save version
-	rm -rf previous
-	mv current previous
+	rm -rf $BASE_DIR/previous
+	mv $BASE_DIR/current $BASE_DIR/previous
 else
-	rm -f *.txt
+	rm -rf $BASE_DIR/current
 fi

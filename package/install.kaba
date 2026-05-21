@@ -112,7 +112,7 @@ func fullfull_dependencies(out list: Package&[]) -> bool
 
 
 func action_install(args: string[])
-	load_module_list()
+	load_package_list()
 	
 	# sources
 	var to_install: Package&[]

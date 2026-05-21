@@ -1,3 +1,0 @@
-description = ""
-param:current_directory = ""
-param:self = ""

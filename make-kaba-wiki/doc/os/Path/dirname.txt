@@ -1,3 +1,0 @@
-description = "Get the directory of a path as a string (<tt>'a/b/c.txt' -> 'a/b/'</tt>)."
-param:self = ""
-return = "The directory."

@@ -1,3 +1,0 @@
-description = ""
-element:c = ""
-element:win = ""

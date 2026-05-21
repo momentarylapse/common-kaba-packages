@@ -1,3 +1,0 @@
-description = ""
-element:cur_index = ""
-element:e = ""

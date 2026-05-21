@@ -1,4 +1,0 @@
-description = ""
-param:area = ""
-param:colors = ""
-param:z = ""

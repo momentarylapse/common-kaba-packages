@@ -1,4 +1,0 @@
-description = ""
-param:delta = ""
-param:self = ""
-return = ""

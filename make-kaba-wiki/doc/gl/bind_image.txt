@@ -1,6 +1,0 @@
-description = ""
-param:binding = ""
-param:layer = ""
-param:level = ""
-param:t = ""
-param:writable = ""

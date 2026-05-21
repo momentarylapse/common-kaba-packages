@@ -1,4 +1,0 @@
-description = ""
-element:name = ""
-element:offset = ""
-element:type = ""

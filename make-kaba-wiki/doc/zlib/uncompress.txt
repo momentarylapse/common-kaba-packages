@@ -1,4 +1,0 @@
-description = ""
-param:len_max = ""
-param:s = ""
-return = ""

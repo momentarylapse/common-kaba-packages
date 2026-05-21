@@ -1,5 +1,0 @@
-description = ""
-param:device = ""
-param:height = ""
-param:width = ""
-return = ""

@@ -1,3 +1,0 @@
-description = 'Reverses the characters in text.\n<tt>"abc".reverse() -> "cba".\n<b>Warning: reverses bytes! Non-ascii characters will be corrupted!</b>'
-param:self = 
-return = Reversed text.

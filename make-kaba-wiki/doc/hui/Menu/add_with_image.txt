@@ -1,5 +1,0 @@
-description = ""
-param:id = ""
-param:image = ""
-param:name = ""
-param:self = ""

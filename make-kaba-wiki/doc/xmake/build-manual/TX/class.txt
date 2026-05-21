@@ -1,3 +1,0 @@
-description = ""
-element:cxx_flags = ""
-element:s = ""

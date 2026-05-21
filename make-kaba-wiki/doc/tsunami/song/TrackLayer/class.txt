@@ -1,7 +1,0 @@
-description = ""
-element:buffers = ""
-element:markers = ""
-element:midi = ""
-element:samples = ""
-element:track = ""
-element:type = ""

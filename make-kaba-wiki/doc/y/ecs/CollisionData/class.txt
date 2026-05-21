@@ -1,4 +1,0 @@
-description = ""
-element:entity = ""
-element:n = ""
-element:pos = ""

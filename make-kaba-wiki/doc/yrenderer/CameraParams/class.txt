@@ -1,6 +1,0 @@
-description = ""
-element:ang = ""
-element:fov = ""
-element:max_depth = ""
-element:min_depth = ""
-element:pos = ""

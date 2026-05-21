@@ -1,3 +1,0 @@
-description = "Add a single character to the string."
-param:self = ""
-param:x = "The character to add."

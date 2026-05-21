@@ -1,9 +1,0 @@
-description = ""
-param:center = ""
-param:centerx = nil
-param:centery = nil
-param:height_1 = nil
-param:size_1 = ""
-param:width_1 = nil
-param:zmax = ""
-param:zmin = ""

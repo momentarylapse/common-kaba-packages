@@ -1,0 +1,805 @@
+
+[math]
+	@info = "Some mathematical tools. Especially for 3d linear algebra."
+
+[math.Any]
+	@info = "Can store an arbitrary value."
+	data = ""
+
+[math.Any.__init__]
+	@info = ""
+
+[math.Any.add]
+	@info = ""
+	a = ""
+
+[math.Any.as_dict]
+	@info = ""
+	@return = ""
+
+[math.Any.as_list]
+	@info = ""
+	@return = ""
+
+[math.Any.clear]
+	@info = "Clear or drop the stored value."
+
+[math.Any.drop]
+	@info = "Drop an entry from a map."
+	key = "The key to the entry to drop."
+
+[math.Any.has]
+	@info = "Checks, if a map contains an entry."
+	@return = "<tt>true</tt> if found."
+	key = "The key of the entry to check."
+
+[math.Any.is_empty]
+	@info = ""
+	@return = ""
+
+[math.Any.keys]
+	@info = ""
+	@return = ""
+
+[math.Any.parse]
+	@info = ""
+	@return = ""
+	s = ""
+
+[math.Any.type]
+	@info = ""
+	@return = ""
+
+[math.Any.unwrap]
+	@info = ""
+	type = ""
+	var = ""
+
+[math.Box]
+	@info = ""
+	max = ""
+	min = ""
+
+[math.Box.__init__]
+	@info = ""
+	max = ""
+	min = ""
+
+[math.Box.center]
+	@info = ""
+	@return = ""
+
+[math.Box.is_inside]
+	@info = ""
+	@return = ""
+	p = ""
+
+[math.Box.size]
+	@info = ""
+	@return = ""
+
+[math.Box.to_absolute]
+	@info = ""
+	@return = ""
+	p = ""
+
+[math.Box.to_relative]
+	@info = ""
+	@return = ""
+	p = ""
+
+[math.Color]
+	@info = ""
+	a = ""
+	b = ""
+	g = ""
+	r = ""
+
+[math.Color.__init__]
+	@info = ""
+	a = ""
+	b = ""
+	g = ""
+	r = ""
+
+[math.Color.hex]
+	@info = ""
+	@return = ""
+
+[math.Color.hsb]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+	h = ""
+	s = ""
+
+[math.Color.mix]
+	@info = ""
+	@return = ""
+	c1 = ""
+	c2 = ""
+	t = ""
+
+[math.Color.with_alpha]
+	@info = ""
+	@return = ""
+	a = ""
+
+[math.Complex]
+	@info = ""
+	x = ""
+	y = ""
+
+[math.Complex.__init__]
+	@info = ""
+	x = ""
+	y = ""
+
+[math.Complex.abs]
+	@info = ""
+	@return = ""
+
+[math.Complex.abs_sqr]
+	@info = ""
+	@return = ""
+
+[math.Complex.bar]
+	@info = ""
+	@return = ""
+
+[math.FloatInterpolator]
+	@info = ""
+	type = ""
+
+[math.FloatInterpolator.__init__]
+	@info = ""
+
+[math.FloatInterpolator.add]
+	@info = ""
+	dt = ""
+	p = ""
+
+[math.FloatInterpolator.add2]
+	@info = ""
+	dt = ""
+	p = ""
+	v = ""
+
+[math.FloatInterpolator.add3]
+	@info = ""
+	dt = ""
+	p = ""
+	v = ""
+	w = ""
+
+[math.FloatInterpolator.clear]
+	@info = ""
+
+[math.FloatInterpolator.get]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.FloatInterpolator.get_derivative]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.FloatInterpolator.get_list]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.FloatInterpolator.jump]
+	@info = ""
+	p = ""
+	v = ""
+
+[math.FloatInterpolator.normalize]
+	@info = ""
+
+[math.FloatInterpolator.set_type]
+	@info = ""
+	type = ""
+
+[math.Plane]
+	@info = ""
+	d = ""
+	n = ""
+
+[math.Plane.distance]
+	@info = ""
+	@return = ""
+	p = ""
+
+[math.Plane.from_point_normal]
+	@info = ""
+	@return = ""
+	n = ""
+	p = ""
+
+[math.Plane.from_points]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+	c = ""
+
+[math.Plane.intersect_line]
+	@info = ""
+	@return = ""
+	inter = ""
+	l1 = ""
+	l2 = ""
+
+[math.Plane.inverse]
+	@info = ""
+	@return = ""
+
+[math.Plane.transform]
+	@info = ""
+	@return = ""
+	m = ""
+
+[math.Quaternion]
+	@info = ""
+	w = ""
+	x = ""
+	y = ""
+	z = ""
+
+[math.Quaternion.__init__]
+	@info = ""
+	ang = ""
+	angle = ""
+	axis = ""
+	m = ""
+
+[math.Quaternion.angles]
+	@info = ""
+	@return = ""
+
+[math.Quaternion.bar]
+	@info = ""
+	@return = ""
+
+[math.Quaternion.drag]
+	@info = ""
+	@return = ""
+	dang = ""
+	reset_z = ""
+	up = ""
+
+[math.Quaternion.interpolate]
+	@info = ""
+	@return = ""
+	q0 = ""
+	q1 = ""
+	t = ""
+
+[math.Quaternion.normalize]
+	@info = ""
+
+[math.Random]
+	@info = ""
+
+[math.Random.__init__]
+	@info = ""
+
+[math.Random.dir]
+	@info = ""
+	@return = ""
+
+[math.Random.in_ball]
+	@info = ""
+	@return = ""
+	r = ""
+
+[math.Random.int]
+	@info = ""
+	@return = ""
+	max = ""
+
+[math.Random.normal]
+	@info = ""
+	@return = ""
+	mean = ""
+	stddev = ""
+
+[math.Random.seed]
+	@info = ""
+	str = ""
+
+[math.Random.uniform]
+	@info = ""
+	@return = ""
+	max = ""
+	min = ""
+
+[math.Random.uniform01]
+	@info = ""
+	@return = ""
+
+[math.Ray]
+	@info = ""
+	u = ""
+	v = ""
+
+[math.Ray.__init__]
+	@info = ""
+	a = ""
+	b = ""
+
+[math.Ray.dot]
+	@info = ""
+	@return = ""
+	r1 = ""
+	r2 = ""
+
+[math.Ray.intersect_plane]
+	@info = ""
+	@return = ""
+	pl = ""
+
+[math.Rect]
+	@info = ""
+	x1 = ""
+	x2 = ""
+	y1 = ""
+	y2 = ""
+
+[math.Rect.__init__]
+	@info = ""
+	p00 = ""
+	p11 = ""
+	x1 = ""
+	x2 = ""
+	y1 = ""
+	y2 = ""
+
+[math.Rect.area]
+	@info = ""
+	@return = ""
+
+[math.Rect.center]
+	@info = ""
+	@return = ""
+
+[math.Rect.grow]
+	@info = ""
+	@return = ""
+	d = ""
+
+[math.Rect.height]
+	@info = ""
+	@return = ""
+
+[math.Rect.inside]
+	@info = ""
+	@return = ""
+	p = ""
+
+[math.Rect.p00]
+	@info = ""
+	@return = ""
+
+[math.Rect.p11]
+	@info = ""
+	@return = ""
+
+[math.Rect.size]
+	@info = ""
+	@return = ""
+
+[math.Rect.width]
+	@info = ""
+	@return = ""
+
+[math.VectorInterpolator]
+	@info = ""
+	type = ""
+
+[math.VectorInterpolator.__init__]
+	@info = ""
+
+[math.VectorInterpolator.add]
+	@info = ""
+	dt = ""
+	p = ""
+
+[math.VectorInterpolator.add2]
+	@info = ""
+	dt = ""
+	p = ""
+	v = ""
+
+[math.VectorInterpolator.add3]
+	@info = ""
+	dt = ""
+	p = ""
+	v = ""
+	w = ""
+
+[math.VectorInterpolator.clear]
+	@info = ""
+
+[math.VectorInterpolator.get]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.VectorInterpolator.get_list]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.VectorInterpolator.get_tang]
+	@info = ""
+	@return = ""
+	t = ""
+
+[math.VectorInterpolator.jump]
+	@info = ""
+	p = ""
+	v = ""
+
+[math.VectorInterpolator.normalize]
+	@info = ""
+
+[math.VectorInterpolator.set_type]
+	@info = ""
+	type = ""
+
+[math.abs]
+	@info = ""
+	@return = ""
+	f = ""
+	i = ""
+	z = ""
+
+[math.acos]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.argmax]
+	@info = ""
+	@return = ""
+	list = ""
+
+[math.argmin]
+	@info = ""
+	@return = ""
+	list = ""
+
+[math.asin]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.atan]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.atan2]
+	@info = ""
+	@return = ""
+	x = ""
+	y = ""
+
+[math.bary_centric]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+	c = ""
+	p = ""
+
+[math.clamp]
+	@info = ""
+	@return = ""
+	f = ""
+	i = ""
+	max = ""
+	min = ""
+
+[math.cos]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.cubic_spline]
+	@info = ""
+	@return = ""
+	points = ""
+	t = ""
+
+[math.cubic_spline_d]
+	@info = ""
+	@return = ""
+	points = ""
+	t = ""
+
+[math.exp]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.log]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.loop]
+	@info = ""
+	@return = ""
+	f = ""
+	i = ""
+	max = ""
+	min = ""
+
+[math.mat3]
+	@info = ""
+	e = ""
+
+[math.mat3.inverse]
+	@info = ""
+	@return = ""
+
+[math.mat3.rotation]
+	@info = ""
+	@return = ""
+	ang = ""
+
+[math.mat3.scale]
+	@info = ""
+	@return = ""
+	s = ""
+	s_x = ""
+	s_y = ""
+	s_z = ""
+
+[math.mat4]
+	@info = ""
+	e = ""
+
+[math.mat4.inverse]
+	@info = ""
+	@return = ""
+
+[math.mat4.perspective]
+	@info = ""
+	@return = ""
+	aspect = ""
+	fovy = ""
+	z_far = ""
+	z_near = ""
+	z_sym = ""
+
+[math.mat4.project]
+	@info = ""
+	@return = ""
+	v = ""
+
+[math.mat4.rotation]
+	@info = ""
+	@return = ""
+	ang = ""
+
+[math.mat4.rotation_x]
+	@info = ""
+	@return = ""
+	ang = ""
+
+[math.mat4.rotation_y]
+	@info = ""
+	@return = ""
+	ang = ""
+
+[math.mat4.rotation_z]
+	@info = ""
+	@return = ""
+	ang = ""
+
+[math.mat4.scale]
+	@info = ""
+	@return = ""
+	s = ""
+	s_x = ""
+	s_y = ""
+	s_z = ""
+
+[math.mat4.transform]
+	@info = ""
+	@return = ""
+	v = ""
+
+[math.mat4.transform_normal]
+	@info = ""
+	@return = ""
+	v = ""
+
+[math.mat4.translation]
+	@info = ""
+	@return = ""
+	trans = ""
+
+[math.mat4.transpose]
+	@info = ""
+	@return = ""
+
+[math.mat4.unproject]
+	@info = ""
+	@return = ""
+	v = ""
+
+[math.mat4.untransform]
+	@info = ""
+	@return = ""
+	v = ""
+
+[math.max]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+	list = ""
+
+[math.min]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+	list = ""
+
+[math.pow]
+	@info = ""
+	@return = ""
+	exp = ""
+	x = ""
+
+[math.rand]
+	@info = ""
+	@return = ""
+	max = ""
+
+[math.rand_seed]
+	@info = ""
+	seed = ""
+
+[math.range]
+	@info = ""
+	@return = ""
+	end = ""
+	start = ""
+	step = ""
+
+[math.sign]
+	@info = ""
+	@return = ""
+	f = ""
+	i = ""
+
+[math.sin]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.sqr]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.sqrt]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.sum]
+	@info = ""
+	@return = ""
+	list = ""
+
+[math.sum_sqr]
+	@info = ""
+	@return = ""
+	list = ""
+
+[math.tan]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.unique]
+	@info = ""
+	@return = ""
+	list = ""
+
+[math.vec2]
+	@info = ""
+	x = ""
+	y = ""
+
+[math.vec2.__init__]
+	@info = ""
+	x = ""
+	y = ""
+
+[math.vec2.dot]
+	@info = ""
+	@return = ""
+	v1 = ""
+	v2 = ""
+
+[math.vec2.length]
+	@info = ""
+	@return = ""
+
+[math.vec2.normalized]
+	@info = ""
+	@return = ""
+
+[math.vec3]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""
+
+[math.vec3.__init__]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""
+
+[math.vec3.ang2dir]
+	@info = ""
+	@return = ""
+
+[math.vec3.cross]
+	@info = ""
+	@return = ""
+	v1 = ""
+	v2 = ""
+
+[math.vec3.dir2ang]
+	@info = ""
+	@return = ""
+
+[math.vec3.dir2ang2]
+	@info = ""
+	@return = ""
+	up = ""
+
+[math.vec3.dot]
+	@info = ""
+	@return = ""
+	v1 = ""
+	v2 = ""
+
+[math.vec3.length]
+	@info = ""
+	@return = ""
+
+[math.vec3.length_fuzzy]
+	@info = ""
+	@return = ""
+
+[math.vec3.length_sqr]
+	@info = ""
+	@return = ""
+
+[math.vec3.normalized]
+	@info = ""
+	@return = ""
+
+[math.vec3.ortho]
+	@info = ""
+	@return = ""
+
+[math.xor]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""

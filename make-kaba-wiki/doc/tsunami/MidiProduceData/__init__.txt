@@ -1,4 +1,0 @@
-description = ""
-param:bar = ""
-param:beat_no = ""
-param:self = ""

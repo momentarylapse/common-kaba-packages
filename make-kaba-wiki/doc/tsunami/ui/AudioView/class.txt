@@ -1,4 +1,0 @@
-description = ""
-element:cam = ""
-element:mouse_wheel_speed = ""
-element:sel = ""

@@ -1,5 +1,0 @@
-description = 
-param:data = 
-param:nx = 
-param:ny = 
-param:nz = 

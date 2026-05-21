@@ -1,6 +1,0 @@
-description = ""
-param:c = ""
-param:e = ""
-param:radius = ""
-param:theta = ""
-return = ""

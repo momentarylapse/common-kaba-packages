@@ -1,5 +1,0 @@
-description = 
-param:cb = 
-param:fence = 
-param:signal_sem = 
-param:wait_sem = 

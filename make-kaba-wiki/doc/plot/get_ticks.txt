@@ -1,5 +1,0 @@
-description = ""
-param:range = ""
-param:spacing0 = ""
-param:total_pixels = ""
-return = ""

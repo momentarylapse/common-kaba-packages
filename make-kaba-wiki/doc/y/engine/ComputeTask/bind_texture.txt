@@ -1,3 +1,0 @@
-description = ""
-param:index = ""
-param:tex = ""

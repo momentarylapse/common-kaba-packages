@@ -1,3 +1,0 @@
-description = ""
-element:index = ""
-element:type = ""

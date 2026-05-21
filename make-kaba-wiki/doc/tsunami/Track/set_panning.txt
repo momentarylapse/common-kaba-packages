@@ -1,3 +1,0 @@
-description = ""
-param:panning = ""
-param:self = ""

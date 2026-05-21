@@ -1,9 +1,0 @@
-description = ""
-param:align = ""
-param:c = ""
-param:col_bg = ""
-param:col_text = ""
-param:p = ""
-param:str = ""
-param:x = nil
-param:y = nil

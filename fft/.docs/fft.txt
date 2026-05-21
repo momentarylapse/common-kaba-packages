@@ -1,0 +1,26 @@
+
+[fft]
+	@info = "Package for fast fourier transformation functions."
+
+[fft.c2c]
+	@info = "Perform a complex->complex FFT."
+	_in = "Input data."
+	_out = "Output data.\nWill be resized appropriately."
+	inverse = "<tt>false:</tt> forward, <tt>true></tt>: inverse."
+
+[fft.c2c_2d]
+	@info = ""
+	_in = ""
+	_out = ""
+	inverse = ""
+	n = ""
+
+[fft.c2r_inv]
+	@info = ""
+	_in = ""
+	_out = ""
+
+[fft.r2c]
+	@info = ""
+	_in = ""
+	_out = ""

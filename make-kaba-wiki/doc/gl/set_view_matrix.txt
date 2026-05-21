@@ -1,3 +1,0 @@
-description = ""
-param:m = ""
-param:view_mat = ""

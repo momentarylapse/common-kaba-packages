@@ -1,5 +1,0 @@
-description = ""
-element:col = ""
-element:color = ""
-element:pos = ""
-element:radius = ""

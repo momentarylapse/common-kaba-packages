@@ -1,5 +1,0 @@
-description = ""
-element:action_con = ""
-element:active_win = ""
-element:cam = ""
-element:mouse_win = ""

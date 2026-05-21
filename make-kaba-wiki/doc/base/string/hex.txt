@@ -1,3 +1,0 @@
-description = 'Hexadecimal representation of binary.\n<tt>"abc".hex() -> "61.62.63"</tt>'
-param:self = 
-return = Hexadecimal representation.

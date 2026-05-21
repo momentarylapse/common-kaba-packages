@@ -1,5 +1,0 @@
-description = ""
-element:color = ""
-element:pos = ""
-element:pos_wanted = ""
-element:text = ""

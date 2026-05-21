@@ -1,0 +1,10 @@
+
+[async]
+	@info = "Helpers for asynchronous operations."
+
+[async.future]
+	@info = "The result returned by a started operation.\nThe operation will return immediately. A callback can be registered to handle the value when available."
+
+[async.promise]
+	@info = "The internal result storage used to implement asynchronous operations."
+

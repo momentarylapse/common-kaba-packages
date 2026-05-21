@@ -1,0 +1,77 @@
+[thread]
+	@info = "Multithreading package."
+
+[thread.Mutex]
+	@info = ""
+
+[thread.Mutex.__init__]
+	@info = ""
+
+[thread.Mutex.lock]
+	@info = ""
+
+[thread.Mutex.unlock]
+	@info = ""
+
+[thread.Scheduler]
+	@info = ""
+
+[thread.Scheduler.__init__]
+	@info = ""
+
+[thread.Scheduler.get_done]
+	@info = ""
+	@return = ""
+
+[thread.Scheduler.get_total]
+	@info = ""
+	@return = ""
+
+[thread.Scheduler.on_status]
+	@info = ""
+	@return = ""
+
+[thread.Scheduler.on_step]
+	@info = ""
+	index = ""
+	worker_id = ""
+
+[thread.Scheduler.run]
+	@info = ""
+	@return = ""
+	partition_size = ""
+	total_size = ""
+
+[thread.Thread]
+	@info = ""
+
+[thread.Thread.__init__]
+	@info = ""
+
+[thread.Thread.is_done]
+	@info = ""
+	@return = ""
+
+[thread.Thread.join]
+	@info = ""
+
+[thread.Thread.kill]
+	@info = ""
+
+[thread.Thread.on_run]
+	@info = ""
+
+[thread.Thread.run]
+	@info = ""
+
+[thread.Thread.self]
+	@info = ""
+	@return = ""
+
+[thread.exit]
+	@info = ""
+
+[thread.get_num_cores]
+	@info = ""
+	@return = ""
+

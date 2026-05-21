@@ -1,6 +1,0 @@
-description = ""
-element:num_surfels = ""
-element:probe_cells = ""
-element:probe_max = ""
-element:probe_min = ""
-element:surfel_buffer = ""

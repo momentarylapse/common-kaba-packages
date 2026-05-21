@@ -1,5 +1,0 @@
-description = ""
-param:num_vertex_specs = ""
-param:num_vertices = ""
-param:reserved = ""
-param:vertex_specs_offset = ""

@@ -1,4 +1,0 @@
-description = ""
-param:length_factor = ""
-param:mode = ""
-param:pitch_factor = ""

@@ -1,7 +1,0 @@
-description = ""
-param:ang = ""
-param:c = ""
-param:pos = ""
-param:radius = ""
-param:theta = ""
-return = ""

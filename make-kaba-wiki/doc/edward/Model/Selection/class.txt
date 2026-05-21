@@ -1,4 +1,0 @@
-description = ""
-element:edge = ""
-element:polygon = ""
-element:vertex = ""

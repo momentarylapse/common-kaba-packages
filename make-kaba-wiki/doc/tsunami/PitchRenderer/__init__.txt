@@ -1,4 +1,0 @@
-description = ""
-param:pitch = ""
-param:self = ""
-param:synth = ""

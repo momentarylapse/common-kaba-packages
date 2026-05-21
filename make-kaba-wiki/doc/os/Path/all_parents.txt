@@ -1,3 +1,0 @@
-description = "Creates a list of all parent directories."
-param:self = "The path."
-return = "The list of all parent directories (sorted from children to root)."

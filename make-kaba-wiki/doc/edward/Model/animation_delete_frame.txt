@@ -1,4 +1,0 @@
-description = ""
-param:frame = ""
-param:index = ""
-param:self = ""

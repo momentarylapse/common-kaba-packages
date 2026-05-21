@@ -1,5 +1,0 @@
-description = ""
-param:_pitch = ""
-param:_pos = ""
-param:_volume = ""
-param:self = ""

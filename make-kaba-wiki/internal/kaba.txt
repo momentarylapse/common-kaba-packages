@@ -1,0 +1,581 @@
+[kaba]
+	@info = "Interface to the compiler. Offers reflection (information about types and code)."
+
+[kaba.Class]
+	@info = ""
+	classes = ""
+	constants = ""
+	elements = ""
+	from_template = ""
+	functions = ""
+	name = ""
+	namespace = ""
+	param = ""
+	parent = ""
+	size = ""
+	static_variables = ""
+	traits = ""
+
+[kaba.Class.cname]
+	@info = ""
+	@return = ""
+	ns = ""
+
+[kaba.Class.get_func]
+	@info = ""
+	@return = ""
+	name = ""
+	params = ""
+	return_type = ""
+
+[kaba.Class.has_trait]
+	@info = ""
+	@return = ""
+	trait = ""
+
+[kaba.Class.is_array]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_derived_from]
+	@info = ""
+	@return = ""
+	c = ""
+
+[kaba.Class.is_dict]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_enum]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_interface]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_list]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_namespace]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_pointer_raw]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_some_pointer]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_some_pointer_not_null]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_struct]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_template]
+	@info = ""
+	@return = ""
+
+[kaba.Class.is_trait]
+	@info = ""
+	@return = ""
+
+[kaba.Class.long_name]
+	@info = ""
+	@return = ""
+
+[kaba.ClassElement]
+	@info = ""
+	name = ""
+	offset = ""
+	type = ""
+
+[kaba.Constant]
+	@info = ""
+	name = ""
+	type = ""
+
+[kaba.Context]
+	@info = ""
+	packages = ""
+
+[kaba.Context.create]
+	@info = ""
+	@return = ""
+
+[kaba.Context.create_module_for_source]
+	@info = ""
+	@return = ""
+	just_analize = ""
+	source = ""
+
+[kaba.Context.execute_single_command]
+	@info = ""
+	cmd = ""
+
+[kaba.Context.get_dynamic_type]
+	@info = ""
+	@return = ""
+	p = ""
+
+[kaba.Context.load_module]
+	@info = ""
+	@return = ""
+	filename = ""
+	just_analize = ""
+
+[kaba.Function]
+	@info = ""
+	code = ""
+	inline_index = ""
+	name = ""
+	namespace = ""
+	num_params = ""
+	param_type = ""
+	return_type = ""
+	var = ""
+	virtual_index = ""
+
+[kaba.Function.cname]
+	@info = ""
+	@return = ""
+	ns = ""
+
+[kaba.Function.is_extern]
+	@info = ""
+	@return = ""
+
+[kaba.Function.is_mutable]
+	@info = ""
+	@return = ""
+
+[kaba.Function.is_pure]
+	@info = ""
+	@return = ""
+
+[kaba.Function.is_selfref]
+	@info = ""
+	@return = ""
+
+[kaba.Function.is_static]
+	@info = ""
+	@return = ""
+
+[kaba.Function.is_unimplemented]
+	@info = ""
+	@return = ""
+
+[kaba.Function.long_name]
+	@info = ""
+	@return = ""
+
+[kaba.Function.signature]
+	@info = ""
+	@return = ""
+	ns = ""
+
+[kaba.Function.throws_exceptions]
+	@info = ""
+	@return = ""
+
+[kaba.Module]
+	@info = ""
+	name = ""
+
+[kaba.Module.base_class]
+	@info = ""
+	@return = ""
+
+[kaba.Module.classes]
+	@info = ""
+	@return = ""
+
+[kaba.Module.constants]
+	@info = ""
+	@return = ""
+
+[kaba.Module.functions]
+	@info = ""
+	@return = ""
+
+[kaba.Module.variables]
+	@info = ""
+	@return = ""
+
+[kaba.Package]
+	@info = ""
+	auto_import = ""
+	directory = ""
+	directory_dynamic = ""
+	is_installed = ""
+	is_internal = ""
+	main_module = ""
+	name = ""
+	version = ""
+
+[kaba.SpecialFunction]
+	@info = ""
+	id = ""
+	max_params = ""
+	min_params = ""
+	name = ""
+
+[kaba.Statement]
+	@info = ""
+	id = ""
+	name = ""
+	num_params = ""
+
+[kaba.Variable]
+	@info = ""
+	name = ""
+	type = ""
+
+[kaba.Variable.is_extern]
+	@info = ""
+	@return = ""
+
+[kaba.Variable.is_mutable]
+	@info = ""
+	@return = ""
+
+[kaba.code]
+	@info = ""
+
+[kaba.disassemble]
+	@info = ""
+	@return = ""
+	comments = ""
+	length = ""
+	p = ""
+
+[kaba.install_root]
+	@info = ""
+	@return = ""
+
+[kaba.link_name]
+	@info = ""
+	@return = ""
+	f = ""
+
+[kaba.packages_root]
+	@info = ""
+	@return = ""
+
+[kaba.show_func]
+	@info = ""
+	f = ""
+
+[kaba.this_module]
+	@info = ""
+	@return = ""
+
+[kaba.this_package]
+	@info = ""
+	@return = ""
+
+[os]
+	@info = ""
+
+[os.CommandLineParser]
+	@info = ""
+
+[os.CommandLineParser.__init__]
+	@info = ""
+
+[os.CommandLineParser.cmd]
+	@info = ""
+	comment = ""
+	f = ""
+	name = ""
+	p = ""
+
+[os.CommandLineParser.info]
+	@info = ""
+	cmd = ""
+	i = ""
+
+[os.CommandLineParser.option]
+	@info = ""
+	comment = ""
+	f = ""
+	name = ""
+	p = ""
+
+[os.CommandLineParser.parse]
+	@info = ""
+	arg = ""
+
+[os.CommandLineParser.show]
+	@info = ""
+
+[os.Configuration]
+	@info = ""
+	dict = ""
+
+[os.Configuration.__init__]
+	@info = ""
+
+[os.Configuration.get_bool]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_float]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_int]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_str]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.keys]
+	@info = ""
+	@return = ""
+
+[os.Configuration.load]
+	@info = ""
+	@return = ""
+	path = ""
+
+[os.Configuration.save]
+	@info = ""
+	path = ""
+
+[os.FileError]
+	@info = ""
+
+[os.FileError.__init__]
+	@info = ""
+
+[os.FileStream]
+	@info = ""
+
+[os.FileStream.is_end]
+	@info = ""
+	@return = ""
+
+[os.FileStream.mtime]
+	@info = ""
+	@return = ""
+
+[os.FileStream.pos]
+	@info = ""
+	@return = ""
+
+[os.FileStream.seek]
+	@info = ""
+	delta = ""
+
+[os.FileStream.set_pos]
+	@info = ""
+	pos = ""
+
+[os.FileStream.size]
+	@info = ""
+	@return = ""
+
+[os.Path]
+	@info = ""
+
+[os.Path.__init__]
+	@info = ""
+	p = ""
+
+[os.Path.absolute]
+	@info = ""
+	@return = ""
+
+[os.Path.all_parents]
+	@info = ""
+	@return = ""
+
+[os.Path.basename]
+	@info = ""
+	@return = ""
+
+[os.Path.basename_no_ext]
+	@info = ""
+	@return = ""
+
+[os.Path.canonical]
+	@info = ""
+	@return = ""
+
+[os.Path.compare]
+	@info = ""
+	@return = ""
+	p = ""
+
+[os.Path.dirname]
+	@info = ""
+	@return = ""
+
+[os.Path.extension]
+	@info = ""
+	@return = ""
+
+[os.Path.is_absolute]
+	@info = ""
+	@return = ""
+
+[os.Path.is_empty]
+	@info = ""
+	@return = ""
+
+[os.Path.is_relative]
+	@info = ""
+	@return = ""
+
+[os.Path.parent]
+	@info = ""
+	@return = ""
+
+[os.Path.relative_to]
+	@info = ""
+	@return = ""
+	p = ""
+
+[os.Stream]
+	@info = ""
+
+[os.Stream.read]
+	@info = ""
+	@return = ""
+	s = ""
+	size = ""
+
+[os.Stream.write]
+	@info = ""
+	@return = ""
+	s = ""
+
+[os.app]
+	@info = ""
+
+[os.exit]
+	@info = ""
+	status = ""
+
+[os.fs]
+	@info = ""
+
+[os.fs.copy]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.create_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.current_directory]
+	@info = ""
+	@return = ""
+
+[os.fs.delete]
+	@info = ""
+	filename = ""
+
+[os.fs.delete_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.exists]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.hash]
+	@info = ""
+	@return = ""
+	filename = ""
+	type = ""
+
+[os.fs.is_directory]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.move]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.mtime]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.open]
+	@info = ""
+	@return = ""
+	filename = ""
+	mode = ""
+
+[os.fs.read]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.read_text]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.rename]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.search]
+	@info = ""
+	@return = ""
+	dir = ""
+	filter = ""
+	options = ""
+
+[os.fs.set_current_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.size]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.write]
+	@info = ""
+	buffer = ""
+	filename = ""
+
+[os.fs.write_text]
+	@info = ""
+	buffer = ""
+	filename = ""
+
+[os.shell_execute]
+	@info = ""
+	@return = ""
+	cmd = ""
+	verbose = ""
+
+[os.terminal]
+	@info = ""

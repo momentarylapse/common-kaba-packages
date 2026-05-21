@@ -1,2 +1,0 @@
-description = A chunk of text, a list of characters.
-element:num = The number of characters.

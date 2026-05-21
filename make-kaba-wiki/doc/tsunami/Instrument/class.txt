@@ -1,3 +1,0 @@
-description = ""
-element:string_pitch = ""
-element:type = ""

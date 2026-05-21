@@ -1,5 +1,0 @@
-description = ""
-param:desktop_file = ""
-param:icons = ""
-param:mime_files = ""
-param:source = ""

@@ -1,9 +1,0 @@
-description = ""
-param:center = ""
-param:centerx = nil
-param:centery = nil
-param:map_height = nil
-param:map_size = ""
-param:map_width = nil
-param:zmax = ""
-param:zmin = ""

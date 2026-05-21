@@ -5,6 +5,8 @@ from os import listdir
 c = MongoClient()
 db = c.wiki
 
+base_dir = "/home/michi/.kaba/make-kaba-wiki" # :P
+
 
 def new_article(name, wiki):
 	return {'name':name, 'wiki':wiki, 'creation_time':int(time.time()), 'creation_user_id':1, 'privilege_read':0, 'privilege_edit':2}
@@ -24,16 +26,16 @@ def upload(name, wiki):
 n = 0
 n_skip = 0
 
-for f in sorted(listdir("current")):
+for f in sorted(listdir(base_dir + "/current")):
 	if f[-4:] == ".txt":
 		name = f[:-4]
 
-		file = open("current/" + f, "r")
+		file = open(base_dir + "/current/" + f, "r")
 		wiki = file.read()
 
 		wiki0 = ""
 		try:
-			file0 = open("previous/" + f, "r")
+			file0 = open(base_dir + "/previous/" + f, "r")
 			wiki0 = file0.read()
 		except:
 			pass

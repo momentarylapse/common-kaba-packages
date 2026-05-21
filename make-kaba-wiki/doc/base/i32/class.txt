@@ -1,1 +1,0 @@
-description = An integer, a whole number. 32 bit.

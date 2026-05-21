@@ -1,3 +1,0 @@
-description = "Gets the extension of a filename (<tt>'a/b/c.txt' -> 'txt'</tt>)."
-param:self = ""
-return = "The extension.\nEmpty if no extension present."

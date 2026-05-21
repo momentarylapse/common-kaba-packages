@@ -1,3 +1,0 @@
-description = ""
-param:radius = ""
-param:self = ""

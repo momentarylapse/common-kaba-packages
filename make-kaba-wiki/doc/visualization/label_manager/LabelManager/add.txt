@@ -1,4 +1,0 @@
-description = ""
-param:color = ""
-param:pos = ""
-param:text = ""

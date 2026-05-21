@@ -3,6 +3,7 @@ use os
 use .common.*
 
 var report_missing = false
+var add_missing = false
 
 func parse_doc_string(s: string) -> string
 	var ss = s
@@ -17,53 +18,65 @@ func parse_doc_string(s: string) -> string
 	return ss.unescape()
 
 
-func doc_get(ns: string, name: string, is_class: bool, key: string) -> string
-	var p = os.Path("doc/" + ns.replace(".", "/"))
-	if is_class
-		p = p | name | "class.txt"
-	else
-		p = p | name + ".txt"
+struct GlobalDocState
 	var conf: os.Configuration
-	conf.load(p)
-	if str(conf[key]) in ["nil", ""]
+	var filename: os.Path
+	func __assign__(other: GlobalDocState)
+		pass
+
+var state: GlobalDocState
+
+
+func doc_start_module(name: string, dir: os.Path)
+	state.filename = dir | name + ".txt"
+	state.conf.load(state.filename)
+
+
+#func doc_get(dir: os.Path, ns: string, name: string, is_class: bool, key: string) -> string
+func doc_get(key: string) -> string
+	if str(state.conf[key]) in ["nil", ""]
 		if report_missing
-			print("MISSING: {{ns}}.{{name}}:  {{key}}")
-		conf[key] = ""
-		conf.save(p)
-	else if str(conf[key]) == "!"
+			print("MISSING: {{key}}")
+		state.conf[key] = ""
+		if add_missing
+			state.conf.save(state.filename)
+	else if str(state.conf[key]) == "!"
 		return ""
 	else
 		#print("OK:      {{ns}}.{{name}}:  {{key}} = {{conf[key]}}")
-		return parse_doc_string(str(conf[key]))
+		return parse_doc_string(str(state.conf[key]))
 	return "..."
 
 
+func doc_get_package_description(name: string) -> string
+	return doc_get(name + ".@info")
+
 func doc_get_class_description(ns: string, c: Class) -> string
-	return doc_get(ns, c.name, true, "description")
+	return doc_get(ns + "." + c.name + ".@info")
 
 func doc_get_class_element(ns: string, c: Class, e: ClassElement) -> string
-	return doc_get(ns, c.name, true, "element:{{e.name}}")
+	return doc_get(ns + "." + c.name + "." + e.name)
 
 func doc_get_func_description(ns: string, f: Function) -> string
-	return doc_get(ns, f.name, false, "description")
+	return doc_get(ns + "." + f.name + ".@info")
 
 func doc_get_func_return(ns: string, f: Function) -> string
-	return doc_get(ns, f.name, false, "return")
+	return doc_get(ns + "." + f.name + ".@return")
 
 func doc_get_func_param(ns: string, f: Function, p: string) -> string
-	return doc_get(ns, f.name, false, "param:{{p}}")
+	return doc_get(ns + "." + f.name + "." + p)
 
 
 func short_doc(s: string) -> string
 	if len(s) == 0
 		return s
 	var x = s.explode("\n")[0]
-	if len(x) > 100
+	if len(x) > 140
 		x = x[:100] + "..."
 	return x
 
 
-func prepare_func(f: Function, ns: string, dir: os.Path)
+func prepare_func(f: Function, ns: string)
 	doc_get_func_description(ns, f)
 	let params = func_notable_params(f)
 	for p in params
@@ -72,11 +85,7 @@ func prepare_func(f: Function, ns: string, dir: os.Path)
 		let x = doc_get_func_return(ns, f)
 
 
-func prepare_class(c: Class, ns: string, dir: os.Path)
-	if not os.fs.exists(dir)
-		os.fs.create_directory(dir)
-	print(c)
-	
+func prepare_class(c: Class, ns: string)
 	let funcs = filter_funcs(c.functions, c)
 	let elements = filter_elements(c.elements)
 	let consts = filter_consts(c.constants)
@@ -87,41 +96,56 @@ func prepare_class(c: Class, ns: string, dir: os.Path)
 		let r = doc_get_class_element(ns, c, e)
 	
 	for f in funcs
-		prepare_func(f, ns + "." + c.name, dir)
+		prepare_func(f, ns + "." + c.name)
 	
 	for cc in classes
-		prepare_class(cc, ns + "." + c.name, dir | cc.name)
+		prepare_class(cc, ns + "." + c.name)
 
 
-func prepare_module(p: Module, name: string, dir: os.Path)
-	if not os.fs.exists(dir)
-		os.fs.create_directory(dir)
+func prepare_module(m: Module, name: string, dir: os.Path)
 	print("PREP MOD   {{name}}  {{dir}}")
+	doc_start_module(name, dir)
 
-	let classes = filter_classes(p.classes())
+	let classes = filter_classes(m.classes())
 	for c in classes
-		prepare_class(c, name, dir | c.name)
+		prepare_class(c, name)
 
-	let funcs = filter_funcs(p.functions(), p.base_class())
+	let funcs = filter_funcs(m.functions(), m.base_class())
 	for f in funcs
-		prepare_func(f, name, dir)
+		prepare_func(f, name)
 
-#	var vars = p.variables()
+#	var vars = m.variables()
 #	for v in vars
-#		wiki_upload("kaba.{{p.name}}.{{v.name}}", show_var(p.name, v))
+#		wiki_upload("kaba.{{m.name}}.{{v.name}}", show_var(m.name, v))
 
 
-func prepare(dir: os.Path)
+func prepare_external_package(p: ExternalPackage)
+	let doc_dir = p.dir | ".docs"
+	for m in p.main
+		doc_start_module(p.name, doc_dir)
+		doc_get_package_description(p.name)
+		prepare_module(m, p.name, doc_dir)
+	for m in p.sub_modules
+		for mm in m[1]
+			prepare_module(mm, p.name + "." + m[0], doc_dir)
+
+
+func prepare_internal_package(p: Package)
+	let doc_dir = "internal"
+	doc_start_module(p.name, doc_dir)
+	doc_get_package_description(p.name)
+	prepare_module(p.main_module, p.name, doc_dir)
+
+
+func prepare()
 	print("PREPARE")
 	for p in default_context.packages
-		prepare_module(p.main_module, p.name, dir | p.name)
-	print("----")
+		print(p)
+		#prepare_module(p.main_module, p.name, dir | p.name)
+	print("----EXT")
 
 	let external_packages = find_external_packages()
 	for p in external_packages
-		for m in p.main
-			prepare_module(m, p.name, dir | p.name)
-		for m in p.sub_modules
-			for mm in m[1]
-				prepare_module(mm, p.name + "." + m[0], dir | p.name | m[0])
+		print(p)
+		#prepare_external_package(p)
 

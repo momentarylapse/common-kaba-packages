@@ -1,4 +1,0 @@
-description = ""
-param:format = ""
-param:self = ""
-param:size = ""

@@ -1,6 +1,0 @@
-description = ""
-param:_length = nil
-param:_offset = nil
-param:length = ""
-param:offset = ""
-param:self = ""

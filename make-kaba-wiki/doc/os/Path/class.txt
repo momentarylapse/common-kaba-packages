@@ -1,1 +1,0 @@
-description = "Represents a path in the filesystem (not necessarily pointing to an existing file)."

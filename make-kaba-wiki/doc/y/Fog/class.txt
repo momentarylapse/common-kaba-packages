@@ -1,4 +1,0 @@
-description = ""
-element:color = ""
-element:distance = ""
-element:enabled = ""

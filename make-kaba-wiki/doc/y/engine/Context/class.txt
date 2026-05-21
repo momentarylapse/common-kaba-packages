@@ -1,3 +1,0 @@
-description = ""
-element:context = ""
-element:tex_white = ""

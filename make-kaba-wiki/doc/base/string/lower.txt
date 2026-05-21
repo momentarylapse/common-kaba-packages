@@ -1,3 +1,0 @@
-description = Turn all characters to lower case.\n<tt>"Hello".lower() -> "hello"</tt>.
-param:self = Input text.
-return = Lower case output.

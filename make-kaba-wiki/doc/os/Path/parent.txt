@@ -1,3 +1,0 @@
-description = "Get the parent directory of a path."
-param:self = ""
-return = "The parent directory."

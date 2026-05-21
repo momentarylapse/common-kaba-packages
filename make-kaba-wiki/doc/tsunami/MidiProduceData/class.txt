@@ -1,3 +1,0 @@
-description = ""
-element:bar = ""
-element:beat_no = ""

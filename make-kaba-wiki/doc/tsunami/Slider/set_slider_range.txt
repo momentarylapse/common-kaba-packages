@@ -1,3 +1,0 @@
-description = ""
-param:v_max = ""
-param:v_min = ""

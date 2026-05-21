@@ -1,4 +1,0 @@
-description = ""
-element:label = ""
-element:value = ""
-element:weight = ""

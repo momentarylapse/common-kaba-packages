@@ -1,0 +1,300 @@
+
+[os]
+	@info = "Interface to the operating system."
+
+[os.CommandLineParser]
+	@info = ""
+
+[os.CommandLineParser.__init__]
+	@info = ""
+
+[os.CommandLineParser.cmd]
+	@info = ""
+	comment = ""
+	f = ""
+	name = ""
+	p = ""
+
+[os.CommandLineParser.info]
+	@info = ""
+	cmd = ""
+	i = ""
+
+[os.CommandLineParser.option]
+	@info = ""
+	comment = ""
+	f = ""
+	name = ""
+	p = ""
+
+[os.CommandLineParser.parse]
+	@info = ""
+	arg = ""
+
+[os.CommandLineParser.show]
+	@info = ""
+
+[os.Configuration]
+	@info = ""
+	dict = ""
+
+[os.Configuration.__init__]
+	@info = ""
+
+[os.Configuration.get_bool]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_float]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_int]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.get_str]
+	@info = ""
+	@return = ""
+	default = ""
+	name = ""
+
+[os.Configuration.keys]
+	@info = ""
+	@return = ""
+
+[os.Configuration.load]
+	@info = ""
+	@return = ""
+	path = ""
+
+[os.Configuration.save]
+	@info = ""
+	path = ""
+
+[os.FileError]
+	@info = ""
+
+[os.FileError.__init__]
+	@info = ""
+
+[os.FileStream]
+	@info = ""
+
+[os.FileStream.is_end]
+	@info = ""
+	@return = ""
+
+[os.FileStream.mtime]
+	@info = ""
+	@return = ""
+
+[os.FileStream.pos]
+	@info = ""
+	@return = ""
+
+[os.FileStream.seek]
+	@info = ""
+	delta = ""
+
+[os.FileStream.set_pos]
+	@info = ""
+	pos = ""
+
+[os.FileStream.size]
+	@info = ""
+	@return = ""
+
+[os.Path]
+	@info = "Represents a path in the filesystem (not necessarily pointing to an existing file)."
+
+[os.Path.__init__]
+	@info = ""
+	p = ""
+
+[os.Path.absolute]
+	@info = "Find the absolute path for a relative one."
+	@return = "The absolute path."
+
+[os.Path.all_parents]
+	@info = "Creates a list of all parent directories."
+	@return = "The list of all parent directories (sorted from children to root)."
+
+[os.Path.basename]
+	@info = "Get the basename of a path as a string (<tt>'a/b/c.txt' -> 'c.txt'</tt>)."
+	@return = "The basename."
+
+[os.Path.basename_no_ext]
+	@info = "Get the basename without extension as a string (<tt>'a/b/c.txt' -> 'c'</tt>)"
+	@return = "The basename."
+
+[os.Path.canonical]
+	@info = "Get a canonical version of a path. (removes <tt>'a/../b'</tt>)"
+	@return = "The canonical path."
+
+[os.Path.compare]
+	@info = "Compare two paths alphabetically."
+	@return = "<tt>0</tt> if equal, positive if <tt>self</tt> sorts after <tt>p</tt>, negative if before."
+	p = "The other path."
+
+[os.Path.dirname]
+	@info = "Get the directory of a path as a string (<tt>'a/b/c.txt' -> 'a/b/'</tt>)."
+	@return = "The directory."
+
+[os.Path.extension]
+	@info = "Gets the extension of a filename (<tt>'a/b/c.txt' -> 'txt'</tt>)."
+	@return = "The extension.\nEmpty if no extension present."
+
+[os.Path.is_absolute]
+	@info = "Check, if a path is absolute.\nAbsolute paths start with <tt>'/...'</tt> or <tt>'X:\\...'</tt>."
+	@return = "<tt>true</tt> if path is absolute."
+
+[os.Path.is_empty]
+	@info = "Check if path is empty (<tt>''</tt>)."
+	@return = "<tt>true</tt> if empty."
+
+[os.Path.is_relative]
+	@info = "Check if a path is relative, i.e. does not start with <tt>'/...'</tt> or <tt>'X:\\...'</ttt>."
+	@return = "<tt>true</tt> if relative."
+
+[os.Path.parent]
+	@info = "Get the parent directory of a path."
+	@return = "The parent directory."
+
+[os.Path.relative_to]
+	@info = "Describe a path relative to another path.\nThis simply removes parent directories: <tt>'a/b/c/d'</tt> relative to <tt>'a/b'</tt> -> <tt>'c/d'</tt>."
+	@return = "The relative path. Or an empty path, if the path is not inside <tt>p</tt>."
+	p = "The reference point."
+
+[os.Stream]
+	@info = ""
+
+[os.Stream.read]
+	@info = ""
+	@return = ""
+	s = ""
+	size = ""
+
+[os.Stream.write]
+	@info = ""
+	@return = ""
+	s = ""
+
+[os.app]
+	@info = ""
+
+[os.exit]
+	@info = ""
+	status = ""
+
+[os.fs]
+	@info = ""
+
+[os.fs.copy]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.create_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.current_directory]
+	@info = ""
+	@return = ""
+
+[os.fs.delete]
+	@info = ""
+	filename = ""
+
+[os.fs.delete_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.exists]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.hash]
+	@info = ""
+	@return = ""
+	filename = ""
+	type = ""
+
+[os.fs.is_directory]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.move]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.mtime]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.open]
+	@info = ""
+	@return = ""
+	filename = ""
+	mode = ""
+
+[os.fs.read]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.read_text]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.rename]
+	@info = ""
+	dest = ""
+	source = ""
+
+[os.fs.search]
+	@info = ""
+	@return = ""
+	dir = ""
+	filter = ""
+	options = ""
+
+[os.fs.set_current_directory]
+	@info = ""
+	dir = ""
+
+[os.fs.size]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[os.fs.write]
+	@info = ""
+	buffer = ""
+	filename = ""
+
+[os.fs.write_text]
+	@info = ""
+	buffer = ""
+	filename = ""
+
+[os.shell_execute]
+	@info = ""
+	@return = ""
+	cmd = ""
+	verbose = ""
+
+[os.terminal]
+	@info = ""

@@ -5,7 +5,7 @@ use .common.*
 
 
 func action_list(args: string[])
-	load_module_list()
+	load_package_list()
 	
 	var packages = conf.packages_installed
 	for p in conf.packages_internal

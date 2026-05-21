@@ -1,3 +1,0 @@
-description = Convert utf8 to utf32.
-param:self = Utf8 input text.
-return = List of utf32 characters.

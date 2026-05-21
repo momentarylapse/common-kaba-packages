@@ -1,3 +1,0 @@
-description = ""
-param:n = ""
-param:q = ""

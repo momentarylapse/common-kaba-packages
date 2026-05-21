@@ -1,5 +1,0 @@
-description = ""
-param:image_index = ""
-param:self = ""
-param:wait_sem = ""
-return = ""

@@ -1,3 +1,0 @@
-description = ""
-param:ctx = ""
-param:shadow_resolution = ""

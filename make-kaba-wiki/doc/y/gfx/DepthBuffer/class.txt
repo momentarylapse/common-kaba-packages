@@ -1,3 +1,0 @@
-description = ""
-element:height = ""
-element:width = ""

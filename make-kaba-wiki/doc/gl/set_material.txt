@@ -1,5 +1,0 @@
-description = ""
-param:albedo = ""
-param:emission = ""
-param:metal = ""
-param:roughness = ""

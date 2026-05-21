@@ -1,0 +1,103 @@
+
+[net]
+	@info = "Package for network access."
+
+[net.Address]
+	@info = "A network address (host name + port)."
+	host = ""
+	port = ""
+
+[net.Address.__init__]
+	@info = ""
+	host = ""
+	port = ""
+
+[net.BinaryBuffer]
+	@info = "Can be used to accumulate binary data for transmission."
+	data = ""
+
+[net.BinaryBuffer.__init__]
+	@info = ""
+
+[net.BinaryBuffer.clear]
+	@info = ""
+
+[net.BinaryBuffer.end_block]
+	@info = ""
+
+[net.BinaryBuffer.get_pos]
+	@info = ""
+	@return = ""
+
+[net.BinaryBuffer.set_pos]
+	@info = ""
+	pos = ""
+
+[net.BinaryBuffer.start_block]
+	@info = ""
+
+[net.Socket]
+	@info = "Represents a biderectional network connection."
+	handle = ""
+	uuid = ""
+
+[net.Socket.__init__]
+	@info = ""
+
+[net.Socket.accept]
+	@info = ""
+	@return = ""
+
+[net.Socket.can_read]
+	@info = ""
+	@return = ""
+
+[net.Socket.can_write]
+	@info = ""
+	@return = ""
+
+[net.Socket.close]
+	@info = ""
+
+[net.Socket.get_sender]
+	@info = ""
+	@return = ""
+
+[net.Socket.is_connected]
+	@info = ""
+	@return = ""
+
+[net.Socket.read]
+	@info = ""
+	@return = ""
+	size = ""
+
+[net.Socket.set_blocking]
+	@info = ""
+	block = ""
+
+[net.Socket.set_target]
+	@info = ""
+	target = ""
+
+[net.Socket.write]
+	@info = ""
+	@return = ""
+	buf = ""
+
+[net.connect]
+	@info = "Connect to TCP host.\nThe host needs to call <tt>listen()</tt>."
+	@return = ""
+	addr = ""
+	port = ""
+
+[net.create_udp]
+	@info = ""
+	@return = ""
+	port = ""
+
+[net.listen]
+	@info = "Create a TCP host socket."
+	@return = ""
+	block = ""
+	port = "Host port on local machine."

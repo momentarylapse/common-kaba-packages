@@ -1,3 +1,0 @@
-description = ""
-param:parent = ""
-param:title = ""

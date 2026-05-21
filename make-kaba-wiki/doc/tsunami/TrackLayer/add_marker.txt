@@ -1,6 +1,0 @@
-description = ""
-param:m = ""
-param:range = nil
-param:self = ""
-param:text = nil
-return = ""

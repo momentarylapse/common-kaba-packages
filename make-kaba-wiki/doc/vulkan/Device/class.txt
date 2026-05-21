@@ -1,5 +1,0 @@
-description = ""
-element:command_pool = ""
-element:compute_queue = ""
-element:graphics_queue = ""
-element:present_queue = ""

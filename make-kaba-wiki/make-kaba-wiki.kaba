@@ -7,19 +7,21 @@ use .docu
 
 
 func wiki_upload(name: string, wiki: string)
-	os.fs.write_text(name + ".txt", wiki)
+	os.fs.write_text(this_package()!.directory_dynamic | "current/{{name}}.txt", wiki)
 
 
 func make_documentation()
+	os.fs.create_directory(this_package()!.directory_dynamic)
+	os.fs.create_directory(this_package()!.directory_dynamic | "current")
 	wiki_upload("kaba reference", wiki.render_reference())
 
 	for p in default_context.packages
-		make_module(p.main_module, p.name, "", [])
+		make_module(p.main_module, p.name, "", [], "internal")
 
 	let external_packages = find_external_packages()
 	for p in external_packages
 		for m in p.main
-			make_module(m, p.name, "", p.sub_modules)
+			make_module(m, p.name, "", p.sub_modules, p.dir | ".docs")
 
 
 func get_func_alternatives(all: Function&[], f: Function) -> Function&[]
@@ -37,12 +39,12 @@ func make_class(c: Class, ns: string)
 		make_class(cc, "{{ns}}.{{c.name}}")
 
 
-func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[])
+func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shared[Module])[], doc_dir: os.Path)
 	var ns = name
 	if _ns != ""
 		ns = "{{_ns}}.{{name}}"
-	print("MAKE MOD {{name}}   {{ns}}")
-	wiki_upload("kaba.{{ns}}", wiki.render_module(p, name, _ns, sub_modules))
+	print("MAKE MOD {{ns}}")
+	wiki_upload("kaba.{{ns}}", wiki.render_module(p, name, _ns, sub_modules, doc_dir))
 
 	let classes = filter_classes(p.classes())
 	for c in classes
@@ -58,15 +60,10 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shar
 	
 	for m in sub_modules
 		for mm in m[1]
-			make_module(mm, m[0], ns, [])
+			make_module(mm, m[0], ns, [], doc_dir)
 
 
 func main(arg: string[])
-	find_external_packages()
-	if len(arg) > 0
-		if arg[0] == "prepare"
-			docu.report_missing = true
-			docu.prepare("doc")
-	else
-		make_documentation()
+	#find_external_packages()
+	make_documentation()
 

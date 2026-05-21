@@ -1,5 +1,0 @@
-description = ""
-param:nx = ""
-param:ny = ""
-param:nz = ""
-param:self = ""

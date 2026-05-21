@@ -1,3 +1,0 @@
-description = ""
-param:just_killed = nil
-param:self = ""

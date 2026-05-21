@@ -1,4 +1,0 @@
-description = ""
-param:langs = ""
-param:own = ""
-param:res = ""

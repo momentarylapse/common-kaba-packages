@@ -1,6 +1,0 @@
-description = ""
-element:active = ""
-element:nx = ""
-element:ny = ""
-element:nz = ""
-element:shader_data = ""

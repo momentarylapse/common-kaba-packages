@@ -1,3 +1,0 @@
-description = "Check, if a path is absolute.\nAbsolute paths start with <tt>'/...'</tt> or <tt>'X:\\...'</tt>."
-param:self = ""
-return = "<tt>true</tt> if path is absolute."

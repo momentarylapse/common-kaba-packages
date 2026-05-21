@@ -1,0 +1,12 @@
+use kaba.*
+use os
+use .common.*
+use .docu
+
+
+
+func main(arg: string[])
+	docu.add_missing = true
+	for p in default_context.packages
+		docu.prepare_internal_package(p)
+

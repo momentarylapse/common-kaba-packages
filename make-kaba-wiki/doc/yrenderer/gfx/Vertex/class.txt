@@ -1,5 +1,0 @@
-description = ""
-element:n = ""
-element:p = ""
-element:u = ""
-element:v = ""

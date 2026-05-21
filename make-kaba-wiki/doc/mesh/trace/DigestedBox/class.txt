@@ -1,3 +1,0 @@
-description = ""
-element:box = ""
-element:planes = ""

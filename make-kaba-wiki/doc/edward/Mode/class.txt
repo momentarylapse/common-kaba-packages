@@ -1,3 +1,0 @@
-description = ""
-element:multi_view = ""
-element:name = ""

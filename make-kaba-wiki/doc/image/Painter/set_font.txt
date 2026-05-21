@@ -1,5 +1,0 @@
-description = ""
-param:bold = ""
-param:font = ""
-param:italic = ""
-param:size = ""

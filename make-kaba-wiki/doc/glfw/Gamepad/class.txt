@@ -1,7 +1,0 @@
-description = ""
-element:_shared_ref_count = nil
-element:axes = ""
-element:buttons = nil
-element:deadzone = ""
-element:index = ""
-element:state_prev = ""

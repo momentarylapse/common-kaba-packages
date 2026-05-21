@@ -1,3 +1,0 @@
-description = Count characters when interpreting as utf8.
-param:self = Input text.
-return = Number of characters.

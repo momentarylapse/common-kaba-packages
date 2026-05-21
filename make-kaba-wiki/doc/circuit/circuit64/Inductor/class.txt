@@ -1,8 +1,0 @@
-description = ""
-element:I = ""
-element:I_prev = ""
-element:U = ""
-element:a = ""
-element:b = ""
-element:param = ""
-element:type = ""

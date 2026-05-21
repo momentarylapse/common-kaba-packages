@@ -1,4 +1,0 @@
-description = ""
-param:files = ""
-param:paths = ""
-return = ""

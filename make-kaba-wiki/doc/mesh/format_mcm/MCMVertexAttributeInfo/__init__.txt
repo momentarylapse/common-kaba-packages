@@ -1,8 +1,0 @@
-description = ""
-param:buffer = ""
-param:components = ""
-param:normalized = ""
-param:offset = ""
-param:semantic = ""
-param:stride = ""
-param:type = ""

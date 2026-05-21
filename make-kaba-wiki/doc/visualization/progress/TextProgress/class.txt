@@ -1,3 +1,0 @@
-description = ""
-element:finished = ""
-element:first = ""

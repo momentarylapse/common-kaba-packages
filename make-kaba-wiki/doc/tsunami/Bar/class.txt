@@ -1,9 +1,0 @@
-description = ""
-element:_shared_ref_count = nil
-element:beats = ""
-element:divisor = ""
-element:index = ""
-element:index_text = ""
-element:length = ""
-element:offset = ""
-element:total_sub_beats = ""

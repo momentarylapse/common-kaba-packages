@@ -1,7 +1,0 @@
-description = ""
-param:dv1 = ""
-param:dv2 = ""
-param:num_x = ""
-param:num_y = ""
-param:pos = ""
-param:self = ""

@@ -1,3 +1,0 @@
-description = 
-element:volume_music = 
-element:volume_sounds = 

@@ -9,7 +9,7 @@ func remove_package(p: Package)
 
 
 func action_remove(args: string[])
-	load_module_list()
+	load_package_list()
 	for name in args
 		for p in list_find(conf.packages_internal, name)
 			print("{{os.terminal.RED}}internal packages can not be removed{{os.terminal.END}}")

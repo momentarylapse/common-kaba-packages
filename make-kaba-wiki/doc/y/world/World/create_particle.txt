@@ -1,5 +1,0 @@
-description = ""
-param:c = ""
-param:radius = ""
-param:tex = ""
-param:ttl = ""

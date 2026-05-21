@@ -1,3 +1,0 @@
-description = ""
-param:col = ""
-param:row = ""
