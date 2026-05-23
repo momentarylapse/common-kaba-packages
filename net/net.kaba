@@ -1,12 +1,12 @@
 
 
-struct Address
+struct extern Address
 	var host: string
 	var port: i32
 #	func extern __init__()
 #	func extern __delete__()
 
-class Socket
+class extern Socket
 	var uuid: i32
 	var handle: i32
 	
@@ -28,7 +28,7 @@ func extern connect(addr: string, port: i32) -> xfer[Socket]
 func extern create_udp(port: i32) -> xfer[Socket]
 
 
-class BinaryBuffer
+class extern BinaryBuffer
 	var data: bytes
 	func extern mut __init__()
 	func extern mut __delete__()

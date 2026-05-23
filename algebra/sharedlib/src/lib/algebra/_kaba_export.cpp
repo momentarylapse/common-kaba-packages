@@ -13,7 +13,7 @@ public:
 };
 
 void export_package_algebra(kaba::IExporter* e) {
-	e->package_info("algebra", "1.0");
+	e->package_info("algebra", "2");
 
 	e->declare_class_size("BigInt", sizeof(BigInt));
 	e->link_class_func("BigInt.__init__:BigInt", &kaba::generic_init<BigInt>);

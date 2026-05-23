@@ -3,11 +3,11 @@ use os
 use async.*
 
 
-class Painter extends image.Painter as @noauto
+class extern Painter extends image.Painter as @noauto
 	func extern override __delete__()
 
 
-class Menu
+class extern Menu
 	func extern mut __init__() #(p: Panel*)
 	func extern mut popup(p: Panel*)
 	func extern mut add(name: string, id: string)
@@ -19,14 +19,14 @@ class Menu
 #	func extern mut check(id: string, enabled: bool)
 
 
-class Toolbar extends Object
+class extern Toolbar extends Object
 	func extern mut set_by_id(id: string)
 #	func extern mut from_source(source: string)
 
 
 
 # exposed mostly for internal development convenience
-class Control extends Object as shared
+class extern Control extends Object as shared
 #	func extern override __delete__()
 	func extern mut request_redraw()
 	func extern virtual mut add_child(c: shared![Control], x: i32, y: i32)
@@ -73,7 +73,7 @@ class Control extends Object as shared
 	func extern virtual mut negotiate_area(available: Rect)
 
 
-class Panel extends Control
+class extern Panel extends Control
 #	var win: Window*
 	func extern mut __init__(id: string)
 	func extern override __delete__()
@@ -133,7 +133,7 @@ class Panel extends Control
 	func extern override set_option(key: string, value: string)
 
 
-class Window extends Panel
+class extern Window extends Panel
 	func extern mut __init__(title: string, width: i32, height: i32)
 	func extern override __delete__()
 #	func extern mut run()
@@ -165,7 +165,7 @@ enum DialogFlags
 	NO_HEADER = 1
 	CLOSE_BY_ESCAPE = 2
 
-class Dialog extends Panel
+class extern Dialog extends Panel
 	func extern mut __init__(title: string, width: i32, height: i32, parent: Panel*, flags: DialogFlags)
 	func extern override __delete__()
 	func extern mut request_destroy()
@@ -202,7 +202,7 @@ class clipboard
 	func static extern copy(text: string)
 
 
-class Event
+class extern Event
 	var id: string
 	var message: string
 	var mouse: vec2
@@ -221,7 +221,7 @@ class Event
 	
 
 
-struct Resource
+struct extern Resource
 	var type: string
 	var id: string
 	var title: string

@@ -2,7 +2,7 @@ use os
 use image
 	
 
-class Context
+class extern Context
 	gl_version: string
 	gl_renderer: string
 	glsl_version: string
@@ -17,7 +17,7 @@ class Context
 	func extern mut load_shader(filename: os.Path) -> xfer[Shader]
 	func extern mut create_shader(source: string) -> xfer[Shader]
 
-class VertexBuffer
+class extern VertexBuffer
 	func extern __init__(format: string)
 	func extern __delete__()
 	func extern mut update(vertices: @DynamicArray)
@@ -27,7 +27,7 @@ class VertexBuffer
 	func extern count() -> i32
 
 
-class Texture as shared
+class extern Texture as Sharable
 	var width: i32
 	var height: i32
 	func extern __init__(width: i32, height: i32, format: string)
@@ -39,20 +39,20 @@ class Texture as shared
 	func extern mut write_float(data: f32[])
 	func extern static load(filename: os.Path) -> xfer[Texture]
 
-class VolumeTexture extends Texture
+class extern VolumeTexture extends Texture
 	func extern __init__(nx: i32, ny: i32, nz: i32, format: string)
 #	func extern override __delete__()
 
-class ImageTexture extends Texture
+class extern ImageTexture extends Texture
 	func extern override __init__(width: i32, height: i32, format: string)
 
-class DepthBuffer extends Texture
+class extern DepthBuffer extends Texture
 	func extern override __init__(width: i32, height: i32, format: string)
 
-class CubeMap extends Texture
+class extern CubeMap extends Texture
 	func extern __init__(size: i32, format: string)
 
-class FrameBuffer as shared
+class extern FrameBuffer as Sharable
 	func extern __init__(attachments: shared![Texture][])
 	func extern __delete__()
 	func extern area() -> Rect
@@ -68,7 +68,7 @@ class FrameBuffer as shared
 	# var _shared_count_...
 	
 
-class Shader as shared
+class extern Shader as Sharable
 	func extern __delete__()
 	func extern location(name: string) -> i32
 	func extern mut link_uniform_block(name: string, binding: i32)
@@ -85,22 +85,22 @@ class Shader as shared
 	func extern dispatch(nx: i32, ny: i32, nz: i32)
 
 
-class Buffer
+class extern Buffer
 	func extern mut update(data: void&, size: i32)
 	func extern mut update(data: @DynamicArray, offset: i32)
 	func extern read(data: void&, size: i32)
 	func extern read(out data: @DynamicArray)
 
-class UniformBuffer extends Buffer
+class extern UniformBuffer extends Buffer
 	func extern __init__(size: i32)
 	func extern __delete__()
 
-class ShaderStorageBuffer extends Buffer
+class extern ShaderStorageBuffer extends Buffer
 	func extern __init__(size: i32)
 	func extern __delete__()
 
 
-enum Alpha
+enum extern Alpha
 	ZERO
 	ONE
 	SOURCE_COLOR
@@ -112,7 +112,7 @@ enum Alpha
 	DEST_ALPHA
 	DEST_INV_ALPHA
 
-enum StencilOp
+enum extern StencilOp
 	NONE
 	INCREASE
 	DECREASE
@@ -125,7 +125,7 @@ enum StencilOp
 	MASK_GREATER_EQUAL
 	RESET
 
-enum CullMode
+enum extern CullMode
 	NONE
 	BACK
 	FRONT

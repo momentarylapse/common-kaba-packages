@@ -1,5 +1,5 @@
 
-class BigInt
+class extern BigInt
 	var sign: bool
 	var data: i32[]
 	
