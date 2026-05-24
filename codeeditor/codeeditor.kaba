@@ -1,0 +1,343 @@
+use xhui
+use os
+use obs
+use .syntaxhighlight.*
+
+
+struct Location
+	var filename: os.Path
+	var offset: i32
+
+
+class CodeEditor extends xhui.Panel as obs.Node
+	var out_changed = obs.Source(&self, &ind, "changed")
+	var out_info = obs.XSource[string](&self, &ind, "info")
+	var out_error = obs.XSource[string](&self, &ind, "error")
+	var out_request_open_file = obs.XSource[Location](&self, &ind, "request-open-file")
+
+	var filename: os.Path
+	var edit: xhui.MultilineEdit&
+	var id_edit, id_structure: string
+	var label_line_numbers: i32[]
+	var theme: Theme&
+
+
+	func mut __init__()
+		super.__init__("")
+		from_source("
+Dialog coding-panel ''
+	Grid ? ''
+		Overlay ? ''
+			MultilineEdit edit '' grabfocus monospace linenumbers focusframe=no
+			Grid ? '' margin=25
+				Label ? '' ignorehover expandx
+				Grid search-grid '' class=card hidden
+					Edit search-pattern '' width=300
+					Grid ? ''
+						Button search-next '>' width=25
+						Button search-prev '<' width=25
+						Button search-close 'x' width=25
+					---|
+					Edit search-replace '' noexpandx
+					Grid ? ''
+						Button search-replace-next 'replace' noexpandx
+		ListView structure 'symbol' nobar style=compact width=250
+)")
+		propagate_events = true
+
+		theme := get_theme()
+	
+		id_edit = "edit"
+		id_structure = "structure"
+	
+		edit := get_control(id_edit)! as xhui.MultilineEdit&
+		edit.set_option("focusframe", "no")
+		edit.set_option("monospace", "")
+		edit.set_option("fontsize", "12")
+	#	edit->set_option("lineheightscale", "1.1f")
+		edit.set_option("altbg", "")
+		edit.set_option("linenumbers", "")
+
+		var list = get_control(id_structure)! as xhui.ListView&
+		list.column_factory(0).set_create(func(id: string) xhui.create_control("Label", "!markup,vmargin=2", id))
+
+		event_x(id_edit, "hui:changed", on_edit_changed)
+		event_x(id_edit, "hui:left-button-up", on_edit_left_button_up)
+		event_x(id_edit, "hui:key-down", on_edit_key_down)
+
+		event_x(id_structure, "hui:select", on_structure)
+
+		event_x("search-pattern", "hui:changed", on_search_changed)
+		event_x("search-pattern", "hui:activate-dialog-default", search_next) # [Return]
+		event_x("search-pattern", "hui:key-down", on_search_key_down)
+		event("search-next", search_next)
+		event_x("search-replace", "hui:changed", on_search_replace_changed)
+		event_x("search-replace", "hui:activate-dialog-default", search_replace_next) # [Return]
+		event_x("search-replace", "hui:key-down", on_search_replace_key_down)
+		event("search-close", search_end)
+		event("search-replace-next", search_replace_next)
+
+		xhui.run_later(0.1, func() activate(id_edit))
+
+
+	func mut on_structure()
+		let n = get_int(id_structure)
+		if n >= 0 and n < len(label_line_numbers)
+			edit.set_cursor_pos(edit.line_pos_to_index([label_line_numbers[n], 0]))
+		activate(id_edit)
+
+
+	func mut on_edit_key_down()
+		var mod = xhui.KEY_CONTROL
+		if os.system_type == os.SystemType.MAC
+			mod = xhui.KEY_SUPER
+		for w in get_window()
+			let k = w.get_key_code()
+			if k == mod + xhui.KEY_F
+				search_start()
+			if k == mod + xhui.KEY_R
+				search_start_replace()
+			if k == mod + xhui.KEY_B
+				show_errors()
+
+
+	var xcounter = 0
+	func mut on_edit_changed()
+		xcounter ++
+		update_highlight_current_line()
+		let f = func()
+			xcounter --
+			if xcounter == 0
+				update_highlight_all()
+				update_structure()
+		xhui.run_later(2.0, f)
+		out_changed.notify()
+
+
+	func mut on_edit_left_button_up()
+		for w in get_window()
+			if w.is_key_pressed(xhui.KEY_CONTROL)
+				for mut p in get_parser(filename)
+					p.prepare_symbols(edit.text, filename)
+					let p0 = edit.find_word_start(edit.cursor_pos)
+					let p1 = edit.find_word_end(edit.cursor_pos)
+					for o in p.symbol_info(edit.text, p0, p1 - p0)
+						if o.filename == filename
+							out_info.notify(o.description)
+							edit.set_cursor_pos(o.position)
+						else if not o.filename.is_empty()
+							out_info.notify(o.description)
+							out_request_open_file.notify([o.filename, o.position])
+						else
+							out_info.notify("internal:  " + o.description)
+					else
+						out_error.notify("unknown symbol")
+
+
+	func mut on_search_key_down()
+		for w in get_window()
+			let k = w.get_key_code()
+			if k == xhui.KEY_ESCAPE
+				search_end()
+
+
+	func mut on_search_replace_key_down()
+		for w in get_window()
+			let k = w.get_key_code()
+			if k == xhui.KEY_ESCAPE
+				search_end()
+
+
+	func mut load(_filename: os.Path)
+		filename = _filename
+		edit.set_string(os.fs.read_text(filename))
+		update_highlight_all()
+		update_structure()
+	
+		edit.clear_history()
+		edit.set_save_state()
+	
+		out_changed.notify()
+
+
+	func mut save(_filename: os.Path)
+		filename = _filename
+		os.fs.write_text(filename, edit.text)
+		edit.set_save_state()
+	
+		out_changed.notify()
+
+
+	func title() -> string
+		if filename.is_empty()
+			return "new document"
+		return filename.basename()
+
+
+	func is_save_state() -> bool
+		return edit.is_save_state()
+
+
+	func mut set_save_state()
+		edit.set_save_state()
+
+
+	func is_undoable() -> bool
+		return edit.is_undoable()
+
+
+	func is_redoable() -> bool
+		return edit.is_redoable()
+
+
+	func mut undo()
+		edit.undo()
+
+
+	func mut redo()
+		edit.redo()
+
+
+	func mut set_cursor_pos(pos: i32)
+		edit.set_cursor_pos(pos)
+
+
+	func get_num_lines() -> i32
+		return len(edit.cache.lines)
+
+
+	func get_line(line_no: i32) -> string
+		return edit.cache.lines[line_no]
+
+
+	func line_start(line_no: i32) -> i32
+		return edit.cache.line_first_index[line_no]
+
+
+	func line_end(line_no: i32) -> i32
+		return edit.cache.line_first_index[line_no] + edit.cache.line_num_characters[line_no]
+
+
+	func mut mark_word(i0: i32, i1: i32, type: MarkupType)
+		let c = &theme.context[i32(type)]
+		var flags = xhui.FontFlags.NONE
+		if c.bold
+			flags = xhui.FontFlags.BOLD
+		edit.add_markup([i0, i1, flags, c.fg])
+
+
+	func mut clear_markings(i0: i32, i1: i32)
+		edit.clean_markup(i0, i1)
+
+
+	func mut update_highlight_current_line()
+		var pp = get_parser(filename)
+		for mut p in pp
+			let lp = edit.index_to_line_pos(edit.cursor_pos)
+			let i0 = line_start(lp.line)
+			let i1 = line_end(lp.line)
+	
+			clear_markings(i0, i1)
+			p.prepare_symbols(edit.text, filename)
+			for m in p.create_markup(edit.text[i0:i1], i0)
+				mark_word(m.start, m.end, m.type)
+
+
+	func mut update_highlight_all()
+		var pp = get_parser(filename)
+		for mut p in pp
+			clear_markings(0, len(edit.text))
+			p.prepare_symbols(edit.text, filename)
+			for m in p.create_markup(edit.text, 0)
+				mark_word(m.start, m.end, m.type)
+
+
+	func mut update_structure()
+		var pp = get_parser(filename)
+		for mut p in pp
+			reset(id_structure)
+			label_line_numbers.clear()
+			for l in p.find_labels(edit.text)
+				var title = l.name
+				title = title.replace("class ", "<b><font color='red'>C</font></b>  ").replace("struct ", "<b><font color='red'>S</font></b>  ").replace("trait ", "<b><font color='red'>T</font></b>  ").replace("enum ", "<b><font color='red'>E</font></b>  ").replace("func ", "<font color='green'><b>F</b></font>  ")
+				for p0 in title.find("(")
+					title = title[0:p0] + " <span alpha='50%'>" + title[p0:] + "</span>"
+				add_string(id_structure, "        ".repeat(l.level) + title)
+				label_line_numbers.add(l.line)
+
+
+	func mut show_errors()
+		var pp = get_parser(filename)
+		for mut p in pp
+			let errors = p.find_errors(edit.text)
+			if len(errors) > 0
+				let e = errors[0]
+				if e.filename == filename
+					edit.set_cursor_pos(e.position)
+				else
+					out_request_open_file.notify([e.filename, e.position])
+				out_error.notify(e.message)
+			else
+				out_info.notify("no error")
+
+
+	func mut search_start()
+		let p0 = min(edit.selection_start, edit.cursor_pos)
+		let p1 = max(edit.selection_start, edit.cursor_pos)
+		search_pos = p0
+		set_visible("search-grid", true)
+		activate("search-pattern")
+	
+		if p0 == p1
+			search_find(search_pos)
+		else
+			set_string("search-pattern", edit.text[p0:p1].escape())
+
+
+	func mut search_start_replace()
+		search_start()
+
+
+	func mut search_next()
+		let p0 = min(edit.selection_start, edit.cursor_pos)
+		if search_find(p0 + 1)
+			search_pos = edit.selection_start
+
+
+	func mut search_replace_next()
+		let filler = get_string("search-replace").unescape()
+		if len(filler) == 0
+			return
+	
+		let p0 = min(edit.selection_start, edit.cursor_pos)
+		let p1 = max(edit.selection_start, edit.cursor_pos)
+		if search_find(p0)
+			edit.replace_range(p0, p1, filler)
+		if search_find(p0 + 1)
+			search_pos = edit.selection_start
+
+
+	func mut search_end()
+		set_visible("search-grid", false)
+		activate(id_edit)
+
+
+	func mut search_find(pos0: i32) -> bool
+		let pattern = get_string("search-pattern").unescape()
+		if len(pattern) == 0
+			return false
+		for p1 in edit.text.find(pattern, pos0 + 1)
+			edit.set_cursor_pos(p1)
+			edit.set_cursor_pos(p1 + len(pattern), true)
+			return true
+		return false
+
+	func mut on_search_changed()
+		let _ = search_find(search_pos)
+	func mut on_search_replace_changed()
+		let _ = search_find(search_pos)
+
+	var search_pos = 0
+
+
+
