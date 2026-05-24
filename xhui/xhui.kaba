@@ -7,6 +7,12 @@ class extern Painter extends image.Painter as @noauto
 	func extern override __delete__()
 
 
+enum extern FontFlags
+	NONE
+	BOLD
+	ITALIC
+
+
 class extern Menu
 	func extern mut __init__() #(p: Panel*)
 	func extern mut popup(p: Panel*)
@@ -72,9 +78,59 @@ class extern Control extends Object as shared
 	func extern virtual get_content_min_size() -> vec2
 	func extern virtual mut negotiate_area(available: Rect)
 
+	func extern selfref get_window() -> Window*
+
+
+class extern MultilineEdit extends Control
+	var text: string
+	class extern Cache
+		var lines: string[]
+		var line_first_index: i32[]
+		var line_num_characters: i32[]
+	var cache: Cache
+	var cursor_pos: i32
+	var selection_start: i32
+	func extern mut clear_history()
+	func extern mut set_save_state()
+	func extern is_save_state() -> bool
+	func extern is_undoable() -> bool
+	func extern is_redoable() -> bool
+	func extern mut undo()
+	func extern mut redo()
+	func extern mut set_cursor_pos(pos: i32, selecting = false)
+	func extern mut replace_range(i0: i32, i1: i32, by: string)
+
+	struct extern Markup
+		var i0, i1: i32
+		var flags: FontFlags
+		var color: Color
+	func extern mut clean_markup(i0: i32, i1: i32)
+	func extern mut add_markup(m: Markup)
+	struct extern LinePos
+		var line: i32
+		var offset: i32
+	func extern index_to_line_pos(i: i32) -> LinePos
+	func extern line_pos_to_index(lp: LinePos) -> i32
+
+	func extern find_word_start(i0: i32) -> i32
+	func extern find_word_end(i0: i32) -> i32
+
+
+class extern ListView extends Control
+	class ColumnFactory
+		func extern mut set_create(f: string->Control&)
+		func extern mut set_set(f: (Control&,string)->void)
+		func extern mut set_select(f: (Control&,bool)->void)
+	func extern selfref column_factory(i: i32) -> ColumnFactory&
+
+
+func extern create_control(type: string, title: string, id: string) -> Control&
+
+
 
 class extern Panel extends Control
 #	var win: Window*
+	var propagate_events: bool
 	func extern mut __init__(id: string)
 	func extern override __delete__()
 #	func extern mut set_border_width(width: i32)
@@ -103,7 +159,7 @@ class extern Panel extends Control
 #	func extern is_enabled(id: string) -> bool
 	func extern mut check(id: string, checked: bool)
 	func extern is_checked(id: string) -> bool
-#	func extern mut hide_control(id: string, hide: bool)
+	func extern mut set_visible(id: string, visible: bool)
 #	func extern mut delete_control(id: string)
 	func extern mut set_int(id: string, i: i32)
 	func extern get_int(id: string) -> i32
@@ -155,6 +211,9 @@ class extern Window extends Panel
 #	func extern mut set_cursor_pos(x: i32, y: i32)
 #	func extern get_mouse(out x: i32, out y: i32, button: i32, change: i32) -> bool
 #	func extern get_key(key: i32) -> bool
+	func extern is_key_pressed(key: i32) -> bool
+	func extern get_mouse_position() -> vec2
+	func extern get_key_code() -> i32
 #	func extern virtual mut on_draw(p: Painter)
 	func extern mut set_key_code(id: string, key_code: i32)
 	func extern mut request_destroy()
