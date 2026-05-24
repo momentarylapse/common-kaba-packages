@@ -7,8 +7,6 @@ use .update.*
 use .remove.*
 
 
-
-
 func main(args: string[])
 	load_basic_config()
 

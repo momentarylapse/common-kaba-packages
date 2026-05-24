@@ -1,0 +1,5 @@
+version 0.1
+requires package
+requires xmake
+run env.kaba
+

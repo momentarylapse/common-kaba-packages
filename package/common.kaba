@@ -4,13 +4,16 @@ use kaba
 let REPO_FILE = ".kaba-repo"
 let PACKAGE_FILE = ".kaba-package"
 
+
 func warn(m: string)
 	print("{{os.terminal.ORANGE}}{{os.terminal.BOLD}}WARNING:  {{m}}{{os.terminal.END}}")
+
 
 enum SourceType
 	UNKNOWN
 	REPO
 	LOCAL
+
 
 struct Source
 	type: SourceType
@@ -19,20 +22,18 @@ struct Source
 	
 	func base_path() -> os.Path
 		match type
-			SourceType.REPO =>
-				return conf.repos_base | name
-			SourceType.LOCAL =>
-				return url
-			else =>
-				return "???"
-		return "???"
+			SourceType.REPO =>  return conf.repos_base | name
+			SourceType.LOCAL => return url
+			else =>             return "???"
+
 
 enum Location
 	INTERNAL
 	INSTALLED
 	REMOTE
 
-struct Package
+
+struct PackageInfo
 	name: string
 	version: string
 	base_installed: os.Path
@@ -52,9 +53,9 @@ class Config
 	var packages_base: os.Path
 	var repos_base: os.Path
 	var sources: Source[]
-	var packages_internal: Package[]
-	var packages_installed: Package[]
-	var packages_remote: Package[]
+	var packages_internal: PackageInfo[]
+	var packages_installed: PackageInfo[]
+	var packages_remote: PackageInfo[]
 	var verbose = false
 	var keep_build_dir = false
 var conf: Config
@@ -83,10 +84,10 @@ func load_basic_config()
 				conf.sources.add([type, x[1].replace("/", "."), x[2]])
 
 
-func find_internal_packages() -> Package[]
-	var r: Package[]
+func find_internal_packages() -> PackageInfo[]
+	var r: PackageInfo[]
 	for p in kaba.default_context.packages
-		var pp: Package
+		var pp: PackageInfo
 		pp.name = p.name
 		pp.version = p.version
 		pp.location = Location.INTERNAL
@@ -94,8 +95,8 @@ func find_internal_packages() -> Package[]
 	return r
 
 
-func read_package(name: string, dir: os.Path, location: Location) -> Package
-	var p: Package
+func read_package(name: string, dir: os.Path, location: Location) -> PackageInfo
+	var p: PackageInfo
 	p.name = name
 	p.version = "0"
 	p.forward = false
@@ -127,14 +128,14 @@ func read_package(name: string, dir: os.Path, location: Location) -> Package
 	return p
 
 
-func read_repo(dir: os.Path) -> Package[]
+func read_repo(dir: os.Path) -> PackageInfo[]
 	if not os.fs.exists(dir)
 		warn("REPO NOT FOUND: {{dir}}")
 		return []
 	if not os.fs.exists(dir | REPO_FILE)
 		warn("NOT A VALID REPO: {{dir}}  ('{{REPO_FILE}}' MISSING)")
 		return []
-	var r: Package[]
+	var r: PackageInfo[]
 	let ss = os.fs.read_text(dir | REPO_FILE)
 	for l in ss.explode("\n")
 		let x = l.explode(" ")
@@ -153,8 +154,8 @@ func read_repo(dir: os.Path) -> Package[]
 	return r
 
 
-func find_remote_packages() -> Package[]
-	var r: Package[]
+func find_remote_packages() -> PackageInfo[]
+	var r: PackageInfo[]
 	for s in conf.sources
 		if s.type == SourceType.REPO or s.type == SourceType.LOCAL
 			for p in read_repo(s.base_path())
@@ -162,22 +163,22 @@ func find_remote_packages() -> Package[]
 	return r
 
 
-func find_installed_packages() -> Package[]
-	var r: Package[]
+func find_installed_packages() -> PackageInfo[]
+	var r: PackageInfo[]
 	let list = os.fs.search(conf.packages_base, "*", "d")
 	for e in list
 		r.add(read_package(str(e), conf.packages_base | e, Location.INSTALLED))
 	return r
 
 
-func list_find(list: Package[], name: string) -> Package*
+func list_find(list: PackageInfo[], name: string) -> PackageInfo*
 	for p in list
 		if p.name == name
 			return &p
 	return nil
 
 
-func list_find(list: Package&[], name: string) -> Package*
+func list_find(list: PackageInfo&[], name: string) -> PackageInfo*
 	for p in list
 		if p.name == name
 			return &p

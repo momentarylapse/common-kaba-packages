@@ -1,5 +1,5 @@
 version 3
-requires kaba a95e9d00c10e8c8f4ee2814ea189954498406bf4
+requires kaba 769a4acc5a8a3149a89e9c9beda8b407994d44a3
 #package alex
 package algebra
 package asciitools
@@ -9,6 +9,7 @@ package cli
 package cloud
 package codeeditor
 package crypto
+package env
 package fft
 package filetags
 package gl

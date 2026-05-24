@@ -27,7 +27,7 @@ func build_options() -> string
 		return opt
 	return ""
 
-func build_package(p: Package) -> bool
+func build_package(p: PackageInfo) -> bool
 	let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
 	if not conf.keep_build_dir
 		if os.fs.is_directory(build_dir)
@@ -51,7 +51,7 @@ func build_package(p: Package) -> bool
 	return true
 
 
-func install_package(p: Package) -> bool
+func install_package(p: PackageInfo) -> bool
 	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
 
 	if os.fs.is_directory(p.base_installed)
@@ -89,7 +89,7 @@ enum IterStatus
 	MORE
 	ERROR
 
-func fullfull_dependencies_step(out list: Package&[]) -> IterStatus
+func fullfull_dependencies_step(out list: PackageInfo&[]) -> IterStatus
 	for p in list
 		for r in p.requires
 			if not is_installed_latest(r) and not list_find(list, r)
@@ -103,7 +103,7 @@ func fullfull_dependencies_step(out list: Package&[]) -> IterStatus
 
 
 # add missing requirements to an to-install list
-func fullfull_dependencies(out list: Package&[]) -> bool
+func fullfull_dependencies(out list: PackageInfo&[]) -> bool
 	while true
 		match fullfull_dependencies_step(list)
 			IterStatus.MORE => continue
@@ -115,7 +115,7 @@ func action_install(args: string[])
 	load_package_list()
 	
 	# sources
-	var to_install: Package&[]
+	var to_install: PackageInfo&[]
 	var missing_sources = false
 	for name in args
 		for p in list_find(conf.packages_internal, name)

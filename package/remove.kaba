@@ -3,7 +3,7 @@ use kaba
 use .common.*
 
 
-func remove_package(p: Package)
+func remove_package(p: PackageInfo)
 	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.base_installed}}")
 	delete_directory(p.base_installed)
 
