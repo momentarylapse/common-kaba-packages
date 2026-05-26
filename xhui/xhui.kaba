@@ -406,4 +406,20 @@ let NUM_KEYS = 98
 let KEY_ANY = 99
 
 
+class extern Theme as @noauto
+	background, background_button: Color
+	background_button_primary, background_button_primary_hover, background_button_primary_active: Color
+	background_button_danger, background_button_danger_hover, background_button_danger_active: Color
+	background_header, background_header_button: Color
+	background_hover, background_active: Color
+	background_low, background_low_hover, background_low_selected: Color
+	text, text_label, text_disabled: Color
+	text_link: Color
+	border: Color
+	func background_raised() -> Color
+
+
+var extern theme: Theme
+
+
 #var extern app_config: os.Configuration
