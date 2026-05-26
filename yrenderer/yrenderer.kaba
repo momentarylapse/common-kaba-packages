@@ -12,7 +12,7 @@ let EXPORT_IMPORTS = true
 ##func extern load_texture(filename: os.Path) -> shared![Texture]
 
 
-enum LightType
+enum extern LightType
 	DIRECTIONAL
 	POINT
 	CONE
@@ -36,6 +36,12 @@ struct extern YLight
 	var shadow_dist_max: f32
 
 
+enum extern TransparencyMode
+	NONE
+	FUNCTIONS
+	COLOR_KEY_HARD
+	COLOR_KEY_SMOOTH
+
 class extern Material
 	var albedo: Color
 	var roughness: f32
@@ -44,16 +50,23 @@ class extern Material
 	var textures: shared![Texture][]
 #	var shader: shared![Shader][6]
 	var cast_shadow: bool
+	struct extern Pass as @noauto
 		shader_path: os.Path
-	struct Pass
+		cull_mode: CullMode
+		wire_mode: bool
+		z_write, z_test: bool
+		mode: TransparencyMode
+		source: Alpha
+		destination: Alpha
 	var pass0: Pass
-	struct Friction
+	struct extern Friction as @noauto
 		sliding: f32
 		_static: f32
 		rolling: f32
 		jump: f32
 	var friction: Friction
-#	func extern __delete__()
+	func extern mut __init__()
+	func extern __delete__()
 #	func extern mut add_uniform(name: string, p: float*, size: int)
 
 
@@ -86,10 +99,16 @@ func extern api_init_xhui(p: void*) -> xfer[Context] # p: xhui.Painter*
 struct extern RenderParams
 	func extern __assign__(o: RenderParams)
 
+class extern RenderData as @noauto
+	func extern draw_triangles(params: RenderParams, vb: VertexBuffer&)
 
 class extern RenderViewData
 	func extern __init__(ctx: Context&)
 	func extern set_view(params: RenderParams, cam: CameraParams, proj: mat4* = (nil as mat4*))
+	func extern get_shader(material: Material*, pass_no: i32, vertex_shader_module: string, geometry_shader_module="", tessellation_module="") -> Shader&
+	func extern start(params: RenderParams, matrix: mat4, shader: Shader*, material: Material*, pass_no: i32, top: PrimitiveTopology, vb: VertexBuffer*) -> RenderData&
+
+func extern apply_shader_data(params: RenderParams, s: Shader*, shader_data: Any)
 
 
 #---------------------------
@@ -207,6 +226,7 @@ class extern RenderPath extends Renderer
 
 	func extern mut set_lights(lights: YLight&[])
 	func extern mut set_view(view: CameraParams)
+	func extern virtual mut remove_all_emitters()
 	func extern virtual mut add_background_emitter(emitter: shared![MeshEmitter])
 	func extern virtual mut add_opaque_emitter(emitter: shared![MeshEmitter])
 	func extern virtual mut add_transparent_emitter(emitter: shared![MeshEmitter])
