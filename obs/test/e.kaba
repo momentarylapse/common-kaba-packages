@@ -12,5 +12,5 @@ func main()
 	var a: A
 	var b: B
 	a.source >> b.create_data_sink[string](func(s: string) print("hi {{s}}"))
-	a.source.notify("test")
+	a.source("test")
 
