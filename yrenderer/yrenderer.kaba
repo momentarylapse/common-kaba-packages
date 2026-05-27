@@ -76,6 +76,8 @@ struct extern CameraParams
 	
 	var fov: f32
 	var min_depth, max_depth: f32
+	func extern projection_matrix(aspect_ratio: f32) -> mat4
+	func extern view_matrix() -> mat4
 
 
 #---------------------------
@@ -168,7 +170,7 @@ class extern TextureRenderer extends Renderer
 
 class extern MeshEmitter extends Object as shared
 	func extern __init__(ctx: Context&, name: string)
-	func extern virtual emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
+	func extern virtual mut emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
 	var ctx: Context&
 
 

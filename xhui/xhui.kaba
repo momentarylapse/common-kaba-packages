@@ -4,6 +4,9 @@ use async.*
 
 
 class extern Painter extends image.Painter as @noauto
+	var _area: Rect
+	var native_area: Rect
+	var ui_scale: f32
 	func extern override __delete__()
 
 
@@ -33,6 +36,8 @@ class extern Toolbar extends Object
 
 # exposed mostly for internal development convenience
 class extern Control extends Object as shared
+	var area: Rect
+	var id: string
 #	func extern override __delete__()
 	func extern mut request_redraw()
 	func extern virtual mut add_child(c: shared![Control], x: i32, y: i32)
@@ -73,7 +78,7 @@ class extern Control extends Object as shared
 	func extern virtual mut on_key_up(key: i32)
 	func extern virtual mut on_key_char(character: i32)
 	
-	func extern virtual _draw(p: Painter)
+	func extern virtual _draw(p: image.Painter)
 	func extern virtual get_greed_factor() -> vec2
 	func extern virtual get_content_min_size() -> vec2
 	func extern virtual mut negotiate_area(available: Rect)
@@ -142,8 +147,8 @@ class extern Panel extends Control
 
 	func extern mut event(id: string, f: void->void) -> i32
 	func extern mut event_x(id: string, msg: string, f: void->void) -> i32
-	func extern mut event_x(id: string, msg: string, f: Painter->void) -> i32
-#	func extern mut event_xp(id: string, msg: string, f: Painter->void) -> i32
+	func extern mut event_x(id: string, msg: string, f: image.Painter->void) -> i32
+#	func extern mut event_xp(id: string, msg: string, f: image.Painter->void) -> i32
 	func extern mut remove_event_handler(uid: i32)
 
 	func extern mut from_source(source: string)
@@ -180,7 +185,7 @@ class extern Panel extends Control
 	func extern mut open_dialog(dlg: shared![Dialog])-> future[void]
 
 
-	func extern override _draw(p: Painter)
+	func extern override _draw(p: image.Painter)
 	func extern override negotiate_area(available: Rect)
 	func extern override get_content_min_size() -> vec2
 	func extern override get_greed_factor() -> vec2
@@ -211,10 +216,16 @@ class extern Window extends Panel
 #	func extern mut set_cursor_pos(x: i32, y: i32)
 #	func extern get_mouse(out x: i32, out y: i32, button: i32, change: i32) -> bool
 #	func extern get_key(key: i32) -> bool
+	func extern set_mouse_mode(mode: i32)
 	func extern is_key_pressed(key: i32) -> bool
 	func extern get_mouse_position() -> vec2
+	func extern get_mouse_delta() -> vec2
+	func extern get_scroll() -> vec2
 	func extern get_key_code() -> i32
-#	func extern virtual mut on_draw(p: Painter)
+	func extern left_button() -> bool  # TODO better interface...
+	func extern middle_button() -> bool
+	func extern right_button() -> bool
+#	func extern virtual mut on_draw(p: image.Painter)
 	func extern mut set_key_code(id: string, key_code: i32)
 	func extern mut request_destroy()
 
@@ -407,6 +418,7 @@ let KEY_ANY = 99
 
 
 class extern Theme as @noauto
+	font_size, font_size_small, font_size_big: f32
 	background, background_button: Color
 	background_button_primary, background_button_primary_hover, background_button_primary_active: Color
 	background_button_danger, background_button_danger_hover, background_button_danger_active: Color
