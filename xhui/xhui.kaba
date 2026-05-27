@@ -16,6 +16,19 @@ enum extern FontFlags
 	ITALIC
 
 
+struct extern TextLayout
+	var box: Rect
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: TextLayout)
+	func extern static from_format_string(p: image.Painter, s: string, font_size=-1.0, align=-1) -> TextLayout
+
+
+# base line will be at y = (pos.y + font_size)
+func extern draw_text_layout(out p: image.Painter, pos: vec2, l: TextLayout, bg: Color)
+func extern draw_text_layout_with_box(out p: image.Painter, pos: vec2, l: TextLayout, fg: Color, bg: Color, padding=7.0, roundness=7.0)
+
+
 class extern Menu
 	func extern mut __init__() #(p: Panel*)
 	func extern mut popup(p: Panel*)

@@ -5,6 +5,7 @@
 #include "Resource.h"
 #include "Window.h"
 #include "Theme.h"
+#include "TextLayout.h"
 #include "dialogs/FileSelectionDialog.h"
 #include "../kapi/KabaExporter.h"
 #include "../base/callable.h"
@@ -94,7 +95,19 @@ void _dummy() {}
 
 
 void export_package_xhui(kaba::IExporter* e) {
-	e->package_info("xhui", "0.13");
+	e->package_info("xhui", "0.14");
+
+	e->declare_class_size("TextLayout", sizeof(xhui::TextLayout));
+	e->declare_class_element("TextLayout.box", &xhui::TextLayout::box);
+	e->link_class_func("TextLayout.__init__", &kaba::generic_init<xhui::TextLayout>);
+	e->link_class_func("TextLayout.__delete__", &kaba::generic_delete<xhui::TextLayout>);
+	e->link_class_func("TextLayout.__assign__", &kaba::generic_assign<xhui::TextLayout>);
+	e->link_func("TextLayout.from_format_string", &xhui::TextLayout::from_format_string);
+
+
+	e->link_func("draw_text_layout", &xhui::draw_text_layout);
+	e->link_func("draw_text_layout_with_box", &xhui::draw_text_layout_with_box);
+
 
 	e->declare_class_size("Menu", sizeof(xhui::Menu));
 	e->link_class_func("Menu.__init__", &kaba::generic_init<xhui::Menu>);
