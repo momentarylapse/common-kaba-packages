@@ -291,8 +291,13 @@ void export_package_xhui(kaba::IExporter* e) {
 	}
 
 	{
+		e->declare_class_size("Window.Drag", sizeof(xhui::Window::Drag));
+		e->declare_class_element("Window.Drag.title", &xhui::Window::Drag::title);
+		e->declare_class_element("Window.Drag.payload", &xhui::Window::Drag::payload);
+
 		xhui::Window win("", 0, 0, xhui::Flags::FAKE);
 		e->declare_class_size("Window", sizeof(xhui::Window));
+		e->declare_class_element("Window.drag", &xhui::Window::drag);
 		e->link_class_func("Window.__init__", &kaba::generic_init_ext<xhui::Window, const string&, int, int>);
 		e->link_virtual("Window.__delete__", &xhui::Window::__delete__, &win);
 		e->link_class_func("Window.destroy", &xhui::Window::request_destroy);
@@ -325,6 +330,7 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_class_func("Window.left_button", &KabaWindowWrapper::left_button);
 		e->link_class_func("Window.middle_button", &KabaWindowWrapper::middle_button);
 		e->link_class_func("Window.right_button", &KabaWindowWrapper::right_button);
+		e->link_class_func("Window.start_drag", &xhui::Window::start_drag);
 	}
 
 	{

@@ -208,6 +208,10 @@ class extern Panel extends Control
 
 
 class extern Window extends Panel
+	class extern Drag
+		title: string
+		payload: string
+	var drag: Drag
 	func extern mut __init__(title: string, width: i32, height: i32)
 	func extern override __delete__()
 #	func extern mut run()
@@ -241,6 +245,7 @@ class extern Window extends Panel
 #	func extern virtual mut on_draw(p: image.Painter)
 	func extern mut set_key_code(id: string, key_code: i32)
 	func extern mut request_destroy()
+	func extern mut start_drag(title: string, payload: string)
 
 
 enum DialogFlags
