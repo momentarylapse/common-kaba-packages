@@ -168,6 +168,7 @@ class extern Panel extends Control
 	func extern mut add_control(type: string, title: string, x: i32, y: i32, id: string)
 	func extern mut embed(target: string, x: i32, y: i32, panel: shared[Panel])
 	func extern mut unembed(panel: Panel*)
+	func extern mut set_target(id: string)
 	func extern mut set_string(id: string, s: string)
 	func extern mut add_string(id: string, s: string)
 	func extern get_string(id: string) -> string
@@ -278,6 +279,7 @@ func extern file_dialog(parent: Panel*, title: string, dir: os.Path, params: str
 #func extern question_box(root: Window*, title: string, text: string, allow_cancel: bool) -> future[bool]
 #func extern info_box(root: Window*, title: string, text: string) -> future[void]
 #func extern error_box(root: Window*, title: string, text: string) -> future[void]
+func extern color_dialog(parent: Panel*, title: string, col: Color, params: string[]) -> future[Color]
 #func extern create_menu_from_source(source: string, panel: Panel*) -> xfer[Menu]
 #func extern get_key_name(id: i32) -> string
 ## func extern get_key_char(id: i32) -> string
