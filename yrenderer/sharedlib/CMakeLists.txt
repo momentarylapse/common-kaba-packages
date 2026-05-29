@@ -121,6 +121,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/image/image_png.cpp
 	src/lib/image/image_tga.cpp
 	src/lib/image/ImagePainter.cpp
+	src/lib/kapi/kapi.cpp
 	src/lib/layout/Grid.cpp
 	src/lib/layout/Node.cpp
 	src/lib/math/Box.cpp
@@ -159,6 +160,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
+	src/lib/pattern/_kaba_export.cpp
 	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
@@ -240,6 +242,7 @@ add_library(moduleyrenderer SHARED
 	src/lib/yrenderer/helper/CubeMapSource.cpp
 	src/lib/yrenderer/helper/jitter.cpp
 	src/lib/yrenderer/helper/LightMeter.cpp
+	src/lib/yrenderer/helper/LineHelper.cpp
 	src/lib/yrenderer/helper/Pipeline.cpp
 	src/lib/yrenderer/helper/PipelineManager.cpp
 	src/lib/yrenderer/post/HDRResolver.cpp
