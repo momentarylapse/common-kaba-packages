@@ -18,8 +18,8 @@ func allow_install_file(f: os.Path) -> bool
 # TODO keep list of "requested" packages, since we currently forget about failed packages!
 
 func build_options() -> string
-	if os.fs.exists(os.app_directory_dynamic | "xmake/prefer")
-		let s = os.fs.read_text(os.app_directory_dynamic | "xmake/prefer")
+	if os.fs.exists(kaba.install_root() | "xmake/prefer")
+		let s = os.fs.read_text(kaba.install_root() | "xmake/prefer")
 		var opt = ""
 		for x in s.explode("\n")
 			if len(x) > 0 and x.head(1) != "#"

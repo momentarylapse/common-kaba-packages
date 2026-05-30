@@ -1,5 +1,6 @@
 use os
 use os.Path
+use kaba
 use .project.*
 
 struct Library
@@ -52,7 +53,7 @@ struct LibraryManager
 	var libraries: Library[]
 
 	func mut init()
-		var lib_dir = os.app_directory_dynamic | "packages/xmake/libs"
+		var lib_dir = kaba.packages_root() | "xmake/libs"
 		var list = os.fs.search(lib_dir, "*.txt", "f")
 		for e in list
 			libraries.add(load_lib(lib_dir | e))
