@@ -12,6 +12,8 @@ func allow_install_file(f: os.Path) -> bool
 	#print("{{f}}  {{b}}")
 	if b in ["src", "build", "CMakeLists.txt", "CMakePresets.json", ".vs", "xmake.conf", "vcpkg-configuration.json", "vcpkg.json", "sharedlib"]
 		return false
+	if b.match("libmodule*")
+		return false
 	
 	return true
 
@@ -28,7 +30,7 @@ func build_options() -> string
 	return ""
 
 func build_package(p: PackageInfo) -> bool
-	let build_dir = os.Path("/tmp/kaba-build-{{p.name}}")
+	let build_dir = kaba.install_root() | "build-{{p.name}}"
 	if not conf.keep_build_dir
 		if os.fs.is_directory(build_dir)
 			delete_directory(build_dir)
