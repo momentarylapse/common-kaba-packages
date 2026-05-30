@@ -1,6 +1,13 @@
 use image.Image
 use os
 
+enum Api
+	NONE
+	OPEN_GL
+	VULKAN
+
+func extern api() -> Api
+
 
 struct ivec3
 	x, y, z: i32
