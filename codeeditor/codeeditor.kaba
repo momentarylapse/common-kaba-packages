@@ -8,6 +8,16 @@ struct Location
 	var filename: os.Path
 	var offset: i32
 
+func trim_ending(s: string) -> string
+	var last_non_whitespace = 0
+	for i=>c in s
+		if c != ' ' and c != '\t'
+			last_non_whitespace = i+1
+	return s[:last_non_whitespace]
+
+
+func trim_line_endings(s: string) -> string
+	return (s.explode("\n") |> trim_ending).join("\n")
 
 class CodeEditor extends xhui.Panel as obs.Node
 	var out_changed = obs.Source(&self, &ind, "changed")
@@ -46,10 +56,10 @@ Dialog coding-panel ''
 		propagate_events = true
 
 		theme := get_theme()
-	
+
 		id_edit = "edit"
 		id_structure = "structure"
-	
+
 		edit := get_control(id_edit)! as xhui.MultilineEdit&
 		edit.set_option("focusframe", "no")
 		edit.set_option("monospace", "")
@@ -153,18 +163,18 @@ Dialog coding-panel ''
 		edit.set_string(os.fs.read_text(filename))
 		update_highlight_all()
 		update_structure()
-	
+
 		edit.clear_history()
 		edit.set_save_state()
-	
+
 		out_changed.notify()
 
 
 	func mut save(_filename: os.Path)
 		filename = _filename
-		os.fs.write_text(filename, edit.text)
+		os.fs.write_text(filename, trim_line_endings(edit.text))
 		edit.set_save_state()
-	
+
 		out_changed.notify()
 
 
@@ -236,7 +246,7 @@ Dialog coding-panel ''
 			let lp = edit.index_to_line_pos(edit.cursor_pos)
 			let i0 = line_start(lp.line)
 			let i1 = line_end(lp.line)
-	
+
 			clear_markings(i0, i1)
 			p.prepare_symbols(edit.text, filename)
 			for m in p.create_markup(edit.text[i0:i1], i0)
@@ -287,7 +297,7 @@ Dialog coding-panel ''
 		search_pos = p0
 		set_visible("search-grid", true)
 		activate("search-pattern")
-	
+
 		if p0 == p1
 			search_find(search_pos)
 		else
@@ -308,7 +318,7 @@ Dialog coding-panel ''
 		let filler = get_string("search-replace").unescape()
 		if len(filler) == 0
 			return
-	
+
 		let p0 = min(edit.selection_start, edit.cursor_pos)
 		let p1 = max(edit.selection_start, edit.cursor_pos)
 		if search_find(p0)
