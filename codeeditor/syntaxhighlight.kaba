@@ -51,7 +51,7 @@ class extern Parser extends Object
 func extern globalref get_parser(filename: os.Path) -> Parser*
 
 
-struct extern Context 
+struct extern ThemeContext
 	var fg, bg: Color
 	var set_bg, bold, italic: bool
 
@@ -59,7 +59,7 @@ struct extern Context
 struct extern Theme
 	var name: string
 	var bg: Color
-	var context: Context[i32(MarkupType.NUM_TYPES)]
+	var context: ThemeContext[i32(MarkupType.NUM_TYPES)]
 
 
 func extern get_theme() -> Theme&
