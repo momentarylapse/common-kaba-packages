@@ -1,4 +1,3 @@
 version 0.15
-requires vulkan
 build xmake sharedlib modulexhui
 
