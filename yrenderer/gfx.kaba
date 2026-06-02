@@ -102,4 +102,5 @@ class extern ShaderStorageBuffer extends Buffer
 
 
 class extern GfxContext
+	func extern make_public()
 

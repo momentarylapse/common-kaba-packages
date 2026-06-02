@@ -2,6 +2,7 @@
 #include "../kapi/KabaExporter.h"
 #include "../os/msg.h"
 #include "../ygraphics/graphics-impl.h"
+#include "../ygraphics/Context.h"
 #include "Context.h"
 #include "Material.h"
 #include "MaterialManager.h"
@@ -330,6 +331,8 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 
 	ext->link_class_func("Shader.set_float", &shader_set_float);
 	ext->link_class_func("Shader.set_floats", &shader_set_floats);
+
+	ext->link_class_func("GfxContext.make_public", &ygfx::Context::make_current);
 
 	{
 		ext->declare_class_size("RenderParams", sizeof(RenderParams));
