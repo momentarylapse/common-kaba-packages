@@ -4,14 +4,6 @@ use .gfx.*
 let EXPORT_IMPORTS = true
 
 
-
-##var extern tex_white: shared![Texture] # TODO use engine.context.tex_white?
-
-##func extern load_shader(filename: os.Path) -> shared![Shader]
-##func extern create_shader(source: string) -> xfer[Shader]
-##func extern load_texture(filename: os.Path) -> shared![Texture]
-
-
 enum extern LightType
 	DIRECTIONAL
 	POINT
@@ -140,9 +132,10 @@ func extern apply_shader_data(params: RenderParams, s: Shader*, shader_data: Any
 # interfaces
 
 class extern Renderer
-	func extern add_child(r: Renderer&)
-	func extern virtual prepare(params: RenderParams)
-	func extern virtual draw(params: RenderParams)
+	func extern mut add_child(r: Renderer&)
+	func extern virtual mut __delete__()
+	func extern virtual mut prepare(params: RenderParams)
+	func extern virtual mut draw(params: RenderParams)
 
 
 class extern RenderTask extends Renderer
@@ -212,14 +205,14 @@ class extern SceneRenderer extends Renderer
 	var background_color: Color?
 
 
-#class ShadowRenderer
+#class extern ShadowRenderer
 #	struct Cascade
 #		depth_buffer: DepthBuffer&
 #	cascades: Cascade[2]
 
-#struct RayTracingData
-#	buffer_meshes: UniformBuffer*
-#	num_meshes: i32
+struct extern RayTracingData
+	buffer_meshes: UniformBuffer*
+	num_meshes: i32
 
 class extern SceneView
 	#var main_camera_params: CameraParams
@@ -228,10 +221,10 @@ class extern SceneView
 	var probe_cells: ivec3
 	var probe_min: vec3
 	var probe_max: vec3
-##	var ray_tracing_data: RayTracingData*
+	var ray_tracing_data: RayTracingData*
 	func extern __init__()
-	func __delete__()
-		pass
+	func extern __delete__()
+#	func extern shadow_projection() -> mat4
 	func extern mut choose_lights(lights: YLight&[])
 	func extern mut choose_shadows()
 
@@ -240,6 +233,8 @@ class extern SceneView
 # path
 
 class extern RenderPath extends Renderer
+	var wireframe: bool
+	var scene_view: SceneView
 	var view: CameraParams
 	var ambient_occlusion_radius: f32
 	var background_color: Color?
@@ -248,6 +243,10 @@ class extern RenderPath extends Renderer
 	static light_sources_module: string
 	static lighting_method: string
 	static shadow_method: string
+
+
+	#func extern virtual render_into_texture(fb: FrameBuffer, cam: Camera)
+	#func extern render_into_cubemap(db: DepthBuffer, cube: CubeMap, pos: vector)
 
 	func extern mut set_lights(lights: YLight&[])
 	func extern mut set_view(view: CameraParams)
@@ -269,13 +268,12 @@ class extern RenderPathDeferred extends RenderPath
 # other...
 
 class extern RegionRenderer
-	struct Region
+	struct extern Region
 		var dest: Rect
 		var z: int
 		var renderer: Renderer&
 	var regions: Region[]
-	func extern add_region(r: Renderer&, dest: Rect, z: int)
-
+	func extern add_region(r: Renderer&, dest: Rect, z: i32)
 
 class extern LightMeter
 	var histogram: i32[]
@@ -296,10 +294,15 @@ class extern HDRResolver extends Renderer
 	var light_meter: LightMeter&
 
 
+#class extern PostProcessor
+#	var fb1, fb2: FrameBuffer&
+#	func extern next_fb(cur: FrameBuffer) -> FrameBuffer&
+#	func extern process(source: Texture*[], target: FrameBuffer, shader: Shader)
+#	func extern mut add_stage(name: string, on_prepare: void->void, on_draw: void->void)
 
 
-class extern CubeMapSource
-	var min_depth, max_depth: f32
-	var cube_map: shared[CubeMap]
-	var resolution: i32
-	var update_rate: i32
+#class extern CubeMapSource
+#	var min_depth, max_depth: f32
+#	var cube_map: shared[CubeMap]
+#	var resolution: i32
+#	var update_rate: i32

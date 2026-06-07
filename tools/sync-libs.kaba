@@ -79,7 +79,9 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 		# ignore:
 		if f in os.Path("test")
 			continue
-		if f.extension() in ["so", "dll", "gitignore"]
+		if f in os.Path(".docs")
+			continue
+		if f.extension() in ["so", "dll", "dylib", "gitignore"]
 			continue
 
 		let label = source.basename() + "/" + str(f)
@@ -101,8 +103,8 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 			if cmd == "push"
 				os.fs.delete(source | f)
 			# TODO create directories...
-			
-			
+
+
 	for f in os.fs.search(dest, "*", "fr")
 		let label = source.basename() + "/" + str(f)
 		if not os.fs.exists(source | f)
@@ -133,7 +135,7 @@ func sync_kaba_package_forward(dir: os.Path, lib: Entry, cmd: string)
 		sync_dir(source, dir, cmd)
 	else
 		print("  {{os.terminal.RED}}NOT INSTALLED{{os.terminal.END}} {{name}}")
-		
+
 
 
 func sync_kaba_repo(dir: os.Path, lib: Entry, cmd: string)
@@ -168,19 +170,19 @@ func main(args: string[])
 	let g = init()
 	var dir = os.fs.current_directory()
 	var command = "summary"
-	
+
 	for a in args
 		if a in ["summary", "push", "pull", "diff", "meld", "ALL"]
 			command = a
 		else
 			dir = a
-	
-	
+
+
 	match command
 		"ALL" =>
 			for e in g.entries
 				if e.type == EntryType.PACKAGES
 					sync_kaba_repo(e.dir, g.lib!, "diff")
 		else => action_sync(g, dir, command)
-			
-	
+
+
