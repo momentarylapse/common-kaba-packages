@@ -1,0 +1,78 @@
+struct extern PMVertex
+	var pos: vec3
+	var normal_mode: i32
+	var bone_index: i32
+	var normal_dirty: bool
+	var ref_count: i32
+
+
+struct extern Polygon
+	struct extern Side
+		var vertex: i32
+		var edge: i32
+		var edge_direction: i32
+		var uv: vec3#[MAX_TEXTURES]
+		var normal_index: i32
+		var normal: vec3
+		var triangulation: i8[3]
+	var sides: Side[]
+	var temp_normal: vec3
+	var normal_dirty, triangulation_dirty: bool
+	var material: i32
+	#func __init__()
+
+
+struct extern PolygonMesh
+	var vertices: PMVertex[]
+	var polygons: Polygon[]
+
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: PolygonMesh)
+
+	func extern bounding_box() -> Box?
+	func extern mut update_normals()
+	func extern mut add(mesh: PolygonMesh)
+	func extern mut smoothen()
+	func extern transform(m: mat4) -> PolygonMesh
+	func extern build(out buf: @DynamicArray) # (vec3,vec3,vec2)[]
+
+
+struct extern MeshEdit
+	func extern mut __init__()
+	func extern mut __delete__()
+	func extern mut __assign__(o: MeshEdit)
+	func extern mut add_vertex(v: PMVertex, at_index=-1)
+	func extern mut add_polygon(p: Polygon, at_index=-1)
+	func extern mut delete_vertex(index: i32)
+	func extern mut delete_polygon(index: i32)
+	func extern apply(mesh: PolygonMesh, inv: MeshEdit* = nil) -> PolygonMesh
+	func extern apply_inplace(out mesh: PolygonMesh) -> MeshEdit
+
+
+struct _ivec3
+	var i, j, k: i32
+
+struct _ivec2
+	var i, j: i32
+
+
+# basic shapes
+func extern create_ball(pos: vec3, radius: f32, num_x: i32, num_y: i32) -> PolygonMesh
+func extern create_cube(box: Box, slices: _ivec3) -> PolygonMesh
+func extern create_plane(r: Rect, slices: _ivec2) -> PolygonMesh
+func extern create_platonic(pos: vec3, radius: f32, type: i32) -> PolygonMesh
+func extern create_tetrahedron(pos: vec3, radius: f32) -> PolygonMesh
+func extern create_octahedron(pos: vec3, radius: f32) -> PolygonMesh
+func extern create_dodecahedron(pos: vec3, radius: f32) -> PolygonMesh
+func extern create_icosahedron(pos: vec3, radius: f32) -> PolygonMesh
+func extern create_sphere(pos: vec3, radius: f32, num: i32) -> PolygonMesh
+func extern create_teapot(pos: vec3, radius: f32, num: i32) -> PolygonMesh
+func extern create_torus(pos: vec3, axis: vec3, radius1: f32, radius2: f32, rings: i32, edges: i32) -> PolygonMesh
+func extern create_torus_knot(pos: vec3, axis: vec3, radius1: f32, radius2: f32, radius3: f32, turns: i32, twists: i32, rings: i32, edges: i32) -> PolygonMesh
+
+
+# edit
+func extern bevel_edges(mesh: PolygonMesh, selv: i32[], sele: i32[], radius: f32) -> MeshEdit
+func extern extrude_polygons(mesh: PolygonMesh, selp: i32[], distance: f32, keep_connected: bool) -> MeshEdit
+
