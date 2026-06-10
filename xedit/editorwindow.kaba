@@ -97,7 +97,7 @@ Window test 'test' padding=0
 		if os.system_type == os.SystemType.MAC
 			mod = xhui.KEY_SUPER
 			key_next_doc = xhui.KEY_ALT + xhui.KEY_TAB
-	
+
 		set_key_code("new", xhui.KEY_N + mod)
 		set_key_code("open", xhui.KEY_O + mod)
 		set_key_code("save", xhui.KEY_S + mod)
@@ -115,6 +115,7 @@ Window test 'test' padding=0
 		event("new", f_new)
 		event("open", on_open)
 		event("save", on_save)
+		event("save-as", on_save_as)
 		event("next-document", on_next_document)
 		event("previous-document", on_previous_document)
 		event("close-document", f_close_doc)
@@ -147,13 +148,18 @@ Window test 'test' padding=0
 	func mut on_save()
 		for mut e in active_editor
 			if e.filename.is_empty()
-				let f = func(filename: os.Path)
-					e.save(filename)
-					info("saved")
-				xhui.file_dialog(&self, "save..", os.fs.current_directory(), ["save"]).then(f)
+				on_save_as()
 			else
 				e.save(e.filename)
 				info("saved")
+
+
+	func mut on_save_as()
+		for mut e in active_editor
+			let f = func(filename: os.Path)
+				e.save(filename)
+				info("saved")
+			xhui.file_dialog(&self, "save..", os.fs.current_directory(), ["save"]).then(f)
 
 
 	func override on_key_up(key_code: i32)
@@ -232,11 +238,11 @@ Window test 'test' padding=0
 		var next = nil as CodeEditor*
 		if len(document_editors) >= 2
 			next = weak(document_editors)[(index + 1) % len(document_editors)]
-	
+
 		document_editors.remove(index)
 		for mut tab in get_control("tab")
 			tab.remove_child(editor)
-	
+
 		set_active(next)
 
 
