@@ -36,6 +36,7 @@ package polymesh
 package profiler
 package psmove
 package shadercomp
+package simplevis
 package sisyphos
 package sqlite
 package statistics

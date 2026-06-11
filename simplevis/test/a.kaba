@@ -1,0 +1,26 @@
+use simplevis as sv
+use yrenderer.*
+use polymesh.*
+use xhui
+
+
+class Window extends sv.Window
+	var vb: owned![VertexBuffer]
+	var material: Material&
+
+
+	func override on_initialize()
+		vb = sv.mesh_to_vb(create_teapot([0,0,0], 2, 6))
+		material := create_material(emission=[0,0.8,0.7,1])
+
+
+	func override on_draw()
+		draw_mesh(weak(vb), mat4.ID, material)
+
+		set_line_color(Color.RED)
+		set_line_width(5)
+		draw_lines([[0,0,-2], [3,3,3]], true)
+
+
+func main()
+	sv.run(new Window("simplevis test"))

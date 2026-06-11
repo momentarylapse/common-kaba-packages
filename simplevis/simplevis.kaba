@@ -1,0 +1,194 @@
+use os
+use kaba
+use obs
+use xhui as hui
+use yrenderer.*
+use polymesh.PolygonMesh
+
+
+func mesh_to_vb(m: PolygonMesh) -> xfer[VertexBuffer]
+		var vb = new VertexBuffer("3f,3f,2f")
+		var vertices: Vertex[]
+		m.build(vertices)
+		vb.update(vertices)
+		return give(vb)
+
+
+class SimpleEmitter extends MeshEmitter
+	var win: Window&
+
+	func __init__(w: Window&)
+		super.__init__(w.ctx!, "simple")
+		win := w
+
+	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
+		win.cur_params := &params
+		win.cur_rvd := &rvd
+		win.shadow_pass = shadow_pass
+		win.lines.begin_draw(params, rvd)
+		win.on_draw()
+
+
+class SimpleCameraController extends Object as obs.Node
+	var out_changed = obs.Source(&self, &ind, "changed")
+	var pos = vec3.0
+	var ang = Quaternion.ID
+	var radius = 5.0
+	var fov = pi/4
+
+	func mut rotate(d: vec3)
+		ang = ang * Quaternion(d)
+		out_changed()
+
+	func mut move(d: vec3)
+		pos += ang * d * radius
+		out_changed()
+
+	func mut zoom(f: f32)
+		radius /= f
+		out_changed()
+
+	func params() -> CameraParams
+		return (pos - ang*vec3.EZ*radius, ang, fov, radius*0.01, radius*1000)
+
+
+class Window extends hui.Window as obs.Node
+	var ctx: owned[Context]
+	var xhui_renderer: owned[XhuiRenderer]
+	var hdr: owned[HDRResolver]
+	var render_path: owned[RenderPath]
+	var light: YLight
+	var emitter: shared[SimpleEmitter]
+	var lines: owned![LineHelper]
+	var cur_params: RenderParams&
+	var cur_rvd: RenderViewData&
+	var shadow_pass = false
+	var cam: SimpleCameraController
+
+
+	func __init__(title: string)
+		super.__init__(title, 800, 600)
+		from_source("
+Dialog win 'bla' borderwidth=0
+	Grid ? ''
+		DrawingArea area '' expandy cangrabfocus grabfocus
+")
+		set_maximized(true)
+
+		event_x("area", "hui:mouse-move", xmouse_move)
+		event_x("area", "hui:mouse-wheel", xmouse_wheel)
+		event_x("area", "hui:key-down", xkey_down)
+
+		event_x("area", "hui:draw", xdraw)
+		event_x("area", "hui:initialize", xinitialize)
+		event_x("win", "hui:just-before-draw", xbefore_draw)
+
+	#	hui.run_repeated(0.01, func() redraw("area"))
+		cam.out_changed >> create_sink(func() redraw("area"))
+
+
+	# interface
+	func virtual mut on_initialize()
+	func virtual mut on_prepare()
+	func virtual mut on_draw()
+#	func override on_mouse_move(m: vec2)
+
+
+
+	func mut xinitialize(p: hui.Painter)
+		ctx = api_init_xhui(&p)
+		ctx!.create_managers("", kaba.packages_root() | "yrenderer/shader", "")
+		xhui_renderer = new XhuiRenderer(ctx!)
+
+
+		hdr = new HDRResolver(ctx!, 1920, 1080)
+#		hdr.bloom_factor = 10
+
+		render_path = new RenderPathForward(ctx!, 1024)
+		#render_path = new RenderPathDeferred(ctx!, 130, 100, 1024)
+		render_path!.background_color = [0.1,0.1,0.1,1]
+
+		xhui_renderer!.add_child(weak(hdr!))
+		hdr!.add_child(weak(render_path!))
+
+		lines = new LineHelper()
+
+		emitter = new SimpleEmitter(&self)
+		render_path!.add_opaque_emitter(emitter!)
+
+
+		light.init(LightType.POINT, [300,0,300,1])
+		light.pos = [0,8,-10]
+
+		on_initialize()
+
+
+	func mut xbefore_draw(p: hui.Painter)
+		for r in xhui_renderer
+			let params = r.extract_params(&p)
+
+			render_path!.set_view(cam.params())
+			render_path!.set_lights([&light])
+
+			r.before_draw(&p)
+			lines.start_frame(1)
+			on_prepare()
+
+
+	func mut xdraw(p: hui.Painter)
+		for r in xhui_renderer
+			r.draw(&p)
+
+
+	func mut xmouse_move()
+		let d = get_mouse_delta()
+		if right_button()
+			cam.rotate(vec3(d.y, d.x, 0) * 0.003)
+
+
+	func mut xmouse_wheel()
+		let d = get_scroll()
+		cam.zoom(exp(d.y * 0.1))
+
+
+	func mut xkey_down()
+		let k = get_key_code()
+		if k == hui.KEY_LEFT
+			cam.move([-0.05,0,0])
+		if k == hui.KEY_RIGHT
+			cam.move([0.05,0,0])
+		if k == hui.KEY_UP
+			cam.move([0,0.05,0])
+		if k == hui.KEY_DOWN
+			cam.move([0,-0.05,0])
+
+
+	func mut draw_mesh(vb: VertexBuffer&, matrix: mat4, material: Material&)
+		var shader = cur_rvd.get_shader(material, 0, "default", "", "")
+		var rd = cur_rvd.start(cur_params, matrix, shader, material, 0, PrimitiveTopology.TRIANGLES, vb)
+		rd.draw_triangles(cur_params, vb)
+
+
+	func mut set_line_color(c: Color)
+		lines.set_color(c)
+
+
+	func mut set_line_width(w: f32)
+		lines.set_line_width(w)
+
+
+	func mut draw_lines(points: vec3[], contiguous: bool)
+		lines.draw_lines(points, contiguous)
+
+
+	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
+		var material = ctx!.create_internal_material()
+		material.albedo = albedo
+		material.roughness = roughness
+		material.metal = metal
+		material.emission = emission
+		return material
+
+
+func run(w: shared[Window])
+	hui.fly_and_wait(w)
