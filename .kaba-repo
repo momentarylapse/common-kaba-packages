@@ -47,7 +47,6 @@ package urdf
 package usb
 package visualization
 package vulkan
-package vulkanx
 package xedit
 package xhui
 package xmake
