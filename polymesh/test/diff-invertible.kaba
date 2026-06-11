@@ -1,0 +1,23 @@
+use polymesh.*
+use.common.*
+
+
+func main()
+	#let mesh0 = create_cube(Box.ID_SYM, [1,1,1])
+	let mesh0 = create_plane(Rect.ID_SYM, [1,1])
+
+	for i in 0:100
+		let ed = random_mesh_edit(mesh0, i)
+	#	show_mesh_diff(ed)
+
+		var mesh = mesh0
+		let inv = ed.apply_inplace(mesh)
+	#	show_mesh(mesh)
+		check_mesh_health(mesh)
+
+	#	show_mesh_diff(inv)
+		inv.apply_inplace(mesh)
+	#	show_mesh(mesh)
+		check_mesh_health(mesh)
+
+		assert_equal(mesh, mesh0)

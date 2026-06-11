@@ -1,0 +1,45 @@
+use polymesh.*
+use.common.*
+
+
+func main()
+	var mesh0: PolygonMesh
+	for i in 0:5
+		mesh0.add_vertex(vec3(i, 0, 0))
+	mesh0.add_polygon_auto_texture([0,2,4])
+	#show_mesh(mesh0);
+
+	var ed: MeshEdit
+	ed.delete_vertex(1)
+	ed.delete_vertex(3)
+	ed.add_vertex(PMVertex(vec3(991,0,0)), 0)
+	ed.add_vertex(PMVertex(vec3(992,0,0)), 3)
+	ed.add_vertex(PMVertex(vec3(993,0,0)), 3)
+	ed.add_vertex(PMVertex(vec3(994,0,0)))
+	#show_mesh_diff(ed);
+
+	var mesh1_expected: PolygonMesh
+	mesh1_expected.add_vertex(vec3(991,0,0))
+	mesh1_expected.add_vertex(vec3(0,0,0))
+	mesh1_expected.add_vertex(vec3(2,0,0))
+	mesh1_expected.add_vertex(vec3(992,0,0))
+	mesh1_expected.add_vertex(vec3(993,0,0))
+	mesh1_expected.add_vertex(vec3(4,0,0))
+	mesh1_expected.add_vertex(vec3(994,0,0))
+	mesh1_expected.add_polygon_auto_texture([1,2,5])
+
+	var inv: MeshEdit
+	let mesh1 = ed.apply(mesh0, &inv)
+	#show_mesh(mesh1);
+	assert_equal(mesh1, mesh1_expected)
+	#show_mesh_diff(inv);
+
+	var invinv: MeshEdit
+	let mesh0b = inv.apply(mesh1, &invinv)
+	#show_mesh(mesh0b);
+	assert_equal(mesh0b, mesh0)
+	#show_mesh_diff(invinv);
+
+	let mesh1b = invinv.apply(mesh0b)
+	#show_mesh(mesh1b);
+	assert_equal(mesh1b, mesh1)

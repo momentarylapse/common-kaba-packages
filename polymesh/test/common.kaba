@@ -1,0 +1,65 @@
+use polymesh.*
+
+func assert_equal(a: vec3, b: vec3, epsilon=0.001)
+	if len(b - a) > epsilon
+		raise(new Exception("{{a}} != {{b}}"))
+
+func assert_equal(a: i32[], b: i32[])
+	if len(a) != len(b)
+		raise(new Exception("{{a}} != {{b}}"))
+	for i=>ia in a
+		if ia != b[i]
+			raise(new Exception("{{a}} != {{b}}"))
+
+func assert_equal(a: PolygonMesh, b: PolygonMesh, epsilon=0.001)
+	if len(a.vertices) != len(b.vertices)
+		raise(new Exception("Mesh #vertices: {{len(a.vertices)}} != {{len(b.vertices)}}"))
+	if len(a.polygons) != len(b.polygons)
+		raise(new Exception("Mesh #polygons: {{len(a.polygons)}} != {{len(b.polygons)}}"))
+
+	# check vertices
+	for i=>va in a.vertices
+		assert_equal(va.pos, b.vertices[i].pos)
+
+	for i=>pa in a.polygons
+		assert_equal(pa.get_vertices(), b.polygons[i].get_vertices())
+
+
+func check_mesh_health(mesh: PolygonMesh)
+	for p in mesh.polygons
+		for s in p.sides
+			if s.vertex < 0 or s.vertex >= len(mesh.vertices)
+				raise(new Exception("Mesh  illegal vertex ref: {{s.vertex}}  (n={{len(mesh.vertices)}})"))
+
+
+
+func random_mesh_edit(mesh: PolygonMesh, seed: i32) -> MeshEdit
+	var r: Random
+	r.seed(str(seed))
+
+	var edit: MeshEdit
+
+	if len(mesh.vertices) > 0
+		let v_del = r.int(mesh.vertices.num)
+		edit.delete_vertex(v_del)
+		for i=>p in mesh.polygons
+			for s in p.sides
+				if s.vertex == v_del
+					edit.delete_polygon(i)
+
+	var new_vertices: i32[]
+	for i in 0:2
+		new_vertices.add(edit.add_vertex(PMVertex(r.in_ball(20))))
+
+	for i in 0:2
+		var polygon: Polygon
+		let n = 3 + r.int(2)
+		polygon.sides.resize(n)
+		for j in 0:n
+			while true
+				polygon.sides[j].vertex = r.int(len(mesh.vertices) + len(new_vertices)) - len(new_vertices)
+				if not(polygon.sides[j].vertex in edit._del_vertices)
+					break
+		edit.add_polygon(polygon)
+
+	return edit

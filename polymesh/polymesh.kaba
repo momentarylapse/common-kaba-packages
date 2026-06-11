@@ -3,7 +3,9 @@ struct extern PMVertex
 	var normal_mode: i32
 	var bone_index: i32
 	var normal_dirty: bool
-	var ref_count: i32
+	var smoothing_id: i32
+	func extern __init__()
+	func extern __init__(pos: vec3)
 
 
 struct extern Polygon
@@ -20,6 +22,7 @@ struct extern Polygon
 	var normal_dirty, triangulation_dirty: bool
 	var material: i32
 	#func __init__()
+	func extern get_vertices() -> i32[]
 
 
 struct extern PolygonMesh
@@ -30,6 +33,9 @@ struct extern PolygonMesh
 	func extern mut __delete__()
 	func extern mut __assign__(o: PolygonMesh)
 
+	func extern mut add_vertex(pos: vec3)
+	func extern mut add_polygon(v: i32[], uv: vec3[])
+	func extern mut add_polygon_auto_texture(v: i32[])
 	func extern bounding_box() -> Box?
 	func extern mut update_normals()
 	func extern mut add(mesh: PolygonMesh)
@@ -39,10 +45,20 @@ struct extern PolygonMesh
 
 
 struct extern MeshEdit
+	var _del_vertices: i32[]
+	var _del_polygons: i32[]
+	struct NewVertex
+		v: PMVertex
+		at, id: i32
+	struct NewPolygon
+		p: Polygon
+		at: i32
+	var _new_vertices: NewVertex[]
+	var _new_polygons: NewPolygon[] # indices are pre-vertex-insertion/deletion!
 	func extern mut __init__()
 	func extern mut __delete__()
 	func extern mut __assign__(o: MeshEdit)
-	func extern mut add_vertex(v: PMVertex, at_index=-1)
+	func extern mut add_vertex(v: PMVertex, at_index=-1) -> i32
 	func extern mut add_polygon(p: Polygon, at_index=-1)
 	func extern mut delete_vertex(index: i32)
 	func extern mut delete_polygon(index: i32)
