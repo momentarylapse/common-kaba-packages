@@ -23,7 +23,6 @@ package linalg
 package linalg64
 package make-kaba-wiki
 package mesh
-package misc
 package mongo
 package msgpack
 package ncurses
@@ -39,7 +38,6 @@ package psmove
 package shadercomp
 package sisyphos
 package sqlite
-package ssh
 package statistics
 package terminal
 package tools
