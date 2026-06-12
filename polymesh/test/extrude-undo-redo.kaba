@@ -1,0 +1,19 @@
+use polymesh.*
+use .common.*
+
+func main()
+	let mesh0 = create_cube(Box.ID_SYM, [1,1,1])
+
+	var mesh = mesh0
+	let sel = [0]
+	var ed = extrude_polygons(mesh, sel, 0.1, false)
+
+	var meshes: PolygonMesh[]
+
+	for i in 0:3
+		ed = ed.apply_inplace(mesh)
+		check_mesh_health(mesh)
+		meshes.add(mesh)
+
+	assert_equal(meshes[1], mesh0)
+	assert_equal(meshes[2], meshes[0])

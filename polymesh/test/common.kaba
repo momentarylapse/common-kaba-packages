@@ -32,6 +32,23 @@ func check_mesh_health(mesh: PolygonMesh)
 				raise(new Exception("Mesh  illegal vertex ref: {{s.vertex}}  (n={{len(mesh.vertices)}})"))
 
 
+func mesh_select_random_polygons(mesh: PolygonMesh, seed: i32) -> i32[]
+	var sel: i32[]
+
+	var r: Random
+	r.seed(str(seed))
+	for i in 0:4
+		sel.add(r.int(len(mesh.polygons)))
+	return sel |> sort |> unique
+
+
+func reversed[X](list: X[]) -> X[]
+	var r: X[]
+	r.resize(len(list))
+	for i=>x in list
+		r[len(list) - i - 1] = x
+	return r
+
 
 func random_mesh_edit(mesh: PolygonMesh, seed: i32) -> MeshEdit
 	var r: Random
