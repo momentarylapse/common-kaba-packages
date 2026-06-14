@@ -12,7 +12,14 @@ class Window extends sv.Window
 	func override on_initialize()
 		light.color = [1,0,1,1]
 
-		vb = sv.mesh_to_vb(create_teapot([0,0,0], 2, 6))
+#		vb = sv.mesh_to_vb(create_teapot([0,0,0], 2, 6))
+		var mesh = create_cube(Box.ID_SYM, [1,1,1])
+		let ed = bevel_edges(mesh, range(8), range(12), 0.4)
+		ed.apply_inplace(mesh)
+		let ed2 = bevel_edges(mesh, range(80), range(200), 0.13)
+		ed2.apply_inplace(mesh)
+		mesh.update_normals()
+		vb = sv.mesh_to_vb(mesh)
 		material := create_material(emission=[0,0.8,0.7,1])
 
 

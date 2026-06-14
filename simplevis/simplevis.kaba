@@ -64,6 +64,7 @@ class Window extends hui.Window as obs.Node
 	var cur_rvd: RenderViewData&
 	var shadow_pass = false
 	var cam: SimpleCameraController
+	var light_cam_ang: Quaternion?
 
 
 	func __init__(title: string)
@@ -106,7 +107,7 @@ Dialog win 'bla' borderwidth=0
 
 		render_path = new RenderPathForward(ctx!, 1024)
 		#render_path = new RenderPathDeferred(ctx!, 130, 100, 1024)
-		render_path!.background_color = [0.1,0.1,0.1,1]
+		render_path!.background_color = [0.2,0.2,0.2,1]
 
 		xhui_renderer!.add_child(weak(hdr!))
 		hdr!.add_child(weak(render_path!))
@@ -117,8 +118,10 @@ Dialog win 'bla' borderwidth=0
 		render_path!.add_opaque_emitter(emitter!)
 
 
-		light.init(LightType.POINT, [300,0,300,1])
-		light.pos = [0,8,-10]
+		light.init(LightType.DIRECTIONAL, [1,1,1,1])
+		light.allow_shadow = true
+		light_cam_ang = Quaternion([0.5, -0.4, 0])
+
 
 		on_initialize()
 
@@ -126,6 +129,9 @@ Dialog win 'bla' borderwidth=0
 	func mut xbefore_draw(p: hui.Painter)
 		for r in xhui_renderer
 			let params = r.extract_params(&p)
+
+			for da in light_cam_ang
+				light.ang = cam.ang * da
 
 			render_path!.set_view(cam.params())
 			render_path!.set_lights([&light])
