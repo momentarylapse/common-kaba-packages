@@ -65,8 +65,10 @@ add_library(modulepolymesh SHARED
 	src/lib/polymesh/create/Teapot.cpp
 	src/lib/polymesh/create/Torus.cpp
 	src/lib/polymesh/create/TorusKnot.cpp
+	src/lib/polymesh/edit/AutoMergePolygons.cpp
 	src/lib/polymesh/edit/BevelEdges.cpp
 	src/lib/polymesh/edit/ExtrudePolygons.cpp
+	src/lib/polymesh/edit/InvertPolygons.cpp
 	src/lib/polymesh/_kaba_export.cpp
 	src/lib/polymesh/GeometrySubtract.cpp
 	src/lib/polymesh/MeshEdit.cpp

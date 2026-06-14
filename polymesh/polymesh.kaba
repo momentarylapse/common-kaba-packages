@@ -91,4 +91,6 @@ func extern create_torus_knot(pos: vec3, axis: vec3, radius1: f32, radius2: f32,
 # edit
 func extern bevel_edges(mesh: PolygonMesh, selv: i32[], sele: i32[], radius: f32) -> MeshEdit
 func extern extrude_polygons(mesh: PolygonMesh, selp: i32[], distance: f32, keep_connected: bool) -> MeshEdit
+func extern invert_polygons(mesh: PolygonMesh, selp: i32[]) -> MeshEdit
+func extern auto_merge_polygons(mesh: PolygonMesh, selp: i32[], dang=0.1) -> MeshEdit
 
