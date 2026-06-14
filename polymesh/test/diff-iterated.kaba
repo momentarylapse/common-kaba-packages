@@ -6,7 +6,7 @@ func main()
 
 	for i in 0:100
 		var inv: MeshEdit[]
-		var meshes: PolygonMesh[]
+		var meshes: Mesh[]
 
 		# forward
 		var mesh = mesh0

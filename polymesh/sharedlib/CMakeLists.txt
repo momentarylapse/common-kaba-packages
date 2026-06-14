@@ -71,9 +71,9 @@ add_library(modulepolymesh SHARED
 	src/lib/polymesh/edit/InvertPolygons.cpp
 	src/lib/polymesh/_kaba_export.cpp
 	src/lib/polymesh/GeometrySubtract.cpp
+	src/lib/polymesh/Mesh.cpp
 	src/lib/polymesh/MeshEdit.cpp
 	src/lib/polymesh/Polygon.cpp
-	src/lib/polymesh/PolygonMesh.cpp
 	src/lib/polymesh/SkinGenerator.cpp
 	src/main.cpp)
 target_include_directories(modulepolymesh PUBLIC ${INCLUDE_DIRECTORIES})

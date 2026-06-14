@@ -4,13 +4,14 @@
 
 #include "BevelEdges.h"
 #include <lib/polymesh/Polygon.h>
-#include <lib/polymesh/PolygonMesh.h>
+#include <lib/polymesh/Mesh.h>
 #include <lib/polymesh/MeshEdit.h>
 #include <lib/base/iter.h>
 #include <lib/base/algo.h>
 #include <lib/base/map.h>
+#include <cmath>
 
-#include "lib/os/msg.h"
+#include "lib/polymesh/SkinGenerator.h"
 
 
 namespace polymesh {
@@ -34,7 +35,7 @@ struct BevelInfo {
 	Array<Edge> edges;
 };
 
-bool mesh_get_polygons_and_edges_around_vertex(const PolygonMesh& mesh, int vertex, Array<PolygonCorner>& out_corners, Array<Edge>& out_edges) {
+bool mesh_get_polygons_and_edges_around_vertex(const Mesh& mesh, int vertex, Array<PolygonCorner>& out_corners, Array<Edge>& out_edges) {
 	out_corners.clear();
 	out_edges.clear();
 	base::set<int> corners_used;
@@ -73,7 +74,7 @@ bool mesh_get_polygons_and_edges_around_vertex(const PolygonMesh& mesh, int vert
 	}
 }
 
-BevelInfo prepare_bevel(const PolygonMesh& mesh, const Array<Edge>& edges, const base::set<int>& selv) {
+BevelInfo prepare_bevel(const Mesh& mesh, const Array<Edge>& edges, const base::set<int>& selv) {
 	BevelInfo bi;
 
 	for (const auto& [i, v]: enumerate(mesh.vertices))
@@ -109,7 +110,7 @@ BevelInfo prepare_bevel(const PolygonMesh& mesh, const Array<Edge>& edges, const
 	return bi;
 }
 
-MeshEdit bevel_edges(const PolygonMesh& mesh, const base::set<int>& selv, const base::set<int>& sele, float radius) {
+MeshEdit bevel_edges(const Mesh& mesh, const base::set<int>& selv, const base::set<int>& sele, float radius) {
 	auto edges = mesh.edges();
 	auto b = prepare_bevel(mesh, edges, selv);
 	MeshEdit ed;
@@ -121,12 +122,12 @@ MeshEdit bevel_edges(const PolygonMesh& mesh, const base::set<int>& selv, const 
 		for (auto&& [i, d]: enumerate(c.edge_dirs)) {
 			c.new_vertices_e[i] = c.new_vertices_p[i] = -1; // meh
 			if (!sele.contains(c.edges[i])) {
-				int v = ed.add_vertex(MeshVertex{c.p0 + d * radius});
+				int v = ed.add_vertex(Vertex{c.p0 + d * radius});
 				c.new_vertices_e[i] = v;
 				c.new_vertices.add(v);
 			}
 			if (sele.contains(c.edges[i]) and sele.contains(c.edges[(i + c.edges.num - 1) % c.edges.num])) {
-				int v = ed.add_vertex(MeshVertex{c.p0 + c.polygon_dirs[i] * radius});
+				int v = ed.add_vertex(Vertex{c.p0 + c.polygon_dirs[i] * radius});
 				c.new_vertices_p[i] = v;
 				c.new_vertices.add(v);
 			}
@@ -138,8 +139,11 @@ MeshEdit bevel_edges(const PolygonMesh& mesh, const base::set<int>& selv, const 
 		if (c.new_vertices.num >= 3) {
 			Polygon p;
 			p.side.resize(c.new_vertices.num);
-			for (int k=0; k<c.new_vertices.num; k++)
+			for (int k=0; k<c.new_vertices.num; k++) {
 				p.side[k].vertex = c.new_vertices[k];
+				float w = (float)k / (float)c.new_vertices.num * 2 * pi;
+				p.side[k].uv = vec3(0.5f + cosf(w)/2,0.5f + sinf(w)/2,0);
+			}
 			ed.add_polygon(p);
 		}
 	}
@@ -173,6 +177,10 @@ MeshEdit bevel_edges(const PolygonMesh& mesh, const base::set<int>& selv, const 
 				p.side[3].vertex = c0->new_vertices_p[d0_next];
 			else
 				p.side[3].vertex = c0->new_vertices_e[d0_next];
+			p.side[0].uv = {0,0,0};
+			p.side[1].uv = {1,0,0};
+			p.side[2].uv = {1,1,0};
+			p.side[3].uv = {0,1,0};
 			ed.add_polygon(p);
 		}
 	}
@@ -186,20 +194,22 @@ MeshEdit bevel_edges(const PolygonMesh& mesh, const base::set<int>& selv, const 
 		if (!changed)
 			continue;
 		Polygon pp;
+		SkinGenerator sg;
+		sg.init_polygon(mesh.vertices, p);
 		for (const auto& [si, s]: enumerate(p.side))
 			if (selv.contains(s.vertex)) {
 				auto c = base::find_by_element(b.caps, &BevelInfo::Cap::index, s.vertex);
 				int e0 = edges.find(p.get_side_edge_in(si));
 				int e1 = edges.find(p.get_side_edge_out(si));
 				if (sele.contains(e0) and sele.contains(e1)) {
-					pp.side.add(PolygonSide{c->new_vertices_p[c->edge_to_dir[e0]]});
+					pp.side.add(PolygonSide{c->new_vertices_p[c->edge_to_dir[e0]], sg.get(c->p0 + c->polygon_dirs[c->edge_to_dir[e0]] * radius)});
 				} else if (sele.contains(e0)) {
-					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e1]]});
+					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e1]], sg.get(c->p0 + c->edge_dirs[c->edge_to_dir[e1]] * radius)});
 				} else if (sele.contains(e1)) {
-					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e0]]});
+					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e0]], sg.get(c->p0 + c->edge_dirs[c->edge_to_dir[e0]] * radius)});
 				} else {
-					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e0]]});
-					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e1]]});
+					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e0]], sg.get(c->p0 + c->edge_dirs[c->edge_to_dir[e0]] * radius)});
+					pp.side.add(PolygonSide{c->new_vertices_e[c->edge_to_dir[e1]], sg.get(c->p0 + c->edge_dirs[c->edge_to_dir[e1]] * radius)});
 				}
 
 			} else {

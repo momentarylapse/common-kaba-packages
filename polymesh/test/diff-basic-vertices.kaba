@@ -3,7 +3,7 @@ use.common.*
 
 
 func main()
-	var mesh0: PolygonMesh
+	var mesh0: Mesh
 	for i in 0:5
 		mesh0.add_vertex(vec3(i, 0, 0))
 	mesh0.add_polygon_auto_texture([0,2,4])
@@ -18,7 +18,7 @@ func main()
 	ed.add_vertex(PMVertex(vec3(994,0,0)))
 	#show_mesh_diff(ed);
 
-	var mesh1_expected: PolygonMesh
+	var mesh1_expected: Mesh
 	mesh1_expected.add_vertex(vec3(991,0,0))
 	mesh1_expected.add_vertex(vec3(0,0,0))
 	mesh1_expected.add_vertex(vec3(2,0,0))

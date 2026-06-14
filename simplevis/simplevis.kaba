@@ -3,10 +3,10 @@ use kaba
 use obs
 use xhui as hui
 use yrenderer.*
-use polymesh.PolygonMesh
+use polymesh.Mesh
 
 
-func mesh_to_vb(m: PolygonMesh) -> xfer[VertexBuffer]
+func mesh_to_vb(m: Mesh) -> xfer[VertexBuffer]
 		var vb = new VertexBuffer("3f,3f,2f")
 		var vertices: Vertex[]
 		m.build(vertices)

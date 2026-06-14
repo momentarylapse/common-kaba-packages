@@ -3,14 +3,14 @@
 //
 
 #include "Polygon.h"
-#include "PolygonMesh.h"
+#include "Mesh.h"
 #include <lib/math/vec2.h>
 #include <lib/math/plane.h>
 #include <cmath>
 
+namespace polymesh {
 
-
-vec3 Polygon::get_area_vector(const Array<MeshVertex> &vertex) const {
+vec3 Polygon::get_area_vector(const Array<Vertex> &vertex) const {
 	// Newell's method
 	vec3 n = v_0;
 	vec3 p1 = vertex[side.back().vertex].pos;
@@ -24,7 +24,7 @@ vec3 Polygon::get_area_vector(const Array<MeshVertex> &vertex) const {
 	return n * 0.5f;
 }
 
-vec3 Polygon::get_normal(const Array<MeshVertex> &vertex) const {
+vec3 Polygon::get_normal(const Array<Vertex> &vertex) const {
 	return get_area_vector(vertex).normalized();
 }
 
@@ -48,13 +48,11 @@ Array<Edge> Polygon::get_edges() const {
 }
 
 
-Array<vec3> Polygon::get_skin_vertices() const {
+Array<vec3> Polygon::get_uvs() const {
 	Array<vec3> sv;
-	sv.resize(side.num * POLYGON_MAX_TEXTURES);
-	int n = 0;
-	for (int l=0;l<POLYGON_MAX_TEXTURES;l++)
-		for (int i=0; i<side.num; i++)
-			sv[n ++] = side[i].skin_vertex[l];
+	sv.resize(side.num);
+	for (int i=0; i<side.num; i++)
+		sv[i] = side[i].uv;
 	return sv;
 }
 
@@ -84,7 +82,7 @@ Edge Polygon::get_side_edge_in(int side_no) const {
 
 
 
-static float get_ang(const Array<MeshVertex> &vertex, int a, int b, int c, const vec3 &flat_n) {
+static float get_ang(const Array<Vertex> &vertex, int a, int b, int c, const vec3 &flat_n) {
 	vec3 v1 = vertex[b].pos - vertex[a].pos;
 	vec3 v2 = vertex[c].pos - vertex[b].pos;
 	v1.normalize();
@@ -94,7 +92,7 @@ static float get_ang(const Array<MeshVertex> &vertex, int a, int b, int c, const
 	return atan2(x, y);
 }
 
-static bool vertex_in_tria(const Array<MeshVertex> &vertex, int a, int b, int c, int v) {
+static bool vertex_in_tria(const Array<Vertex> &vertex, int a, int b, int c, int v) {
 	auto fg = bary_centric(vertex[v].pos, vertex[a].pos, vertex[b].pos, vertex[c].pos);
 	return ((fg.x > 0) and (fg.y > 0) and (fg.x + fg.y < 1));
 }
@@ -116,7 +114,7 @@ static bool vertex_in_tria(const Array<MeshVertex> &vertex, int a, int b, int c,
 	return v_0;
 }*/
 
-Array<int> Polygon::triangulate(const Array<MeshVertex> &vertex) const {
+Array<int> Polygon::triangulate(const Array<Vertex> &vertex) const {
 	Array<int> output;
 
 	Array<int> v, vi;
@@ -174,7 +172,7 @@ Array<int> Polygon::triangulate(const Array<MeshVertex> &vertex) const {
 	return output;
 }
 
-void Polygon::update_triangulation(const Array<MeshVertex> &vertex) {
+void Polygon::update_triangulation(const Array<Vertex> &vertex) {
 	auto v = triangulate(vertex);
 	for (int i=0; i<v.num; i+=3)
 		for (int k=0; k<3; k++)
@@ -184,10 +182,10 @@ void Polygon::update_triangulation(const Array<MeshVertex> &vertex) {
 
 struct DummyVertex {
 	vec3 pos, n;
-	vec2 u, v;
+	vec2 uv;
 };
 
-void Polygon::add_to_vertex_buffer(const Array<MeshVertex> &vertex, DynamicArray& buf) {
+void Polygon::add_to_vertex_buffer(const Array<Vertex> &vertex, DynamicArray& buf) {
 	if (triangulation_dirty)
 		update_triangulation(vertex);
 	int i0 = buf.num;
@@ -196,9 +194,9 @@ void Polygon::add_to_vertex_buffer(const Array<MeshVertex> &vertex, DynamicArray
 		auto &a = side[side[i].triangulation[0]];
 		auto &b = side[side[i].triangulation[1]];
 		auto &c = side[side[i].triangulation[2]];
-		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3  )) = {vertex[a.vertex].pos, a.normal, a.skin_vertex[0].xy()};
-		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3+1)) = {vertex[b.vertex].pos, b.normal, b.skin_vertex[0].xy()};
-		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3+2)) = {vertex[c.vertex].pos, c.normal, c.skin_vertex[0].xy()};
+		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3  )) = {vertex[a.vertex].pos, a.normal, a.uv.xy()};
+		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3+1)) = {vertex[b.vertex].pos, b.normal, b.uv.xy()};
+		*reinterpret_cast<DummyVertex*>(buf.simple_element(i0 + i*3+2)) = {vertex[c.vertex].pos, c.normal, c.uv.xy()};
 	}
 }
 
@@ -206,10 +204,11 @@ void Polygon::invert() {
 	Polygon pp = *this;
 	for (int i=0; i<side.num; i++) {
 		side[i].vertex = pp.side[side.num - i - 1].vertex;
-		memcpy(side[i].skin_vertex, pp.side[side.num - i - 1].skin_vertex, sizeof(side[i].skin_vertex));
+		side[i].uv = pp.side[side.num - i - 1].uv;
 		side[i].normal = - pp.side[side.num - i - 1].normal;
 	}
 	temp_normal = - temp_normal;
 }
 
+}
 

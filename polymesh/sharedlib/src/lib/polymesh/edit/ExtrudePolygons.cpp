@@ -4,12 +4,12 @@
 
 #include "ExtrudePolygons.h"
 #include <lib/polymesh/Polygon.h>
-#include <lib/polymesh/PolygonMesh.h>
+#include <lib/polymesh/Mesh.h>
 #include <lib/polymesh/MeshEdit.h>
 #include <lib/base/iter.h>
 
 namespace polymesh {
-	MeshEdit extrude_polygons(const PolygonMesh& mesh, const base::set<int>& sel, float distance, bool keep_connected) {
+	MeshEdit extrude_polygons(const Mesh& mesh, const base::set<int>& sel, float distance, bool keep_connected) {
 		MeshEdit ed;
 		for (const auto& [i, p]: enumerate(mesh.polygons))
 			if (sel.contains(i)) {
@@ -18,7 +18,7 @@ namespace polymesh {
 				Array<int> new_vertices;
 				for (int k=0; k<p.side.num; k++) {
 					int v0 = p.side[k].vertex;
-					MeshVertex vv = mesh.vertices[v0];
+					Vertex vv = mesh.vertices[v0];
 					vv.pos += distance * p.get_normal(mesh.vertices);
 					int v1 = ed.add_vertex(vv);
 					new_vertices.add(v1);
@@ -31,6 +31,10 @@ namespace polymesh {
 					ppp.side[1].vertex = p.side[(k+1) % p.side.num].vertex;
 					ppp.side[2].vertex = new_vertices[(k+1) % p.side.num];
 					ppp.side[3].vertex = new_vertices[k];
+					ppp.side[0].uv = {0,0,0};
+					ppp.side[1].uv = {1,0,0};
+					ppp.side[2].uv = {1,1,0};
+					ppp.side[3].uv = {0,1,0};
 					ed.add_polygon(ppp);
 				}
 				ed.add_polygon(pp);

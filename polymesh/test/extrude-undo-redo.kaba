@@ -8,7 +8,7 @@ func main()
 	let sel = [0]
 	var ed = extrude_polygons(mesh, sel, 0.1, false)
 
-	var meshes: PolygonMesh[]
+	var meshes: Mesh[]
 
 	for i in 0:3
 		ed = ed.apply_inplace(mesh)

@@ -11,7 +11,7 @@ func assert_equal(a: i32[], b: i32[])
 		if ia != b[i]
 			raise(new Exception("{{a}} != {{b}}"))
 
-func assert_equal(a: PolygonMesh, b: PolygonMesh, epsilon=0.001)
+func assert_equal(a: Mesh, b: Mesh, epsilon=0.001)
 	if len(a.vertices) != len(b.vertices)
 		raise(new Exception("Mesh #vertices: {{len(a.vertices)}} != {{len(b.vertices)}}"))
 	if len(a.polygons) != len(b.polygons)
@@ -25,14 +25,14 @@ func assert_equal(a: PolygonMesh, b: PolygonMesh, epsilon=0.001)
 		assert_equal(pa.get_vertices(), b.polygons[i].get_vertices())
 
 
-func check_mesh_health(mesh: PolygonMesh)
+func check_mesh_health(mesh: Mesh)
 	for p in mesh.polygons
 		for s in p.sides
 			if s.vertex < 0 or s.vertex >= len(mesh.vertices)
 				raise(new Exception("Mesh  illegal vertex ref: {{s.vertex}}  (n={{len(mesh.vertices)}})"))
 
 
-func mesh_select_random_polygons(mesh: PolygonMesh, seed: i32) -> i32[]
+func mesh_select_random_polygons(mesh: Mesh, seed: i32) -> i32[]
 	var sel: i32[]
 
 	var r: Random
@@ -50,7 +50,7 @@ func reversed[X](list: X[]) -> X[]
 	return r
 
 
-func random_mesh_edit(mesh: PolygonMesh, seed: i32) -> MeshEdit
+func random_mesh_edit(mesh: Mesh, seed: i32) -> MeshEdit
 	var r: Random
 	r.seed(str(seed))
 
