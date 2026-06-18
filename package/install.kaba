@@ -14,7 +14,7 @@ func allow_install_file(f: os.Path) -> bool
 		return false
 	if b.match("libmodule*")
 		return false
-	
+
 	return true
 
 # TODO keep list of "requested" packages, since we currently forget about failed packages!
@@ -70,7 +70,7 @@ func install_package(p: PackageInfo) -> bool
 	for e in listd
 		if allow_install_file(e)
 			os.fs.create_directory(p.base_installed | e)
-		
+
 	let list = os.fs.search(p.root_source, "*", "rf")
 	for e in list
 		if allow_install_file(e)
@@ -79,7 +79,7 @@ func install_package(p: PackageInfo) -> bool
 			if conf.verbose
 				print("{{os.terminal.YELLOW}}copy{{os.terminal.END}} {{a}}  ->  {{b}}")
 			os.fs.copy(a, b)
-	
+
 	# package info file might be skipped if root!=base...
 	if os.fs.exists(p.base_source | PACKAGE_FILE)
 		os.fs.copy(p.base_source | PACKAGE_FILE, p.base_installed | PACKAGE_FILE)
@@ -115,28 +115,28 @@ func fullfull_dependencies(out list: PackageInfo&[]) -> bool
 
 func action_install(args: string[])
 	load_package_list()
-	
+
 	# sources
 	var to_install: PackageInfo&[]
 	var missing_sources = false
 	for name in args
 		for p in list_find(conf.packages_internal, name)
 			print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}} {{name}}")
-			return
+			os.exit(1)
 		for p in list_find(conf.packages_remote, name)
 			to_install.add(&p)
 		else
 			print("{{os.terminal.RED}}no package source found{{os.terminal.END}} {{name}}")
 			missing_sources = true
 	if missing_sources
-		return
-	
+		os.exit(1)
+
 	# dependencies
 	if not fullfull_dependencies(to_install)
-		return
-	
+		os.exit(1)
+
 	# install
 	for p in to_install
 		if not install_package(p)
-			return
+			os.exit(1)
 
