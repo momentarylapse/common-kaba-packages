@@ -1,0 +1,88 @@
+name: CMake on multiple platforms
+
+on:
+  push:
+    branches: [ "master", "devel", "ci-tests" ]
+  pull_request:
+    branches: [ "master", "devel" ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        build_type: [Release]
+        cpp_compiler: [g++, clang++]
+        graphics: [vulkan, gl]
+        exclude:
+          - os: windows-latest
+          - graphics: vulkan
+
+    steps:
+    - name: Setup
+      id: strings
+      shell: bash
+      run: |
+        echo "env-dir=${{ github.workspace }}/env" >> "$GITHUB_OUTPUT"
+        echo "kaba-repo=${{ github.workspace }}/kaba" >> "$GITHUB_OUTPUT"
+        mkdir ${{ github.workspace }}/env
+        mkdir ${{ github.workspace }}/env/repos
+        mkdir ${{ github.workspace }}/env/packages
+        mkdir ${{ github.workspace }}/env/kaba
+        mkdir ${{ github.workspace }}/env/xmake
+        echo "repo michi.common whatever" > ${{ github.workspace }}/env/sources
+        echo "VULKAN_OR_GL=${{ matrix.graphics }}" > ${{ github.workspace }}/env/xmake/prefer
+
+    - uses: actions/checkout@v6
+      with:
+        path: ${{ steps.strings.outputs.env-dir }}/repos/michi.common
+
+    - uses: actions/checkout@v6
+      with:
+        repository: 'michi/kaba'
+        ref: 'master'
+        path: './kaba'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake ninja-build clang build-essential libgtk-4-dev
+        sudo apt-get install -y libfftw3-dev libbson-dev libsqlite3-dev libglfw3-dev libgl-dev libvulkan1 libvulkan-dev vulkan-tools
+
+    - name: Kaba - Configure CMake
+      run: >
+        cmake -B ${{ steps.strings.outputs.kaba-repo }}/build
+        -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+        -DCMAKE_CXX_FLAGS="-Werror -Wall"
+        -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        -S ${{ steps.strings.outputs.kaba-repo }}
+
+    - name: Kaba - Build
+      run: |
+        cmake --build ${{ steps.strings.outputs.kaba-repo }}/build --config ${{ matrix.build_type }}
+        cp ${{ steps.strings.outputs.kaba-repo }}/build/kaba ${{ steps.strings.outputs.env-dir }}/kaba/kaba
+
+#    - name: Evil
+#      run: |
+#        cp ${{ steps.strings.outputs.env-dir }}/repos/michi.common/kaba ${{ steps.strings.outputs.env-dir }}/kaba
+
+    - name: Install packages
+      run: |
+        echo "Installing package manager"
+        cp -r ${{ steps.strings.outputs.env-dir }}/repos/michi.common/package ${{ steps.strings.outputs.env-dir }}/packages
+        export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
+        echo "packages..."
+        ${{ steps.strings.outputs.env-dir }}/kaba/kaba package install \
+          algebra asciitools bson circuit cli cloud crypto fft filetags gl glfw hui huibui iter kabama mesh msgpack ncurses \
+          net obs opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools urdf xhui xmake xml yrenderer zlib zmq
+
+    - name: Test compile
+      run: |
+        export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
+        ${{ steps.strings.outputs.env-dir }}/kaba/kaba tools/test-compile ${{ steps.strings.outputs.env-dir }}/packages
+
+# TODO run package tests (e.g. polymesh/tests)
