@@ -1,7 +1,8 @@
 use os.*
 use kaba
 
-var error_count: int
+var error_count: i32
+
 
 func test_compile(filename: Path)
 	print("    {{filename.basename()}}")
@@ -11,6 +12,7 @@ func test_compile(filename: Path)
 	except Exception as e
 		print("{{terminal.RED}}  ERROR  {{e}}{{terminal.END}}")
 		error_count ++
+
 
 func test_rec(dir: Path)
 	let subdirs = fs.search(dir, "", "dr0")
@@ -22,14 +24,16 @@ func test_rec(dir: Path)
 		for e in list
 			test_compile(dir | s | e)
 
+
 func main(arg: string[])
-	if len(arg) == 0
-		print("directory?")
-		return
 	error_count = 0
+	if len(arg) == 0
+		test_rec(fs.current_directory())
 	for a in arg
 		test_rec(a)
+
 	if error_count > 0
 		print("{{terminal.RED}}{{error_count}} errors found{{terminal.END}}")
+		exit(1)
 	else
 		print("{{terminal.GREEN}}all files ok{{terminal.END}}")
