@@ -98,7 +98,7 @@ Dialog win 'bla' borderwidth=0
 
 	func mut xinitialize(p: hui.Painter)
 		ctx = api_init_xhui(&p)
-		ctx!.create_managers("", kaba.packages_root() | "yrenderer/shader", "")
+		ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader"], [])
 		xhui_renderer = new XhuiRenderer(ctx!)
 
 
