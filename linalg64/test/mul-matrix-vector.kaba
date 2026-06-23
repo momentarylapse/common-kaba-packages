@@ -1,0 +1,7 @@
+use linalg.*
+
+func main()
+	let M = Matrix([[1,2],[3,4],[5,6]])
+	print(M)
+	print(mul(M, [1,0]))
+

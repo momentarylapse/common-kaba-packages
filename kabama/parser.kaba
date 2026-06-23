@@ -115,8 +115,8 @@ class Parser
 				return AddVariable(c)
 
 		raise(new SyntaxError("unknown operand '{{c}}'"))
-	
-	
+
+
 	func parse_operand() -> xfer[Term]
 		#print("operand {{cur_index}}")
 		if cur() == "def"
@@ -130,12 +130,12 @@ class Parser
 				raise(new SyntaxError("unexpected end of line"))
 			var xx = parse_operand_minimal()
 			eid.add(give(xx))
-			
+
 			if end_of_line()
 				break
 			if cur() in [")", ",", "]"]
 				break
-			
+
 			# operator
 			if operator_rank(cur()) < 0
 				raise(new SyntaxError("unknown operator '{{cur()}}'"))
@@ -168,7 +168,7 @@ func digest_operators(_eid: xfer[Term][]) -> xfer[Term]
 	var eid = _eid
 	if (len(eid) % 2) != 1
 		raise(new SyntaxError("missing operand after operator"))
-	
+
 	while len(eid) >= 3
 		var i_sig: int
 		var sig = -1
@@ -185,8 +185,8 @@ func digest_operators(_eid: xfer[Term][]) -> xfer[Term]
 		eid.remove(i_sig)
 		eid.remove(i_sig)
 	#print eid
-	
-	
+
+
 	return give(eid[0])
 
 func parse(s: string) -> shared![Term]
@@ -198,9 +198,4 @@ func parse(s: string) -> shared![Term]
 #func f() -> xfer[Term]
 #	return new Term(Type.NUMBER, "1")
 
-func main()
-	#shared Term t = f()
-	var t = parse("x+1")
-	print(str(t))
-	
-	
+

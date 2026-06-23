@@ -1,0 +1,6 @@
+use kabama.parser.*
+
+func main()
+	#shared Term t = f()
+	var t = parse("x+1")
+	print(str(t))

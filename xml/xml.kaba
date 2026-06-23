@@ -182,7 +182,7 @@ func _encode_part(key: string, doc: Any, pre: string) -> string
 	if doc.type() in [i32, f32, string]
 		# string
 		return "{{pre}}<{{key}}>{{doc}}</{{key}}>\n"
-	else if doc.type == Any{}
+	else if doc.type() == Any{}
 		# dict
 		var s: string
 		s += "{{pre}}<{{key}}>\n"
@@ -190,30 +190,21 @@ func _encode_part(key: string, doc: Any, pre: string) -> string
 			s += _encode_part(k, doc[k]!, pre + "\t")
 		s += "{{pre}}</{{key}}>\n"
 		return s
-	else if doc.type == Any[]
+	else if doc.type() == Any[]
 		# array
 		var s: string
 		for i in 0:len(doc)
 			s += _encode_part(key, doc[i]!, pre)
 		return s
 	else
-		return "???{{doc.type}}\n"
+		return "???{{doc.type()}}\n"
 
 
 func encode(doc: Any) -> string
 	var s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-	if doc.type != Any{}
+	if doc.type() != Any{}
 		raise(new Exception("doc must be a dict"))
 	for k in doc.keys()
 		s += _encode_part(k, doc[k]!, "")
 	return s
 
-
-func main()
-	var d = dyn({"a":{"b":[{"x":2, "y":1.1}, "c"], "d":{"a":"4"}}})
-	print(d)
-	print(encode(d))
-	print(parse(encode(d)))
-	
-	print("--------")
-	print(parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a><test/><x a=\"b\"/></a>"))

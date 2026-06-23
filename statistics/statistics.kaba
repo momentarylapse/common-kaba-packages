@@ -73,7 +73,3 @@ func find_peaks(_h: f32[], sigma: f32) -> (f32[],f32[])
 		#break
 	return peaks, h
 
-# "unit test"
-func main()
-	for i in 0:100
-		print(sorted_count_smaller(range(100.), i) - i)

@@ -1,0 +1,8 @@
+use linalg.*
+
+func main()
+	let A = SparseRowMatrix(Matrix([[1,2],[3,4]]))
+	let B = SparseRowMatrix(Matrix([[1,-1],[0,100]]))
+	print(A.to_matrix())
+	print(B.to_matrix())
+	print(outer_product(A, B).to_matrix())

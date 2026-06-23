@@ -1,0 +1,8 @@
+use linalg.*
+
+func main()
+	let M = Matrix([[2.,1.],[-1.,2.]])
+	print(M)
+	let x = solve(M, [1.0,1.0])
+	print(x)
+	print(mul(M, x))

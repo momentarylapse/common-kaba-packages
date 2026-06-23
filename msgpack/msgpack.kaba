@@ -27,19 +27,19 @@ func signify_uint(u: i32, l: i32) -> i32
 func decode_part(b: bytes, out offset: i32) -> Any
 	if len(b) <= offset
 		return nil
-	
+
 	let c = b[offset]
 	offset ++
-		
+
 	if c == 0xc0
 		return nil
-	
+
 	# bool
 	if c == 0xc2
-		return false	
+		return false
 	if c == 0xc3
 		return true
-	
+
 	# int
 	if (c & 0x80) == 0x00
 		return i32(c)
@@ -69,7 +69,7 @@ func decode_part(b: bytes, out offset: i32) -> Any
 		# i32
 		offset +=4
 		return signify_uint(to_uint(b[offset-4:offset]), 4)
-	
+
 	# float
 	if c == 0xca
 		# f32
@@ -81,7 +81,7 @@ func decode_part(b: bytes, out offset: i32) -> Any
 		offset += 8
 		let x = reversed(b[offset-8:offset])
 		return f32(*(&x[0] as f64&))
-	
+
 	# str/bin
 	if (c & 0xa0) == 0xa0
 		# str5
@@ -102,7 +102,7 @@ func decode_part(b: bytes, out offset: i32) -> Any
 		offset += 2
 		offset += l
 		return b[offset-l:offset]
-	
+
 	# "ext"
 	if c == 0xc7
 		let l = i32(b[offset])
@@ -112,7 +112,7 @@ func decode_part(b: bytes, out offset: i32) -> Any
 		let a = b[offset - l:offset] as Any
 		return dyn([n, a])
 		#return b[offset - l:offset]
-		
+
 	raise(new Exception("unhandled msgpack tag  {{c}}"))
 	return nil
 
@@ -136,14 +136,3 @@ func encode_ext(b: bytes, type: i32) -> bytes
 	return [0xc7, u8(len(b)), u8(type)] | b
 
 
-func main()
-	print(decode([0x05]))
-	print(decode([0xcc, 0xff]))
-	print(decode([0xcd, 0x00, 0xff]))
-	print(decode([0xce, 0x00, 0x00, 0x00, 0xff]))
-	print(decode([0xff]))
-	print(decode([0xd0, 0xff]))
-	print(decode([0xd1, 0xff, 0xff]))
-	print(decode([0xd2, 0xff, 0xff, 0xff, 0xff]))
-	print(decode([0xca, 0x3f, 0x80, 0x00, 0x00]))
-	print(decode(encode(13)))

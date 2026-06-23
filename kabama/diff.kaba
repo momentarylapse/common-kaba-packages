@@ -26,16 +26,16 @@ func diff_function(f: string, params: shared![Term][]) -> xfer[Term]
 # d/dx
 # always copies...
 func diff(t: shared![Term], by: string) -> xfer[Term]
-	print("D D D D")
-	print(t)
-	print(by)
+#	print("D D D D")
+#	print(t)
+#	print(by)
 
 	# self
 	if t.type == Type.NUMBER or t.type == Type.CONSTANT or t.type == Type.FLOAT # in [Type.NUMBER, Type.FLOAT, Type.CONSTANT]
 		return AddNumber("0")
 	if t.type == Type.VARIABLE
 		if t.name == by
-			print("1")
+#			print("1")
 			return AddNumber("1")
 		return AddNumber("0")
 	if t.type == Type.FUNCTION
@@ -45,14 +45,14 @@ func diff(t: shared![Term], by: string) -> xfer[Term]
 		# diff(f(a))  ->  f'(a) * diff(a)
 		return give(r)
 	if t.type == Type.OPERATOR
-		print("DD op")
-		print(t)
+#		print("DD op")
+#		print(t)
 		if len(t.params) < 2
 			raise(new RuntimeError("unhandled differential..."))
-		print("a")
+#		print("a")
 		let a = t.params[0]
 		let b = t.params[1]
-		print("b")
+#		print("b")
 		if t.name in ["+", "-", "="]
 			# diff(a + b)  ->  diff(a) + diff(b)
 			return AddOperator(t.name, diff(a, by), diff(b, by))
@@ -66,16 +66,16 @@ func diff(t: shared![Term], by: string) -> xfer[Term]
 			                        AddOperator("/", AddOperator("*", a, diff(b, by)),
 			                                         AddOperator("^", b, AddNumber("2"))))
 		if t.name == "^"
-			print("^")
+#			print("^")
 			if b.type == Type.NUMBER or b.type == Type.FLOAT or b.type == Type.CONSTANT # in [...]
 				# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a))
 				return AddOperator("*", b,
 				                        AddOperator("*", AddOperator("^", a, AddNumber(sub(b.name, "1"))),
 				                                         diff(a, by)))
-			print("^^")
-			print([a])
-			print([a])
-			print([b])
+#			print("^^")
+#			print([a])
+#			print([a])
+#			print([b])
 			# diff(a ^ b)  ->  b * ((a ^ (b - 1)) * diff(a)) + ln(a) * a^b * diff(b)
 			return AddOperator("+", AddOperator("*", b,
 			                                         AddOperator("*", AddOperator("^", a, AddOperator("-", b, AddNumber("1"))),

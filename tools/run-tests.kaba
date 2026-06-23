@@ -42,7 +42,7 @@ func run_tests_for_dir(dir: Path)
 
 
 func run_tests_for_package(dir: Path)
-	print("{{terminal.ORANGE}}package {{dir.basename()}}{{terminal.END}}")
+	print("{{terminal.YELLOW}}package {{dir.basename()}}{{terminal.END}}")
 	run_tests_for_dir(dir | "test")
 
 

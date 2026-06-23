@@ -141,13 +141,13 @@ func literally_equal(a: shared![Term], b: shared![Term]) -> bool
 		if !literally_equal(a.params[i], b.params[i])
 			return false
 	return true
-	
-			
-	
+
+
+
 func sort_group(out l: shared![Term][])
 	# "render" all terms...   need a comp(term, term) function
 	var s = [for t in l str(t)]
-	
+
 	# sorti
 	for i in 0:len(l)-1
 		for j in i+1:len(l)
@@ -159,7 +159,7 @@ func sort_group(out l: shared![Term][])
 
 func make_unique_in_product(out l: shared![Term][], inv: bool[])
 	var exponents: shared![Term][]
-	
+
 	for i=>x in l
 		var e: shared![Term] = x # dummy
 		if x.name == "^"
@@ -186,8 +186,8 @@ func eval_product(t: shared![Term]) -> shared![Term]
 	var inverse: bool[]
 	var l = extract_product_group(t, inverse)
 	#print_group(l)
-	
-	
+
+
 	var num = "1"
 	var denum = "1"
 	for i in 0:len(l)
@@ -199,17 +199,17 @@ func eval_product(t: shared![Term]) -> shared![Term]
 			l.remove(i)
 			inverse.remove(i)
 			i --
-	
+
 	if num == "0"
 		return AddNumber("0")
 	if len(l) == 0
 		return eval_number_division(num, denum)
-	
+
 	#print_group(l)
 	make_unique_in_product(l, inverse)
 	#print_group(l)
 	sort_group(l)
-	
+
 	var r = l[0]
 	for i in 1:len(l)
 		r = AddOperator("*", r, l[i])
@@ -222,7 +222,7 @@ func eval_product(t: shared![Term]) -> shared![Term]
 func make_unique_in_sum(out l: shared![Term][], out negative: bool[])
 	var multiplicity: string[]
 	#print_group(l)
-	
+
 	for i=>x in l
 		var m = "1"
 		if x.name == "*"
@@ -254,7 +254,7 @@ func eval_sum(t: shared![Term]) -> shared![Term]
 	var negative: bool[]
 	var l = extract_add_group(t, negative)
 	#print_group(l)
-	
+
 	# add constants
 	var num = "0"
 	for i in 0:len(l)
@@ -266,19 +266,19 @@ func eval_sum(t: shared![Term]) -> shared![Term]
 			l.remove(i)
 			negative.remove(i)
 			i --
-	
-	
+
+
 
 	#print_group(l)
 	make_unique_in_sum(l, negative)
 	#print_group(l)
-	
+
 	# all constant numbers
 	if len(l) == 0
 		return AddNumber(num)
-	
+
 	sort_group(l)
-	
+
 	var t_r = l[0]
 	for i in 1:len(l)
 		t_r = AddOperator("+", t_r, l[i])
@@ -373,7 +373,7 @@ func eval_function(t: shared![Term]) -> shared![Term]
 		if p.name == "∧"
 			return normalize(AddOperator("+", AddFunction("deg", [p.params[0]]),
 			                                  AddFunction("deg", [p.params[1]])))
-		
+
 	return t
 
 func eval_wedge(_t: shared![Term]) -> shared![Term]
@@ -394,7 +394,7 @@ func eval_wedge(_t: shared![Term]) -> shared![Term]
 		                                                     AddFunction("deg", [t.params[0]]),
 		                                                     AddFunction("deg", [t.params[1]]))),
 		                             t))
-		
+
 	return t
 
 func eval_equal(t: shared![Term]) -> shared![Term]
@@ -415,7 +415,7 @@ func normalize(_t: shared![Term]) -> shared![Term]
 	# recursion
 	for i in 0:len(t.params)
 		t.params[i] = normalize(t.params[i])
-		
+
 	# self
 	if t.type == Type.FUNCTION
 		return eval_function(t)
@@ -433,10 +433,3 @@ func normalize(_t: shared![Term]) -> shared![Term]
 		return eval_in(t)
 	return t
 
-
-func main()
-	var e = parse("1+1")
-	print("n")
-	var t = normalize(e)
-	print(str(t))
-	

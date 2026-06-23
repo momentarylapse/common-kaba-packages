@@ -30,7 +30,7 @@ class Database
 
 	func error() -> string
 		return _cstr2str(_sqlite3_errmsg(db))
-		
+
 	func query(sql: string) -> xfer[Query]
 		var s = sql
 		s.add(0)
@@ -42,7 +42,7 @@ class Database
 	func run(sql: string)
 		var q = query(sql)
 		q.step()
-	
+
 	func load_doc(table: string, id: Any) -> Any?
 		var sql = "select * from {{table}} where id = {{id}}"
 		print(sql)
@@ -50,7 +50,7 @@ class Database
 	#	if not q.has_more()
 	#		return nil #raise(new Exception("{{id}} not found in {{table}}"))
 		return q.get_column()
-	
+
 	#any save_doc(string table, any id)
 	#	var q = query("select * from " + table + " where id = " + str(id))
 	#	if !q.has_more()
@@ -68,13 +68,13 @@ class Query as shared
 
 	func mut step()
 		step_result = _sqlite3_step(res)
-	
+
 	func mut has_more() -> bool
 		if needs_step
 			step()
 			needs_step = false
 		return step_result == 100
-	
+
 	func mut get_column_text() -> string[]
 		var r: string[]
 		if not has_more()
@@ -109,7 +109,7 @@ class Query as shared
 		for i in 0:n
 			r.add(_cstr2str(_sqlite3_column_name(res, i)))
 		return r
-	
+
 
 func open(filename: string) -> xfer[Database]
 	var f = filename
@@ -131,21 +131,4 @@ func create(filename: string) -> xfer[Database]
 	return give(db)
 
 
-func main()
-	if true
-		var db = create("test.sqlite3")
-		db.run("create table michi (id text, a integer, b text)")
-		db.run("insert into michi (id,a,b) values ('1001',13,'xxx')")
-		db.run("insert into michi (id,a,b) values ('1002',14,'yyy')")
-		db.run("insert into michi (id,a,b) values ('1003',15,'zzz')")
-
-	if true
-		var db = open("test.sqlite3")
-	#	if true
-		var q = db.query("select * from michi")
-#		var q = db.query("SELECT * FROM sqlite_master where type='table'")
-#		print(q.column_names())
-		while q.has_more()
-			print(q.get_column())
-		#print(db.load_doc("michi", "1002"))
 

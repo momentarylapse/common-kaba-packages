@@ -1,0 +1,9 @@
+use linalg.*
+
+func main()
+	let M = Matrix([[2.,1.],[-1.,2.]])
+	print(M)
+	let I = inverse(M)
+	print(I)
+	print(mul(I,M))
+	print(mul(M,I))

@@ -1,0 +1,11 @@
+use xml.*
+
+
+func main()
+	var d = dyn({"a":{"b":[{"x":2, "y":1.1}, "c"], "d":{"a":"4"}}})
+	print(d)
+	print(encode(d))
+	print(parse(encode(d)))
+
+	print("--------")
+	print(parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a><test/><x a=\"b\"/></a>"))

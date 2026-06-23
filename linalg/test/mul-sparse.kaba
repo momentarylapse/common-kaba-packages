@@ -1,0 +1,11 @@
+use linalg.*
+
+func main()
+	var M: SparseRowMatrix
+	M.clear(4,5)
+	M.set(3,2, 5)
+	M.set(1,2, 6)
+	M.set(3,2, 7)
+	print(M)
+	print(M.to_matrix())
+	print(mul(M, [99,1,1,0,0]))

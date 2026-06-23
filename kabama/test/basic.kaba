@@ -1,0 +1,5 @@
+use kabama.runtime.*
+
+func main()
+	var r: Runtime
+	print(r.eval("1+1"))

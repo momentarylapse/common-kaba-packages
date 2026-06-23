@@ -1,0 +1,9 @@
+use kabama.parser.*
+use kabama.simplify.*
+
+
+func main()
+	var e = parse("1+1")
+	print("n")
+	var t = normalize(e)
+	print(str(t))

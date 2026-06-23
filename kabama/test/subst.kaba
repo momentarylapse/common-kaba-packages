@@ -1,0 +1,5 @@
+use kabama.runtime.*
+
+func main()
+	var r: Runtime
+	print(r.eval("subst(2*ln(x*y*c), ln(@A*@B), ln(@A)+ln(@B))"))

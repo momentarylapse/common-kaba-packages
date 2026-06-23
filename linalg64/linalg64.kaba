@@ -56,7 +56,7 @@ struct Matrix
 			for j in i:n
 				e[i * n + j] /= f
 			b[i] /= f
-			
+
 			for ii in i+1:m
 				var g = *get(ii, i)
 				for j in i:n
@@ -91,7 +91,7 @@ func solve(A: Matrix, b: f64[]) -> f64[]
 	x.resize(A.m)
 	var bb = b
 	mm._diagonalize(bb)
-	
+
 	var i = A.n-1
 	while i >= 0
 		var s = 0.0 as f64
@@ -243,7 +243,7 @@ func inverse(M: SparseRowMatrix) -> Matrix
 func outer_product(A: SparseRowMatrix, B: SparseRowMatrix) -> SparseRowMatrix
 	var r: Ret
 	r.clear(A.m*B.m, A.n*B.n)
-		
+
 	for i=>rowA in A.rows
 		for j=>rowB in B.rows
 			for eA in rowA
@@ -251,54 +251,3 @@ func outer_product(A: SparseRowMatrix, B: SparseRowMatrix) -> SparseRowMatrix
 					r.set(j*A.m+i, eB[0]*A.m+eA[0], eA[1]*eB[1])
 	return r
 
-# ok
-func _test_solve()
-func main()
-	let M = Matrix([[2.,1.],[-1.,2.]])
-	print(M)
-	let x = solve(M, [1.0,1.0])
-	print(x)
-	print(mul(M, x))
-
-func _test_mul()
-	let M = Matrix([[1,2],[3,4],[5,6]])
-	print(M)
-	print(mul(M, [1,0]))
-
-func _test_inverse()
-#func main()
-	let M = Matrix([[2.,1.],[-1.,2.]])
-	print(M)
-	let I = inverse(M)
-	print(I)
-	print(mul(I,M))
-	print(mul(M,I))
-
-func _test_sparse_mul()
-	var M: SparseRowMatrix
-	M.clear(4,5)
-	M.set(3,2, 5)
-	M.set(1,2, 6)
-	M.set(3,2, 7)
-	print(M)
-	print(M.to_matrix())
-	print(mul(M, [99,1,1,0,0]))
-
-func _test_outer()
-	let A = SparseRowMatrix(Matrix([[1,2],[3,4]]))
-	let B = SparseRowMatrix(Matrix([[1,-1],[0,100]]))
-	print(A.to_matrix())
-	print(B.to_matrix())
-	print(outer_product(A, B).to_matrix())
-
-func _test_qr()
-#func main()
-	var A = Matrix([[12,-51,4],[6,167,-68],[-4,24,-41]])
-	#var A = Matrix([[1,2],[4,5],[5,6]])
-	#var A = Matrix([[1,2,3],[4,5,6]])
-	print(A)
-	let (Q,R) = qr_decomposition(A)
-	print(Q)
-	print(R)
-	print(mul(Q, R))
-	

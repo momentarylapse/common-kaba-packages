@@ -77,7 +77,7 @@ jobs:
         export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
         echo "packages..."
         ${{ steps.strings.outputs.env-dir }}/kaba/kaba package install \
-          algebra asciitools bson circuit cli cloud crypto fft filetags gl glfw hui huibui iter kabama mesh msgpack ncurses \
+          algebra asciitools bson circuit cli cloud crypto fft filetags gl glfw hui huibui iter kabama linalg linalg64 mesh msgpack ncurses \
           net obs opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools urdf xhui xmake xml yrenderer zlib zmq
 
     - name: Test compile all
@@ -89,5 +89,4 @@ jobs:
       run: |
         export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
         export PATH="${{ steps.strings.outputs.kaba-repo }}/build:$PATH"
-        echo $PATH
         ${{ steps.strings.outputs.env-dir }}/kaba/kaba tools/run-tests ${{ steps.strings.outputs.env-dir }}/repos/michi.common
