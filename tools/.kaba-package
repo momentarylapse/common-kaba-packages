@@ -1,7 +1,8 @@
-version 5
+version 6
 requires package
 run bindiff.kaba
 run replace.kaba
 run test-compile.kaba
 run sync-libs.kaba
+run tun-tests.kaba
 

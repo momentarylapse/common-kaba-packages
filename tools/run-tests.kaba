@@ -1,0 +1,76 @@
+use os.*
+use kaba
+
+var test_count: i32
+var error_count: i32
+
+
+func run_test(filename: Path, name: string)
+	_print_postfix = ""
+	print("    {{name}}")
+	_print_postfix = "\n"
+	test_count ++
+	try
+		let r = shell_execute("kaba '{{filename}}'")
+		let r0 = fs.read_text(str(filename).replace(".kaba", ".reg")).replace("\r", "")
+		if r == r0
+			print("  {{terminal.GREEN}}OK{{terminal.END}}")
+		else
+			print("  {{terminal.RED}}ERROR{{terminal.END}}")
+			print("expected:")
+			print(r0)
+			print("got:")
+			print(r)
+			error_count ++
+	except Exception as e
+		print("  {{terminal.RED}}ERROR{{terminal.END}}")
+		print(e)
+		error_count ++
+#	var context = kaba.Context.create()
+#	try
+#		var m = context.load_module(filename, true)
+#	except Exception as e
+#		print("{{terminal.RED}}  ERROR  {{e}}{{terminal.END}}")
+#		error_count ++
+
+
+func run_tests_for_dir(dir: Path)
+	let list = fs.search(dir, "*.kaba", "fr")
+	for e in list
+		if fs.exists(dir | str(e).replace(".kaba", ".reg"))
+			run_test(dir | e, str(e).replace(".kaba", ""))
+
+
+func run_tests_for_package(dir: Path)
+	print("{{terminal.ORANGE}}package {{dir.basename()}}{{terminal.END}}")
+	run_tests_for_dir(dir | "test")
+
+
+func run_tests_for_repo(dir: Path)
+	for e in fs.search(dir, "*", "d")
+		if fs.exists(dir | e | "test")
+			run_tests_for_package(dir | e)
+
+
+func run_tests_for(dir: Path)
+	if fs.exists(dir | ".kaba-repo")
+		run_tests_for_repo(dir)
+	else if fs.exists(dir | ".kaba-package")
+		run_tests_for_package(dir)
+	else
+		run_tests_for_dir(dir)
+
+
+func main(arg: string[])
+	error_count = 0
+	if len(arg) == 0
+		run_tests_for(fs.current_directory())
+	for a in arg
+		run_tests_for(a)
+
+	if error_count > 0
+		print("{{terminal.RED}}{{error_count}} / {{test_count}} tests failed{{terminal.END}}")
+		exit(1)
+	else
+		print("{{terminal.GREEN}}all {{test_count}} tests ok{{terminal.END}}")
+
