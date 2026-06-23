@@ -80,9 +80,14 @@ jobs:
           algebra asciitools bson circuit cli cloud crypto fft filetags gl glfw hui huibui iter kabama mesh msgpack ncurses \
           net obs opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools urdf xhui xmake xml yrenderer zlib zmq
 
-    - name: Test compile
+    - name: Test compile all
       run: |
         export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
         ${{ steps.strings.outputs.env-dir }}/kaba/kaba tools/test-compile ${{ steps.strings.outputs.env-dir }}/packages
 
-# TODO run package tests (e.g. polymesh/tests)
+    - name: Run tests
+      run: |
+        export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
+        export PATH="${{ steps.strings.outputs.kaba-repo }}/build:$PATH"
+        echo $PATH
+        ${{ steps.strings.outputs.env-dir }}/kaba/kaba tools/run-tests ${{ steps.strings.outputs.env-dir }}/repos/michi.common
