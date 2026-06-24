@@ -8,7 +8,6 @@ package cli
 package cloud
 package codeeditor
 package crypto
-package env
 package fft
 package filetags
 package gl
