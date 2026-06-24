@@ -1,6 +1,5 @@
 version 3
-requires kaba bfb3e286359b0afe60c92961b59a0bde900c157f
-#package alex
+requires kaba 791a2d92836dd8631335ed70b5f108cb307f50b2
 package algebra
 package asciitools
 package bson
@@ -34,10 +33,7 @@ package pdf
 package plot
 package polymesh
 package profiler
-package psmove
-package shadercomp
 package simplevis
-package sisyphos
 package sqlite
 package statistics
 package terminal

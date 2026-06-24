@@ -1,5 +1,0 @@
-version 6
-requires sqlite
-requires filetags
-run sisyphos.kaba
-
