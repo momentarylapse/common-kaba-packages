@@ -51,6 +51,7 @@ void TextureRenderer::render(const RenderParams& params) {
 
 	nix::bind_frame_buffer(frame_buffer.get());
 	nix::set_viewport(p.area);
+	nix::set_scissor(p.area, frame_buffer->area());
 	if (clear_z)
 		nix::clear_z();
 	for (int i=0; i<clear_colors.num; i++)

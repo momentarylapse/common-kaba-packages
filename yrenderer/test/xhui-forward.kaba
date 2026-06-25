@@ -24,11 +24,16 @@ Dialog win 'bla'
 		---|
 		Button b2 'Test' noexpandy
 		---|
+		Button b3 'Test' noexpandy
+		---|
+		Button b4 'Test' noexpandy
+		---|
 		DrawingArea area '' expandy
 ")
+		set_maximized(true)
 		event("b", func() print("hi"))
 		event_x("area", "hui:draw", xdraw)
-	#	event_x("area", "hui:initialize", xinitialize)
+		event_x("area", "hui:initialize", xinitialize)
 		event_x("win", "hui:just-before-draw", xbefore_draw)
 
 		hui.run_repeated(0.01, func() redraw("area"))
@@ -81,10 +86,10 @@ Dialog win 'bla'
 
 
 	func mut xdraw(p: hui.Painter)
-		p.set_color(Color.RED)
-		print(p.area())
-		p.draw_rect(p.area())
-		return
+	#	p.set_color(Color.RED)
+	#	print(p.area())
+	#	p.draw_rect(p.area())
+	#	return
 		for r in xhui_renderer
 			r.draw(&p)
 

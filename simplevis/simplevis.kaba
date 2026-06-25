@@ -102,7 +102,7 @@ Dialog win 'bla' borderwidth=0
 		xhui_renderer = new XhuiRenderer(ctx!)
 
 
-		hdr = new HDRResolver(ctx!, 1920, 1080)
+		hdr = new HDRResolver(ctx!, 1920, 1080) # TODO dynamically adapt to window size...
 #		hdr.bloom_factor = 10
 
 		render_path = new RenderPathForward(ctx!, 1024)
@@ -119,11 +119,13 @@ Dialog win 'bla' borderwidth=0
 
 
 		light.init(LightType.DIRECTIONAL, [1,1,1,1])
-		light.allow_shadow = true
+#		light.allow_shadow = true
 		light_cam_ang = Quaternion([0.5, -0.4, 0])
 
 
 		on_initialize()
+
+		hui.run_later(0.1, func() redraw("area"))
 
 
 	func mut xbefore_draw(p: hui.Painter)
@@ -137,7 +139,7 @@ Dialog win 'bla' borderwidth=0
 			render_path!.set_lights([&light])
 
 			r.before_draw(&p)
-			lines.start_frame(1)
+			lines.start_frame(p.ui_scale)
 			on_prepare()
 
 
