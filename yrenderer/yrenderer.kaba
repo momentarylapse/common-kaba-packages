@@ -108,6 +108,8 @@ func extern api_init_xhui(p: void*) -> xfer[Context] # p: xhui.Painter*
 
 
 struct extern RenderParams
+	var desired_aspect_ratio: f32
+	var target_is_window: bool
 	func extern __assign__(o: RenderParams)
 
 class extern RenderData as @noauto
