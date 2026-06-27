@@ -10,7 +10,7 @@
 
 #include "nix.h"
 #include "nix_common.h"
-#include "../math/vec2.h"
+#include <lib/math/vec2.h>
 #if __has_include("../hui/hui.h")
 #include "../hui/hui.h"
 #define NIX_USE_HUI 1
