@@ -13,7 +13,7 @@ namespace xhui {
 class Group : public Control {
 public:
 	Group(const string& id, const string& title);
-	void negotiate_area(const rect& available) override;
+	void negotiate_content_area(const rect& available) override;
 	vec2 get_content_min_size() const override;
 	vec2 get_greed_factor() const override;
 	void _draw(Painter* p) override;
@@ -22,7 +22,7 @@ public:
 
 	Label header;
 	shared<Control> child;
-	Array<Control*> get_children(ChildFilter f) const override;
+	Array<const Node*> _get_children(ChildFilter f) const override;
 	void add_child(shared<Control> c, int x, int y) override;
 	void remove_child(Control* c) override;
 };

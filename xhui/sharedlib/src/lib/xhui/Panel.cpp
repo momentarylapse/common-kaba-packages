@@ -34,27 +34,10 @@
 namespace xhui {
 
 
-struct Option {
-	string key, value;
-};
-
-Array<Option> parse_options(const string& s) {
-	Array<Option> r;
-	for (const auto& o: s.explode(",")) {
-		auto xx = o.explode("=");
-		if (xx.num >= 2)
-			r.add({xx[0], xx[1]});
-		else
-			r.add({xx[0], ""});
-	}
-	return r;
-}
-
-
 Panel::Panel(const string &_id) : Control(_id, ControlType::Panel) {
 	ignore_hover = true;
 
-	padding = 0;
+	padding = rect::EMPTY;
 	size_mode_x = SizeMode::ForwardChild;
 	size_mode_y = SizeMode::ForwardChild;
 }
@@ -64,46 +47,14 @@ void Panel::_draw(Painter *p) {
 		top_control->_draw(p);
 }
 
-void Panel::negotiate_area(const rect &available) {
-	area = available;
+void Panel::negotiate_content_area(const rect &available) {
 	if (top_control)
-		top_control->negotiate_area(area.grow(-padding));
-
-	/*Array<int> w, h;
-	get_grid_min_sizes(w, h);
-	int total_min_w, total_min_h;
-	get_content_min_size(total_min_w, total_min_h);
-	float diff_x = max(available.width() - total_min_w, 0.0f);
-	float diff_y = max(available.height() - total_min_h, 0.0f);
-
-	Array<float> gx, gy;
-	get_grid_greed_factors(gx, gy);
-	float total_greed_x, total_greed_y;
-	get_greed_factor(total_greed_x, total_greed_y);
-
-	float greed_to_x = (total_greed_x > 0) ? diff_x / total_greed_x : 0;
-	float greed_to_y = (total_greed_y > 0) ? diff_y / total_greed_y : 0;
-
-	for (int i=0; i<w.num; i++)
-		w[i] += greed_to_x * gx[i];
-	for (int i=0; i<h.num; i++)
-		h[i] += greed_to_y * gy[i];
-
-	for (auto &c: children) {
-		int x0 = _area.x1;
-		int y0 = _area.y1;
-		for (int i=0; i<c.x; i++)
-			x0 += w[i] + spacing;
-		for (int i=0; i<c.y; i++)
-			y0 += h[i] + spacing;
-		c.control->negotiate_area(rect(x0, x0 + w[c.x], y0, y0 + h[c.y]));
-	}*/
+		top_control->negotiate_outer_area(available);
 }
 
 vec2 Panel::get_content_min_size() const {
 	if (top_control)
-		return top_control->get_effective_min_size() + vec2(padding, padding) * 2;
-		//return top_control->get_content_min_size();
+		return top_control->get_effective_min_size();
 	return {0, 0};
 }
 
@@ -351,9 +302,7 @@ void Panel::set_options(const string& id, const string& options) {
 }
 
 void Panel::set_option(const string& key, const string& value) {
-	if (key == "padding") {
-		padding = value._float();
-	} else if (key == "propagateevents") {
+	if (key == "propagateevents") {
 		propagate_events = true;
 	} else {
 		Control::set_option(key, value);
@@ -362,7 +311,7 @@ void Panel::set_option(const string& key, const string& value) {
 
 
 
-Array<Control*> Panel::get_children(ChildFilter f) const {
+Array<const layout::Node*> Panel::_get_children(ChildFilter f) const {
 	if (top_control and (top_control->visible or f == ChildFilter::All))
 		return {top_control.get()};
 	return {};
@@ -471,8 +420,8 @@ void Panel::_add_control(const string &ns, const Resource &cmd, const string &pa
 				cmd.x, cmd.y,
 				cmd.id);
 
-	for (const string &o: cmd.options)
-		set_options(cmd.id, o);
+	for (const auto &o: cmd.options)
+		set_options(cmd.id, str(o));
 
 	enable(cmd.id, cmd.enabled());
 	/*if (cmd.has("hidden"))
@@ -482,7 +431,7 @@ void Panel::_add_control(const string &ns, const Resource &cmd, const string &pa
 		set_image(cmd.id, cmd.image());*/
 
 
-	string tooltip = get_language_t(ns, cmd.id, cmd.tooltip);
+	string tooltip = get_language_t(ns, cmd.id, cmd.value("tooltip"));
 	if (tooltip.num > 0)
 		set_tooltip(cmd.id, tooltip);
 
@@ -543,7 +492,7 @@ void Panel::from_resource(const Resource& res) {
 		int width = res.value("width", "0")._int();
 		int height = res.value("height", "0")._int();
 		for (auto &o: res.options)
-			set_options(id, o);
+			set_options(id, str(o));
 
 		if (auto dlg = as_dialog(this)) {
 			if (width + height > 0) {
@@ -597,9 +546,9 @@ void Panel::from_resource(const Resource& res) {
 	}
 #endif
 
-	int bw = res.value("borderwidth", "-1")._int();
+	float bw = res.value("borderwidth", "-1")._float();
 	if (bw >= 0)
-		padding = bw;
+		padding = rect(bw, bw, bw, bw);
 
 
 	// controls

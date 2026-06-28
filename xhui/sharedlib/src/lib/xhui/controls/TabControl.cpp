@@ -70,17 +70,16 @@ vec2 TabControl::get_content_min_size() const {
 	return s;
 }
 
-void TabControl::negotiate_area(const rect& available) {
-	area = available;
+void TabControl::negotiate_content_area(const rect& available) {
 	vec2 p00 = available.p00();
 	if (show_header) {
 		const vec2 s = header->get_effective_min_size();
-		header->negotiate_area({available.p00(), available.p10() + vec2(0, s.y)});
+		header->negotiate_outer_area({available.p00(), available.p10() + vec2(0, s.y)});
 		p00 = header->area.p01() + vec2(0, Theme::_default.spacing);
 	}
 	for (auto& p: pages)
 		if (p.child)
-			p.child->negotiate_area({p00, available.p11()});
+			p.child->negotiate_outer_area({p00, available.p11()});
 }
 
 vec2 TabControl::get_greed_factor() const {
@@ -91,8 +90,8 @@ vec2 TabControl::get_greed_factor() const {
 	return f;
 }
 
-Array<Control*> TabControl::get_children(ChildFilter f) const {
-	Array<Control*> children;
+Array<const layout::Node*> TabControl::_get_children(ChildFilter f) const {
+	Array<const Node*> children;
 	if (f == ChildFilter::All or show_header)
 		children.add(header.get());
 	for (const auto& [i, p]: enumerate(pages))

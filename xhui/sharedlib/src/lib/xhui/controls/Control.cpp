@@ -66,16 +66,12 @@ void Control::_unregister() {
 	owner = nullptr;
 }
 
-Array<Control*> Control::get_children_recursive(bool include_me, ChildFilter f) const {
+Array<Control*> Control::get_children(ChildFilter f) {
 	Array<Control*> r;
-	if (include_me)
-		r.add(const_cast<Control*>(this));
-	for (auto c: get_children(f))
-		r.append(c->get_children_recursive(true, f));
+	const auto cc = _get_children(f);
+	r.simple_assign(&cc);
 	return r;
 }
-
-
 
 
 void Control::request_redraw() {
@@ -130,6 +126,7 @@ void Control::set_option(const string& key, const string& value) {
 	} else if (key == "grabfocus") {
 		can_grab_focus = true;
 		run_later(0.01f, [this] {
+			// wait till we have a window
 			if (auto w = get_window())
 				w->focus_control = this;
 		});
@@ -140,7 +137,7 @@ void Control::set_option(const string& key, const string& value) {
 	} else if (key == "tooltip") {
 		tooltip = value;
 	} else {
-		set_layout_option(key, value);
+		Node::set_option(key, value);
 		request_redraw();
 	}
 }

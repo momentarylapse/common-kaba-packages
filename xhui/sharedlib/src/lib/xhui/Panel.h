@@ -6,11 +6,15 @@
 
 class Painter;
 
+namespace layout {
+	struct Resource;
+}
+
 namespace xhui {
 
 using Callback = std::function<void()>;
 using CallbackP = std::function<void(::Painter*)>;
-struct Resource;
+using Resource = layout::Resource;
 class Dialog;
 
 class Panel : public Control {
@@ -18,10 +22,10 @@ public:
 	explicit Panel(const string &id);
 
 	void _draw(Painter* p) override;
-	void negotiate_area(const rect& available) override;
+	void negotiate_content_area(const rect& available) override;
 	vec2 get_content_min_size() const override;
 	vec2 get_greed_factor() const override;
-	Array<Control*> get_children(ChildFilter f) const override;
+	Array<const Node*> _get_children(ChildFilter f) const override;
 
 	void add_child(shared<Control> c, int x=0, int y=0) override;
 	void set_target(const string& id);
@@ -55,7 +59,6 @@ public:
 	shared<Control> top_control;
 	Control* target_control = nullptr;
 	Array<Control*> controls;
-	float padding;
 
 	struct EventHandler {
 		EventHandler() = default;

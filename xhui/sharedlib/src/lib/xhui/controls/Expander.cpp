@@ -85,22 +85,21 @@ void Expander::remove_child(Control* c) {
 		child = nullptr;
 }
 
-Array<Control*> Expander::get_children(ChildFilter f) const {
+Array<const layout::Node*> Expander::_get_children(ChildFilter f) const {
 	if (child and (state == State::Expanded or f == ChildFilter::All))
-		return {static_cast<Control*>(const_cast<Label*>(&header)), child.get()};
-	return {static_cast<Control*>(const_cast<Label*>(&header))};
+		return {&header, child.get()};
+	return {&header};
 }
 
-void Expander::negotiate_area(const rect& available) {
+void Expander::negotiate_content_area(const rect& available) {
 	if (state == State::Undecided)
 		state = State::Compact;
-	area = available;
 	float hh = 0;
 	if (show_header)
-		hh = header.get_content_min_size().y;
-	header.negotiate_area({available.p00(), available.p10() + vec2(0, hh)});
+		hh = header.get_effective_min_size().y;
+	header.negotiate_outer_area({available.p00(), available.p10() + vec2(0, hh)});
 	if (child)
-		child->negotiate_area({area.p00() + vec2(0, hh + SPACING), area.p11()});
+		child->negotiate_outer_area({available.p00() + vec2(0, hh + SPACING), available.p11()});
 }
 
 vec2 Expander::get_content_min_size() const {

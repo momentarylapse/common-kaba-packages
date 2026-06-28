@@ -39,7 +39,7 @@ Dialog coding-panel ''
 	Grid ? ''
 		Overlay ? ''
 			MultilineEdit edit '' grabfocus monospace linenumbers focusframe=no
-			Grid ? '' margin=25
+			Grid ? '' padding=25
 				Label ? '' ignorehover expandx
 				Grid search-grid '' class=card hidden
 					Edit search-pattern '' width=300
@@ -69,7 +69,7 @@ Dialog coding-panel ''
 		edit.set_option("linenumbers", "")
 
 		var list = get_control(id_structure)! as xhui.ListView&
-		list.column_factory(0).set_create(func(id: string) xhui.create_control("Label", "!markup,vmargin=2", id))
+		list.column_factory(0).set_create(func(id: string) xhui.create_control("Label", "!markup,paddingy=2", id))
 
 		event_x(id_edit, "hui:changed", on_edit_changed)
 		event_x(id_edit, "hui:left-button-up", on_edit_left_button_up)

@@ -10,8 +10,8 @@ public:
 	Button(const string &id, const string &title);
 
 	vec2 get_content_min_size() const override;
-	void negotiate_area(const rect& available) override;
-	Array<Control*> get_children(ChildFilter f) const override;
+	void negotiate_content_area(const rect& available) override;
+	Array<const Node*> _get_children(ChildFilter f) const override;
 	void set_string(const string& s) override;
 	string get_string() override;
 	void enable(bool enabled) override;
@@ -30,7 +30,6 @@ public:
 	bool primary = false;
 	bool danger = false;
 	bool flat = false;
-	rect padding;
 
 	enum class State {
 		DEFAULT,

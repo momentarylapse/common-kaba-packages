@@ -21,12 +21,12 @@ public:
 	int get_int() override;
 	Array<int> get_selection() override;
 	void set_option(const string& key, const string& value) override;
-	Array<Control*> get_children(ChildFilter f) const override;
+	Array<const Node*> _get_children(ChildFilter f) const override;
 
 	void _update_selection(const Array<int>& sel);
 
 	vec2 get_content_min_size() const override;
-	void negotiate_area(const rect& available) override;
+	void negotiate_content_area(const rect& available) override;
 
 	void on_mouse_enter(const vec2& m) override;
 	void on_mouse_leave(const vec2& m) override;
@@ -70,13 +70,12 @@ public:
 	} selection_mode;
 
 	Array<int> selected;
-	//float view_y = 0;
 	bool show_headers = true;
-	rect padding;
 	float selection_radius;
 
 	bool show_selection = true;
 	bool sunken_background = true;
+	vec2 cell_padding;
 
 	int hover_row = -1;
 
