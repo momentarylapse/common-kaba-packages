@@ -11,7 +11,9 @@ func write_resource(out f: os.FileStream, r: hui.Resource)
 		f << r.id[1:]
 	else
 		f << r.id
-	f << r.options.join(",")
+	var rr = r
+	rr.options = rr.options |> filter(o => o.key != "tooltip")
+	f << rr._options_str().escape()
 	f << r.x
 	f << r.y
 	f << len(r.children)

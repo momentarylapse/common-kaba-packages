@@ -7,11 +7,11 @@ use .resource.*
 use .source.*
 use .demo.*
 use .export.*
-	
+
 
 func get_ids(out l: Language, r: hui.Resource, ns: string)
-	lang_id_add(l.ids, r.id, r.title, r.tooltip, ns)
-	
+	lang_id_add(l.ids, r.id, r.title, r.value("tooltip"), ns)
+
 	for c in r.children
 		get_ids(l, c, ns)
 
@@ -19,34 +19,34 @@ func get_ids(out l: Language, r: hui.Resource, ns: string)
 func find_all_ids(out lang: Language, res: hui.Resource[])
 	for r in res
 		get_ids(lang, r, r.id)
-	
+
 #	lang.show()
 
 
 func load_own_lang(literally: bool) -> Language
 	var own: Language
 	own.name = conf.own_lang_name
-	
+
 	print("loading own language: {{own.name}}")
 	resources = load_all_huis(literally)
 	find_all_ids(own, resources)
-	
+
 	parse_source_code_dir(conf.source_code_dir, own)
 	own.sort()
 	print("    {{len(own.ids)}} ids, {{len(own.texts)}} texts")
-	
+
 	return own
 
-	
+
 func action_check(arg: string[])
 	var dir = Path(arg[0])
 	conf.set_dir(dir)
 	conf.load()
-	
+
 	var own = load_own_lang(true)
-	
+
 	var langs = load_prelangs()
-	
+
 	for l in langs
 		let r = check_lang(l, own, false)
 
@@ -57,11 +57,11 @@ func action_export(arg: string[])
 		dir = Path(arg[0])
 	conf.set_dir(dir)
 	conf.load()
-	
+
 	var own = load_own_lang(true)#false)
-	
+
 	var langs = load_prelangs()
-	
+
 	export_resources(resources, own, langs)
 
 func patch_language(out l: Language, own: Language, filename: Path)
@@ -87,13 +87,13 @@ func action_translate(arg: string[])
 	var filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()
-	
+
 	var own = load_own_lang(true)
-	
+
 	var l = load_prelang(filename)
 	if check_lang(l, own, true)
 		return
-	
+
 	var path = conf.dir | "TRANS"
 	try
 		os.shell_execute("sgribthmaker \"{{path}}\"")
@@ -112,11 +112,11 @@ func action_add(arg: string[])
 	var name = arg[1]
 	conf.set_dir(filename.parent())
 	conf.load()
-	
+
 	var l: Language
 	l.name = name
 	l.filename = filename
-	
+
 	l.save()
 
 
@@ -133,11 +133,18 @@ func swap_translate_lang(out own: Language, l: Language, target: Path)
 	own.filename = target
 	own.save()
 
+func set_value(out r: hui.Resource, key: string, value: string)
+	for mut o in r.options
+		if o.key == key
+			o.value = value
+			return
+	r.options.add([key, value])
+
 func swap_translate_gui(out r: hui.Resource, l: Language, ns: string)
 	for i in l.ids
 		if i.id == r.id or i.id == "{{ns}}/{{r.id}}"
 			r.title = i.title
-			r.tooltip = i.tooltip
+			set_value(r, "tooltip", i.tooltip)
 	for mut c in r.children
 		swap_translate_gui(c, l, ns)
 
@@ -155,23 +162,23 @@ func action_swap(arg: string[])
 	var target = Path(arg[1])
 	conf.set_dir(source.parent())
 	conf.load()
-	
+
 	var own = load_own_lang(true)
-	
+
 	var l = load_prelang(source)
 	if not check_lang(l, own, true)
 		print("ERROR: missing translations")
 		return
-	
+
 	swap_translate_lang(own, l, target)
-	
+
 	swap_translate_guis(l)
-	
+
 	swap_translate_source(conf.source_code_dir, l)
-	
+
 	# should also translate other languages... but... screw it
 
-	
+
 
 func main(arg: string[])
 	var p: os.CommandLineParser

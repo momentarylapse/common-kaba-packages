@@ -194,6 +194,10 @@ add_library(modulehui SHARED
 	src/lib/image/image_png.cpp
 	src/lib/image/image_tga.cpp
 	src/lib/image/ImagePainter.cpp
+	src/lib/kapi/kapi.cpp
+	src/lib/layout/Grid.cpp
+	src/lib/layout/Node.cpp
+	src/lib/layout/Resource.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
