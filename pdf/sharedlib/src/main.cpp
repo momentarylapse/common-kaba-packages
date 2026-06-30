@@ -1,5 +1,5 @@
 #include <lib/base/base.h>
-#include <lib/doc/_kaba_export.h>
+#include <lib/pdf/_kaba_export.h>
 
 
 extern "C" {

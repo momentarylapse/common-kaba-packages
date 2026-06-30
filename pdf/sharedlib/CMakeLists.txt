@@ -35,10 +35,7 @@ add_library(modulepdf SHARED
 	src/lib/base/array.cpp
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
-	src/lib/doc/_kaba_export.cpp
 	src/lib/doc/chunked.cpp
-	src/lib/doc/pdf.cpp
-	src/lib/doc/ttf.cpp
 	src/lib/doc/xml.cpp
 	src/lib/image/color.cpp
 	src/lib/image/image.cpp
@@ -47,6 +44,7 @@ add_library(modulepdf SHARED
 	src/lib/image/image_png.cpp
 	src/lib/image/image_tga.cpp
 	src/lib/image/ImagePainter.cpp
+	src/lib/kapi/kapi.cpp
 	src/lib/math/Box.cpp
 	src/lib/math/complex.cpp
 	src/lib/math/interpolation.cpp
@@ -73,6 +71,9 @@ add_library(modulepdf SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
+	src/lib/pdf/_kaba_export.cpp
+	src/lib/pdf/pdf.cpp
+	src/lib/pdf/ttf.cpp
 	src/main.cpp)
 target_include_directories(modulepdf PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulepdf PUBLIC ${LINK_DIRECTORIES})
