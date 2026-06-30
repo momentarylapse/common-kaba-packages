@@ -243,6 +243,8 @@ add_library(modulexhui SHARED
 	src/lib/ygraphics/Painter.cpp
 	src/lib/ygraphics/PainterGL.cpp
 	src/lib/ygraphics/PainterVulkan.cpp
+	src/lib/ygraphics/ShaderManager.cpp
+	src/lib/ygraphics/TextureManager.cpp
 	src/main.cpp)
 target_include_directories(modulexhui PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(modulexhui PUBLIC ${LINK_DIRECTORIES})

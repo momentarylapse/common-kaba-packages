@@ -238,6 +238,8 @@ add_library(moduleyrenderer SHARED
 	src/lib/ygraphics/Painter.cpp
 	src/lib/ygraphics/PainterGL.cpp
 	src/lib/ygraphics/PainterVulkan.cpp
+	src/lib/ygraphics/ShaderManager.cpp
+	src/lib/ygraphics/TextureManager.cpp
 	src/lib/yrenderer/helper/Bindable.cpp
 	src/lib/yrenderer/helper/ComputeTask.cpp
 	src/lib/yrenderer/helper/CubeMapSource.cpp
@@ -283,8 +285,6 @@ add_library(moduleyrenderer SHARED
 	src/lib/yrenderer/Material.cpp
 	src/lib/yrenderer/MaterialManager.cpp
 	src/lib/yrenderer/Renderer.cpp
-	src/lib/yrenderer/ShaderManager.cpp
-	src/lib/yrenderer/TextureManager.cpp
 	src/main.cpp)
 target_include_directories(moduleyrenderer PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(moduleyrenderer PUBLIC ${LINK_DIRECTORIES})

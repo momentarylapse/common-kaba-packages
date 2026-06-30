@@ -3,6 +3,7 @@
 #include <lib/image/ImagePainter.h>
 #include <lib/math/vec2.h>
 #include <lib/math/mat4.h>
+#include <lib/any/any.h>
 #include <lib/ygraphics/graphics-fwd.h>
 
 
@@ -60,6 +61,11 @@ public:
 		return _area;
 	}
 
+	void set_font_face(font::Face* f);
+	void set_texture(Texture* tex);
+	void set_shader(Shader* s);
+	void set_shader_data(const Any& data);
+
 	rect _area;
 	rect native_area;
 	rect native_area_window;
@@ -77,6 +83,9 @@ public:
 	float softness = 0;
 	bool fill = true;
 	font::Face* face;
+	Shader* user_shader = nullptr;
+	Texture* user_texture = nullptr;
+	Any user_shader_data;
 
 	bool accumulate_alpha = false;
 
