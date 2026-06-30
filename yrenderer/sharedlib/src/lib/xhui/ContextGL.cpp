@@ -3,10 +3,10 @@
 #include "Context.h"
 #include "Window.h"
 #include "Painter.h"
-#include "../os/msg.h"
-#include "../image/image.h"
+#include <lib/image/image.h>
 #include <lib/nix/nix.h>
 #include <lib/ygraphics/Context.h>
+#include <lib/ygraphics/TextCache.h>
 
 namespace nix {
 	extern bool allow_separate_vertex_arrays;
@@ -14,9 +14,10 @@ namespace nix {
 
 namespace xhui {
 
-Context::Context(Window* w, ygfx::Context* ctx) {
+Context::Context(Window* w, ygfx::Context* ctx, ygfx::FontManager* fm) {
 	window = w;
 	context = ctx;
+	font_manager = fm;
 }
 
 Painter* Context::prepare_draw() {
@@ -26,13 +27,11 @@ Painter* Context::prepare_draw() {
 	int ww, hh;
 	glfwGetFramebufferSize(window->window, &ww, &hh);
 
-	if (!aux)
-		aux = context->_create_auxiliary_stuff();
-
 	const rect area = {0, (float)width, 0, (float)height};
 	const rect native_area = {0, (float)ww, 0, (float)hh};
 	//if (!painter)
 	painter = new Painter(this, window, native_area, area);
+	painter->text_cache = text_cache.get();
 	return painter.get();
 }
 
@@ -52,7 +51,7 @@ void Context::end_draw(Painter *p) {
 	nix::end_frame_glfw();
 	nix::set_srgb(false);
 	aux->reset_frame();
-	iterate_text_caches();
+	text_cache->iterate();
 }
 
 
@@ -61,17 +60,18 @@ Context* Context::create(Window* window) {
 	glfwMakeContextCurrent(window->window);
 	nix::allow_separate_vertex_arrays = true;
 	nix::default_shader_bindings = false;
-	auto ctx = new Context(window, new ygfx::Context(nix::init()));
+	auto ctx = new Context(window, new ygfx::Context(nix::init()), global_font_manager);
 
 	ctx->context->color_space_shaders = color_space_shaders;
 	ctx->context->color_space_input = color_space_input;
 
 	ctx->context->_create_default_textures();
 	ctx->tex_white = ctx->context->tex_white;
-	ctx->tex_black = ctx->context->tex_black;
 
-	ctx->context->_create_auxiliary_stuff();
+	ctx->aux = ctx->context->_create_auxiliary_stuff();
 
+	ctx->text_cache = new ygfx::TextCache(ctx->aux);
+	global_text_cache = ctx->text_cache.get();
 
 	return ctx;
 }

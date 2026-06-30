@@ -24,13 +24,9 @@ Dialog win 'bla'
 		---|
 		Button b2 'Test' noexpandy
 		---|
-		Button b3 'Test' noexpandy
-		---|
-		Button b4 'Test' noexpandy
-		---|
 		DrawingArea area '' expandy
 ")
-		set_maximized(true)
+#		set_maximized(true)
 		event("b", func() print("hi"))
 		event_x("area", "hui:draw", xdraw)
 		event_x("area", "hui:initialize", xinitialize)

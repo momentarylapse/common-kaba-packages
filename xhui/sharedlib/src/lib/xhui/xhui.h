@@ -6,8 +6,10 @@
 #include "../base/map.h"
 #include <lib/ygraphics/graphics-fwd.h>
 
-namespace font {
+namespace ygfx {
 	struct Face;
+	class FontManager;
+	class TextCache;
 }
 
 class Image;
@@ -201,10 +203,12 @@ void delete_image(const string& name);
 void prepare_image(XImage* image);
 
 
-extern font::Face* default_font_regular;
-extern font::Face* default_font_bold;
-extern font::Face* default_font_mono_regular;
-extern font::Face* default_font_mono_bold;
-font::Face* pick_font(const string &font, bool bold, bool italic);
+/*extern ygfx::Face* default_font_regular;
+extern ygfx::Face* default_font_bold;
+extern ygfx::Face* default_font_mono_regular;
+extern ygfx::Face* default_font_mono_bold;
+ygfx::Face* pick_font(const string &font, bool bold, bool italic);*/
+extern ygfx::FontManager* global_font_manager;
+extern ygfx::TextCache* global_text_cache;
 
 }
