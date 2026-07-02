@@ -92,7 +92,6 @@ class extern Control extends Object as shared
 	func extern virtual mut on_key_char(character: i32)
 	
 	func extern virtual _draw(p: image.Painter)
-	func extern virtual get_greed_factor() -> vec2
 	func extern virtual get_content_min_size() -> vec2
 	func extern virtual mut negotiate_area(available: Rect)
 
@@ -202,7 +201,6 @@ class extern Panel extends Control
 	func extern override _draw(p: image.Painter)
 	func extern override negotiate_area(available: Rect)
 	func extern override get_content_min_size() -> vec2
-	func extern override get_greed_factor() -> vec2
 	func extern override get_children(f: i32) -> Control&[]
 	func extern override add_child(c: shared![Control], x: i32, y: i32)
 	func extern override set_option(key: string, value: string)
