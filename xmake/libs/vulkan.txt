@@ -1,8 +1,9 @@
 link = vulkan
 include = vulkan/vulkan.h
 pkg = vulkan
-vcpkg = [vulkan,vulkan-headers]
+vcpkg = [vulkan,vulkan-headers,shaderc]
 cmake.package = Vulkan
 cmake.components = [shaderc_combined]
 cmake.target = ["Vulkan::Vulkan", "Vulkan::shaderc_combined"]
+requires = shaderc?
 

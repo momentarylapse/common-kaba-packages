@@ -192,6 +192,22 @@ find_package(PkgConfig REQUIRED)
 			else
 				r += link_mandatory_lib(g.libs[0])
 
+	var has_vulkan = false
+	for g in lib_groups
+		if "vulkan" in g.libs
+			has_vulkan = true
+
+	if has_vulkan
+		r += "
+
+
+# lib: shaderc (optional)
+if(WIN32)
+	find_package(unofficial-shaderc CONFIG)
+	list(APPEND DEPS unofficial::shaderc::shaderc)
+endif()"
+
+
 
 	r += "
 

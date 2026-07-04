@@ -1,7 +1,7 @@
 link = GLU
 include = GL/glu.h
 pkg = glu
-dependency = gl
+requires = gl
 _cmake.package = GLU
 _cmake.target = GLU
 

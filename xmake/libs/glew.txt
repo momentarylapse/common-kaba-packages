@@ -4,4 +4,4 @@ pkg = glew
 vcpkg = glew
 cmake.package = GLEW
 cmake.target = GLEW::GLEW
-dependency = gl
+requires = gl
