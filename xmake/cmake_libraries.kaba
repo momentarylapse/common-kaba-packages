@@ -30,7 +30,7 @@ func lib_discover(ll: Library, indent: string, is_required: bool) -> string
 
 func lib_guard(ll: Library) -> string
 	if ll.name == "gl"
-		return "OPENGL_FOUND AND NOT APPLE AND NOT WIN32" # :(
+		return "OPENGL_FOUND AND NOT APPLE" # :(
 	if len(ll.cmake_packages) > 0
 		for v in ll.cmake_variable
 			return v
@@ -102,7 +102,7 @@ else()
 	message(SEND_ERROR \"Neither {{label}} found\") #  or/nor..
 	set({{cvar}} \"\")
 endif()"
-	
+
 	for i=>v in varxs
 		s += "
 if({{cvar}} STREQUAL \"{{g.libs[i]}}\")
@@ -115,9 +115,9 @@ endif()"
 func link_optional_lib(l: string) -> string
 	let ll = lib.get(l)
 	#deps.add("{{varx}}_LIBRARIES")
-	
+
 	let var_enabled = "LIB_{{var_name(l)}}_ENABLED"
-	
+
 	#for _code in ll.cmake_code
 	if len(ll.cmake_code) > 0
 		let code = ll.cmake_code.replace(":define:", ll.define())
@@ -191,7 +191,7 @@ find_package(PkgConfig REQUIRED)
 			else
 				r += link_mandatory_lib(g.libs[0])
 
-	
+
 	r += "
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -207,5 +207,5 @@ CheckGitSetup()
 list(APPEND DEPS git-version)"
 
 	return r
-	
-	
+
+

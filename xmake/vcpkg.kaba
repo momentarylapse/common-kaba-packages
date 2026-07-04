@@ -5,7 +5,7 @@ use .library.*
 
 func create()
 	var req: string[]
-	
+
 	let lib_groups = conf.dependencies()
 	for g in lib_groups
 		if g.optional
@@ -15,9 +15,10 @@ func create()
 		else
 			for l in g.libs
 				req += lib.get(l).vcpkg
-	
+
 	req = req |> filter(l => l[:3] != "gtk")
-	
+	req.add("pkgconf")
+
 	if len(req) == 0
 		return
 
@@ -30,7 +31,7 @@ func create()
 "
 
 	os.fs.write_text(conf.root | "vcpkg.json", vcpkg)
-		
+
 	os.fs.write_text(conf.root | "vcpkg-configuration.json", "{
   \"default-registry\": {
     \"kind\": \"git\",

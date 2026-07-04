@@ -3,5 +3,5 @@ include = GL/gl.h
 pkg = gl
 vcpkg = opengl
 cmake.package = OpenGL
-cmake.target = OpenGL::OpenGL
+cmake.target = OpenGL::GL
 
