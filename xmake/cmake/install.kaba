@@ -1,4 +1,4 @@
-use .project.*
+use ..project.*
 use os
 
 
@@ -31,7 +31,7 @@ set(RESOURCE_DESTINATION share/{{conf.project.name}})"
 			r += "
 install(TARGETS {{t.binary_file}} DESTINATION bin)"
 
-	r += "	
+	r += "
 
 # resources"
 	let list = conf.needs_installing()
@@ -68,7 +68,7 @@ endif ()"
 func create_install_icons() -> string
 	if len(conf.install.icons) == 0
 		return ""
-		
+
 	var r = "
 
 

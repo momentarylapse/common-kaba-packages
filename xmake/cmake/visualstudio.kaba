@@ -1,0 +1,82 @@
+use ..project.*
+use os
+
+func vs2022_preset(type: string, ext: string, vars: string{}) -> string
+	var A = ""
+	var B = ""
+	var C = ""
+	if ext != ""
+		A = "-{{ext.lower()}}"
+		B = " {{ext}}"
+		for k=>v in vars
+			C += ",
+				\"{{k}}\": \"{{v}}\""
+	return "{
+			\"name\": \"x64-{{type.lower()}}{{A}}\",
+			\"displayName\": \"x64 {{type}}{{B}}\",
+			\"inherits\": \"windows-base\",
+			\"architecture\": {
+				\"value\": \"x64\",
+				\"strategy\": \"external\"
+			},
+			\"cacheVariables\": {
+				\"CMAKE_BUILD_TYPE\": \"{{type}}\"{{C}}
+			}
+		}"
+
+
+func is_vulkan_or_gl() -> bool
+	for d in conf.main_target().dependencies
+		if d.libs == ["vulkan", "gl"]
+			return true
+	return false
+
+
+func create_vs2022_stuff()
+	var X = ""
+
+	if is_vulkan_or_gl()
+		X = ",
+		{{vs2022_preset("Debug", "GL", {"VULKAN_OR_GL": "gl"})}},
+		{{vs2022_preset("Release", "GL", {"VULKAN_OR_GL": "gl"})}}"
+
+	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
+	\"version\": 3,
+	\"configurePresets\": [
+		{
+			\"name\": \"windows-base\",
+			\"hidden\": true,
+			\"generator\": \"Ninja\",
+			\"binaryDir\": \"${sourceDir}/out/build/${presetName}\",
+			\"installDir\": \"${sourceDir}/out/install/${presetName}\",
+			\"toolchainFile\": \"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake\",
+			\"condition\": {
+				\"type\": \"equals\",
+				\"lhs\": \"${hostSystemName}\",
+				\"rhs\": \"Windows\"
+			}
+		},
+		{{vs2022_preset("Debug", "", {})}},
+		{{vs2022_preset("Release", "", {})}}{{X}}
+	]
+}
+".replace("\t", "    ").replace("\n", "\r\n"))
+
+	let t = conf.main_target()
+
+	os.fs.create_directory(conf.root | ".vs")
+	os.fs.write_text(conf.root | ".vs" | "launch.vs.json", "{
+  \"version\": \"0.2.1\",
+  \"defaults\": {},
+  \"configurations\": [
+    {
+      \"type\": \"default\",
+      \"project\": \"CMakeLists.txt\",
+      \"projectTarget\": \"{{t.binary_file}}.exe\",
+      \"name\": \"{{t.binary_file}}.exe\",
+      \"currentDir\": \"${workspaceRoot}\"
+    }
+  ]
+}
+".replace("\n", "\r\n"))
+

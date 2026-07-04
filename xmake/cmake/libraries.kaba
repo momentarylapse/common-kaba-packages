@@ -1,5 +1,5 @@
-use .project.*
-use .library.*
+use ..project.*
+use ..library.*
 
 
 func var_name(l: string) -> string
@@ -79,6 +79,7 @@ func link_mandatory_group(g: LibGroup) -> string
 	#deps.add("{{varx}}_LIBRARIES")
 	let cvar = varxs.join("_OR_")
 	let label = g.libs.join(" or ")
+	let label_nor = g.libs.join(" nor ")
 	var s = "
 
 
@@ -99,7 +100,7 @@ if({{cvar}}_FOUND)
 		message(WARNING \"Choice for {{cvar}} invalid, using ${"+cvar+"} instead\")
 	endif()
 else()
-	message(SEND_ERROR \"Neither {{label}} found\") #  or/nor..
+	message(SEND_ERROR \"Neither {{label_nor}} found\")
 	set({{cvar}} \"\")
 endif()"
 

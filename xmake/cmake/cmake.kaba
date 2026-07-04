@@ -1,12 +1,12 @@
 use os
-use .project.*
-use .library.*
-use .vcpkg
-use .cmake_libraries.*
-use .cmake_install.*
-use .cmake_bundle.*
-use .cmake_visualstudio.*
-use .cmake_gitversion.*
+use ..project.*
+use ..library.*
+use ..vcpkg
+use .libraries.*
+use .install.*
+use .bundle.*
+use .visualstudio.*
+use .gitversion.*
 
 
 
@@ -14,7 +14,7 @@ use .cmake_gitversion.*
 
 func create_base() -> string
 	let debug = conf.build.type == "debug"
-	
+
 	var r = "# created by xmake
 
 cmake_minimum_required(VERSION 3.21)
@@ -31,7 +31,7 @@ set(CMAKE_BUILD_TYPE Debug)"
 if(WIN32)
 	list(APPEND COMPILE_OPTIONS /permissive-)
 endif()"
-	
+
 #	let common_sources = conf.find_common_sources()
 #	let files = [for s in common_sources  str(rel(s))].join("\n\t")
 #	r += "
@@ -60,12 +60,12 @@ func find_extra_sources(t: BuildTarget) -> os.Path[]
 func create_target(t: BuildTarget) -> string
 	let xsources = conf.find_sources(t) | find_extra_sources(t)
 	let xfiles = [for s in xsources  str(rel(s))].join("\n\t")
-	
+
 	var deps = "${DEPS}"
 	for d in t.dependencies
 		if conf.find_target(d.libs[0])
 			deps += " {{d.libs[0]}}"
-	
+
 	var r = "
 
 
@@ -108,7 +108,7 @@ target_include_directories({{t.binary_file}} PUBLIC {{t.source[0]}})"
 	for i in t.include_directories
 		r += "
 target_include_directories({{t.binary_file}} PUBLIC {{i}})"
-	
+
 	if not t.default
 		r += "
 set_target_properties({{t.binary_file}} PROPERTIES EXCLUDE_FROM_ALL TRUE)"
@@ -118,19 +118,19 @@ set_target_properties({{t.binary_file}} PROPERTIES EXCLUDE_FROM_ALL TRUE)"
 
 
 func create()
-	
+
 	print("-- cmake --")
-	 
+
 	var r = create_base()
-	
+
 	r += create_libs()
 
 	for t in conf.targets
 		r += create_target(t)
-	
+
 	if "macosbundle" in conf.build.features
 		r += create_macos_bundle()
-	
+
 	r += create_install_base()
 
 	if conf.install.desktop_file != ""
@@ -141,13 +141,13 @@ func create()
 
 	if len(conf.install.mime_files) > 0
 		r += create_install_mime()
-		
+
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
-	
+
 
 	if "gitversion" in conf.build.features
 		create_git_version()
-	
+
 	if "vs2022" in conf.build.features
 		create_vs2022_stuff()
 
