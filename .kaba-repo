@@ -36,6 +36,7 @@ package simplevis
 package sqlite
 package statistics
 package terminal
+package threadpool
 package tools
 package urdf
 package usb

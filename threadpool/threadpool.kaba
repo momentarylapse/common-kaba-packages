@@ -1,0 +1,5 @@
+
+class ThreadPool
+	func extern mut __init__(num_threads=-1)
+	func extern mut __delete__()
+	func extern mut run(n: i32, f: i32->void, cluster_size=1)
