@@ -12,7 +12,7 @@ func lib_discover(ll: Library, indent: string, is_required: bool) -> string
 		flags = " REQUIRED"
 	var components = ""
 	if len(ll.cmake_components) > 0
-		components = " COMPONENTS {{ll.cmake_components.join("")}}"
+		components = " COMPONENTS {{ll.cmake_components.join(" ")}}"
 	var s = ""
 	if len(ll.cmake_packages) > 0
 		for i=>p in ll.cmake_packages
@@ -43,10 +43,15 @@ func lib_guard(ll: Library) -> string
 
 func lib_add_data(ll: Library, indent: string) -> string
 	var s = ""
-	if len(ll.cmake_packages) > 0
+	if len(ll.cmake_targets) > 0
 		s = "
-{{indent}}list(APPEND DEPS {{ll.cmake_targets.join(" " )}})
-{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+{{indent}}list(APPEND DEPS {{ll.cmake_targets.join(" " )}})"
+	else if len(ll.cmake_packages) > 0
+		for p in ll.cmake_packages
+			let varx = var_name(p)
+			s = "
+{{indent}}list(APPEND INCLUDE_DIRECTORIES ${"+varx+"_INCLUDE_DIRS})
+{{indent}}list(APPEND DEPS ${"+varx+"_LIBRARIES})"
 	else if len(ll.pkg) > 0
 		for p in ll.pkg
 			let varx = var_name(p)
@@ -55,10 +60,10 @@ func lib_add_data(ll: Library, indent: string) -> string
 {{indent}}list(APPEND LINK_DIRECTORIES ${"+varx+"_LIBRARY_DIRS})
 {{indent}}list(APPEND DEPS ${"+varx+"_LIBRARIES})
 {{indent}}list(APPEND COMPILE_OPTIONS ${"+varx+"_CFLAGS_OTHER})"
-		s += "
-{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
 	else
 		raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+	s += "
+{{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
 	return s[1:]
 
 
@@ -192,21 +197,13 @@ find_package(PkgConfig REQUIRED)
 			else
 				r += link_mandatory_lib(g.libs[0])
 
-	var has_vulkan = false
-	for g in lib_groups
-		if "vulkan" in g.libs
-			has_vulkan = true
 
-	if has_vulkan
-		r += "
-
-
-# lib: shaderc (optional)
-if(WIN32)
-	find_package(unofficial-shaderc CONFIG)
-	list(APPEND DEPS unofficial::shaderc::shaderc)
-endif()"
-
+	# HORRIBLE HACK :P
+	r = r.replace("list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined Vulkan::glslang)", "if(WIN32)
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::glslang)
+	else()
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined Vulkan::glslang)
+	endif()")
 
 
 	r += "
