@@ -38,8 +38,9 @@ add_library(moduleobs SHARED
 	src/lib/base/pointer.cpp
 	src/lib/base/strings.cpp
 	src/lib/kapi/kapi.cpp
-	src/lib/pattern/_kaba_export.cpp
-	src/lib/pattern/Observable.cpp
+	src/lib/obs/_kaba_export.cpp
+	src/lib/obs/Log.cpp
+	src/lib/obs/Observable.cpp
 	src/main.cpp)
 target_include_directories(moduleobs PUBLIC ${INCLUDE_DIRECTORIES})
 target_link_directories(moduleobs PUBLIC ${LINK_DIRECTORIES})
@@ -59,7 +60,7 @@ target_include_directories(moduleobs PUBLIC src/lib)
 
 set(RESOURCE_DESTINATION share/mouduleobs)
 
-# binaries	
+# binaries
 
 # resources
 install(FILES "static/" DESTINATION ${RESOURCE_DESTINATION})

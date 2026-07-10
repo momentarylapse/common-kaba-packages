@@ -39,12 +39,12 @@ list(APPEND COMPILE_DEFINITIONS HAS_LIB_GLFW=1)
 
 # lib: vulkan or gl (mandatory)
 set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
-find_package(Vulkan COMPONENTS shaderc_combined)
+find_package(Vulkan COMPONENTS shaderc_combined glslang)
 if(VULKAN_FOUND)
 	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
 endif()
 find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+if(OPENGL_FOUND AND NOT APPLE)
 	list(APPEND VULKAN_OR_GL_FOUND "gl")
 endif()
 if(VULKAN_OR_GL_FOUND)
@@ -54,15 +54,19 @@ if(VULKAN_OR_GL_FOUND)
 		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
 	endif()
 else()
-	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
+	message(SEND_ERROR "Neither vulkan nor gl found")
 	set(VULKAN_OR_GL "")
 endif()
 if(VULKAN_OR_GL STREQUAL "vulkan")
-	list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
+	if(WIN32)
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::glslang)
+	else()
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined Vulkan::glslang)
+	endif()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
 endif()
 if(VULKAN_OR_GL STREQUAL "gl")
-	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND DEPS OpenGL::GL)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
 endif()
 
@@ -149,6 +153,9 @@ add_library(moduleyrenderer SHARED
 	src/lib/nix/nix_textures.cpp
 	src/lib/nix/nix_vertexbuffer.cpp
 	src/lib/nix/nix_view.cpp
+	src/lib/obs/_kaba_export.cpp
+	src/lib/obs/Log.cpp
+	src/lib/obs/Observable.cpp
 	src/lib/os/app.cpp
 	src/lib/os/CommandLineParser.cpp
 	src/lib/os/config.cpp
@@ -161,8 +168,6 @@ add_library(moduleyrenderer SHARED
 	src/lib/os/stream.cpp
 	src/lib/os/terminal.cpp
 	src/lib/os/time.cpp
-	src/lib/pattern/_kaba_export.cpp
-	src/lib/pattern/Observable.cpp
 	src/lib/profiler/_kaba_export.cpp
 	src/lib/profiler/Profiler.cpp
 	src/lib/vulkan/_kaba_export.cpp
@@ -304,7 +309,7 @@ target_include_directories(moduleyrenderer PUBLIC src)
 
 set(RESOURCE_DESTINATION share/moduleyrenderer)
 
-# binaries	
+# binaries
 
 # resources
 install(FILES "static/" DESTINATION ${RESOURCE_DESTINATION})
