@@ -1,10 +1,10 @@
-use hui
+use xhui as hui
 
 
 class Theme
-	let bg = Color(0.95,0.95,0.95,1)#color.WHITE
-	let fg = Color.BLACK
-	let grid = Color(0.7, 0.7, 0.7, 1)
+	let bg = Color(0.2,0.2,0.2,1)#color.WHITE
+	let fg = Color.WHITE
+	let grid = Color(0.3, 0.3, 0.3, 1)
 
 
 struct Range
@@ -58,9 +58,9 @@ class Window extends hui.Window
 
 	func __init__()
 		super.__init__("plot", 800, 600)
-		set_options("", "borderwidth=0")
-		#set_options("","headerbar")
-		add_drawing_area("", 0, 0, "area")
+		from_source("
+Window window '' borderwidth=0
+	DrawingArea area '' expand margin=0")
 
 
 		event_x("area", "hui:draw", on_draw)
@@ -84,6 +84,7 @@ class Window extends hui.Window
 		for d in data_sets
 			if len(d.x) > 0
 				_xrange = [d.x[0],d.x[0]]
+				_yrange = [d.y[0],d.y[0]]
 	#	_yrange = [0,1]
 		for d in data_sets
 			let rx = Range.from_data(d.x)
@@ -97,7 +98,7 @@ class Window extends hui.Window
 		for r in yrange
 			_yrange = r
 
-	func override on_draw(p: hui.Painter)
+	func mut on_draw(p: hui.Painter)
 		width = p.width
 		height = p.height
 		p.set_color(Theme.bg)
@@ -117,7 +118,7 @@ class Window extends hui.Window
 			p.set_color(Theme.grid)
 			p.draw_line([pp.x, BORDER], [pp.x, height - BORDER])
 			if t.weight > 0.8
-				p.set_color(Color.BLACK)
+				p.set_color(Theme.fg)
 				p.draw_str([pp.x, height-BORDER], t.label)
 
 		for t in ty
@@ -125,7 +126,7 @@ class Window extends hui.Window
 			p.set_color(Theme.grid)
 			p.draw_line([BORDER, pp.y], [width - BORDER, pp.y])
 			if t.weight > 0.8
-				p.set_color(Color.BLACK)
+				p.set_color(Theme.fg)
 				p.draw_str([BORDER, pp.y], t.label)
 
 
@@ -161,6 +162,12 @@ func plot(p: vec2[])
 	for i=>q in p
 		x[i] = q.x
 		y[i] = q.y
+	plot(x, y)
+
+
+func plot(f: f32->f32)
+	let x = range(-10.0, 10.0, 0.1)
+	let y = [for xx in x  f(xx)] # x |> f
 	plot(x, y)
 
 
