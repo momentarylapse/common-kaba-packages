@@ -1,0 +1,5 @@
+use plot.*
+
+func main()
+	plot(sin)
+

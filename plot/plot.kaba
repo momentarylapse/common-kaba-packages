@@ -1,60 +1,11 @@
 use xhui as hui
+use .plotarea.*
 
-
-class Theme
-	let bg = Color(0.2,0.2,0.2,1)#color.WHITE
-	let fg = Color.WHITE
-	let grid = Color(0.3, 0.3, 0.3, 1)
-
-
-struct Range
-	var min, max: f32
-	func length() -> f32
-		return max - min
-	func static from_data(x: f32[]) -> Range
-		return [min(x), max(x)]
-
-
-let BORDER = 10.0
-
-
-var xrange, yrange: Range?
-var xlogscale = false
-var ylogscale = false
-
-
-struct Tick
-	value: f32
-	weight: f32
-	label: string
-
-
-func get_ticks(range: Range, total_pixels: f32, spacing0: f32, logscale: bool) -> Tick[]
-	var r: Tick[]
-	let d0 = len(range) / total_pixels * spacing0
-
-	let ld0 = log(d0) / log(10.0)
-	var ldi = i32(ld0 + 0.5)
-	if ld0 < 0
-		ldi = i32(ld0 - 0.5)
-	let d = pow(10.0, ldi)
-
-	let x0 = (i32(range.min / d) - 1) * d
-
-	for x in x0:range.max:d
-		r.add([x, 1.0, "{{x|0.1}}"])
-
-	return r
-
-
-struct DataSet
-	var x, y: f32[]
 
 
 class Window extends hui.Window
-	var width, height: f32
+	var plotter: PlotArea
 	var data_sets: DataSet[]
-	var _xrange, _yrange: Range
 
 	func __init__()
 		super.__init__("plot", 800, 600)
@@ -62,86 +13,21 @@ class Window extends hui.Window
 Window window '' borderwidth=0
 	DrawingArea area '' expand margin=0")
 
-
 		event_x("area", "hui:draw", on_draw)
 
 	func mut add_plot(x: f32[], y: f32[])
 		data_sets.add([x, y])
-
-	func project(p: vec2) -> vec2
-		let xx = (p.x - _xrange.min) / len(_xrange)
-		let yy = (p.y - _yrange.min) / len(_yrange)
-		if xlogscale
-			let xxx = (log(p.x) - log(_xrange.min)) / (log(_xrange.max) - log(_xrange.min))
-			return [BORDER + xxx * (width - 2*BORDER),
-				height - BORDER - yy * (height - 2*BORDER)]
-		return [BORDER + xx * (width - 2*BORDER),
-			height - BORDER - yy * (height - 2*BORDER)]
-
-	func mut optimize_view()
-		_xrange = [0,1]
-		_yrange = [0,1]
-		for d in data_sets
-			if len(d.x) > 0
-				_xrange = [d.x[0],d.x[0]]
-				_yrange = [d.y[0],d.y[0]]
-	#	_yrange = [0,1]
-		for d in data_sets
-			let rx = Range.from_data(d.x)
-			let ry = Range.from_data(d.y)
-			_xrange.min = min(_xrange.min, min(d.x))
-			_xrange.max = max(_xrange.max, max(d.x))
-			_yrange.min = min(_yrange.min, min(d.y))
-			_yrange.max = max(_yrange.max, max(d.y))
-		for r in xrange
-			_xrange = r
-		for r in yrange
-			_yrange = r
-
-	func mut on_draw(p: hui.Painter)
-		width = p.width
-		height = p.height
-		p.set_color(Theme.bg)
-		p.draw_rect([0, width, 0, height])
-
 		optimize_view()
 
-		let tx = get_ticks(_xrange, width - 2*BORDER, 100, xlogscale)
-		let ty = get_ticks(_yrange, height - 2*BORDER, 30, ylogscale)
+	func mut optimize_view()
+		plotter.optimize_view(data_sets)
 
-
-
-		p.set_line_width(1.0)
-		p.set_font_size(8)
-		for t in tx
-			let pp = project([t.value, 0])
-			p.set_color(Theme.grid)
-			p.draw_line([pp.x, BORDER], [pp.x, height - BORDER])
-			if t.weight > 0.8
-				p.set_color(Theme.fg)
-				p.draw_str([pp.x, height-BORDER], t.label)
-
-		for t in ty
-			let pp = project([0, t.value])
-			p.set_color(Theme.grid)
-			p.draw_line([BORDER, pp.y], [width - BORDER, pp.y])
-			if t.weight > 0.8
-				p.set_color(Theme.fg)
-				p.draw_str([BORDER, pp.y], t.label)
-
-
-		var points: vec2[]
+	func mut on_draw(out p: hui.Painter)
+		plotter.set_area(p.area())
+		plotter.draw_background(p)
 
 		for d in data_sets
-			for i=>yy in d.y
-				let xx = d.x[i]
-				points.add(project([xx, yy]))
-
-		p.set_clip([BORDER, width-BORDER, BORDER, height-BORDER])
-		p.set_color(Theme.fg)
-		p.set_line_width(2.0)
-		p.set_antialiasing(true)
-		p.draw_lines(points)
+			plotter.plot(p, d, DefaultTheme.fg)
 
 
 func plot(x: f32[], y: f32[])
@@ -166,10 +52,7 @@ func plot(p: vec2[])
 
 
 func plot(f: f32->f32)
-	let x = range(-10.0, 10.0, 0.1)
+	let x = range(-12.0, 12.0, 0.02)
 	let y = [for xx in x  f(xx)] # x |> f
 	plot(x, y)
 
-
-func main()
-	plot(range(0.0, 20.0, 0.1) |> sin)

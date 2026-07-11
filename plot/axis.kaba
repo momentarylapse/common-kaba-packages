@@ -1,0 +1,139 @@
+
+
+struct Range
+	var min, max: f32
+	func length() -> f32
+		return max - min
+
+
+func get_range(x: f32[]) -> Range
+	return [min(x), max(x)]
+
+
+struct Tick
+	value: f32
+	weight: f32
+	label: string
+
+
+struct Axis
+	var range: Range
+	var val_min_min, val_max_max: f32? # zoom limit
+	var log_scale = false
+	var unit = ""
+	var offset = 0.0
+	var size = 100.0 # "pixels"
+	var min_label_dist = 50.0
+
+	func project(x: f32) -> f32
+		if log_scale
+			return offset + (log(x) - log(range.min)) / (log(range.max) - log(range.min)) * size
+		return offset + (x - range.min) / len(range) * size
+
+	func get_lin_partition() -> Tick[]
+		let d = abs(len(range) / size) * 150 # ideal step
+		var r: Tick[]
+		let e = floor(log(d) / log(10))
+		let step = pow(10.0, e) # quantized step
+		let factor = d / step
+		let decimals = i32(max(-e, 0))
+		let min = floor(range.min / step) * step
+		let max = range.max
+
+		var vv = min
+		var i = i32(floor(range.min / step))
+		while vv <= max and step > 0
+			var w = 0.4
+			if (i % 10) == 0
+				w = 1.0
+			r.add([vv, w, "{{vv.str2(decimals)}} {{unit}}"])
+			if factor < 3
+				r.add([vv + step / 2, 0.2, ""])
+			vv += step
+			i ++
+
+		return r
+
+	func get_log_partition() -> Tick[]
+		let pixel_per_decade = abs(size / log(range.max / range.min)) * log(10)
+		let size_param = pixel_per_decade / min_label_dist
+		var r: Tick[]
+		let e_min = int(log(abs(range.min)) / log(10))
+		let e_max = int(log(abs(range.max)) / log(10)) + 1
+		for e in e_min:e_max
+			var vv0 = pow(10, e)
+			for i in 1:10
+				var vv = vv0 * i
+				if (vv >= range.min) and (vv <= range.max)
+					var label: string
+					var show = false
+					if (i == 1)
+						show = true
+					if (i == 3) and (size_param > 2)
+						show = true
+					if ((i == 2) or (i == 5)) and (size_param > 4)
+						show = true
+					if show
+						label = "{{vv|.0}} {{unit}}"
+					r.add([vv, exp(-(i+1)*0.07), label])
+				vv = vv0 * 1.5
+				if (i == 1) and (vv >= range.min) and (vv <= range.max)
+					r.add([vv, 0.2, ""])
+		return r
+
+#	func get_pitch_partition() -> Tick[]
+#		var r: Tick[]
+#		var pitch_min = freq_to_pitch(range.min)
+#		var pitch_max = freq_to_pitch(range.max)
+#		var density = (pitch_max - pitch_min) / area.width()
+#		#print(density)
+#
+#		for p in int(pitch_min):int(pitch_max+1)
+#			var rp = pitch_to_rel(p)
+#			var tt: GridTick
+#			tt.value = pitch_to_freq(p)
+#			var xxx = 0.03
+#			tt.weight = 0.1
+#			if rp in [2,5,7,11]
+#				xxx = 0.06
+#				tt.weight = 0.2
+#			if rp in [4,9]
+#				xxx = 0.25
+#				tt.weight = 0.4
+#			if rp == 0
+#				xxx = 10000
+#				tt.weight = 1.0
+#			if density < xxx / 1.6
+#				tt.label = pitch_name(p)
+#			#else
+#			#	tt.weight = tt.weight * 0.7
+#
+#			tt.weight = tt.weight * clamp(1 - density / xxx, 0, 1)#min(1.0, pow(xxx, 2))
+#			#if density < xxx
+#			r.tick.add(tt)
+#		return r
+
+	func get_partition() -> Tick[]
+		if log_scale
+#			if freq_as_pitch
+#				return get_pitch_partition()
+			return get_log_partition()
+		return get_lin_partition()
+
+
+func _get_ticks(range: Range, total_pixels: f32, spacing0: f32, logscale: bool) -> Tick[]
+	var r: Tick[]
+	let d0 = len(range) / total_pixels * spacing0
+
+	let ld0 = log(d0) / log(10.0)
+	var ldi = i32(ld0 + 0.5)
+	if ld0 < 0
+		ldi = i32(ld0 - 0.5)
+	let d = pow(10.0, ldi)
+
+	let x0 = (i32(range.min / d) - 1) * d
+
+	for x in x0:range.max:d
+		r.add([x, 1.0, "{{x|0.1}}"])
+
+	return r

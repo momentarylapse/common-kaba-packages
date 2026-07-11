@@ -1,0 +1,109 @@
+use .axis.*
+use image.Painter
+
+class DefaultTheme
+	let bg = Color(0.2,0.2,0.2,1)#color.WHITE
+	let fg = Color.WHITE
+	let grid = Color(0.5, 0.5, 0.5, 1)
+
+
+let TICK_FONT_SIZE = 8.0
+let BORDER = 0.0
+
+
+# user "override" choices
+var xrange, yrange: Range?
+var xlogscale = false
+var ylogscale = false
+
+
+
+
+struct DataSet
+	var x, y: f32[]
+
+
+class PlotArea
+	var area: Rect
+	var x_axis, y_axis: Axis
+	var background_color: Color
+	var grid_color: Color
+	var text_color: Color
+
+	func mut __init__()
+		x_axis.min_label_dist = 50
+		y_axis.min_label_dist = 30
+		x_axis.log_scale = false
+		y_axis.log_scale = false
+		background_color = DefaultTheme.bg
+		grid_color = DefaultTheme.grid
+		text_color = DefaultTheme.fg
+
+	func mut set_area(a: Rect)
+		area = a
+		x_axis.offset = area.x1 + BORDER
+		x_axis.size = area.width() - 2*BORDER
+		y_axis.offset = area.y2 - BORDER
+		y_axis.size = 2*BORDER - area.height()
+
+	func mut optimize_view(data_sets: DataSet[])
+		x_axis.range = [0,1]
+		y_axis.range = [0,1]
+		for d in data_sets
+			if len(d.x) > 0
+				x_axis.range = [d.x[0],d.x[0]]
+				y_axis.range = [d.y[0],d.y[0]]
+	#	_yrange = [0,1]
+		for d in data_sets
+			let rx = get_range(d.x)
+			let ry = get_range(d.y)
+			x_axis.range.min = min(x_axis.range.min, min(d.x))
+			x_axis.range.max = max(x_axis.range.max, max(d.x))
+			y_axis.range.min = min(y_axis.range.min, min(d.y))
+			y_axis.range.max = max(y_axis.range.max, max(d.y))
+		for r in xrange
+			x_axis.range = r
+		for r in yrange
+			x_axis.range = r
+
+	func project(p: vec2) -> vec2
+		return [x_axis.project(p.x), y_axis.project(p.y)]
+
+	func draw_background(out p: Painter)
+		p.set_color(background_color)
+		p.draw_rect(area)
+
+		let tx = x_axis.get_partition()
+		let ty = y_axis.get_partition()
+
+		p.set_line_width(1.0)
+		p.set_font_size(TICK_FONT_SIZE)
+		for t in tx
+			let px = x_axis.project(t.value)
+			p.set_color(grid_color.with_alpha(t.weight))
+			p.draw_line([px, area.y1 + BORDER], [px, area.y2 - BORDER])
+			if len(t.label) > 0
+				p.set_color(text_color)
+				p.draw_str([px, area.y2 - BORDER - TICK_FONT_SIZE*1.5], t.label)
+
+		for t in ty
+			let py = y_axis.project(t.value)
+			p.set_color(grid_color.with_alpha(t.weight))
+			p.draw_line([area.x1 + BORDER, py], [area.x2 - BORDER, py])
+			if len(t.label) > 0
+				p.set_color(text_color)
+				p.draw_str([area.x1 + BORDER, py-TICK_FONT_SIZE*1.5], t.label)
+
+	func plot(out p: Painter, data: DataSet, color: Color)
+		var points: vec2[]
+
+		for i=>yy in data.y
+			let xx = data.x[i]
+			points.add(project([xx, yy]))
+
+		p.set_clip(area)
+		p.set_color(color)
+		p.set_line_width(2.0)
+		p.set_antialiasing(true)
+		p.draw_lines(points)
+
