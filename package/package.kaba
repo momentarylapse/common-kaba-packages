@@ -14,7 +14,8 @@ func main(args: string[])
 	p.info("package", "kaba package manager")
 	p.option("-v", "verbose", func() conf.verbose = true)
 	p.option("-k", "keep build dir", func() conf.keep_build_dir = true)
-	
+	p.option("-f", "force update (local repo)", func() conf.force = true)
+
 	p.cmd("update", "", "update database / repositories", action_update)
 	p.cmd("upgrade", "", "update all outdated packages", action_upgrade)
 	p.cmd("list", "", "list available packages", action_list)

@@ -16,15 +16,21 @@ enum SourceType
 
 
 struct Source
-	type: SourceType
+	#type: SourceType
 	name: string
 	url: string
-	
+
+	func user_managed() -> bool
+		return not url.find("://").has_value()
+
 	func base_path() -> os.Path
-		match type
-			SourceType.REPO =>  return conf.repos_base | name
-			SourceType.LOCAL => return url
-			else =>             return "???"
+		if user_managed()
+			return url
+		return conf.repos_base | name
+#		match type
+#			SourceType.REPO =>  return conf.repos_base | name
+#			SourceType.LOCAL => return url
+#			else =>             return "???"
 
 
 enum Location
@@ -46,7 +52,7 @@ struct PackageInfo
 	requires: string[]
 	forward: bool
 	func mut __init__() # kaba ARM workaround...
-	
+
 
 class Config
 	var kaba_base: os.Path
@@ -58,6 +64,7 @@ class Config
 	var packages_remote: PackageInfo[]
 	var verbose = false
 	var keep_build_dir = false
+	var force = false
 var conf: Config
 
 
@@ -66,12 +73,12 @@ func load_basic_config()
 	conf.packages_base = kaba.packages_root()
 	conf.repos_base = conf.kaba_base | "repos"
 	conf.sources = []
-	
+
 	if not os.fs.is_directory(conf.packages_base)
 		os.fs.create_directory(conf.packages_base)
 	if not os.fs.is_directory(conf.repos_base)
 		os.fs.create_directory(conf.repos_base)
-	
+
 	if os.fs.exists(conf.kaba_base | "sources")
 		let s = os.fs.read_text(conf.kaba_base | "sources")
 		for l in s.explode("\n")
@@ -81,7 +88,8 @@ func load_basic_config()
 					"repo" => SourceType.REPO
 					"local" => SourceType.LOCAL
 					else => SourceType.UNKNOWN
-				conf.sources.add([type, x[1].replace("/", "."), x[2]])
+				if type != SourceType.UNKNOWN
+					conf.sources.add([x[1].replace("/", "."), x[2]])
 
 
 func find_internal_packages() -> PackageInfo[]
@@ -100,14 +108,14 @@ func read_package(name: string, dir: os.Path, location: Location) -> PackageInfo
 	p.name = name
 	p.version = "0"
 	p.forward = false
-	
+
 	p.base_installed = conf.packages_base | name
 	if location == Location.INSTALLED
 		p.base_installed = dir
 	else
 		p.base_source = dir
 		p.root_source = dir
-		
+
 	if os.fs.exists(dir | PACKAGE_FILE)
 		let ss = os.fs.read_text(dir | PACKAGE_FILE)
 		for l in ss.explode("\n")
@@ -157,9 +165,8 @@ func read_repo(dir: os.Path) -> PackageInfo[]
 func find_remote_packages() -> PackageInfo[]
 	var r: PackageInfo[]
 	for s in conf.sources
-		if s.type == SourceType.REPO or s.type == SourceType.LOCAL
-			for p in read_repo(s.base_path())
-				r.add(p)
+		for p in read_repo(s.base_path())
+			r.add(p)
 	return r
 
 
