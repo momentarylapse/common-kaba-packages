@@ -1,19 +1,19 @@
 #include <lib/base/base.h>
+#include <lib/kapi/KabaExporter.h>
 #include <lib/profiler/_kaba_export.h>
+#include <lib/profiler/Profiler.h>
 
 
-extern "C" {
-__attribute__ ((visibility ("default")))
-void export_symbols(kaba::IExporter* e) {
+KABA_PACKAGE_EXPORT_BEGIN
+KABA_PACKAGE_EXPORT void export_symbols(kaba::IExporter* e) {
+	profiler::init();
 	export_package_profiler(e);
 }
-}
 
-// required for linking the shared library!
-namespace os::app {
-int main(const Array<string>&) {
-	return 0;
+KABA_PACKAGE_EXPORT void* export_globals(const string& name) {
+	if (name == "state")
+		return profiler::state;
+	return nullptr;
 }
-}
-
+KABA_PACKAGE_EXPORT_END
 
