@@ -34,7 +34,7 @@ jobs:
         mkdir ${{ github.workspace }}/env/packages
         mkdir ${{ github.workspace }}/env/kaba
         mkdir ${{ github.workspace }}/env/xmake
-        echo "repo michi.common whatever" > ${{ github.workspace }}/env/sources
+        echo "repo michi.common ssh://whatever" > ${{ github.workspace }}/env/sources
         echo "VULKAN_OR_GL=${{ matrix.graphics }}" > ${{ github.workspace }}/env/xmake/prefer
 
     - uses: actions/checkout@v6
