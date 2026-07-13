@@ -94,6 +94,9 @@ class extern VertexBuffer
 	func extern mut update(data: @DynamicArray)
 	func extern mut create_quad(d: Rect, s = Rect.ID)
 
+class extern DynamicVertexBuffer extends VertexBuffer
+	func extern override __init__(format: string = "3f,3f,2f")
+
 class extern UniformBuffer extends Buffer
 	func extern __init__(size: i32)
 

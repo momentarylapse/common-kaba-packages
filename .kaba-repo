@@ -1,5 +1,4 @@
-version 3
-requires kaba 791a2d92836dd8631335ed70b5f108cb307f50b2
+requires kaba 30d7a3526d9269a7b3c1d37680920181aa949b8b
 package algebra
 package asciitools
 package bson
