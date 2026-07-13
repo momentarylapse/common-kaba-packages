@@ -1,4 +1,5 @@
 use simplevis as sv
+use simplevis.common.*
 use yrenderer.*
 use polymesh.*
 use xhui
@@ -12,7 +13,7 @@ class Window extends sv.Window
 	func override on_initialize()
 		light.color = [1,0,1,1]
 
-		vb = sv.mesh_to_vb(create_teapot([0,0,0], 2, 6))
+		vb = mesh_to_vb(create_teapot([0,0,0], 2, 6))
 		material := create_material(emission=[0,0.8,0.7,1])
 
 

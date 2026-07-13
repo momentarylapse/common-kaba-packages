@@ -1,0 +1,29 @@
+use simplevis as sv
+use simplevis.volume.VolumeRenderer
+
+
+class Window extends sv.Window
+	var vr = VolumeRenderer(&ctx)
+
+
+	func override on_initialize()
+		vr.initialize()
+
+		let N = 64
+		var data: f32[]
+		data.resize(N^3)
+
+		for i in 0:N
+			for j in 0:N
+				for k in 0:N
+					data[i + j*N + k*N*N] = sin(i * 0.20) * sin(j * 0.15) * sin(k * 0.25)
+
+		vr.set(data, [N,N,N])
+
+
+	func override on_draw()
+		vr.draw(mat4.translation([-0.5,-0.5,-0.5]))
+
+
+func main()
+	sv.run(new Window("simplevis test"))

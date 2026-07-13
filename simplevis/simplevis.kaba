@@ -3,28 +3,24 @@ use kaba
 use obs
 use xhui as hui
 use yrenderer.*
-use polymesh.Mesh
+use .common.*
 
 
-func mesh_to_vb(m: Mesh) -> xfer[VertexBuffer]
-		var vb = new VertexBuffer("3f,3f,2f")
-		var vertices: Vertex[]
-		m.build(vertices)
-		vb.update(vertices)
-		return give(vb)
+let EXPORT_IMPORTS = true
+
 
 
 class SimpleEmitter extends MeshEmitter
 	var win: Window&
 
 	func __init__(w: Window&)
-		super.__init__(w.ctx!, "simple")
+		super.__init__(w.ctx.ctx!, "simple")
 		win := w
 
 	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
-		win.cur_params := &params
-		win.cur_rvd := &rvd
-		win.shadow_pass = shadow_pass
+		win.ctx.cur_params := &params
+		win.ctx.cur_rvd := &rvd
+		win.ctx.shadow_pass = shadow_pass
 		win.lines.begin_draw(params, rvd)
 		win.on_draw()
 
@@ -53,16 +49,13 @@ class SimpleCameraController extends Object as obs.Node
 
 
 class Window extends hui.Window as obs.Node
-	var ctx: owned[Context]
+	var ctx: SimpleContext
 	var xhui_renderer: owned[XhuiRenderer]
 	var hdr: owned[HDRResolver]
 	var render_path: owned[RenderPath]
 	var light: YLight
 	var emitter: shared[SimpleEmitter]
 	var lines: owned![LineHelper]
-	var cur_params: RenderParams&
-	var cur_rvd: RenderViewData&
-	var shadow_pass = false
 	var cam: SimpleCameraController
 	var light_cam_ang: Quaternion?
 
@@ -97,15 +90,15 @@ Dialog win 'bla' borderwidth=0
 
 
 	func mut xinitialize(p: hui.Painter)
-		ctx = api_init_xhui(&p)
-		ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader"], [])
-		xhui_renderer = new XhuiRenderer(ctx!)
+		ctx.ctx = api_init_xhui(&p)
+		ctx.ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
+		xhui_renderer = new XhuiRenderer(ctx.ctx!)
 
 
-		hdr = new HDRResolver(ctx!, 1920, 1080) # TODO dynamically adapt to window size...
+		hdr = new HDRResolver(ctx.ctx!, 1920, 1080) # TODO dynamically adapt to window size...
 #		hdr.bloom_factor = 10
 
-		render_path = new RenderPathForward(ctx!, 1024)
+		render_path = new RenderPathForward(ctx.ctx!, 1024)
 		#render_path = new RenderPathDeferred(ctx!, 130, 100, 1024)
 		render_path!.background_color = [0.2,0.2,0.2,1]
 
@@ -172,9 +165,7 @@ Dialog win 'bla' borderwidth=0
 
 
 	func mut draw_mesh(vb: VertexBuffer&, matrix: mat4, material: Material&)
-		var shader = cur_rvd.get_shader(material, 0, "default", "", "")
-		var rd = cur_rvd.start(cur_params, matrix, shader, material, 0, PrimitiveTopology.TRIANGLES, vb)
-		rd.draw_triangles(cur_params, vb)
+		ctx.draw_mesh(vb, matrix, material)
 
 
 	func mut set_line_color(c: Color)
@@ -190,12 +181,7 @@ Dialog win 'bla' borderwidth=0
 
 
 	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
-		var material = ctx!.create_internal_material()
-		material.albedo = albedo
-		material.roughness = roughness
-		material.metal = metal
-		material.emission = emission
-		return material
+		return ctx.create_material(albedo, roughness, metal, emission)
 
 
 func run(w: shared[Window])

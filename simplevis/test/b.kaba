@@ -1,4 +1,5 @@
 use simplevis as sv
+use simplevis.common.*
 use yrenderer.*
 use polymesh.*
 use xhui
@@ -19,7 +20,7 @@ class Window extends sv.Window
 		let ed2 = bevel_edges(mesh, range(80), range(200), 0.13)
 		ed2.apply_inplace(mesh)
 		mesh.update_normals()
-		vb = sv.mesh_to_vb(mesh)
+		vb = mesh_to_vb(mesh)
 		material := create_material(emission=[0,0.8,0.7,1])
 
 
