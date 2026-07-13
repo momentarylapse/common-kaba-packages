@@ -13,23 +13,41 @@ func mesh_to_vb(m: Mesh) -> xfer[VertexBuffer]
 struct ColorMap
 	var colors: Color[]
 	var values: f32[]
-#	func get(t: f32) -> Color
-#		return Color.BLACK # TODO
-#	func min() -> f32
-#		return min(values)
-#	func max() -> f32
-#		return max(values)
-#	func mut sort()
+	func get(f: f32) -> Color
+		if len(values) > 0
+			if f < values[0]
+				return colors[0]
+		for i in 0:len(values)-1
+			if f >= values[i] and f <= values[i+1]
+				return Color.mix(colors[i], colors[i+1], (f - values[i]) / (values[i+1] - values[i]))
+		if len(values) >= 1
+			return colors[1]
+		return Color.BLACK
+	func min() -> f32
+		if len(values) >= 1
+			return values[0] #min(values)
+		return 0
+	func max() -> f32
+		if len(values) >= 1
+			return values[len(values)-1] #max(values)
+		return 0
+	func mut sort()
+		for i in 0:len(values)
+			for j in i+1:len(values)
+				if values[i] > values[j]
+					values.swap(i, j)
+					colors.swap(i, j)
 
 
 func default_color_map() -> ColorMap
-	return [[Color.RED, Color.WHITE, Color.BLUE], [-1,0,1]]
+	return [[[0,0,1,1], Color.WHITE, [1,0,0,1]], [-1,0,1]]
 func default_color_map_transparent() -> ColorMap
-	return [[Color.RED, [0,0,0,0], Color.BLUE], [-1,0,1]]
+	return [[[0,0,1,0.5], [1,1,1,0], [1,0,0,0.5]], [-1,0,1]]
 
 
 class SimpleContext
-	var ctx: owned[Context]
+	var ctx: Context&
+	var lines: owned![LineHelper]
 	var cur_params: RenderParams&
 	var cur_rvd: RenderViewData&
 	var shadow_pass = false
@@ -38,12 +56,24 @@ class SimpleContext
 
 
 	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
-		var material = ctx!.create_internal_material()
+		var material = ctx.create_internal_material()
 		material.albedo = albedo
 		material.roughness = roughness
 		material.metal = metal
 		material.emission = emission
 		return material
+
+
+	func mut set_color(c: Color)
+		lines.set_color(c)
+
+
+	func mut set_line_width(w: f32)
+		lines.set_line_width(w)
+
+
+	func mut draw_lines(points: vec3[], contiguous: bool)
+		lines.draw_lines(points, contiguous)
 
 
 	func mut draw_mesh(vb: VertexBuffer&, matrix: mat4, material: Material&)

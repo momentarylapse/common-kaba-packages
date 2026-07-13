@@ -12,17 +12,30 @@ let EXPORT_IMPORTS = true
 
 class SimpleEmitter extends MeshEmitter
 	var canvas: Canvas&
+	var xx_vb: owned![VertexBuffer]
+	var xx_mat: Material&
 
-	func __init__(c: Canvas&)
-		super.__init__(c.ctx.ctx!, "simple")
+	func __init__(out c: Canvas&)
+		super.__init__(c.ctx.ctx, "simple")
 		canvas := c
+		xx_vb = new VertexBuffer("3f,3f,2f")
+		xx_mat := c.ctx.create_material()
 
 	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
 		canvas.ctx.cur_params := &params
 		canvas.ctx.cur_rvd := &rvd
 		canvas.ctx.shadow_pass = shadow_pass
-		canvas.lines.begin_draw(params, rvd)
+		canvas.ctx.lines.begin_draw(params, rvd)
+
+		# FIXME bug: lines only visible AFTER drawing a mesh :[
+		canvas.ctx.draw_mesh(xx_vb, mat4.ID, xx_mat)
+
 		canvas.on_draw()
+		if canvas.f_draw
+			canvas.f_draw()
+		canvas.on_draw_transparent() # meh later...
+		if canvas.f_draw_transparent
+			canvas.f_draw_transparent()
 
 
 class ViewPort extends Object as obs.Node
@@ -32,8 +45,8 @@ class ViewPort extends Object as obs.Node
 	var radius = 5.0
 	var fov = pi/4
 
-	func mut rotate(d: vec3)
-		ang = ang * Quaternion(d)
+	func mut rotate(d: Quaternion)
+		ang = ang * d
 		out_changed()
 
 	func mut move(d: vec3)
@@ -61,9 +74,16 @@ class Canvas extends Object as obs.Node, Sharable
 	var render_path: owned[RenderPath]
 	var light: YLight
 	var emitter: shared[SimpleEmitter]
-	var lines: owned![LineHelper]
 	var cam: ViewPort
 	var light_cam_ang: Quaternion?
+	var f_draw: void->void = nil
+	var f_draw_transparent: void->void = nil
+
+#	enum MouseMode
+#		NONE
+#		ROTATE
+#		MOVE
+#	var mode = MouseMode.NONE
 
 
 	func override __init__()
@@ -74,25 +94,25 @@ class Canvas extends Object as obs.Node, Sharable
 	func virtual mut on_initialize()
 	func virtual mut on_prepare()
 	func virtual mut on_draw()
+	func virtual mut on_draw_transparent()
 #	func override on_mouse_move(m: vec2)
 
-	func mut initialize(p: hui.Painter)
-		ctx.ctx = api_init_xhui(&p)
-		ctx.ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
-		xhui_renderer = new XhuiRenderer(ctx.ctx!)
+	func mut initialize(c: Context&)
+		ctx.ctx := c
+		xhui_renderer = new XhuiRenderer(ctx.ctx)
 
 
-		hdr = new HDRResolver(ctx.ctx!, 1920, 1080) # TODO dynamically adapt to window size...
+		hdr = new HDRResolver(ctx.ctx, 1920, 1080) # TODO dynamically adapt to window size...
 #		hdr.bloom_factor = 10
 
-		render_path = new RenderPathForward(ctx.ctx!, 1024)
-		#render_path = new RenderPathDeferred(ctx!, 130, 100, 1024)
+		render_path = new RenderPathForward(ctx.ctx, 1024)
+		#render_path = new RenderPathDeferred(ctx.ctx, 130, 100, 1024)
 		render_path!.background_color = [0.2,0.2,0.2,1]
 
 		xhui_renderer!.add_child(weak(hdr!))
 		hdr!.add_child(weak(render_path!))
 
-		lines = new LineHelper()
+		ctx.lines = new LineHelper()
 
 		emitter = new SimpleEmitter(&self)
 		render_path!.add_opaque_emitter(emitter!)
@@ -118,7 +138,7 @@ class Canvas extends Object as obs.Node, Sharable
 			render_path!.set_lights([&light])
 
 			r.before_draw(&p)
-			lines.start_frame(p.ui_scale)
+			ctx.lines.start_frame(p.ui_scale)
 
 			on_prepare()
 
@@ -130,7 +150,9 @@ class Canvas extends Object as obs.Node, Sharable
 
 	func mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
 		if rbut
-			cam.rotate(vec3(d.y, d.x, 0) * 0.003)
+			cam.rotate(Quaternion(vec3(d.y, d.x, 0) * 0.003))
+		if mbut
+			cam.move(vec3(-d.x, d.y, 0.0) * 0.001)
 
 
 	func mut on_mouse_wheel(d: vec2)
@@ -152,23 +174,12 @@ class Canvas extends Object as obs.Node, Sharable
 		ctx.draw_mesh(vb, matrix, material)
 
 
-	func mut set_line_color(c: Color)
-		lines.set_color(c)
-
-
-	func mut set_line_width(w: f32)
-		lines.set_line_width(w)
-
-
-	func mut draw_lines(points: vec3[], contiguous: bool)
-		lines.draw_lines(points, contiguous)
-
-
 	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
 		return ctx.create_material(albedo, roughness, metal, emission)
 
 
 class Window extends hui.Window as obs.Node
+	var ctx: owned![Context]
 	var canvas: shared![Canvas]
 
 
@@ -196,7 +207,9 @@ Dialog win 'bla' borderwidth=0
 
 
 	func mut xinitialize(p: hui.Painter)
-		canvas.initialize(p)
+		ctx = api_init_xhui(&p)
+		ctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
+		canvas.initialize(weak(ctx))
 
 		#hui.run_later(0.1, func() redraw("area"))
 

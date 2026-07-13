@@ -46,6 +46,7 @@ class VolumeRenderer
 		texture.set_options("wrap=clamp,magfilter=nearest")
 		texture.write_float(data)
 		material.textures[0] = texture
+		material_solid.textures[0] = texture
 
 
 	func mut draw(matrix: mat4)

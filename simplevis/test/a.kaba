@@ -18,11 +18,11 @@ class Canvas extends sv.Canvas
 
 
 	func override on_draw()
-		draw_mesh(weak(vb), mat4.ID, material)
+		ctx.draw_mesh(weak(vb), mat4.ID, material)
 
-		set_line_color(Color.RED)
-		set_line_width(5)
-		draw_lines([[0,0,-2], [3,3,3]], true)
+		ctx.set_color(Color.RED)
+		ctx.set_line_width(5)
+		ctx.draw_lines([[0,0,-2], [3,3,3]], true)
 
 
 func main()
