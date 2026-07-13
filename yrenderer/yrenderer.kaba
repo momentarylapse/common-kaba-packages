@@ -78,6 +78,7 @@ class extern TextureManager
 class extern ShaderManager
 	var default_shader: string
 #	func extern __init__(ctx: GfxContext, dir: os.Path[])
+	func extern mut add_directory(dir: os.Path)
 	func extern mut load_shader_module(filename: os.Path)
 class extern MaterialManager
 #	func extern __init__(tm: TextureManager, dir: os.Path[])
