@@ -5,7 +5,7 @@ use polymesh.*
 use xhui
 
 
-class Window extends sv.Window
+class Canvas extends sv.Canvas
 	var vb: owned![VertexBuffer]
 	var material: Material&
 
@@ -26,4 +26,4 @@ class Window extends sv.Window
 
 
 func main()
-	sv.run(new Window("simplevis test"))
+	sv.run(new Canvas())

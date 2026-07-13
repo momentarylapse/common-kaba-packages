@@ -11,21 +11,21 @@ let EXPORT_IMPORTS = true
 
 
 class SimpleEmitter extends MeshEmitter
-	var win: Window&
+	var canvas: Canvas&
 
-	func __init__(w: Window&)
-		super.__init__(w.ctx.ctx!, "simple")
-		win := w
+	func __init__(c: Canvas&)
+		super.__init__(c.ctx.ctx!, "simple")
+		canvas := c
 
 	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
-		win.ctx.cur_params := &params
-		win.ctx.cur_rvd := &rvd
-		win.ctx.shadow_pass = shadow_pass
-		win.lines.begin_draw(params, rvd)
-		win.on_draw()
+		canvas.ctx.cur_params := &params
+		canvas.ctx.cur_rvd := &rvd
+		canvas.ctx.shadow_pass = shadow_pass
+		canvas.lines.begin_draw(params, rvd)
+		canvas.on_draw()
 
 
-class SimpleCameraController extends Object as obs.Node
+class ViewPort extends Object as obs.Node
 	var out_changed = obs.Source(&self, &ind, "changed")
 	var pos = vec3.0
 	var ang = Quaternion.ID
@@ -44,11 +44,17 @@ class SimpleCameraController extends Object as obs.Node
 		radius /= f
 		out_changed()
 
+	func mut focus_on_box(box: Box)
+		pos = box.center()
+		radius = len(box.size()) * 2
+		out_changed()
+
 	func params() -> CameraParams
-		return (pos - ang*vec3.EZ*radius, ang, fov, radius*0.01, radius*1000)
+		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000)
 
 
-class Window extends hui.Window as obs.Node
+class Canvas extends Object as obs.Node, Sharable
+	var out_redraw = obs.Source(&self, &ind, "redraw")
 	var ctx: SimpleContext
 	var xhui_renderer: owned[XhuiRenderer]
 	var hdr: owned[HDRResolver]
@@ -56,29 +62,12 @@ class Window extends hui.Window as obs.Node
 	var light: YLight
 	var emitter: shared[SimpleEmitter]
 	var lines: owned![LineHelper]
-	var cam: SimpleCameraController
+	var cam: ViewPort
 	var light_cam_ang: Quaternion?
 
 
-	func __init__(title: string)
-		super.__init__(title, 800, 600)
-		from_source("
-Dialog win 'bla' borderwidth=0
-	Grid ? ''
-		DrawingArea area '' expandy cangrabfocus grabfocus
-")
-		set_maximized(true)
-
-		event_x("area", "hui:mouse-move", xmouse_move)
-		event_x("area", "hui:mouse-wheel", xmouse_wheel)
-		event_x("area", "hui:key-down", xkey_down)
-
-		event_x("area", "hui:draw", xdraw)
-		event_x("area", "hui:initialize", xinitialize)
-		event_x("win", "hui:just-before-draw", xbefore_draw)
-
-	#	hui.run_repeated(0.01, func() redraw("area"))
-		cam.out_changed >> create_sink(func() redraw("area"))
+	func override __init__()
+		cam.out_changed >> create_sink(func() out_redraw())
 
 
 	# interface
@@ -87,9 +76,7 @@ Dialog win 'bla' borderwidth=0
 	func virtual mut on_draw()
 #	func override on_mouse_move(m: vec2)
 
-
-
-	func mut xinitialize(p: hui.Painter)
+	func mut initialize(p: hui.Painter)
 		ctx.ctx = api_init_xhui(&p)
 		ctx.ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
 		xhui_renderer = new XhuiRenderer(ctx.ctx!)
@@ -115,13 +102,12 @@ Dialog win 'bla' borderwidth=0
 #		light.allow_shadow = true
 		light_cam_ang = Quaternion([0.5, -0.4, 0])
 
-
 		on_initialize()
 
-		hui.run_later(0.1, func() redraw("area"))
+		hui.run_later(0.1, func() out_redraw())
 
 
-	func mut xbefore_draw(p: hui.Painter)
+	func mut before_draw(p: hui.Painter)
 		for r in xhui_renderer
 			let params = r.extract_params(&p)
 
@@ -133,27 +119,25 @@ Dialog win 'bla' borderwidth=0
 
 			r.before_draw(&p)
 			lines.start_frame(p.ui_scale)
+
 			on_prepare()
 
 
-	func mut xdraw(p: hui.Painter)
+	func mut draw(p: hui.Painter)
 		for r in xhui_renderer
 			r.draw(&p)
 
 
-	func mut xmouse_move()
-		let d = get_mouse_delta()
-		if right_button()
+	func mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
+		if rbut
 			cam.rotate(vec3(d.y, d.x, 0) * 0.003)
 
 
-	func mut xmouse_wheel()
-		let d = get_scroll()
+	func mut on_mouse_wheel(d: vec2)
 		cam.zoom(exp(d.y * 0.1))
 
 
-	func mut xkey_down()
-		let k = get_key_code()
+	func mut on_key_down(k: i32)
 		if k == hui.KEY_LEFT
 			cam.move([-0.05,0,0])
 		if k == hui.KEY_RIGHT
@@ -184,5 +168,61 @@ Dialog win 'bla' borderwidth=0
 		return ctx.create_material(albedo, roughness, metal, emission)
 
 
-func run(w: shared[Window])
-	hui.fly_and_wait(w)
+class Window extends hui.Window as obs.Node
+	var canvas: shared![Canvas]
+
+
+	func __init__(_canvas: shared![Canvas], title: string)
+		super.__init__(title, 800, 600)
+		from_source("
+Dialog win 'bla' borderwidth=0
+	Grid ? ''
+		DrawingArea area '' expandy cangrabfocus grabfocus
+")
+		set_maximized(true)
+
+		canvas = _canvas
+
+		event_x("area", "hui:mouse-move", xmouse_move)
+		event_x("area", "hui:mouse-wheel", xmouse_wheel)
+		event_x("area", "hui:key-down", xkey_down)
+
+		event_x("area", "hui:draw", xdraw)
+		event_x("area", "hui:initialize", xinitialize)
+		event_x("win", "hui:just-before-draw", xbefore_draw)
+
+		canvas.out_redraw >> create_sink(func() redraw("area"))
+
+
+
+	func mut xinitialize(p: hui.Painter)
+		canvas.initialize(p)
+
+		#hui.run_later(0.1, func() redraw("area"))
+
+
+	func mut xbefore_draw(p: hui.Painter)
+		canvas.before_draw(p)
+
+
+	func mut xdraw(p: hui.Painter)
+		canvas.draw(p)
+
+
+	func mut xmouse_move()
+		canvas.on_mouse_move(get_mouse_delta(), left_button(), middle_button(), right_button())
+
+
+	func mut xmouse_wheel()
+		canvas.on_mouse_wheel(get_scroll())
+
+
+	func mut xkey_down()
+		canvas.on_key_down(get_key_code())
+
+
+func run(c: shared![Canvas], title="Simplevis")
+	hui.fly_and_wait(new Window(c, title))
+
+#func run(w: shared[Window])
+#	hui.fly_and_wait(w)

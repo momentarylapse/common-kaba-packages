@@ -2,7 +2,7 @@ use simplevis as sv
 use simplevis.volume.VolumeRenderer
 
 
-class Window extends sv.Window
+class Canvas extends sv.Canvas
 	var vr = VolumeRenderer(&ctx)
 
 
@@ -26,4 +26,4 @@ class Window extends sv.Window
 
 
 func main()
-	sv.run(new Window("simplevis test"))
+	sv.run(new Canvas())
