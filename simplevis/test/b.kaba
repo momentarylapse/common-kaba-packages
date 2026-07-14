@@ -21,7 +21,7 @@ class Canvas extends sv.Canvas
 		ed2.apply_inplace(mesh)
 		mesh.update_normals()
 		vb = mesh_to_vb(mesh)
-		material := create_material(emission=[0,0.8,0.7,1])
+		material := ctx.create_material(emission=[0,0.8,0.7,1])
 
 
 	func override on_draw()

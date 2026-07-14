@@ -170,12 +170,12 @@ class Canvas extends Object as obs.Node, Sharable
 			cam.move([0,-0.05,0])
 
 
-	func mut draw_mesh(vb: VertexBuffer&, matrix: mat4, material: Material&)
-		ctx.draw_mesh(vb, matrix, material)
+	func mut set_background(b: Color)
+		render_path!.background_color = b
 
 
-	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
-		return ctx.create_material(albedo, roughness, metal, emission)
+	func mut set_hdr_exposure(exposure: f32)
+		hdr!.exposure = exposure
 
 
 class Window extends hui.Window as obs.Node
