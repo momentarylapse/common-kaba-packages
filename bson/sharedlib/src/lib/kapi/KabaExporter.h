@@ -54,8 +54,8 @@ void* mf(T tmf) {
 }
 
 namespace kaba {
-
-class KabaException;
+	class IContext;
+	class KabaException;
 
 KabaException* create_kaba_exception(const string& message);
 void kaba_raise_exception(KabaException* e);
@@ -89,6 +89,8 @@ public:
 	void link_virtual(const string& name, T pointer, void* instance) {
 		_link_virtual(name, mf(pointer), instance);
 	}
+
+	virtual IContext* context() = 0;
 };
 
 template<class T>
@@ -140,6 +142,20 @@ template<class T, class... Args>
 void generic_init_ext(T* me, Args... args) {
 	new(me) T(args...);
 }
+}
+
+
+#define KABA_PACKAGE_EXPORT_BEGIN \
+extern "C" {
+#define KABA_PACKAGE_EXPORT \
+__attribute__ ((visibility ("default")))
+
+#define KABA_PACKAGE_EXPORT_END \
+} \
+namespace os::app { \
+int main(const Array<string>&) { \
+	return 0; \
+} \
 }
 
 //#endif
