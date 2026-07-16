@@ -2,32 +2,64 @@ use xhui as hui
 use .plotarea.*
 
 
-
-class Window extends hui.Window
+class PlotPanel extends hui.Panel
 	var plotter: PlotArea
 	var data_sets: DataSet[]
+	var first_draw = true
 
 	func __init__()
-		super.__init__("plot", 800, 600)
+		super.__init__(p2s(&self))
 		from_source("
-Window window '' borderwidth=0
+Window panel ''
 	DrawingArea area '' expand margin=0")
 
 		event_x("area", "hui:draw", on_draw)
+		event_x("area", "hui:mouse-wheel", on_scroll)
 
 	func mut add_plot(x: f32[], y: f32[])
 		data_sets.add([x, y])
-		optimize_view()
+		request_redraw()
 
 	func mut optimize_view()
 		plotter.optimize_view(data_sets)
 
 	func mut on_draw(out p: hui.Painter)
 		plotter.set_area(p.area())
+
+		if first_draw
+			optimize_view()
+			first_draw = false
+
 		plotter.draw_background(p)
 
 		for d in data_sets
 			plotter.plot(p, d, DefaultTheme.fg)
+
+	func mut on_scroll()
+		let m = get_window()!.get_mouse_position()
+		let d = get_window()!.get_scroll()
+		if get_window()!.is_key_pressed(hui.KEY_CONTROL)
+			plotter.move(m, -d * 20)
+		else
+			plotter.zoom(m, exp(-d.y * 0.1))
+		request_redraw()
+
+
+
+class Window extends hui.Window
+	var panel: shared![PlotPanel]
+
+	func __init__()
+		super.__init__("plot", 800, 600)
+		from_source("
+Window window '' borderwidth=0
+	Grid grid ''")
+
+		panel = new PlotPanel()
+		embed("grid", 0, 0, panel)
+
+	func mut add_plot(x: f32[], y: f32[])
+		panel.add_plot(x, y)
 
 
 func plot(x: f32[], y: f32[])

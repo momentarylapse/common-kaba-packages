@@ -66,8 +66,13 @@ class PlotArea
 		for r in yrange
 			x_axis.range = r
 
+	# value -> pixel
 	func project(p: vec2) -> vec2
 		return [x_axis.project(p.x), y_axis.project(p.y)]
+
+	# pixel -> value
+	func unproject(p: vec2) -> vec2
+		return [x_axis.unproject(p.x), y_axis.unproject(p.y)]
 
 	func draw_background(out p: Painter)
 		p.set_color(background_color)
@@ -106,4 +111,16 @@ class PlotArea
 		p.set_line_width(2.0)
 		p.set_antialiasing(true)
 		p.draw_lines(points)
+
+	func mut zoom(m: vec2, scale: f32)
+		if m.x > area.x1 + 30
+			x_axis.zoom(m.x, scale)
+		if m.y < area.y2 - 30
+			y_axis.zoom(m.y, scale)
+
+	func mut move(m: vec2, d: vec2)
+		if m.x > area.x1 + 30
+			x_axis.move(d.x)
+		if m.y < area.y2 - 30
+			y_axis.move(d.y)
 

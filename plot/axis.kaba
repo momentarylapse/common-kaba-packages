@@ -16,6 +16,28 @@ struct Tick
 	label: string
 
 
+func grid_level(i: i32) -> i32
+	if i == 0
+		return 0
+	if i % 10 == 0
+		return 1
+	if i % 100 == 0
+		return 2
+	return 3
+
+
+let LOW_MAX = 0.5
+let MID_MAX = 0.75
+
+func grid_density(level: i32, _d_err: f32) -> f32
+	if level == 0
+		return 1
+	var d_err = _d_err
+	if level == 1
+		d_err += 1
+	return min(pow(10.0, d_err-1.0) * LOW_MAX, MID_MAX)
+
+
 struct Axis
 	var range: Range
 	var val_min_min, val_max_max: f32? # zoom limit
@@ -25,32 +47,38 @@ struct Axis
 	var size = 100.0 # "pixels"
 	var min_label_dist = 50.0
 
+	# value -> pixel
 	func project(x: f32) -> f32
 		if log_scale
 			return offset + (log(x) - log(range.min)) / (log(range.max) - log(range.min)) * size
 		return offset + (x - range.min) / len(range) * size
+
+	# pixel -> value
+	func unproject(x: f32) -> f32
+		if log_scale
+			return 0 # TODO
+		return range.min + (x - offset) * len(range) / size
 
 	func get_lin_partition() -> Tick[]
 		let d = abs(len(range) / size) * 150 # ideal step
 		var r: Tick[]
 		let e = floor(log(d) / log(10))
 		let step = pow(10.0, e) # quantized step
-		let factor = d / step
+		let err = log10(d / step) # in [0..1]
 		let decimals = i32(max(-e, 0))
-		let min = floor(range.min / step) * step
-		let max = range.max
 
-		var vv = min
-		var i = i32(floor(range.min / step))
-		while vv <= max and step > 0
-			var w = 0.4
-			if (i % 10) == 0
-				w = 1.0
-			r.add([vv, w, "{{vv.str2(decimals)}} {{unit}}"])
-			if factor < 3
-				r.add([vv + step / 2, 0.2, ""])
-			vv += step
-			i ++
+		let i0 = i32(floor(range.min / step))
+		let i1 = i32(ceil(range.max / step))+1
+		for i in i0:i1
+			let vv = f32(i) * step
+			let level = grid_level(i)
+			let w = grid_density(level, 1-err)
+			if level < 3 or err < 0.5 or (i % 5) == 0
+				r.add([vv, w, "{{vv.str2(decimals)}} {{unit}}"])
+			else
+				r.add([vv, w, ""])
+			if err < 0.3
+				r.add([vv + step / 2, 0.1, ""])
 
 		return r
 
@@ -119,6 +147,14 @@ struct Axis
 #				return get_pitch_partition()
 			return get_log_partition()
 		return get_lin_partition()
+
+	func mut zoom(fixpoint_pixel: f32, scale: f32)
+		let p = unproject(fixpoint_pixel)
+		range = [p + (range.min - p) * scale, p + (range.max - p) * scale]
+
+	func mut move(d_pixel: f32)
+		let d = d_pixel * len(range) / size
+		range = [range.min + d, range.max + d]
 
 
 func _get_ticks(range: Range, total_pixels: f32, spacing0: f32, logscale: bool) -> Tick[]

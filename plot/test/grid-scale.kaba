@@ -1,0 +1,17 @@
+use plot.*
+use xhui
+
+var t = 0.0
+
+func main()
+	var w = new shared Window()
+	var ww = weak(w)
+	let f = func()
+		t += 0.01
+		let x = exp(sin(t)*3)
+		ww.panel.plotter.x_axis.range = [-x,x]
+		ww.panel.plotter.y_axis.range = [-x,x]
+		ww.request_redraw()
+	xhui.run_repeated(0.02, f)
+	xhui.fly_and_wait(w)
+
