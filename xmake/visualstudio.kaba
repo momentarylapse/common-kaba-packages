@@ -3,8 +3,10 @@ use os.Path
 use .project.*
 use .library.*
 
+
 func win_path(p: Path) -> string
 	return str(p).replace("/", "\\")
+
 
 func rand_hex(chars: int) -> string
 	var s: string
@@ -12,8 +14,11 @@ func rand_hex(chars: int) -> string
 		let r = rand(0xffff)
 		s += as_binary(&r, 1).hex().upper()[:1]
 	return s
+
+
 func create_guid() -> string
 	return "{" + rand_hex(8) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(4) + "-" + rand_hex(12) + "}"
+
 
 func guess_guid() -> (string,string)
 	var pguid, sguid: string
@@ -26,7 +31,7 @@ func guess_guid() -> (string,string)
 				sguid = l[17:]
 	except
 		pass
-		
+
 	return [pguid, sguid]
 
 func create_visual_studio(version: int)
@@ -34,7 +39,7 @@ func create_visual_studio(version: int)
 		raise(new Exception("only visual studio 2019 and 2022 supported"))
 	print("-- visual studio {{version}} --")
 	#print(create_guid())
-	
+
 	var GUIDS = guess_guid()
 	var PGUID = GUIDS.e0
 	var SGUID = GUIDS.e1
@@ -44,12 +49,12 @@ func create_visual_studio(version: int)
 		SGUID = create_guid()
 	#PGUID = "{4902439D-3481-4D78-B0FC-5962FB4F7540}"
 	#SGUID = "{1C17E605-00BD-4298-9523-803FC7452E99}"
-	
+
 	if conf.verbose
 		print(" PGUID:{{PGUID}}")
 		print(" SGUID:{{SGUID}}")
 
-	
+
 	var xdef: string[]
 	let lib_groups = conf.dependencies()
 	for g in lib_groups
@@ -62,11 +67,11 @@ func create_visual_studio(version: int)
 	var defines = xdef.join(";")
 	if conf.verbose
 		print(defines)
-	
+
 	var includes = os.fs.search("./", "*.h", "rf")
-	
+
 	var CPPVER = conf.build.language.replace("c++", "stdcpp")
-	
+
 	var f = "
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
@@ -100,11 +105,11 @@ Global
 EndGlobal
 "
 	os.fs.write(conf.root | "{{conf.project.name}}.sln", f.replace("\n", "\r\n"))
-	
+
 	var toolset = "v142"
 	if version == 2022
 		toolset = "v143"
-	
+
 	f = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <Project DefaultTargets=\"Build\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
   <ItemGroup Label=\"ProjectConfigurations\">
@@ -223,8 +228,8 @@ EndGlobal
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>"
-  
-  
+
+
 	for s in _sources
 		f += "
     <ClCompile Include=\"{{win_path(rel(s.filename))}}\" />"
@@ -245,10 +250,10 @@ EndGlobal
 "
 
 	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj", f.replace("\n", "\r\n"))
-	
-	
-	
-	
+
+
+
+
 	f = "<?xml version=\"1.0\" encoding=\"utf-8\"?>
 <Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">
   <ItemGroup>"
@@ -268,7 +273,7 @@ EndGlobal
     <ClInclude Include=\"{{win_path(i)}}\">
       <Filter>{{win_path(i.parent())[:-1]}}</Filter>
     </ClInclude>"
-    
+
     	raise(new Exception("TODO: visualstudio backend"))
 
 #	rand_seed(win_path(conf.source_dir).hash())
@@ -291,6 +296,6 @@ EndGlobal
 	f += "
   </ItemGroup>
 </Project>"
-  
-  
+
+
 	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj.filters", f.replace("\n", "\r\n"))

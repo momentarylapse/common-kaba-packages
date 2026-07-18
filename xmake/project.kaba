@@ -82,12 +82,21 @@ struct ProjectInfo
 	var icon: Path
 
 
+namespace Feature
+	let GIT_VERSION = "gitversion"
+	let MACOS_BUNDLE = "macosbundle"
+	let VS2022 = "vs2022"
+	let VS2026 = "vs2026"
+	let VCPKG = "vcpkg"
+	let VS_LINK_STATIC = "vslinkstatic"
+	let GUI = "gui" # build
+
+
 struct BuildInfo
 	var systems = ["cmake"]
 	var profiles: Profile[]
 	var language = "c++17"
 	var optimization = "2"
-	var type = "debug"
 	var flags_global: string
 	var flags_compiler: string
 	var flags_linker: string
@@ -186,8 +195,6 @@ struct Config
 				build.flags_global = str(v)
 			else if k == "build.optimization"
 				build.optimization = str(v)
-			else if k == "build.type"
-				build.type = str(v)
 			#else if k == "compiler-flags"
 #				flags_compiler = c[k]
 #			else if k == "linker-flags"
@@ -267,7 +274,6 @@ struct Config
 		c["build.system"] = sa2any(build.systems)
 		c["build.language"] = build.language
 		c["build.optimization"] = build.optimization
-		c["build.type"] = build.type
 		c["build.flags"] = build.flags_global
 		c["build.features"] = sa2any(build.features)
 		for p in build.profiles

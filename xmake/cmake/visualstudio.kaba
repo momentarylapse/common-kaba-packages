@@ -1,7 +1,7 @@
 use ..project.*
 use os
 
-func vs2022_preset(type: string, ext: string, vars: string{}) -> string
+func vs_preset(type: string, ext: string, vars: string{}) -> string
 	var A = ""
 	var B = ""
 	var C = ""
@@ -32,13 +32,23 @@ func is_vulkan_or_gl() -> bool
 	return false
 
 
-func create_vs2022_stuff()
+func create_visual_studio_stuff()
 	var X = ""
+	var Y = ""
 
 	if is_vulkan_or_gl()
 		X = ",
-		{{vs2022_preset("Debug", "GL", {"VULKAN_OR_GL": "gl"})}},
-		{{vs2022_preset("Release", "GL", {"VULKAN_OR_GL": "gl"})}}"
+		{{vs_preset("Debug", "GL", {"VULKAN_OR_GL": "gl"})}},
+		{{vs_preset("Release", "GL", {"VULKAN_OR_GL": "gl"})}}"
+
+	if Feature.VS_LINK_STATIC in conf.build.features
+		Y = "
+		\"cacheVariables\": {
+			\"CMAKE_C_COMPILER\": \"cl.exe\",
+			\"CMAKE_CXX_COMPILER\": \"cl.exe\",
+			\"VCPKG_TARGET_TRIPLET\": \"x64-windows-static\",
+			\"CMAKE_MSVC_RUNTIME_LIBRARY\": \"MultiThreaded$<$<CONFIG:Debug>:Debug>\"
+		},"
 
 	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
 	\"version\": 3,
@@ -49,19 +59,21 @@ func create_vs2022_stuff()
 			\"generator\": \"Ninja\",
 			\"binaryDir\": \"${sourceDir}/out/build/${presetName}\",
 			\"installDir\": \"${sourceDir}/out/install/${presetName}\",
-			\"toolchainFile\": \"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake\",
+			\"toolchainFile\": \"$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake\",{{Y}}
 			\"condition\": {
 				\"type\": \"equals\",
 				\"lhs\": \"${hostSystemName}\",
 				\"rhs\": \"Windows\"
 			}
 		},
-		{{vs2022_preset("Debug", "", {})}},
-		{{vs2022_preset("Release", "", {})}}{{X}}
+		{{vs_preset("Debug", "", {})}},
+		{{vs_preset("Release", "", {})}}{{X}}
 	]
 }
 ".replace("\t", "    ").replace("\n", "\r\n"))
 
+
+func create_vs_default_launch()
 	let t = conf.main_target()
 
 	os.fs.create_directory(conf.root | ".vs")

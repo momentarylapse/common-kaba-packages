@@ -13,17 +13,22 @@ use .gitversion.*
 
 
 func create_base() -> string
-	let debug = conf.build.type == "debug"
-
 	var r = "# created by xmake
 
 cmake_minimum_required(VERSION 3.21)
+cmake_policy(SET CMP0091 NEW)
+
 project({{conf.project.name}})
 set(CMAKE_CXX_STANDARD {{conf.build.language[3:]}})
-set(CMAKE_CXX_STANDARD_REQUIRED True)"
-	if debug
-		r += "
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)"
+
+	if Feature.VS_LINK_STATIC in conf.build.features
+		r += "
+
+if(MSVC)
+	set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} /MT\")
+endif()"
 
 	if i32(conf.build.language[3:]) <= 17
 		r += "
@@ -74,7 +79,7 @@ func create_target(t: BuildTarget) -> string
 #======================================================================================="
 
 	var tflags = ""
-	if "gui" in t.features
+	if Feature.GUI in t.features
 		tflags += " WIN32"
 
 	if t.is_library()
@@ -128,7 +133,7 @@ func create()
 	for t in conf.targets
 		r += create_target(t)
 
-	if "macosbundle" in conf.build.features
+	if Feature.MACOS_BUNDLE in conf.build.features
 		r += create_macos_bundle()
 
 	r += create_install_base()
@@ -145,13 +150,13 @@ func create()
 	os.fs.write_text(conf.root | "CMakeLists.txt", r)
 
 
-	if "gitversion" in conf.build.features
+	if Feature.GIT_VERSION in conf.build.features
 		create_git_version()
 
-	if "vs2022" in conf.build.features
-		create_vs2022_stuff()
+	if Feature.VS2022 in conf.build.features or Feature.VS2026 in conf.build.features
+		create_visual_studio_stuff()
 
-	if "vcpkg" in conf.build.features
+	if Feature.VCPKG in conf.build.features
 		vcpkg.create()
 
 

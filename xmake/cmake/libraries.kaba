@@ -64,6 +64,14 @@ func lib_add_data(ll: Library, indent: string) -> string
 		raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
 	s += "
 {{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
+
+	# FIXME workarounds...
+	if ll.name == "fftw3" and Feature.VS_LINK_STATIC in conf.build.features
+		s += "
+	if(MSVC)
+		list(REMOVE_ITEM DEPS \"m\") # Windows :S
+	endif()"
+
 	return s[1:]
 
 
@@ -210,9 +218,15 @@ find_package(PkgConfig REQUIRED)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-list(APPEND DEPS Threads::Threads)"
+list(APPEND DEPS Threads::Threads)
 
-	if "gitversion" in conf.build.features
+
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+	list(APPEND DEPS ${MATH_LIBRARY})
+endif()"
+
+	if Feature.GIT_VERSION in conf.build.features
 		r += "
 
 # git version

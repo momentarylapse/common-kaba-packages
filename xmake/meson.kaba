@@ -47,7 +47,7 @@ func create_libs(f: os.FileStream) -> string[]
 func create()
 	print("-- meson --")
 	var f = os.fs.open(conf.root | "meson.build", "wt")
-	var debug = str(conf.build.type == "debug")
+	var debug = true#str(conf.build.type == "debug")
 	f << "project('{{conf.project.name}}', 'cpp', default_options : ['cpp_std={{conf.build.language}}', 'warning_level=1', 'optimization={{conf.build.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]
 	var opt = [for o in opts "'{{o}}'"].join(", ")
@@ -64,7 +64,7 @@ mdep = cc.find_library('m', required : false)
 threaddep = dependency('threads')"
 
 	var vars = create_libs(f)
-	
+
 	for t in conf.targets
 		let sources = conf.find_sources(t)
 		f << "
@@ -81,16 +81,16 @@ threaddep = dependency('threads')"
 
 	for t in conf.targets
 		f << "executable('{{t.binary_file}}', {{t.name}}_sources, dependencies : deps, install : {{t.default}})"
-	
+
 	f << ""
-	
+
 	var list = conf.needs_installing()
 	for e in list
 		if os.fs.is_directory(e)
 			f << "install_subdir('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.project.name}}'))"
 		else
 			f << "install_data('{{e}}', install_dir : join_paths(get_option('datadir'), '{{conf.project.name}}'))"
-	
+
 	if conf.install.desktop_file != ""
 		f << "install_data('{{conf.install.desktop_file}}', install_dir : join_paths(get_option('datadir'), 'applications'))"
 
