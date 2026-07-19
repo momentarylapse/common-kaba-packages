@@ -23,13 +23,6 @@ set(CMAKE_CXX_STANDARD {{conf.build.language[3:]}})
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_BUILD_TYPE Debug)"
 
-	if Feature.VS_LINK_STATIC in conf.build.features
-		r += "
-
-if(MSVC)
-	set(CMAKE_CXX_FLAGS \"${CMAKE_CXX_FLAGS} /MT\")
-endif()"
-
 	if i32(conf.build.language[3:]) <= 17
 		r += "
 

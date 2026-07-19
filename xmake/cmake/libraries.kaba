@@ -216,6 +216,7 @@ find_package(PkgConfig REQUIRED)
 
 	r += "
 
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
@@ -229,10 +230,19 @@ endif()"
 	if Feature.GIT_VERSION in conf.build.features
 		r += "
 
+
 # git version
 include(.cmake/CheckGit.cmake)
 CheckGitSetup()
 list(APPEND DEPS git-version)"
+
+	if Feature.VS_LINK_STATIC in conf.build.features
+		r += "
+
+
+if(MSVC)
+	list(APPEND COMPILE_OPTIONS $<IF:$<CONFIG:Debug>,/MTd,/MT>)
+endif()"
 
 	return r
 

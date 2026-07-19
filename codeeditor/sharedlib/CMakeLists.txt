@@ -1,6 +1,8 @@
 # created by xmake
 
 cmake_minimum_required(VERSION 3.21)
+cmake_policy(SET CMP0091 NEW)
+
 project(codeeditor)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -23,12 +25,12 @@ list(APPEND COMPILE_DEFINITIONS HAS_LIB_ZLIB=1)
 
 # lib: vulkan or gl (mandatory)
 set(VULKAN_OR_GL "vulkan" CACHE STRING "Use vulkan or gl?")
-find_package(Vulkan COMPONENTS shaderc_combined)
+find_package(Vulkan COMPONENTS shaderc_combined glslang)
 if(VULKAN_FOUND)
 	list(APPEND VULKAN_OR_GL_FOUND "vulkan")
 endif()
 find_package(OpenGL)
-if(OPENGL_FOUND AND NOT APPLE AND NOT WIN32)
+if(OPENGL_FOUND AND NOT APPLE)
 	list(APPEND VULKAN_OR_GL_FOUND "gl")
 endif()
 if(VULKAN_OR_GL_FOUND)
@@ -38,15 +40,19 @@ if(VULKAN_OR_GL_FOUND)
 		message(WARNING "Choice for VULKAN_OR_GL invalid, using ${VULKAN_OR_GL} instead")
 	endif()
 else()
-	message(SEND_ERROR "Neither vulkan or gl found") #  or/nor..
+	message(SEND_ERROR "Neither vulkan nor gl found")
 	set(VULKAN_OR_GL "")
 endif()
 if(VULKAN_OR_GL STREQUAL "vulkan")
-	list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined)
+	if(WIN32)
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::glslang)
+	else()
+		list(APPEND DEPS Vulkan::Vulkan Vulkan::shaderc_combined Vulkan::glslang)
+	endif()
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_VULKAN=1)
 endif()
 if(VULKAN_OR_GL STREQUAL "gl")
-	list(APPEND DEPS OpenGL::OpenGL)
+	list(APPEND DEPS OpenGL::GL)
 	list(APPEND COMPILE_DEFINITIONS HAS_LIB_GL=1)
 endif()
 
@@ -80,9 +86,16 @@ find_package(Freetype REQUIRED)
 list(APPEND DEPS Freetype::Freetype)
 list(APPEND COMPILE_DEFINITIONS HAS_LIB_FREETYPE2=1)
 
+
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 list(APPEND DEPS Threads::Threads)
+
+
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+	list(APPEND DEPS ${MATH_LIBRARY})
+endif()
 
 
 #=======================================================================================
@@ -131,14 +144,19 @@ add_library(modulecodeeditor SHARED
 	src/lib/kaba/lib/lib_threads.cpp
 	src/lib/kaba/lib/lib_time.cpp
 	src/lib/kaba/lib/list.cpp
+	src/lib/kaba/parser/concretifier/Concretifier.cpp
+	src/lib/kaba/parser/concretifier/pipe.cpp
+	src/lib/kaba/parser/concretifier/special_function.cpp
+	src/lib/kaba/parser/concretifier/statement.cpp
+	src/lib/kaba/parser/concretifier/statement_for.cpp
+	src/lib/kaba/parser/concretifier/type_matching.cpp
 	src/lib/kaba/parser/AbstractParser.cpp
-	src/lib/kaba/parser/Concretifier.cpp
 	src/lib/kaba/parser/import.cpp
 	src/lib/kaba/parser/lexical.cpp
 	src/lib/kaba/parser/macros.cpp
 	src/lib/kaba/parser/Parser.cpp
+	src/lib/kaba/parser/preprocessor.cpp
 	src/lib/kaba/parser/Transformer.cpp
-	src/lib/kaba/parser/type_matching.cpp
 	src/lib/kaba/syntax/Block.cpp
 	src/lib/kaba/syntax/Class.cpp
 	src/lib/kaba/syntax/Constant.cpp
@@ -146,7 +164,6 @@ add_library(modulecodeeditor SHARED
 	src/lib/kaba/syntax/Identifier.cpp
 	src/lib/kaba/syntax/Node.cpp
 	src/lib/kaba/syntax/Operator.cpp
-	src/lib/kaba/syntax/preprocessor.cpp
 	src/lib/kaba/syntax/Statement.cpp
 	src/lib/kaba/syntax/SyntaxTree.cpp
 	src/lib/kaba/syntax/Variable.cpp
@@ -224,7 +241,7 @@ target_include_directories(modulecodeeditor PUBLIC src)
 
 set(RESOURCE_DESTINATION share/codeeditor)
 
-# binaries	
+# binaries
 
 # resources
 install(FILES "static/" DESTINATION ${RESOURCE_DESTINATION})

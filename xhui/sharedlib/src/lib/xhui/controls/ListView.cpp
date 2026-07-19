@@ -138,6 +138,10 @@ int ListView::get_hover(const vec2& m) const {
 
 vec2 ListView::get_content_min_size() const {
 	vec2 s = viewport.effective_min_size();
+	if (size_mode_x != SizeMode::ForwardChild)
+		s.x = 30;
+	if (size_mode_y != SizeMode::ForwardChild)
+		s.y = 30;
 	if (show_headers)
 		s.y += HEADER_DY;
 	return s;
