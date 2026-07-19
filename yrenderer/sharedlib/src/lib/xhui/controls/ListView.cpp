@@ -30,6 +30,7 @@ ListView::ListView(const string &_id, const string &t) :
 	cell_grid->grid.spacing = 4;
 	cell_padding = {4, 4};
 	viewport.add_child(cell_grid, 0, 0);
+	viewport.size_mode_x = SizeMode::Fill;
 	viewport.size_mode_y = SizeMode::Fill;
 	viewport.ignore_hover = true;
 	padding = {5, 5, 5, 5};
@@ -138,10 +139,6 @@ int ListView::get_hover(const vec2& m) const {
 
 vec2 ListView::get_content_min_size() const {
 	vec2 s = viewport.effective_min_size();
-	if (size_mode_x != SizeMode::ForwardChild)
-		s.x = 30;
-	if (size_mode_y != SizeMode::ForwardChild)
-		s.y = 30;
 	if (show_headers)
 		s.y += HEADER_DY;
 	return s;
