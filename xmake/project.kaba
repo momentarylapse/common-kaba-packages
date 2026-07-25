@@ -101,6 +101,7 @@ struct BuildInfo
 	var flags_compiler: string
 	var flags_linker: string
 	var features: string[]
+	func mut __init__()
 
 
 struct InstallInfo

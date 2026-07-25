@@ -43,12 +43,12 @@ func create_visual_studio_stuff()
 
 	if Feature.VS_LINK_STATIC in conf.build.features
 		Y = "
-		\"cacheVariables\": {
-			\"CMAKE_C_COMPILER\": \"cl.exe\",
-			\"CMAKE_CXX_COMPILER\": \"cl.exe\",
-			\"VCPKG_TARGET_TRIPLET\": \"x64-windows-static\",
-			\"CMAKE_MSVC_RUNTIME_LIBRARY\": \"MultiThreaded$<$<CONFIG:Debug>:Debug>\"
-		},"
+			\"cacheVariables\": {
+				\"CMAKE_C_COMPILER\": \"cl.exe\",
+				\"CMAKE_CXX_COMPILER\": \"cl.exe\",
+				\"VCPKG_TARGET_TRIPLET\": \"x64-windows-static\",
+				\"CMAKE_MSVC_RUNTIME_LIBRARY\": \"MultiThreaded$<$<CONFIG:Debug>:Debug>\"
+			},"
 
 	os.fs.write_text(conf.root | "CMakePresets.json", "﻿{
 	\"version\": 3,
