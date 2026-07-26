@@ -74,7 +74,7 @@ class extern Control extends Object as shared
 	func extern virtual mut enable(enabled: bool)
 	func extern virtual mut set_option(key: string, valu: string)
 	func extern virtual get_children(_filter: i32) -> Control&[]
-	
+
 	func extern virtual mut on_mouse_move(m: vec2)
 	func extern virtual mut on_mouse_wheel(d: vec2)
 	func extern virtual mut on_mouse_enter(m: vec2)
@@ -90,12 +90,18 @@ class extern Control extends Object as shared
 	func extern virtual mut on_key_down(key: i32)
 	func extern virtual mut on_key_up(key: i32)
 	func extern virtual mut on_key_char(character: i32)
-	
+
 	func extern virtual _draw(p: image.Painter)
 	func extern virtual get_content_min_size() -> vec2
 	func extern virtual mut negotiate_area(available: Rect)
 
 	func extern selfref get_window() -> Window*
+
+
+enum CursorMovingMode
+	DEFAULT
+	SELECTING
+	SHOW_CONTEXT
 
 
 class extern MultilineEdit extends Control
@@ -114,7 +120,7 @@ class extern MultilineEdit extends Control
 	func extern is_redoable() -> bool
 	func extern mut undo()
 	func extern mut redo()
-	func extern mut set_cursor_pos(pos: i32, selecting = false)
+	func extern mut set_cursor_pos(pos: i32, mode = CursorMovingMode.DEFAULT)
 	func extern mut replace_range(i0: i32, i1: i32, by: string)
 
 	struct extern Markup
@@ -306,7 +312,7 @@ class extern Event
 	var row: i32
 	var column: i32
 #	func __delete__()
-	
+
 
 
 struct extern Resource
@@ -321,7 +327,7 @@ struct extern Resource
 	func __init__() # workaround for arm64 ... prevents complex default constructor using stack parameters
 	func extern show(indent: i32)
 	func extern str(indent: i32) -> string
-	
+
 func extern parse_resource(buffer: string, literally: bool) -> Resource
 
 # key ids (int)
