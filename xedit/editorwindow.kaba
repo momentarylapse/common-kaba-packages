@@ -38,41 +38,51 @@ func draw_boxed_str(p: xhui.Painter, _pos: vec2, str: string, align: i32, style:
 	p.draw_str(pos, str)
 
 
+func nice_dir(dir: os.Path) -> string
+	if dir in os.fs.home_directory
+		return "~/" + str(dir.relative_to(os.fs.home_directory))
+	return str(dir)
+
 
 class DocumentSwitcher extends xhui.Dialog
+	var editor_window: EditorWindow&
+	var docs: CodeEditor&[]
+
+
 	func __init__(_editor_window: EditorWindow&)
-		super.__init__("...", 400, 400, _editor_window, xhui.DialogFlags.NO_HEADER)
+		super.__init__("...", 500, 400, _editor_window, xhui.DialogFlags.NO_HEADER)
 		editor_window := _editor_window
+		docs = weak(editor_window.document_editors) |> sort("-last_usage_counter")
 
 		add_control("ListView", "open files", 0, 0, "list")
+		for mut list in get_control("list") as xhui.ListView*
+			let f = func(id: string) xhui.create_control("Label", "!markup,paddingx=5", id)
+			list.column_factory(0).set_create(f)
 
-		for e in weak(editor_window.document_editors)
-			add_string("list", e.title())
-		set_int("list", find(weak(editor_window.document_editors), editor_window.active_editor))
+		for e in docs
+			add_string("list", "<b>{{e.filename.basename()}}</b>  <font alpha=0.5 size=80%>{{nice_dir(e.filename.parent())}}</font>")
+		set_int("list", 0)#find(docs, editor_window.active_editor))
 		next()
 
 	func override __delete__()
 		let i = get_int("list")
-		if len(editor_window.document_editors) > 0
-			editor_window.set_active(weak(editor_window.document_editors)[i])
+		if len(docs) > 0
+			editor_window.set_active(docs[i])
 
 	func mut next()
-		if len(editor_window.document_editors) > 0
-			set_int("list", loop(get_int("list") + 1, 0, len(editor_window.document_editors)))
+		if len(docs) > 0
+			set_int("list", loop(get_int("list") + 1, 0, len(docs)))
 
 	func mut previous()
-		if len(editor_window.document_editors) > 0
-			set_int("list", loop(get_int("list") - 1, 0, len(editor_window.document_editors)))
-
-	var editor_window: EditorWindow&
-
-
+		if len(docs) > 0
+			set_int("list", loop(get_int("list") - 1, 0, len(docs)))
 
 
 class EditorWindow extends xhui.Window as obs.Node
 	var document_editors: shared![CodeEditor][]
 	var active_editor = nil as CodeEditor*
 	var switcher: shared[DocumentSwitcher]
+	var activation_counter = 0
 
 	struct Message
 		type: MessageType
@@ -228,6 +238,8 @@ Window test 'test' padding=0
 
 		for mut e in active_editor
 			e.activate(e.id_edit)
+			e.last_usage_counter = activation_counter
+		activation_counter ++
 		update_title()
 
 
