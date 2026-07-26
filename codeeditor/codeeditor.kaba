@@ -8,6 +8,7 @@ struct Location
 	var filename: os.Path
 	var offset: i32
 
+
 func trim_ending(s: string) -> string
 	var last_non_whitespace = 0
 	for i=>c in s
@@ -18,6 +19,47 @@ func trim_ending(s: string) -> string
 
 func trim_line_endings(s: string) -> string
 	return (s.explode("\n") |> trim_ending).join("\n")
+
+
+struct LabelGroup
+	var label: Parser.Label
+	var children: LabelGroup[]
+	func mut sort_children()
+		#children = children |> sort("label.name")
+		for i in 0:len(children)
+			for j in i+1:len(children)
+				if children[i].label.name.lower() > children[j].label.name.lower()
+					children.swap(i, j)
+		for mut c in children
+			c.sort_children()
+	func linearize() -> Parser.Label[]
+		var r: Ret
+		r.add(label)
+		for c in children
+			# r = r | c.linearize()
+			for x in c.linearize()
+				r.add(x)
+		return r
+
+
+func group_structure(ll: Parser.Label[]) -> LabelGroup
+	var r: LabelGroup
+	for l in ll
+		var lx: LabelGroup
+		lx.label = l
+		if l.level == 0
+			r.children.add(lx)
+		else
+			r.children[len(r.children) - 1].children.add(lx)
+		# TODO :P
+	return r
+
+
+func sort_structure(ll: Parser.Label[]) -> Parser.Label[]
+	var g = group_structure(ll)
+	g.sort_children()
+	return g.linearize()[1:]
+
 
 class CodeEditor extends xhui.Panel as obs.Node
 	var out_changed = obs.Source(&self, &ind, "changed")
@@ -30,6 +72,7 @@ class CodeEditor extends xhui.Panel as obs.Node
 	var id_edit, id_structure: string
 	var label_line_numbers: i32[]
 	var theme: Theme&
+	var last_usage_counter = -1
 
 
 	func mut __init__()
@@ -93,7 +136,7 @@ Dialog coding-panel ''
 	func mut on_structure()
 		let n = get_int(id_structure)
 		if n >= 0 and n < len(label_line_numbers)
-			edit.set_cursor_pos(edit.line_pos_to_index([label_line_numbers[n], 0]))
+			edit.set_cursor_pos(edit.line_pos_to_index([label_line_numbers[n], 0]), xhui.CursorMovingMode.SHOW_CONTEXT)
 		activate(id_edit)
 
 
@@ -241,8 +284,7 @@ Dialog coding-panel ''
 
 
 	func mut update_highlight_current_line()
-		var pp = get_parser(filename)
-		for mut p in pp
+		for mut p in get_parser(filename)
 			let lp = edit.index_to_line_pos(edit.cursor_pos)
 			let i0 = line_start(lp.line)
 			let i1 = line_end(lp.line)
@@ -254,22 +296,30 @@ Dialog coding-panel ''
 
 
 	func mut update_highlight_all()
-		var pp = get_parser(filename)
-		for mut p in pp
+		for mut p in get_parser(filename)
 			clear_markings(0, len(edit.text))
 			p.prepare_symbols(edit.text, filename)
 			for m in p.create_markup(edit.text, 0)
 				mark_word(m.start, m.end, m.type)
 
 
+	func static fancy_category(cat: string) -> string
+		match cat
+			"class" => return "<b><font color='red'>C</font></b>"
+			"struct" => return "<b><font color='red'>S</font></b>"
+			"trait" => return "<b><font color='red'>T</font></b>"
+			"enum" => return "<b><font color='red'>E</font></b>"
+			"func" => return "<b><font color='green'>F</font></b>"
+			else => return "<b>{{cat}}</b>"
+
+
 	func mut update_structure()
-		var pp = get_parser(filename)
-		for mut p in pp
+		for mut p in get_parser(filename)
 			reset(id_structure)
 			label_line_numbers.clear()
-			for l in p.find_labels(edit.text)
-				var title = l.name
-				title = title.replace("class ", "<b><font color='red'>C</font></b>  ").replace("struct ", "<b><font color='red'>S</font></b>  ").replace("trait ", "<b><font color='red'>T</font></b>  ").replace("enum ", "<b><font color='red'>E</font></b>  ").replace("func ", "<font color='green'><b>F</b></font>  ")
+			for l in sort_structure(p.find_labels(edit.text))
+				var title = fancy_category(l.category)
+				title += "  " + l.name
 				for p0 in title.find("(")
 					title = title[0:p0] + " <span alpha='50%'>" + title[p0:] + "</span>"
 				add_string(id_structure, "        ".repeat(l.level) + title)
@@ -277,8 +327,7 @@ Dialog coding-panel ''
 
 
 	func mut show_errors()
-		var pp = get_parser(filename)
-		for mut p in pp
+		for mut p in get_parser(filename)
 			let errors = p.find_errors(edit.text)
 			if len(errors) > 0
 				let e = errors[0]
@@ -338,7 +387,7 @@ Dialog coding-panel ''
 			return false
 		for p1 in edit.text.find(pattern, pos0 + 1)
 			edit.set_cursor_pos(p1)
-			edit.set_cursor_pos(p1 + len(pattern), true)
+			edit.set_cursor_pos(p1 + len(pattern), xhui.CursorMovingMode.SELECTING)
 			return true
 		return false
 
