@@ -1,8 +1,9 @@
 use simplevis as sv
+use simplevis.canvas
 use simplevis.cloudrenderer.PointCloudRenderer
 
 
-class Canvas extends sv.Canvas
+class Canvas extends canvas.Canvas
 	var cr = PointCloudRenderer(&ctx)
 
 

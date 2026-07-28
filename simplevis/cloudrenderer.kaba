@@ -1,7 +1,7 @@
 use yrenderer
 use yrenderer.gfx
 use .common.*
-use .simplevis.Canvas
+use .canvas.*
 use cloud
 
 class PointCloudRenderer
