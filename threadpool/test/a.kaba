@@ -1,0 +1,6 @@
+use threadpool.*
+
+func main()
+	var pool = new ThreadPool()
+	pool.run(100, i => print(i), 10)
+
