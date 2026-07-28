@@ -1,0 +1,31 @@
+use simplevis as sv
+use simplevis.cloudrenderer.PointCloudRenderer
+
+
+class Canvas extends sv.Canvas
+	var cr = PointCloudRenderer(&ctx)
+
+
+	func override on_initialize()
+		cr.initialize()
+
+		let N = 1024*16
+		var points: vec3[]
+		points.resize(N)
+
+		let R = 100.0
+		for mut i=>p in points
+			p = [R * sin(i * 0.2), R * sin(i * 0.15), R * sin(i * 0.25)]
+
+		cr.set_points(points)
+		cam.focus_on_box(cr.bounds)
+		#set_background(Color.RED)
+		cr.R = 5
+
+
+	func override on_draw()
+		cr.draw()
+
+
+func main()
+	sv.run(new Canvas())

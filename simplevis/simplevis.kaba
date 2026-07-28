@@ -59,7 +59,7 @@ class ViewPort extends Object as obs.Node
 
 	func mut focus_on_box(box: Box)
 		pos = box.center()
-		radius = len(box.size()) * 2
+		radius = len(box.size()) * 1.5
 		out_changed()
 
 	func params() -> CameraParams
