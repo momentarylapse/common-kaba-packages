@@ -1,52 +1,43 @@
-
-
 struct Point
 	pos: vec3
 	intensity: f32
 
+
 func get_points(cloud: Point[]) -> vec3[]
 	return cloud |> (func(p: Point) p.pos)
+
 
 func from_points(points: vec3[]) -> Point[]
 	return points |> (func(p: vec3) Point(p, 1.0))
 
-
-func append(out A: vec3[], B: vec3[])
-	# since vec3[].append() is missing :(
-	let n0 = len(A)
-	A.resize(len(A) + len(B))
-	as_binary(&A[n0], len(B) * sizeof(vec3)) = as_binary(&B[0], len(B) * sizeof(vec3))
-
-
-func append(out A: Point[], B: Point[])
-	# since vec3[].append() is missing :(
-	let n0 = len(A)
-	A.resize(len(A) + len(B))
-	as_binary(&A[n0], len(B) * sizeof(Point)) = as_binary(&B[0], len(B) * sizeof(Point))
 
 func random_sample(points: vec3[], n: int) -> vec3[]
 	if len(points) == 0
 		return points
 	return [for i in 0:n points[rand(len(points))]]
 
+
 func random_sample(points: Point[], n: i32) -> Point[]
 	if len(points) == 0
 		return points
 	return [for i in 0:n points[rand(len(points))]]
 
+
 func center_of_mass(points: vec3[]) -> vec3
 	return sum(points) / len(points)
 
-	
+
 func map_rel(b: Box, p: vec3, nx: i32, ny: i32, nz: i32) -> (i32,i32,i32)
 	return [(p.x - b.min.x) / (b.max.x - b.min.x) * nx,
 		(p.y - b.min.y) / (b.max.y - b.min.y) * ny,
 		(p.z - b.min.z) / (b.max.z - b.min.z) * nz]
-	
+
+
 func map_abs(b: Box, i: (i32,i32,i32), nx: i32, ny: i32, nz: i32) -> vec3
 	return b.min + [f32(i.e0) * (b.max.x - b.min.x) / f32(nx),
 	               f32(i.e1) * (b.max.y - b.min.y) / f32(ny),
 	               f32(i.e2) * (b.max.z - b.min.z) / f32(nz)]
+
 
 func bounding_box(points: vec3[]) -> Box
 	if len(points) == 0
@@ -61,6 +52,7 @@ func bounding_box(points: vec3[]) -> Box
 		vmax.y = max(vmax.y, v.y)
 		vmax.z = max(vmax.z, v.z)
 	return (vmin, vmax)
+
 
 func moment2(points: vec3[], p0: vec3) -> mat3
 	var m = mat3.0
@@ -77,9 +69,11 @@ func moment2(points: vec3[], p0: vec3) -> mat3
 	m.e[2][1] = m.e[1][2]
 	return m
 
+
 func filter_box(points: vec3[], box: Box) -> vec3[]
 	return points
 		|> filter(p => box.is_inside(p))
+
 
 func filter_box(points: Point[], box: Box) -> Point[]
 	return points

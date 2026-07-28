@@ -1,5 +1,5 @@
-use cloud.pcd
-use cloud.Point
+use .pcd
+use .cloud.Point
 use os
 
 func parse_vec3(s: string) -> vec3

@@ -1,6 +1,6 @@
 use os
-use cloud
-use cloud.pcd
+use .cloud
+use .pcd
 
 func cut_out(arg: string[])
 	let dir0 = os.Path(arg[0])
@@ -9,7 +9,7 @@ func cut_out(arg: string[])
 	let z1 = float(arg[3].replace("m", "-")) #-2.0
 	print("{{z0}}  {{z1}}")
 	#return
-			
+
 	let files = os.fs.search(dir0, "*.pcd", "f")
 	for f in files
 		for i in str(f).find("binary")
@@ -32,4 +32,4 @@ func main(arg: string[])
 #	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "SOURCE_DIR DEST_DIR Z0 Z1", "cut", func(a: string[]) cut_out(a))
 	p.parse(arg)
-	
+

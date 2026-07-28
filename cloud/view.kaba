@@ -2,8 +2,8 @@ use hui
 use gl
 use os
 use image.Image
-use cloud
-use cloud.pcd
+use .cloud
+use .pcd
 use visualization
 use visualization.cloud_renderer
 
@@ -21,16 +21,16 @@ func is_cloud_file(f: os.Path) -> bool
 class MyWindow extends visualization.RenderWindow
 	var cloud_renderer: cloud_renderer.PointCloudRenderer
 	var points: cloud.Point[]
-	
+
 	var current: int[]
 
 	func __init__()
 		super.__init__("Cloud explorer")
 		set_options("", "headerbar")
 		set_title("Cloud explorer") # hui bug :P
-		
+
 	#	set_target(":header:")
-		
+
 		set_target("side-panel")
 		set_options("side-panel", "visible=true")
 		add_grid("!epandy", 0, 0, "side-panel-grid")
@@ -42,18 +42,18 @@ class MyWindow extends visualization.RenderWindow
 			else
 				add_string("list", "<span size='x-small'>" + str(f) + "</span>")
 		event_x("list", "hui:select", on_list)
-			
+
 		load([cfg.initial_file], true)
-		
+
 		cloud_renderer.set_good_camera(self, cloud.get_points(points))
 		#cam_pos = [170.03, 48.2536, -2.75144]
-		
+
 		on_post_init(init_data)
-	
+
 	func override mut draw_content()
 		draw_magic_grid([0.5,0.5,0.5, 1])
 		cloud_renderer.draw()
-		
+
 		set_mode_2d()
 		set_font(14, false, false)
 		gl.set_material(Color.BLACK, 0, 0, Color.WHITE)
@@ -61,13 +61,13 @@ class MyWindow extends visualization.RenderWindow
 		gl.set_material(Color.BLACK, 0, 0, Color.GRAY)
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
-			
+
 	func mut init_data()
 		print("main.init_data")
 		for mut c in ctx
 			cloud_renderer.init_data(c)
 			update_cloud_renderer()
-	
+
 	func override mut on_key_down_x(k: int)
 		if k == hui.KEY_PAGE_DOWN
 			load([loop(current[0]+1, 0, len(cfg.files))], true)
@@ -86,30 +86,30 @@ class MyWindow extends visualization.RenderWindow
 		if k == hui.KEY_2
 			cloud_renderer.color_mode = cloud_renderer.ColorMode.INTENSITY
 			set_message("color mode: intensity")
-		
-	
+
+
 	func mut load(i: int[], update_ui: bool)
 		current = i
-		
+
 		points.clear()
 		for c in current
-			cloud.append(points, pcd.load(pcd.quick_file(cfg.dir | cfg.files[c])))
+			points |= pcd.load(pcd.quick_file(cfg.dir | cfg.files[c]))
 	#	print(points |> (func(p: cloud.Point) p.intensity))
 		update_cloud_renderer()
 		if update_ui
 			set_selection("list", current)
 		force_redraw()
-	
+
 	func mut update_cloud_renderer()
 		cloud_renderer.set_points(points)
-	
+
 	func mut set_points(p: cloud.Point[])
 		points = p
 		update_cloud_renderer()
 
 	func mut on_list()
 		load(get_selection(""), false)
-	
+
 	func export_cloud()
 		let f = func(filename: os.Path)
 			pcd.save(points, filename)
@@ -127,19 +127,19 @@ func explore(arg: string[])
 		cfg.dir = path
 	else
 		cfg.dir = path.parent()
-		
+
 	cfg.files = os.fs.search(cfg.dir, "*", "f")
 		|> filter(f => is_cloud_file(f))
-		
+
 	if len(cfg.files) == 0
 		raise(new Exception("no cloud files in {{cfg.dir}}"))
-		
+
 	if not os.fs.is_directory(path)
 		let bn = path.basename()
 		for i=>f in cfg.files
 			if f == bn
 				cfg.initial_file = i
-		
+
 	var w: shared[MyWindow] = new MyWindow()
 	hui.fly_and_wait(w)
 
@@ -150,4 +150,4 @@ func main(arg: string[])
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "FILE_OR_DIR", "show all cloud files in a directory", func(a: string[]) explore(a))
 	p.parse(arg)
-	
+
