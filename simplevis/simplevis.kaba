@@ -36,7 +36,7 @@ Dialog win 'bla' borderwidth=0
 
 
 
-	func mut xinitialize(p: hui.Painter)
+	func mut xinitialize(out p: hui.Painter)
 		ctx = api_init_xhui(&p)
 		ctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
 		canvas.initialize(weak(ctx))
@@ -44,11 +44,11 @@ Dialog win 'bla' borderwidth=0
 		#hui.run_later(0.1, func() redraw("area"))
 
 
-	func mut xbefore_draw(p: hui.Painter)
+	func mut xbefore_draw(out p: hui.Painter)
 		canvas.before_draw(p)
 
 
-	func mut xdraw(p: hui.Painter)
+	func mut xdraw(out p: hui.Painter)
 		canvas.draw(p)
 
 

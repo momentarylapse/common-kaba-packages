@@ -1,5 +1,6 @@
 use os
 use kaba
+use image
 use obs
 use xhui as hui
 use yrenderer.*
@@ -91,6 +92,7 @@ class Canvas extends Object as obs.Node, Sharable
 	func virtual mut on_prepare()
 	func virtual mut on_draw()
 	func virtual mut on_draw_transparent()
+	func virtual mut on_draw_2d(out p: image.Painter)
 #	func override on_mouse_move(m: vec2)
 
 	func mut initialize(c: Context&)
@@ -123,7 +125,7 @@ class Canvas extends Object as obs.Node, Sharable
 		hui.run_later(0.1, func() out_redraw())
 
 
-	func mut before_draw(p: hui.Painter)
+	func mut before_draw(out p: hui.Painter)
 		for r in xhui_renderer
 			let params = r.extract_params(&p)
 
@@ -139,9 +141,10 @@ class Canvas extends Object as obs.Node, Sharable
 			on_prepare()
 
 
-	func mut draw(p: hui.Painter)
+	func mut draw(out p: hui.Painter)
 		for r in xhui_renderer
 			r.draw(&p)
+		on_draw_2d(p)
 
 
 	func mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
