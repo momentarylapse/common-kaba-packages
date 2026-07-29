@@ -3,11 +3,8 @@ use kaba
 use obs
 use xhui as hui
 use yrenderer.*
-use .common.*
-use .canvas.*
-
-
-let EXPORT_IMPORTS = true
+use out .common.*
+use out .canvas.*
 
 
 
