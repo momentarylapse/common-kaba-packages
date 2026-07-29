@@ -1,14 +1,11 @@
 use os
 use kaba
-use .common.*
+use out .common.*
 use .format_3ds.*
 use .format_ply.*
 use .format_mcm.*
 use .format_stl.*
 use .format_obj.*
-
-let EXPORT_IMPORTS = true
-
 
 
 func load(fn: os.Path) -> Mesh
@@ -25,6 +22,7 @@ func load(fn: os.Path) -> Mesh
 		return load_obj(fn)
 	raise(new Exception("unknown file extension: {{ext}}"))
 
+
 func save(m: Mesh, fn: os.Path)
 	let ext = fn.extension()
 	if ext == "3ds"
@@ -34,10 +32,11 @@ func save(m: Mesh, fn: os.Path)
 	else
 		raise(new Exception("unhandled file extension: {{ext}}"))
 
+
 func main(arg: string[])
 	for a in arg
 		let m = load(a)
 		print(len(m.vertices))
 		print(len(m.indices))
 		#print(load_3ds(a))
-	
+
