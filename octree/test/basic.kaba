@@ -1,0 +1,19 @@
+use octree.Octree
+use cloud
+
+
+func main()
+	let N = 1024*64
+	var points: vec3[]
+	points.resize(N)
+
+	let R = 100.0
+	for mut i=>p in points
+		p = [R * sin(i * 0.02), R * sin(i * 0.015), R * sin(i * 0.025)]
+
+	var tree: Octree
+	tree.max_per_cell = 16
+	tree.max_levels = 4
+	tree.create(cloud.bounding_box(points))
+	tree.fill(points)
+	print(len(tree.cells))

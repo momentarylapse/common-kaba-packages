@@ -78,7 +78,7 @@ jobs:
         echo "packages..."
         ${{ steps.strings.outputs.env-dir }}/kaba/kaba package install \
           algebra asciitools bson circuit cli cloud crypto fft filetags gl glfw hui huibui iter kabama linalg linalg64 mesh msgpack ncurses \
-          net obs opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools urdf xhui xmake xml yrenderer zlib zmq
+          net obs octree opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools urdf xhui xmake xml yrenderer zlib zmq
 
     - name: Test compile all
       run: |

@@ -1,0 +1,97 @@
+
+struct Cell
+	var volume: Box
+	var parent = -1
+	var level = 0
+	var count = 0
+	var count_total = 0
+
+
+func box_canonical(b: Box) -> Box
+	var r = b
+	if r.min.x > r.max.x
+		let t = r.min.x
+		r.min.x = r.max.x
+		r.max.x = t
+	if r.min.y > r.max.y
+		let t = r.min.y
+		r.min.y = r.max.y
+		r.max.y = t
+	if r.min.z > r.max.z
+		let t = r.min.z
+		r.min.z = r.max.z
+		r.max.z = t
+	return r
+
+
+func box_corner(b: Box, index: i32) -> vec3
+	var r = b.min
+	if (index & 1) > 0
+		r.x = b.max.x
+	if (index & 2) > 0
+		r.y = b.max.y
+	if (index & 4) > 0
+		r.z = b.max.z
+	return r
+
+
+struct Octree
+	var cells: Cell[]
+	var cell_indices: i32[]
+	var max_per_cell = 8
+	var max_levels = 5
+
+
+	func mut create(box: Box)
+		cells = [[box, -1, 0, 0, 0]]
+		cell_indices.resize(0)
+
+
+	func mut fill(points: vec3[])
+
+		# initial: all in 1 cell
+		cells[0].count = len(points)
+		cells[0].count =  len(points)
+		cell_indices.resize(len(points))
+		for mut i in cell_indices
+			i = 0
+
+		if cells[0].count > max_per_cell
+			split_cell(0, points)
+
+
+	func mut move_down_to_child(index: i32, from: i32, to: i32)
+		cell_indices[index] = to
+		cells[from].count --
+		cells[to].count ++
+		cells[to].count_total ++
+
+
+	func mut split_cell(index: i32, points: vec3[])
+		let c0 = cells[index]
+		let center = c0.volume.center()
+
+		let first_child_index = len(cells)
+		for k in 0:8
+			let vv = box_canonical([box_corner(c0.volume, k), center])
+			cells.add([vv, index, c0.level+1, 0, 0])
+
+		for i=>p in points
+			if cell_indices[i] == index
+				var xxx = 0
+				if p.x > center.x
+					xxx += 1
+				if p.y > center.y
+					xxx += 2
+				if p.z > center.z
+					xxx += 4
+				move_down_to_child(i, index, first_child_index + xxx)
+
+		if c0.level < max_levels
+			for k in 0:8
+				if cells[first_child_index + k].count > max_per_cell
+					split_cell(first_child_index + k, points)
+
+
+
+

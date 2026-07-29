@@ -25,6 +25,7 @@ package msgpack
 package ncurses
 package net
 package obs
+package octree
 package opt
 package package
 package pdf
