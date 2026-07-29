@@ -4,6 +4,13 @@ use .common.*
 use .canvas.*
 use cloud
 
+
+enum ColorMode
+	AUTO
+	FIXED
+	INTENSITY
+
+
 class PointCloudRenderer
 	var ctx: SimpleContext&
 	var bounds: Box
@@ -11,11 +18,8 @@ class PointCloudRenderer
 	# "regular" clouds
 	var cloud_vb: owned![gfx.VertexBuffer]
 	var cloud_max_intensity = 1.0
-	enum ColorMode
-		AUTO
-		FIXED
-		INTENSITY
-	var color_mode = PointCloudRenderer.ColorMode.AUTO
+	var color_mode = ColorMode.AUTO
+	var color = Color.WHITE
 
 	# clouds with explicit color
 	var cloud_color_shader: shared![gfx.Shader]
@@ -39,11 +43,12 @@ class PointCloudRenderer
 		var rd = ctx.cur_rvd.start(ctx.cur_params, matrix, shader, weak(material), 0, gfx.PrimitiveTopology.POINTS, weak(cloud_vb))
 
 		var data: Any
-		data["dx:0"] = R / ctx.cur_params.area.width()
+		data["dx:0"] = R / ctx.cur_params.area.height() / ctx.cur_params.desired_aspect_ratio
 		data["dy:4"] = R / ctx.cur_params.area.height()
 		data["color_mode:8"] = i32(color_mode)
 		data["vmin:16"] = dyn(bounds.min)
 		data["vmax:32"] = dyn(bounds.max)
+		data["color_fixed:48"] = dyn(color)
 		yrenderer.apply_shader_data(ctx.cur_params, shader, data)
 		rd.draw(ctx.cur_params, weak(cloud_vb), gfx.PrimitiveTopology.POINTS)
 
@@ -68,6 +73,15 @@ class PointCloudRenderer
 
 	func mut set_points(points: cloud.Point[])
 		bounds = cloud.bounding_box(cloud.get_points(points))
+		if bounds.size().x == 0
+			bounds.min.x -= 0.5
+			bounds.max.x += 0.5
+		if bounds.size().y == 0
+			bounds.min.y -= 0.5
+			bounds.max.y += 0.5
+		if bounds.size().z == 0
+			bounds.min.z -= 0.5
+			bounds.max.z += 0.5
 		cloud_max_intensity = points |> (func(p: cloud.Point) p.intensity) |> max
 
 		cloud_vb.update(points)
