@@ -1,6 +1,6 @@
-version 1
-requires visualization
+version 2
 run convert.kaba
 run cut-z.kaba
+run explore.kaba
 run view.kaba
 

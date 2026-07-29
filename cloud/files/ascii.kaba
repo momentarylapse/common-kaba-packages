@@ -1,0 +1,26 @@
+use os
+use ..common.Point
+
+
+func load_asc(filename: os.Path) -> Point[]
+	let x = os.fs.read_text(filename)
+	var points: Ret
+	for l in x.explode("\n")
+		let s = l.explode(" ")
+		if len(s) >= 3
+			points.add([[f32(s[0]), f32(s[1]), f32(s[2])], f32(s[3])])
+		else if len(s) >= 3
+			points.add([[f32(s[0]), f32(s[1]), f32(s[2])], 1.0])
+	return points
+
+
+func load_txt(filename: os.Path) -> Point[]
+	let s = os.fs.read_text(filename)
+	var points: Ret
+	for l in s.explode("\n")
+		let rr = l.explode(" ")
+		if len(rr) >= 4
+			points.add([vec3(f32(rr[0]), f32(rr[1]), f32(rr[2])) * 0.001, f32(rr[3])])
+		else if len(rr) >= 3
+			points.add([vec3(f32(rr[0]), f32(rr[1]), f32(rr[2])) * 0.001, 1.0])
+	return points

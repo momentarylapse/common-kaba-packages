@@ -1,5 +1,5 @@
-use .pcd
-use .cloud.Point
+use .cloud
+use .common.Point
 use os
 
 func parse_vec3(s: string) -> vec3
@@ -15,7 +15,7 @@ var scale: vec3?
 
 func convert_file(source: os.Path, dest: os.Path)
 	print("CONVERT  {{source}}  ->  {{dest}}")
-	var points = pcd.load(source)
+	var points = cloud.load(source)
 	for v in flip
 		points = [for p in points  Point(p.pos - vec3.dot(v, p.pos) * v * 2, p.intensity)]
 	for s in scale
@@ -27,7 +27,7 @@ func convert_file(source: os.Path, dest: os.Path)
 	for t in translation
 		let m = mat4.translation(t)
 		points = [for p in points  Point(m*p.pos, p.intensity)]
-	pcd.save(points, dest)
+	cloud.save(points, dest)
 
 func action_convert(args: string[])
 	convert_file(args[0], args[1])
