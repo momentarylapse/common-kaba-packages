@@ -43,9 +43,9 @@ class PointCloudRenderer
 		data["dy:4"] = R / ctx.cur_params.area.height()
 		data["color_mode:8"] = i32(color_mode)
 		data["vmin:16"] = dyn(bounds.min)
-		data["vmin:32"] = dyn(bounds.max)
+		data["vmax:32"] = dyn(bounds.max)
 		yrenderer.apply_shader_data(ctx.cur_params, shader, data)
-		rd.draw_triangles(ctx.cur_params, weak(cloud_vb))
+		rd.draw(ctx.cur_params, weak(cloud_vb), gfx.PrimitiveTopology.POINTS)
 
 
 #		if cloud_color_dirty
