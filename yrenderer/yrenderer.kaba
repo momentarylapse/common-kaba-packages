@@ -1,7 +1,5 @@
 use os
-use .gfx.*
-
-let EXPORT_IMPORTS = true
+use out .gfx.*
 
 
 enum extern LightType
