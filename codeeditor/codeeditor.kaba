@@ -47,7 +47,7 @@ func group_structure(ll: Parser.Label[]) -> LabelGroup
 	for l in ll
 		var lx: LabelGroup
 		lx.label = l
-		if l.level == 0
+		if l.level == 0 or len(r.children) == 0
 			r.children.add(lx)
 		else
 			r.children[len(r.children) - 1].children.add(lx)
@@ -307,6 +307,7 @@ Dialog coding-panel ''
 		match cat
 			"class" => return "<b><font color='red'>C</font></b>"
 			"struct" => return "<b><font color='red'>S</font></b>"
+			"namespace" => return "<b><font color='red'>N</font></b>"
 			"trait" => return "<b><font color='red'>T</font></b>"
 			"enum" => return "<b><font color='red'>E</font></b>"
 			"func" => return "<b><font color='green'>F</font></b>"
