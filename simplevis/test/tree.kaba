@@ -1,0 +1,44 @@
+use simplevis as sv
+use simplevis.canvas
+use simplevis.cloudrenderer.PointCloudRenderer
+use octree.Octree
+use cloud
+
+
+class Canvas extends canvas.Canvas
+	var cr = PointCloudRenderer(&ctx)
+	var tree: Octree
+
+
+	func override on_initialize()
+		cr.initialize()
+
+		let N = 1024*64
+		var points: vec3[]
+		points.resize(N)
+
+		let R = 100.0
+		for mut i=>p in points
+			p = [R * sin(i * 0.02), R * sin(i * 0.015), R * sin(i * 0.025)]
+
+		cr.set_points(points)
+		cam.focus_on_box(cr.bounds)
+		cr.R = 5
+
+		tree.max_per_cell = 16
+		tree.max_levels = 4
+		tree.create(cloud.bounding_box(points))
+		tree.fill(points)
+
+
+	func override on_draw()
+		cr.draw()
+
+		ctx.set_color(Color.GRAY)
+		for c in tree.cells
+			if c.count > 0
+				ctx.draw_wire_box(c.volume)
+
+
+func main()
+	sv.run(new Canvas())

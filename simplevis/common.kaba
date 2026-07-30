@@ -81,3 +81,17 @@ class SimpleContext
 		var rd = cur_rvd.start(cur_params, matrix, shader, material, 0, PrimitiveTopology.TRIANGLES, vb)
 		rd.draw_triangles(cur_params, vb)
 
+
+	func mut draw_wire_box(box: Box)
+		var p: vec3[]
+		for k in 0:8
+			var r = box.min
+			if (k & 1) > 0
+				r.x = box.max.x
+			if (k & 2) > 0
+				r.y = box.max.y
+			if (k & 4) > 0
+				r.z = box.max.z
+			p.add(r)
+		draw_lines([p[0],p[1], p[0],p[2], p[1],p[3], p[2],p[3], p[0],p[4], p[1],p[5], p[2],p[6], p[3],p[7], p[4],p[5], p[4],p[6], p[5],p[7], p[6],p[7]], false)
+
