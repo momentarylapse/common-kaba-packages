@@ -1,0 +1,143 @@
+use simplevis as sv
+use simplevis.canvas
+use simplevis.cloudrenderer.PointCloudRenderer
+use octree.Octree
+use xhui
+use time
+use image
+
+
+class Canvas extends canvas.Canvas
+	var cr = PointCloudRenderer(&ctx)
+	var tree: Octree
+
+	let N = 1024*2#*4
+	var points: vec3[]
+	var vel: vec3[]
+	let R = 100.0
+
+	let G = 10.1
+	let dt = 0.03
+
+	var time_per_step = 0.0
+	var time_tree = 0.0
+	var show_tree = true
+
+	func override on_initialize()
+		cr.initialize()
+
+		points.resize(N)
+		vel.resize(N)
+
+		for mut i=>p in points
+			while true
+				p = [rand(2.0) - 1, rand(2.0) - 1, rand(0.4) - 0.2]
+				let l = len(p)
+				if l > 1
+					continue
+				vel[i] = vec3.cross(p, vec3.EZ)*20 * l
+				#p = p.normalized() * R #* l^10 #exp(l^18)/exp(1)
+				p *= R/2
+				break
+
+		cr.set_points(points)
+		cam.focus_on_box(cr.bounds)
+		cr.R = 3
+
+		tree.max_per_cell = 16
+		tree.max_levels = 4
+		tree.create([[-R*2,-R*2,-R], [R*2,R*2,R]])
+		tree.fill(points)
+
+		xhui.run_repeated(0.1, iterate)
+
+
+	func override on_draw()
+		cr.draw()
+
+		if show_tree
+			ctx.set_color(Color.GRAY)
+			for c in tree.cells
+				if c.count > 0
+					ctx.draw_wire_box(c.volume)
+
+
+	func override on_draw_2d(out p: image.Painter)
+		p.set_color(Color.GRAY)
+		p.draw_str([20,20], "{{N}} points - sim: {{time_per_step*1000|.1}} ms - tree: {{time_tree*1000|.1}} ms")
+
+
+	func mut step_brute_force()
+		for i=>p in points
+			var f = vec3.0
+			for j=>q in points
+				if i == j
+					continue
+				let dp = q - p
+				f += G * dp / len(dp)^3
+			vel[i] += f * dt
+
+		for mut i=>p in points
+			p += vel[i] * dt
+
+
+	func mut step_tree()
+		var nn0 = 0
+		var nn1 = 0
+		var nn2 = 0
+		#for i=>p in points
+
+		for c1 in tree.cells
+			if c1.count == 0
+				continue
+			let cc1 = c1.volume.center()
+
+			for c2 in tree.cells
+				if c2.count == 0
+					continue
+				let cc2 = c2.volume.center()
+
+					let d = len(cc1 - cc2)
+					if d > R / 2.0^max(c1.level, c2.level)
+						# far field - approximate
+						let f0 = G * (cc1 - cc2) / d^3
+						for i in c1.contents
+							vel[i] += f0 * c2.count
+						for i in c2.contents
+							vel[i] += f0 * c1.count
+						nn0 ++
+					else
+						nn1 ++
+						# near field - precise
+						for i in c1.contents
+							for j in c2.contents
+								if i == j
+									continue
+								let dp = points[j] - points[i]
+								vel[i] += G * dp / len(dp)^3 * dt
+								nn2 ++
+
+		for mut i=>p in points
+			p += vel[i] * dt
+		print("{{nn0}}  {{nn1}}  {{nn2}}")
+
+
+	func mut iterate()
+		var t: time.Timer
+		step_brute_force()
+		#step_tree()
+		time_per_step = t.get()
+
+		tree.update(points)
+		time_tree = t.get()
+
+		cr.set_points(points)
+		for mut i=>p in points
+			if len(p) > R*3
+				p = p.normalized() * R*3
+				vel[i] = vec3.0
+		out_redraw()
+
+
+func main()
+	sv.run(new Canvas())

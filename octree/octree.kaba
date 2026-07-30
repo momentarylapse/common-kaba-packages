@@ -5,6 +5,13 @@ struct Cell
 	var level = 0
 	var count = 0
 	var count_total = 0
+	var first_child = -1
+	var contents: i32[]
+	func mut __init__()
+	func mut __init__(v: Box, p: i32, l: i32)
+		volume = v
+		parent = p
+		level = l
 
 
 func box_canonical(b: Box) -> Box
@@ -35,6 +42,23 @@ func box_corner(b: Box, index: i32) -> vec3
 	return r
 
 
+func which_octant(p: vec3, center: vec3) -> i32
+	var xxx = 0
+	if p.x > center.x
+		xxx += 1
+	if p.y > center.y
+		xxx += 2
+	if p.z > center.z
+		xxx += 4
+	return xxx
+
+func list_remove_value(out list: i32[], v: i32)
+	for i=>x in list
+		if x == v
+			list.remove(i)
+			return
+
+
 struct Octree
 	var cells: Cell[]
 	var cell_indices: i32[]
@@ -43,7 +67,7 @@ struct Octree
 
 
 	func mut create(box: Box)
-		cells = [[box, -1, 0, 0, 0]]
+		cells = [[box, -1, 0]]
 		cell_indices.resize(0)
 
 
@@ -52,6 +76,7 @@ struct Octree
 		# initial: all in 1 cell
 		cells[0].count = len(points)
 		cells[0].count =  len(points)
+		cells[0].contents = range(len(points))
 		cell_indices.resize(len(points))
 		for mut i in cell_indices
 			i = 0
@@ -63,34 +88,53 @@ struct Octree
 	func mut move_down_to_child(index: i32, from: i32, to: i32)
 		cell_indices[index] = to
 		cells[from].count --
+		list_remove_value(cells[from].contents, index)
 		cells[to].count ++
 		cells[to].count_total ++
+		cells[to].contents.add(index)
+
+
+	func mut move_up_to_parent(index: i32, from: i32)
+		let to = cells[from].parent
+		cell_indices[index] = to
+		cells[from].count --
+		cells[from].count_total --
+		list_remove_value(cells[from].contents, index)
+		cells[to].count ++
+		cells[to].contents.add(index)
 
 
 	func mut split_cell(index: i32, points: vec3[])
-		let c0 = cells[index]
+		var c0 = cells[index]
 		let center = c0.volume.center()
 
 		let first_child_index = len(cells)
+		cells[index].first_child = first_child_index
 		for k in 0:8
 			let vv = box_canonical([box_corner(c0.volume, k), center])
-			cells.add([vv, index, c0.level+1, 0, 0])
+			cells.add(Cell(vv, index, c0.level+1))
 
 		for i=>p in points
 			if cell_indices[i] == index
-				var xxx = 0
-				if p.x > center.x
-					xxx += 1
-				if p.y > center.y
-					xxx += 2
-				if p.z > center.z
-					xxx += 4
-				move_down_to_child(i, index, first_child_index + xxx)
+				move_down_to_child(i, index, first_child_index + which_octant(p, center))
 
 		if c0.level < max_levels
 			for k in 0:8
 				if cells[first_child_index + k].count > max_per_cell
 					split_cell(first_child_index + k, points)
+
+
+	func mut update(points: vec3[])
+		for i=>p in points
+			let index0 = cell_indices[i]
+			if cells[index0].volume.is_inside(p)
+				if cells[index0].first_child >= 0
+					move_down_to_child(i, index0, cells[index0].first_child + which_octant(p, cells[index0].volume.center()))
+
+				continue
+
+			if cells[index0].parent >= 0
+				move_up_to_parent(i, index0)
 
 
 
