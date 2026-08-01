@@ -7,7 +7,7 @@
 bool init_stuff() {
 	syntaxhighlight::init();
 	syntaxhighlight::default_theme = syntaxhighlight::get_theme("dark2");
-	InitParser();
+	syntaxhighlight::init_parser();
 	return true;
 }
 
@@ -17,7 +17,7 @@ void export_symbols(kaba::IExporter* e) {
 	kaba::make_context_public(e); // work-around until we can purely use kapi
 	init_stuff();
 	
-	e->package_info("codeeditor", "0.3");
+	e->package_info("codeeditor", "0.4");
 	_export_package_syntaxhighlight_internal(e);
 }
 }

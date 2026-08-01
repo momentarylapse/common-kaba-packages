@@ -29,8 +29,8 @@ func extern draw_text_layout(out p: image.Painter, pos: vec2, l: TextLayout, bg:
 func extern draw_text_layout_with_box(out p: image.Painter, pos: vec2, l: TextLayout, fg: Color, bg: Color, padding=7.0, roundness=7.0)
 
 
-class extern Menu
-	func extern mut __init__() #(p: Panel*)
+class extern Menu extends Object as Sharable
+	func extern override __init__() #(p: Panel*)
 	func extern mut popup(p: Panel*)
 	func extern mut add(name: string, id: string)
 #	func extern mut add_with_image(name: string, image: string, id: string)
@@ -48,7 +48,7 @@ class extern Toolbar extends Object
 
 
 # exposed mostly for internal development convenience
-class extern Control extends Object as shared
+class extern Control extends Object as Sharable
 	var area: Rect
 	var id: string
 #	func extern override __delete__()
