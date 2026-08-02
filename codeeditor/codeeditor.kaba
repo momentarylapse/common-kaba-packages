@@ -218,12 +218,17 @@ Dialog coding-panel ''
 				search_end()
 
 
+	func mut set_filename(_filename: os.Path)
+		if filename != _filename
+			filename = _filename
+			parser = create_parser(filename)
+			update_highlight_all()
+			update_structure()
+
+
 	func mut load(_filename: os.Path)
-		filename = _filename
-		edit.set_string(os.fs.read_text(filename))
-		parser = create_parser(filename)
-		update_highlight_all()
-		update_structure()
+		edit.set_string(os.fs.read_text(_filename))
+		set_filename(_filename)
 
 		edit.clear_history()
 		edit.set_save_state()
@@ -232,9 +237,7 @@ Dialog coding-panel ''
 
 
 	func mut save(_filename: os.Path)
-		if filename != _filename
-			parser = create_parser(_filename)
-		filename = _filename
+		set_filename(_filename)
 		os.fs.write_text(filename, trim_line_endings(edit.text))
 		edit.set_save_state()
 
