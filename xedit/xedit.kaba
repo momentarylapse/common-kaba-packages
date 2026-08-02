@@ -3,6 +3,7 @@ use .editorwindow.*
 
 
 func main(args: string[])
+	xhui.set_property("name", "xedit")
 	var w = new shared EditorWindow()
 	for a in args
 		let _ = w.open_document(a)
