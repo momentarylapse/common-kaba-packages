@@ -119,7 +119,7 @@ Array<CodeContext> get_block_map(Module* m) {
 	}
 
 	for (auto f: m->tree->functions)
-		if (f->owner() == m->tree and !f->auto_declared) {
+		if (f->owner() == m->tree and !f->auto_declared and !f->name_space->from_template) {
 			CodeContext bm{m, f->name_space, f, f->block, -1, -1};
 			bm.start = m->tree->parser->Exp.token_offset(f->token_id);
 			int last_token = f->token_id;
