@@ -152,7 +152,7 @@ Window test 'test' padding=0
 				dir = e.filename.parent()
 		let f = func(filename: os.Path)
 			let _ = open_document(filename)
-		xhui.file_dialog(&self, "open..", dir, []).then(f)
+		xhui.file_dialog(&self, "Open file..", dir, []).then(f)
 
 
 	func mut on_save()
@@ -169,7 +169,7 @@ Window test 'test' padding=0
 			let f = func(filename: os.Path)
 				e.save(filename)
 				info("saved")
-			xhui.file_dialog(&self, "save..", os.fs.current_directory(), ["save"]).then(f)
+			xhui.file_dialog(&self, "Save file..", os.fs.current_directory(), ["save"]).then(f)
 
 
 	func override on_key_up(key_code: i32)
@@ -227,7 +227,7 @@ Window test 'test' padding=0
 
 		var e = create_document_editor()
 		e.load(filename)
-		set_options("files", "directory={{filename.parent()}}")
+		set_options("files", "select={{filename}}")
 		return e
 
 
@@ -238,6 +238,7 @@ Window test 'test' padding=0
 
 		for mut e in active_editor
 			e.activate(e.id_edit)
+			set_options("files", "select={{e.filename}}")
 			e.last_usage_counter = activation_counter
 		activation_counter ++
 		update_title()
