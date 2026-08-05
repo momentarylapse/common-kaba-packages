@@ -157,20 +157,8 @@ void depthbuffer_init(DepthBuffer *t, int w, int h, const string &format) {
 #endif
 }
 
-void imagetexture_init(DepthBuffer *t, int w, int h, const string &format) {
-#ifdef USING_VULKAN
-	new(t) ImageTexture(w, h, 1, format);
-#else
-	new(t) ImageTexture(w, h, format);
-#endif
-}
-
 void storagetexture_init(DepthBuffer *t, int nx, int ny, int nz, const string &format) {
-#ifdef USING_VULKAN
-	new(t) vulkan::StorageTexture(nx, ny, nz, format);
-#else
-	new(t) VolumeTexture(nx, ny, nz, format);
-#endif
+	new(t) StorageTexture(nx, ny, nz, format);
 }
 
 void volumetexture_init(VolumeTexture *t, int nx, int ny, int nz, const string &format) {
@@ -353,8 +341,6 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->link_class_func("CubeMap.__init__", &cubemap_init);
 
 	ext->link_class_func("DepthBuffer.__init__", &depthbuffer_init);
-
-	ext->link_class_func("ImageTexture.__init__", &imagetexture_init);
 
 	ext->link_class_func("StorageTexture.__init__", &storagetexture_init);
 
@@ -609,7 +595,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.16");
+	ext->package_info("yrenderer", "0.17");
 	_export_package_yrenderer_internal(ext);
 }
 

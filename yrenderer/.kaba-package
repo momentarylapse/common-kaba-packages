@@ -1,4 +1,4 @@
-version 0.16
+version 0.17
 build xmake sharedlib moduleyrenderer
 requires profiler
 requires xhui
