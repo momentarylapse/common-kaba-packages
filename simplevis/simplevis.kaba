@@ -41,7 +41,8 @@ Dialog win 'bla' borderwidth=0
 		ctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
 		canvas.initialize(weak(ctx))
 
-		#hui.run_later(0.1, func() redraw("area"))
+		if canvas.animated
+			hui.run_repeated(0.02, func() redraw("area"))
 
 
 	func mut xbefore_draw(out p: hui.Painter)

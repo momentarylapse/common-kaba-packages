@@ -18,6 +18,10 @@ class SimpleEmitter extends MeshEmitter
 		xx_vb = new VertexBuffer("3f,3f,2f")
 		xx_mat := c.ctx.create_material()
 
+	func override prepare(params: RenderParams)
+		canvas.ctx.cur_params := &params
+		canvas.on_prepare()
+
 	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
 		canvas.ctx.cur_params := &params
 		canvas.ctx.cur_rvd := &rvd
@@ -75,6 +79,7 @@ class Canvas extends Object as obs.Node, Sharable
 	var light_cam_ang: Quaternion?
 	var f_draw: void->void = nil
 	var f_draw_transparent: void->void = nil
+	var animated = false
 
 #	enum MouseMode
 #		NONE
@@ -137,8 +142,6 @@ class Canvas extends Object as obs.Node, Sharable
 
 			r.before_draw(&p)
 			ctx.lines.start_frame(p.ui_scale)
-
-			on_prepare()
 
 
 	func mut draw(out p: hui.Painter)
