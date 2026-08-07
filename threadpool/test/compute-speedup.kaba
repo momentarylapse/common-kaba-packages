@@ -1,0 +1,29 @@
+use threadpool.*
+use time
+
+
+let N = 100000
+let M = 10000
+
+
+func f(i: i32)
+	for k in 0:M
+		let x = sin(k as f32)
+
+
+func main()
+	var pool = new ThreadPool()
+
+	var timer: time.Timer
+	let t0 = timer.get()
+
+	for i in 0:N
+		f(i)
+	let t1 = timer.get()
+	print("single threaded: {{t1*1000|.1}} ms")
+
+	pool.run(N, f, 10)
+	let t2 = timer.get()
+	print("thread pool: {{t2*1000|.1}} ms")
+	print("speedup {{t1 / t2}} x")
+

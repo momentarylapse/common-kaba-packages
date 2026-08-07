@@ -1,0 +1,53 @@
+use threadpool.*
+use time
+
+
+let N = 10000
+let M = 10000
+
+var mem: i64[]
+var oo: i64[]
+
+func sum64(list: i64[]) -> i64
+	var r: i64 = 0
+	for x in list
+		r += x
+	return r
+
+
+func f(i: i32)
+	var x: i64 = 0
+	var index = i * M
+	for k in 0:M
+		x += mem[index]
+		index ++
+	oo[i] = x
+
+
+func main()
+	var pool = new ThreadPool()
+	mem.resize(N * M)
+	for mut i=>m in mem
+		m = i
+	oo.resize(N)
+	for k in 0:10
+		for x in mem
+			pass
+
+	var timer: time.Timer
+	let t0 = timer.get()
+
+	for i in 0:N
+		f(i)
+	print(sum64(oo))
+	let t1 = timer.get()
+	print("single threaded: {{t1*1000|.1}} ms  -  {{len(mem) * 8 / t1 / 1000000|.1}} mb/s")
+
+	oo.clear()
+	oo.resize(N)
+	pool.run(N, f, 10)
+	let t2 = timer.get()
+	print(sum64(oo))
+	print("thread pool: {{t2*1000|.1}} ms  -  {{len(mem) * 8 / t2 / 1000000|.1}} mb/s")
+	print("speedup {{t1 / t2}} x")
+
