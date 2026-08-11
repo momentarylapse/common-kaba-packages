@@ -6,7 +6,7 @@
 extern "C" {
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::IExporter* e) {
-	e->package_info("sqlite", "3");
+	e->package_info("sqlite", "4");
 
 	e->link_func("sqlite3_libversion_number", &sqlite3_libversion_number);
 	e->link_func("_sqlite3_open_v2", &sqlite3_open_v2);
