@@ -23,7 +23,7 @@ func create_guid() -> string
 func guess_guid() -> (string,string)
 	var pguid, sguid: string
 	try
-		var f = os.fs.read_text(conf.root | "{{conf.project.name}}.sln")
+		var f = os.fs.read_text(conf.root | "{{conf.project.name}}.sln")!
 		for l in f.explode("\r\n")
 			if l[:3] == "\t\t{" and l[39:] == "}.Debug|x64.ActiveCfg = Debug|x64"
 				pguid = l[2:40]
@@ -34,9 +34,9 @@ func guess_guid() -> (string,string)
 
 	return [pguid, sguid]
 
-func create_visual_studio(version: int)
+func create_visual_studio(version: i32)
 	if not (version in [2019, 2022])
-		raise(new Exception("only visual studio 2019 and 2022 supported"))
+		raise Error("only visual studio 2019 and 2022 supported")
 	print("-- visual studio {{version}} --")
 	#print(create_guid())
 
@@ -104,7 +104,7 @@ Global
 	EndGlobalSection
 EndGlobal
 "
-	os.fs.write(conf.root | "{{conf.project.name}}.sln", f.replace("\n", "\r\n"))
+	os.fs.write(conf.root | "{{conf.project.name}}.sln", f.replace("\n", "\r\n"))!
 
 	var toolset = "v142"
 	if version == 2022
@@ -249,7 +249,7 @@ EndGlobal
 </Project>
 "
 
-	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj", f.replace("\n", "\r\n"))!
 
 
 
@@ -274,7 +274,7 @@ EndGlobal
       <Filter>{{win_path(i.parent())[:-1]}}</Filter>
     </ClInclude>"
 
-    	raise(new Exception("TODO: visualstudio backend"))
+    	raise Error("TODO: visualstudio backend")
 
 #	rand_seed(win_path(conf.source_dir).hash())
 #	f += "
@@ -298,4 +298,5 @@ EndGlobal
 </Project>"
 
 
-	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj.filters", f.replace("\n", "\r\n"))
+	os.fs.write_text(conf.root | "{{conf.project.name}}.vcxproj.filters", f.replace("\n", "\r\n"))!
+

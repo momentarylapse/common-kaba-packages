@@ -139,10 +139,9 @@ struct Config
 		#return l in ignore_libs
 
 	func mut parse_targets(c: os.Configuration)
-
 		var target_names = find_targets(c)
 		if len(target_names) == 0
-			raise(new Exception("no [build.target:...] found"))
+			raise Error("no [build.target:...] found")
 		#print("targets: {{target_names}}")
 		for n in target_names
 			var t: BuildTarget
@@ -170,11 +169,11 @@ struct Config
 					conf.root = conf.root | "sharedlib"
 
 
-	func mut load()
+	func mut load() -> result[void]
 		if not os.fs.exists(conf.root | "xmake.conf")
-			raise(new Exception("no xmake.conf found"))
+			raise Error("no xmake.conf found")
 		var c: os.Configuration
-		c.load(conf.root | "xmake.conf")
+		c.load(conf.root | "xmake.conf")!
 		install.source = ["static/"]
 
 		parse_targets(c)
@@ -262,7 +261,8 @@ struct Config
 					##else if k == "build.main"
 					##	targets[0].exclusive_source = [str(c[k])]
 				if not found
-					raise(new Exception("unknown tag: {{k}}"))
+					raise Error("unknown tag: {{k}}")
+		return result_ok
 
 
 	func mut save()
@@ -332,14 +332,14 @@ struct Config
 			return force_build_dir
 		return root | "build"
 
-	func main_target() -> BuildTarget
+	func main_target() -> result[BuildTarget]
 		for t in targets
 			if t.type == BuildType.BINARY and t.default
 				return t
 		for t in targets
 			if t.default
 				return t
-		raise(new Exception("no main target found (executable and default)"))
+		raise Error("no main target found (executable and default)")
 
 	func _find_sources()
 		#let dir = root | source_dir
@@ -461,7 +461,7 @@ func rel(filename: Path) -> Path
 func find_dep(out f: SourceFile, filename: Path)
 	var s: string
 	try
-		s = os.fs.read(filename)
+		s = os.fs.read_text(filename)!
 	except
 		return
 

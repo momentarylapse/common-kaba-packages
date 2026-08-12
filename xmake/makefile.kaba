@@ -12,7 +12,7 @@ func create_all_makefiles()
 			create_makefile(p, "")
 		else
 			create_makefile(p, "-{{p.name}}")
-	
+
 	# dynamic profile
 	if conf.has_explicit_default_profile()
 		return
@@ -60,7 +60,7 @@ func collect_global_flags(p: Profile, out cflags: string, out lflags: string, ou
 	 defines += " -D'INSTALL_PREFIX=\"$(prefix)\"'"
 
 func collect_objects(from: Path) -> string[]
-	raise(new Exception("Makefile system not supported anymore!"))
+	raise Error("Makefile system not supported anymore!")
 	var obj: string[]
 	for s in _sources
 	##	if rel(s.filename) != rel(conf.root | conf.main_file)
@@ -73,7 +73,7 @@ func cl(s: string) -> string
 
 func create_makefile(p: Profile, postfix: string)
 
-	raise(new Exception("Makefile deprecated!"))
+	raise Error("Makefile deprecated!")
 
 #	print("-- makefile {{p.name}} --")
 #	var f = os.fs.open(conf.root | conf.source_dir | ("Makefile" + postfix), "wt")

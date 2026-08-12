@@ -28,7 +28,7 @@ func action_init(a: string[])
 func action_update(a: string[])
 	print("updating {{conf.root}}")
 
-	conf.load()
+	conf.load()!
 
 	var missing = []#conf.libs |> filter(l => not lib.test(l))
 	let lib_groups = conf.dependencies()
@@ -52,12 +52,12 @@ func action_update(a: string[])
 		if "cmake" in conf.build.systems
 			cmake.create()
 		if "cmake+vs2022" in conf.build.systems
-			raise(new Exception("cmake+vs2022 deprecated. Use cmake + features=[vs2022]"))
+			raise Error("cmake+vs2022 deprecated. Use cmake + features=[vs2022]")
 
 
 func action_build(a: string[])
 	#print("building {{conf.root}}")
-	conf.load()
+	conf.load()!
 	conf._find_sources()
 	if not build()
 		os.exit(1)
@@ -65,7 +65,7 @@ func action_build(a: string[])
 
 func action_build_bundle(a: string[])
 	#print("building {{conf.root}}")
-	conf.load()
+	conf.load()!
 	conf._find_sources()
 	if not build()
 		os.exit(1)
@@ -75,7 +75,7 @@ func action_build_bundle(a: string[])
 
 func action_install(a: string[])
 	#print("building {{conf.root}}")
-	conf.load()
+	conf.load()!
 	conf._find_sources()
 	if not build()
 		os.exit(1)
@@ -85,7 +85,7 @@ func action_install(a: string[])
 
 func action_clean(a: string[])
 	#print("clearing {{conf.root}}")
-	conf.load()
+	conf.load()!
 	conf._find_sources()
 	build_clear()
 
@@ -114,7 +114,7 @@ func action_clean(a: string[])
 
 
 func action_create_vcpkg(a: string[])
-	conf.load()
+	conf.load()!
 	vcpkg.create()
 
 
@@ -153,4 +153,4 @@ func main(arg: string[])
 #	p.cmd("vcpkg-install", "", "print vcpkg install command", action_vcpkg_install)
 	p.cmd("vcpkg", "", "create vcpkg config files", action_create_vcpkg)
 	p.cmd("", "", "default: build", action_build)
-	p.parse(arg)
+	p.parse(arg)!

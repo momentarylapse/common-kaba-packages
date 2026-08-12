@@ -13,7 +13,7 @@ func create_libs(f: os.FileStream) -> string[]
 			for l in g.libs
 				f << "
 # optional dependency: " + l
-				var ll = lib.get(l)
+				var ll = lib.get(l)!
 				var mlibs = ll.meson_libs()
 				var ltest: string
 				var deps: string
@@ -35,7 +35,7 @@ func create_libs(f: os.FileStream) -> string[]
 				f << "endif"
 		else
 			for l in g.libs
-				var ll = lib.get(l)
+				var ll = lib.get(l)!
 				var varx = l + "dep"
 				vars.add(varx)
 				f << varx + " = dependency('{{ll.meson_libs()[0]}}')"
@@ -46,7 +46,7 @@ func create_libs(f: os.FileStream) -> string[]
 
 func create()
 	print("-- meson --")
-	var f = os.fs.open(conf.root | "meson.build", "wt")
+	var f = os.fs.open(conf.root | "meson.build", "wt")!
 	var debug = true#str(conf.build.type == "debug")
 	f << "project('{{conf.project.name}}', 'cpp', default_options : ['cpp_std={{conf.build.language}}', 'warning_level=1', 'optimization={{conf.build.optimization}}', 'debug={{debug}}'])"
 	var opts = ["-Wno-unused", "-Wstrict-aliasing=0", "-fno-omit-frame-pointer"]

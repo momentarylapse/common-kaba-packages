@@ -6,7 +6,7 @@ func find_best_png_icon() -> os.Path
 		return conf.project.icon
 	let list = os.fs.search("static/icons/hicolor/64x64/apps", "*.png", "f")
 	if len(list) == 0
-		raise(new Exception("no suitable *.png icon found for MacOS app bundle"))
+		raise Error("no suitable *.png icon found for MacOS app bundle")
 	return os.Path("static/icons/hicolor/64x64/apps") | list[0]
 
 func no_ending_slash(p: os.Path) -> string
@@ -18,7 +18,7 @@ func no_ending_slash(p: os.Path) -> string
 
 func create_macos_bundle() -> string
 
-	os.fs.create_directory(conf.root | ".cmake")
+	os.fs.create_directory(conf.root | ".cmake")!
 
 	os.fs.write_text(conf.root | ".cmake/Info.plist", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
@@ -54,7 +54,7 @@ func create_macos_bundle() -> string
 	<string></string>
 </dict>
 </plist>
-")
+")!
 
 
 	var input = "${CMAKE_CURRENT_SOURCE_DIR}/{{find_best_png_icon()}}"
@@ -86,7 +86,7 @@ if (APPLE)
 		COMMAND [ -e {{conf.project.name}}.app ] || mkdir {{conf.project.name}}.app
 		COMMAND [ -e {{conf.project.name}}.app/Contents ] || mkdir {{conf.project.name}}.app/Contents
 		COMMAND [ -e {{conf.project.name}}.app/Contents/MacOS ] || mkdir {{conf.project.name}}.app/Contents/MacOS
-		COMMAND cp -f {{conf.main_target().name}} {{conf.project.name}}.app/Contents/MacOS
+		COMMAND cp -f {{conf.main_target()!.name}} {{conf.project.name}}.app/Contents/MacOS
 		COMMAND [ -e {{conf.project.name}}.app/Contents/Resources ] || mkdir {{conf.project.name}}.app/Contents/Resources
 		COMMAND cp -rf {{conf.project.name}}.icns {{conf.project.name}}.app/Contents/Resources"
 	let list = conf.needs_installing()

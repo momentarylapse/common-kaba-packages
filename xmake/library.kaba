@@ -61,7 +61,7 @@ struct LibraryManager
 
 	func load_lib(file: os.Path) -> Library
 		var c: os.Configuration
-		c.load(file)
+		c.load(file)!
 		var l: Library
 		l.name = file.basename_no_ext()
 		if len(c["link"]) > 0
@@ -94,19 +94,19 @@ struct LibraryManager
 			print("WARNING: lib {{file.basename_no_ext()}} has multiple packages and also components...")
 
 		let code_file = file.parent() | (file.basename_no_ext() + ".cmakecode")
-		if os.fs.exists(code_file)
-			l.cmake_code = os.fs.read_text(code_file)
+		try
+			l.cmake_code = os.fs.read_text(code_file)!
 		return l
 
-	func get(name: string) -> Library&
+	func get(name: string) -> result[Library&]
 		for l in libraries
 			if l.name == name
 				return &l
-		raise(new Exception("unknown library: {{name}}"))
-		#return nil
+		raise Error("unknown library: {{name}}")
 
 	func has(name: string) -> bool
-		return get(name).test()
+		try return get(name)!.test()
+		return false
 
 	func test(name: string) -> bool
 		if has(name)
@@ -117,18 +117,23 @@ struct LibraryManager
 		return false
 
 	func compiler_flags(name: string) -> string
-		return get(name).compiler_flags()
+		try return get(name)!.compiler_flags()
+		return ""
 
 	func linker_flags(name: string) -> string
-		return get(name).linker_flags()
+		try return get(name)!.linker_flags()
+		return ""
 
 	func define(name: string) -> string
-		return get(name).define()
+		try return get(name)!.define()
+		return ""
 
 	func pkg(name: string) -> string[]
-		return get(name).pkg
+		try return get(name)!.pkg
+		return []
 
 	func vs_might_have(name: string) -> bool
-		return len(get(name).vcpkg) > 0
+		try return len(get(name)!.vcpkg) > 0
+		return false
 
 var lib: LibraryManager

@@ -4,19 +4,19 @@ use os.Path
 
 func suggest_install_prefix() -> Path
 	if conf.home_directory.is_empty()
-		raise(new Exception("failed to find suitable install prefix..."))
+		raise Error("failed to find suitable install prefix...")
 	return conf.home_directory | ".local"
 
 
 func build() -> bool
 	if conf.force_rebuild
 		build_clear()
-	
+
 	let dir = "build" as Path
 	if not os.fs.exists(dir)
-		os.fs.create_directory(dir)
+		os.fs.create_directory(dir)!
 		if conf.install_prefix.is_empty()
-			raise(new Exception("failed to find suitable install prefix... use --prefix DIR instead"))
+			raise Error("failed to find suitable install prefix... use --prefix DIR instead")
 		let r = os.shell_execute("cd {{dir}};cmake '{{conf.root}}' -GNinja -DCMAKE_INSTALL_PREFIX='{{conf.install_prefix}}';cd ..", true)
 
 	try
@@ -49,5 +49,5 @@ func install() -> bool
 		return true
 	except
 		return false
-	
-	
+
+

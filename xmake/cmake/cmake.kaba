@@ -140,7 +140,7 @@ func create()
 	if len(conf.install.mime_files) > 0
 		r += create_install_mime()
 
-	os.fs.write_text(conf.root | "CMakeLists.txt", r)
+	os.fs.write_text(conf.root | "CMakeLists.txt", r)!
 
 
 	if Feature.GIT_VERSION in conf.build.features

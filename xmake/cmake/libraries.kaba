@@ -25,7 +25,7 @@ func lib_discover(ll: Library, indent: string, is_required: bool) -> string
 {{indent}}pkg_check_modules({{varx}}{{flags}} {{p}})"
 	return s[1:]
 
-	raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+	raise Error("no cmake/pkg data for mandatory lib {{ll.name}}")
 
 
 func lib_guard(ll: Library) -> string
@@ -61,7 +61,7 @@ func lib_add_data(ll: Library, indent: string) -> string
 {{indent}}list(APPEND DEPS ${"+varx+"_LIBRARIES})
 {{indent}}list(APPEND COMPILE_OPTIONS ${"+varx+"_CFLAGS_OTHER})"
 	else
-		raise(new Exception("no cmake/pkg data for mandatory lib {{ll.name}}"))
+		raise Error("no cmake/pkg data for mandatory lib {{ll.name}}")
 	s += "
 {{indent}}list(APPEND COMPILE_DEFINITIONS {{ll.define()}}=1)"
 
@@ -76,7 +76,7 @@ func lib_add_data(ll: Library, indent: string) -> string
 
 
 func link_mandatory_lib(l: string) -> string
-	let ll = lib.get(l)
+	let ll = lib.get(l)!
 	return "
 
 
@@ -87,7 +87,7 @@ func link_mandatory_lib(l: string) -> string
 
 # a|b|c
 func link_mandatory_group(g: LibGroup) -> string
-	let lls = [for l in g.libs  lib.get(l)]
+	let lls = [for l in g.libs  lib.get(l)!]
 	let varxs = g.libs |> var_name
 	#deps.add("{{varx}}_LIBRARIES")
 	let cvar = varxs.join("_OR_")
@@ -127,7 +127,7 @@ endif()"
 
 
 func link_optional_lib(l: string) -> string
-	let ll = lib.get(l)
+	let ll = lib.get(l)!
 	#deps.add("{{varx}}_LIBRARIES")
 
 	let var_enabled = "LIB_{{var_name(l)}}_ENABLED"

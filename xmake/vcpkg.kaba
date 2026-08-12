@@ -11,10 +11,10 @@ func create()
 		if g.optional
 			for l in g.libs
 				if not conf.ignored(l)
-					req += lib.get(l).vcpkg
+					req += lib.get(l)!.vcpkg
 		else
 			for l in g.libs
-				req += lib.get(l).vcpkg
+				req += lib.get(l)!.vcpkg
 
 	req = req |> filter(l => l[:3] != "gtk")
 	req.add("pkgconf")
@@ -30,7 +30,7 @@ func create()
 }
 "
 
-	os.fs.write_text(conf.root | "vcpkg.json", vcpkg)
+	os.fs.write_text(conf.root | "vcpkg.json", vcpkg)!
 
 	os.fs.write_text(conf.root | "vcpkg-configuration.json", "{
   \"default-registry\": {
@@ -46,4 +46,4 @@ func create()
     }
   ]
 }
-")
+")!

@@ -3,7 +3,7 @@ use os
 
 
 func create_git_version()
-	os.fs.create_directory(conf.root | ".cmake")
+	os.fs.create_directory(conf.root | ".cmake")!
 
 	os.fs.write_text(conf.root | ".cmake/git-version.h", "#ifndef GIT_VERSION_H
 #define GIT_VERSION_H
@@ -11,10 +11,10 @@ func create_git_version()
 extern const char* GitHash;
 
 #endif // GIT_VERSION_H
-")
+")!
 	os.fs.write_text(conf.root | ".cmake/git-version.cpp.in", "#include \"git-version.h\"
 
-const char* GitHash = \"@GIT_HASH@\";")
+const char* GitHash = \"@GIT_HASH@\";")!
 
 
 	os.fs.write_text(conf.root | ".cmake/CheckGit.cmake", "# stolen from https://jonathanhamberg.com/post/cmake-embedding-git-hash/
@@ -101,4 +101,4 @@ endfunction()
 if (RUN_CHECK_GIT_VERSION)
     CheckGitVersion()
 endif ()
-")
+")!

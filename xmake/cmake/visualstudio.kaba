@@ -26,7 +26,7 @@ func vs_preset(type: string, ext: string, vars: string{}) -> string
 
 
 func is_vulkan_or_gl() -> bool
-	for d in conf.main_target().dependencies
+	for d in conf.main_target()!.dependencies
 		if d.libs == ["vulkan", "gl"]
 			return true
 	return false
@@ -70,13 +70,13 @@ func create_visual_studio_stuff()
 		{{vs_preset("Release", "", {})}}{{X}}
 	]
 }
-".replace("\t", "    ").replace("\n", "\r\n"))
+".replace("\t", "    ").replace("\n", "\r\n"))!
 
 
 func create_vs_default_launch()
-	let t = conf.main_target()
+	let t = conf.main_target()!
 
-	os.fs.create_directory(conf.root | ".vs")
+	os.fs.create_directory(conf.root | ".vs")!
 	os.fs.write_text(conf.root | ".vs" | "launch.vs.json", "{
   \"version\": \"0.2.1\",
   \"defaults\": {},
@@ -90,5 +90,5 @@ func create_vs_default_launch()
     }
   ]
 }
-".replace("\n", "\r\n"))
+".replace("\n", "\r\n"))!
 

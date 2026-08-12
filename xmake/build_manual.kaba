@@ -11,12 +11,12 @@ use time
 func is_completely_built(s: SourceFile) -> bool
 	if not os.fs.exists(s.object())
 		return false
-	var ts = os.fs.mtime(s.filename)
-	var to = os.fs.mtime(s.object())
+	let ts = os.fs.mtime(s.filename)!
+	let to = os.fs.mtime(s.object())!
 	if to.time < ts.time
 		return false
 	for d in s.dep
-		var td = os.fs.mtime(d)
+		let td = os.fs.mtime(d)!
 		if to.time < td.time
 			return false
 	return true
@@ -39,7 +39,7 @@ func create_directory_recursive(dir: Path)
 
 func compile(s: SourceFile, cxx_flags: string) -> bool
 	create_directory_recursive(s.object().parent())
-	var command = "g++ -c {{s.filename}} -o {{s.object()}} {{cxx_flags}}"
+	let command = "g++ -c {{s.filename}} -o {{s.object()}} {{cxx_flags}}"
 	if conf.verbose
 		print(command)
 	try
@@ -161,7 +161,7 @@ func build_old()
 	if conf.verbose
 		print(command)
 	try
-		var r = os.shell_execute(command)
+		var r = os.shell_execute(command)!
 	except Exception as e
 		#print("ERROR:")
 		#print(e)
@@ -171,10 +171,10 @@ func build_old()
 func build_clear_old()
 	for s in _sources
 		if os.fs.exists(s.object())
-			os.fs.delete(s.object())
+			os.fs.delete(s.object())!
 			#print(s.object())
 	let binary_file = conf.targets[0].binary_file
 	if os.fs.exists(binary_file)
-		os.fs.delete(binary_file)
+		os.fs.delete(binary_file)!
 
 
