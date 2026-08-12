@@ -85,7 +85,7 @@ func transpose(M: Matrix) -> Matrix
 
 func solve(A: Matrix, b: f64[]) -> f64[]
 	if A.m != A.n or len(b) != A.m
-		raise(new Exception("size mismatch"))
+		raise Error("size mismatch")
 	var mm = A
 	var x: f64[]
 	x.resize(A.m)
@@ -108,7 +108,7 @@ func solve(A: Matrix, b: f64[]) -> f64[]
 
 func mul(M: Matrix, x: f64[]) -> f64[]
 	if M.n != len(x)
-		raise(new Exception("size mismatch"))
+		raise Error("size mismatch")
 	var y: f64[]
 	y.resize(M.m)
 	for i in 0:M.m
@@ -118,7 +118,7 @@ func mul(M: Matrix, x: f64[]) -> f64[]
 
 func mul(A: Matrix, B: Matrix) -> Matrix
 	if A.n != B.m
-		raise(new Exception("size mismatch"))
+		raise Error("size mismatch")
 	var r: Matrix
 	r.clear(A.m, B.n)
 	for i in 0:r.m
@@ -131,7 +131,7 @@ func mul(A: Matrix, B: Matrix) -> Matrix
 
 func inverse(M: Matrix) -> Matrix
 	if M.m != M.n
-		raise(new Exception("not square"))
+		raise Error("not square")
 	let n = M.n
 	var r: Matrix
 	r.clear(n, n)
@@ -225,7 +225,7 @@ struct SparseRowMatrix
 
 func mul(M: SparseRowMatrix, x: f64[]) -> f64[]
 	if M.n != len(x)
-		raise(new Exception("size mismatch"))
+		raise Error("size mismatch")
 	var y: f64[]
 	y.resize(M.m)
 	for i in 0:M.m
