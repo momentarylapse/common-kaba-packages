@@ -61,13 +61,13 @@ func load_external_package(dir: Path) -> ExternalPackage?
 	p.name = name
 	p.dir = dir
 	print("extern: {{dir}}")
-	p.main = default_context.load_module(dir | "{{name}}.kaba", true)
-		
+	p.main = default_context.load_module(dir | "{{name}}.kaba", true)!
+
 	# sub-modules
 	let list2 = fs.search(dir, "*.kaba", "f")
 	for e2 in list2
 		if str(e2) != str(name) + ".kaba"
-			var xx = default_context.load_module(dir | e2, true)
+			var xx = default_context.load_module(dir | e2, true)!
 			p.sub_modules.add([str(e2).replace(".kaba", ""), xx])
 	#p.name = str(e)[:-5]
 	return p

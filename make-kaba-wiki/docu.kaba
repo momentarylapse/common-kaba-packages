@@ -29,7 +29,7 @@ var state: GlobalDocState
 
 func doc_start_module(name: string, dir: os.Path)
 	state.filename = dir | name + ".txt"
-	state.conf.load(state.filename)
+	state.conf.load(state.filename)!
 
 
 #func doc_get(dir: os.Path, ns: string, name: string, is_class: bool, key: string) -> string
@@ -90,14 +90,14 @@ func prepare_class(c: Class, ns: string)
 	let elements = filter_elements(c.elements)
 	let consts = filter_consts(c.constants)
 	let classes = filter_classes(c.classes)
-	
+
 	doc_get_class_description(ns, c)
 	for e in elements
 		let r = doc_get_class_element(ns, c, e)
-	
+
 	for f in funcs
 		prepare_func(f, ns + "." + c.name)
-	
+
 	for cc in classes
 		prepare_class(cc, ns + "." + c.name)
 

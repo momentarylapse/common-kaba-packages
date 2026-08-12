@@ -7,12 +7,12 @@ use .docu
 
 
 func wiki_upload(name: string, wiki: string)
-	os.fs.write_text(this_package()!.directory_dynamic | "current/{{name}}.txt", wiki)
+	os.fs.write_text(this_package()!.directory_dynamic | "current/{{name}}.txt", wiki)!
 
 
 func make_documentation()
-	os.fs.create_directory(this_package()!.directory_dynamic)
-	os.fs.create_directory(this_package()!.directory_dynamic | "current")
+	os.fs.create_directory(this_package()!.directory_dynamic)!
+	os.fs.create_directory(this_package()!.directory_dynamic | "current")!
 	wiki_upload("kaba reference", wiki.render_reference())
 
 	for p in default_context.packages
@@ -57,7 +57,7 @@ func make_module(p: Module, name: string, _ns: string, sub_modules: (string,shar
 	let vars = p.variables()
 	for v in vars
 		wiki_upload("kaba.{{ns}}.{{v.name}}", wiki.render_var(ns, v))
-	
+
 	for m in sub_modules
 		for mm in m[1]
 			make_module(mm, m[0], ns, [], doc_dir)
