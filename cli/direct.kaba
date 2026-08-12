@@ -10,13 +10,13 @@ func main()
 	print("welcome to kaba {{kaba.kaba_version}}")
 	while true#!stdin.eof()
 		print("\n>>> ")
-	
-	
+
+
 		var s = os.stdin.read(1000)
 		if len(s) == 0
 			break
 		s = s[:-1]
-		kaba.default_context.execute_single_command(s)
+		kaba.default_context.execute_single_command(s)!
 		#print("read: " + s)
 	print("\n")
 
