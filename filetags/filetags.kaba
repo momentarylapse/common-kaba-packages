@@ -32,7 +32,7 @@ func get_tags_video_by_name(path: Path) -> string{}
 
 
 func get_tags_audio(path: Path) -> string{}
-	let s = shell_execute("tsunami --info \"{{bash_escape(str(path))}}\"").explode("\n")
+	let s = shell_execute("tsunami --info \"{{bash_escape(str(path))}}\"")!.explode("\n")
 	var samples = -1
 	var sample_rate = 44100
 	var tags: string{}
@@ -56,7 +56,7 @@ func get_tags_audio(path: Path) -> string{}
 
 
 func get_tags_image_photo(path: Path) -> string{}
-	var s = shell_execute("exiv2 -pv \"{{bash_escape(str(path))}}\"").explode("\n")
+	var s = shell_execute("exiv2 -pv \"{{bash_escape(str(path))}}\"")!.explode("\n")
 	var model, make, time: string
 	var tags: string{}
 	for mut l in s
@@ -94,7 +94,7 @@ func get_tags_image_photo(path: Path) -> string{}
 
 
 func __get_tags_image_photo_old(path: Path) -> string{}
-	var s = shell_execute("exif -mi \"{{bash_escape(str(path))}}\" || echo --end--").explode("\n")
+	var s = shell_execute("exif -mi \"{{bash_escape(str(path))}}\" || echo --end--")!.explode("\n")
 	var model, make, time: string
 	var tags: string{}
 	for mut l in s
@@ -138,11 +138,11 @@ func get_tags(path: Path) -> string{}
 	let ext = path.extension()
 	#print(ext)
 	if ext == "pdf"
-		let s = shell_execute("pdfinfo \"{{bash_escape(str(path))}}\" | awk '/Pages/{print $2}'")
+		let s = shell_execute("pdfinfo \"{{bash_escape(str(path))}}\" | awk '/Pages/{print $2}'")!
 		if len(s) > 0
 			return {"pages": s}
 	else if ext in ["png", "bmp"] #, "jpg"]
-		let s = shell_execute("identify -format \"%w\n%h\" \"{{bash_escape(str(path))}}\"").explode("\n")
+		let s = shell_execute("identify -format \"%w\n%h\" \"{{bash_escape(str(path))}}\"")!.explode("\n")
 		if len(s) >= 2
 			return {"width": s[0],
 				"height": s[1]}
