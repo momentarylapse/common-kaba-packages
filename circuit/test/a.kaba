@@ -1,0 +1,14 @@
+use circuit.*
+
+func main()
+	var c: Circuit
+	c.reset_default()
+	#c.edges.add(new Resistor([0,1], 1))
+	#c.nodes.add(Node((0,0)))
+	#c.edges.add(new Diode([0, 2]))
+	#c.edges.add(new Resistor([2,1], 1))
+	c.edges.add(new Diode([0, 1]))
+	print(str(c))
+	var res: SimResult
+	c.simulate(1, 1, 0.1, 1, 0, res)
+	print(str(c))

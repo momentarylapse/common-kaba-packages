@@ -1,0 +1,10 @@
+use circuit.*
+
+func main()
+	var d = new Diode([0,0])
+	return
+	for f in 0.5:1.5:0.01
+	#	print(f)
+		d.U = f
+		print(d.I_id(f))
+
