@@ -181,25 +181,6 @@ void shader_set_floats(Shader *s, const string &name, float *f, int num) {
 #endif
 }
 
-class ContextWrapper : public yrenderer::Context {
-public:
-	/*shared<Texture> _load_texture(const Path& path) {
-		return REQUIRED(load_texture(path));
-	}
-	shared<Shader> _create_shader(const string& code) {
-		return REQUIRED(create_shader(code));
-	}
-	shared<Shader> _load_shader(const Path& path) {
-		return REQUIRED(load_shader(path));
-	}
-	shared<Shader> _load_surface_shader(const Path& path, const string &render_path, const string &vertex_module, const string &geometry_module, const string& tessellation_module) {
-		return REQUIRED(load_surface_shader(path, render_path, vertex_module, geometry_module, tessellation_module));
-	}*/
-	void _load_shader_module(const Path& path) {
-		REQUIRED(load_shader_module(path));
-	}
-};
-
 KABA_LINK_GROUP_END
 
 
@@ -576,7 +557,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->link_class_func("Context.load_texture", &yrenderer::Context::load_texture);
 	ext->link_class_func("Context.load_shader", &yrenderer::Context::load_shader);
 	ext->link_class_func("Context.create_shader", &yrenderer::Context::create_shader);
-	ext->link_class_func("Context.load_shader_module", &ContextWrapper::_load_shader_module);
+	ext->link_class_func("Context.load_shader_module", &yrenderer::Context::load_shader_module);
 	ext->link_class_func("Context.load_surface_shader", &yrenderer::Context::load_surface_shader);
 
 	ext->link_func("apply_shader_data", &apply_shader_data);
@@ -586,7 +567,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.18");
+	ext->package_info("yrenderer", "0.19");
 	_export_package_yrenderer_internal(ext);
 }
 

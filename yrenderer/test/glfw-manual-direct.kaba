@@ -39,25 +39,25 @@ func main()
 
 
 #	ctx.default_shader = "default.shader"
-	ctx.load_shader_module("module-basic-interface.shader")
-	ctx.load_shader_module("module-basic-data.shader")
+	ctx.load_shader_module("module-basic-interface.shader")!
+	ctx.load_shader_module("module-basic-data.shader")!
 	let light_sources = "default"
-	ctx.load_shader_module("module-light-sources-{{light_sources}}.shader")
+	ctx.load_shader_module("module-light-sources-{{light_sources}}.shader")!
 	let shadows_method = "pcf-hardening"
-	ctx.load_shader_module("module-shadows-{{shadows_method}}.shader")
+	ctx.load_shader_module("module-shadows-{{shadows_method}}.shader")!
 	let lighting_method = "pbr"
-	ctx.load_shader_module("module-lighting-{{lighting_method}}.shader")
+	ctx.load_shader_module("module-lighting-{{lighting_method}}.shader")!
 	let fog_module = "simple"
-	ctx.load_shader_module("module-fog-{{fog_module}}.shader")
-	ctx.load_shader_module("module-vertex-default.shader")
-	ctx.load_shader_module("module-vertex-animated.shader")
-	ctx.load_shader_module("module-vertex-instanced.shader")
-	ctx.load_shader_module("module-vertex-lines.shader")
-	ctx.load_shader_module("module-vertex-points.shader")
-	ctx.load_shader_module("module-vertex-fx.shader")
-	ctx.load_shader_module("module-geometry-lines.shader")
-	ctx.load_shader_module("module-geometry-points.shader")
-	ctx.load_shader_module("forward/module-surface.shader")
+	ctx.load_shader_module("module-fog-{{fog_module}}.shader")!
+	ctx.load_shader_module("module-vertex-default.shader")!
+	ctx.load_shader_module("module-vertex-animated.shader")!
+	ctx.load_shader_module("module-vertex-instanced.shader")!
+	ctx.load_shader_module("module-vertex-lines.shader")!
+	ctx.load_shader_module("module-vertex-points.shader")!
+	ctx.load_shader_module("module-vertex-fx.shader")!
+	ctx.load_shader_module("module-geometry-lines.shader")!
+	ctx.load_shader_module("module-geometry-points.shader")!
+	ctx.load_shader_module("forward/module-surface.shader")!
 
 	var t = 0.0
 

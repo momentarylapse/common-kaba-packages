@@ -51,8 +51,8 @@ Dialog win 'bla'
 		render_path = new RenderPathDeferred(ctx!, 130, 100, 1024)
 		render_path!.background_color = [0.125,0.125,0.125,1]
 
-		xhui_renderer!.add_child(weak(hdr!))
-		hdr!.add_child(weak(render_path!))
+		xhui_renderer!.add_child(hdr!)
+		hdr!.add_child(render_path!)
 
 
 		cube = new shared CubeEmitter(ctx!)
