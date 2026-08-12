@@ -2,9 +2,9 @@ use os
 use ..common.Point
 
 
-func load_asc(filename: os.Path) -> Point[]
-	let x = os.fs.read_text(filename)
-	var points: Ret
+func load_asc(filename: os.Path) -> result[Point[]]
+	let x = os.fs.read_text(filename)!
+	var points: Point[]
 	for l in x.explode("\n")
 		let s = l.explode(" ")
 		if len(s) >= 3
@@ -15,7 +15,7 @@ func load_asc(filename: os.Path) -> Point[]
 
 
 func load_txt(filename: os.Path) -> Point[]
-	let s = os.fs.read_text(filename)
+	let s = os.fs.read_text(filename)!
 	var points: Ret
 	for l in s.explode("\n")
 		let rr = l.explode(" ")

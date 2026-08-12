@@ -3,8 +3,8 @@ use kaba
 use ..common.Point
 
 
-func load_pcd(filename: os.Path) -> Point[]
-	let f = os.fs.open(filename, "rt")
+func load_pcd(filename: os.Path) -> result[Point[]]
+	let f = os.fs.open(filename, "rt")!
 	var n = 0
 	var points: Point[]
 	var fields: string[]
@@ -25,7 +25,7 @@ func load_pcd(filename: os.Path) -> Point[]
 		else if x[0] == "FIELDS"
 			fields = x[1:]
 			if fields[:3] != ["x", "y", "z"]
-				raise(new Exception("unhandled fields: {{s}}"))
+				raise Error("unhandled fields: {{s}}")
 			if len(fields) >= 4
 				has_intensity = (fields[3] == "intensity")
 		else if x[0] == "TYPE"
@@ -42,17 +42,17 @@ func load_pcd(filename: os.Path) -> Point[]
 						points[i].intensity = f32(p[3])
 			else if x[1] == "binary"
 				if len(fields) > 4
-					raise(new Exception("too many fields"))
+					raise Error("too many fields")
 				if types == ["F", "F", "F", "F"]
 					#if sizes != [4, 4, 4, 4]
-					#	raise(new Exception("unhandled types: {{sizes}}  ([4,4,4] expected)"))
-					let data = os.fs.read(filename)#[:f.stream.pos()]
+					#	raise Error("unhandled types: {{sizes}}  ([4,4,4] expected)")
+					let data = os.fs.read(filename)!#[:f.stream.pos()]
 					let p0 = data.find("binary")! + 7
 					as_binary(&points[0], n * sizeof(Point)) = data[p0:]
 				else if types == ["F", "F", "F"]
 					#if sizes != [4, 4, 4]
-					#	raise(new Exception("unhandled types: {{sizes}}  ([4,4,4] expected)"))
-					let data = os.fs.read(filename)#[:f.stream.pos()]
+					#	raise Error("unhandled types: {{sizes}}  ([4,4,4] expected)")
+					let data = os.fs.read(filename)!#[:f.stream.pos()]
 					var p0 = data.find("binary")! + 7
 					var temp: vec3[]
 					temp.resize(n)
@@ -62,7 +62,7 @@ func load_pcd(filename: os.Path) -> Point[]
 						points[i].pos = temp[i]
 						points[i].intensity = 1
 				else
-					raise(new Exception("unhandled types: {{types}}  ([F,F,F] or [F,F,F,F] expected)"))
+					raise Error("unhandled types: {{types}}  ([F,F,F] or [F,F,F,F] expected)")
 			break
 
 #	print("max intensity:")
@@ -72,7 +72,7 @@ func load_pcd(filename: os.Path) -> Point[]
 
 
 func save_pcd(points: Point[], filename: os.Path)
-	var f = os.fs.open(filename, "wb")
+	var f = os.fs.open(filename, "wb")!
 	f.write("# .PCD v0.7 - Point Cloud Data file format
 VERSION 0.7
 FIELDS x y z intensity

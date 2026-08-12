@@ -6,6 +6,7 @@ use .cloud
 use visualization
 use visualization.cloud_renderer
 
+
 func large_num(i: int) -> string
 	let s = str(i)
 	if len(s) > 6
@@ -14,8 +15,10 @@ func large_num(i: int) -> string
 		return s[:-3] + "," + s[-3:]
 	return s
 
+
 func is_cloud_file(f: os.Path) -> bool
 	return f.extension() in ["pcd", "ply"]
+
 
 class MyWindow extends visualization.RenderWindow
 	var cloud_renderer: cloud_renderer.PointCloudRenderer
@@ -67,7 +70,7 @@ class MyWindow extends visualization.RenderWindow
 			cloud_renderer.init_data(c)
 			update_cloud_renderer()
 
-	func override mut on_key_down_x(k: int)
+	func override mut on_key_down_x(k: i32)
 		if k == hui.KEY_PAGE_DOWN
 			load([loop(current[0]+1, 0, len(cfg.files))], true)
 		if k == hui.KEY_PAGE_UP
@@ -87,12 +90,12 @@ class MyWindow extends visualization.RenderWindow
 			set_message("color mode: intensity")
 
 
-	func mut load(i: int[], update_ui: bool)
+	func mut load(i: i32[], update_ui: bool)
 		current = i
 
 		points.clear()
 		for c in current
-			points |= cloud.load(cloud.quick_file(cfg.dir | cfg.files[c]))
+			points |= cloud.load(cloud.quick_file(cfg.dir | cfg.files[c]))!
 	#	print(points |> (func(p: cloud.Point) p.intensity))
 		update_cloud_renderer()
 		if update_ui
@@ -111,7 +114,7 @@ class MyWindow extends visualization.RenderWindow
 
 	func export_cloud()
 		let f = func(filename: os.Path)
-			cloud.save(points, filename)
+			cloud.save(points, filename)!
 		hui.file_dialog_save(&self, "export cloud", "./", ["filter=*.pcd"]).then(f)
 
 class Config
@@ -131,7 +134,7 @@ func explore(arg: string[])
 		|> filter(f => is_cloud_file(f))
 
 	if len(cfg.files) == 0
-		raise(new Exception("no cloud files in {{cfg.dir}}"))
+		raise Error("no cloud files in {{cfg.dir}}")
 
 	if not os.fs.is_directory(path)
 		let bn = path.basename()
@@ -139,14 +142,13 @@ func explore(arg: string[])
 			if f == bn
 				cfg.initial_file = i
 
-	var w: shared[MyWindow] = new MyWindow()
-	hui.fly_and_wait(w)
+	hui.fly_and_wait(new shared MyWindow())
+
 
 func main(arg: string[])
-
 	var p = new os.CommandLineParser()
 	p.info("explore", "gallery of cloud data sets")
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "FILE_OR_DIR", "show all cloud files in a directory", func(a: string[]) explore(a))
-	p.parse(arg)
+	p.parse(arg)!
 

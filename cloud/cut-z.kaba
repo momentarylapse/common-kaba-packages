@@ -14,13 +14,13 @@ func cut_out(arg: string[])
 		for i in str(f).find("binary")
 			continue
 		print(f)
-		let p = cloud.load(cloud.quick_file(dir0 | f))
+		let p = cloud.load(cloud.quick_file(dir0 | f))!
 		let q = cloud.filter_box(p, [[-1000,-1000,z1], [1000,1000,1000]])
 		let s = cloud.filter_box(p, [[-1000,-1000,-1000], [1000,1000,z0]])
 		var points = q
 		for x in s
 			points.add([[x.pos.x, x.pos.y, x.pos.z + z1 - z0], x.intensity])
-		cloud.save(points, dir1 | f)
+		cloud.save(points, dir1 | f)!
 		#break
 
 func main(arg: string[])
@@ -30,5 +30,5 @@ func main(arg: string[])
 	p.info("cut-z", "cut out z-range to simulate full hatches")
 #	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "SOURCE_DIR DEST_DIR Z0 Z1", "cut", func(a: string[]) cut_out(a))
-	p.parse(arg)
+	p.parse(arg)!
 

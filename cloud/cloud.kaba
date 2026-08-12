@@ -5,7 +5,7 @@ use .files.ply.*
 use .files.ascii.*
 
 
-func load(filename: os.Path) -> Point[]
+func load(filename: os.Path) -> result[Point[]]
 	if filename.extension() == "pcd"
 		return load_pcd(filename)
 	if filename.extension() == "ply"
@@ -14,16 +14,17 @@ func load(filename: os.Path) -> Point[]
 		return load_asc(filename)
 	if filename.extension() == "txt"
 		return load_txt(filename)
-	raise(new Exception("unhandled extension"))
+	raise Error("unhandled extension")
 
 
-func save(points: Point[], filename: os.Path)
+func save(points: Point[], filename: os.Path) -> result[void]
 	if filename.extension() == "pcd"
 		save_pcd(points, filename)
 	else if filename.extension() == "ply"
 		save_ply(points, filename)
 	else
-		raise(new Exception("unhandled extension {{filename.extension()}}"))
+		raise Error("unhandled extension {{filename.extension()}}")
+	return result_ok
 
 
 func quick_file(filename: os.Path) -> os.Path

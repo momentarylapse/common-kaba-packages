@@ -10,20 +10,20 @@ struct Field
 	byte_offset: i32
 
 
-func parse_ply_type(s: string) -> kaba.Class&
+func parse_ply_type(s: string) -> result[kaba.Class&]
 	if s == "double"
 		return f64
 	if s == "float"
 		return f32
 	if s == "uchar"
 		return i8
-	raise(new Exception("unknown property type: {{s}}"))
+	raise Error("unknown property type: {{s}}")
 
 
-func load_ply(filename: os.Path) -> Point[]
-	let f = os.fs.open(filename, "rt")
+func load_ply(filename: os.Path) -> result[Point[]]
+	let f = os.fs.open(filename, "rt")!
 	var n = 0
-	var points: Ret
+	var points: Point[]
 	var fields: Field[]
 	var is_binary = false
 	var vertex_byte_size = 0
@@ -44,7 +44,7 @@ func load_ply(filename: os.Path) -> Point[]
 				n = i32(x[2])
 				points.resize(n)
 		else if x[0] == "property"
-			let type = parse_ply_type(x[1])
+			let type = parse_ply_type(x[1])!
 			fields.add([x[2], type, len(fields), vertex_byte_size])
 			vertex_byte_size += type.size
 
@@ -56,7 +56,7 @@ func load_ply(filename: os.Path) -> Point[]
 	# load points
 	if is_binary
 		# binary
-		let data = os.fs.read(filename)#[:f.stream.pos()]
+		let data = os.fs.read(filename)!#[:f.stream.pos()]
 		let p0 = data.find("end_header")! + 11
 		if vertex_byte_size == sizeof(Point) and intensity.has_value()
 			#print("direct f32[3]+f32")
@@ -96,7 +96,7 @@ func load_ply(filename: os.Path) -> Point[]
 
 
 func save_ply(points: Point[], filename: os.Path)
-	var f = os.fs.open(filename, "wb")
+	var f = os.fs.open(filename, "wb")!
 	f.write("ply
 format binary_little_endian 1.0
 comment Created by Kaba

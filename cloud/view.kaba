@@ -20,7 +20,7 @@ class Canvas extends canvas.Canvas
 	var points: vec3[]
 
 	func __init__(filename: os.Path)
-		points = cloud.get_points(cloud.load(filename))
+		points = cloud.get_points(cloud.load(filename)!)
 
 	func override on_initialize()
 		cr.initialize()
@@ -48,4 +48,4 @@ func main(args: string[])
 	p.info("view", "show a point cloud file")
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "FILE", "...", func(a: string[]) view_cloud(a))
-	p.parse(args)
+	p.parse(args)!

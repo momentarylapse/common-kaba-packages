@@ -1,4 +1,4 @@
-version 2
+version 3
 run convert.kaba
 run cut-z.kaba
 run explore.kaba
