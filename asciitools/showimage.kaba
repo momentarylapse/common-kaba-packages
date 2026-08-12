@@ -2,11 +2,8 @@ use ncurses.*
 use image.*
 use os
 
-func main(args: string[])
-	for a in args
-		show_image(a)
-
 let CHARS = [' ', '.', ':', '-', '+', '*', 'a', 'H', 'M', 'W']
+
 
 func to_ascii(c: Color) -> u8
 	let b = (c.r + c.g + c.b) / 3
@@ -50,10 +47,9 @@ func draw_image(im: Image, vp: ViewPort, w: i32, h: i32)
 				s.add("   ?"[((x+y) % 4) * (y%2)])
 		stdwin.print(s)
 
+
 func show_image(fn: os.Path)
-	let im = Image.load(fn)
-	if im.error
-		return
+	let im = Image.load(fn)!
 
 	init()
 	raw()
@@ -62,19 +58,19 @@ func show_image(fn: os.Path)
 	use_default_colors()
 	curs_set(0)
 	stdwin.keypad(true)
-	
+
 	var w = stdwin.width()
 	var h = stdwin.height()
-	
-	
+
+
 	var vp: ViewPort
 	vp.center_on([0,im.width, 0,im.height], w, h)
-	
+
 	while true
-	
+
 		draw_image(im, vp, w, h)
-	
-	
+
+
 		stdwin.move(0, h-1)
 		stdwin.attron(int(Attr.REVERSE))
 		for x in 0:w
@@ -84,7 +80,7 @@ func show_image(fn: os.Path)
 		stdwin.attroff(int(Attr.REVERSE))
 		stdwin.refresh()
 		#let p = _stdscr
-	
+
 		var r = stdwin.getch()
 		match Key.from_int(r)
 			Key.PLUS => vp.zoom(1.1, w/2, h/2)
@@ -95,3 +91,8 @@ func show_image(fn: os.Path)
 			Key.RIGHT => vp.offset.x += h / vp.scale * 0.1
 			else => break
 	endwin()
+
+
+func main(args: string[])
+	for a in args
+		show_image(a)
