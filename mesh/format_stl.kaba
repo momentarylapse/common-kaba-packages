@@ -1,15 +1,15 @@
 use os
 use .common.*
 
-func load_stl(fn: os.Path) -> Mesh
+func load_stl(fn: os.Path) -> result[Mesh]
 	var m: Mesh
-	
-	var f = os.fs.open(fn, "rb")
+
+	var f = os.fs.open(fn, "rb")!
 	let header = f.read(80)
 	if header[:5] == "solid"
-		raise(new Exception("probably an ascii STL file"))
+		raise Error("probably an ascii STL file")
 	#if header[:4] != "STLB" and header[0] != 0x2d
-	#	raise(new Exception("probably no binary STL file"))
+	#	raise Error("probably no binary STL file")
 	var num_triangles: i32
 	f >> num_triangles
 	m.vertices.resize(num_triangles * 3)
@@ -24,6 +24,6 @@ func load_stl(fn: os.Path) -> Mesh
 		m.vertices[i*3+1] = [b, n, 0, 0]
 		m.vertices[i*3+2] = [c, n, 0, 0]
 	m.indices = range(len(m.vertices))
-	
+
 	return m
 

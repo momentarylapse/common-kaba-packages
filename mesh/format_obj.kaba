@@ -3,13 +3,13 @@ use .common.*
 
 # https://en.wikipedia.org/wiki/Wavefront_.obj_file
 
-func load_obj(fn: os.Path) -> Mesh
+func load_obj(fn: os.Path) -> result[Mesh]
 	var m: Mesh
-	
+
 	var vertices: vec3[]
 	var normals: vec3[]
-	
-	var f = os.fs.open(fn, "rt")
+
+	var f = os.fs.open(fn, "rt")!
 	while true#not f.is_end()
 		var s: string
 		try
@@ -45,6 +45,6 @@ func load_obj(fn: os.Path) -> Mesh
 		else
 			break
 	m.indices = range(len(m.vertices))
-	
+
 	return m
 

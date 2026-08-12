@@ -8,7 +8,7 @@ use .format_stl.*
 use .format_obj.*
 
 
-func load(fn: os.Path) -> Mesh
+func load(fn: os.Path) -> result[Mesh]
 	let ext = fn.extension()
 	if ext == "3ds"
 		return load_3ds(fn)
@@ -20,22 +20,22 @@ func load(fn: os.Path) -> Mesh
 		return load_stl(fn)
 	if ext == "obj"
 		return load_obj(fn)
-	raise(new Exception("unknown file extension: {{ext}}"))
+	raise Error("unknown file extension: {{ext}}")
 
 
-func save(m: Mesh, fn: os.Path)
+func save(m: Mesh, fn: os.Path) -> result[void]
 	let ext = fn.extension()
 	if ext == "3ds"
-		save_3ds(m, fn)
+		return save_3ds(m, fn)
 	else if ext == "ply"
-		save_ply(m, fn)
+		return save_ply(m, fn)
 	else
-		raise(new Exception("unhandled file extension: {{ext}}"))
+		raise Error("unhandled file extension: {{ext}}")
 
 
 func main(arg: string[])
 	for a in arg
-		let m = load(a)
+		let m = load(a)!
 		print(len(m.vertices))
 		print(len(m.indices))
 		#print(load_3ds(a))

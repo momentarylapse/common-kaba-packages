@@ -13,9 +13,9 @@ func read_cstr(out f: os.FileStream) -> string
 			return r
 		r.add(cc[0])
 
-func load_3ds(fn: os.Path) -> Mesh
+func load_3ds(fn: os.Path) -> result[Mesh]
 	var m: Mesh
-	var f = os.fs.open(fn, "rb")
+	var f = os.fs.open(fn, "rb")!
 	var chunk_ends: i32[]
 	while true
 		let t = read16(f)
@@ -63,46 +63,46 @@ func load_3ds(fn: os.Path) -> Mesh
 		#f.seek(size - 6)
 		if f.pos() > f.size() - 100
 			break
-			
+
 	return m
 
 
-func save_3ds(_m: Mesh, fn: os.Path)
+func save_3ds(_m: Mesh, fn: os.Path) -> result[void]
 	var m = _m
 	let bb = m.bounding_box()
 	for mut v in m.vertices
 		v.pos -= bb.center()
 		v.pos *= 0.002
 	print(m.bounding_box())
-	
-	var f = os.fs.open(fn, "wb")
+
+	var f = os.fs.open(fn, "wb")!
 	let nv = len(m.vertices)
 	let nf = len(m.indices)/3
 	let size_vertices = 6 + 2 + nv*12
 	let size_faces = 6 + 2 + nf*8
-	
+
 	# main
 	f.write([0x4d, 0x4d])
 	f << 6 + 10 + 6 + 6 + 5 + 6 + size_vertices + size_faces
-	
+
 	# M3D version
 	f.write([0x02, 0x00])
 	f << 10
 	f << 3
-	
+
 	# 3d editor
 	f.write([0x3d, 0x3d])
 	f << 6 + 6 + 5 + 6 + size_vertices + size_faces
-	
+
 	# object
 	f.write([0x00, 0x40])
 	f << 6 + 5 + 6 + size_vertices + size_faces
 	f.write([0x43, 0x75, 0x62, 0x65, 0x00]) # "Cube"
-	
+
 	# triangular mesh
 	f.write([0x00, 0x41])
 	f << 6 + size_vertices + size_faces
-	
+
 	# vertices
 	f.write([0x10, 0x41])
 	f << size_vertices
@@ -110,7 +110,7 @@ func save_3ds(_m: Mesh, fn: os.Path)
 	for v in m.vertices
 		#f << v.pos
 		let r = f.write(as_binary(&v.pos, 12))
-	
+
 	# faces
 	f.write([0x20, 0x41])
 	f << size_faces
@@ -120,6 +120,8 @@ func save_3ds(_m: Mesh, fn: os.Path)
 		f.write(as_binary(&m.indices[i*3+1], 2))
 		f.write(as_binary(&m.indices[i*3+2], 2))
 		let r = f.write([0,0])
-	
-	
-	
+
+	return result_ok
+
+
+

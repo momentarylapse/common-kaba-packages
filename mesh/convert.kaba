@@ -1,11 +1,11 @@
-use mesh.common.Vertex
-use mesh
+use .common.Vertex
+use .mesh
 use os
 
 func parse_vec3(s: string) -> vec3
 	let rr = s.explode(",")
 	if len(rr) < 3
-		raise(new Exception("parameter 'A,B,C' expected"))
+		raise Error("parameter 'A,B,C' expected")
 	return vec3(float(rr[0]), float(rr[1]), float(rr[2]))
 
 var rotation: vec3?
@@ -15,7 +15,7 @@ var scale: vec3?
 
 func convert_file(source: os.Path, dest: os.Path)
 	print("CONVERT  {{source}}  ->  {{dest}}")
-	var m = mesh.load(source)
+	var m = mesh.load(source)!
 #	for v in flip
 #		mesh.vertices = [for p in mesh.vertices  p - vec3.dot(v, p) * v * 2]
 	for s in scale
@@ -27,7 +27,7 @@ func convert_file(source: os.Path, dest: os.Path)
 #	for t in translation
 #		let m = mat4.translation(t)
 #		points = [for p in points  m*p]
-	mesh.save(m, dest)
+	mesh.save(m, dest)!
 
 func action_convert(args: string[])
 	convert_file(args[0], args[1])
@@ -41,4 +41,4 @@ func main(arg: string[])
 #	p.option("--flip", "AXIS", "flip axis 'x,y,z'", func(a: string) flip = parse_vec3(a).normalized())
 	p.option("--scale", "FACTIR", "scale 'x,y,z'", func(a: string) scale = parse_vec3(a))
 	p.cmd("", "SOURCE DEST", "", action_convert)
-	p.parse(arg)
+	p.parse(arg)!

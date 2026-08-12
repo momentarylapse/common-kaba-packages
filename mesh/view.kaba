@@ -2,8 +2,8 @@ use hui
 use gl
 use os
 use visualization
-use mesh
-use mesh.common.Mesh
+use .mesh
+use .common.Mesh
 
 class Theme
 	let bg = Color(0.2,0.2,0.2, 1)
@@ -14,7 +14,7 @@ class Theme
 	let tunnel_mesh = Color(0.4,0.4,0.4, 1)
 	let tunnel_mesh_inside = Color(0.3,0.3,0.3, 1)
 
-	
+
 func create_vb(m: Mesh) -> xfer[gl.VertexBuffer]
 	var vb = new gl.VertexBuffer("3f,3f,2f|i32")
 	vb.update(m.vertices)
@@ -26,42 +26,42 @@ class MyWindow extends visualization.RenderWindow
 	var m: Mesh
 	var vb: owned![gl.VertexBuffer]
 	var wireframe = false
-	
+
 
 	func __init__()
 		super.__init__("")
 		set_options("", "headerbar")
 		set_title("Mesh Viewer") # hui bug :P
-		
+
 		background_color = Theme.bg
 		cam_ang = Quaternion([pi/2,0,0])
 		light_enabled = true
-		
+
 		on_post_init(init_data)
-		
+
 		hui.run_repeated(0.1, force_redraw)
 
 
 	func override mut draw_content()
 		draw_magic_grid(Theme.grid)
-		
+
 		set_default_shader_3d()
 		gl.set_material(Color.WHITE, 0, 0, Theme.arm_mesh)
 		gl.set_wire(wireframe)
 		gl.set_model_matrix(mat4.ID)
 		gl.draw_triangles(vb)
 		gl.set_wire(false)
-				
+
 		gl.clear_z(1)
-		
+
 		draw_frame([-10,-10,0])
-	
+
 		set_mode_2d()
 		set_font(14, false, false)
 		gl.set_material(Color.WHITE, 0, 0, Color.GRAY)
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
-	
+
 
 
 	func mut draw_frame(p0: vec3)
@@ -79,11 +79,11 @@ class MyWindow extends visualization.RenderWindow
 
 	func mut init_data()
 		print("main.init_data")
-		
-		
-		m = mesh.load(cfg.filename)
+
+
+		m = mesh.load(cfg.filename)!
 		vb = create_vb(m)
-		
+
 		if len(m.vertices) >= 2
 			let bb = m.bounding_box()
 			cam_pos = bb.center()
@@ -94,8 +94,8 @@ class MyWindow extends visualization.RenderWindow
 		if k == hui.KEY_W
 			wireframe = not wireframe
 			force_redraw()
-			
-		
+
+
 
 class Config
 	var filename: os.Path
@@ -103,7 +103,7 @@ var cfg: Config
 
 func explore(arg: string[])
 	cfg.filename = arg[0]
-		
+
 	var w: shared[MyWindow] = new MyWindow()
 	hui.fly_and_wait(w)
 
@@ -113,5 +113,5 @@ func main(arg: string[])
 	p.info("mesh-view", "...")
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
 	p.cmd("", "FILENAME", "mesh to show", func(a: string[]) explore(a))
-	p.parse(arg)
-	
+	p.parse(arg)!
+
