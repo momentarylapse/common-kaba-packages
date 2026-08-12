@@ -6,7 +6,7 @@ use .common.*
 
 class VolumeRenderer
 	var ctx: SimpleContext&
-	var texture: shared![gfx.VolumeTexture]
+	var texture: shared![gfx.Texture]
 	var vertex_buffer: owned![gfx.VertexBuffer]
 	var material: owned![yrenderer.Material]
 	var material_solid: owned![yrenderer.Material]
@@ -36,6 +36,12 @@ class VolumeRenderer
 		material_solid = new yrenderer.Material()
 		material_solid.pass0.shader_path = "volume-surface.shader"
 		material_solid.textures.add(texture)
+
+
+	func mut set_texture(tex: shared![gfx.Texture])
+		texture = tex
+		material.textures[0] = texture
+		material_solid.textures[0] = texture
 
 
 	func mut set(data: f32[], n: i32[])

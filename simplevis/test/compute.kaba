@@ -8,7 +8,6 @@ class Canvas extends sv.Canvas
 	var tex: shared![Texture]
 	var material: Material&
 
-	var shader: shared![Shader]
 	var ct: owned![ComputeTask]
 	var roll = 0.8
 
@@ -18,12 +17,12 @@ class Canvas extends sv.Canvas
 		animated = true
 
 		vb = sv.mesh_to_vb(create_cube(Box.ID_SYM, [1,1,1]))
-		tex = new StorageTexture(16, 16, 1, "rgba:i8")
+		tex = new StorageTexture(16, 16, 16, "rgba:i8")
 
 		material := ctx.create_material()
 		material.textures[0] = tex
 
-		shader = ctx.ctx.create_shader("
+		var shader = ctx.ctx.create_shader("
 <Layout>
 	version = 430
 	bindings = [[image]]
@@ -36,18 +35,18 @@ layout(push_constant) uniform PushConstants { float roll; };
 #else
 uniform float roll;
 #endif
-layout(binding=0, rgba8) uniform writeonly image2D image;
+layout(binding=0, rgba8) uniform writeonly image3D image;
 layout(local_size_x=16, local_size_y=16) in;
 
 void main() {
-	ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+	ivec3 storePos = ivec3(gl_GlobalInvocationID);
 	float localCoef = length(vec2(ivec2(gl_LocalInvocationID.xy)-8)/8.0);
 	float globalCoef = sin(float(gl_WorkGroupID.x+gl_WorkGroupID.y)*0.1 + roll)*0.5;
 	imageStore(image, storePos, vec4(localCoef, abs(sin(roll)), 0, 1.0));
 }
 </ComputeShader>")
 
-		ct = new ComputeTask(ctx.ctx, "compute", shader, [16,16])
+		ct = new ComputeTask(ctx.ctx, "compute", shader!, [16,16,16])
 		ct.bind_image(0, weak(tex))
 
 

@@ -1,0 +1,104 @@
+use simplevis as sv
+use simplevis.volume.VolumeRenderer
+use yrenderer.*
+use polymesh.*
+
+
+let N = 64
+let CELL_SIZE = 8
+
+class Canvas extends sv.Canvas
+	var tex: shared![Texture]
+	var buf: owned![ShaderStorageBuffer]
+	var vr = VolumeRenderer(&ctx)
+
+	var ct: owned![ComputeTask]
+	var roll = 0.8
+	var first = true
+
+
+	func override on_initialize()
+		light.color = [1,1,1,1]
+		animated = true
+
+		vr.initialize()
+
+		tex = new StorageTexture(N, N, N, "rgba:i8")
+
+		let NP = (N / CELL_SIZE)^3
+		buf = new ShaderStorageBuffer(NP * sizeof(vec3))
+		var points: vec3[]
+		for i in 0:NP
+			points.add([rand(N), rand(N), rand(N)])
+		buf.update(points)
+
+
+		var shader = ctx.ctx.create_shader("
+<Layout>
+	version = 430
+	bindings = [[image,storage-buffer]]
+	pushsize = 4
+</Layout>
+<ComputeShader>
+
+#if vulkan
+layout(push_constant) uniform PushConstants {
+	int cell_size;
+	int num_points;
+};
+#else
+uniform int cell_size;
+uniform int num_points;
+#endif
+layout(binding=0, rgba8) uniform writeonly image3D image;
+layout(binding=1, std430) buffer Points {
+	vec3 points[];
+};
+layout(local_size_x=16, local_size_y=16) in;
+
+float noise(vec3 p, vec3 size) {
+	float min_dist = 10;
+	for (int i=0; i<num_points; i++) {
+		vec3 dp = p - points[i];
+		dp = mod(dp + size/2, size) - size/2;
+		float d = length(dp);
+		min_dist = min(min_dist, d);
+	}
+	return 1-clamp(min_dist/cell_size*0.7, 0.0, 1.0);
+}
+
+void main() {
+	ivec3 storePos = ivec3(gl_GlobalInvocationID);
+	vec3 size = vec3(imageSize(image));
+
+	float value = noise(gl_GlobalInvocationID, size) * 0.7;
+	value -= noise(gl_GlobalInvocationID*2 + vec3(12,23,34), size)*0.3;
+	value += noise(gl_GlobalInvocationID*4 + vec3(23,45,11), size)*0.15;
+
+	imageStore(image, storePos, vec4(value, 0, 0, 1.0));
+}
+</ComputeShader>")
+
+		ct = new ComputeTask(ctx.ctx, "compute", shader!, [N, N, N])
+		ct.bind_image(0, weak(tex))
+		ct.bind_storage_buffer(1, weak(buf))
+
+
+
+	func override on_prepare()
+		roll += 0.08
+		if first
+			ct.shader_data = dyn({"cell_size:0": CELL_SIZE, "num_points:4": (N / CELL_SIZE)^3})
+			ct.render(ctx.cur_params)
+
+			vr.set_texture(tex)
+			first = false
+
+
+	func override on_draw()
+		vr.solid = true
+		vr.draw(mat4.translation([-0.5,-0.5,-0.5]))
+
+
+func main()
+	sv.run(new Canvas())
