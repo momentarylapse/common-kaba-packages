@@ -66,7 +66,7 @@ func action_export(arg: string[])
 
 func patch_language(out l: Language, own: Language, filename: Path)
 	try
-		var ttt = os.fs.read_text(filename)
+		var ttt = os.fs.read_text(filename)!
 		var lines = ttt.explode("\n")
 		for i in 0:len(lines)/3
 			var a = lines[i*3]
@@ -155,7 +155,7 @@ func swap_translate_guis(l: Language)
 		print(r.str(0))
 		swap_translate_gui(r, l, r.id)
 		print(r.str(0))
-		os.fs.write_text(resource_files[i], r.str(0))
+		os.fs.write_text(resource_files[i], r.str(0))!
 
 func action_swap(arg: string[])
 	var source = Path(arg[0])
@@ -189,4 +189,4 @@ func main(arg: string[])
 	p.cmd("t", "<PRELANG-FILE>", "translate...", action_translate)
 	p.cmd("add", "<PRELANG-FILE> <LANGUAGE-NAME>", "add", action_add)
 	p.cmd("swap", "<PRELANG-FILE> <LANGUAGE-NAME>", "swap languages", action_swap)
-	p.parse(arg)
+	p.parse(arg)!

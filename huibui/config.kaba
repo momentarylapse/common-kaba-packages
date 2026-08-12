@@ -9,7 +9,7 @@ use os.Path
 #string str_escape(string s)
 #	string r
 #	for c in s
-#		if c == 
+#		if c ==
 #	return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\t", "\\t")
 
 func str_m2utf8(s: string) -> string
@@ -19,15 +19,15 @@ class Config
 	var own_lang_name: string
 	var source_code_dir: Path
 	var export_dir: Path
-	
+
 	var dir: Path
-	
+
 	func mut set_dir(_dir: Path)
 		dir = _dir
-	
+
 	func mut load()
 		try
-			var f = os.fs.open(dir | "export.txt", "rt")
+			var f = os.fs.open(dir | "export.txt", "rt")!
 			var t: string
 			f >> t
 			f >> t
@@ -37,7 +37,7 @@ class Config
 			source_code_dir = Path(t)
 			f >> t
 			f >> own_lang_name
-			
+
 			source_code_dir = dir | source_code_dir
 			export_dir = dir | export_dir
 			os.app_directory_static = export_dir

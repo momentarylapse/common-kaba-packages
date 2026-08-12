@@ -31,7 +31,7 @@ class SourceParser
 			if os.fs.is_directory(dir | f)
 				parse_source_code_dir(dir | f)
 			else
-				source = os.fs.read(dir | f)
+				source = os.fs.read(dir | f)!
 				begin()
 				parse()
 				end(dir | f)
@@ -45,7 +45,7 @@ class SourceLanguageFinder extends SourceParser
 	func override mut handle(pos: int, length: int)
 		var t: LangText
 		t.orig = str_m2utf8(source[pos:pos+length]).unescape()
-		
+
 		if len(t.orig) > 0
 			var found = false
 			for tt in l.texts
@@ -66,24 +66,24 @@ class SourceSwapper extends SourceParser
 		delta = 0
 	func override mut handle(pos: int, length: int)
 		var orig = str_m2utf8(source[pos:pos+length]).unescape()
-		
+
 		for t in l.texts
 			if orig == t.orig
 				var r = t.trans.escape()
 				print("REPLACE {{orig}}    ->   {{r}}")
-				
+
 				var ppos = pos + delta
 				source_new = source_new.head(ppos) + r + source_new[ppos+length:]
-				
+
 				delta += len(r) - length
-				
+
 				changed = true
 	func override end(filename: Path)
 		if !changed
 			return
 		#print(">>>>>>>>>>>")
-		os.fs.write_text(filename, source_new)
-				
+		os.fs.write_text(filename, source_new)!
+
 
 
 func parse_source_code_dir(dir: Path, l: Language)

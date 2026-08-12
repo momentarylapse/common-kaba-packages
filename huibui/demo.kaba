@@ -31,21 +31,21 @@ func action_demo(arg: string[])
 	var filename = Path(arg[0])
 	conf.set_dir(filename.parent())
 	conf.load()
-	
-	var source = os.fs.read_text(filename)
+
+	var source = os.fs.read_text(filename)!
 	#print(source)
 	var r = hui.parse_resource(source, true)
 	#r.show(0)
 	#print(r.str(0))
-	
+
 	if r.type in ["Dialog", "Window"]
-		var dlg: shared![DemoDialog] = new DemoDialog(source)
+		var dlg = new shared DemoDialog(source)
 		hui.fly_and_wait(dlg)
 	else if r.type == "Toolbar"
-		var dlg: shared![ToolbarDemoDialog] = new ToolbarDemoDialog(source)
+		var dlg = new shared ToolbarDemoDialog(source)
 		hui.fly_and_wait(dlg)
 	else if r.type == "Menu"
-		var dlg: shared![MenuDemoDialog] = new MenuDemoDialog(source)
+		var dlg = new shared MenuDemoDialog(source)
 		hui.fly_and_wait(dlg)
 	else
 		print("don't know how to show a {{r.type}}")

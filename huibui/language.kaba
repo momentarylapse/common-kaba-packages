@@ -23,7 +23,7 @@ struct Language
 			print(i.id)
 			print("\t{{i.title}}")
 			print("\t{{i.tooltip}}")
-			
+
 		for t in texts
 			print(t.orig)
 			print("\t{{t.trans}}")
@@ -50,9 +50,9 @@ struct Language
 		t.orig = orig
 		t.trans = trans
 		texts.add(t)
-		
+
 	func save()
-		var f = os.fs.open(filename, "wt")
+		var f = os.fs.open(filename, "wt")!
 		f << "# Language"
 		f << name
 		f << "# Num IDs"
@@ -95,7 +95,7 @@ func load_prelang(filename: Path) -> Language
 	l.filename = filename
 	#try
 	if true
-		var f = os.fs.open(filename, "rt")
+		var f = os.fs.open(filename, "rt")!
 		var t: string
 		var n: int
 		f >> t
@@ -173,14 +173,14 @@ func sort_texts(out texts: LangText[])
 func check_lang(l: Language, own: Language, create_file: bool) -> bool
 	print("checking {{l.name}}")
 	var nerrors = 0
-	
+
 	var file: owned[os.FileStream]
 	if create_file
-		file = os.fs.open(conf.dir | "TRANS", "wt")
-	
+		file = os.fs.open(conf.dir | "TRANS", "wt")!
+
 	# check ids
 	for i in own.ids
-		
+
 		var found_title = false
 		var found_tooltip = false
 		for j in l.ids
@@ -202,7 +202,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 				f << ""
 			#print("    MISSING tooltip for {{i.id}}")
 			nerrors ++
-	
+
 	# check texts
 	for t in own.texts
 		var found = false
@@ -217,7 +217,7 @@ func check_lang(l: Language, own: Language, create_file: bool) -> bool
 				f << ""
 			#print("    MISSING text: " + t.orig)
 			nerrors ++
-	
+
 	if nerrors == 0
 		print("    ok, good translation!")
 	else
