@@ -1,7 +1,7 @@
 use os.*
 
 func test_replace(filename: Path, what: string, by: string, allow: bool)
-	var s = fs.read_text(filename)
+	var s = fs.read_text(filename)!
 	var n = 0
 	var pos0 = 0
 	while true
@@ -16,7 +16,7 @@ func test_replace(filename: Path, what: string, by: string, allow: bool)
 		else
 			break
 	if n > 0 and allow
-		fs.write_text(filename, s)
+		fs.write_text(filename, s)!
 
 func test_rec(dir: Path, what: string, by: string, allow: bool)
 	for e in fs.search(dir, "*.*", "fr")
@@ -24,7 +24,7 @@ func test_rec(dir: Path, what: string, by: string, allow: bool)
 
 func main(arg: string[])
 	if len(arg) < 3
-		raise(new Exception("[WHAT] [BY] [DIR]"))
+		raise Error("[WHAT] [BY] [DIR]")
 	var allow = true
 	if len(arg) >= 4
 		allow = (arg[3] != "--dry")

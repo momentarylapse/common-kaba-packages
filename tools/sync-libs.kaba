@@ -16,7 +16,7 @@ struct Entry
 
 func load_list() -> Entry[]
 	var list: Entry[]
-	let s = os.fs.read_text(os.app_directory_dynamic | "sync-libs")
+	let s = os.fs.read_text(os.app_directory_dynamic | "sync-libs")!
 	for l in s.explode("\n")
 		let x = l.explode(" ")
 		if len(x) >= 2
@@ -41,7 +41,7 @@ struct Global
 
 func load_repo(dir: os.Path) -> Package[]
 	var r: Package[]
-	let ss = os.fs.read_text(dir | REPO_FILE)
+	let ss = os.fs.read_text(dir | REPO_FILE)!
 	for l in ss.explode("\n")
 		let x = l.explode(" ")
 		if len(x) < 2
@@ -63,7 +63,7 @@ func init() -> Global
 		if e.type == EntryType.LIB
 			g.lib = &e
 	if not g.lib
-		raise(new Exception("no 'lib' entry found in '~/.kaba/sync-libs'"))
+		raise Error("no 'lib' entry found in '~/.kaba/sync-libs'")
 	for e in g.entries
 		if e.type == EntryType.PACKAGES
 			let packages = load_repo(e.dir)
@@ -86,22 +86,22 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 
 		let label = source.basename() + "/" + str(f)
 		if os.fs.exists(dest | f)
-			if os.fs.read_text(source | f) != os.fs.read_text(dest | f)
+			if os.fs.read_text(source | f) != os.fs.read_text(dest | f)!
 				print("  {{os.terminal.ORANGE}}CHANGED{{os.terminal.END}} {{label}}")
 				if cmd == "pull"
-					os.fs.copy(source | f, dest | f)
+					os.fs.copy(source | f, dest | f)!
 				if cmd == "push"
-					os.fs.copy(dest | f, source | f)
+					os.fs.copy(dest | f, source | f)!
 				if cmd == "diff"
 					let _cmd = "diff --color=always '{{source}}/{{f}}' '{{dest}}/{{f}}'; a=8" # prevent error return value!
 					#print(_cmd)
-					print(os.shell_execute(_cmd))
+					print(os.shell_execute(_cmd)!)
 		else
 			print("  {{os.terminal.ORANGE}}ONLY REMOTE{{os.terminal.END}} {{label}}")
 			if cmd == "pull"
-				os.fs.copy(source | f, dest | f)
+				os.fs.copy(source | f, dest | f)!
 			if cmd == "push"
-				os.fs.delete(source | f)
+				os.fs.delete(source | f)!
 			# TODO create directories...
 
 
@@ -110,9 +110,9 @@ func sync_dir(source: os.Path, dest: os.Path, cmd: string)
 		if not os.fs.exists(source | f)
 			print("  {{os.terminal.ORANGE}}ONLY LOCAL{{os.terminal.END}} {{label}}")
 			if cmd == "pull"
-				os.fs.delete(dest | f)
+				os.fs.delete(dest | f)!
 			if cmd == "push"
-				os.fs.copy(dest | f, source | f)
+				os.fs.copy(dest | f, source | f)!
 
 
 func sync_xmake_project(dir: os.Path, lib: Entry, cmd: string)

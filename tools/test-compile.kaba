@@ -8,8 +8,8 @@ func test_compile(filename: Path)
 	print("    {{filename.basename()}}")
 	var context = kaba.Context.create()
 	try
-		var m = context.load_module(filename, true)
-	except Exception as e
+		var m = context.load_module(filename, true)!
+	except Error as e
 		print("{{terminal.RED}}  ERROR  {{e}}{{terminal.END}}")
 		error_count ++
 

@@ -1,0 +1,17 @@
+
+
+struct DiffChunk
+	var equal: bool
+	var i0, n: i32
+	var j0, m: i32
+
+func show(a: string, b: string, diffs: DiffChunk[])
+
+func diff(a: string, b: string) -> DiffChunk[]
+
+
+func main()
+	let a = "hallo"
+	let b = "heeello"
+	show(a, b, diff(a, b))
+

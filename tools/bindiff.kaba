@@ -16,7 +16,7 @@ struct Mapping
 
 func expand_mapping(a: string, b: string, out m: Mapping)
 	var d = m.b0 - m.a0
-	
+
 	# forward comp
 	for i in m.a0:len(a)
 		if a[i] != b[i+d]
@@ -57,7 +57,7 @@ func hex(s: string) -> string
 					in_printable = false
 			if in_printable
 				r += "«"
-		
+
 		if in_printable
 			r += as_binary(&s[i], 1)
 		else
@@ -73,7 +73,7 @@ func diff(a: string, b: string)
 	var m: Mapping
 	m.a0 = 0
 	m.b0 = 0
-	
+
 	while true
 		expand_mapping(a, b, m)
 		if m.a1 >= len(a) or m.b1 >= len(b)
@@ -82,14 +82,14 @@ func diff(a: string, b: string)
 		if m2.a0 < 0
 			break
 		expand_mapping(a, b, m2)
-	
+
 		var d: Mapping
 		d.a0 = m.a1
 		d.b0 = m.b1
 		d.a1 = m2.a0
 		d.b1 = m2.b0
 		diffs.add(d)
-	
+
 		print("{{os.terminal.YELLOW}}diff at {{d}}:{{os.terminal.END}}")
 		var a000 = clamp(d.a0-CONTEXT, 0, len(a))
 		var a111 = clamp(d.a1+CONTEXT, 0, len(a))
@@ -108,6 +108,6 @@ func main(arg: string[])
 	p.option("--max-diff", "BYTES", "maximum size of a non-matching chunk", func (a: string) MAX_DIFF_SIZE = int(a))
 	p.option("--min-match", "BYTES", "minimum size to recognize a matching chunk", func (a: string) MIN_MATCH_SIZE = int(a))
 	p.cmd("help", "", "show help", func (a: string[]) pp.show())
-	p.cmd("", "FILE1 FILE2", "show diff", func (a: string[]) diff(os.fs.read(a[0]), os.fs.read(a[1])))
-	p.parse(arg)
+	p.cmd("", "FILE1 FILE2", "show diff", func (a: string[]) diff(os.fs.read(a[0])!, os.fs.read(a[1])!))
+	p.parse(arg)!
 	#p.show_help()

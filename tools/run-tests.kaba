@@ -11,8 +11,8 @@ func run_test(filename: Path, name: string)
 	_print_postfix = "\n"
 	test_count ++
 	try
-		let r = shell_execute("kaba '{{filename}}'")
-		let r0 = fs.read_text(str(filename).replace(".kaba", ".reg")).replace("\r", "")
+		let r = shell_execute("kaba '{{filename}}'")!
+		let r0 = fs.read_text(str(filename).replace(".kaba", ".reg"))!.replace("\r", "")
 		if r == r0
 			print("  {{terminal.GREEN}}OK{{terminal.END}}")
 		else

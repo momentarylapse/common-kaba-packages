@@ -35,33 +35,33 @@ func is_old_decl(tokens: string[]) -> bool
 			#print("asm>>")
 			in_asm = false
 		return false
-		
+
 	if len(tokens) < 2
 		return false
-		
+
 	if tokens == ["asm", "{"]
 		#print("<<asm")
 		in_asm = true
 		return false
-	
+
 	if tokens[len(tokens) - 1] == ";"
 		return false
-		
+
 	if tokens[0] in ["func", "class", "let", "var", "enum", "const", "for", "if", "else", "while", "return", "use", "import", "new", "del", "try", "except", "#"] or tokens[1] in ["as"]
 		return false
-	
+
 	# type...
 	let ptl = potential_type_length(tokens)
 	if ptl == 0
 		return false
-		
+
 	if not is_letter(tokens[ptl][0])
 		return false
-	
+
 	if len(tokens) > ptl+1
 		if not (tokens[ptl+1] in [",", "="])
 			return false
-	
+
 	return true
 
 
@@ -76,21 +76,21 @@ func glue_type(tokens: string[], ptl: i32) -> string
 
 func migrate_file_decl(filename: os.Path)
 	print(filename)
-	let s = os.fs.read_text(filename)
+	let s = os.fs.read_text(filename)!
 	let lines = s.explode("\n")
 	var lines_out: string[]
-	
+
 	in_asm = false
-	
+
 	for l in lines
 		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:;")
-		
-		
+
+
 		if not is_old_decl(tokens)
 			lines_out.add(l)
 			continue
-			
-			
+
+
 		print(l)
 		let ind = "\t".repeat(count_indent(l))
 		let ptl = potential_type_length(tokens)
@@ -105,7 +105,7 @@ func migrate_file_decl(filename: os.Path)
 			options.add("{{ind}}var {{z}}: {{type}}")
 		else
 			options.add("{{ind}}var {{tokens[ptl]}}: {{type}}")
-			
+
 		if len(options) == 1
 			print("=>{{options[0]}}")
 			lines_out.add(options[0])
@@ -113,7 +113,7 @@ func migrate_file_decl(filename: os.Path)
 		for i=>o in options
 			#lines_out.add(ll)
 			print("{{i+1}}){{o}}")
-		
+
 		let x = read_char()
 		var done = false
 		for i=>o in options
@@ -123,7 +123,7 @@ func migrate_file_decl(filename: os.Path)
 				print("=>>>>>")
 		if not done
 			lines_out.add(l)
-		
+
 #		let p = s.find(what, 0)
 #		if p < 0
 #			break
@@ -136,40 +136,40 @@ func migrate_file_decl(filename: os.Path)
 		pass
 	let ss = lines_out.join("\n")
 	if ss != s
-		os.fs.write_text(filename, ss)
+		os.fs.write_text(filename, ss)!
 		print("================================= saved")
 
 
 func migrate_file_for(filename: os.Path)
 	print(filename)
-	let s = os.fs.read_text(filename)
+	let s = os.fs.read_text(filename)!
 	let lines = s.explode("\n")
 	var lines_out: string[]
-	
+
 	for l in lines
 		let tokens = l.parse_tokens(" \t,=+-*/()[]{}#:;")
-		
-		
+
+
 		if len(tokens) < 4
 			lines_out.add(l)
 			continue
-		
+
 		if tokens[0] != "for" or tokens[2] != ","
 			lines_out.add(l)
 			continue
-			
-			
+
+
 		print(l)
 		let ind = "\t".repeat(count_indent(l))
 		for p in l.find("in", 0)
 			let o = "{{ind}}for {{tokens[3]}}=>{{tokens[1]}} {{l[p:]}}"
 			print("=>{{o}}")
 			let x = read_char()
-		
+
 			lines_out.add(o)
 	let ss = lines_out.join("\n")
 	if ss != s
-		os.fs.write_text(filename, ss)
+		os.fs.write_text(filename, ss)!
 		print("================================= saved")
 
 func migrate(arg: string[])
@@ -190,4 +190,4 @@ func main(arg: string[])
 	var p: os.CommandLineParser
 	p.cmd("", "DIR", "", migrate)
 	p.cmd("for", "DIR", "", migrate_for)
-	p.parse(arg)
+	p.parse(arg)!

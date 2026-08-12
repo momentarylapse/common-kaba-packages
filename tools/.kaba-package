@@ -1,4 +1,4 @@
-version 6
+version 7
 requires package
 run bindiff.kaba
 run replace.kaba
