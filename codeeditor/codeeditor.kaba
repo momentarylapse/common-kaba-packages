@@ -227,7 +227,7 @@ Dialog coding-panel ''
 
 
 	func mut load(_filename: os.Path)
-		edit.set_string(os.fs.read_text(_filename))
+		try edit.set_string(os.fs.read_text(_filename)!)
 		set_filename(_filename)
 
 		edit.clear_history()
@@ -238,7 +238,7 @@ Dialog coding-panel ''
 
 	func mut save(_filename: os.Path)
 		set_filename(_filename)
-		os.fs.write_text(filename, trim_line_endings(edit.text))
+		try os.fs.write_text(filename, trim_line_endings(edit.text))
 		edit.set_save_state()
 
 		out_changed.notify()

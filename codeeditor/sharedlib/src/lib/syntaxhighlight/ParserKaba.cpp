@@ -99,7 +99,7 @@ Array<CodeContext> get_block_block_map(Module* m, Function* f, shared<Node> b) {
 
 	// mark (direct) coverage of all blocks
 	kaba::Transformer::transformb_block(b.get(), [mark] (shared<Node> n, Block* bb) {
-		if (n->token_id >= 0)
+		if (bb and n->token_id >= 0)
 			mark(bb, n->token_id);
 		return n;
 	});
