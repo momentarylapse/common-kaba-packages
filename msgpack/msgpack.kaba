@@ -1,6 +1,6 @@
 use kaba
 
-func decode(b: bytes) -> Any
+func decode(b: bytes) -> result[Any]
 	var offset = 0
 	return decode_part(b, offset)
 
@@ -24,9 +24,9 @@ func signify_uint(u: i32, l: i32) -> i32
 		return u | (0xffffffff << (l * 8))
 	return u
 
-func decode_part(b: bytes, out offset: i32) -> Any
+func decode_part(b: bytes, out offset: i32) -> result[Any]
 	if len(b) <= offset
-		return nil
+		return Error("unexpected end")
 
 	let c = b[offset]
 	offset ++
@@ -113,23 +113,22 @@ func decode_part(b: bytes, out offset: i32) -> Any
 		return dyn([n, a])
 		#return b[offset - l:offset]
 
-	raise(new Exception("unhandled msgpack tag  {{c}}"))
-	return nil
+	raise Error("unhandled msgpack tag  {{c}}")
 
 
-func encode(a: Any) -> bytes
+func encode(a: Any) -> result[bytes]
 	var r: bytes
 	let type = a.type()
 	if type == string
 		let s = str(a) as bytes
 		if len(s) < 256
 			return [0xd9, u8(len(s))] | s
-		raise(new Exception("TODO: implement string encode for len>255"))
+		raise Error("TODO: implement string encode for len>255")
 	#	if len(s) < 65536
 	#		return [0xd9] | s
 	if type == i32
 		return [0xd2] | reversed(as_binary(&i32(a), 4))
-	raise(new Exception("TODO: implement encoding for ... {{type}}"))
+	raise Error("TODO: implement encoding for ... {{type}}")
 
 
 func encode_ext(b: bytes, type: i32) -> bytes

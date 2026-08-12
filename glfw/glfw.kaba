@@ -32,7 +32,7 @@ func init(opts: string[])
 	if "vulkan" in opts
 		print("VULKAN!!!!")
 		if _glfwVulkanSupported() == 0
-			raise(new Exception("glfw: vulkan not supported"))
+			raise Error("glfw: vulkan not supported")
 		_glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API)
 		_glfwWindowHint(GLFW_RESIZABLE, 0)
 
@@ -78,7 +78,7 @@ func _get_key(k: int) -> int
 	if k == 265
 		return KEY_UP
 	return -1
-	
+
 
 func _on_key(w: void*, a: i32, b: i32, c: i32, d: i32)
 	#print("ON KEY   {{a}} {{b}} {{c}} {{d}}")
@@ -199,17 +199,17 @@ struct Gamepad extends GamepadState as shared
 		RIGHT
 		DOWN
 		LEFT
-		
+
 	var state_prev: GamepadState
 	var index: i32
 	var deadzone: f32
 	func __init__(i: i32)
 		index = i
 		deadzone = 0.05
-	
+
 	func present() -> bool
 		return _glfwJoystickIsGamepad(index) == 1
-	
+
 	func mut update()
 		state_prev = self
 		_glfwGetGamepadState(index, &self)
@@ -220,13 +220,13 @@ struct Gamepad extends GamepadState as shared
 				a = (a - deadzone) / (1 - deadzone)
 			else
 				a = (a + deadzone) / (1 - deadzone)
-	
+
 	func click(b: Button) -> bool
 		return _buttons[i32(b)] and not state_prev._buttons[i32(b)]
 	func button(b: Button) -> bool
 		return _buttons[i32(b)]
-		
-	
+
+
 	func static get(index: int) -> shared[Gamepad]
 		return new Gamepad(index)
 

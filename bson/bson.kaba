@@ -37,7 +37,7 @@ func json_to_bson(json: string) -> void*
 	t.add(0)
 	var b = _bson_new_from_json(&t[0], len(json), nil)
 	if !b
-		raise(new Exception("invalid json: {{json}}"))
+		raise Error("invalid json: {{json}}")
 	return b
 
 
@@ -101,7 +101,7 @@ func bson_iter_to_any(iter: Iter&) -> Any
 		var it2: Iter
 		_bson_iter_recurse(&iter, &it2)
 		return bson_iter_map_to_any(&it2)
-	raise(new Exception("UNKNOWN TYPE: {{t}}"))
+	raise Error("UNKNOWN TYPE: {{t}}")
 
 
 func bson_iter_map_to_any(iter: Iter&) -> Any

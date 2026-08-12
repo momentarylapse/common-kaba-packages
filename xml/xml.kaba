@@ -53,7 +53,7 @@ func _peek(s: string, i0: i32) -> string
 
 func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (Any,bool)
 	if _next(s, i0) != "<"
-		raise(new Exception("< expected"))
+		raise Error("< expected")
 
 	tag_key = _next(s, i0)
 	if tag_key == "?"
@@ -77,7 +77,7 @@ func _parse_tag(out tag_key: string, s: string, out i0: i32) -> (Any,bool)
 			let key = n
 			#print("KEY {{key}}")
 			if _next(s, i0) != "="
-				raise(new Exception("= expected after {{key}}"))
+				raise Error("= expected after {{key}}")
 			let value = _decode_str(_next(s, i0))
 			#print("VAL {{value}}")
 			tag[key] = value
@@ -149,7 +149,7 @@ func _parse_inside_part(s: string, key: string, out i0: i32, out part: Any) -> s
 			var k: string
 			var (tag,_sc) = _parse_tag(k, s, i0)
 			if k != "/" + key
-				raise(new Exception("end tag expected"))
+				raise Error("end tag expected")
 			#print("<< OUTSIDE {{key}}")
 			return content
 		#print("AGAIN! in {{key}}")
@@ -203,7 +203,7 @@ func _encode_part(key: string, doc: Any, pre: string) -> string
 func encode(doc: Any) -> string
 	var s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
 	if doc.type() != Any{}
-		raise(new Exception("doc must be a dict"))
+		raise Error("doc must be a dict")
 	for k in doc.keys()
 		s += _encode_part(k, doc[k]!, "")
 	return s

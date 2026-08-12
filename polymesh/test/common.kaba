@@ -2,20 +2,20 @@ use polymesh.*
 
 func assert_equal(a: vec3, b: vec3, epsilon=0.001)
 	if len(b - a) > epsilon
-		raise(new Exception("{{a}} != {{b}}"))
+		raise Error("{{a}} != {{b}}")
 
 func assert_equal(a: i32[], b: i32[])
 	if len(a) != len(b)
-		raise(new Exception("{{a}} != {{b}}"))
+		raise Error("{{a}} != {{b}}")
 	for i=>ia in a
 		if ia != b[i]
-			raise(new Exception("{{a}} != {{b}}"))
+			raise Error("{{a}} != {{b}}")
 
 func assert_equal(a: Mesh, b: Mesh, epsilon=0.001)
 	if len(a.vertices) != len(b.vertices)
-		raise(new Exception("Mesh #vertices: {{len(a.vertices)}} != {{len(b.vertices)}}"))
+		raise Error("Mesh #vertices: {{len(a.vertices)}} != {{len(b.vertices)}}")
 	if len(a.polygons) != len(b.polygons)
-		raise(new Exception("Mesh #polygons: {{len(a.polygons)}} != {{len(b.polygons)}}"))
+		raise Error("Mesh #polygons: {{len(a.polygons)}} != {{len(b.polygons)}}")
 
 	# check vertices
 	for i=>va in a.vertices
@@ -29,7 +29,7 @@ func check_mesh_health(mesh: Mesh)
 	for p in mesh.polygons
 		for s in p.sides
 			if s.vertex < 0 or s.vertex >= len(mesh.vertices)
-				raise(new Exception("Mesh  illegal vertex ref: {{s.vertex}}  (n={{len(mesh.vertices)}})"))
+				raise Error("Mesh  illegal vertex ref: {{s.vertex}}  (n={{len(mesh.vertices)}})")
 
 
 func mesh_select_random_polygons(mesh: Mesh, seed: i32) -> i32[]

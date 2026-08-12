@@ -11,7 +11,7 @@ enum Mode
 	XPUB
 
 func die(s: string)
-	raise(new Exception(s))
+	raise Error(s)
 
 func expect(a: bytes, b: bytes, context: string)
 	if a != b
@@ -33,29 +33,29 @@ class Socket
 	socket: owned[net.Socket]
 	buffer: string #bytes
 	mode = Mode.NONE
-	
+
 	on_ready: Socket->void = nil
 	on_receive: Packet->void = nil
 	on_subscribe: bytes->void = nil
-	
+
 	func mut connect(host: string, port: i32, _mode: Mode)
 		mode = _mode
 		print("connecting...")
 		socket = net.connect(host, port)
-	
+
 		print("handshake...")
 		expect(socket!.read(10), GREETING, "greeting")
 		socket!.write(GREETING)
-	
+
 		# protocol version
 		expect(socket!.read(1), [0x03], "protocol version")
 		socket!.write([0x03])
-	
+
 		let _r = socket!.read(53)
 		socket!.write(_r)
-		
+
 		socket!.set_blocking(false)
-	
+
 	func mut iterate()
 		for mut s in socket
 			if not s.can_read()
@@ -70,7 +70,7 @@ class Socket
 		#print("SUB")
 		let payload = [0x09] | "SUBSCRIBE" | id
 		socket!.write([0x04, u8(len(payload))] | payload)
-		
+
 
 	func mut handle_packet(p: bytes) -> i32
 		#print(p.hex())
@@ -87,7 +87,7 @@ class Socket
 			if len(p) < 4 + keysize + valuesize
 				return 0
 			#print("DATA  {{keysize}}  {{valuesize}}")
-			
+
 			var packet = Packet(p[2:2+keysize], p[4+keysize:4+keysize+valuesize])
 			if on_receive
 				on_receive(packet)
@@ -119,16 +119,16 @@ class Socket
 		offset += command_size
 	#	print("command: {{command}}")
 		#expect(p[3:8], "READY", "handshake")
-			
+
 		if command == "READY"
 			let key = read_string_u8(p, offset)
 		#	print(p[offset:offset+4])
 		#	print(offset)
-			
+
 			offset += 3 # _u32()...
 			let value = read_string_u8(p, offset)
 		#	print("  {{key}} = {{value}}")
-			
+
 			expect(key, "Socket-Type", "handshake-key")
 			if mode == Mode.XPUB or mode == Mode.PUB
 				if value != "XSUB" and value != "SUB"
@@ -138,7 +138,7 @@ class Socket
 				if value != "XPUB" and value != "PUB"
 					die("expected XPUB / PUB, got {{value}}")
 				#expect(value, "XPUB", "handshake-value")
-		
+
 			var type: bytes
 			if mode == Mode.XPUB
 				type = "XPUB"
@@ -169,7 +169,7 @@ class Socket
 			print(p)
 			print(len(p))
 			die("unhandled command  {{command}}")
-	
+
 
 	func mut send(id: bytes, payload: bytes)
 		let r = socket!.write([0x01, len(id) as u8] | id | [0x00, len(payload) as u8] | payload)
@@ -187,7 +187,7 @@ func parse_mode(m: string) -> Mode
 
 func main(args: string[])
 	var s: Socket
-	
+
 	if "xpub" in args
 		s.connect("127.0.0.1", 5555, Mode.XPUB)
 	if "pub" in args
