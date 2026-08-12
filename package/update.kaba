@@ -19,7 +19,7 @@ func action_update(args: string[])
 				let r = os.shell_execute("cd {{base}}; git pull --rebase")
 		else
 			if not os.fs.is_directory(base)
-				os.fs.create_directory(base)
+				os.fs.create_directory(base)!
 			let git = base | ".git" # FIXME bug in kaba!!!!
 			if not os.fs.is_directory(base | ".git")
 				let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")

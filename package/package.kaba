@@ -21,4 +21,4 @@ func main(args: string[])
 	p.cmd("list", "", "list available packages", action_list)
 	p.cmd("install", "NAME", "install package", action_install)
 	p.cmd("remove", "NAME", "remove package", action_remove)
-	p.parse(args)
+	p.parse(args)!
