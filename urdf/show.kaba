@@ -1,4 +1,4 @@
-use urdf
+use .urdf
 use hui
 use gl
 use os
@@ -27,27 +27,27 @@ class MyWindow extends visualization.RenderWindow
 	var show_labels = true
 	var show_frames = false
 	label_manager: LabelManager
-	
+
 	matrices: mat4{}
-	
+
 
 	func __init__(t: urdf.Tree)
 		super.__init__("Cloud explorer")
 		set_options("", "headerbar")
 		set_title("urdf explorer") # hui bug :P
-		
+
 		set_target(":header:")
-		
+
 		tree = t
 #		print(tree)
-		
+
 		matrices = tree.default_matrices()
-		
+
 		on_post_init(init_data)
-	
+
 	func mut draw_node(n: string)
 		let matrix = matrices[n]!
-		
+
 		for e in tree.edges
 			if e.parent == n
 				draw_node(e.child)
@@ -63,7 +63,7 @@ class MyWindow extends visualization.RenderWindow
 			draw_lines([matrix * vec3.0, matrix * [0,l,0]])
 			gl.set_material(Color.BLACK, 0, 0, [0.2,0.2,1,1])
 			draw_lines([matrix * vec3.0, matrix * [0,0,l]])
-				
+
 		let pp = (projection_matrix * matrix).project(vec3.0)
 		#print(pp)
 		if show_labels
@@ -72,15 +72,15 @@ class MyWindow extends visualization.RenderWindow
 		gl.set_material(Color.BLACK, 0, 0, Color.BLACK)
 		draw_image(tex_white, [pp.x-3,pp.x+3,pp.y-3,pp.y+3])
 		set_mode_3d()
-		
-	
+
+
 	func override mut draw_content()
 		draw_magic_grid([0.5,0.5,0.5,1])
-	
+
 		var y0 = 0
 		for n in tree.root_nodes()
 			draw_node(n)
-	
+
 		set_mode_2d()
 		set_font(14, false, false)
 		gl.set_material(Color.BLACK, 0, 0, Color.WHITE)
@@ -89,29 +89,29 @@ class MyWindow extends visualization.RenderWindow
 		set_font(10, false, false)
 		draw_str([0,20], "cam: {{cam_pos}}")
 		label_manager.draw(self)
-		
+
 		let types = [urdf.Edge.Type.FIXED, urdf.Edge.Type.FLOATING, urdf.Edge.Type.PRISMATIC, urdf.Edge.Type.REVOLUTE]
 		for i=>t in types #urdf.Edge.Type.all()
 			gl.set_material(Color.BLACK, 0, 0, edge_color(t))
 #			for c in ctx
 #				c.default_frame_buffer
 			draw_str([20, 200 + i*20], str(t))
-		
+
 	func mut update_matrix_simple(n: string, level: i32, out y0: i32)
 		matrices[n] = mat4.translation([level, y0, 0])
 		y0 ++
 		for e in tree.edges
 			if e.parent == n
 				update_matrix_simple(e.child, level + 1, y0)
-	
+
 	func mut update_matrices_simple()
 		var y0 = 0
 		for n in tree.root_nodes()
 			update_matrix_simple(n, 0, y0)
-			
+
 	func mut init_data()
 		print("main.init_data")
-	
+
 	func override mut on_key_down_x(k: i32)
 		if k == hui.KEY_1
 			graph_mode = GraphMode.SIMPLE
@@ -125,7 +125,7 @@ class MyWindow extends visualization.RenderWindow
 		if k == hui.KEY_L
 			show_labels = not show_labels
 			force_redraw()
-	
+
 
 class Config
 	#var dir: Path
@@ -138,11 +138,11 @@ func explore(arg: string[])
 func main(arg: string[])
 	var p = new os.CommandLineParser()
 	p.info("show-urdf", "view a urdf file")
-	#p.option("--algo", "ALGO", "select algo A/B/C/D/E", 
+	#p.option("--algo", "ALGO", "select algo A/B/C/D/E",
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
-	p.cmd("", "URDF_FILE", "show urdf file", func(a: string[]) explore(a))
-	p.parse(arg)
-	
+	p.cmd("", "URDF_FILE", "show urdf file", explore)
+	p.parse(arg)!
+
 
 
 #func main(arg: string[])
