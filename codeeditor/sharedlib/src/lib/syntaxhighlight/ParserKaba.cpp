@@ -168,37 +168,34 @@ void ParserKaba::prepare_symbols(const string &text, const Path& filename) {
 
 	current_code = text;
 	errors.clear();
-	block_map.clear();
 
-	try {
-		//msg_write(kaba::config.directory.str());
-		auto new_context = kaba::default_context->create_new_context();
-		auto new_module = new_context->create_module_for_source(text, filename, true);
+	//msg_write(kaba::config.directory.str());
+	auto new_context = kaba::default_context->create_new_context();
+	auto new_module = new_context->create_module_for_source(text, filename, CompilerFlags::JustParse);
+	if (new_module) {
 
 		clear_symbols();
 
-		module = new_module;
+		module = *new_module;
 		context = new_context;
 
 		block_map = get_block_map(module.get());
 
-	} catch (kaba::Exception &e) {
-		auto ee = &e;
-		while (ee->parent)
-			ee = ee->parent.get();
+	} else {
 
-		int offset = 0;
-		if (ee == &e) {
-			offset = text_line_column_to_offset(text, ee->line, ee->column);
-		} else {
-			try {
-				offset = text_line_column_to_offset(os::fs::read_text(ee->filename), ee->line, ee->column);
-			} catch (...) {}
+		// read errors
+		for (const auto& e: new_context->get_errors()) {
+			const auto& l = e.locations.back();
+			int offset = 0;
+			if (e.locations.num == 1) {
+				offset = text_line_column_to_offset(text, l.line, l.column);
+			} else {
+				try {
+					offset = text_line_column_to_offset(os::fs::read_text(l.filename), l.line, l.column);
+				} catch (...) {}
+			}
+			errors.add({l.filename, e.message, offset});
 		}
-		errors.add({ee->filename, ee->message(), offset});
-	} catch (::Exception &e) {
-		errors.add({"", e.message(), 0});
-		//msg_error(e.message());
 	}
 }
 
