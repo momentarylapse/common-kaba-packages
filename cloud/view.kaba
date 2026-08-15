@@ -3,7 +3,7 @@ use image
 use .cloud
 use simplevis as sv
 use simplevis.canvas
-use simplevis.cloudrenderer.PointCloudRenderer
+use simplevis.cloud.PointCloudRenderer
 
 
 func large_num(i: int) -> string
