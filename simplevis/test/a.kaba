@@ -20,7 +20,7 @@ class Canvas extends sv.Canvas
 
 		ctx.set_color(Color.RED)
 		ctx.set_line_width(5)
-		ctx.draw_lines([[0,0,-2], [3,3,3]], true)
+		ctx.draw_lines([[0,0,-2], [3,3,3]], sv.LineMode.CONNECTED)
 
 
 func main()

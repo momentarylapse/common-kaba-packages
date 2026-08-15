@@ -14,7 +14,7 @@ class Canvas extends sv.Canvas
 
 	func override on_initialize()
 		light.color = [1,1,1,1]
-		animated = true
+		begin_animation()
 
 		vb = sv.mesh_to_vb(create_cube(Box.ID_SYM, [1,1,1]))
 		tex = new StorageTexture(16, 16, 16, "rgba:i8")

@@ -1,6 +1,6 @@
 use simplevis as sv
 use simplevis.canvas
-use simplevis.cloudrenderer.PointCloudRenderer
+use simplevis.cloud.PointCloudRenderer
 use octree.Octree
 use xhui
 use time

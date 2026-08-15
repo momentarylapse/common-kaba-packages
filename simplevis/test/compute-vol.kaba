@@ -19,7 +19,7 @@ class Canvas extends sv.Canvas
 
 	func override on_initialize()
 		light.color = [1,1,1,1]
-		animated = true
+		begin_animation()
 
 		vr.initialize()
 

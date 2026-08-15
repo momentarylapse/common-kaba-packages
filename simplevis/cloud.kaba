@@ -16,7 +16,7 @@ class PointCloudRenderer
 	var bounds: Box
 
 	# "regular" clouds
-	var cloud_vb: owned![gfx.VertexBuffer]
+	var cloud_vb: owned[gfx.VertexBuffer]
 	var cloud_max_intensity = 1.0
 	var color_mode = ColorMode.AUTO
 	var color = Color.WHITE
@@ -40,7 +40,7 @@ class PointCloudRenderer
 
 	func mut draw()
 		var shader = ctx.cur_rvd.get_shader(weak(material), 0, "point-cloud-default", "point-cloud")
-		var rd = ctx.cur_rvd.start(ctx.cur_params, matrix, shader, weak(material), 0, gfx.PrimitiveTopology.POINTS, weak(cloud_vb))
+		var rd = ctx.cur_rvd.start(ctx.cur_params, matrix, shader, weak(material), 0, gfx.PrimitiveTopology.POINTS, weak(cloud_vb)!)
 
 		var data: Any
 		data["dx:0"] = R / ctx.cur_params.area.height() / ctx.cur_params.desired_aspect_ratio
@@ -50,7 +50,7 @@ class PointCloudRenderer
 		data["vmax:32"] = dyn(bounds.max)
 		data["color_fixed:48"] = dyn(color)
 		yrenderer.apply_shader_data(ctx.cur_params, shader, data)
-		rd.draw(ctx.cur_params, weak(cloud_vb), gfx.PrimitiveTopology.POINTS)
+		rd.draw(ctx.cur_params, weak(cloud_vb)!, gfx.PrimitiveTopology.POINTS)
 
 
 #		if cloud_color_dirty
@@ -84,7 +84,9 @@ class PointCloudRenderer
 			bounds.max.z += 0.5
 		cloud_max_intensity = points |> (func(p: cloud.Point) p.intensity) |> max
 
-		cloud_vb.update(points)
+
+		for mut vb in cloud_vb
+			vb.update(points)
 
 
 	func mut add_color_point(p: vec3, c: Color)
@@ -102,10 +104,11 @@ class PointCloudRenderer
 	#	material.pass0.z_write = true
 	#	material.pass0.z_test = true
 
-		let _1 = ctx.ctx.load_shader("module-point-cloud-data.shader")
-		let _2 = ctx.ctx.load_shader("module-vertex-point-cloud-default.shader")
-		let _3 = ctx.ctx.load_shader("module-geometry-point-cloud.shader")
+		ctx.ctx.load_shader_module("module-point-cloud-data.shader")!
+		ctx.ctx.load_shader_module("module-vertex-point-cloud-default.shader")!
+		ctx.ctx.load_shader_module("module-geometry-point-cloud.shader")!
 
 		cloud_vb = new gfx.VertexBuffer("3f,f")
 
 #		cloud_color_vb = new gfx.VertexBuffer("3f,4f")
+

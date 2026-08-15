@@ -9,7 +9,6 @@ use out .canvas.*
 
 
 class Window extends hui.Window as obs.Node
-	var ctx: owned![Context]
 	var canvas: shared![Canvas]
 
 
@@ -17,52 +16,16 @@ class Window extends hui.Window as obs.Node
 		super.__init__(title, 800, 600)
 		from_source("
 Dialog win 'bla' borderwidth=0
-	Grid ? ''
-		DrawingArea area '' expandy cangrabfocus grabfocus
+	Grid gid ''
 ")
 		set_maximized(true)
 
 		canvas = _canvas
-
-		event_x("area", "hui:mouse-move", xmouse_move)
-		event_x("area", "hui:mouse-wheel", xmouse_wheel)
-		event_x("area", "hui:key-down", xkey_down)
-
-		event_x("area", "hui:draw", xdraw)
-		event_x("area", "hui:initialize", xinitialize)
-		event_x("win", "hui:just-before-draw", xbefore_draw)
+		embed("grid", 0, 0, canvas)
 
 		canvas.out_redraw >> create_sink(func() redraw("area"))
 
-
-
-	func mut xinitialize(out p: hui.Painter)
-		ctx = api_init_xhui(&p)
-		ctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
-		canvas.initialize(weak(ctx))
-
-		if canvas.animated
-			hui.run_repeated(0.02, func() redraw("area"))
-
-
-	func mut xbefore_draw(out p: hui.Painter)
-		canvas.before_draw(p)
-
-
-	func mut xdraw(out p: hui.Painter)
-		canvas.draw(p)
-
-
-	func mut xmouse_move()
-		canvas.on_mouse_move(get_mouse_delta(), left_button(), middle_button(), right_button())
-
-
-	func mut xmouse_wheel()
-		canvas.on_mouse_wheel(get_scroll())
-
-
-	func mut xkey_down()
-		canvas.on_key_down(get_key_code())
+		print("hi")
 
 
 func run(c: shared![Canvas], title="Simplevis")

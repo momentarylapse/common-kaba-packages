@@ -1,0 +1,46 @@
+use .common.*
+use .canvas.*
+
+class GridRenderer
+	var ctx: SimpleContext&
+	var cam: ViewPort&
+	var color = Color.WHITE
+
+
+	func mut __init__()
+	func mut __init__(_ctx: SimpleContext&, _cam: ViewPort&)
+		ctx := _ctx
+		cam := _cam
+
+	func mut draw()
+		let x0 = -10.0
+		let x1 = 10.0
+		let dx = 1.0
+
+		var e1 = vec3.EX
+		var e2 = vec3.EZ
+		if abs((cam.ang * vec3.EZ).z) > 0.7
+			e1 = vec3.EX
+			e2 = vec3.EY
+		if abs((cam.ang * vec3.EZ).x) > 0.7
+			e1 = vec3.EY
+			e2 = vec3.EZ
+
+		var v: vec3[]
+		for x in x0:x1+dx/2:dx
+			v.add(x * e1 + x0 * e2)
+			v.add(x * e1 + x1 * e2)
+		for y in x0:x1+dx/2:dx
+			v.add(y * e2 + x0 * e1)
+			v.add(y * e2 + x1 * e1)
+		let background_color = Color(0,0,0,1)
+		ctx.set_color(Color.mix(color, background_color, 0.7))
+		ctx.draw_lines(v, LineMode.SEPARATE)
+
+		v.clear()
+		v.add(x0 * e2)
+		v.add(x1 * e2)
+		v.add(x0 * e1)
+		v.add(x1 * e1)
+		ctx.set_color(color)
+		ctx.draw_lines(v, LineMode.SEPARATE)

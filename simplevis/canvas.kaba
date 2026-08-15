@@ -7,6 +7,9 @@ use yrenderer.*
 use .common.*
 
 
+let UPDATE_DT = 0.02
+
+
 class SimpleEmitter extends MeshEmitter
 	var canvas: Canvas&
 	var xx_vb: owned![VertexBuffer]
@@ -67,8 +70,9 @@ class ViewPort extends Object as obs.Node
 		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000)
 
 
-class Canvas extends Object as obs.Node, Sharable
+class Canvas extends hui.Panel as obs.Node
 	var out_redraw = obs.Source(&self, &ind, "redraw")
+	var yctx: owned![Context]
 	var ctx: SimpleContext
 	var xhui_renderer: owned[XhuiRenderer]
 	var hdr: owned[HDRResolver]
@@ -79,7 +83,10 @@ class Canvas extends Object as obs.Node, Sharable
 	var light_cam_ang: Quaternion?
 	var f_draw: void->void = nil
 	var f_draw_transparent: void->void = nil
-	var animated = false
+	var animation_request_level = 0
+	var animation_id = -1
+	var message: string
+	var message_ttl = -1.0
 
 #	enum MouseMode
 #		NONE
@@ -88,8 +95,81 @@ class Canvas extends Object as obs.Node, Sharable
 #	var mode = MouseMode.NONE
 
 
-	func override __init__()
+	func __init__()
+		super.__init__("")
+		from_source("
+Dialog canvas ''
+	DrawingArea area '' expandy cangrabfocus grabfocus
+")
 		cam.out_changed >> create_sink(func() out_redraw())
+
+		event_x("area", "hui:mouse-move", xmouse_move)
+		event_x("area", "hui:mouse-wheel", xmouse_wheel)
+		event_x("area", "hui:key-down", xkey_down)
+
+		event_x("area", "hui:draw", xdraw)
+		event_x("area", "hui:initialize", xinitialize)
+
+
+
+	func mut xinitialize(out p: hui.Painter)
+		yctx = api_init_xhui(&p)
+		yctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
+		initialize(weak(yctx))
+
+		for mut w in get_window()
+			let _ = w.event_x("win", "hui:just-before-draw", xbefore_draw)
+
+
+	func mut begin_animation()
+		animation_request_level ++
+		if animation_request_level == 1
+			animation_id = hui.run_repeated(UPDATE_DT, func() out_redraw())
+
+
+	func mut end_animation()
+		animation_request_level --
+		if animation_request_level == 0
+			hui.cancel_runner(animation_id)
+
+
+	func mut clear_message()
+		message = ""
+		message_ttl = -1.0
+		end_animation()
+		# direct out_redraw() not working...
+		hui.run_later(0.01, func() out_redraw())
+
+
+	func mut set_message(m: string)
+		if message != ""
+			clear_message()
+		message = m
+		message_ttl = 2.0
+		begin_animation()
+
+
+	func mut xbefore_draw(out p: hui.Painter)
+		before_draw(p)
+
+
+	func mut xdraw(out p: hui.Painter)
+		draw(p)
+
+
+	func mut xmouse_move()
+		for w in get_window()
+			on_mouse_move(w.get_mouse_delta(), w.left_button(), w.middle_button(), w.right_button())
+
+
+	func mut xmouse_wheel()
+		for w in get_window()
+			on_mouse_wheel(w.get_scroll())
+
+
+	func mut xkey_down()
+		for w in get_window()
+			on_key_down(w.get_key_code())
 
 
 	# interface
@@ -148,20 +228,27 @@ class Canvas extends Object as obs.Node, Sharable
 		for r in xhui_renderer
 			r.draw(&p)
 		on_draw_2d(p)
+		if message_ttl >= 0
+			p.set_font_size(20)
+			p.set_color(Color.WHITE.with_alpha(min(message_ttl*5, 1.0)))
+			p.draw_str(p.area().center() - p.get_str_size(message)/2, message)
+			message_ttl -= UPDATE_DT
+			if message_ttl < 0
+				clear_message()
 
 
-	func mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
+	func virtual mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
 		if rbut
 			cam.rotate(Quaternion(vec3(d.y, d.x, 0) * 0.003))
 		if mbut
 			cam.move(vec3(-d.x, d.y, 0.0) * 0.001)
 
 
-	func mut on_mouse_wheel(d: vec2)
+	func override on_mouse_wheel(d: vec2)
 		cam.zoom(exp(d.y * 0.1))
 
 
-	func mut on_key_down(k: i32)
+	func override on_key_down(k: i32)
 		if k == hui.KEY_LEFT
 			cam.move([-0.05,0,0])
 		if k == hui.KEY_RIGHT
