@@ -1,0 +1,5 @@
+cmake.package = OpenXR
+cmake.target = OpenXR::openxr_loader
+cmake.variable = OpenXR_FOUND
+vcpkg = openxr-loader
+
