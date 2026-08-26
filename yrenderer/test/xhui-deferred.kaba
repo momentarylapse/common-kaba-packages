@@ -64,7 +64,7 @@ Dialog win 'bla'
 
 
 	func mut xbefore_draw(p: hui.Painter)
-		for r in xhui_renderer
+		for mut r in xhui_renderer
 			let params = r.extract_params(&p)
 
 			cube!.matrix = mat4.rotation([t*0.4543,t*0.743,0])
@@ -81,7 +81,7 @@ Dialog win 'bla'
 
 
 	func mut xdraw(p: hui.Painter)
-		for r in xhui_renderer
+		for mut r in xhui_renderer
 			r.draw(&p)
 
 

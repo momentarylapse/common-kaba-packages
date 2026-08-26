@@ -211,7 +211,7 @@ Dialog canvas ''
 
 
 	func mut before_draw(out p: hui.Painter)
-		for r in xhui_renderer
+		for mut r in xhui_renderer
 			let params = r.extract_params(&p)
 
 			for da in light_cam_ang
@@ -225,7 +225,7 @@ Dialog canvas ''
 
 
 	func mut draw(out p: hui.Painter)
-		for r in xhui_renderer
+		for mut r in xhui_renderer
 			r.draw(&p)
 		on_draw_2d(p)
 		if message_ttl >= 0

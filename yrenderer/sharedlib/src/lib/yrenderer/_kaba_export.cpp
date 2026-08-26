@@ -353,6 +353,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_virtual("Renderer.draw", &Renderer::draw, &renderer);
 	}
 	{
+#ifdef HAS_LIB_GLFW
 		WindowRenderer wr(nullptr, nullptr, true);
 		ext->declare_class_size("WindowRenderer", sizeof(WindowRenderer));
 		ext->link_class_func("WindowRenderer.__init__", &kaba::generic_init_ext<WindowRenderer, yrenderer::Context*, GLFWwindow*, bool>);
@@ -362,6 +363,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_class_func("WindowRenderer.create_params", &WindowRenderer::create_params);
 		ext->link_virtual("WindowRenderer.prepare", &WindowRenderer::prepare, &wr);
 		ext->link_virtual("WindowRenderer.draw", &WindowRenderer::draw, &wr);
+#endif
 	}
 	{
 
@@ -419,6 +421,15 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_class_func("ComputeTask.bind_uniform_buffer", &ComputeTask::bind_uniform_buffer);
 		ext->link_class_func("ComputeTask.bind_storage_buffer", &ComputeTask::bind_storage_buffer);
 		ext->link_virtual("ComputeTask.render", &ComputeTask::render, &ct);
+	}
+
+	{
+		ext->declare_class_size("ComputeScheduler", sizeof(ComputeScheduler));
+		ext->link_class_func("ComputeScheduler.__init__", &kaba::generic_init_ext<ComputeScheduler, yrenderer::Context*>);
+		ext->link_class_func("ComputeScheduler.__delete__", &kaba::generic_delete<ComputeScheduler>);
+		ext->link_class_func("ComputeScheduler.start", &ComputeScheduler::start);
+		ext->link_class_func("ComputeScheduler.submit", &ComputeScheduler::submit);
+		ext->link_class_func("ComputeScheduler.wait", &ComputeScheduler::wait);
 	}
 
 	{
@@ -562,12 +573,14 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 
 	ext->link_func("apply_shader_data", &apply_shader_data);
 
+#ifdef HAS_LIB_GLFW
 	ext->link_func("api_init_glfw", &api_init_glfw);
+#endif
 	ext->link_func("api_init_xhui", &api_init_xhui);
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.19");
+	ext->package_info("yrenderer", "0.20");
 	_export_package_yrenderer_internal(ext);
 }
 
