@@ -8,10 +8,10 @@ use mongo.*
 #	bson_destroy(b)
 
 func main()
-	var m = new Mongo("localhost")
+	var m = create_client("localhost")!
 	#let col = m.get_collection("wiki", "articles")
 	#let r = col.find("{\"name\":\"Hauptseite\"}")
-	var col = m.collection("alex", "files")
+	var col = m.collection("alex", "files")!
 #	var r = col.find(dyn({"id":"100222175"})) # 900942014
 #	var r = col.aggregate(dyn([{"$group": {"_id": "$artist", "num": {"$sum": 1} } }]))
 

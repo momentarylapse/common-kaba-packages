@@ -6,7 +6,7 @@
 extern "C" {
 __attribute__ ((visibility ("default")))
 void export_symbols(kaba::IExporter* e) {
-	e->package_info("mongo", "4");
+	e->package_info("mongo", "5");
 
 	e->link_func("_mongoc_init", &mongoc_init);
 	e->link_func("_mongoc_cleanup", &mongoc_cleanup);

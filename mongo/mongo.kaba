@@ -16,29 +16,33 @@ func extern _mongoc_collection_destroy(col: void*)
 func extern _mongoc_client_destroy(client: void*)
 
 
-class Mongo as shared
+func create_client(host: string) -> result[shared![MongoClient]]
+	_any_allow_simple_output = false
+	_mongoc_init()
+	var client = __mongo_client_new("mongodb://{{host}}:27017/?appname=kaba")
+	if !client
+		raise Error("can not connect to {{host}}")
+	return new MongoClient(client)
+
+class MongoClient as Sharable
 	var client: void*
-	func __init__(host: string)
-		_any_allow_simple_output = false
-		_mongoc_init()
-		client = __mongo_client_new("mongodb://{{host}}:27017/?appname=kaba")
-		if !client
-			raise(new Exception("can not connect to {{host}}"))
+	func __init__(c: void*)
+		client = c
 
 	func __delete__()
 		if client
 			_mongoc_client_destroy(client)
 		_mongoc_cleanup()
 
-	func collection(db: string, col: string) -> xfer[Collection]
+	func collection(db: string, col: string) -> result[xfer[Collection]]
 		var c = new Collection()
 		c.col = __mongoc_client_get_collection(client, db, col)
 		if !c.col
-			raise(new Exception("can not open collection"))
+			raise Error("can not open collection")
 		return give(c)
 
 
-class Collection as shared
+class Collection as Sharable
 	var col: void* = nil
 	func __delete__()
 		if col
@@ -49,28 +53,32 @@ class Collection as shared
 	func aggregate(pattern: Any) -> xfer[Result]
 		var b = json_to_bson(repr(pattern))
 		return new Result(_mongoc_collection_aggregate(col, 0, b, nil, nil))
-	func insert(doc: Any)
+	func insert(doc: Any) -> result[void]
 		var b = json_to_bson(repr(doc))
 		if !_mongoc_collection_insert_one(col, b, nil, nil, nil)
-			raise(new Exception("can not insert"))
-	func replace(filter: Any, doc: Any)
+			raise Error("can not insert")
+		return result_ok
+	func replace(filter: Any, doc: Any) -> result[void]
 		var b = json_to_bson(repr(filter))
 		var d = json_to_bson(repr(doc))
 		if !_mongoc_collection_replace_one(col, b, d, nil, nil, nil)
-			raise(new Exception("can not replace"))
-	func delete_one(filter: Any)
+			raise Error("can not replace")
+	func delete_one(filter: Any) -> result[void]
 		var b = json_to_bson(repr(filter))
 		if !_mongoc_collection_delete_one(col, b, nil, nil, nil)
-			raise(new Exception("can not delete"))
-	func delete_many(filter: Any)
+			raise Error("can not delete")
+		return result_ok
+	func delete_many(filter: Any) -> result[void]
 		var b = json_to_bson(repr(filter))
 		var reply: int[160]
 		if !_mongoc_collection_delete_many(col, b, nil, &reply, nil)
-			raise(new Exception("can not delete"))
+			raise Error("can not delete")
 		var r = bson_to_any(&reply)
 		print(repr(r))
+		return result_ok
 
-class Result as shared
+
+class Result as Sharable
 	var cur: void*
 	var doc: void*
 	func __init__(_cur: void*)
