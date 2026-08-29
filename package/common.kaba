@@ -65,6 +65,8 @@ class Config
 	var verbose = false
 	var keep_build_dir = false
 	var force = false
+	func backup_dir() -> os.Path
+		return kaba_base | "_backup"
 var conf: Config
 
 
@@ -216,7 +218,7 @@ func is_installed_latest(name: string) -> bool
 	return false
 
 
-func delete_directory(dir: os.Path)
+func delete_directory(dir: os.Path) -> result[void]
 #	let list = os.fs.search(dir, "*", "rf")
 #	for e in list
 #		let f = dir | e
@@ -232,4 +234,5 @@ func delete_directory(dir: os.Path)
 #		os.fs.delete_directory(f)
 #	os.fs.delete_directory(dir)
 	let r = os.shell_execute("rm -rf '{{dir}}'")!
+	return result_ok
 

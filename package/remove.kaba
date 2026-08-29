@@ -5,7 +5,7 @@ use .common.*
 
 func remove_package(p: PackageInfo)
 	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.base_installed}}")
-	delete_directory(p.base_installed)
+	delete_directory(p.base_installed)!
 
 
 func action_remove(args: string[])
@@ -14,7 +14,7 @@ func action_remove(args: string[])
 		for p in list_find(conf.packages_internal, name)
 			print("{{os.terminal.RED}}internal packages can not be removed{{os.terminal.END}}")
 			return
-		
+
 		for p in list_find(conf.packages_installed, name)
 			remove_package(p)
 		else

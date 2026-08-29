@@ -33,7 +33,7 @@ func build_package(p: PackageInfo) -> bool
 	let build_dir = kaba.install_root() | "build-{{p.name}}"
 	if not conf.keep_build_dir
 		if os.fs.is_directory(build_dir)
-			delete_directory(build_dir)
+			delete_directory(build_dir)!
 	try os.fs.create_directory(build_dir)
 
 	print("{{os.terminal.YELLOW}}build{{os.terminal.END}} {{p.name}}")
@@ -44,11 +44,11 @@ func build_package(p: PackageInfo) -> bool
 	except
 		print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
 		if not conf.keep_build_dir
-			delete_directory(build_dir)
-		delete_directory(p.base_installed)
+			delete_directory(build_dir)!
+		delete_directory(p.base_installed)!
 		return false
 	if not conf.keep_build_dir
-		delete_directory(build_dir)
+		delete_directory(build_dir)!
 	return true
 
 
@@ -56,7 +56,7 @@ func install_package(p: PackageInfo) -> bool
 	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
 
 	if os.fs.is_directory(p.base_installed)
-		delete_directory(p.base_installed)
+		delete_directory(p.base_installed)!
 	os.fs.create_directory(p.base_installed)!
 
 	# build shared library?
@@ -112,6 +112,47 @@ func fullfull_dependencies(out list: PackageInfo&[]) -> bool
 			IterStatus.ERROR => return false
 
 
+func copy_dir(source: os.Path, dest: os.Path) -> result[void]
+	os.fs.create_directory(dest)!
+	for e in os.fs.search(source, "*", "rd")
+		os.fs.create_directory(dest | e)!
+
+	for e in os.fs.search(source, "*", "rf")
+		let a = source | e
+		let b = dest | e
+		os.fs.copy(a, b)!
+
+	return result_ok
+
+
+# backup "packages" and some files
+func install_begin()
+	if os.fs.exists(conf.backup_dir())
+		print("{{os.terminal.RED}}previous backup found{{os.terminal.END}} {{conf.backup_dir()}}")
+		os.exit(1)
+	os.fs.create_directory(conf.backup_dir())!
+
+	copy_dir(conf.packages_base, conf.backup_dir() | "packages")!
+
+	for e in os.fs.search(conf.kaba_base, "*", "f")
+		os.fs.copy(conf.kaba_base | e, conf.backup_dir() | e)!
+
+
+func install_end()
+	delete_directory(conf.backup_dir())!
+
+
+func install_undo()
+	warn("restoring backup")
+	for e in os.fs.search(conf.backup_dir(), "*", "d")
+		delete_directory(conf.kaba_base | e)!
+		os.fs.move(conf.backup_dir() | e, conf.kaba_base | e)!
+	for e in os.fs.search(conf.backup_dir(), "*", "f")
+		os.fs.delete(conf.kaba_base | e)!
+		os.fs.move(conf.backup_dir() | e, conf.kaba_base | e)!
+	delete_directory(conf.backup_dir())!
+
+
 func action_install(args: string[])
 	load_package_list()
 
@@ -135,7 +176,10 @@ func action_install(args: string[])
 		os.exit(1)
 
 	# install
+	install_begin()
 	for p in to_install
 		if not install_package(p)
+			install_undo()
 			os.exit(1)
+	install_end()
 

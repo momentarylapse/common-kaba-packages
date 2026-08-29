@@ -4,9 +4,8 @@ use .common.*
 use .install.*
 
 
-func action_update(args: string[])
+func action_pull(args: string[])
 	for s in conf.sources
-		print("updating repo {{s.name}}")
 		let base = s.base_path()
 		if s.user_managed()
 			if not os.fs.is_directory(base)
@@ -16,18 +15,22 @@ func action_update(args: string[])
 				warn("local repo is not git: {{base}}")
 				break
 			if conf.force
-				let r = os.shell_execute("cd {{base}}; git pull --rebase")
+				print("updating repo {{s.name}}")
+				let r = os.shell_execute("cd {{base}}; git pull --rebase")!
+			else
+				print("{{os.terminal.GRAY}}skipping local repo {{s.name}}{{os.terminal.END}}")
 		else
+			print("updating repo {{s.name}}")
 			if not os.fs.is_directory(base)
 				os.fs.create_directory(base)!
 			let git = base | ".git" # FIXME bug in kaba!!!!
 			if not os.fs.is_directory(base | ".git")
-				let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")
-			let r = os.shell_execute("cd {{base}}; git pull --rebase")
+				let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")!
+			let r = os.shell_execute("cd {{base}}; git pull --rebase")!
 
 
-func action_upgrade(args: string[])
-	action_update(args)
+func action_update(args: string[])
+	action_pull(args)
 	load_package_list()
 
 	var needs_upgrade: string[]
@@ -36,7 +39,11 @@ func action_upgrade(args: string[])
 			if pp.version != p.version
 				needs_upgrade.add(p.name)
 
+	install_begin()
 	for name in needs_upgrade
 		for p in list_find(conf.packages_remote, name)
-			let _ = install_package(p)
+			if not install_package(p)
+				install_undo()
+				os.exit(1)
+	install_end()
 
