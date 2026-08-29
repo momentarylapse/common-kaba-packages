@@ -4,7 +4,7 @@ use os
 let FILE = "temp.sqlite3"
 
 func main()
-	try os.fs.delete(FILE)
+	try os.fs.delete(FILE)!
 
 
 	if true
@@ -24,4 +24,4 @@ func main()
 			print(q.get_column())
 		#print(db.load_doc("michi", "1002"))
 
-	try os.fs.delete(FILE)
+	try os.fs.delete(FILE)!

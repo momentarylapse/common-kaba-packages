@@ -26,7 +26,7 @@ func create_directory_recursive(dir: Path)
 	if not os.fs.exists(dir)
 		create_directory_recursive(dir.parent())
 		try
-			os.fs.create_directory(dir)
+			os.fs.create_directory(dir)!
 		except
 			pass
 #	let parents = sorted(dir.all_parents(), "-")

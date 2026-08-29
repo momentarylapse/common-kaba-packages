@@ -31,7 +31,7 @@ func get_tags_video_by_name(path: Path) -> string{}
 			"name": n[off_x+6:]}
 
 
-func get_tags_audio(path: Path) -> string{}
+func get_tags_audio(path: Path) -> result[string{}]
 	let s = shell_execute("tsunami --info \"{{bash_escape(str(path))}}\"")!.explode("\n")
 	var samples = -1
 	var sample_rate = 44100
@@ -55,7 +55,7 @@ func get_tags_audio(path: Path) -> string{}
 	return tags
 
 
-func get_tags_image_photo(path: Path) -> string{}
+func get_tags_image_photo(path: Path) -> result[string{}]
 	var s = shell_execute("exiv2 -pv \"{{bash_escape(str(path))}}\"")!.explode("\n")
 	var model, make, time: string
 	var tags: string{}
@@ -93,7 +93,7 @@ func get_tags_image_photo(path: Path) -> string{}
 	return tags
 
 
-func __get_tags_image_photo_old(path: Path) -> string{}
+func __get_tags_image_photo_old(path: Path) -> result[string{}]
 	var s = shell_execute("exif -mi \"{{bash_escape(str(path))}}\" || echo --end--")!.explode("\n")
 	var model, make, time: string
 	var tags: string{}
@@ -131,10 +131,9 @@ func __get_tags_image_photo_old(path: Path) -> string{}
 	return tags
 
 
-# throws exception...
-func get_tags(path: Path) -> string{}
+func get_tags(path: Path) -> result[string{}]
 	if not fs.exists(path)
-		return {}
+		raise Error("file not found")
 	let ext = path.extension()
 	#print(ext)
 	if ext == "pdf"
@@ -144,12 +143,11 @@ func get_tags(path: Path) -> string{}
 	else if ext in ["png", "bmp"] #, "jpg"]
 		let s = shell_execute("identify -format \"%w\n%h\" \"{{bash_escape(str(path))}}\"")!.explode("\n")
 		if len(s) >= 2
-			return {"width": s[0],
-				"height": s[1]}
+			return {"width": s[0], "height": s[1]}
 	else if ext in ["jpg", "heic"]
 		return get_tags_image_photo(path)
 	else if ext in ["nami", "ogg", "flac", "wav", "mid", "mp3"]
 		return get_tags_audio(path)
 	else if ext in ["mp4", "avi", "flv"]
 		return get_tags_video_by_name(path)
-	return {}
+	raise Error("unknown file type")

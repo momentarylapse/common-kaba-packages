@@ -96,16 +96,14 @@ func action_translate(arg: string[])
 
 	var path = conf.dir | "TRANS"
 	try
-		os.shell_execute("sgribthmaker \"{{path}}\"")
+		os.shell_execute("sgribthmaker \"{{path}}\"")!
 		patch_language(l, own, path)
 		check_lang(l, own, false)
 		l.save()
 	except
 		pass
-	try
-		os.fs.delete(path)
-	except
-		pass
+
+	try os.fs.delete(path)!
 
 func action_add(arg: string[])
 	var filename = Path(arg[0])

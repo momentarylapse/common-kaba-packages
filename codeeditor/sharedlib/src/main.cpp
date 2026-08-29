@@ -17,7 +17,7 @@ void export_symbols(kaba::IExporter* e) {
 	kaba::make_context_public(e); // work-around until we can purely use kapi
 	init_stuff();
 	
-	e->package_info("codeeditor", "0.10");
+	e->package_info("codeeditor", "0.11");
 	_export_package_syntaxhighlight_internal(e);
 }
 }

@@ -34,13 +34,13 @@ func build_package(p: PackageInfo) -> bool
 	if not conf.keep_build_dir
 		if os.fs.is_directory(build_dir)
 			delete_directory(build_dir)!
-	try os.fs.create_directory(build_dir)
+	try os.fs.create_directory(build_dir)!
 
 	print("{{os.terminal.YELLOW}}build{{os.terminal.END}} {{p.name}}")
 	let source_dir = p.base_source | p.build_dir
 	try
 		let opt = build_options()
-		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} {{opt}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)
+		let r = os.shell_execute("cd '{{build_dir}}'; cmake {{source_dir}} {{opt}} -GNinja && ninja {{p.build_target}} && cp libmodule* '{{p.base_installed}}'", true)!
 	except
 		print("{{os.terminal.RED}}ERROR{{os.terminal.END}} failed building")
 		if not conf.keep_build_dir

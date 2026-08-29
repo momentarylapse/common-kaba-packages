@@ -1,3 +1,4 @@
+version 0.2
 requires terminal
 requires ncurses
 run cli.kaba

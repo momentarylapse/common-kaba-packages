@@ -76,8 +76,8 @@ func load_basic_config()
 	conf.repos_base = conf.kaba_base | "repos"
 	conf.sources = []
 
-	try os.fs.create_directory(conf.packages_base)
-	try os.fs.create_directory(conf.repos_base)
+	try os.fs.create_directory(conf.packages_base)!
+	try os.fs.create_directory(conf.repos_base)!
 
 	if os.fs.exists(conf.kaba_base | "sources")
 		let s = os.fs.read_text(conf.kaba_base | "sources")!
