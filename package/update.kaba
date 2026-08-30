@@ -4,29 +4,63 @@ use .common.*
 use .install.*
 
 
+func repo_is_clean(dir: os.Path) -> bool
+	return os.shell_execute("cd {{dir}}; git status --short -uno")! == ""
+
+
+func repo_is_ahead(dir: os.Path) -> bool
+	return os.shell_execute("cd {{dir}}; git status --short -uno -b")!.explode("\n")[0].find(" [ahead ").has_value()
+
+
+func repo_pull(dir: os.Path, rebase: bool)
+	if rebase
+		let r = os.shell_execute("cd {{dir}}; git pull --rebase")!
+	else
+		let r = os.shell_execute("cd {{dir}}; git pull")!
+
+
 func action_pull(args: string[])
 	for s in conf.sources
 		let base = s.base_path()
-		if s.user_managed()
-			if not os.fs.is_directory(base)
-				warn("local repo not found: {{base}}")
-				break
-			if not os.fs.is_directory(base | ".git")
-				warn("local repo is not git: {{base}}")
-				break
-			if conf.force
-				print("updating repo {{s.name}}")
-				let r = os.shell_execute("cd {{base}}; git pull --rebase")!
+
+		print("updating repo {{s.name}}")
+
+		# dir missing?
+		if not os.fs.is_directory(base)
+			if s.user_managed()
+				warn("repo not found: {{base}}")
+				continue
 			else
-				print("{{os.terminal.GRAY}}skipping local repo {{s.name}}{{os.terminal.END}}")
-		else
-			print("updating repo {{s.name}}")
-			if not os.fs.is_directory(base)
 				os.fs.create_directory(base)!
-			let git = base | ".git" # FIXME bug in kaba!!!!
-			if not os.fs.is_directory(base | ".git")
+
+		# not git?
+		if not os.fs.is_directory(base | ".git")
+			if s.user_managed()
+				warn("repo is not git: {{base}}")
+				continue
+			else
 				let r = os.shell_execute("cd {{base}}; git clone {{s.url}} .")!
-			let r = os.shell_execute("cd {{base}}; git pull --rebase")!
+
+		# local changes?
+		if not repo_is_clean(base)
+			warn("repo has local changes: {{base}}")
+			if conf.force
+				let r = os.shell_execute("cd {{base}}; git restore .")!
+			else
+				continue
+
+		if s.user_managed()
+			if repo_is_ahead(base)
+				warn("repo has local commits: {{base}}")
+				if conf.force
+					print("---force")
+					repo_pull(base, true)
+				else
+					continue
+			else
+				repo_pull(base, false)
+		else
+			repo_pull(base, true)
 
 
 func action_update(args: string[])
