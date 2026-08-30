@@ -1,0 +1,33 @@
+use os
+use kaba
+use .common.*
+
+func show_info(p: PackageInfo)
+	print(p.name)
+	print("  version:  {{p.version}}")
+	print("  location: {{p.location}}")
+	print("  requires: {{p.requires}}")
+	match p.location
+		Location.INSTALLED =>
+			print("  base:     {{p.base_installed}}")
+			for r in list_find(conf.packages_remote, p.name)
+				print("  source:   {{r.base_source}}")
+				print("  source:   {{r.version}}")
+		Location.REMOTE =>
+			print("  source:   {{p.base_source}}")
+		else => pass
+
+func action_info(args: string[])
+	load_package_list()
+	for name in args
+		for p in list_find(conf.packages_installed, name)
+			show_info(p)
+			continue
+		for p in list_find(conf.packages_remote, name)
+			show_info(p)
+			continue
+		for _p in list_find(conf.packages_internal, name)
+			show_info(_p)
+		else
+			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
+

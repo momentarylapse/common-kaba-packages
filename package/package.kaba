@@ -2,6 +2,7 @@ use os
 use kaba
 use .common.*
 use .list.*
+use .info.*
 use .install.*
 use .update.*
 use .remove.*
@@ -11,6 +12,7 @@ func main(args: string[])
 	load_basic_config()
 
 	var p: os.CommandLineParser
+	var pp = &p
 	p.info("package", "kaba package manager")
 	p.option("-v", "verbose", func() conf.verbose = true)
 	p.option("-k", "keep build dir", func() conf.keep_build_dir = true)
@@ -20,6 +22,8 @@ func main(args: string[])
 	p.cmd("update", "", "update all outdated packages", action_update)
 	p.cmd("@hidden upgrade", "", "update all outdated packages", action_update)
 	p.cmd("list", "", "list available packages", action_list)
+	p.cmd("info", "NAME", "show package info", action_info)
 	p.cmd("install", "NAME", "install package", action_install)
 	p.cmd("remove", "NAME", "remove package", action_remove)
+	p.cmd("", "", "show help", func(a: string[]) pp.show())
 	p.parse(args)!
