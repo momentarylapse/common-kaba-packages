@@ -1,0 +1,54 @@
+
+[statistics]
+	@info = ""
+
+[statistics.bottom10percent]
+	@info = ""
+	@return = ""
+	data = ""
+
+[statistics.find_peaks]
+	@info = ""
+	@return = ""
+	_h = ""
+	sigma = ""
+
+[statistics.majority_vote]
+	@info = ""
+	@return = ""
+	R = ""
+	points = ""
+
+[statistics.partial_sums]
+	@info = ""
+	@return = ""
+	list = ""
+
+[statistics.smoothen]
+	@info = ""
+	@return = ""
+	D = ""
+	list = ""
+
+[statistics.sorted_count_between]
+	@info = ""
+	@return = ""
+	data = ""
+	x0 = ""
+	x1 = ""
+
+[statistics.sorted_count_smaller]
+	@info = ""
+	@return = ""
+	data = ""
+	x = ""
+
+[statistics.top10percent]
+	@info = ""
+	@return = ""
+	data = ""
+
+[statistics.variance]
+	@info = ""
+	@return = ""
+	data = ""

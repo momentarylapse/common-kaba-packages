@@ -1,9 +1,10 @@
+
 [time]
 	@info = "Time and date related functionality."
 
 [time.Date]
-	@info = ""
-	time = ""
+	@info = "A point in time.\nMillisecond precision."
+	time = "Unix timestamp."
 
 [time.Date.format]
 	@info = ""
@@ -11,26 +12,26 @@
 	f = ""
 
 [time.Timer]
-	@info = ""
+	@info = "Counts time between events."
 
 [time.Timer.__init__]
 	@info = ""
 
 [time.Timer.get]
-	@info = ""
-	@return = ""
+	@info = "Get the time since the last request."
+	@return = "Time in seconds."
 
 [time.Timer.peek]
-	@info = ""
-	@return = ""
+	@info = "Get the time since the last request without resetting."
+	@return = "Time in seconds."
 
 [time.Timer.reset]
-	@info = ""
+	@info = "Reset the timer."
 
 [time.now]
-	@info = ""
-	@return = ""
+	@info = "Get the current time."
+	@return = "!"
 
 [time.sleep]
-	@info = ""
-	duration = ""
+	@info = "Sleep/pause the current thread."
+	duration = "Duration in seconds."

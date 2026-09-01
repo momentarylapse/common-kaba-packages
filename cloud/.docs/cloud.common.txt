@@ -1,0 +1,66 @@
+
+[cloud.common.Point]
+	@info = ""
+	intensity = ""
+	pos = ""
+
+[cloud.common.Point.__init__]
+	@info = ""
+	intensity = ""
+	pos = ""
+
+[cloud.common.bounding_box]
+	@info = ""
+	@return = ""
+	points = ""
+
+[cloud.common.center_of_mass]
+	@info = ""
+	@return = ""
+	points = ""
+
+[cloud.common.filter_box]
+	@info = ""
+	@return = ""
+	box = ""
+	points = ""
+
+[cloud.common.from_points]
+	@info = ""
+	@return = ""
+	points = ""
+
+[cloud.common.get_points]
+	@info = ""
+	@return = ""
+	cloud = ""
+
+[cloud.common.map_abs]
+	@info = ""
+	@return = ""
+	b = ""
+	i = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[cloud.common.map_rel]
+	@info = ""
+	@return = ""
+	b = ""
+	nx = ""
+	ny = ""
+	nz = ""
+	p = ""
+
+[cloud.common.moment2]
+	@info = ""
+	@return = ""
+	p0 = ""
+	points = ""
+
+[cloud.common.random_sample]
+	@info = ""
+	@return = ""
+	n = ""
+	points = ""

@@ -1,0 +1,117 @@
+
+[obs]
+	@info = ""
+
+[obs.InternalNodeData]
+	@info = ""
+
+[obs.InternalNodeData.__init__]
+	@info = ""
+
+[obs.InternalNodeData.add_temp_sink]
+	@info = ""
+	s = ""
+
+[obs.InternalNodeData.cleanup_temp_sinks]
+	@info = ""
+
+[obs.InternalNodeData.create_temp_sink0]
+	@info = ""
+	@return = ""
+	f = ""
+	node = ""
+
+[obs.InternalNodeData.create_temp_xsink0]
+	@info = ""
+	@return = ""
+	node = ""
+	s = ""
+
+[obs.InternalNodeData.unsubscribe]
+	@info = ""
+	node = ""
+
+[obs.Node]
+	@info = ""
+	ind = ""
+
+[obs.Node.__init__]
+	@info = ""
+
+[obs.Node.create_data_sink]
+	@info = ""
+
+[obs.Node.create_sink]
+	@info = ""
+	@return = ""
+	f = ""
+
+[obs.Node.unsubscribe]
+	@info = ""
+	observer = ""
+
+[obs.Sink]
+	@info = ""
+
+[obs.Sink.__init__]
+	@info = ""
+
+[obs.Source]
+	@info = ""
+
+[obs.Source.__init__]
+	@info = ""
+	ind = ""
+	name = ""
+	node = ""
+
+[obs.Source.call]
+	@info = ""
+
+[obs.Source.notify]
+	@info = ""
+
+[obs.XPSink]
+	@info = ""
+
+[obs.XPSink.__init__]
+	@info = ""
+
+[obs.XPSource]
+	@info = ""
+
+[obs.XPSource.__init__]
+	@info = ""
+	ind = ""
+	name = ""
+	node = ""
+
+[obs.XSink]
+	@info = ""
+
+[obs.XSink.__init__]
+	@info = ""
+
+[obs.XSource]
+	@info = ""
+
+[obs.XSource.__init__]
+	@info = ""
+	ind = ""
+	name = ""
+	node = ""
+
+[obs.subscribe]
+	@info = ""
+	sink = ""
+	source = ""
+
+[obs.xpsubscribe]
+	@info = ""
+	sink = ""
+	source = ""
+
+[obs.xsubscribe]
+	@info = ""
+	sink = ""
+	source = ""

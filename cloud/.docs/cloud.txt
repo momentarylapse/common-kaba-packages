@@ -1,0 +1,19 @@
+
+[cloud]
+	@info = ""
+
+[cloud.load]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[cloud.quick_file]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[cloud.save]
+	@info = ""
+	@return = ""
+	filename = ""
+	points = ""

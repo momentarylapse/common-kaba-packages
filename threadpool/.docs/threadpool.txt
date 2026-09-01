@@ -1,0 +1,16 @@
+
+[threadpool]
+	@info = ""
+
+[threadpool.ThreadPool]
+	@info = ""
+
+[threadpool.ThreadPool.__init__]
+	@info = ""
+	num_threads = ""
+
+[threadpool.ThreadPool.run]
+	@info = ""
+	cluster_size = ""
+	f = ""
+	n = ""

@@ -1,0 +1,17 @@
+use visualization
+use hui
+use gl
+
+
+class MyWindow extends visualization.RenderWindow
+	func override mut draw_content()
+		draw_magic_grid([0.5,0.5,0.5, 1])
+
+		set_mode_2d()
+		set_font(14, false, false)
+		gl.set_material(Color.BLACK, 0, 0, Color.WHITE)
+		draw_str([0,0], "Some Test")
+
+func main()
+	var win = new shared MyWindow("test")
+	hui.fly_and_wait(win)

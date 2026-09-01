@@ -1,0 +1,14 @@
+
+[cloud.convert.action_convert]
+	@info = ""
+	args = ""
+
+[cloud.convert.convert_file]
+	@info = ""
+	dest = ""
+	source = ""
+
+[cloud.convert.parse_vec3]
+	@info = ""
+	@return = ""
+	s = ""

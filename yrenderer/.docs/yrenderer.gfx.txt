@@ -1,0 +1,307 @@
+
+[yrenderer.gfx.Alpha]
+	@info = ""
+
+[yrenderer.gfx.Alpha.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.gfx.Alpha.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.gfx.Alpha.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.gfx.Api]
+	@info = ""
+
+[yrenderer.gfx.Api.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.gfx.Api.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.gfx.Api.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.gfx.Buffer]
+	@info = ""
+
+[yrenderer.gfx.Buffer.read]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.Buffer.read_chunk]
+	@info = ""
+	data = ""
+	size = ""
+
+[yrenderer.gfx.Buffer.update]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.Buffer.update_chunk]
+	@info = ""
+	data = ""
+	size = ""
+
+[yrenderer.gfx.CubeMap]
+	@info = ""
+	depth = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.CubeMap.__init__]
+	@info = ""
+	format = ""
+	size = ""
+
+[yrenderer.gfx.CullMode]
+	@info = ""
+
+[yrenderer.gfx.CullMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.gfx.CullMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.gfx.CullMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.gfx.DepthBuffer]
+	@info = ""
+	depth = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.DepthBuffer.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[yrenderer.gfx.DynamicVertexBuffer]
+	@info = ""
+
+[yrenderer.gfx.DynamicVertexBuffer.__init__]
+	@info = ""
+	format = ""
+
+[yrenderer.gfx.FrameBuffer]
+	@info = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.FrameBuffer.__init__]
+	@info = ""
+	att = ""
+
+[yrenderer.gfx.FrameBuffer.color_attachments]
+	@info = ""
+	@return = ""
+
+[yrenderer.gfx.FrameBuffer.depth_buffer]
+	@info = ""
+	@return = ""
+
+[yrenderer.gfx.GfxContext]
+	@info = ""
+
+[yrenderer.gfx.GfxContext.make_public]
+	@info = ""
+
+[yrenderer.gfx.PointVertex]
+	@info = ""
+	color = ""
+	pos = ""
+	radius = ""
+
+[yrenderer.gfx.PointVertex.__init__]
+	@info = ""
+	color = ""
+	pos = ""
+	radius = ""
+
+[yrenderer.gfx.PrimitiveTopology]
+	@info = ""
+
+[yrenderer.gfx.PrimitiveTopology.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.gfx.PrimitiveTopology.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.gfx.PrimitiveTopology.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[yrenderer.gfx.Shader]
+	@info = ""
+
+[yrenderer.gfx.Shader.__init__]
+	@info = ""
+
+[yrenderer.gfx.Shader.set_float]
+	@info = ""
+	f = ""
+	name = ""
+
+[yrenderer.gfx.Shader.set_floats]
+	@info = ""
+	f = ""
+	name = ""
+	num = ""
+
+[yrenderer.gfx.ShaderStorageBuffer]
+	@info = ""
+
+[yrenderer.gfx.ShaderStorageBuffer.__init__]
+	@info = ""
+	size = ""
+
+[yrenderer.gfx.StorageTexture]
+	@info = ""
+	depth = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.StorageTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[yrenderer.gfx.Texture]
+	@info = ""
+	depth = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.Texture.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[yrenderer.gfx.Texture.read]
+	@info = ""
+	im = ""
+
+[yrenderer.gfx.Texture.set_options]
+	@info = ""
+	op = ""
+
+[yrenderer.gfx.Texture.write]
+	@info = ""
+	im = ""
+
+[yrenderer.gfx.Texture.write_float]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.UniformBuffer]
+	@info = ""
+
+[yrenderer.gfx.UniformBuffer.__init__]
+	@info = ""
+	size = ""
+
+[yrenderer.gfx.Vertex]
+	@info = ""
+	n = ""
+	p = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.Vertex.__init__]
+	@info = ""
+	n = ""
+	p = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VertexBuffer]
+	@info = ""
+
+[yrenderer.gfx.VertexBuffer.__init__]
+	@info = ""
+	format = ""
+
+[yrenderer.gfx.VertexBuffer.create_quad]
+	@info = ""
+	d = ""
+	s = ""
+
+[yrenderer.gfx.VertexBuffer.update]
+	@info = ""
+	data = ""
+
+[yrenderer.gfx.VertexFx]
+	@info = ""
+	color = ""
+	pos = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VertexFx.__init__]
+	@info = ""
+	color = ""
+	pos = ""
+	u = ""
+	v = ""
+
+[yrenderer.gfx.VolumeTexture]
+	@info = ""
+	depth = ""
+	height = ""
+	width = ""
+
+[yrenderer.gfx.VolumeTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[yrenderer.gfx.api]
+	@info = ""
+	@return = ""
+
+[yrenderer.gfx.ivec3]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""
+
+[yrenderer.gfx.ivec3.__init__]
+	@info = ""
+	x = ""
+	y = ""
+	z = ""

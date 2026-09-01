@@ -15,7 +15,7 @@ func parse_doc_string(s: string) -> string
 				ss = ss[:p] + "'''<tt>[[kaba.{{c}}|{{xx[len(xx)-1]}}]]</tt>'''" + ss[p2+8:]
 				continue
 		break
-	return ss.unescape()
+	return ss#.unescape()
 
 
 struct GlobalDocState
@@ -29,7 +29,7 @@ var state: GlobalDocState
 
 func doc_start_module(name: string, dir: os.Path)
 	state.filename = dir | name + ".txt"
-	state.conf.load(state.filename)!
+	try state.conf.load(state.filename)!
 
 
 #func doc_get(dir: os.Path, ns: string, name: string, is_class: bool, key: string) -> string

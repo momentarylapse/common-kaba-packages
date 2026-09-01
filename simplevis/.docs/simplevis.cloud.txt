@@ -1,0 +1,58 @@
+
+[simplevis.cloud.ColorMode]
+	@info = ""
+
+[simplevis.cloud.ColorMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[simplevis.cloud.ColorMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[simplevis.cloud.ColorMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[simplevis.cloud.PointCloudRenderer]
+	@info = ""
+	R = ""
+	bounds = ""
+	cloud_color_buf = ""
+	cloud_color_dirty = ""
+	cloud_color_shader = ""
+	cloud_color_vb = ""
+	cloud_max_intensity = ""
+	cloud_vb = ""
+	color = ""
+	color_mode = ""
+	ctx = ""
+	material = ""
+	matrix = ""
+
+[simplevis.cloud.PointCloudRenderer.__init__]
+	@info = ""
+	_ctx = ""
+
+[simplevis.cloud.PointCloudRenderer.add_color_point]
+	@info = ""
+	c = ""
+	p = ""
+
+[simplevis.cloud.PointCloudRenderer.draw]
+	@info = ""
+
+[simplevis.cloud.PointCloudRenderer.initialize]
+	@info = ""
+
+[simplevis.cloud.PointCloudRenderer.set_good_camera]
+	@info = ""
+	c = ""
+
+[simplevis.cloud.PointCloudRenderer.set_points]
+	@info = ""
+	points = ""

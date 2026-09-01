@@ -2,6 +2,13 @@
 [base]
 	@info = "Basic data types and functions."
 
+[base.Error]
+	@info = "Represents the failure state of a <tt>result[]</tt>."
+
+[base.Error.__init__]
+	@info = ""
+	message = ""
+
 [base.Exception]
 	@info = ""
 
@@ -16,22 +23,22 @@
 	@info = ""
 
 [base.None]
-	@info = ""
+	@info = "Type of <tt>nil</tt>."
 
 [base.Object]
-	@info = ""
+	@info = "Base class for objects with virtual functions."
 
 [base.Object.__init__]
 	@info = ""
 
 [base.Sharable]
-	@info = ""
+	@info = "Trait for reference counted objects."
 
 [base.as_binary]
-	@info = ""
-	@return = ""
-	length = ""
-	p = ""
+	@info = "Interpret an object as raw binary data."
+	@return = "A binary \"view\"."
+	length = "Size of the object."
+	p = "The object."
 
 [base.assert]
 	@info = "Kills the program if the condition is false."
@@ -39,76 +46,9 @@
 
 [base.bool]
 	@info = "Can hold a True/False value."
-	num = ""
-
-[base.bool.__init__]
-	@info = ""
-
-[base.bool.add]
-	@info = ""
-	x = ""
-
-[base.bool.all]
-	@info = ""
-	@return = ""
-
-[base.bool.any]
-	@info = ""
-	@return = ""
-
-[base.bool.clear]
-	@info = ""
-
-[base.bool.insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.bool.remove]
-	@info = ""
-	index = ""
-
-[base.bool.resize]
-	@info = ""
-	num = ""
-
-[base.bool[]]
-	@info = ""
-	num = ""
-
-[base.bool[].__init__]
-	@info = ""
-
-[base.bool[].add]
-	@info = ""
-	x = ""
-
-[base.bool[].all]
-	@info = ""
-	@return = ""
-
-[base.bool[].any]
-	@info = ""
-	@return = ""
-
-[base.bool[].clear]
-	@info = ""
-
-[base.bool[].insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.bool[].remove]
-	@info = ""
-	index = ""
-
-[base.bool[].resize]
-	@info = ""
-	num = ""
 
 [base.bytes]
-	@info = ""
+	@info = "An array of binary data."
 	num = ""
 
 [base.bytes.__init__]
@@ -132,8 +72,8 @@
 	@return = ""
 
 [base.bytes.hex]
-	@info = ""
-	@return = ""
+	@info = "Convert to a hex string."
+	@return = "!"
 
 [base.bytes.insert]
 	@info = ""
@@ -161,79 +101,28 @@
 	@return = ""
 
 [base.char]
-	@info = ""
+	@info = "A single character (byte)."
 	@return = ""
 	c = ""
 
 [base.cstring]
-	@info = ""
+	@info = "Probably don't use this!"
 
 [base.f32]
 	@info = "A floating point number. 32 bit."
-	num = ""
-
-[base.f32.__init__]
-	@info = ""
-
-[base.f32.add]
-	@info = ""
-	x = ""
-
-[base.f32.clear]
-	@info = ""
 
 [base.f32.format]
 	@info = ""
 	@return = ""
 	fmt = ""
 
-[base.f32.insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.f32.remove]
-	@info = ""
-	index = ""
-
-[base.f32.resize]
-	@info = ""
-	num = ""
-
 [base.f32.str2]
 	@info = ""
 	@return = ""
 	decimals = ""
 
-[base.f32[]]
-	@info = ""
-	num = ""
-
-[base.f32[].__init__]
-	@info = ""
-
-[base.f32[].add]
-	@info = ""
-	x = ""
-
-[base.f32[].clear]
-	@info = ""
-
-[base.f32[].insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.f32[].remove]
-	@info = ""
-	index = ""
-
-[base.f32[].resize]
-	@info = ""
-	num = ""
-
 [base.f64]
-	@info = ""
+	@info = "A floating point number. 64 bit."
 
 [base.f64.format]
 	@info = ""
@@ -241,9 +130,9 @@
 	fmt = ""
 
 [base.hex]
-	@info = ""
-	@return = ""
-	i = ""
+	@info = "Convert an integer to a hex string."
+	@return = "!"
+	i = "!"
 
 [base.i16]
 	@info = ""
@@ -251,66 +140,16 @@
 	low = ""
 
 [base.i32]
-	@info = "An integer, a whole number. 32 bit."
+	@info = "A signed integer, a whole number. 32 bit."
 	num = ""
-
-[base.i32.__init__]
-	@info = ""
-
-[base.i32.add]
-	@info = ""
-	x = ""
-
-[base.i32.clear]
-	@info = ""
 
 [base.i32.format]
 	@info = ""
 	@return = ""
 	fmt = ""
 
-[base.i32.insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.i32.remove]
-	@info = ""
-	index = ""
-
-[base.i32.resize]
-	@info = ""
-	num = ""
-
-[base.i32[]]
-	@info = ""
-	num = ""
-
-[base.i32[].__init__]
-	@info = ""
-
-[base.i32[].add]
-	@info = ""
-	x = ""
-
-[base.i32[].clear]
-	@info = ""
-
-[base.i32[].insert]
-	@info = ""
-	index = ""
-	x = ""
-
-[base.i32[].remove]
-	@info = ""
-	index = ""
-
-[base.i32[].resize]
-	@info = ""
-	num = ""
-
 [base.i64]
-	@info = ""
+	@info = "A signed integer, a whole number. 64 bit."
 
 [base.i64.format]
 	@info = ""
@@ -318,43 +157,46 @@
 	fmt = ""
 
 [base.i8]
-	@info = ""
+	@info = "A signed integer, a whole number. 8 bit (ranging from -128 to +127)."
 
 [base.owned]
-	@info = ""
+	@info = "A pointer with unique ownership. Can be null."
 
 [base.owned!]
-	@info = ""
+	@info = "A pointer with unique ownership. Can not be null."
 
 [base.p2b]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Check if a pointer is not null."
+	@return = "!"
+	p = "!"
 
 [base.p2s]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Convert a pointer to a hex string."
+	@return = "!"
+	p = "!"
 
 [base.print]
-	@info = ""
-	str = ""
+	@info = "Print text to the terminal."
+	str = "!"
 
 [base.ptr]
-	@info = ""
+	@info = "A raw pointer (no ownership, can be null)."
 
 [base.raise]
 	@info = ""
 	e = ""
 
 [base.ref]
-	@info = ""
+	@info = "A reference pointer (no ownership, can not be null)."
+
+[base.result]
+	@info = "A value or an error."
 
 [base.shared]
-	@info = ""
+	@info = "A pointer with shared ownership. Can be null.\nReference counted - deleting the last pointer will delete the object."
 
 [base.shared!]
-	@info = ""
+	@info = "A pointer with shared ownership. Can not be null.\nReference counted - deleting the last pointer will delete the object."
 
 [base.string]
 	@info = "A chunk of text, a list of characters."
@@ -385,7 +227,7 @@
 	@return = ""
 
 [base.string.escape]
-	@info = "Add escapes to \"problematic\" characters (tab, linebreak, quotation, null).\n<tt>\"hello&lt;TAB&gt;world,&lt;LINEBREAK&gt;...".escape() -> \"hello\\tworld\\n,...\"</tt>."
+	@info = "Add escapes to \"problematic\" characters (tab, linebreak, quotation, null).\n<tt>\"hello&lt;TAB&gt;world,&lt;LINEBREAK&gt;...\".escape() -> \"hello\\tworld\\n,...\"</tt>."
 	@return = ""
 
 [base.string.explode]
@@ -474,8 +316,8 @@
 	@return = ""
 
 [base.string.unescape]
-	@info = ""
-	@return = ""
+	@info = "Inverse of <tt>escape()</tt>."
+	@return = "Escaped string."
 
 [base.string.unhex]
 	@info = "Parse hexadecimal into binary.\n<tt>\"61.62.63\".unhex() -> \"abc\"</tt>."
@@ -495,14 +337,14 @@
 
 [base.u16]
 	@info = "Unsigned 16bit integer."
-	high = ""
-	low = ""
+	high = "High byte."
+	low = "Low byte."
 
 [base.u8]
-	@info = "Unsigned 8bit integer."
+	@info = "Unsigned 8bit integer (ranging from 0 to 255)."
 
 [base.void]
 	@info = "The empty type."
 
 [base.xfer]
-	@info = "Ownership-transfer pointer."
+	@info = "Ownership-transfer pointer.\nCan only be used as a parameter of return type of a function."

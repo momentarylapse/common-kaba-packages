@@ -1,0 +1,34 @@
+
+[simplevis]
+	@info = ""
+
+[simplevis.Window]
+	@info = ""
+	area = ""
+	canvas = ""
+	drag = ""
+	id = ""
+	ind = ""
+	propagate_events = ""
+
+[simplevis.Window.__init__]
+	@info = ""
+	_canvas = ""
+	title = ""
+
+[simplevis.Window.create_data_sink]
+	@info = ""
+
+[simplevis.Window.create_sink]
+	@info = ""
+	@return = ""
+	f = ""
+
+[simplevis.Window.unsubscribe]
+	@info = ""
+	observer = ""
+
+[simplevis.run]
+	@info = ""
+	c = ""
+	title = ""

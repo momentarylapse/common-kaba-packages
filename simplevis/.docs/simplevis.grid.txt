@@ -1,0 +1,14 @@
+
+[simplevis.grid.GridRenderer]
+	@info = ""
+	cam = ""
+	color = ""
+	ctx = ""
+
+[simplevis.grid.GridRenderer.__init__]
+	@info = ""
+	_cam = ""
+	_ctx = ""
+
+[simplevis.grid.GridRenderer.draw]
+	@info = ""

@@ -1,0 +1,71 @@
+
+[sqlite]
+	@info = ""
+
+[sqlite.Database]
+	@info = ""
+	db = ""
+
+[sqlite.Database.__init__]
+	@info = ""
+
+[sqlite.Database.error]
+	@info = ""
+	@return = ""
+
+[sqlite.Database.load_doc]
+	@info = ""
+	@return = ""
+	id = ""
+	table = ""
+
+[sqlite.Database.query]
+	@info = ""
+	@return = ""
+	sql = ""
+
+[sqlite.Database.run]
+	@info = ""
+	sql = ""
+
+[sqlite.Query]
+	@info = ""
+	needs_step = ""
+	res = ""
+	step_result = ""
+
+[sqlite.Query.__init__]
+	@info = ""
+
+[sqlite.Query.column_names]
+	@info = ""
+	@return = ""
+
+[sqlite.Query.get_column]
+	@info = ""
+	@return = ""
+
+[sqlite.Query.get_column_text]
+	@info = ""
+	@return = ""
+
+[sqlite.Query.has_more]
+	@info = ""
+	@return = ""
+
+[sqlite.Query.step]
+	@info = ""
+
+[sqlite.create]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[sqlite.open]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[sqlite.sqlite3_libversion_number]
+	@info = ""
+	@return = ""

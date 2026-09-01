@@ -1,0 +1,83 @@
+
+[octree]
+	@info = ""
+
+[octree.Cell]
+	@info = ""
+	contents = ""
+	count = ""
+	count_total = ""
+	first_child = ""
+	level = ""
+	parent = ""
+	volume = ""
+
+[octree.Cell.__init__]
+	@info = ""
+	l = ""
+	p = ""
+	v = ""
+
+[octree.Octree]
+	@info = ""
+	cell_indices = ""
+	cells = ""
+	max_levels = ""
+	max_per_cell = ""
+
+[octree.Octree.__init__]
+	@info = ""
+	cell_indices = ""
+	cells = ""
+	max_levels = ""
+	max_per_cell = ""
+
+[octree.Octree.create]
+	@info = ""
+	box = ""
+
+[octree.Octree.fill]
+	@info = ""
+	points = ""
+
+[octree.Octree.move_down_to_child]
+	@info = ""
+	from = ""
+	index = ""
+	to = ""
+
+[octree.Octree.move_up_to_parent]
+	@info = ""
+	from = ""
+	index = ""
+
+[octree.Octree.split_cell]
+	@info = ""
+	index = ""
+	points = ""
+
+[octree.Octree.update]
+	@info = ""
+	points = ""
+
+[octree.box_canonical]
+	@info = ""
+	@return = ""
+	b = ""
+
+[octree.box_corner]
+	@info = ""
+	@return = ""
+	b = ""
+	index = ""
+
+[octree.list_remove_value]
+	@info = ""
+	list = ""
+	v = ""
+
+[octree.which_octant]
+	@info = ""
+	@return = ""
+	center = ""
+	p = ""

@@ -1,0 +1,56 @@
+
+[bson]
+	@info = ""
+
+[bson.Iter]
+	@info = ""
+	x = ""
+
+[bson.Iter.__init__]
+	@info = ""
+	x = ""
+
+[bson.bson_iter_key]
+	@info = ""
+	@return = ""
+	i = ""
+
+[bson.bson_iter_map_to_any]
+	@info = ""
+	@return = ""
+	iter = ""
+
+[bson.bson_iter_str]
+	@info = ""
+	@return = ""
+	i = ""
+
+[bson.bson_iter_str_array]
+	@info = ""
+	@return = ""
+	i = ""
+
+[bson.bson_iter_to_any]
+	@info = ""
+	@return = ""
+	iter = ""
+
+[bson.bson_to_any]
+	@info = ""
+	@return = ""
+	doc = ""
+
+[bson.bson_to_json]
+	@info = ""
+	@return = ""
+	bson = ""
+
+[bson.char_to_str]
+	@info = ""
+	@return = ""
+	p = ""
+
+[bson.json_to_bson]
+	@info = ""
+	@return = ""
+	json = ""

@@ -1,0 +1,86 @@
+
+[mesh.format_mcm.MCMBufferHeader]
+	@info = ""
+	offset = ""
+	reserved = ""
+	size = ""
+	type = ""
+
+[mesh.format_mcm.MCMBufferHeader.__init__]
+	@info = ""
+	offset = ""
+	reserved = ""
+	size = ""
+	type = ""
+
+[mesh.format_mcm.MCMHeader]
+	@info = ""
+	bb_max = ""
+	bb_min = ""
+	index_spec_offset = ""
+	magic = ""
+	num_buffers = ""
+	num_index_specs = ""
+	num_vertex_specs = ""
+	reserved = ""
+	version = ""
+	vertex_data_sets_offset = ""
+
+[mesh.format_mcm.MCMIndexBufferInfo]
+	@info = ""
+	buffer = ""
+	count = ""
+	material = ""
+	mode = ""
+	offset = ""
+	type = ""
+	vertex_data_set = ""
+
+[mesh.format_mcm.MCMIndexBufferInfo.__init__]
+	@info = ""
+	buffer = ""
+	count = ""
+	material = ""
+	mode = ""
+	offset = ""
+	type = ""
+	vertex_data_set = ""
+
+[mesh.format_mcm.MCMVertexAttributeInfo]
+	@info = ""
+	buffer = ""
+	components = ""
+	normalized = ""
+	offset = ""
+	semantic = ""
+	stride = ""
+	type = ""
+
+[mesh.format_mcm.MCMVertexAttributeInfo.__init__]
+	@info = ""
+	buffer = ""
+	components = ""
+	normalized = ""
+	offset = ""
+	semantic = ""
+	stride = ""
+	type = ""
+
+[mesh.format_mcm.MCMVertexDataSet]
+	@info = ""
+	num_vertex_specs = ""
+	num_vertices = ""
+	reserved = ""
+	vertex_specs_offset = ""
+
+[mesh.format_mcm.MCMVertexDataSet.__init__]
+	@info = ""
+	num_vertex_specs = ""
+	num_vertices = ""
+	reserved = ""
+	vertex_specs_offset = ""
+
+[mesh.format_mcm.load_mcm]
+	@info = ""
+	@return = ""
+	fn = ""

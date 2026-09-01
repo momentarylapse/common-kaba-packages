@@ -1,0 +1,863 @@
+
+[xhui]
+	@info = ""
+
+[xhui.Control]
+	@info = ""
+	area = ""
+	id = ""
+
+[xhui.Control.__init__]
+	@info = ""
+
+[xhui.Control.add_child]
+	@info = ""
+	c = ""
+	x = ""
+	y = ""
+
+[xhui.Control.add_string]
+	@info = ""
+	s = ""
+
+[xhui.Control.check]
+	@info = ""
+	checked = ""
+
+[xhui.Control.enable]
+	@info = ""
+	enabled = ""
+
+[xhui.Control.expand]
+	@info = ""
+	expanded = ""
+
+[xhui.Control.get_cell]
+	@info = ""
+	col = ""
+	row = ""
+
+[xhui.Control.get_children]
+	@info = ""
+	@return = ""
+	_filter = ""
+
+[xhui.Control.get_color]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_content_min_size]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_float]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_int]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_selection]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_string]
+	@info = ""
+	@return = ""
+
+[xhui.Control.get_window]
+	@info = ""
+	@return = ""
+
+[xhui.Control.is_checked]
+	@info = ""
+	@return = ""
+
+[xhui.Control.negotiate_area]
+	@info = ""
+	available = ""
+
+[xhui.Control.on_key_char]
+	@info = ""
+	character = ""
+
+[xhui.Control.on_key_down]
+	@info = ""
+	key = ""
+
+[xhui.Control.on_key_up]
+	@info = ""
+	key = ""
+
+[xhui.Control.on_left_button_down]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_left_button_up]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_left_double_click]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_middle_button_down]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_middle_button_up]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_mouse_enter]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_mouse_leave]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_mouse_move]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_mouse_wheel]
+	@info = ""
+	d = ""
+
+[xhui.Control.on_right_button_down]
+	@info = ""
+	m = ""
+
+[xhui.Control.on_right_button_up]
+	@info = ""
+	m = ""
+
+[xhui.Control.remove_child]
+	@info = ""
+	c = ""
+
+[xhui.Control.request_redraw]
+	@info = ""
+
+[xhui.Control.reset]
+	@info = ""
+
+[xhui.Control.set_cell]
+	@info = ""
+	col = ""
+	row = ""
+	s = ""
+
+[xhui.Control.set_color]
+	@info = ""
+	c = ""
+
+[xhui.Control.set_float]
+	@info = ""
+	f = ""
+
+[xhui.Control.set_int]
+	@info = ""
+	i = ""
+
+[xhui.Control.set_option]
+	@info = ""
+	key = ""
+	valu = ""
+
+[xhui.Control.set_string]
+	@info = ""
+	s = ""
+
+[xhui.CursorMovingMode]
+	@info = ""
+
+[xhui.CursorMovingMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[xhui.CursorMovingMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[xhui.CursorMovingMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[xhui.Dialog]
+	@info = ""
+	area = ""
+	id = ""
+	propagate_events = ""
+
+[xhui.Dialog.__init__]
+	@info = ""
+	flags = ""
+	height = ""
+	parent = ""
+	title = ""
+	width = ""
+
+[xhui.Dialog.request_destroy]
+	@info = ""
+
+[xhui.Dialog.set_title]
+	@info = ""
+	title = ""
+
+[xhui.DialogFlags]
+	@info = ""
+
+[xhui.DialogFlags.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[xhui.DialogFlags.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[xhui.DialogFlags.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[xhui.Event]
+	@info = ""
+	button_l = ""
+	button_m = ""
+	button_r = ""
+	column = ""
+	dmouse = ""
+	height = ""
+	id = ""
+	key = ""
+	message = ""
+	mouse = ""
+	pressure = ""
+	row = ""
+	scroll = ""
+	width = ""
+
+[xhui.Event.__init__]
+	@info = ""
+
+[xhui.FontFlags]
+	@info = ""
+
+[xhui.FontFlags.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[xhui.FontFlags.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[xhui.FontFlags.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[xhui.ListView]
+	@info = ""
+	area = ""
+	id = ""
+
+[xhui.ListView.ColumnFactory]
+	@info = ""
+
+[xhui.ListView.ColumnFactory.set_create]
+	@info = ""
+	f = ""
+
+[xhui.ListView.ColumnFactory.set_select]
+	@info = ""
+	f = ""
+
+[xhui.ListView.ColumnFactory.set_set]
+	@info = ""
+	f = ""
+
+[xhui.ListView.__init__]
+	@info = ""
+
+[xhui.ListView.column_factory]
+	@info = ""
+	@return = ""
+	i = ""
+
+[xhui.Menu]
+	@info = ""
+
+[xhui.Menu.__init__]
+	@info = ""
+
+[xhui.Menu.add]
+	@info = ""
+	id = ""
+	name = ""
+
+[xhui.Menu.enable]
+	@info = ""
+	enabled = ""
+	id = ""
+
+[xhui.Menu.popup]
+	@info = ""
+	p = ""
+
+[xhui.MultilineEdit]
+	@info = ""
+	area = ""
+	cache = ""
+	cursor_pos = ""
+	id = ""
+	selection_start = ""
+	text = ""
+
+[xhui.MultilineEdit.Cache]
+	@info = ""
+	line_first_index = ""
+	line_num_characters = ""
+	lines = ""
+
+[xhui.MultilineEdit.Cache.__init__]
+	@info = ""
+
+[xhui.MultilineEdit.LinePos]
+	@info = ""
+	line = ""
+	offset = ""
+
+[xhui.MultilineEdit.LinePos.__init__]
+	@info = ""
+	line = ""
+	offset = ""
+
+[xhui.MultilineEdit.Markup]
+	@info = ""
+	color = ""
+	flags = ""
+	i0 = ""
+	i1 = ""
+
+[xhui.MultilineEdit.Markup.__init__]
+	@info = ""
+	color = ""
+	flags = ""
+	i0 = ""
+	i1 = ""
+
+[xhui.MultilineEdit.__init__]
+	@info = ""
+
+[xhui.MultilineEdit.add_markup]
+	@info = ""
+	m = ""
+
+[xhui.MultilineEdit.clean_markup]
+	@info = ""
+	i0 = ""
+	i1 = ""
+
+[xhui.MultilineEdit.clear_history]
+	@info = ""
+
+[xhui.MultilineEdit.find_word_end]
+	@info = ""
+	@return = ""
+	i0 = ""
+
+[xhui.MultilineEdit.find_word_start]
+	@info = ""
+	@return = ""
+	i0 = ""
+
+[xhui.MultilineEdit.index_to_line_pos]
+	@info = ""
+	@return = ""
+	i = ""
+
+[xhui.MultilineEdit.is_redoable]
+	@info = ""
+	@return = ""
+
+[xhui.MultilineEdit.is_save_state]
+	@info = ""
+	@return = ""
+
+[xhui.MultilineEdit.is_undoable]
+	@info = ""
+	@return = ""
+
+[xhui.MultilineEdit.line_pos_to_index]
+	@info = ""
+	@return = ""
+	lp = ""
+
+[xhui.MultilineEdit.redo]
+	@info = ""
+
+[xhui.MultilineEdit.replace_range]
+	@info = ""
+	by = ""
+	i0 = ""
+	i1 = ""
+
+[xhui.MultilineEdit.set_cursor_pos]
+	@info = ""
+	mode = ""
+	pos = ""
+
+[xhui.MultilineEdit.set_save_state]
+	@info = ""
+
+[xhui.MultilineEdit.undo]
+	@info = ""
+
+[xhui.Painter]
+	@info = ""
+	height = ""
+	native_area = ""
+	ui_scale = ""
+	width = ""
+
+[xhui.Panel]
+	@info = ""
+	area = ""
+	id = ""
+	propagate_events = ""
+
+[xhui.Panel.__init__]
+	@info = ""
+	id = ""
+
+[xhui.Panel.activate]
+	@info = ""
+	id = ""
+
+[xhui.Panel.add_child]
+	@info = ""
+	c = ""
+	x = ""
+	y = ""
+
+[xhui.Panel.add_control]
+	@info = ""
+	id = ""
+	title = ""
+	type = ""
+	x = ""
+	y = ""
+
+[xhui.Panel.add_string]
+	@info = ""
+	id = ""
+	s = ""
+
+[xhui.Panel.check]
+	@info = ""
+	checked = ""
+	id = ""
+
+[xhui.Panel.embed]
+	@info = ""
+	panel = ""
+	target = ""
+	x = ""
+	y = ""
+
+[xhui.Panel.enable]
+	@info = ""
+	enabled = ""
+	id = ""
+
+[xhui.Panel.event]
+	@info = ""
+	@return = ""
+	f = ""
+	id = ""
+
+[xhui.Panel.event_x]
+	@info = ""
+	@return = ""
+	f = ""
+	id = ""
+	msg = ""
+
+[xhui.Panel.from_source]
+	@info = ""
+	source = ""
+
+[xhui.Panel.get_children]
+	@info = ""
+	@return = ""
+	f = ""
+
+[xhui.Panel.get_color]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.get_content_min_size]
+	@info = ""
+	@return = ""
+
+[xhui.Panel.get_control]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.get_float]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.get_int]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.get_string]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.is_checked]
+	@info = ""
+	@return = ""
+	id = ""
+
+[xhui.Panel.negotiate_area]
+	@info = ""
+	available = ""
+
+[xhui.Panel.open_dialog]
+	@info = ""
+	@return = ""
+	dlg = ""
+
+[xhui.Panel.remove_event_handler]
+	@info = ""
+	uid = ""
+
+[xhui.Panel.reset]
+	@info = ""
+	id = ""
+
+[xhui.Panel.set_color]
+	@info = ""
+	c = ""
+	id = ""
+
+[xhui.Panel.set_float]
+	@info = ""
+	f = ""
+	id = ""
+
+[xhui.Panel.set_int]
+	@info = ""
+	i = ""
+	id = ""
+
+[xhui.Panel.set_option]
+	@info = ""
+	key = ""
+	value = ""
+
+[xhui.Panel.set_options]
+	@info = ""
+	id = ""
+	options = ""
+
+[xhui.Panel.set_string]
+	@info = ""
+	id = ""
+	s = ""
+
+[xhui.Panel.set_target]
+	@info = ""
+	id = ""
+
+[xhui.Panel.set_visible]
+	@info = ""
+	id = ""
+	visible = ""
+
+[xhui.Panel.unembed]
+	@info = ""
+	panel = ""
+
+[xhui.Resource]
+	@info = ""
+	children = ""
+	id = ""
+	options = ""
+	title = ""
+	tooltip = ""
+	type = ""
+	x = ""
+	y = ""
+
+[xhui.Resource.__init__]
+	@info = ""
+
+[xhui.Resource.show]
+	@info = ""
+	indent = ""
+
+[xhui.Resource.str]
+	@info = ""
+	@return = ""
+	indent = ""
+
+[xhui.TextLayout]
+	@info = ""
+	box = ""
+
+[xhui.TextLayout.__init__]
+	@info = ""
+
+[xhui.TextLayout.from_format_string]
+	@info = ""
+	@return = ""
+	align = ""
+	font_size = ""
+	p = ""
+	s = ""
+
+[xhui.Theme]
+	@info = ""
+	background = ""
+	background_active = ""
+	background_button = ""
+	background_button_danger = ""
+	background_button_danger_active = ""
+	background_button_danger_hover = ""
+	background_button_primary = ""
+	background_button_primary_active = ""
+	background_button_primary_hover = ""
+	background_header = ""
+	background_header_button = ""
+	background_hover = ""
+	background_low = ""
+	background_low_hover = ""
+	background_low_selected = ""
+	border = ""
+	font_size = ""
+	font_size_big = ""
+	font_size_small = ""
+	text = ""
+	text_disabled = ""
+	text_label = ""
+	text_link = ""
+
+[xhui.Theme.background_raised]
+	@info = ""
+	@return = ""
+
+[xhui.Toolbar]
+	@info = ""
+
+[xhui.Toolbar.__init__]
+	@info = ""
+
+[xhui.Toolbar.set_by_id]
+	@info = ""
+	id = ""
+
+[xhui.Window]
+	@info = ""
+	area = ""
+	drag = ""
+	id = ""
+	propagate_events = ""
+
+[xhui.Window.Drag]
+	@info = ""
+	payload = ""
+	title = ""
+
+[xhui.Window.Drag.__init__]
+	@info = ""
+
+[xhui.Window.__init__]
+	@info = ""
+	height = ""
+	title = ""
+	width = ""
+
+[xhui.Window.destroy]
+	@info = ""
+
+[xhui.Window.get_key_code]
+	@info = ""
+	@return = ""
+
+[xhui.Window.get_mouse_delta]
+	@info = ""
+	@return = ""
+
+[xhui.Window.get_mouse_position]
+	@info = ""
+	@return = ""
+
+[xhui.Window.get_scroll]
+	@info = ""
+	@return = ""
+
+[xhui.Window.is_key_pressed]
+	@info = ""
+	@return = ""
+	key = ""
+
+[xhui.Window.is_maximized]
+	@info = ""
+	@return = ""
+
+[xhui.Window.left_button]
+	@info = ""
+	@return = ""
+
+[xhui.Window.middle_button]
+	@info = ""
+	@return = ""
+
+[xhui.Window.redraw]
+	@info = ""
+	id = ""
+
+[xhui.Window.request_destroy]
+	@info = ""
+
+[xhui.Window.right_button]
+	@info = ""
+	@return = ""
+
+[xhui.Window.set_key_code]
+	@info = ""
+	id = ""
+	key_code = ""
+
+[xhui.Window.set_maximized]
+	@info = ""
+	max = ""
+
+[xhui.Window.set_mouse_mode]
+	@info = ""
+	mode = ""
+
+[xhui.Window.set_position]
+	@info = ""
+	x = ""
+	y = ""
+
+[xhui.Window.set_title]
+	@info = ""
+	title = ""
+
+[xhui.Window.start_drag]
+	@info = ""
+	payload = ""
+	title = ""
+
+[xhui.cancel_runner]
+	@info = ""
+	id = ""
+
+[xhui.clipboard]
+	@info = ""
+
+[xhui.clipboard.copy]
+	@info = ""
+	text = ""
+
+[xhui.clipboard.paste]
+	@info = ""
+	@return = ""
+
+[xhui.color_dialog]
+	@info = ""
+	@return = ""
+	col = ""
+	params = ""
+	parent = ""
+	title = ""
+
+[xhui.create_control]
+	@info = ""
+	@return = ""
+	id = ""
+	title = ""
+	type = ""
+
+[xhui.draw_text_layout]
+	@info = ""
+	bg = ""
+	l = ""
+	p = ""
+	pos = ""
+
+[xhui.draw_text_layout_with_box]
+	@info = ""
+	bg = ""
+	fg = ""
+	l = ""
+	p = ""
+	padding = ""
+	pos = ""
+	roundness = ""
+
+[xhui.file_dialog]
+	@info = ""
+	@return = ""
+	dir = ""
+	params = ""
+	parent = ""
+	title = ""
+
+[xhui.fly]
+	@info = ""
+	@return = ""
+	win = ""
+
+[xhui.fly_and_wait]
+	@info = ""
+	win = ""
+
+[xhui.parse_resource]
+	@info = ""
+	@return = ""
+	buffer = ""
+	literally = ""
+
+[xhui.run]
+	@info = ""
+
+[xhui.run_later]
+	@info = ""
+	@return = ""
+	dt = ""
+	f = ""
+
+[xhui.run_repeated]
+	@info = ""
+	@return = ""
+	dt = ""
+	f = ""
+
+[xhui.set_property]
+	@info = ""
+	key = ""
+	value = ""

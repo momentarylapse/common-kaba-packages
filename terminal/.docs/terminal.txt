@@ -1,0 +1,70 @@
+
+[terminal]
+	@info = ""
+
+[terminal.BreakSignal]
+	@info = ""
+
+[terminal.BreakSignal.__init__]
+	@info = ""
+	message = ""
+
+[terminal.Flags]
+	@info = ""
+
+[terminal.Flags.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[terminal.Flags.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[terminal.Flags.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[terminal.Key]
+	@info = ""
+
+[terminal.Termios]
+	@info = ""
+	cflag = ""
+	iflag = ""
+	lflag = ""
+	oflag = ""
+
+[terminal.Termios.__init__]
+	@info = ""
+	cflag = ""
+	iflag = ""
+	lflag = ""
+	oflag = ""
+
+[terminal.clear_scr]
+	@info = ""
+
+[terminal.fancy_read_command]
+	@info = ""
+	@return = ""
+	history = ""
+	prompt = ""
+
+[terminal.move_cursor]
+	@info = ""
+	dx = ""
+	dy = ""
+
+[terminal.read_char]
+	@info = ""
+	@return = ""
+
+[terminal.setraw]
+	@info = ""
+
+[terminal.unsetraw]
+	@info = ""

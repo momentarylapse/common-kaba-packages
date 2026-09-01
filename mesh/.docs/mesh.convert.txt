@@ -1,0 +1,14 @@
+
+[mesh.convert.action_convert]
+	@info = ""
+	args = ""
+
+[mesh.convert.convert_file]
+	@info = ""
+	dest = ""
+	source = ""
+
+[mesh.convert.parse_vec3]
+	@info = ""
+	@return = ""
+	s = ""

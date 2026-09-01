@@ -1,0 +1,22 @@
+
+[statistics.histogram.find_cutoff]
+	@info = ""
+	@return = ""
+	hist = ""
+	max_sum = ""
+
+[statistics.histogram.histogram]
+	@info = ""
+	@return = ""
+	N = ""
+	data = ""
+	fmax = ""
+	fmin = ""
+
+[statistics.histogram.histogram_radial]
+	@info = ""
+	@return = ""
+	N = ""
+	R = ""
+	p0 = ""
+	points = ""

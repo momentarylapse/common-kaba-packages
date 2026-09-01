@@ -1,0 +1,121 @@
+
+[profiler]
+	@info = ""
+
+[profiler.profiler]
+	@info = ""
+
+[profiler.profiler.Channel]
+	@info = ""
+	name = ""
+	parent = ""
+
+[profiler.profiler.Channel.__init__]
+	@info = ""
+	name = ""
+	parent = ""
+
+[profiler.profiler.ChannelStats]
+	@info = ""
+	average = ""
+	channel = ""
+	count = ""
+	total = ""
+
+[profiler.profiler.ChannelStats.__init__]
+	@info = ""
+	average = ""
+	channel = ""
+	count = ""
+	total = ""
+
+[profiler.profiler.FrameHistory]
+	@info = ""
+	total_times = ""
+
+[profiler.profiler.FrameHistory.__init__]
+	@info = ""
+	total_times = ""
+
+[profiler.profiler.FrameTimingData]
+	@info = ""
+	cpu0 = ""
+	gpu = ""
+	total_time = ""
+
+[profiler.profiler.FrameTimingData.__init__]
+	@info = ""
+	cpu0 = ""
+	gpu = ""
+	total_time = ""
+
+[profiler.profiler.TimingData]
+	@info = ""
+	channel = ""
+	offset = ""
+
+[profiler.profiler.TimingData.__init__]
+	@info = ""
+	channel = ""
+	offset = ""
+
+[profiler.profiler.avg_frame_time]
+	@info = ""
+	@return = ""
+
+[profiler.profiler.begin]
+	@info = ""
+	channel = ""
+
+[profiler.profiler.channels]
+	@info = ""
+	@return = ""
+
+[profiler.profiler.create_channel]
+	@info = ""
+	@return = ""
+	name = ""
+	parent = ""
+
+[profiler.profiler.delete_channel]
+	@info = ""
+	channel = ""
+
+[profiler.profiler.digest_report]
+	@info = ""
+	@return = ""
+	td = ""
+
+[profiler.profiler.end]
+	@info = ""
+	channel = ""
+
+[profiler.profiler.frames]
+	@info = ""
+	@return = ""
+
+[profiler.profiler.get_name]
+	@info = ""
+	@return = ""
+	channel = ""
+
+[profiler.profiler.history]
+	@info = ""
+	@return = ""
+
+[profiler.profiler.next_frame]
+	@info = ""
+
+[profiler.profiler.previous_frame_timing]
+	@info = ""
+	@return = ""
+
+[profiler.profiler.set_name]
+	@info = ""
+	channel = ""
+	name = ""
+
+[profiler.profiler.set_parent]
+	@info = ""
+	channel = ""
+	parent = ""

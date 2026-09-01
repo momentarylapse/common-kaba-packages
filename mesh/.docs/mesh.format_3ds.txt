@@ -1,0 +1,21 @@
+
+[mesh.format_3ds.load_3ds]
+	@info = ""
+	@return = ""
+	fn = ""
+
+[mesh.format_3ds.read16]
+	@info = ""
+	@return = ""
+	s = ""
+
+[mesh.format_3ds.read_cstr]
+	@info = ""
+	@return = ""
+	f = ""
+
+[mesh.format_3ds.save_3ds]
+	@info = ""
+	@return = ""
+	_m = ""
+	fn = ""

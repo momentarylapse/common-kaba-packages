@@ -1,0 +1,130 @@
+
+[mesh.trace.DigestedBox]
+	@info = ""
+	box = ""
+	planes = ""
+
+[mesh.trace.DigestedBox.__init__]
+	@info = ""
+	box = ""
+	planes = ""
+
+[mesh.trace.DigestedBox.in_reach]
+	@info = ""
+	@return = ""
+	max_dist = ""
+	p = ""
+
+[mesh.trace.DigestedBox.ray_intersects]
+	@info = ""
+	@return = ""
+	r = ""
+
+[mesh.trace.DigestedBox.update]
+	@info = ""
+
+[mesh.trace.TraceWorld]
+	@info = ""
+	allow_split = ""
+	data = ""
+	sub = ""
+	subs = ""
+
+[mesh.trace.TraceWorld.DigestedTriangle]
+	@info = ""
+	pl = ""
+	rab = ""
+	rbc = ""
+	rca = ""
+
+[mesh.trace.TraceWorld.DigestedTriangle.__init__]
+	@info = ""
+	pl = ""
+	rab = ""
+	rbc = ""
+	rca = ""
+
+[mesh.trace.TraceWorld.SubWorld]
+	@info = ""
+	box = ""
+	digested_triangles = ""
+	subs = ""
+	triangles = ""
+
+[mesh.trace.TraceWorld.SubWorld.__init__]
+	@info = ""
+	box = ""
+	digested_triangles = ""
+	subs = ""
+	triangles = ""
+
+[mesh.trace.TraceWorld.SubWorld.clear]
+	@info = ""
+
+[mesh.trace.TraceWorld.SubWorld.distance]
+	@info = ""
+	@return = ""
+	_max_dist = ""
+	p = ""
+
+[mesh.trace.TraceWorld.SubWorld.points]
+	@info = ""
+	@return = ""
+
+[mesh.trace.TraceWorld.SubWorld.split]
+	@info = ""
+	pl = ""
+
+[mesh.trace.TraceWorld.SubWorld.trace]
+	@info = ""
+	@return = ""
+	_max_dist = ""
+	dir = ""
+	p0 = ""
+
+[mesh.trace.TraceWorld.SubWorld.try_split]
+	@info = ""
+
+[mesh.trace.TraceWorld.Triangle]
+	@info = ""
+	a = ""
+	b = ""
+	c = ""
+
+[mesh.trace.TraceWorld.Triangle.__init__]
+	@info = ""
+	a = ""
+	b = ""
+	c = ""
+
+[mesh.trace.TraceWorld.__init__]
+	@info = ""
+
+[mesh.trace.TraceWorld.add]
+	@info = ""
+	m = ""
+	mat = ""
+
+[mesh.trace.TraceWorld.clear]
+	@info = ""
+
+[mesh.trace.TraceWorld.digest]
+	@info = ""
+
+[mesh.trace.TraceWorld.distance]
+	@info = ""
+	@return = ""
+	_max_dist = ""
+	p = ""
+
+[mesh.trace.TraceWorld.trace]
+	@info = ""
+	@return = ""
+	_max_dist = ""
+	dir = ""
+	p0 = ""
+
+[mesh.trace.middle]
+	@info = ""
+	@return = ""
+	list = ""

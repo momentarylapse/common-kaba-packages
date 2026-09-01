@@ -1,0 +1,225 @@
+
+[codeeditor]
+	@info = ""
+
+[codeeditor.CodeEditor]
+	@info = ""
+	area = ""
+	auto_suggestion_popup = ""
+	auto_suggestions = ""
+	auto_suggestions_offset = ""
+	edit = ""
+	filename = ""
+	id = ""
+	id_edit = ""
+	id_later = ""
+	id_structure = ""
+	ind = ""
+	label_line_numbers = ""
+	last_usage_counter = ""
+	out_changed = ""
+	out_error = ""
+	out_info = ""
+	out_request_open_file = ""
+	parser = ""
+	propagate_events = ""
+	search_pos = ""
+	theme = ""
+	xcounter = ""
+
+[codeeditor.CodeEditor.__init__]
+	@info = ""
+
+[codeeditor.CodeEditor.auto_suggest]
+	@info = ""
+
+[codeeditor.CodeEditor.clear_markings]
+	@info = ""
+	i0 = ""
+	i1 = ""
+
+[codeeditor.CodeEditor.create_data_sink]
+	@info = ""
+
+[codeeditor.CodeEditor.create_sink]
+	@info = ""
+	@return = ""
+	f = ""
+
+[codeeditor.CodeEditor.fancy_category]
+	@info = ""
+	@return = ""
+	cat = ""
+
+[codeeditor.CodeEditor.get_line]
+	@info = ""
+	@return = ""
+	line_no = ""
+
+[codeeditor.CodeEditor.get_num_lines]
+	@info = ""
+	@return = ""
+
+[codeeditor.CodeEditor.is_redoable]
+	@info = ""
+	@return = ""
+
+[codeeditor.CodeEditor.is_save_state]
+	@info = ""
+	@return = ""
+
+[codeeditor.CodeEditor.is_undoable]
+	@info = ""
+	@return = ""
+
+[codeeditor.CodeEditor.line_end]
+	@info = ""
+	@return = ""
+	line_no = ""
+
+[codeeditor.CodeEditor.line_start]
+	@info = ""
+	@return = ""
+	line_no = ""
+
+[codeeditor.CodeEditor.load]
+	@info = ""
+	_filename = ""
+
+[codeeditor.CodeEditor.mark_word]
+	@info = ""
+	i0 = ""
+	i1 = ""
+	type = ""
+
+[codeeditor.CodeEditor.on_edit_changed]
+	@info = ""
+
+[codeeditor.CodeEditor.on_edit_key_down]
+	@info = ""
+
+[codeeditor.CodeEditor.on_edit_left_button_up]
+	@info = ""
+
+[codeeditor.CodeEditor.on_search_changed]
+	@info = ""
+
+[codeeditor.CodeEditor.on_search_key_down]
+	@info = ""
+
+[codeeditor.CodeEditor.on_search_replace_changed]
+	@info = ""
+
+[codeeditor.CodeEditor.on_search_replace_key_down]
+	@info = ""
+
+[codeeditor.CodeEditor.on_structure]
+	@info = ""
+
+[codeeditor.CodeEditor.redo]
+	@info = ""
+
+[codeeditor.CodeEditor.save]
+	@info = ""
+	_filename = ""
+
+[codeeditor.CodeEditor.search_end]
+	@info = ""
+
+[codeeditor.CodeEditor.search_find]
+	@info = ""
+	@return = ""
+	pos0 = ""
+
+[codeeditor.CodeEditor.search_next]
+	@info = ""
+
+[codeeditor.CodeEditor.search_replace_next]
+	@info = ""
+
+[codeeditor.CodeEditor.search_start]
+	@info = ""
+
+[codeeditor.CodeEditor.search_start_replace]
+	@info = ""
+
+[codeeditor.CodeEditor.set_cursor_pos]
+	@info = ""
+	pos = ""
+
+[codeeditor.CodeEditor.set_filename]
+	@info = ""
+	_filename = ""
+
+[codeeditor.CodeEditor.set_save_state]
+	@info = ""
+
+[codeeditor.CodeEditor.show_errors]
+	@info = ""
+
+[codeeditor.CodeEditor.title]
+	@info = ""
+	@return = ""
+
+[codeeditor.CodeEditor.undo]
+	@info = ""
+
+[codeeditor.CodeEditor.unsubscribe]
+	@info = ""
+	observer = ""
+
+[codeeditor.CodeEditor.update_highlight_all]
+	@info = ""
+
+[codeeditor.CodeEditor.update_highlight_current_line]
+	@info = ""
+
+[codeeditor.CodeEditor.update_structure]
+	@info = ""
+
+[codeeditor.LabelGroup]
+	@info = ""
+	children = ""
+	label = ""
+
+[codeeditor.LabelGroup.__init__]
+	@info = ""
+	children = ""
+	label = ""
+
+[codeeditor.LabelGroup.linearize]
+	@info = ""
+	@return = ""
+
+[codeeditor.LabelGroup.sort_children]
+	@info = ""
+
+[codeeditor.Location]
+	@info = ""
+	filename = ""
+	offset = ""
+
+[codeeditor.Location.__init__]
+	@info = ""
+	filename = ""
+	offset = ""
+
+[codeeditor.group_structure]
+	@info = ""
+	@return = ""
+	ll = ""
+
+[codeeditor.sort_structure]
+	@info = ""
+	@return = ""
+	ll = ""
+
+[codeeditor.trim_ending]
+	@info = ""
+	@return = ""
+	s = ""
+
+[codeeditor.trim_line_endings]
+	@info = ""
+	@return = ""
+	s = ""

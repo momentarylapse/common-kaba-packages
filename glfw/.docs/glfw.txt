@@ -1,0 +1,144 @@
+
+[glfw]
+	@info = ""
+
+[glfw.Gamepad]
+	@info = ""
+	axes = ""
+	deadzone = ""
+	index = ""
+	state_prev = ""
+
+[glfw.Gamepad.Button]
+	@info = ""
+
+[glfw.Gamepad.Button.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[glfw.Gamepad.Button.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[glfw.Gamepad.Button.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[glfw.Gamepad.__init__]
+	@info = ""
+	i = ""
+
+[glfw.Gamepad.button]
+	@info = ""
+	@return = ""
+	b = ""
+
+[glfw.Gamepad.click]
+	@info = ""
+	@return = ""
+	b = ""
+
+[glfw.Gamepad.get]
+	@info = ""
+	@return = ""
+	index = ""
+
+[glfw.Gamepad.present]
+	@info = ""
+	@return = ""
+
+[glfw.Gamepad.update]
+	@info = ""
+
+[glfw.GamepadState]
+	@info = ""
+	axes = ""
+
+[glfw.GamepadState.__init__]
+	@info = ""
+
+[glfw.Window]
+	@info = ""
+	input = ""
+	win = ""
+
+[glfw.Window.Input]
+	@info = ""
+	button = ""
+	d = ""
+	key = ""
+	m = ""
+
+[glfw.Window.Input.__init__]
+	@info = ""
+
+[glfw.Window.__init__]
+	@info = ""
+	h = ""
+	title = ""
+	w = ""
+	ww = ""
+
+[glfw.Window.get_mouse]
+	@info = ""
+	@return = ""
+
+[glfw.Window.key]
+	@info = ""
+	@return = ""
+	k = ""
+
+[glfw.Window.on_idle]
+	@info = ""
+
+[glfw.Window.on_key_down]
+	@info = ""
+	key = ""
+
+[glfw.Window.on_left_button_down]
+	@info = ""
+
+[glfw.Window.on_left_button_up]
+	@info = ""
+
+[glfw.Window.on_mouse_move]
+	@info = ""
+
+[glfw.Window.on_right_button_down]
+	@info = ""
+
+[glfw.Window.on_right_button_up]
+	@info = ""
+
+[glfw.Window.run]
+	@info = ""
+
+[glfw.Window.should_close]
+	@info = ""
+	@return = ""
+
+[glfw.Window.swap_buffers]
+	@info = ""
+
+[glfw.cp2s]
+	@info = ""
+	@return = ""
+	_p = ""
+
+[glfw.end]
+	@info = ""
+
+[glfw.init]
+	@info = ""
+	opts = ""
+
+[glfw.make_context_current]
+	@info = ""
+	w = ""
+
+[glfw.poll_events]
+	@info = ""

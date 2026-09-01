@@ -56,9 +56,9 @@
 	var = ""
 
 [math.Box]
-	@info = ""
-	max = ""
-	min = ""
+	@info = "An axis-aligned box in 3d."
+	max = "!"
+	min = "!"
 
 [math.Box.__init__]
 	@info = ""
@@ -66,34 +66,44 @@
 	min = ""
 
 [math.Box.center]
-	@info = ""
-	@return = ""
+	@info = "The center of the box."
+	@return = "!"
+
+[math.Box.clamp]
+	@info = "Force a point into the box by moving it to the nearest wall if it is outside."
+	@return = "!"
+	p = "!"
 
 [math.Box.is_inside]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Check if a point is inside a box."
+	@return = "!"
+	p = "!"
+
+[math.Box.loop]
+	@info = "Force a point into the box by repeatedly moving it by by the box size if it is outside."
+	@return = "!"
+	p = "!"
 
 [math.Box.size]
-	@info = ""
-	@return = ""
+	@info = "Size along each axis."
+	@return = "!"
 
 [math.Box.to_absolute]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Convert from world into relative coordinates. <tt>min -> (0,0,0), max -> (1,1,1)</tt>."
+	@return = "!"
+	p = "!"
 
 [math.Box.to_relative]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Convert from relative into world coordinates. <tt>(0,0,0) -> min, (1,1,1) -> max</tt>."
+	@return = "!"
+	p = "!"
 
 [math.Color]
-	@info = ""
-	a = ""
-	b = ""
-	g = ""
-	r = ""
+	@info = "Represents a color with red, green, blue and alpha components between 0 and 1."
+	a = "Alpha component."
+	b = "Blue component."
+	g = "Green component."
+	r = "Red component."
 
 [math.Color.__init__]
 	@info = ""
@@ -103,33 +113,33 @@
 	r = ""
 
 [math.Color.hex]
-	@info = ""
-	@return = ""
+	@info = "Hex representation of the color."
+	@return = "!"
 
 [math.Color.hsb]
-	@info = ""
-	@return = ""
-	a = ""
-	b = ""
-	h = ""
-	s = ""
+	@info = "Create color from hue, saturation and brightness."
+	@return = "!"
+	a = "Alpha value."
+	b = "Brightness between 0 and 1."
+	h = "Hue."
+	s = "Saturation between 0 and 1."
 
 [math.Color.mix]
-	@info = ""
-	@return = ""
-	c1 = ""
-	c2 = ""
-	t = ""
+	@info = "Interpolate between colors."
+	@return = "<tt>(1-t) * c1 + t * c2</tt>"
+	c1 = "!"
+	c2 = "!"
+	t = "Interpolation parameter between 0 and 1."
 
 [math.Color.with_alpha]
-	@info = ""
-	@return = ""
-	a = ""
+	@info = "Same color but with a different alpha value."
+	@return = "!"
+	a = "New alpha value."
 
 [math.Complex]
-	@info = ""
-	x = ""
-	y = ""
+	@info = "A complex number with real and imaginary component."
+	x = "The real component."
+	y = "The imaginary component."
 
 [math.Complex.__init__]
 	@info = ""
@@ -137,16 +147,16 @@
 	y = ""
 
 [math.Complex.abs]
-	@info = ""
-	@return = ""
+	@info = "The absolute value (\"length\")."
+	@return = "!"
 
 [math.Complex.abs_sqr]
 	@info = ""
 	@return = ""
 
 [math.Complex.bar]
-	@info = ""
-	@return = ""
+	@info = "The complex conjugate - the imaginary component is negated."
+	@return = "!"
 
 [math.FloatInterpolator]
 	@info = ""
@@ -204,50 +214,50 @@
 	type = ""
 
 [math.Plane]
-	@info = ""
-	d = ""
-	n = ""
+	@info = "A 3d plane <math>(a,b,c,d)</math>.\nAll points <math>(x,y,z)</math> in the plane are defined by <math> a \cdot x + b \cdot y + c \cdot z + d = 0 </math>."
+	d = "The distance from the origin <math>(0,0,0)</math>."
+	n = "The normal vector.\nThis is just a reinterpretation of <math>(a, b, c)</math> as a <class>math.vector</class>."
 
 [math.Plane.distance]
-	@info = ""
-	@return = ""
-	p = ""
+	@info = "Gives the minimal distance of a point to the plane."
+	@return = "The minimal distance."
+	p = "The point."
 
 [math.Plane.from_point_normal]
-	@info = ""
-	@return = ""
-	n = ""
-	p = ""
+	@info = "Find the plane containing a point and orthogonal to a normal vector."
+	@return = "!"
+	n = "The normal vector."
+	p = "The point in the plane."
 
 [math.Plane.from_points]
-	@info = ""
-	@return = ""
-	a = ""
-	b = ""
-	c = ""
+	@info = "Find the plane containing 3 points."
+	@return = "!"
+	a = "The first point."
+	b = "The second point."
+	c = "The third point."
 
 [math.Plane.intersect_line]
-	@info = ""
-	@return = ""
-	inter = ""
-	l1 = ""
-	l2 = ""
+	@info = "Find the intersection point between the plane and a line (given by 2 points)."
+	@return = "Do the plane and line intersect (might be parallel)?"
+	inter = "The intersection point."
+	l1 = "The first point of the line."
+	l2 = "The second point of the line."
 
 [math.Plane.inverse]
-	@info = ""
-	@return = ""
+	@info = "Create the plane with flipped normal vector."
+	@return = "!"
 
 [math.Plane.transform]
-	@info = ""
-	@return = ""
-	m = ""
+	@info = "Transform the plane by a matrix (rotation, translation)."
+	@return = "!"
+	m = "!"
 
 [math.Quaternion]
-	@info = ""
-	w = ""
-	x = ""
-	y = ""
-	z = ""
+	@info = "A quaternion - a conveniant way to represent rotations/orientations in 3d.\nTip: use as a black box - ignore the components!"
+	w = "!"
+	x = "!"
+	y = "!"
+	z = "!"
 
 [math.Quaternion.__init__]
 	@info = ""
@@ -257,12 +267,12 @@
 	m = ""
 
 [math.Quaternion.angles]
-	@info = ""
-	@return = ""
+	@info = "Calculate the 3 angles of the orientation."
+	@return = "The 3 angles."
 
 [math.Quaternion.bar]
-	@info = ""
-	@return = ""
+	@info = "Get the conjugate <math>(w, -x, -y, -z)</math>.\nFor unit-quaternions this it also the inverse."
+	@return = "!"
 
 [math.Quaternion.drag]
 	@info = ""
@@ -272,17 +282,17 @@
 	up = ""
 
 [math.Quaternion.interpolate]
-	@info = ""
-	@return = ""
-	q0 = ""
-	q1 = ""
-	t = ""
+	@info = "Spherical linear interpolation between orientations."
+	@return = "!"
+	q0 = "Start orientation."
+	q1 = "End orientation."
+	t = "Interpolation parameter <math>\in [0, 1]</math>"
 
 [math.Quaternion.normalize]
-	@info = ""
+	@info = "Normalizes a quaternion to unit length."
 
 [math.Random]
-	@info = ""
+	@info = "A random number generator."
 
 [math.Random.__init__]
 	@info = ""
@@ -295,6 +305,11 @@
 	@info = ""
 	@return = ""
 	r = ""
+
+[math.Random.in_box]
+	@info = ""
+	@return = ""
+	b = ""
 
 [math.Random.int]
 	@info = ""
@@ -322,9 +337,9 @@
 	@return = ""
 
 [math.Ray]
-	@info = ""
-	u = ""
-	v = ""
+	@info = "Represents a line in 3d using Plücker coordinates."
+	u = "Direction vector."
+	v = "Cross product between direction vector and a point on the line."
 
 [math.Ray.__init__]
 	@info = ""
@@ -343,7 +358,7 @@
 	pl = ""
 
 [math.Rect]
-	@info = ""
+	@info = "An axis-aligned rectangle in 2d."
 	x1 = ""
 	x2 = ""
 	y1 = ""
@@ -359,6 +374,10 @@
 	y2 = ""
 
 [math.Rect.area]
+	@info = ""
+	@return = ""
+
+[math.Rect.canonical]
 	@info = ""
 	@return = ""
 
@@ -379,6 +398,11 @@
 	@info = ""
 	@return = ""
 	p = ""
+
+[math.Rect.overlaps]
+	@info = ""
+	@return = ""
+	o = ""
 
 [math.Rect.p00]
 	@info = ""
@@ -497,6 +521,11 @@
 	c = ""
 	p = ""
 
+[math.ceil]
+	@info = ""
+	@return = ""
+	x = ""
+
 [math.clamp]
 	@info = ""
 	@return = ""
@@ -527,7 +556,17 @@
 	@return = ""
 	x = ""
 
+[math.floor]
+	@info = ""
+	@return = ""
+	x = ""
+
 [math.log]
+	@info = ""
+	@return = ""
+	x = ""
+
+[math.log10]
 	@info = ""
 	@return = ""
 	x = ""
@@ -541,7 +580,7 @@
 	min = ""
 
 [math.mat3]
-	@info = ""
+	@info = "A 3x3 matrix. Used for linear operations in 3d: rotation, scaling, shearing."
 	e = ""
 
 [math.mat3.inverse]
@@ -562,7 +601,7 @@
 	s_z = ""
 
 [math.mat4]
-	@info = ""
+	@info = "A 4x4 matrix. Used for operations in 3d: rotation, scaling, shearing, translation, projection."
 	e = ""
 
 [math.mat4.inverse]
@@ -676,6 +715,11 @@
 	start = ""
 	step = ""
 
+[math.round]
+	@info = ""
+	@return = ""
+	x = ""
+
 [math.sign]
 	@info = ""
 	@return = ""
@@ -718,7 +762,7 @@
 	list = ""
 
 [math.vec2]
-	@info = ""
+	@info = "A 2d vector."
 	x = ""
 	y = ""
 
@@ -742,7 +786,7 @@
 	@return = ""
 
 [math.vec3]
-	@info = ""
+	@info = "A 3d vector."
 	x = ""
 	y = ""
 	z = ""

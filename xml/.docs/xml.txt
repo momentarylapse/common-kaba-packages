@@ -1,0 +1,13 @@
+
+[xml]
+	@info = ""
+
+[xml.encode]
+	@info = ""
+	@return = ""
+	doc = ""
+
+[xml.parse]
+	@info = ""
+	@return = ""
+	s = ""

@@ -1,0 +1,11 @@
+
+[mesh.format_ply.load_ply]
+	@info = ""
+	@return = ""
+	fn = ""
+
+[mesh.format_ply.save_ply]
+	@info = ""
+	@return = ""
+	fn = ""
+	m = ""

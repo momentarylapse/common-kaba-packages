@@ -36,7 +36,7 @@ func filter_classes(classes: Class&[]) -> Class&[]
 		|> filter(c => not("*" in c.name) and not("&" in c.name))
 		|> filter(c => not("@" in c.name) and not("-" in c.name) and not("<" in c.name))
 		|> filter(c => c.name[0] != '_')
-		|> filter(c => (not("[" in c.name) and not("{" in c.name)) or (c.name in ["i32[]", "f32[]", "bool[]"]))
+		|> filter(c => not("[" in c.name) and not("{" in c.name))
 		|> filter(c => not("(" in c.name))
 		|> sort("name")
 

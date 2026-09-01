@@ -1,0 +1,65 @@
+
+[mesh.view.Config]
+	@info = ""
+	filename = ""
+
+[mesh.view.Config.__init__]
+	@info = ""
+
+[mesh.view.MyWindow]
+	@info = ""
+	background_color = ""
+	cam_ang = ""
+	cam_ortho = ""
+	cam_pos = ""
+	cam_radius = ""
+	cam_speed = ""
+	cb_init_data = ""
+	ctx = ""
+	def_shader_3d = ""
+	font = ""
+	image_shader = ""
+	initialized = ""
+	light_enabled = ""
+	lines_shader = ""
+	m = ""
+	message = ""
+	message_ttl = ""
+	post_projection_matrix = ""
+	projection_matrix = ""
+	tex_white = ""
+	text_tex = ""
+	ubo_lights = ""
+	vb = ""
+	vb_lines = ""
+	win = ""
+	wireframe = ""
+
+[mesh.view.MyWindow.__init__]
+	@info = ""
+
+[mesh.view.MyWindow.draw_content]
+	@info = ""
+
+[mesh.view.MyWindow.draw_frame]
+	@info = ""
+	p0 = ""
+
+[mesh.view.MyWindow.init_data]
+	@info = ""
+
+[mesh.view.MyWindow.on_key_down_x]
+	@info = ""
+	k = ""
+
+[mesh.view.Theme]
+	@info = ""
+
+[mesh.view.create_vb]
+	@info = ""
+	@return = ""
+	m = ""
+
+[mesh.view.explore]
+	@info = ""
+	arg = ""

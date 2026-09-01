@@ -1,0 +1,280 @@
+
+[polymesh]
+	@info = ""
+
+[polymesh.Mesh]
+	@info = ""
+	polygons = ""
+	vertices = ""
+
+[polymesh.Mesh.__init__]
+	@info = ""
+
+[polymesh.Mesh.add]
+	@info = ""
+	mesh = ""
+
+[polymesh.Mesh.add_polygon]
+	@info = ""
+	uv = ""
+	v = ""
+
+[polymesh.Mesh.add_polygon_auto_texture]
+	@info = ""
+	v = ""
+
+[polymesh.Mesh.add_vertex]
+	@info = ""
+	pos = ""
+
+[polymesh.Mesh.bounding_box]
+	@info = ""
+	@return = ""
+
+[polymesh.Mesh.build]
+	@info = ""
+	buf = ""
+
+[polymesh.Mesh.smoothen]
+	@info = ""
+
+[polymesh.Mesh.transform]
+	@info = ""
+	@return = ""
+	m = ""
+
+[polymesh.Mesh.update_normals]
+	@info = ""
+
+[polymesh.MeshEdit]
+	@info = ""
+
+[polymesh.MeshEdit.NewPolygon]
+	@info = ""
+	at = ""
+	p = ""
+
+[polymesh.MeshEdit.NewPolygon.__init__]
+	@info = ""
+	at = ""
+	p = ""
+
+[polymesh.MeshEdit.NewVertex]
+	@info = ""
+	at = ""
+	id = ""
+	v = ""
+
+[polymesh.MeshEdit.NewVertex.__init__]
+	@info = ""
+	at = ""
+	id = ""
+	v = ""
+
+[polymesh.MeshEdit.__init__]
+	@info = ""
+
+[polymesh.MeshEdit.add_polygon]
+	@info = ""
+	at_index = ""
+	p = ""
+
+[polymesh.MeshEdit.add_vertex]
+	@info = ""
+	@return = ""
+	at_index = ""
+	v = ""
+
+[polymesh.MeshEdit.apply]
+	@info = ""
+	@return = ""
+	inv = ""
+	mesh = ""
+
+[polymesh.MeshEdit.apply_inplace]
+	@info = ""
+	@return = ""
+	mesh = ""
+
+[polymesh.MeshEdit.delete_polygon]
+	@info = ""
+	index = ""
+
+[polymesh.MeshEdit.delete_vertex]
+	@info = ""
+	index = ""
+
+[polymesh.PMVertex]
+	@info = ""
+	bone_index = ""
+	normal_dirty = ""
+	normal_mode = ""
+	pos = ""
+	smoothing_id = ""
+
+[polymesh.PMVertex.__init__]
+	@info = ""
+	pos = ""
+
+[polymesh.Polygon]
+	@info = ""
+	material = ""
+	normal_dirty = ""
+	sides = ""
+	temp_normal = ""
+	triangulation_dirty = ""
+
+[polymesh.Polygon.Side]
+	@info = ""
+	edge = ""
+	edge_direction = ""
+	normal = ""
+	normal_index = ""
+	triangulation = ""
+	uv = ""
+	vertex = ""
+
+[polymesh.Polygon.Side.__init__]
+	@info = ""
+	edge = ""
+	edge_direction = ""
+	normal = ""
+	normal_index = ""
+	triangulation = ""
+	uv = ""
+	vertex = ""
+
+[polymesh.Polygon.__init__]
+	@info = ""
+	material = ""
+	normal_dirty = ""
+	sides = ""
+	temp_normal = ""
+	triangulation_dirty = ""
+
+[polymesh.Polygon.get_vertices]
+	@info = ""
+	@return = ""
+
+[polymesh.auto_merge_polygons]
+	@info = ""
+	@return = ""
+	dang = ""
+	mesh = ""
+	selp = ""
+
+[polymesh.bevel_edges]
+	@info = ""
+	@return = ""
+	mesh = ""
+	radius = ""
+	sele = ""
+	selv = ""
+
+[polymesh.create_ball]
+	@info = ""
+	@return = ""
+	num_x = ""
+	num_y = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_cube]
+	@info = ""
+	@return = ""
+	box = ""
+	slices = ""
+
+[polymesh.create_dodecahedron]
+	@info = ""
+	@return = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_icosahedron]
+	@info = ""
+	@return = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_octahedron]
+	@info = ""
+	@return = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_plane]
+	@info = ""
+	@return = ""
+	r = ""
+	slices = ""
+
+[polymesh.create_platonic]
+	@info = ""
+	@return = ""
+	pos = ""
+	radius = ""
+	type = ""
+
+[polymesh.create_sphere]
+	@info = ""
+	@return = ""
+	num = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_teapot]
+	@info = ""
+	@return = ""
+	num = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_tetrahedron]
+	@info = ""
+	@return = ""
+	pos = ""
+	radius = ""
+
+[polymesh.create_torus]
+	@info = ""
+	@return = ""
+	axis = ""
+	edges = ""
+	pos = ""
+	radius1 = ""
+	radius2 = ""
+	rings = ""
+
+[polymesh.create_torus_knot]
+	@info = ""
+	@return = ""
+	axis = ""
+	edges = ""
+	pos = ""
+	radius1 = ""
+	radius2 = ""
+	radius3 = ""
+	rings = ""
+	turns = ""
+	twists = ""
+
+[polymesh.extrude_polygons]
+	@info = ""
+	@return = ""
+	distance = ""
+	keep_connected = ""
+	mesh = ""
+	selp = ""
+
+[polymesh.invert_polygons]
+	@info = ""
+	@return = ""
+	mesh = ""
+	selp = ""
+
+[polymesh.triangulate_polygons]
+	@info = ""
+	@return = ""
+	mesh = ""
+	selp = ""

@@ -1,0 +1,754 @@
+
+[hui]
+	@info = ""
+
+[hui.Dialog]
+	@info = ""
+	win = ""
+
+[hui.Dialog.__init__]
+	@info = ""
+	allow_parent = ""
+	height = ""
+	parent = ""
+	title = ""
+	width = ""
+
+[hui.Event]
+	@info = ""
+	button_l = ""
+	button_m = ""
+	button_r = ""
+	column = ""
+	dmouse = ""
+	height = ""
+	id = ""
+	key = ""
+	message = ""
+	mouse = ""
+	pressure = ""
+	row = ""
+	scroll = ""
+	width = ""
+
+[hui.Event.__init__]
+	@info = ""
+
+[hui.GlWindow]
+	@info = ""
+	win = ""
+
+[hui.GlWindow.__init__]
+	@info = ""
+	height = ""
+	title = ""
+	width = ""
+
+[hui.Menu]
+	@info = ""
+
+[hui.Menu.__init__]
+	@info = ""
+	p = ""
+
+[hui.Menu.add]
+	@info = ""
+	id = ""
+	name = ""
+
+[hui.Menu.add_checkable]
+	@info = ""
+	id = ""
+	name = ""
+
+[hui.Menu.add_separator]
+	@info = ""
+
+[hui.Menu.add_sub_menu]
+	@info = ""
+	id = ""
+	name = ""
+	sub_menu = ""
+
+[hui.Menu.add_with_image]
+	@info = ""
+	id = ""
+	image = ""
+	name = ""
+
+[hui.Menu.check]
+	@info = ""
+	enabled = ""
+	id = ""
+
+[hui.Menu.enable]
+	@info = ""
+	enabled = ""
+	id = ""
+
+[hui.Menu.popup]
+	@info = ""
+	p = ""
+
+[hui.Option]
+	@info = ""
+	key = ""
+	value = ""
+
+[hui.Option.__init__]
+	@info = ""
+	key = ""
+	value = ""
+
+[hui.Painter]
+	@info = ""
+	height = ""
+	width = ""
+
+[hui.Panel]
+	@info = ""
+	win = ""
+
+[hui.Panel.__init__]
+	@info = ""
+	id = ""
+	parent = ""
+
+[hui.Panel.activate]
+	@info = ""
+	id = ""
+
+[hui.Panel.add_button]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_check_box]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_combo_box]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_drawing_area]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_edit]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_expander]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_grid]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_group]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_icon_view]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_label]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_list_view]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_multiline_edit]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_paned]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_progress_bar]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_radio_button]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_scroller]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_separator]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_slider]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_spin_button]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_string]
+	@info = ""
+	id = ""
+	s = ""
+
+[hui.Panel.add_tab_control]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_toggle_button]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.add_tree_view]
+	@info = ""
+	id = ""
+	title = ""
+	x = ""
+	y = ""
+
+[hui.Panel.check]
+	@info = ""
+	checked = ""
+	id = ""
+
+[hui.Panel.delete_control]
+	@info = ""
+	id = ""
+
+[hui.Panel.embed]
+	@info = ""
+	id = ""
+	panel = ""
+	x = ""
+	y = ""
+
+[hui.Panel.enable]
+	@info = ""
+	enabled = ""
+	id = ""
+
+[hui.Panel.event]
+	@info = ""
+	@return = ""
+	f = ""
+	id = ""
+
+[hui.Panel.event_x]
+	@info = ""
+	@return = ""
+	f = ""
+	id = ""
+	msg = ""
+
+[hui.Panel.expand]
+	@info = ""
+	expand = ""
+	id = ""
+	row = ""
+
+[hui.Panel.from_source]
+	@info = ""
+	source = ""
+
+[hui.Panel.get_cell]
+	@info = ""
+	@return = ""
+	column = ""
+	id = ""
+	row = ""
+
+[hui.Panel.get_color]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.get_float]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.get_int]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.get_selection]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.get_string]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.hide_control]
+	@info = ""
+	hide = ""
+	id = ""
+
+[hui.Panel.is_active]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.is_checked]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.is_enabled]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.Panel.is_expanded]
+	@info = ""
+	@return = ""
+	id = ""
+	row = ""
+
+[hui.Panel.redraw]
+	@info = ""
+	id = ""
+
+[hui.Panel.remove_event_handler]
+	@info = ""
+	uid = ""
+
+[hui.Panel.reset]
+	@info = ""
+	id = ""
+
+[hui.Panel.set_border_width]
+	@info = ""
+	width = ""
+
+[hui.Panel.set_cell]
+	@info = ""
+	column = ""
+	id = ""
+	row = ""
+	s = ""
+
+[hui.Panel.set_color]
+	@info = ""
+	c = ""
+	id = ""
+
+[hui.Panel.set_decimals]
+	@info = ""
+	decimals = ""
+
+[hui.Panel.set_float]
+	@info = ""
+	f = ""
+	id = ""
+
+[hui.Panel.set_image]
+	@info = ""
+	id = ""
+	image = ""
+
+[hui.Panel.set_int]
+	@info = ""
+	i = ""
+	id = ""
+
+[hui.Panel.set_options]
+	@info = ""
+	id = ""
+	options = ""
+
+[hui.Panel.set_selection]
+	@info = ""
+	id = ""
+	sel = ""
+
+[hui.Panel.set_string]
+	@info = ""
+	id = ""
+	s = ""
+
+[hui.Panel.set_target]
+	@info = ""
+	id = ""
+
+[hui.Panel.unembed]
+	@info = ""
+	panel = ""
+
+[hui.Resource]
+	@info = ""
+	children = ""
+	id = ""
+	options = ""
+	title = ""
+	type = ""
+	x = ""
+	y = ""
+
+[hui.Resource.__init__]
+	@info = ""
+
+[hui.Resource.show]
+	@info = ""
+	indent = ""
+
+[hui.Resource.str]
+	@info = ""
+	@return = ""
+	indent = ""
+
+[hui.Resource.value]
+	@info = ""
+	@return = ""
+	fallback = ""
+	key = ""
+
+[hui.Toolbar]
+	@info = ""
+
+[hui.Toolbar.__init__]
+	@info = ""
+
+[hui.Toolbar.from_source]
+	@info = ""
+	source = ""
+
+[hui.Toolbar.set_by_id]
+	@info = ""
+	id = ""
+
+[hui.Window]
+	@info = ""
+	win = ""
+
+[hui.Window.__init__]
+	@info = ""
+	height = ""
+	title = ""
+	width = ""
+
+[hui.Window.destroy]
+	@info = ""
+
+[hui.Window.get_key]
+	@info = ""
+	@return = ""
+	key = ""
+
+[hui.Window.get_mouse]
+	@info = ""
+	@return = ""
+	button = ""
+	change = ""
+	x = ""
+	y = ""
+
+[hui.Window.get_size]
+	@info = ""
+	x = ""
+	y = ""
+
+[hui.Window.hide]
+	@info = ""
+
+[hui.Window.is_maximized]
+	@info = ""
+	@return = ""
+
+[hui.Window.is_minimized]
+	@info = ""
+	@return = ""
+
+[hui.Window.on_close_request]
+	@info = ""
+
+[hui.Window.on_double_click]
+	@info = ""
+	m = ""
+
+[hui.Window.on_draw]
+	@info = ""
+	p = ""
+
+[hui.Window.on_key_down]
+	@info = ""
+	key = ""
+
+[hui.Window.on_key_up]
+	@info = ""
+	key = ""
+
+[hui.Window.on_left_button_down]
+	@info = ""
+	m = ""
+
+[hui.Window.on_left_button_up]
+	@info = ""
+	m = ""
+
+[hui.Window.on_middle_button_down]
+	@info = ""
+	m = ""
+
+[hui.Window.on_middle_button_up]
+	@info = ""
+	m = ""
+
+[hui.Window.on_mouse_enter]
+	@info = ""
+	m = ""
+
+[hui.Window.on_mouse_leave]
+	@info = ""
+
+[hui.Window.on_mouse_move]
+	@info = ""
+	m = ""
+
+[hui.Window.on_mouse_wheel]
+	@info = ""
+	d = ""
+
+[hui.Window.on_right_button_down]
+	@info = ""
+	m = ""
+
+[hui.Window.on_right_button_up]
+	@info = ""
+	m = ""
+
+[hui.Window.set_cursor_pos]
+	@info = ""
+	x = ""
+	y = ""
+
+[hui.Window.set_fullscreen]
+	@info = ""
+	fullscreen = ""
+
+[hui.Window.set_id]
+	@info = ""
+	id = ""
+
+[hui.Window.set_maximized]
+	@info = ""
+	max = ""
+
+[hui.Window.set_menu]
+	@info = ""
+	menu = ""
+
+[hui.Window.set_position]
+	@info = ""
+	x = ""
+	y = ""
+
+[hui.Window.set_size]
+	@info = ""
+	x = ""
+	y = ""
+
+[hui.Window.set_title]
+	@info = ""
+	title = ""
+
+[hui.Window.show]
+	@info = ""
+
+[hui.Window.toolbar]
+	@info = ""
+	@return = ""
+	index = ""
+
+[hui.cancel_runner]
+	@info = ""
+	id = ""
+
+[hui.clipboard]
+	@info = ""
+
+[hui.clipboard.copy]
+	@info = ""
+	text = ""
+
+[hui.clipboard.paste]
+	@info = ""
+	@return = ""
+
+[hui.create_menu_from_source]
+	@info = ""
+	@return = ""
+	panel = ""
+	source = ""
+
+[hui.do_single_main_loop]
+	@info = ""
+
+[hui.error_box]
+	@info = ""
+	@return = ""
+	root = ""
+	text = ""
+	title = ""
+
+[hui.file_dialog_dir]
+	@info = ""
+	@return = ""
+	dir = ""
+	params = ""
+	root = ""
+	title = ""
+
+[hui.file_dialog_open]
+	@info = ""
+	@return = ""
+	dir = ""
+	params = ""
+	root = ""
+	title = ""
+
+[hui.file_dialog_save]
+	@info = ""
+	@return = ""
+	dir = ""
+	params = ""
+	root = ""
+	title = ""
+
+[hui.fly]
+	@info = ""
+	@return = ""
+	win = ""
+
+[hui.fly_and_wait]
+	@info = ""
+	win = ""
+
+[hui.get_event]
+	@info = ""
+	@return = ""
+
+[hui.get_key_name]
+	@info = ""
+	@return = ""
+	id = ""
+
+[hui.info_box]
+	@info = ""
+	@return = ""
+	root = ""
+	text = ""
+	title = ""
+
+[hui.make_gui_image]
+	@info = ""
+	@return = ""
+	image = ""
+
+[hui.open_document]
+	@info = ""
+	filename = ""
+
+[hui.parse_resource]
+	@info = ""
+	@return = ""
+	buffer = ""
+	literally = ""
+
+[hui.question_box]
+	@info = ""
+	@return = ""
+	allow_cancel = ""
+	root = ""
+	text = ""
+	title = ""
+
+[hui.run_later]
+	@info = ""
+	@return = ""
+	dt = ""
+	f = ""
+
+[hui.run_repeated]
+	@info = ""
+	@return = ""
+	dt = ""
+	f = ""
+
+[hui.set_idle_function]
+	@info = ""
+	f = ""

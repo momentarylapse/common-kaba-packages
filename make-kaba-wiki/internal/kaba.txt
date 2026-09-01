@@ -1,3 +1,4 @@
+
 [kaba]
 	@info = "Interface to the compiler. Offers reflection (information about types and code)."
 
@@ -96,10 +97,17 @@
 	offset = ""
 	type = ""
 
+[kaba.CompilerFlags]
+	@info = ""
+
 [kaba.Constant]
 	@info = ""
 	name = ""
 	type = ""
+
+[kaba.Constant.as_int]
+	@info = ""
+	@return = ""
 
 [kaba.Context]
 	@info = ""
@@ -112,11 +120,13 @@
 [kaba.Context.create_module_for_source]
 	@info = ""
 	@return = ""
+	flags = ""
 	just_analize = ""
 	source = ""
 
 [kaba.Context.execute_single_command]
 	@info = ""
+	@return = ""
 	cmd = ""
 
 [kaba.Context.get_dynamic_type]
@@ -124,11 +134,20 @@
 	@return = ""
 	p = ""
 
+[kaba.Context.installation_root]
+	@info = ""
+	@return = ""
+
 [kaba.Context.load_module]
 	@info = ""
 	@return = ""
 	filename = ""
+	flags = ""
 	just_analize = ""
+
+[kaba.Context.packages_root]
+	@info = ""
+	@return = ""
 
 [kaba.Function]
 	@info = ""
@@ -203,6 +222,13 @@
 [kaba.Module.functions]
 	@info = ""
 	@return = ""
+
+[kaba.Module.match_function]
+	@info = ""
+	@return = ""
+	name = ""
+	params = ""
+	ret = ""
 
 [kaba.Module.variables]
 	@info = ""
@@ -279,303 +305,3 @@
 [kaba.this_package]
 	@info = ""
 	@return = ""
-
-[os]
-	@info = ""
-
-[os.CommandLineParser]
-	@info = ""
-
-[os.CommandLineParser.__init__]
-	@info = ""
-
-[os.CommandLineParser.cmd]
-	@info = ""
-	comment = ""
-	f = ""
-	name = ""
-	p = ""
-
-[os.CommandLineParser.info]
-	@info = ""
-	cmd = ""
-	i = ""
-
-[os.CommandLineParser.option]
-	@info = ""
-	comment = ""
-	f = ""
-	name = ""
-	p = ""
-
-[os.CommandLineParser.parse]
-	@info = ""
-	arg = ""
-
-[os.CommandLineParser.show]
-	@info = ""
-
-[os.Configuration]
-	@info = ""
-	dict = ""
-
-[os.Configuration.__init__]
-	@info = ""
-
-[os.Configuration.get_bool]
-	@info = ""
-	@return = ""
-	default = ""
-	name = ""
-
-[os.Configuration.get_float]
-	@info = ""
-	@return = ""
-	default = ""
-	name = ""
-
-[os.Configuration.get_int]
-	@info = ""
-	@return = ""
-	default = ""
-	name = ""
-
-[os.Configuration.get_str]
-	@info = ""
-	@return = ""
-	default = ""
-	name = ""
-
-[os.Configuration.keys]
-	@info = ""
-	@return = ""
-
-[os.Configuration.load]
-	@info = ""
-	@return = ""
-	path = ""
-
-[os.Configuration.save]
-	@info = ""
-	path = ""
-
-[os.FileError]
-	@info = ""
-
-[os.FileError.__init__]
-	@info = ""
-
-[os.FileStream]
-	@info = ""
-
-[os.FileStream.is_end]
-	@info = ""
-	@return = ""
-
-[os.FileStream.mtime]
-	@info = ""
-	@return = ""
-
-[os.FileStream.pos]
-	@info = ""
-	@return = ""
-
-[os.FileStream.seek]
-	@info = ""
-	delta = ""
-
-[os.FileStream.set_pos]
-	@info = ""
-	pos = ""
-
-[os.FileStream.size]
-	@info = ""
-	@return = ""
-
-[os.Path]
-	@info = ""
-
-[os.Path.__init__]
-	@info = ""
-	p = ""
-
-[os.Path.absolute]
-	@info = ""
-	@return = ""
-
-[os.Path.all_parents]
-	@info = ""
-	@return = ""
-
-[os.Path.basename]
-	@info = ""
-	@return = ""
-
-[os.Path.basename_no_ext]
-	@info = ""
-	@return = ""
-
-[os.Path.canonical]
-	@info = ""
-	@return = ""
-
-[os.Path.compare]
-	@info = ""
-	@return = ""
-	p = ""
-
-[os.Path.dirname]
-	@info = ""
-	@return = ""
-
-[os.Path.extension]
-	@info = ""
-	@return = ""
-
-[os.Path.is_absolute]
-	@info = ""
-	@return = ""
-
-[os.Path.is_empty]
-	@info = ""
-	@return = ""
-
-[os.Path.is_relative]
-	@info = ""
-	@return = ""
-
-[os.Path.parent]
-	@info = ""
-	@return = ""
-
-[os.Path.relative_to]
-	@info = ""
-	@return = ""
-	p = ""
-
-[os.Stream]
-	@info = ""
-
-[os.Stream.read]
-	@info = ""
-	@return = ""
-	s = ""
-	size = ""
-
-[os.Stream.write]
-	@info = ""
-	@return = ""
-	s = ""
-
-[os.app]
-	@info = ""
-
-[os.exit]
-	@info = ""
-	status = ""
-
-[os.fs]
-	@info = ""
-
-[os.fs.copy]
-	@info = ""
-	dest = ""
-	source = ""
-
-[os.fs.create_directory]
-	@info = ""
-	dir = ""
-
-[os.fs.current_directory]
-	@info = ""
-	@return = ""
-
-[os.fs.delete]
-	@info = ""
-	filename = ""
-
-[os.fs.delete_directory]
-	@info = ""
-	dir = ""
-
-[os.fs.exists]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.hash]
-	@info = ""
-	@return = ""
-	filename = ""
-	type = ""
-
-[os.fs.is_directory]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.move]
-	@info = ""
-	dest = ""
-	source = ""
-
-[os.fs.mtime]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.open]
-	@info = ""
-	@return = ""
-	filename = ""
-	mode = ""
-
-[os.fs.read]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.read_text]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.rename]
-	@info = ""
-	dest = ""
-	source = ""
-
-[os.fs.search]
-	@info = ""
-	@return = ""
-	dir = ""
-	filter = ""
-	options = ""
-
-[os.fs.set_current_directory]
-	@info = ""
-	dir = ""
-
-[os.fs.size]
-	@info = ""
-	@return = ""
-	filename = ""
-
-[os.fs.write]
-	@info = ""
-	buffer = ""
-	filename = ""
-
-[os.fs.write_text]
-	@info = ""
-	buffer = ""
-	filename = ""
-
-[os.shell_execute]
-	@info = ""
-	@return = ""
-	cmd = ""
-	verbose = ""
-
-[os.terminal]
-	@info = ""

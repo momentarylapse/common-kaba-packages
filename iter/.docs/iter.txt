@@ -1,0 +1,33 @@
+
+[iter]
+	@info = "Helper functions for lists."
+
+[iter.accumulate]
+	@info = "\"Integrate\" - Generate a list of partial sums."
+	list = "!"
+
+[iter.all_neighbors]
+	@info = "Split a list into pairs with overlap: <tt>[1,2,3,4,5] -> [(1,2), (2,3), (3,4), (4,5)]</tt>"
+	list = "!"
+
+[iter.batched]
+	@info = "Split a list into batches of length <tt>n</tt> - <tt>[1,2,3,4,5,6,7] -> [[1,2,3],[4,5,6]]</tt>.\nAny rest that is shorter than <tt>n</tt> is ignored."
+	list = "!"
+	n = "Batch size."
+
+[iter.merge]
+	@info = "Glue two lists together."
+	list1 = "!"
+	list2 = "!"
+
+[iter.pairs]
+	@info = "Split a list into pairs without overlap: <tt>[1,2,3,4,5] -> [(1,2), (3,4)]</tt>\nIf the input has odd length, the last element is ignored."
+	list = "!"
+
+[iter.permutations]
+	@info = "Generate all permutations of a list."
+	list = "!"
+
+[iter.reversed]
+	@info = "Reverse a list."
+	list = "!"

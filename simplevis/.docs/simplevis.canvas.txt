@@ -1,0 +1,188 @@
+
+[simplevis.canvas.Canvas]
+	@info = ""
+	animation_id = ""
+	animation_request_level = ""
+	area = ""
+	cam = ""
+	ctx = ""
+	emitter = ""
+	f_draw = ""
+	f_draw_transparent = ""
+	hdr = ""
+	id = ""
+	ind = ""
+	light = ""
+	light_cam_ang = ""
+	message = ""
+	message_ttl = ""
+	out_redraw = ""
+	propagate_events = ""
+	render_path = ""
+	xhui_renderer = ""
+	yctx = ""
+
+[simplevis.canvas.Canvas.__init__]
+	@info = ""
+
+[simplevis.canvas.Canvas.before_draw]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.begin_animation]
+	@info = ""
+
+[simplevis.canvas.Canvas.clear_message]
+	@info = ""
+
+[simplevis.canvas.Canvas.create_data_sink]
+	@info = ""
+
+[simplevis.canvas.Canvas.create_sink]
+	@info = ""
+	@return = ""
+	f = ""
+
+[simplevis.canvas.Canvas.draw]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.end_animation]
+	@info = ""
+
+[simplevis.canvas.Canvas.initialize]
+	@info = ""
+	c = ""
+
+[simplevis.canvas.Canvas.on_draw]
+	@info = ""
+
+[simplevis.canvas.Canvas.on_draw_2d]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.on_draw_transparent]
+	@info = ""
+
+[simplevis.canvas.Canvas.on_initialize]
+	@info = ""
+
+[simplevis.canvas.Canvas.on_key_down]
+	@info = ""
+	k = ""
+
+[simplevis.canvas.Canvas.on_mouse_move]
+	@info = ""
+	d = ""
+	lbut = ""
+	mbut = ""
+	rbut = ""
+
+[simplevis.canvas.Canvas.on_mouse_wheel]
+	@info = ""
+	d = ""
+
+[simplevis.canvas.Canvas.on_prepare]
+	@info = ""
+
+[simplevis.canvas.Canvas.set_background]
+	@info = ""
+	b = ""
+
+[simplevis.canvas.Canvas.set_hdr_exposure]
+	@info = ""
+	exposure = ""
+
+[simplevis.canvas.Canvas.set_message]
+	@info = ""
+	m = ""
+
+[simplevis.canvas.Canvas.unsubscribe]
+	@info = ""
+	observer = ""
+
+[simplevis.canvas.Canvas.xbefore_draw]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.xdraw]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.xinitialize]
+	@info = ""
+	p = ""
+
+[simplevis.canvas.Canvas.xkey_down]
+	@info = ""
+
+[simplevis.canvas.Canvas.xmouse_move]
+	@info = ""
+
+[simplevis.canvas.Canvas.xmouse_wheel]
+	@info = ""
+
+[simplevis.canvas.SimpleEmitter]
+	@info = ""
+	canvas = ""
+	ctx = ""
+	xx_mat = ""
+	xx_vb = ""
+
+[simplevis.canvas.SimpleEmitter.__init__]
+	@info = ""
+	c = ""
+
+[simplevis.canvas.SimpleEmitter.emit]
+	@info = ""
+	params = ""
+	rvd = ""
+	shadow_pass = ""
+
+[simplevis.canvas.SimpleEmitter.prepare]
+	@info = ""
+	params = ""
+
+[simplevis.canvas.ViewPort]
+	@info = ""
+	ang = ""
+	fov = ""
+	ind = ""
+	out_changed = ""
+	pos = ""
+	radius = ""
+
+[simplevis.canvas.ViewPort.__init__]
+	@info = ""
+
+[simplevis.canvas.ViewPort.create_data_sink]
+	@info = ""
+
+[simplevis.canvas.ViewPort.create_sink]
+	@info = ""
+	@return = ""
+	f = ""
+
+[simplevis.canvas.ViewPort.focus_on_box]
+	@info = ""
+	box = ""
+
+[simplevis.canvas.ViewPort.move]
+	@info = ""
+	d = ""
+
+[simplevis.canvas.ViewPort.params]
+	@info = ""
+	@return = ""
+
+[simplevis.canvas.ViewPort.rotate]
+	@info = ""
+	d = ""
+
+[simplevis.canvas.ViewPort.unsubscribe]
+	@info = ""
+	observer = ""
+
+[simplevis.canvas.ViewPort.zoom]
+	@info = ""
+	f = ""

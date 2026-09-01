@@ -1,0 +1,481 @@
+
+[gl]
+	@info = ""
+
+[gl.Alpha]
+	@info = ""
+
+[gl.Alpha.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[gl.Alpha.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[gl.Alpha.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[gl.Buffer]
+	@info = ""
+
+[gl.Buffer.read]
+	@info = ""
+	data = ""
+	size = ""
+
+[gl.Buffer.update]
+	@info = ""
+	data = ""
+	offset = ""
+	size = ""
+
+[gl.Context]
+	@info = ""
+	default_framebuffer = ""
+	default_shader_2d = ""
+	default_shader_3d = ""
+	extensions = ""
+	gl_renderer = ""
+	gl_version = ""
+	glsl_version = ""
+	tex_white = ""
+	vb_temp = ""
+	vb_temp_i = ""
+
+[gl.Context.__init__]
+	@info = ""
+
+[gl.Context.create_shader]
+	@info = ""
+	@return = ""
+	source = ""
+
+[gl.Context.load_shader]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[gl.CubeMap]
+	@info = ""
+	height = ""
+	width = ""
+
+[gl.CubeMap.__init__]
+	@info = ""
+	format = ""
+	size = ""
+
+[gl.CullMode]
+	@info = ""
+
+[gl.CullMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[gl.CullMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[gl.CullMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[gl.DepthBuffer]
+	@info = ""
+	height = ""
+	width = ""
+
+[gl.DepthBuffer.__init__]
+	@info = ""
+	format = ""
+	height = ""
+	width = ""
+
+[gl.FrameBuffer]
+	@info = ""
+	color_attachments = ""
+	depth_buffer = ""
+	height = ""
+	width = ""
+
+[gl.FrameBuffer.__init__]
+	@info = ""
+	attachments = ""
+
+[gl.FrameBuffer.area]
+	@info = ""
+	@return = ""
+
+[gl.FrameBuffer.clear_color]
+	@info = ""
+	c = ""
+	index = ""
+
+[gl.FrameBuffer.clear_depth]
+	@info = ""
+	z = ""
+
+[gl.FrameBuffer.read]
+	@info = ""
+	image = ""
+
+[gl.FrameBuffer.update]
+	@info = ""
+	attachments = ""
+	face = ""
+
+[gl.ImageTexture]
+	@info = ""
+	height = ""
+	width = ""
+
+[gl.ImageTexture.__init__]
+	@info = ""
+	format = ""
+	height = ""
+	width = ""
+
+[gl.Shader]
+	@info = ""
+
+[gl.Shader.__init__]
+	@info = ""
+
+[gl.Shader.dispatch]
+	@info = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[gl.Shader.link_uniform_block]
+	@info = ""
+	binding = ""
+	name = ""
+
+[gl.Shader.location]
+	@info = ""
+	@return = ""
+	name = ""
+
+[gl.Shader.set_color]
+	@info = ""
+	c = ""
+	name = ""
+
+[gl.Shader.set_color_l]
+	@info = ""
+	c = ""
+	loc = ""
+
+[gl.Shader.set_float]
+	@info = ""
+	f = ""
+	name = ""
+
+[gl.Shader.set_float_l]
+	@info = ""
+	f = ""
+	loc = ""
+
+[gl.Shader.set_floats]
+	@info = ""
+	data = ""
+	name = ""
+	num = ""
+
+[gl.Shader.set_floats_l]
+	@info = ""
+	data = ""
+	loc = ""
+	num = ""
+
+[gl.Shader.set_int]
+	@info = ""
+	i = ""
+	name = ""
+
+[gl.Shader.set_int_l]
+	@info = ""
+	i = ""
+	loc = ""
+
+[gl.Shader.set_matrix]
+	@info = ""
+	m = ""
+	name = ""
+
+[gl.Shader.set_matrix_l]
+	@info = ""
+	loc = ""
+	m = ""
+
+[gl.ShaderStorageBuffer]
+	@info = ""
+
+[gl.ShaderStorageBuffer.__init__]
+	@info = ""
+	size = ""
+
+[gl.StencilOp]
+	@info = ""
+
+[gl.StencilOp.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[gl.StencilOp.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[gl.StencilOp.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[gl.Texture]
+	@info = ""
+	height = ""
+	width = ""
+
+[gl.Texture.__init__]
+	@info = ""
+	format = ""
+	height = ""
+	width = ""
+
+[gl.Texture.load]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[gl.Texture.read]
+	@info = ""
+	image = ""
+
+[gl.Texture.read_float]
+	@info = ""
+	data = ""
+
+[gl.Texture.set_options]
+	@info = ""
+	op = ""
+
+[gl.Texture.write]
+	@info = ""
+	image = ""
+
+[gl.Texture.write_float]
+	@info = ""
+	data = ""
+
+[gl.UniformBuffer]
+	@info = ""
+
+[gl.UniformBuffer.__init__]
+	@info = ""
+	size = ""
+
+[gl.VertexBuffer]
+	@info = ""
+
+[gl.VertexBuffer.__init__]
+	@info = ""
+	format = ""
+
+[gl.VertexBuffer.count]
+	@info = ""
+	@return = ""
+
+[gl.VertexBuffer.create_cube]
+	@info = ""
+	a = ""
+	b = ""
+
+[gl.VertexBuffer.create_quad]
+	@info = ""
+	dest = ""
+	source = ""
+
+[gl.VertexBuffer.update]
+	@info = ""
+	vertices = ""
+
+[gl.VertexBuffer.update_index]
+	@info = ""
+	indices = ""
+
+[gl.VolumeTexture]
+	@info = ""
+	height = ""
+	width = ""
+
+[gl.VolumeTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[gl.bind_frame_buffer]
+	@info = ""
+	fb = ""
+
+[gl.bind_image]
+	@info = ""
+	binding = ""
+	layer = ""
+	level = ""
+	t = ""
+	writable = ""
+
+[gl.bind_storage_buffer]
+	@info = ""
+	binding = ""
+	buf = ""
+
+[gl.bind_texture]
+	@info = ""
+	binding = ""
+	t = ""
+
+[gl.bind_textures]
+	@info = ""
+	t = ""
+
+[gl.bind_uniform_buffer]
+	@info = ""
+	binding = ""
+	buf = ""
+
+[gl.clear]
+	@info = ""
+	c = ""
+
+[gl.clear_color]
+	@info = ""
+	c = ""
+
+[gl.clear_z]
+	@info = ""
+	z = ""
+
+[gl.disable_alpha]
+	@info = ""
+
+[gl.draw_lines]
+	@info = ""
+	contiguous = ""
+	vb = ""
+
+[gl.draw_points]
+	@info = ""
+	vb = ""
+
+[gl.draw_triangles]
+	@info = ""
+	vb = ""
+
+[gl.end_frame_hui]
+	@info = ""
+
+[gl.init]
+	@info = ""
+	@return = ""
+	flags = ""
+
+[gl.screen_shot_to_image]
+	@info = ""
+	im = ""
+
+[gl.set_alpha]
+	@info = ""
+	dest = ""
+	source = ""
+
+[gl.set_cull]
+	@info = ""
+	mode = ""
+
+[gl.set_material]
+	@info = ""
+	albedo = ""
+	emission = ""
+	metal = ""
+	roughness = ""
+
+[gl.set_model_matrix]
+	@info = ""
+	m = ""
+
+[gl.set_projection_matrix]
+	@info = ""
+	m = ""
+
+[gl.set_projection_ortho_ext]
+	@info = ""
+	center = ""
+	map_size = ""
+	zmax = ""
+	zmin = ""
+
+[gl.set_projection_ortho_pixel]
+	@info = ""
+
+[gl.set_projection_ortho_relative]
+	@info = ""
+
+[gl.set_projection_perspective]
+	@info = ""
+	center = ""
+	size_1 = ""
+	zmax = ""
+	zmin = ""
+
+[gl.set_scissor]
+	@info = ""
+	all = ""
+	r = ""
+
+[gl.set_shader]
+	@info = ""
+	s = ""
+
+[gl.set_stencil]
+	@info = ""
+	mode = ""
+	param = ""
+
+[gl.set_view_matrix]
+	@info = ""
+	m = ""
+
+[gl.set_viewport]
+	@info = ""
+	r = ""
+
+[gl.set_wire]
+	@info = ""
+	enabled = ""
+
+[gl.set_z]
+	@info = ""
+	read = ""
+	write = ""
+
+[gl.start_frame_hui]
+	@info = ""
+	ctx = ""
+	event = ""

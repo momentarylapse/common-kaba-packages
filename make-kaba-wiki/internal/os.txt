@@ -3,7 +3,7 @@
 	@info = "Interface to the operating system."
 
 [os.CommandLineParser]
-	@info = ""
+	@info = "Parses command line arguments."
 
 [os.CommandLineParser.__init__]
 	@info = ""
@@ -29,16 +29,20 @@
 
 [os.CommandLineParser.parse]
 	@info = ""
+	@return = ""
 	arg = ""
 
 [os.CommandLineParser.show]
 	@info = ""
 
 [os.Configuration]
-	@info = ""
-	dict = ""
+	@info = "Represents a config file."
+	dict = "!"
 
 [os.Configuration.__init__]
+	@info = ""
+
+[os.Configuration.clear]
 	@info = ""
 
 [os.Configuration.get_bool]
@@ -186,115 +190,131 @@
 	@return = ""
 	s = ""
 
+[os.SystemType]
+	@info = ""
+
 [os.app]
 	@info = ""
 
 [os.exit]
-	@info = ""
-	status = ""
+	@info = "Exit the program."
+	status = "Status code reported to the operating system."
 
 [os.fs]
-	@info = ""
+	@info = "Namespace of filesystem functions."
 
 [os.fs.copy]
-	@info = ""
-	dest = ""
-	source = ""
+	@info = "Copy a file or directory.\n<tt>dest</tt> and its parents will be created if not existing."
+	@return = "!"
+	dest = "Target name or directory into which to copy."
+	source = "!"
 
 [os.fs.create_directory]
-	@info = ""
-	dir = ""
+	@info = "Create a new directory.\nNo error is raised if the directory already exists."
+	@return = "!"
+	dir = "!"
 
 [os.fs.current_directory]
-	@info = ""
-	@return = ""
+	@info = "Get the current directory of the environment."
+	@return = "!"
 
 [os.fs.delete]
-	@info = ""
-	filename = ""
+	@info = "Delete a file or directory including its contents."
+	@return = "!"
+	filename = "!"
 
 [os.fs.delete_directory]
-	@info = ""
-	dir = ""
+	@info = "Deprecated. Use <tt>delete()</tt> instead."
+	@return = "!"
+	dir = "!"
 
 [os.fs.exists]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Test if file or directory exists."
+	@return = "!"
+	filename = "!"
 
 [os.fs.hash]
-	@info = ""
-	@return = ""
-	filename = ""
-	type = ""
+	@info = "Compute the hash of a file."
+	@return = "!"
+	filename = "!"
+	type = "Only \"md5\" supported."
 
 [os.fs.is_directory]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Test if path exists and is a directory."
+	@return = "!"
+	filename = "!"
 
 [os.fs.move]
-	@info = ""
-	dest = ""
-	source = ""
+	@info = "Move a file or directory.\n<tt>dest</tt> and its parents will be created if not existing."
+	@return = "!"
+	dest = "Target name or directory into which to move."
+	source = "!"
 
 [os.fs.mtime]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Get the last write time of a file."
+	@return = "!"
+	filename = "!"
 
 [os.fs.open]
-	@info = ""
-	@return = ""
-	filename = ""
-	mode = ""
+	@info = "Open a file for reading or writing."
+	@return = "A handle / file stream."
+	filename = "!"
+	mode = "Combination of: \"r\" read - \"w\" write - \"t\" text - \"b\" binary."
 
 [os.fs.read]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Read the whole contents of a binary file."
+	@return = "!"
+	filename = "!"
 
 [os.fs.read_text]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Read the whole contents of a text file."
+	@return = "!"
+	filename = "!"
 
 [os.fs.rename]
-	@info = ""
-	dest = ""
-	source = ""
+	@info = "Deprecated. Use <tt>move()</tt> instead."
+	@return = "!"
+	dest = "!"
+	source = "!"
 
 [os.fs.search]
-	@info = ""
-	@return = ""
-	dir = ""
-	filter = ""
-	options = ""
+	@info = "List contents of a directory."
+	@return = "A list of files and/or directories sorted by name."
+	dir = "The directory to search."
+	filter = "Filter for filenames (e.g. \"*\" or \"*.txt\". Directories are not filtered."
+	options = "Combination of: \"f\" list files - \"d\" list directories - \"r\" recursive."
 
 [os.fs.set_current_directory]
-	@info = ""
-	dir = ""
+	@info = "Set the current directory of the environment."
+	dir = "!"
 
 [os.fs.size]
-	@info = ""
-	@return = ""
-	filename = ""
+	@info = "Get the size of a file."
+	@return = "Size in bytes."
+	filename = "!"
 
 [os.fs.write]
-	@info = ""
-	buffer = ""
-	filename = ""
+	@info = "Write binary data into a binary file."
+	@return = "!"
+	buffer = "!"
+	filename = "!"
 
 [os.fs.write_text]
-	@info = ""
-	buffer = ""
-	filename = ""
+	@info = "Write text into a text file."
+	@return = "!"
+	buffer = "!"
+	filename = "!"
+
+[os.get_env]
+	@info = "Read environment variable."
+	@return = "Value or empty string."
+	var = "Variable name. E.g. \"PATH\"."
 
 [os.shell_execute]
-	@info = ""
-	@return = ""
-	cmd = ""
-	verbose = ""
+	@info = "Execute shell command."
+	@return = "The output (stdout) of the command."
+	cmd = "The command."
+	verbose = "Print the output to the terminal?"
 
 [os.terminal]
-	@info = ""
+	@info = "Namespace for terminal functions."

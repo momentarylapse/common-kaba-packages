@@ -1,0 +1,5 @@
+
+[mesh.format_stl.load_stl]
+	@info = ""
+	@return = ""
+	fn = ""

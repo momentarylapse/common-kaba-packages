@@ -1,0 +1,48 @@
+
+[cloud.view.Canvas]
+	@info = ""
+	animation_id = ""
+	animation_request_level = ""
+	area = ""
+	cam = ""
+	cr = ""
+	ctx = ""
+	emitter = ""
+	f_draw = ""
+	f_draw_transparent = ""
+	hdr = ""
+	id = ""
+	ind = ""
+	light = ""
+	light_cam_ang = ""
+	message = ""
+	message_ttl = ""
+	out_redraw = ""
+	points = ""
+	propagate_events = ""
+	render_path = ""
+	xhui_renderer = ""
+	yctx = ""
+
+[cloud.view.Canvas.__init__]
+	@info = ""
+	filename = ""
+
+[cloud.view.Canvas.on_draw]
+	@info = ""
+
+[cloud.view.Canvas.on_draw_2d]
+	@info = ""
+	p = ""
+
+[cloud.view.Canvas.on_initialize]
+	@info = ""
+
+[cloud.view.large_num]
+	@info = ""
+	@return = ""
+	i = ""
+
+[cloud.view.view_cloud]
+	@info = ""
+	args = ""

@@ -1,0 +1,76 @@
+
+[algebra]
+	@info = ""
+
+[algebra.BigInt]
+	@info = ""
+	data = ""
+	sign = ""
+
+[algebra.BigInt.__init__]
+	@info = ""
+	i = ""
+	s = ""
+
+[algebra.BigInt.compare]
+	@info = ""
+	@return = ""
+	o = ""
+
+[algebra.BigInt.count_bits]
+	@info = ""
+	@return = ""
+
+[algebra.BigInt.div]
+	@info = ""
+	@return = ""
+	div = ""
+	rem = ""
+
+[algebra.BigInt.find_coprime]
+	@info = ""
+	@return = ""
+	e = ""
+	phi = ""
+
+[algebra.BigInt.find_mod_inverse]
+	@info = ""
+	@return = ""
+	d = ""
+	e = ""
+	phi = ""
+
+[algebra.BigInt.gcd]
+	@info = ""
+	@return = ""
+	a = ""
+	b = ""
+
+[algebra.BigInt.idiv]
+	@info = ""
+	div = ""
+	rem = ""
+
+[algebra.BigInt.miller_rabin_prime]
+	@info = ""
+	@return = ""
+	count = ""
+	p = ""
+
+[algebra.BigInt.pow]
+	@info = ""
+	@return = ""
+	e = ""
+	x = ""
+
+[algebra.BigInt.pow_mod]
+	@info = ""
+	@return = ""
+	e = ""
+	mod = ""
+	x = ""
+
+[algebra.BigInt.rand]
+	@info = ""
+	@return = ""
+	bits = ""

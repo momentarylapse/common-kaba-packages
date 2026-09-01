@@ -1,0 +1,31 @@
+
+[simplevis.volume.VolumeRenderer]
+	@info = ""
+	color_map = ""
+	ctx = ""
+	material = ""
+	material_solid = ""
+	solid = ""
+	texture = ""
+	value_scale = ""
+	vertex_buffer = ""
+
+[simplevis.volume.VolumeRenderer.__init__]
+	@info = ""
+	_ctx = ""
+
+[simplevis.volume.VolumeRenderer.draw]
+	@info = ""
+	matrix = ""
+
+[simplevis.volume.VolumeRenderer.initialize]
+	@info = ""
+
+[simplevis.volume.VolumeRenderer.set]
+	@info = ""
+	data = ""
+	n = ""
+
+[simplevis.volume.VolumeRenderer.set_texture]
+	@info = ""
+	tex = ""

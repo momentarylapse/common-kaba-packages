@@ -1,6 +1,6 @@
 
 [yrenderer]
-	@info = ""
+	@info = "Node-based rendering library for the y engine.\nUsing Vulkan or OpenGL."
 
 [yrenderer.CameraParams]
 	@info = ""
@@ -17,6 +17,33 @@
 	max_depth = ""
 	min_depth = ""
 	pos = ""
+
+[yrenderer.CameraParams.projection_matrix]
+	@info = ""
+	@return = ""
+	aspect_ratio = ""
+
+[yrenderer.CameraParams.view_matrix]
+	@info = ""
+	@return = ""
+
+[yrenderer.ComputeScheduler]
+	@info = ""
+
+[yrenderer.ComputeScheduler.__init__]
+	@info = ""
+	ctx = ""
+
+[yrenderer.ComputeScheduler.start]
+	@info = ""
+	@return = ""
+
+[yrenderer.ComputeScheduler.submit]
+	@info = ""
+	block = ""
+
+[yrenderer.ComputeScheduler.wait]
+	@info = ""
 
 [yrenderer.ComputeTask]
 	@info = ""
@@ -60,18 +87,33 @@
 [yrenderer.Context]
 	@info = ""
 	context = ""
+	material_manager = ""
+	shader_manager = ""
 	tex_white = ""
+	texture_manager = ""
+
+[yrenderer.Context.create_internal_material]
+	@info = ""
+	@return = ""
 
 [yrenderer.Context.create_managers]
 	@info = ""
 	material_dir = ""
+	material_dirs = ""
 	shader_dir = ""
+	shader_dirs = ""
 	texture_dir = ""
+	texture_dirs = ""
 
 [yrenderer.Context.create_shader]
 	@info = ""
 	@return = ""
 	source = ""
+
+[yrenderer.Context.load_material]
+	@info = ""
+	@return = ""
+	path = ""
 
 [yrenderer.Context.load_shader]
 	@info = ""
@@ -80,6 +122,7 @@
 
 [yrenderer.Context.load_shader_module]
 	@info = ""
+	@return = ""
 	path = ""
 
 [yrenderer.Context.load_surface_shader]
@@ -89,6 +132,11 @@
 	path = ""
 	render_path = ""
 	vertex_module = ""
+
+[yrenderer.Context.load_texture]
+	@info = ""
+	@return = ""
+	path = ""
 
 [yrenderer.CubeEmitter]
 	@info = ""
@@ -164,6 +212,38 @@
 	label = ""
 	type = ""
 
+[yrenderer.LineHelper]
+	@info = ""
+
+[yrenderer.LineHelper.__init__]
+	@info = ""
+
+[yrenderer.LineHelper.begin_draw]
+	@info = ""
+	params = ""
+	rvd = ""
+
+[yrenderer.LineHelper.draw_lines]
+	@info = ""
+	contiguous = ""
+	points = ""
+
+[yrenderer.LineHelper.set_color]
+	@info = ""
+	c = ""
+
+[yrenderer.LineHelper.set_line_width]
+	@info = ""
+	w = ""
+
+[yrenderer.LineHelper.set_z]
+	@info = ""
+	enabled = ""
+
+[yrenderer.LineHelper.start_frame]
+	@info = ""
+	ui_scale = ""
+
 [yrenderer.Material]
 	@info = ""
 	albedo = ""
@@ -173,6 +253,7 @@
 	metal = ""
 	pass0 = ""
 	roughness = ""
+	shader_data = ""
 	shader_path = ""
 	textures = ""
 
@@ -190,8 +271,19 @@
 
 [yrenderer.Material.Pass]
 	@info = ""
+	cull_mode = ""
+	destination = ""
+	mode = ""
+	shader_path = ""
+	source = ""
+	wire_mode = ""
+	z_test = ""
+	z_write = ""
 
 [yrenderer.Material.__init__]
+	@info = ""
+
+[yrenderer.MaterialManager]
 	@info = ""
 
 [yrenderer.MeshEmitter]
@@ -208,6 +300,20 @@
 	params = ""
 	rvd = ""
 	shadow_pass = ""
+
+[yrenderer.MeshEmitter.prepare]
+	@info = ""
+	params = ""
+
+[yrenderer.RayTracingData]
+	@info = ""
+	buffer_meshes = ""
+	num_meshes = ""
+
+[yrenderer.RayTracingData.__init__]
+	@info = ""
+	buffer_meshes = ""
+	num_meshes = ""
 
 [yrenderer.RegionRenderer]
 	@info = ""
@@ -234,14 +340,47 @@
 	r = ""
 	z = ""
 
+[yrenderer.RenderData]
+	@info = ""
+
+[yrenderer.RenderData.draw]
+	@info = ""
+	params = ""
+	topology = ""
+	vb = ""
+
+[yrenderer.RenderData.draw_instanced]
+	@info = ""
+	count = ""
+	params = ""
+	vb = ""
+
+[yrenderer.RenderData.draw_triangles]
+	@info = ""
+	params = ""
+	vb = ""
+
 [yrenderer.RenderParams]
 	@info = ""
+	area = ""
+	desired_aspect_ratio = ""
+	frame_buffer = ""
+	target_is_window = ""
+
+[yrenderer.RenderParams.__init__]
+	@info = ""
+	area = ""
+	desired_aspect_ratio = ""
+	frame_buffer = ""
+	target_is_window = ""
 
 [yrenderer.RenderPath]
 	@info = ""
 	ambient_occlusion_radius = ""
 	background_color = ""
+	scene_view = ""
 	view = ""
+	wireframe = ""
 
 [yrenderer.RenderPath.__init__]
 	@info = ""
@@ -258,6 +397,9 @@
 	@info = ""
 	emitter = ""
 
+[yrenderer.RenderPath.remove_all_emitters]
+	@info = ""
+
 [yrenderer.RenderPath.set_lights]
 	@info = ""
 	lights = ""
@@ -270,7 +412,9 @@
 	@info = ""
 	ambient_occlusion_radius = ""
 	background_color = ""
+	scene_view = ""
 	view = ""
+	wireframe = ""
 
 [yrenderer.RenderPathDeferred.__init__]
 	@info = ""
@@ -283,7 +427,9 @@
 	@info = ""
 	ambient_occlusion_radius = ""
 	background_color = ""
+	scene_view = ""
 	view = ""
+	wireframe = ""
 
 [yrenderer.RenderPathForward.__init__]
 	@info = ""
@@ -308,11 +454,31 @@
 	@info = ""
 	ctx = ""
 
+[yrenderer.RenderViewData.get_shader]
+	@info = ""
+	@return = ""
+	geometry_shader_module = ""
+	material = ""
+	pass_no = ""
+	tessellation_module = ""
+	vertex_shader_module = ""
+
 [yrenderer.RenderViewData.set_view]
 	@info = ""
 	cam = ""
 	params = ""
 	proj = ""
+
+[yrenderer.RenderViewData.start]
+	@info = ""
+	@return = ""
+	material = ""
+	matrix = ""
+	params = ""
+	pass_no = ""
+	shader = ""
+	top = ""
+	vb = ""
 
 [yrenderer.Renderer]
 	@info = ""
@@ -354,10 +520,18 @@
 
 [yrenderer.SceneView]
 	@info = ""
+	fog_color = ""
+	fog_density = ""
+	fog_enabled = ""
+	lights = ""
+	main_camera_params = ""
 	num_surfels = ""
 	probe_cells = ""
 	probe_max = ""
 	probe_min = ""
+	ray_tracing_data = ""
+	shadow_box_size = ""
+	shadow_indices = ""
 	surfel_buffer = ""
 
 [yrenderer.SceneView.__init__]
@@ -368,6 +542,25 @@
 	lights = ""
 
 [yrenderer.SceneView.choose_shadows]
+	@info = ""
+
+[yrenderer.ShaderManager]
+	@info = ""
+	default_shader = ""
+
+[yrenderer.ShaderManager.__init__]
+	@info = ""
+
+[yrenderer.ShaderManager.add_directory]
+	@info = ""
+	dir = ""
+
+[yrenderer.ShaderManager.load_shader_module]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[yrenderer.TextureManager]
 	@info = ""
 
 [yrenderer.TextureRenderer]
@@ -385,6 +578,25 @@
 [yrenderer.TextureRenderer.set_area]
 	@info = ""
 	area = ""
+
+[yrenderer.TransparencyMode]
+	@info = ""
+
+[yrenderer.TransparencyMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[yrenderer.TransparencyMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[yrenderer.TransparencyMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
 
 [yrenderer.WindowRenderer]
 	@info = ""
@@ -450,6 +662,12 @@
 	theta = ""
 	type = ""
 
+[yrenderer.YLight.suggest_shadow_projection]
+	@info = ""
+	@return = ""
+	cam = ""
+	shadow_box_size = ""
+
 [yrenderer.api_init_glfw]
 	@info = ""
 	@return = ""
@@ -459,6 +677,12 @@
 	@info = ""
 	@return = ""
 	p = ""
+
+[yrenderer.apply_shader_data]
+	@info = ""
+	params = ""
+	s = ""
+	shader_data = ""
 
 [yrenderer.gfx.Buffer]
 	@info = ""

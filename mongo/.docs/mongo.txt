@@ -1,0 +1,81 @@
+
+[mongo]
+	@info = ""
+
+[mongo.Collection]
+	@info = ""
+	col = ""
+
+[mongo.Collection.__init__]
+	@info = ""
+
+[mongo.Collection.aggregate]
+	@info = ""
+	@return = ""
+	pattern = ""
+
+[mongo.Collection.delete_many]
+	@info = ""
+	@return = ""
+	filter = ""
+
+[mongo.Collection.delete_one]
+	@info = ""
+	@return = ""
+	filter = ""
+
+[mongo.Collection.find]
+	@info = ""
+	@return = ""
+	filter = ""
+
+[mongo.Collection.insert]
+	@info = ""
+	@return = ""
+	doc = ""
+
+[mongo.Collection.replace]
+	@info = ""
+	@return = ""
+	doc = ""
+	filter = ""
+
+[mongo.MongoClient]
+	@info = ""
+	client = ""
+
+[mongo.MongoClient.__init__]
+	@info = ""
+	c = ""
+
+[mongo.MongoClient.collection]
+	@info = ""
+	@return = ""
+	col = ""
+	db = ""
+
+[mongo.Result]
+	@info = ""
+	cur = ""
+	doc = ""
+
+[mongo.Result.__init__]
+	@info = ""
+	_cur = ""
+
+[mongo.Result.get]
+	@info = ""
+	@return = ""
+
+[mongo.Result.has_more]
+	@info = ""
+	@return = ""
+
+[mongo.Result.json]
+	@info = ""
+	@return = ""
+
+[mongo.create_client]
+	@info = ""
+	@return = ""
+	host = ""

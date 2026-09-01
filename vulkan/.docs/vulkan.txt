@@ -1,0 +1,561 @@
+
+[vulkan]
+	@info = ""
+
+[vulkan.AccelerationStructure]
+	@info = ""
+
+[vulkan.AccelerationStructure.create_bottom]
+	@info = ""
+	@return = ""
+	device = ""
+	vb = ""
+
+[vulkan.AccelerationStructure.create_top]
+	@info = ""
+	@return = ""
+	device = ""
+	instances = ""
+	matrices = ""
+
+[vulkan.AccessFlags]
+	@info = ""
+
+[vulkan.AccessFlags.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[vulkan.AccessFlags.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[vulkan.AccessFlags.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[vulkan.Buffer]
+	@info = ""
+
+[vulkan.CommandBuffer]
+	@info = ""
+
+[vulkan.CommandBuffer.barrier]
+	@info = ""
+	mode = ""
+	t = ""
+
+[vulkan.CommandBuffer.begin]
+	@info = ""
+
+[vulkan.CommandBuffer.begin_render_pass]
+	@info = ""
+	fb = ""
+	rp = ""
+
+[vulkan.CommandBuffer.bind_descriptor_set]
+	@info = ""
+	index = ""
+	set = ""
+
+[vulkan.CommandBuffer.bind_pipeline]
+	@info = ""
+	p = ""
+
+[vulkan.CommandBuffer.clear]
+	@info = ""
+	area = ""
+	colors = ""
+	z = ""
+
+[vulkan.CommandBuffer.copy_image]
+	@info = ""
+	dst = ""
+	extend = ""
+	src = ""
+
+[vulkan.CommandBuffer.dispatch]
+	@info = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[vulkan.CommandBuffer.draw]
+	@info = ""
+	vb = ""
+
+[vulkan.CommandBuffer.end]
+	@info = ""
+
+[vulkan.CommandBuffer.end_render_pass]
+	@info = ""
+
+[vulkan.CommandBuffer.image_barrier]
+	@info = ""
+	dst_access = ""
+	new_layout = ""
+	old_layout = ""
+	src_access = ""
+	t = ""
+
+[vulkan.CommandBuffer.next_subpass]
+	@info = ""
+
+[vulkan.CommandBuffer.push_constant]
+	@info = ""
+	data = ""
+	offset = ""
+	size = ""
+
+[vulkan.CommandBuffer.set_bind_point]
+	@info = ""
+	bp = ""
+
+[vulkan.CommandBuffer.set_scissor]
+	@info = ""
+	r = ""
+
+[vulkan.CommandBuffer.set_viewport]
+	@info = ""
+	r = ""
+
+[vulkan.CommandBuffer.trace_rays]
+	@info = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[vulkan.CommandPool]
+	@info = ""
+
+[vulkan.CommandPool.create_command_buffer]
+	@info = ""
+	@return = ""
+
+[vulkan.ComputePipeline]
+	@info = ""
+
+[vulkan.ComputePipeline.__init__]
+	@info = ""
+	shader = ""
+
+[vulkan.CubeMap]
+	@info = ""
+	height = ""
+	view = ""
+	width = ""
+
+[vulkan.CubeMap.__init__]
+	@info = ""
+	format = ""
+	size = ""
+
+[vulkan.DepthBuffer]
+	@info = ""
+	height = ""
+	view = ""
+	width = ""
+
+[vulkan.DepthBuffer.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+	with_sampler = ""
+
+[vulkan.DescriptorPool]
+	@info = ""
+
+[vulkan.DescriptorPool.__init__]
+	@info = ""
+	max_sets = ""
+	s = ""
+
+[vulkan.DescriptorPool.create_set]
+	@info = ""
+	@return = ""
+	bindings = ""
+
+[vulkan.DescriptorSet]
+	@info = ""
+
+[vulkan.DescriptorSet.set_acceleration_structure]
+	@info = ""
+	ac = ""
+	binding = ""
+
+[vulkan.DescriptorSet.set_storage_image]
+	@info = ""
+	binding = ""
+	tex = ""
+
+[vulkan.DescriptorSet.set_texture]
+	@info = ""
+	binding = ""
+	tex = ""
+
+[vulkan.DescriptorSet.set_uniform_buffer]
+	@info = ""
+	binding = ""
+	buf = ""
+
+[vulkan.DescriptorSet.update]
+	@info = ""
+
+[vulkan.Device]
+	@info = ""
+	command_pool = ""
+	compute_queue = ""
+	graphics_queue = ""
+	present_queue = ""
+
+[vulkan.Device.create_simple]
+	@info = ""
+	@return = ""
+	instance = ""
+	op = ""
+	surface = ""
+
+[vulkan.Device.wait_idle]
+	@info = ""
+
+[vulkan.Fence]
+	@info = ""
+
+[vulkan.Fence.__init__]
+	@info = ""
+	device = ""
+
+[vulkan.Fence.reset]
+	@info = ""
+
+[vulkan.Fence.wait]
+	@info = ""
+
+[vulkan.FrameBuffer]
+	@info = ""
+	height = ""
+	width = ""
+
+[vulkan.FrameBuffer.__init__]
+	@info = ""
+	attachments = ""
+	rp = ""
+
+[vulkan.FrameBuffer.area]
+	@info = ""
+	@return = ""
+
+[vulkan.GraphicsPipeline]
+	@info = ""
+
+[vulkan.GraphicsPipeline.__init__]
+	@info = ""
+	format = ""
+	rp = ""
+	shader = ""
+	subpass = ""
+	topology = ""
+
+[vulkan.GraphicsPipeline.rebuild]
+	@info = ""
+
+[vulkan.GraphicsPipeline.set_blend]
+	@info = ""
+	alpha = ""
+	dst = ""
+	src = ""
+
+[vulkan.GraphicsPipeline.set_dynamic]
+	@info = ""
+	mode = ""
+
+[vulkan.GraphicsPipeline.set_line_width]
+	@info = ""
+	w = ""
+
+[vulkan.GraphicsPipeline.set_wireframe]
+	@info = ""
+	w = ""
+
+[vulkan.GraphicsPipeline.set_z]
+	@info = ""
+	test = ""
+	write = ""
+
+[vulkan.ImageLayout]
+	@info = ""
+
+[vulkan.ImageLayout.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[vulkan.ImageLayout.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[vulkan.ImageLayout.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[vulkan.Instance]
+	@info = ""
+
+[vulkan.Instance.create_glfw_surface]
+	@info = ""
+	@return = ""
+	window = ""
+
+[vulkan.Instance.create_headless_surface]
+	@info = ""
+	@return = ""
+
+[vulkan.Pipeline]
+	@info = ""
+
+[vulkan.PipelineBindPoint]
+	@info = ""
+
+[vulkan.PipelineBindPoint.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[vulkan.PipelineBindPoint.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[vulkan.PipelineBindPoint.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[vulkan.Queue]
+	@info = ""
+
+[vulkan.Queue.submit]
+	@info = ""
+	cb = ""
+	fence = ""
+	signal_sem = ""
+	wait_sem = ""
+
+[vulkan.RayPipeline]
+	@info = ""
+
+[vulkan.RayPipeline.__init__]
+	@info = ""
+	layout = ""
+	recursion_depth = ""
+	shader = ""
+
+[vulkan.RayPipeline.create_sbt]
+	@info = ""
+
+[vulkan.RenderPass]
+	@info = ""
+	clear_color = ""
+	clear_z = ""
+
+[vulkan.RenderPass.__init__]
+	@info = ""
+	formats = ""
+	options = ""
+
+[vulkan.RenderPass.add_dependency]
+	@info = ""
+	dst = ""
+	dst_opt = ""
+	src = ""
+	src_opt = ""
+
+[vulkan.RenderPass.add_subpass]
+	@info = ""
+	color_att = ""
+	depth_att = ""
+
+[vulkan.RenderPass.rebuild]
+	@info = ""
+
+[vulkan.Semaphore]
+	@info = ""
+
+[vulkan.Semaphore.__init__]
+	@info = ""
+	device = ""
+
+[vulkan.Shader]
+	@info = ""
+
+[vulkan.Shader.__init__]
+	@info = ""
+
+[vulkan.Shader.load]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[vulkan.StorageTexture]
+	@info = ""
+	height = ""
+	view = ""
+	width = ""
+
+[vulkan.StorageTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[vulkan.SwapChain]
+	@info = ""
+	format = ""
+	height = ""
+	width = ""
+
+[vulkan.SwapChain.acquire_image]
+	@info = ""
+	@return = ""
+	signal_sem = ""
+
+[vulkan.SwapChain.create]
+	@info = ""
+	@return = ""
+	device = ""
+	height = ""
+	width = ""
+
+[vulkan.SwapChain.create_depth_buffer]
+	@info = ""
+	@return = ""
+
+[vulkan.SwapChain.create_for_glfw]
+	@info = ""
+	@return = ""
+	device = ""
+	win = ""
+
+[vulkan.SwapChain.create_frame_buffers]
+	@info = ""
+	@return = ""
+	depth_buffer = ""
+	render_pass = ""
+
+[vulkan.SwapChain.create_render_pass]
+	@info = ""
+	@return = ""
+	depth_buffer = ""
+	options = ""
+
+[vulkan.SwapChain.create_textures]
+	@info = ""
+	@return = ""
+
+[vulkan.SwapChain.present]
+	@info = ""
+	@return = ""
+	image_index = ""
+	wait_sem = ""
+
+[vulkan.Texture]
+	@info = ""
+	height = ""
+	view = ""
+	width = ""
+
+[vulkan.Texture.__init__]
+	@info = ""
+	format = ""
+	h = ""
+	w = ""
+
+[vulkan.Texture.load]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[vulkan.Texture.write]
+	@info = ""
+	data = ""
+	format = ""
+	image = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[vulkan.UniformBuffer]
+	@info = ""
+
+[vulkan.UniformBuffer.__init__]
+	@info = ""
+	size = ""
+
+[vulkan.UniformBuffer.update]
+	@info = ""
+	source = ""
+
+[vulkan.VertexBuffer]
+	@info = ""
+	index = ""
+	vertex = ""
+
+[vulkan.VertexBuffer.__init__]
+	@info = ""
+	format = ""
+
+[vulkan.VertexBuffer.create_quad]
+	@info = ""
+	dest = ""
+	source = ""
+
+[vulkan.VertexBuffer.update]
+	@info = ""
+	vertices = ""
+
+[vulkan.VertexBuffer.update_index]
+	@info = ""
+	indices = ""
+
+[vulkan.VolumeTexture]
+	@info = ""
+	height = ""
+	view = ""
+	width = ""
+
+[vulkan.VolumeTexture.__init__]
+	@info = ""
+	format = ""
+	nx = ""
+	ny = ""
+	nz = ""
+
+[vulkan.create_window]
+	@info = ""
+	@return = ""
+	h = ""
+	title = ""
+	w = ""
+
+[vulkan.init]
+	@info = ""
+	@return = ""
+	op = ""
+
+[vulkan.window_close]
+	@info = ""
+	w = ""
+
+[vulkan.window_handle]
+	@info = ""
+	@return = ""
+	w = ""

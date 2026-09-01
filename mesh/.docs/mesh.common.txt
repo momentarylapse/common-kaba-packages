@@ -1,0 +1,28 @@
+
+[mesh.common.Mesh]
+	@info = ""
+	indices = ""
+	vertices = ""
+
+[mesh.common.Mesh.__init__]
+	@info = ""
+	indices = ""
+	vertices = ""
+
+[mesh.common.Mesh.bounding_box]
+	@info = ""
+	@return = ""
+
+[mesh.common.Vertex]
+	@info = ""
+	n = ""
+	pos = ""
+	u = ""
+	v = ""
+
+[mesh.common.Vertex.__init__]
+	@info = ""
+	n = ""
+	pos = ""
+	u = ""
+	v = ""

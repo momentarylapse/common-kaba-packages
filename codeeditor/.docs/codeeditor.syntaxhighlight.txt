@@ -1,0 +1,174 @@
+
+[codeeditor.syntaxhighlight.AutoCompleteData]
+	@info = ""
+	offset = ""
+	suggestions = ""
+
+[codeeditor.syntaxhighlight.AutoCompleteData.Item]
+	@info = ""
+	context = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.AutoCompleteData.Item.__init__]
+	@info = ""
+	context = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.AutoCompleteData.__init__]
+	@info = ""
+	offset = ""
+	suggestions = ""
+
+[codeeditor.syntaxhighlight.Markup]
+	@info = ""
+	end = ""
+	start = ""
+	type = ""
+
+[codeeditor.syntaxhighlight.Markup.__init__]
+	@info = ""
+	end = ""
+	start = ""
+	type = ""
+
+[codeeditor.syntaxhighlight.MarkupType]
+	@info = ""
+
+[codeeditor.syntaxhighlight.MarkupType.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[codeeditor.syntaxhighlight.MarkupType.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[codeeditor.syntaxhighlight.MarkupType.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[codeeditor.syntaxhighlight.Parser]
+	@info = ""
+
+[codeeditor.syntaxhighlight.Parser.Error]
+	@info = ""
+	filename = ""
+	message = ""
+	position = ""
+
+[codeeditor.syntaxhighlight.Parser.Error.__init__]
+	@info = ""
+	filename = ""
+	message = ""
+	position = ""
+
+[codeeditor.syntaxhighlight.Parser.Label]
+	@info = ""
+	category = ""
+	level = ""
+	line = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.Parser.Label.__init__]
+	@info = ""
+	category = ""
+	level = ""
+	line = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.Parser.SymbolInfo]
+	@info = ""
+	description = ""
+	filename = ""
+	line = ""
+	position = ""
+
+[codeeditor.syntaxhighlight.Parser.SymbolInfo.__init__]
+	@info = ""
+	description = ""
+	filename = ""
+	line = ""
+	position = ""
+
+[codeeditor.syntaxhighlight.Parser.__init__]
+	@info = ""
+
+[codeeditor.syntaxhighlight.Parser.create_markup]
+	@info = ""
+	@return = ""
+	offset = ""
+	text = ""
+
+[codeeditor.syntaxhighlight.Parser.find_errors]
+	@info = ""
+	@return = ""
+	text = ""
+
+[codeeditor.syntaxhighlight.Parser.find_labels]
+	@info = ""
+	@return = ""
+	text = ""
+
+[codeeditor.syntaxhighlight.Parser.prepare_symbols]
+	@info = ""
+	filename = ""
+	text = ""
+
+[codeeditor.syntaxhighlight.Parser.run_autocomplete]
+	@info = ""
+	@return = ""
+	code = ""
+	filename = ""
+	offset = ""
+
+[codeeditor.syntaxhighlight.Parser.symbol_info]
+	@info = ""
+	@return = ""
+	length = ""
+	offset = ""
+	text = ""
+
+[codeeditor.syntaxhighlight.Parser.word_type]
+	@info = ""
+	@return = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.Theme]
+	@info = ""
+	bg = ""
+	context = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.Theme.__init__]
+	@info = ""
+	bg = ""
+	context = ""
+	name = ""
+
+[codeeditor.syntaxhighlight.ThemeContext]
+	@info = ""
+	bg = ""
+	bold = ""
+	fg = ""
+	italic = ""
+	set_bg = ""
+
+[codeeditor.syntaxhighlight.ThemeContext.__init__]
+	@info = ""
+	bg = ""
+	bold = ""
+	fg = ""
+	italic = ""
+	set_bg = ""
+
+[codeeditor.syntaxhighlight.create_parser]
+	@info = ""
+	@return = ""
+	filename = ""
+
+[codeeditor.syntaxhighlight.get_theme]
+	@info = ""
+	@return = ""

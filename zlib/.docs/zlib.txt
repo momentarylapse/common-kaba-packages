@@ -1,0 +1,14 @@
+
+[zlib]
+	@info = "Zlib compression library."
+
+[zlib.compress]
+	@info = "Compress binary data."
+	@return = "!"
+	s = "!"
+
+[zlib.uncompress]
+	@info = "Decompress binary data."
+	@return = "!"
+	len_max = ""
+	s = "!"

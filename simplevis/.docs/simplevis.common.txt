@@ -1,0 +1,100 @@
+
+[simplevis.common.ColorMap]
+	@info = ""
+	colors = ""
+	values = ""
+
+[simplevis.common.ColorMap.__init__]
+	@info = ""
+	colors = ""
+	values = ""
+
+[simplevis.common.ColorMap.get]
+	@info = ""
+	@return = ""
+	f = ""
+
+[simplevis.common.ColorMap.max]
+	@info = ""
+	@return = ""
+
+[simplevis.common.ColorMap.min]
+	@info = ""
+	@return = ""
+
+[simplevis.common.ColorMap.sort]
+	@info = ""
+
+[simplevis.common.LineMode]
+	@info = ""
+
+[simplevis.common.LineMode.all]
+	@info = ""
+	@return = ""
+	type = ""
+
+[simplevis.common.LineMode.from_int]
+	@info = ""
+	@return = ""
+	i = ""
+
+[simplevis.common.LineMode.parse]
+	@info = ""
+	@return = ""
+	label = ""
+	type = ""
+
+[simplevis.common.SimpleContext]
+	@info = ""
+	ctx = ""
+	cur_params = ""
+	cur_rvd = ""
+	lines = ""
+	shadow_pass = ""
+
+[simplevis.common.SimpleContext.__init__]
+	@info = ""
+
+[simplevis.common.SimpleContext.create_material]
+	@info = ""
+	@return = ""
+	albedo = ""
+	emission = ""
+	metal = ""
+	roughness = ""
+
+[simplevis.common.SimpleContext.draw_lines]
+	@info = ""
+	mode = ""
+	points = ""
+
+[simplevis.common.SimpleContext.draw_mesh]
+	@info = ""
+	material = ""
+	matrix = ""
+	vb = ""
+
+[simplevis.common.SimpleContext.draw_wire_box]
+	@info = ""
+	box = ""
+
+[simplevis.common.SimpleContext.set_color]
+	@info = ""
+	c = ""
+
+[simplevis.common.SimpleContext.set_line_width]
+	@info = ""
+	w = ""
+
+[simplevis.common.default_color_map]
+	@info = ""
+	@return = ""
+
+[simplevis.common.default_color_map_transparent]
+	@info = ""
+	@return = ""
+
+[simplevis.common.mesh_to_vb]
+	@info = ""
+	@return = ""
+	m = ""
