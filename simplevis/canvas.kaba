@@ -185,7 +185,7 @@ Dialog canvas ''
 		xhui_renderer = new XhuiRenderer(ctx.ctx)
 
 
-		hdr = new HDRResolver(ctx.ctx, 1920, 1080) # TODO dynamically adapt to window size...
+		hdr = new HDRResolver(ctx.ctx)
 #		hdr.bloom_factor = 10
 
 		render_path = new RenderPathForward(ctx.ctx, 1024)

@@ -44,7 +44,7 @@ Dialog win 'bla'
 		xhui_renderer = new XhuiRenderer(ctx!)
 
 
-		hdr = new HDRResolver(ctx!, W, H)
+		hdr = new HDRResolver(ctx!)
 		hdr!.exposure = 0.2
 #		hdr.bloom_factor = 10
 

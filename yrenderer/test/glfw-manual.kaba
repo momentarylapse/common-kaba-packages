@@ -22,7 +22,7 @@ func main()
 
 	var wr = new WindowRenderer(ctx, w.win)
 
-	var hdr = new HDRResolver(ctx, W, H)
+	var hdr = new HDRResolver(ctx)
 	hdr.exposure = 0.2
 #	hdr.bloom_factor = 10
 

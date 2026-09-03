@@ -14,15 +14,6 @@ KABA_PACKAGE_EXPORT void export_symbols(kaba::IExporter* e) {
 }
 KABA_PACKAGE_EXPORT_END
 
-namespace yrenderer {
-	rect dynamicly_scaled_area(ygfx::FrameBuffer *fb) {
-		return rect(0, fb->width, 0, fb->height);
-	}
-
-	rect dynamicly_scaled_source() {
-		return rect(0, 1, 0, 1);
-	}
-}
 
 float global_shadow_box_size = 1000;
 

@@ -297,6 +297,8 @@ class extern RegionRenderer
 		var renderer: Renderer&
 	var regions: Region[]
 	func extern add_region(r: Renderer&, dest: Rect, z: i32)
+	func extern remove_region(r: Renderer*)
+	func extern selfref get_region(r: Renderer*) -> Region*
 
 class extern LightMeter
 	var histogram: i32[]
@@ -304,7 +306,8 @@ class extern LightMeter
 
 
 class extern HDRResolver extends Renderer
-	func extern __init__(ctx: Context&, width: i32, height: i32)
+	func extern mut __init__(ctx: Context&)
+	func extern mut set_resolution(width: i32, height: i32)
 	var texture: shared![Texture]
 	var depth_buffer: shared![DepthBuffer]
 	var exposure: f32
