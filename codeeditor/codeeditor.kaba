@@ -386,6 +386,7 @@ Dialog coding-panel ''
 			search_find(search_pos)
 		else
 			set_string("search-pattern", edit.text[p0:p1].escape())
+			set_options("search-pattern", "select")
 
 
 	func mut search_start_replace()
