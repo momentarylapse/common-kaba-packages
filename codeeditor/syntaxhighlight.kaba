@@ -37,8 +37,8 @@ class extern Parser extends Object
 	struct extern Label
 		var category: string
 		var name: string
-		var line: i32
-		var level: i32
+		var line = 0
+		var level = 0
 	struct extern Error
 		var filename: os.Path
 		var message: string

@@ -312,7 +312,7 @@ Dialog coding-panel ''
 		let i1 = line_end(lp.line)
 
 		clear_markings(i0, i1)
-		parser.prepare_symbols(edit.text, filename)
+	#	parser.prepare_symbols(edit.text, filename)
 		for m in parser.create_markup(edit.text[i0:i1], i0)
 			mark_word(m.start, m.end, m.type)
 
