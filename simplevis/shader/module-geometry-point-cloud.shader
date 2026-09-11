@@ -15,10 +15,13 @@ void main() {
 	out_color = in_color[0];
 	gl_Position = p + vec4(-dx,-dy,0,0);
 	EmitVertex();
+	out_color = in_color[0];
 	gl_Position = p + vec4( dx,-dy,0,0);
 	EmitVertex();
+	out_color = in_color[0];
 	gl_Position = p + vec4(-dx, dy,0,0);
 	EmitVertex();
+	out_color = in_color[0];
 	gl_Position = p + vec4( dx, dy,0,0);
 	EmitVertex();
 	EndPrimitive();
