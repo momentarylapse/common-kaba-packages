@@ -42,6 +42,16 @@ func box_corner(b: Box, index: i32) -> vec3
 	return r
 
 
+func box_intersects(a: Box, b: Box) -> bool
+	if a.max.x < b.min.x or a.min.x > b.max.x
+		return false
+	if a.max.y < b.min.y or a.min.y > b.max.y
+		return false
+	if a.max.z < b.min.z or a.min.z > b.max.z
+		return false
+	return true
+
+
 func which_octant(p: vec3, center: vec3) -> i32
 	var xxx = 0
 	if p.x > center.x
@@ -137,5 +147,17 @@ struct Octree
 				move_up_to_parent(i, index0)
 
 
+	func find_in_cell(c: Cell, b: Box, out indices: i32[])
+		indices |= c.contents
+		if c.first_child >= 0
+			for k in 0:8
+				let child = &cells[c.first_child + k]
+				if box_intersects(child.volume, b)
+					find_in_cell(child, b, indices)
 
+
+	func find(b: Box) -> i32[]
+		var indices: i32[]
+		find_in_cell(cells[0], b, indices)
+		return indices
 
