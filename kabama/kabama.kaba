@@ -7,13 +7,13 @@ use terminal
 
 func main(arg: string[])
 	var r: Runtime
-	
+
 	if len(arg) > 0
 		for a in arg
 			var t = r.eval(a)
 			print(str(t))
 		return
-	
+
 	print("welcome to kabama")
 	var history: string[]
 	while true

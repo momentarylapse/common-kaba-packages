@@ -1,9 +1,9 @@
 use .common.*
 use .parser.*
 
-func expand(_t: shared![Term]) -> shared![Term]
+func expand(_t: Term) -> Term
 	# recursive
-	var t = _t.shallow_copy()
+	var t = _t
 	for mut p in t.params
 		p = expand(p)
 
@@ -11,7 +11,7 @@ func expand(_t: shared![Term]) -> shared![Term]
 	if t.name == "*"
 		var p1 = t.params[0]
 		var p2 = t.params[1]
-		
+
 		if (p1.name == "+") or (p1.name == "-")
 			# (x + y) * z  ->  x * z + y * z
 			return expand(AddOperator(p1.name, AddOperator("*", p1.params[0], p2),
@@ -37,5 +37,5 @@ func expand(_t: shared![Term]) -> shared![Term]
 		if p1.name == "^"
 			# (a ^ b) ^ c -> a ^ (b * c)
 			return expand(AddOperator("^", p1.params[0], AddOperator("*", p1.params[1], p2)))
-		
-	return give(t)
+
+	return t

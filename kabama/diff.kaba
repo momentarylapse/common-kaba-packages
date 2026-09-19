@@ -3,7 +3,7 @@ use .parser.*
 use .simplify.*
 
 
-func diff_function(f: string, params: shared![Term][]) -> xfer[Term]
+func diff_function(f: string, params: Term[]) -> Term
 	if f == "exp"
 		return AddFunction("exp", params)
 	if f == "sin"
@@ -25,7 +25,7 @@ func diff_function(f: string, params: shared![Term][]) -> xfer[Term]
 
 # d/dx
 # always copies...
-func diff(t: shared![Term], by: string) -> xfer[Term]
+func diff(t: Term, by: string) -> Term
 #	print("D D D D")
 #	print(t)
 #	print(by)
@@ -41,9 +41,9 @@ func diff(t: shared![Term], by: string) -> xfer[Term]
 	if t.type == Type.FUNCTION
 		var r = diff_function(t.name, t.params)
 		for p in t.params
-			r = AddOperator("*", diff(p, by), give(r))
+			r = AddOperator("*", diff(p, by), r)
 		# diff(f(a))  ->  f'(a) * diff(a)
-		return give(r)
+		return r
 	if t.type == Type.OPERATOR
 #		print("DD op")
 #		print(t)
@@ -84,8 +84,8 @@ func diff(t: shared![Term], by: string) -> xfer[Term]
 			                                         AddOperator("*", AddOperator("^", a, b),
 			                                                          diff(b, by))))
 	if t.type == Type.LIST
-		var r = t.shallow_copy()
+		var r = t
 		for i=>p in r.params
 			r.params[i] = diff(p, by)
-		return give(r)
+		return r
 	raise(new RuntimeError("unhandled differential..."))

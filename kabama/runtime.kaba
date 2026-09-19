@@ -14,17 +14,17 @@ class Runtime
 	struct Function
 		var name: string
 		var params: string[]
-		var formula: shared![Term]
+		var formula: Term
 		func __str__() -> string
 			var p = params.join(", ")
 			return "Function {{name}}({{p}}) := {{formula}}"
-	var assumptions: shared![Term][]
+	var assumptions: Term[]
 	var functions: owned![Function][]
-	var history: shared![Term][]
-	
+	var history: Term[]
+
 	#class Error extends Exception
-	
-	func mut add_function(t: shared![Term])
+
+	func mut add_function(t: Term)
 		var f = new Function()
 		f.name = t.params[0].name
 		for p in t.params[0].params
@@ -33,11 +33,11 @@ class Runtime
 		functions.add(give(f))
 		#print("added... " + str(f))
 
-	func mut eval_term(_t: shared![Term]) -> shared![Term]
+	func mut eval_term(_t: Term) -> Term
 		# recursive
-		var t = _t.shallow_copy()
+		var t = _t
 		t.params = [for p in t.params eval_term(p)]
-			
+
 		# self
 		if t.name == "$"
 			if len(history) == 0
@@ -49,7 +49,7 @@ class Runtime
 			try
 				return diff(t.params[0], t.params[1].name)
 			except
-				return give(t)
+				return t
 		else if t.name == "subst"
 			return subst(t.params[0], t.params[1], t.params[2], 50)
 		else if t.name == "zeros"
@@ -63,10 +63,10 @@ class Runtime
 			for f in functions
 				if f.name == t.name
 					return subst_variable(f.formula, f.params[0], t.params[0])
-				
-		return give(t)
 
-	func mut eval(s: string) -> shared![Term]
+		return t
+
+	func mut eval(s: string) -> Term
 		let t = parse(s)
 		let r = normalize(eval_term(t))
 		history.add(r)
