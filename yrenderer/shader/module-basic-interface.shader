@@ -71,8 +71,8 @@ layout(binding=10) uniform Multi {
 layout(binding=11) uniform BoneData {
 	mat4 bone_matrix[1024];
 };
-layout(binding=12) uniform SurfelData {
-	Surfel surfels[1024];
+layout(binding=12) readonly buffer SurfelData {
+	Surfel surfels[4096];
 };
 
 //uniform Fog fog;
@@ -89,7 +89,7 @@ const float PI = 3.141592654;
 
 
 float _surf_rand3d(vec3 p) {
-	return fract(sin(dot(p ,vec3(12.9898,78.233,4213.1234))) * 43758.5453);
+	return fract(sin(dot(p ,vec3(12.9898,78.233,42.1234))) * 43758.5453);
 }
 
 vec4 texture_blurred(sampler2D tex, vec2 uv, float r) {
