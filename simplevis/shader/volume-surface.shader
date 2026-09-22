@@ -1,5 +1,5 @@
 <Layout>
-	version = 420
+	version = 460
 	pushsize = 128
 	input = [vec3,vec3,vec2]
 	topology = triangles
@@ -40,12 +40,12 @@ void main() {
 	float tmp5 = material.roughness;
 	float tmp6 = material.metal;
 	vec4 tmp7 = material.emission;
-	
+
 	vec3 p0 = (inverse(matrix.view * matrix.model) * vec4(tmp1,1)).xyz;
-	
+
 	float f = texture(tex3d, p0).r;
 	vec4 c = color_map(f);
-	
+
 	// SurfaceOutput
 	surface_out(tmp2, c, tmp7, tmp6, tmp5);
 }

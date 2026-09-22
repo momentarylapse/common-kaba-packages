@@ -97,14 +97,14 @@ class Canvas extends canvas.Canvas
 					continue
 				let cc2 = c2.volume.center()
 
-					let d = len(cc1 - cc2)
+					let d = len(cc2 - cc1)
 					if d > R / 2.0^max(c1.level, c2.level)
 						# far field - approximate
-						let f0 = G * (cc1 - cc2) / d^3
+						let f0 = G * (cc2 - cc1) / d^3 * dt
 						for i in c1.contents
 							vel[i] += f0 * c2.count
 						for i in c2.contents
-							vel[i] += f0 * c1.count
+							vel[i] -= f0 * c1.count
 						nn0 ++
 					else
 						nn1 ++
@@ -124,8 +124,8 @@ class Canvas extends canvas.Canvas
 
 	func mut iterate()
 		var t: time.Timer
-		step_brute_force()
-		#step_tree()
+		#step_brute_force()
+		step_tree()
 		time_per_step = t.get()
 
 		tree.update(points)
