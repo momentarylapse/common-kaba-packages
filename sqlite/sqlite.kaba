@@ -1,3 +1,5 @@
+use os
+
 let _SQLITE_OPEN_READWRITE = 2
 let _SQLITE_OPEN_CREATE = 4
 
@@ -115,8 +117,8 @@ class Query as shared
 		return r
 
 
-func open(filename: string) -> result[xfer[Database]]
-	var f = filename
+func open(filename: os.Path) -> result[xfer[Database]]
+	var f = str(filename)
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE, nil)
@@ -125,8 +127,8 @@ func open(filename: string) -> result[xfer[Database]]
 	return give(db)
 
 
-func create(filename: string) -> result[xfer[Database]]
-	var f = filename
+func create(filename: os.Path) -> result[xfer[Database]]
+	var f = str(filename)
 	f.add(0)
 	var db = new Database()
 	_sqlite3_open_v2(&f[0], &db.db, _SQLITE_OPEN_READWRITE + _SQLITE_OPEN_CREATE, nil)
