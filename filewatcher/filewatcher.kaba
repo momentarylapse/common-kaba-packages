@@ -1,0 +1,21 @@
+use os
+use obs
+
+
+#-----------------------------------------------------------------
+# experimental!
+
+struct MoveInfo
+	var from, to: os.Path
+
+
+class extern FileWatcher as obs.Node
+	var out_edited = obs.XSource[os.Path](&self, &ind, "edited")
+	var out_created = obs.XSource[os.Path](&self, &ind, "created")
+	var out_deleted = obs.XSource[os.Path](&self, &ind, "deleted")
+	var out_moved = obs.XSource[MoveInfo](&self, &ind, "moved")
+	func extern mut __init__()
+	func extern virtual mut __delete__()
+	func extern add(path: os.Path)
+	func extern iterate()
+

@@ -9,6 +9,7 @@ package codeeditor
 package crypto
 package fft
 package filetags
+package filewatcher
 package gl
 package glfw
 package hui
