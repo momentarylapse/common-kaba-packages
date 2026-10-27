@@ -738,6 +738,9 @@ template<> string str(const bool& b) {
 template<> string str(const string& s) {
 	return s;
 }
+template<> string str(const bytes& s) {
+	return s.hex();
+}
 /*template<> string str(const Array<string>& a) {
 	return sa2s(a);
 }*/
@@ -1005,7 +1008,7 @@ double s2f64(const string &s) {
 }
 
 bool string::_bool() const {
-	return (*this == "true") or (*this == "yes");
+	return (*this == "true") or (*this == "yes") or (*this == "on");
 }
 
 bool s2b(const string &s) {

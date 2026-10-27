@@ -1,3 +1,6 @@
+use os
+
+
 class extern InternalNodeData
 	func extern mut __init__()
 	func extern mut __delete__()
@@ -69,4 +72,21 @@ func extern subscribe(source: Source, sink: Sink)
 func extern xpsubscribe(source: XPSource, sink: XPSink)
 func xsubscribe[X](source: XSource[X], sink: XSink[X])
 	xpsubscribe(source, sink)
+
+
+#-----------------------------------------------------------------
+# experimental
+
+#struct MoveInfo
+#	var from, to: os.Path
+
+
+#class extern FileWatcher as Node
+#	var out_edited = XSource[os.Path](&self, &ind, "edited")
+#	var out_created = XSource[os.Path](&self, &ind, "created")
+#	var out_deleted = XSource[os.Path](&self, &ind, "deleted")
+#	var out_moved = XSource[MoveInfo](&self, &ind, "moved")
+#	func extern mut __init__()
+#	func extern virtual mut __delete__()
+#	func extern add(path: os.Path)
 
