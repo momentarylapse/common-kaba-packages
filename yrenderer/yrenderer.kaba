@@ -20,7 +20,7 @@ struct extern YLight
 	var theta: f32
 	var harshness: f32
 	var enabled: bool
-	var allow_shadow: bool
+	var allow_shadows: bool
 	var user_shadow_control: bool
 	var user_shadow_theta: f32
 	var shadow_dist_min: f32
@@ -130,9 +130,10 @@ class extern LineHelper
 	func extern mut start_frame(ui_scale=1.0)
 	func extern mut begin_draw(params: RenderParams, rvd: RenderViewData)
 	func extern mut set_color(c: Color)
-	func extern mut set_z(enabled: bool)
+	func extern mut set_z_test(enabled: bool)
 	func extern mut set_line_width(w: f32)
 	func extern mut draw_lines(points: vec3[], contiguous=true)
+	func extern mut draw_circle(center: vec3, axis: vec3, radius: f32)
 
 func extern apply_shader_data(params: RenderParams, s: Shader*, shader_data: Any)
 
@@ -236,7 +237,7 @@ class extern SceneView
 	var shadow_indices: i32[] # read-only
 	var lights: YLight&[] # read-only
 	var shadow_box_size: f32
-	var surfel_buffer: owned[UniformBuffer]
+	var surfel_buffer: owned[ShaderStorageBuffer]
 	var num_surfels: i32
 	var probe_cells: ivec3
 	var probe_min: vec3
@@ -301,8 +302,9 @@ class extern RegionRenderer
 	func extern selfref get_region(r: Renderer*) -> Region*
 
 class extern LightMeter
-	var histogram: i32[]
-	var brightness: f32
+	var active: bool
+	var buffer: ShaderStorageBuffer&
+	func extern read_histogram() -> i32[]
 
 
 class extern HDRResolver extends Renderer

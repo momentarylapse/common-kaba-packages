@@ -259,7 +259,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->declare_enum("CullMode.FRONT", CullMode::FRONT);
 
 	ext->declare_enum("Alpha.ZERO", Alpha::ZERO);
-	ext->declare_enum("Alpha.ZERO", Alpha::ONE);
+	ext->declare_enum("Alpha.ONE", Alpha::ONE);
 	ext->declare_enum("Alpha.SOURCE_COLOR", Alpha::SOURCE_COLOR);
 	ext->declare_enum("Alpha.SOURCE_INV_COLOR", Alpha::SOURCE_INV_COLOR);
 	ext->declare_enum("Alpha.SOURCE_ALPHA", Alpha::SOURCE_ALPHA);
@@ -496,10 +496,11 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_class_func("LineHelper.__delete__", &kaba::generic_delete<LineHelper>);
 		ext->link_class_func("LineHelper.start_frame", &LineHelper::start_frame);
 		ext->link_class_func("LineHelper.begin_draw", &LineHelper::begin_draw);
-		ext->link_class_func("LineHelper.set_z", &LineHelper::set_z_test);
+		ext->link_class_func("LineHelper.set_z_test", &LineHelper::set_z_test);
 		ext->link_class_func("LineHelper.set_color", &LineHelper::set_color);
 		ext->link_class_func("LineHelper.set_line_width", &LineHelper::set_line_width);
 		ext->link_class_func("LineHelper.draw_lines", &LineHelper::draw_lines);
+		ext->link_class_func("LineHelper.draw_circle", &LineHelper::draw_circle);
 	}
 
 	{
@@ -584,7 +585,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.21");
+	ext->package_info("yrenderer", "0.22");
 	_export_package_yrenderer_internal(ext);
 }
 
