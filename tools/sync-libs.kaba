@@ -1,5 +1,5 @@
 use os
-#use package
+use package.common as pc
 
 let REPO_FILE = ".kaba-repo"
 
@@ -57,6 +57,9 @@ func load_repo(dir: os.Path) -> Package[]
 
 
 func init() -> Global
+	pc.load_basic_config()
+	pc.load_package_list()
+
 	var g: Global
 	g.entries = load_list()
 	for e in g.entries
@@ -73,13 +76,15 @@ func init() -> Global
 	return g
 
 
-func sync_dir(source: os.Path, dest: os.Path, cmd: string)
+func sync_dir(source: os.Path, dest: os.Path, cmd: string, allow_cpp_source = true)
 	#print("  {{source.basename()}}")
 	for f in os.fs.search(source, "*", "fr")
 		# ignore:
 		if f in os.Path("test")
 			continue
 		if f in os.Path(".docs")
+			continue
+		if f in os.Path("sharedlib") and not allow_cpp_source
 			continue
 		if f.extension() in ["so", "dll", "dylib", "gitignore"]
 			continue
@@ -130,11 +135,11 @@ func sync_kaba_package(dir: os.Path, lib: Entry, cmd: string)
 func sync_kaba_package_forward(dir: os.Path, lib: Entry, cmd: string)
 	print("> kaba package {{dir}} (forward)")
 	let name = dir.basename()
-	let source = os.app_directory_dynamic | "packages" | name
-	if os.fs.exists(source)
-		sync_dir(source, dir, cmd)
+	for pp in pc.list_find(pc.conf.packages_remote, name)
+		#print(pp.base_source)
+		sync_dir(pp.base_source, dir, cmd, false)
 	else
-		print("  {{os.terminal.RED}}NOT INSTALLED{{os.terminal.END}} {{name}}")
+		print("  {{os.terminal.RED}}NO SOURCE FOUND{{os.terminal.END}} {{name}}")
 
 
 
