@@ -48,7 +48,6 @@ class DocumentSwitcher extends xhui.Dialog
 	var editor_window: EditorWindow&
 	var docs: CodeEditor&[]
 
-
 	func __init__(_editor_window: EditorWindow&)
 		super.__init__("...", 500, 400, _editor_window, xhui.DialogFlags.NO_HEADER)
 		editor_window := _editor_window
@@ -117,26 +116,25 @@ Window test 'test' padding=0
 		set_key_code("next-document", key_next_doc)
 		set_key_code("previous-document", key_next_doc + xhui.KEY_SHIFT)
 
-		let f_new = func()
+		event("new", func()
 			let _ = create_document_editor()
-		let f_close_doc = func()
-			close_document(active_editor)
-
-		event("new", f_new)
+		end)
 		event("open", on_open)
 		event("save", on_save)
 		event("save-as", on_save_as)
 		event("next-document", on_next_document)
 		event("previous-document", on_previous_document)
-		event("close-document", f_close_doc)
+		event("close-document", func()
+			close_document(active_editor)
+		end)
 		event("exit", request_destroy)
 		event_x("overlay-area", "hui:draw", draw_overlay)
 
 		set_options("files", "linkevents")
 		set_options("files", "directory={{os.fs.current_directory()}}")
-		let on_files = func()
+		event("files", func()
 			let _ = open_document(get_string("files"))
-		event("files", on_files)
+		end)
 
 
 	func mut draw_overlay(p: xhui.Painter)
@@ -150,9 +148,9 @@ Window test 'test' padding=0
 		for e in active_editor
 			if not e.filename.is_empty()
 				dir = e.filename.parent()
-		let f = func(filename: os.Path)
+		xhui.file_dialog(&self, "Open file..", dir, []).then(func(filename: os.Path)
 			let _ = open_document(filename)
-		xhui.file_dialog(&self, "Open file..", dir, []).then(f)
+		end)
 
 
 	func mut on_save()
@@ -166,10 +164,10 @@ Window test 'test' padding=0
 
 	func mut on_save_as()
 		for mut e in active_editor
-			let f = func(filename: os.Path)
+			xhui.file_dialog(&self, "Save file..", os.fs.current_directory(), ["save"]).then(func(filename: os.Path)
 				e.save(filename)
 				info("saved")
-			xhui.file_dialog(&self, "Save file..", os.fs.current_directory(), ["save"]).then(f)
+			end)
 
 
 	func override on_key_up(key_code: i32)
@@ -246,7 +244,7 @@ Window test 'test' padding=0
 
 	func mut close_document(editor: CodeEditor*)
 		let index = find(weak(document_editors), editor)
-		if (index < 0)
+		if index < 0
 			return
 		var next = nil as CodeEditor*
 		if len(document_editors) >= 2
@@ -269,10 +267,10 @@ Window test 'test' padding=0
 
 	func mut add_message(type: MessageType, message: string)
 		messages.add([type, message])
-		let f = func()
+		xhui.run_later(4.0, func()
 			messages.remove(0)
 			request_redraw()
-		xhui.run_later(4.0, f)
+		end)
 		request_redraw()
 	func mut info(message: string)
 		add_message(MessageType.INFO, message)
