@@ -1,16 +1,13 @@
 use os
 use kaba
-use obs
 use xhui as hui
 use yrenderer.*
 use out .common.*
 use out .canvas.*
 
 
-
-class Window extends hui.Window as obs.Node
+class Window extends hui.Window
 	var canvas: shared![Canvas]
-
 
 	func __init__(_canvas: shared![Canvas], title: string)
 		super.__init__(title, 800, 600)
@@ -22,10 +19,6 @@ Dialog win 'bla' borderwidth=0
 
 		canvas = _canvas
 		embed("grid", 0, 0, canvas)
-
-		canvas.out_redraw >> create_sink(func() redraw("area"))
-
-		print("hi")
 
 
 func run(c: shared![Canvas], title="Simplevis")

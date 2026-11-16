@@ -70,8 +70,16 @@ class ViewPort extends Object as obs.Node
 		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000)
 
 
+struct MouseInfo
+	var position = vec2.0
+	var delta = vec2.0
+	var scroll = vec2.0
+	var left_button = false
+	var middle_button = false
+	var right_button = false
+
+
 class Canvas extends hui.Panel as obs.Node
-	var out_redraw = obs.Source(&self, &ind, "redraw")
 	var yctx: owned![Context]
 	var ctx: SimpleContext
 	var xhui_renderer: owned[XhuiRenderer]
@@ -95,13 +103,24 @@ class Canvas extends hui.Panel as obs.Node
 #	var mode = MouseMode.NONE
 
 
+	# interface
+	func virtual mut on_initialize()
+	func virtual mut on_prepare()
+	func virtual mut on_draw()
+	func virtual mut on_draw_transparent()
+	func virtual mut on_draw_2d(out p: image.Painter)
+	func virtual mut on_mouse_move(m: MouseInfo)
+	func virtual mut on_mouse_wheel(d: vec2)
+	func virtual mut on_key_down(k: i32)
+
+
 	func __init__()
 		super.__init__("")
 		from_source("
 Dialog canvas ''
 	DrawingArea area '' expandy cangrabfocus grabfocus
 ")
-		cam.out_changed >> create_sink(func() out_redraw())
+		cam.out_changed >> create_sink(request_redraw)
 
 		event_x("area", "hui:mouse-move", xmouse_move)
 		event_x("area", "hui:mouse-wheel", xmouse_wheel)
@@ -124,7 +143,7 @@ Dialog canvas ''
 	func mut begin_animation()
 		animation_request_level ++
 		if animation_request_level == 1
-			animation_id = hui.run_repeated(UPDATE_DT, func() out_redraw())
+			animation_id = hui.run_repeated(UPDATE_DT, request_redraw)
 
 
 	func mut end_animation()
@@ -137,8 +156,7 @@ Dialog canvas ''
 		message = ""
 		message_ttl = -1.0
 		end_animation()
-		# direct out_redraw() not working...
-		hui.run_later(0.01, func() out_redraw())
+		hui.run_later(0.01, request_redraw)
 
 
 	func mut set_message(m: string)
@@ -159,26 +177,42 @@ Dialog canvas ''
 
 	func mut xmouse_move()
 		for w in get_window()
-			on_mouse_move(w.get_mouse_delta(), w.left_button(), w.middle_button(), w.right_button())
+			var m: MouseInfo
+			m.position = w.get_mouse_position()
+			m.delta = w.get_mouse_delta()
+			m.left_button = w.left_button()
+			m.middle_button = w.middle_button()
+			m.right_button = w.right_button()
+			if m.right_button
+				cam.rotate(Quaternion(vec3(m.delta.y, m.delta.x, 0) * 0.003))
+			if m.middle_button
+				cam.move(vec3(-m.delta.x, m.delta.y, 0.0) * 0.001)
+
+			on_mouse_move(m)
 
 
 	func mut xmouse_wheel()
 		for w in get_window()
-			on_mouse_wheel(w.get_scroll())
+			let d = w.get_scroll()
+			cam.zoom(exp(d.y * 0.1))
+
+			on_mouse_wheel(d)
 
 
 	func mut xkey_down()
 		for w in get_window()
-			on_key_down(w.get_key_code())
+			let k = w.get_key_code()
+			if k == hui.KEY_LEFT
+				cam.move([-0.05,0,0])
+			if k == hui.KEY_RIGHT
+				cam.move([0.05,0,0])
+			if k == hui.KEY_UP
+				cam.move([0,0.05,0])
+			if k == hui.KEY_DOWN
+				cam.move([0,-0.05,0])
 
+			on_key_down(k)
 
-	# interface
-	func virtual mut on_initialize()
-	func virtual mut on_prepare()
-	func virtual mut on_draw()
-	func virtual mut on_draw_transparent()
-	func virtual mut on_draw_2d(out p: image.Painter)
-#	func override on_mouse_move(m: vec2)
 
 	func mut initialize(c: Context&)
 		ctx.ctx := c
@@ -207,7 +241,7 @@ Dialog canvas ''
 
 		on_initialize()
 
-		hui.run_later(0.1, func() out_redraw())
+		hui.run_later(0.1, request_redraw)
 
 
 	func mut before_draw(out p: hui.Painter)
@@ -235,28 +269,6 @@ Dialog canvas ''
 			message_ttl -= UPDATE_DT
 			if message_ttl < 0
 				clear_message()
-
-
-	func virtual mut on_mouse_move(d: vec2, lbut: bool, mbut: bool, rbut: bool)
-		if rbut
-			cam.rotate(Quaternion(vec3(d.y, d.x, 0) * 0.003))
-		if mbut
-			cam.move(vec3(-d.x, d.y, 0.0) * 0.001)
-
-
-	func override on_mouse_wheel(d: vec2)
-		cam.zoom(exp(d.y * 0.1))
-
-
-	func override on_key_down(k: i32)
-		if k == hui.KEY_LEFT
-			cam.move([-0.05,0,0])
-		if k == hui.KEY_RIGHT
-			cam.move([0.05,0,0])
-		if k == hui.KEY_UP
-			cam.move([0,0.05,0])
-		if k == hui.KEY_DOWN
-			cam.move([0,-0.05,0])
 
 
 	func mut set_background(b: Color)
