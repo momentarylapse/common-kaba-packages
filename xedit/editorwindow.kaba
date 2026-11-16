@@ -170,7 +170,7 @@ Window test 'test' padding=0
 			end)
 
 
-	func override on_key_up(key_code: i32)
+	func override _on_key_up(key_code: i32)
 		let key = key_code & 0xff
 		if key == xhui.KEY_LEFT_CONTROL or key == xhui.KEY_LEFT_ALT
 			for mut s in switcher

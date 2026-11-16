@@ -34,9 +34,6 @@ Dialog win 'bla'
 
 		hui.run_repeated(0.01, func() redraw("area"))
 
-	func override on_mouse_move(m: vec2)
-		#print(m)
-
 	func mut xinitialize(p: hui.Painter)
 		print("INIT")
 		ctx = api_init_xhui(&p)

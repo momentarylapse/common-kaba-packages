@@ -101,13 +101,13 @@ class MyWindow extends xhui.Window as obs.Node
 Window win 'Cloud explorer' borderwidth=0
 	Grid main-grid ''
 		.
-		Grid side-panel ''
-			ListView list 'files' nobar width=250 selectmulti'")
+		Grid side-panel '' expandy
+			ListView list 'files' nobar width=280 expandy selectmulti
+			---|
+			Button ? '???' height=0")
 
 		canvas = new CloudRenderCanvas()
 		embed("main-grid", 0, 0, canvas)
-
-		canvas.out_redraw >> create_sink(func() redraw("area"))
 
 		for mut list in get_control("list") as xhui.ListView*
 			list.column_factory(0).set_create(func(id: string) xhui.create_control("Label", "!markup", id))

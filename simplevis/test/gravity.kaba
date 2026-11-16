@@ -136,7 +136,7 @@ class Canvas extends canvas.Canvas
 			if len(p) > R*3
 				p = p.normalized() * R*3
 				vel[i] = vec3.0
-		out_redraw()
+		request_redraw()
 
 
 func main()
