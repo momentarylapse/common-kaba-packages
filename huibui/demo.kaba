@@ -7,7 +7,6 @@ use .resource.*
 class DemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("", 100, 100)
-		set_border_width(10)
 		from_source(source)
 		event("close", on_close)
 		event("ok", on_close)
@@ -18,14 +17,14 @@ class DemoDialog extends hui.Window
 class ToolbarDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Toolbar demo", 800, 300)
-		for mut t in toolbar(0)
-			t.from_source(source)
+#		for mut t in toolbar(0)
+#			t.from_source(source)
 
 class MenuDemoDialog extends hui.Window
 	func __init__(source: string)
 		super.__init__("Menu demo", 800, 300)
-		var m = hui.create_menu_from_source(source, &self)
-		set_menu(give(m))
+#		var m = hui.create_menu_from_source(source, &self)
+#		set_menu(give(m))
 
 func action_demo(arg: string[])
 	var filename = Path(arg[0])

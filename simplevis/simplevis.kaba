@@ -1,6 +1,6 @@
 use os
 use kaba
-use xhui as hui
+use hui
 use yrenderer.*
 use out .common.*
 use out .canvas.*

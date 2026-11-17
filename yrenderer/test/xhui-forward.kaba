@@ -1,6 +1,6 @@
 use os
 use kaba
-use xhui as hui
+use hui
 use yrenderer.*
 
 let W = 800
@@ -36,7 +36,7 @@ Dialog win 'bla'
 
 	func mut xinitialize(p: hui.Painter)
 		print("INIT")
-		ctx = api_init_xhui(&p)
+		ctx = api_init_hui(&p)
 		ctx!.create_managers([], [kaba.packages_root() | "yrenderer/shader"], [])
 		xhui_renderer = new XhuiRenderer(ctx!)
 

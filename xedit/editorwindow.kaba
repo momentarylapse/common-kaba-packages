@@ -1,4 +1,4 @@
-use xhui
+use hui
 use os
 use obs
 use codeeditor.*
@@ -18,7 +18,7 @@ enum MessageType
 	ERROR
 
 
-func draw_boxed_str(p: xhui.Painter, _pos: vec2, str: string, align: i32, style: MessageType)
+func draw_boxed_str(p: hui.Painter, _pos: vec2, str: string, align: i32, style: MessageType)
 	let size = p.get_str_size(str)
 	var pos = _pos
 	if align == 0
@@ -44,18 +44,18 @@ func nice_dir(dir: os.Path) -> string
 	return str(dir)
 
 
-class DocumentSwitcher extends xhui.Dialog
+class DocumentSwitcher extends hui.Dialog
 	var editor_window: EditorWindow&
 	var docs: CodeEditor&[]
 
 	func __init__(_editor_window: EditorWindow&)
-		super.__init__("...", 500, 400, _editor_window, xhui.DialogFlags.NO_HEADER)
+		super.__init__("...", 500, 400, _editor_window, hui.DialogFlags.NO_HEADER)
 		editor_window := _editor_window
 		docs = weak(editor_window.document_editors) |> sort("-last_usage_counter")
 
 		add_control("ListView", "open files", 0, 0, "list")
-		for mut list in get_control("list") as xhui.ListView*
-			let f = func(id: string) xhui.create_control("Label", "!markup,paddingx=5", id)
+		for mut list in get_control("list") as hui.ListView*
+			let f = func(id: string) hui.create_control("Label", "!markup,paddingx=5", id)
 			list.column_factory(0).set_create(f)
 
 		for e in docs
@@ -77,7 +77,7 @@ class DocumentSwitcher extends xhui.Dialog
 			set_int("list", loop(get_int("list") - 1, 0, len(docs)))
 
 
-class EditorWindow extends xhui.Window as obs.Node
+class EditorWindow extends hui.Window as obs.Node
 	var document_editors: shared![CodeEditor][]
 	var active_editor = nil as CodeEditor*
 	var switcher: shared[DocumentSwitcher]
@@ -101,20 +101,20 @@ Window test 'test' padding=0
 
 		set_maximized(true)
 
-		var mod = xhui.KEY_CONTROL
-		var key_next_doc = xhui.KEY_CONTROL + xhui.KEY_TAB
+		var mod = hui.KEY_CONTROL
+		var key_next_doc = hui.KEY_CONTROL + hui.KEY_TAB
 		if os.system_type == os.SystemType.MAC
-			mod = xhui.KEY_SUPER
-			key_next_doc = xhui.KEY_ALT + xhui.KEY_TAB
+			mod = hui.KEY_SUPER
+			key_next_doc = hui.KEY_ALT + hui.KEY_TAB
 
-		set_key_code("new", xhui.KEY_N + mod)
-		set_key_code("open", xhui.KEY_O + mod)
-		set_key_code("save", xhui.KEY_S + mod)
-		set_key_code("save-as", xhui.KEY_S + mod + xhui.KEY_SHIFT)
-		set_key_code("exit", xhui.KEY_Q + mod)
-		set_key_code("close-document", xhui.KEY_W + mod)
+		set_key_code("new", hui.KEY_N + mod)
+		set_key_code("open", hui.KEY_O + mod)
+		set_key_code("save", hui.KEY_S + mod)
+		set_key_code("save-as", hui.KEY_S + mod + hui.KEY_SHIFT)
+		set_key_code("exit", hui.KEY_Q + mod)
+		set_key_code("close-document", hui.KEY_W + mod)
 		set_key_code("next-document", key_next_doc)
-		set_key_code("previous-document", key_next_doc + xhui.KEY_SHIFT)
+		set_key_code("previous-document", key_next_doc + hui.KEY_SHIFT)
 
 		event("new", func()
 			let _ = create_document_editor()
@@ -137,7 +137,7 @@ Window test 'test' padding=0
 		end)
 
 
-	func mut draw_overlay(p: xhui.Painter)
+	func mut draw_overlay(p: hui.Painter)
 		p.set_color(Color.WHITE)
 		for m in messages
 			draw_boxed_str(p, p.area().center(), m.message, 0, m.type)
@@ -148,7 +148,7 @@ Window test 'test' padding=0
 		for e in active_editor
 			if not e.filename.is_empty()
 				dir = e.filename.parent()
-		xhui.file_dialog(&self, "Open file..", dir, []).then(func(filename: os.Path)
+		hui.file_dialog(&self, "Open file..", dir, []).then(func(filename: os.Path)
 			let _ = open_document(filename)
 		end)
 
@@ -164,7 +164,7 @@ Window test 'test' padding=0
 
 	func mut on_save_as()
 		for mut e in active_editor
-			xhui.file_dialog(&self, "Save file..", os.fs.current_directory(), ["save"]).then(func(filename: os.Path)
+			hui.file_dialog(&self, "Save file..", os.fs.current_directory(), ["save"]).then(func(filename: os.Path)
 				e.save(filename)
 				info("saved")
 			end)
@@ -172,7 +172,7 @@ Window test 'test' padding=0
 
 	func override _on_key_up(key_code: i32)
 		let key = key_code & 0xff
-		if key == xhui.KEY_LEFT_CONTROL or key == xhui.KEY_LEFT_ALT
+		if key == hui.KEY_LEFT_CONTROL or key == hui.KEY_LEFT_ALT
 			for mut s in switcher
 				s.request_destroy()
 				switcher = nil
@@ -267,7 +267,7 @@ Window test 'test' padding=0
 
 	func mut add_message(type: MessageType, message: string)
 		messages.add([type, message])
-		xhui.run_later(4.0, func()
+		hui.run_later(4.0, func()
 			messages.remove(0)
 			request_redraw()
 		end)

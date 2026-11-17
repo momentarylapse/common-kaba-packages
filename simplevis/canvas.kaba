@@ -2,7 +2,7 @@ use os
 use kaba
 use image
 use obs
-use xhui as hui
+use hui
 use yrenderer.*
 use .common.*
 
@@ -114,10 +114,9 @@ class Canvas extends hui.Panel as obs.Node
 	func virtual mut on_key_down(k: i32)
 
 
-	func __init__()
-		super.__init__("")
+	func override __init__()
 		from_source("
-Dialog canvas ''
+Panel canvas ''
 	DrawingArea area '' expandy cangrabfocus grabfocus
 ")
 		cam.out_changed >> create_sink(request_redraw)
@@ -132,7 +131,7 @@ Dialog canvas ''
 
 
 	func mut xinitialize(out p: hui.Painter)
-		yctx = api_init_xhui(&p)
+		yctx = api_init_hui(&p)
 		yctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
 		initialize(weak(yctx))
 

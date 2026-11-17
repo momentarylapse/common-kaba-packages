@@ -1,3 +1,4 @@
 version 6
+requires hui
 run huibui.kaba
 

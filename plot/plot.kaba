@@ -1,4 +1,4 @@
-use xhui as hui
+use hui
 use .plotarea.*
 
 
@@ -7,10 +7,9 @@ class PlotPanel extends hui.Panel
 	var data_sets: DataSet[]
 	var first_draw = true
 
-	func __init__()
-		super.__init__(p2s(&self))
+	func override __init__()
 		from_source("
-Window panel ''
+Panel panel ''
 	DrawingArea area '' expand margin=0")
 
 		event_x("area", "hui:draw", on_draw)

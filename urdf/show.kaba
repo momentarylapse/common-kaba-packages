@@ -1,14 +1,15 @@
 use .urdf
 use hui
-use gl
 use os
 use image
-use visualization
-use visualization.label_manager.LabelManager
+use simplevis
+#use visualization.label_manager.LabelManager
+
 
 enum GraphMode
 	SIMPLE
 	REAL
+
 
 func edge_color(t: urdf.Edge.Type) -> Color
 	if t == urdf.Edge.Type.FIXED
@@ -21,14 +22,15 @@ func edge_color(t: urdf.Edge.Type) -> Color
 		return [0.3,0.3,1, 1]
 	return Color.GRAY
 
-class MyWindow extends visualization.RenderWindow
-	tree: urdf.Tree
-	graph_mode = GraphMode.REAL
+
+class MyWindow extends hui.Window
+	var tree: urdf.Tree
+	var graph_mode = GraphMode.REAL
 	var show_labels = true
 	var show_frames = false
-	label_manager: LabelManager
+#	var label_manager: LabelManager
 
-	matrices: mat4{}
+	var matrices: mat4{}
 
 
 	func __init__(t: urdf.Tree)
@@ -131,9 +133,10 @@ class Config
 	#var dir: Path
 var cfg: Config
 
+
 func explore(arg: string[])
-	var w: shared[MyWindow] = new MyWindow(urdf.parse(arg[0]))
-	hui.fly_and_wait(w)
+	hui.fly_and_wait(new MyWindow(urdf.parse(arg[0])))
+
 
 func main(arg: string[])
 	var p = new os.CommandLineParser()

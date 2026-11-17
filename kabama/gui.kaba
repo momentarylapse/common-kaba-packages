@@ -17,17 +17,19 @@ class KabamaWindow extends hui.Window
 
 	func __init__()
 		super.__init__("kabama", 800, 600)
-		from_source("Grid table ''
-	MultilineEdit log ''
-	---|
-	Grid ? ''
-		Edit input '' expandx
-		Button eval 'Eval' default image=hui:ok")
-		
+		from_source("
+Window ? 'kabama'
+	Grid table ''
+		MultilineEdit log ''
+		---|
+		Grid ? ''
+			Edit input '' expandx
+			Button eval 'Eval' default image=hui:ok")
+
 		enable("log", false)
 		activate("input")
-	
+
 		event("eval", on_eval)
-	
+
 func main()
 	hui.fly_and_wait(new KabamaWindow())

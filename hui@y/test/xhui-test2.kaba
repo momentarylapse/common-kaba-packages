@@ -1,11 +1,10 @@
-use xhui as hui
-#use hui
+use hui
 
 class Window extends hui.Window
 	func __init__()
 		super.__init__("test", 800, 600)
 		from_source("
-Dialog win 'bla'
+Window win 'bla'
 	Grid ? ''
 		Button b 'Test' noexpandy
 		---|
@@ -27,5 +26,4 @@ Dialog win 'bla'
 
 
 func main()
-	var w = new shared Window()
-	hui.fly_and_wait(w)
+	hui.fly_and_wait(new shared Window())

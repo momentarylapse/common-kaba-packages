@@ -1,4 +1,4 @@
-use xhui
+use hui
 use os
 use image
 use obs
@@ -58,22 +58,22 @@ class CloudRenderCanvas extends simplevis.Canvas
 
 
 	func override mut on_key_down(k: i32)
-		if k == xhui.KEY_PAGE_DOWN
+		if k == hui.KEY_PAGE_DOWN
 			pass #load([loop(current[0]+1, 0, len(cfg.files))], true)
-		if k == xhui.KEY_PAGE_UP
+		if k == hui.KEY_PAGE_UP
 			pass #load([loop(current[0]-1, 0, len(cfg.files))], true)
-		if k == xhui.KEY_CONTROL + xhui.KEY_B
+		if k == hui.KEY_CONTROL + hui.KEY_B
 			cloud_renderer.R = loop(cloud_renderer.R+1, 1.0, 4.0)
-	#	if k == xhui.KEY_CONTROL + xhui.KEY_E
+	#	if k == hui.KEY_CONTROL + hui.KEY_E
 	#		export_cloud()
-		if k == xhui.KEY_C
+		if k == hui.KEY_C
 			cam.pos = cloud.center_of_mass(cloud.get_points(points))
 			set_message("jump to center")
-		if k == xhui.KEY_1
+		if k == hui.KEY_1
 			cloud_renderer.color_mode = ColorMode.AUTO
 			request_redraw()
 			set_message("color mode: auto")
-		if k == xhui.KEY_2
+		if k == hui.KEY_2
 			cloud_renderer.color_mode = ColorMode.INTENSITY
 			request_redraw()
 			set_message("color mode: intensity")
@@ -88,7 +88,7 @@ class CloudRenderCanvas extends simplevis.Canvas
 
 
 
-class MyWindow extends xhui.Window as obs.Node
+class MyWindow extends hui.Window as obs.Node
 	var canvas: shared![CloudRenderCanvas]
 	var current: i32[]
 
@@ -109,8 +109,8 @@ Window win 'Cloud explorer' borderwidth=0
 		canvas = new CloudRenderCanvas()
 		embed("main-grid", 0, 0, canvas)
 
-		for mut list in get_control("list") as xhui.ListView*
-			list.column_factory(0).set_create(func(id: string) xhui.create_control("Label", "!markup", id))
+		for mut list in get_control("list") as hui.ListView*
+			list.column_factory(0).set_create(func(id: string) hui.create_control("Label", "!markup", id))
 
 		for f in cfg.files
 			if f.extension() == "ply" and os.Path(f.basename_no_ext() + ".pcd") in cfg.files
@@ -175,7 +175,7 @@ func explore(arg: string[])
 			if f == bn
 				cfg.initial_file = i
 
-	xhui.fly_and_wait(new shared MyWindow())
+	hui.fly_and_wait(new shared MyWindow())
 
 
 func main(arg: string[])

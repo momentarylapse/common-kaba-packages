@@ -2,7 +2,7 @@ use simplevis as sv
 use simplevis.canvas
 use simplevis.cloud.PointCloudRenderer
 use octree.Octree
-use xhui
+use hui
 use time
 use image
 
@@ -49,7 +49,7 @@ class Canvas extends canvas.Canvas
 		tree.create([[-R*2,-R*2,-R], [R*2,R*2,R]])
 		tree.fill(points)
 
-		xhui.run_repeated(0.1, iterate)
+		hui.run_repeated(0.1, iterate)
 
 
 	func override on_draw()

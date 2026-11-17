@@ -1,5 +1,5 @@
-version 0.4
-requires xhui
+version 0.5
+requires hui@y
 requires obs
 requires codeeditor
 run xedit.kaba

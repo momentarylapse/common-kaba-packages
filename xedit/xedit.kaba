@@ -1,14 +1,14 @@
-use xhui
+use hui
 use .editorwindow.*
 
 
 func main(args: string[])
-	xhui.set_property("name", "xedit")
+	hui.set_property("name", "xedit")
 	var w = new shared EditorWindow()
 	for a in args
 		let _ = w.open_document(a)
 	if len(args) == 0
 		w.create_document_editor()
-	xhui.fly_and_wait(w)
+	hui.fly_and_wait(w)
 
 
