@@ -55,8 +55,15 @@ func build_package(p: PackageInfo) -> bool
 func install_package(p: PackageInfo) -> bool
 	print("{{os.terminal.YELLOW}}installing{{os.terminal.END}} {{p.base_installed}}")
 
+	# delete previous installation(s)
 	if os.fs.is_directory(p.base_installed)
 		delete_directory(p.base_installed)!
+	for d in os.fs.search(conf.packages_base, "*", "d")
+		if str(d).match(fuzzy_name(p.name) + "@*")
+			delete_directory(conf.packages_base | d)!
+	if os.fs.is_symlink(conf.packages_base | fuzzy_name(p.name))
+		os.fs.delete(conf.packages_base | fuzzy_name(p.name))!
+
 	os.fs.create_directory(p.base_installed)!
 
 	# build shared library?
@@ -82,6 +89,13 @@ func install_package(p: PackageInfo) -> bool
 	# package info file might be skipped if root!=base...
 	if os.fs.exists(p.base_source | PACKAGE_FILE)
 		os.fs.copy(p.base_source | PACKAGE_FILE, p.base_installed | PACKAGE_FILE)!
+
+	# symlink
+	if p.name != fuzzy_name(p.name)
+		let link = conf.packages_base | fuzzy_name(p.name)
+		print("symlink {{link}}")
+		os.fs.create_symlink(p.name, link)!
+
 	return true
 
 
@@ -90,12 +104,17 @@ enum IterStatus
 	MORE
 	ERROR
 
-func fullfull_dependencies_step(out list: PackageInfo&[]) -> IterStatus
+func fullfull_dependencies_step(out list: PackageInfo[]) -> IterStatus
 	for p in list
 		for r in p.requires
-			if not is_installed_latest(r) and not list_find(list, r)
-				for rr in list_find(conf.packages_remote, r)
-					list.add(&rr)
+			if is_installed_latest(r) or list_find_by_fuzzy_name(list, fuzzy_name(r), false)
+				continue
+			for rr in list_find(conf.packages_remote, r)
+				list.add(rr)
+				return IterStatus.MORE
+			else
+				for rrr in list_find_by_fuzzy_name(conf.packages_remote, r, true)
+					list.add(rrr)
 					return IterStatus.MORE
 				else
 					print("{{os.terminal.RED}}MISSING DEPENDENCY{{os.terminal.END}} {{p.name}} -> {{r}}")
@@ -104,7 +123,7 @@ func fullfull_dependencies_step(out list: PackageInfo&[]) -> IterStatus
 
 
 # add missing requirements to an to-install list
-func fullfull_dependencies(out list: PackageInfo&[]) -> bool
+func fullfull_dependencies(out list: PackageInfo[]) -> bool
 	while true
 		match fullfull_dependencies_step(list)
 			IterStatus.MORE => continue
@@ -157,17 +176,21 @@ func action_install(args: string[])
 	load_package_list()
 
 	# sources
-	var to_install: PackageInfo&[]
+	var to_install: PackageInfo[]
 	var missing_sources = false
 	for name in args
 		for p in list_find(conf.packages_internal, name)
 			print("{{os.terminal.RED}}internal packages can not be installed{{os.terminal.END}} {{name}}")
 			os.exit(1)
+
 		for p in list_find(conf.packages_remote, name)
-			to_install.add(&p)
+			to_install.add(p)
 		else
-			print("{{os.terminal.RED}}no package source found{{os.terminal.END}} {{name}}")
-			missing_sources = true
+			for pp in list_find_by_fuzzy_name(conf.packages_remote, name, true)
+				to_install.add(pp)
+			else
+				print("{{os.terminal.RED}}no package source found{{os.terminal.END}} {{name}}")
+				missing_sources = true
 	if missing_sources
 		os.exit(1)
 

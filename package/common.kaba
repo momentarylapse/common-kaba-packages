@@ -51,6 +51,7 @@ struct PackageInfo
 	location: Location
 	requires: string[]
 	forward: bool
+	is_default = false
 	func mut __init__() # kaba ARM workaround...
 
 
@@ -153,8 +154,9 @@ func read_repo(dir: os.Path) -> PackageInfo[]
 			continue
 		if "forward" in x
 			continue
-		var name = os.Path(x[1]).basename().replace(".kaba", "")
-		let p = read_package(name, dir | x[1], Location.REMOTE)
+		let name = os.Path(x[1]).basename().replace(".kaba", "")
+		var p = read_package(name, dir | x[1], Location.REMOTE)
+		p.is_default = ("default" in x)
 		for pp in list_find(r, name)
 			warn("MULTIPLE SOURCES FOR {{name}}:  {{p.base_source}}  {{pp.base_source}}")
 		else
@@ -172,15 +174,28 @@ func find_remote_packages() -> PackageInfo[]
 
 func find_installed_packages() -> PackageInfo[]
 	var r: PackageInfo[]
-	let list = os.fs.search(conf.packages_base, "*", "d")
-	for e in list
-		r.add(read_package(str(e), conf.packages_base | e, Location.INSTALLED))
+	for e in os.fs.search(conf.packages_base, "*", "d")
+		if not os.fs.is_symlink(conf.packages_base | e)
+			r.add(read_package(str(e), conf.packages_base | e, Location.INSTALLED))
 	return r
+
+
+func fuzzy_name(name: string) -> string
+	if name.find("@").has_value()
+		return name.explode("@")[0]
+	return name
 
 
 func list_find(list: PackageInfo[], name: string) -> PackageInfo*
 	for p in list
 		if p.name == name
+			return &p
+	return nil
+
+
+func list_find_by_fuzzy_name(list: PackageInfo[], name: string, require_default: bool) -> PackageInfo*
+	for p in list
+		if fuzzy_name(p.name) == name and (not require_default or p.is_default)
 			return &p
 	return nil
 
@@ -195,8 +210,8 @@ func list_find(list: PackageInfo&[], name: string) -> PackageInfo*
 func file_equal(a: os.Path, b: os.Path) -> bool
 	if not os.fs.exists(a) or not os.fs.exists(b)
 		return false
-	let sa = os.fs.read(a)
-	let sb = os.fs.read(b)
+	let sa = os.fs.read(a)!
+	let sb = os.fs.read(b)!
 	return sa == sb
 
 
@@ -207,13 +222,24 @@ func load_package_list()
 
 
 func is_installed_latest(name: string) -> bool
+	# internal?
 	for p in list_find(conf.packages_internal, name)
 		return true
+
+	# installed?
 	for p in list_find(conf.packages_installed, name)
 		for pp in list_find(conf.packages_remote, p.name)
 			return pp.version == p.version
 		# no remote? ...not sure
 		return true
+
+	# fuzzy installed?
+	if name == fuzzy_name(name)
+		for p in list_find_by_fuzzy_name(conf.packages_installed, name, false)
+			for pp in list_find(conf.packages_remote, p.name)
+				return pp.version == p.version
+			return true
+
 	# not installed
 	return false
 

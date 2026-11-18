@@ -5,6 +5,10 @@ use .common.*
 
 func remove_package(p: PackageInfo)
 	print("{{os.terminal.YELLOW}}deleting{{os.terminal.END}} {{p.base_installed}}")
+	if p.name != fuzzy_name(p.name)
+		let link = conf.packages_base | fuzzy_name(p.name)
+		if os.fs.exists(link) and os.fs.is_symlink(link)
+			os.fs.delete(link)!
 	delete_directory(p.base_installed)!
 
 
@@ -18,5 +22,8 @@ func action_remove(args: string[])
 		for p in list_find(conf.packages_installed, name)
 			remove_package(p)
 		else
-			print("{{os.terminal.RED}}package not found{{os.terminal.END}}")
+			for pp in list_find_by_fuzzy_name(conf.packages_installed, name, false)
+				remove_package(pp)
+			else
+				print("{{os.terminal.RED}}package not found{{os.terminal.END}} {{name}}")
 
