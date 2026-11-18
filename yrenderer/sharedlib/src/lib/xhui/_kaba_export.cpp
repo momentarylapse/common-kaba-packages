@@ -118,7 +118,7 @@ public:
 
 
 void export_package_xhui(kaba::IExporter* e) {
-	e->package_info("xhui", "0.19");
+	e->package_info("hui", "0.22");
 
 
 //	e->link_class_func("future[Color].__init__", &kaba::generic_init<kaba::KabaFuture<color>>);
@@ -193,20 +193,20 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_virtual("Control.get_selection", &xhui::Control::get_selection, &ctrl);
 		e->link_virtual("Control.set_selection", &xhui::Control::set_selection, &ctrl);
 
-		e->link_virtual("Control.on_mouse_move", &xhui::Control::on_mouse_move, &ctrl);
-		e->link_virtual("Control.on_mouse_wheel", &xhui::Control::on_mouse_wheel, &ctrl);
-		e->link_virtual("Control.on_mouse_enter", &xhui::Control::on_mouse_enter, &ctrl);
-		e->link_virtual("Control.on_mouse_leave", &xhui::Control::on_mouse_leave, &ctrl);
-		e->link_virtual("Control.on_left_button_down", &xhui::Control::on_left_button_down, &ctrl);
-		e->link_virtual("Control.on_middle_button_down", &xhui::Control::on_middle_button_down, &ctrl);
-		e->link_virtual("Control.on_right_button_down", &xhui::Control::on_right_button_down, &ctrl);
-		e->link_virtual("Control.on_left_button_up", &xhui::Control::on_left_button_up, &ctrl);
-		e->link_virtual("Control.on_middle_button_up", &xhui::Control::on_middle_button_up, &ctrl);
-		e->link_virtual("Control.on_right_button_up", &xhui::Control::on_right_button_up, &ctrl);
-		e->link_virtual("Control.on_left_double_click", &xhui::Control::on_left_double_click, &ctrl);
-		e->link_virtual("Control.on_key_down", &xhui::Control::on_key_down, &ctrl);
-		e->link_virtual("Control.on_key_up", &xhui::Control::on_key_up, &ctrl);
-		e->link_virtual("Control.on_key_char", &xhui::Control::on_key_char, &ctrl);
+		e->link_virtual("Control._on_mouse_move", &xhui::Control::on_mouse_move, &ctrl);
+		e->link_virtual("Control._on_mouse_wheel", &xhui::Control::on_mouse_wheel, &ctrl);
+		e->link_virtual("Control._on_mouse_enter", &xhui::Control::on_mouse_enter, &ctrl);
+		e->link_virtual("Control._on_mouse_leave", &xhui::Control::on_mouse_leave, &ctrl);
+		e->link_virtual("Control._on_left_button_down", &xhui::Control::on_left_button_down, &ctrl);
+		e->link_virtual("Control._on_middle_button_down", &xhui::Control::on_middle_button_down, &ctrl);
+		e->link_virtual("Control._on_right_button_down", &xhui::Control::on_right_button_down, &ctrl);
+		e->link_virtual("Control._on_left_button_up", &xhui::Control::on_left_button_up, &ctrl);
+		e->link_virtual("Control._on_middle_button_up", &xhui::Control::on_middle_button_up, &ctrl);
+		e->link_virtual("Control._on_right_button_up", &xhui::Control::on_right_button_up, &ctrl);
+		e->link_virtual("Control._on_left_double_click", &xhui::Control::on_left_double_click, &ctrl);
+		e->link_virtual("Control._on_key_down", &xhui::Control::on_key_down, &ctrl);
+		e->link_virtual("Control._on_key_up", &xhui::Control::on_key_up, &ctrl);
+		e->link_virtual("Control._on_key_char", &xhui::Control::on_key_char, &ctrl);
 
 		e->link_virtual("Control.set_option", &xhui::Control::set_option, &ctrl);
 		e->link_virtual("Control.get_children", &layout::Node::_get_children, &ctrl);
@@ -268,7 +268,8 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->declare_class_size("Panel", sizeof(xhui::Panel));
 		e->declare_class_element("Panel.propagate_events", &xhui::Panel::propagate_events);
 		//	e->declare_class_element("Panel.win", &xhui::Panel::win);
-		e->link_class_func("Panel.__init__", &kaba::generic_init_ext<xhui::Panel, const string&>);
+		e->link_class_func("Panel.__init__:Panel", &kaba::generic_init<xhui::Panel>);
+		e->link_class_func("Panel.__init__:Panel:string", &kaba::generic_init_ext<xhui::Panel, const string&>);
 		e->link_virtual("Panel.__delete__", &kaba::generic_virtual<KabaPanelWrapper>::__delete__, &panel);
 		//e->link_class_func("Panel.set_border_width", &xhui::Panel::set_border_width);
 		//e->link_class_func("Panel.set_decimals", &xhui::Panel::set_decimals);
@@ -374,7 +375,7 @@ void export_package_xhui(kaba::IExporter* e) {
 		e->link_class_func("Dialog.request_destroy", &xhui::Dialog::request_destroy);
 		e->link_class_func("Dialog.set_title", &xhui::Dialog::set_title);
 	}
-	
+
 
 	xhui::Painter painter(nullptr, nullptr, rect::ID, rect::ID);
 	e->declare_class_element("Painter._area", &xhui::Painter::_area);
@@ -383,7 +384,7 @@ void export_package_xhui(kaba::IExporter* e) {
 	e->link_func("Painter.__init__", &_dummy); // dummy
 	e->link_virtual("Painter.__delete__", &kaba::generic_virtual<xhui::Painter>::__delete__, &painter);
 
-	
+
 	// user interface
 //	e->link_func("set_idle_function", &hui_set_idle_function_kaba);
 	e->link_func("run_later", &hui_run_later_kaba);
@@ -437,6 +438,8 @@ void export_package_xhui(kaba::IExporter* e) {
 	e->declare_class_size("Resource", sizeof(xhui::Resource));
 	e->link_class_func("Resource.show", &xhui::Resource::show);
 	e->link_class_func("Resource.str", &xhui::Resource::to_string);
+	e->link_class_func("Resource._options_str", &xhui::Resource::_options_str);
+	e->link_class_func("Resource.value", &xhui::Resource::value);
 
 	e->link_func("parse_resource", &xhui::parse_resource);
 
