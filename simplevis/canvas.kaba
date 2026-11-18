@@ -95,6 +95,8 @@ class Canvas extends hui.Panel as obs.Node
 	var animation_id = -1
 	var message: string
 	var message_ttl = -1.0
+	var temp_background = Color(0.2,0.2,0.2,1)
+	var temp_exposure = 1.0
 
 #	enum MouseMode
 #		NONE
@@ -219,11 +221,12 @@ Panel canvas ''
 
 
 		hdr = new HDRResolver(ctx.ctx)
-#		hdr.bloom_factor = 10
+#		hdr!.bloom_factor = 10
+		hdr!.exposure = temp_exposure
 
 		render_path = new RenderPathForward(ctx.ctx, 1024)
 		#render_path = new RenderPathDeferred(ctx.ctx, 130, 100, 1024)
-		render_path!.background_color = [0.2,0.2,0.2,1]
+		render_path!.background_color = temp_background
 
 		xhui_renderer!.add_child(hdr!)
 		hdr!.add_child(render_path!)
@@ -271,8 +274,12 @@ Panel canvas ''
 
 
 	func mut set_background(b: Color)
-		render_path!.background_color = b
+		temp_background = b
+		for mut rp in render_path
+			rp.background_color = b
 
 
 	func mut set_hdr_exposure(exposure: f32)
-		hdr!.exposure = exposure
+		temp_exposure = exposure
+		for mut h in hdr
+			h.exposure = exposure
