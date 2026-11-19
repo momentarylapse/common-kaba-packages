@@ -1,0 +1,82 @@
+use hui
+
+#-----------------------------------------------
+#    TODO!!!!!!!!!!!!!!!
+#
+
+
+var main_win: hui.Window*
+
+
+class Progress
+	dlg: shared[hui.Dialog]
+
+	func __init__(title: string)
+#		dlg = new xhui.Dialog(title, 300, 50, main_win, xhui.DialogFlags.NONE)
+		#set_options("", "")
+#		for mut d in dlg
+#			d.add_control("ProgressBar", "", 0, 0, "progress")
+#		xhui.fly(dlg)
+#		hui.do_single_main_loop()
+
+	func __delete__()
+#		for mut d in dlg
+#			d.destroy()
+#		hui.do_single_main_loop()
+
+	func mut set(f: float)
+		for mut d in dlg
+			d.set_float("progress", f)
+#		hui.do_single_main_loop()
+
+	func mut set(t: string)
+		for mut d in dlg
+			d.set_title(t)
+#		hui.do_single_main_loop()
+
+
+var progress: owned[Progress]
+
+
+func start(title: string)
+	progress = new Progress(title)
+
+
+func set(f: float)
+	for mut p in progress
+		p.set(f)
+
+
+func set(t: string)
+	for mut p in progress
+		p.set(t)
+
+
+func end()
+	progress = nil
+
+
+class TextProgress
+	var first = true
+	var finished = false
+	let width = 64
+
+	func __delete__()
+		done()
+
+	func mut show(f: float)
+		if not first
+			print("\x08".repeat(width + 2))
+		first = false
+		let n_done = int(f * width)
+		_print_postfix = ""
+		print("[" + "#".repeat(n_done) + " ".repeat(width - n_done) + "]")
+
+	func mut done()
+		if finished
+			return
+		show(1.0)
+		_print_postfix = "\n"
+		print("")
+		finished = true
+

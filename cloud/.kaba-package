@@ -1,4 +1,6 @@
-version 4
+version 5
+suggests hui
+suggests simplevis
 run convert.kaba
 run cut-z.kaba
 run explore.kaba

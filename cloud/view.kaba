@@ -2,7 +2,6 @@ use os
 use image
 use .cloud
 use simplevis as sv
-use simplevis.canvas
 use simplevis.cloud.PointCloudRenderer
 
 
@@ -15,7 +14,7 @@ func large_num(i: int) -> string
 	return s
 
 
-class Canvas extends canvas.Canvas
+class Canvas extends sv.Canvas
 	var cr = PointCloudRenderer(&ctx)
 	var points: vec3[]
 
@@ -47,5 +46,5 @@ func main(args: string[])
 	var p = new os.CommandLineParser()
 	p.info("view", "show a point cloud file")
 ##	p.cmd("-h/--help", "", "show help", func(a: string[]) p.show()) # FIXME kaba
-	p.cmd("", "FILE", "...", func(a: string[]) view_cloud(a))
+	p.cmd("", "FILE", "...", view_cloud)
 	p.parse(args)!

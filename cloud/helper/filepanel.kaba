@@ -1,0 +1,44 @@
+use hui
+use obs
+use os
+
+# files in current directory
+# - user selection
+class FilePanel extends hui.Panel as obs.Node
+	var out_selected = obs.XSource[os.Path[]](&self, &ind, "selected")
+	var directory: os.Path
+	var all_files: os.Path[]
+	var selected: i32[]
+
+
+	func __init__(dir: os.Path)
+		super.__init__("file-panel")
+		directory = dir
+
+		from_source("Dialog ? '' expandy
+	ListView list 'files'' expandy nobar selectmulti")
+
+		for mut list in get_control("list") as hui.ListView*
+			let f = func(id: string) hui.create_control("Label", "!markup,padding=5", id)
+			list.column_factory(0).set_create(f)
+
+		all_files = os.fs.search(directory, "*.pcd", "f")
+			|> filter(f => not str(f).match("*.binary.*"))
+
+		for f in all_files
+			add_string("list", "<span size='small'>" + str(f).replace(".pcd", "<span alpha='50%'>.pcd</span>") + "</span>")
+
+		event_x("list", "hui:select", on_list)
+
+		set_selection("list", [0])
+
+
+	func get_selected() -> os.Path[]
+		var sel: os.Path[]
+		for i in get_selection("list")
+			sel.add(directory | all_files[i])
+		return sel
+
+
+	func mut on_list()
+		out_selected(get_selected())
