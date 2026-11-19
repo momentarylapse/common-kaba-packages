@@ -104,8 +104,12 @@ void buffer_read_array(Buffer *buf, DynamicArray &data) {
 #endif
 }
 
-void vertexbuffer_update_array(VertexBuffer *buf, const DynamicArray &data) {
+void vertexbuffer_update_array(VertexBuffer *buf, const DynamicArray& data) {
 	buf->update(data);
+}
+
+void vertexbuffer_update_index(VertexBuffer *buf, const Array<int>& data) {
+	buf->update_index(data);
 }
 
 void uniformbuffer_init(UniformBuffer* buf, int size) {
@@ -289,6 +293,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->declare_class_size("VertexBuffer", sizeof(VertexBuffer));
 	ext->link_class_func("VertexBuffer.__init__", &kaba::generic_init_ext<VertexBuffer, const string&>);
 	ext->link_class_func("VertexBuffer.update", &vertexbuffer_update_array);
+	ext->link_class_func("VertexBuffer.update_index", &vertexbuffer_update_index);
 	ext->link_class_func("VertexBuffer.create_quad", &VertexBuffer::create_quad);
 
 	ext->link_class_func("DynamicVertexBuffer.__init__", &kaba::generic_init_ext<DynamicVertexBuffer, const string&>);
@@ -582,10 +587,11 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 	ext->link_func("api_init_glfw", &api_init_glfw);
 #endif
 	ext->link_func("api_init_hui", &api_init_xhui);
+	ext->link_func("api_init_xhui", &api_init_xhui); // legacy
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.23");
+	ext->package_info("yrenderer", "0.24");
 	_export_package_yrenderer_internal(ext);
 }
 
