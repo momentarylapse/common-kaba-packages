@@ -77,9 +77,9 @@ jobs:
         export KABA_ENVIRONMENT_PATH="${{ steps.strings.outputs.env-dir }}"
         echo "packages..."
         ${{ steps.strings.outputs.env-dir }}/kaba/kaba package install \
-          algebra asciitools bson cli cloud crypto fft filetags gl glfw hui huibui iter kabama linalg linalg64 msgpack ncurses \
+          algebra asciitools bson cli cloud crypto fft filetags gl glfw hui huibui iter kabama linalg linalg64 mesh msgpack ncurses \
           net obs octree opt pdf plot polymesh profiler simplevis sqlite statistics terminal tools xmake xml yrenderer zlib zmq
-        # FIXME: circuit mesh urdf
+        # FIXME: circuit urdf
 
     - name: Test compile all
       run: |

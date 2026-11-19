@@ -41,7 +41,7 @@ func load_ply(fn: os.Path) -> result[Mesh]
 					else if x[1] == "int" or x[1] == "uint"
 						t := i32
 					else
-						raise Error("unknown property type {{s}}")
+						raise Error("unknown property type: {{s}}")
 					vertex_properties.add([x[2], t, vertex_total_binary_size])
 					vertex_total_binary_size += t.size
 		else if s == "end_header"

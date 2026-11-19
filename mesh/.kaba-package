@@ -1,5 +1,5 @@
-version 5
-requires visualization
+version 6
+suggests simplevis
 run convert.kaba
 run view.kaba
 

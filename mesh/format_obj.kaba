@@ -16,7 +16,7 @@ func load_obj(fn: os.Path) -> result[Mesh]
 			f >> s
 		except
 			break
-		if s[:1] == "#"
+		if s[:1] == "#" or s == ""
 			continue
 		else if s[:2] == "g "
 			continue
