@@ -2,45 +2,141 @@ use .common.*
 use .canvas.*
 
 class GridRenderer
-	var ctx: SimpleContext&
+	var ctx: Context&
+	var canvas: Canvas&
 	var cam: ViewPort&
-	var color = Color.WHITE
+	var color = Color.GRAY
+	var soft = true
 
 
 	func mut __init__()
-	func mut __init__(_ctx: SimpleContext&, _cam: ViewPort&)
-		ctx := _ctx
-		cam := _cam
+	func mut __init__(cv: Canvas&)
+		canvas := cv
+		ctx := &cv.ctx
+		cam := &cv.cam
+
+
+	let GRID_CONST = 5.0
+
+	func zoom() -> f32
+		return canvas.area.height() / cam.radius
+
+	func get_grid_d() -> f32
+		return pow(10.0, ceil(log10(GRID_CONST / zoom())))
+
+
+	func grid_level(i: i32) -> i32
+		if i == 0
+			return 0
+		if i % 10 == 0
+			return 1
+		if i % 100 == 0
+			return 2
+		return 3
+
+	let LOW_MAX = 0.25
+	let MID_MAX = 0.5
+
+	func grid_density(level: i32, _d_err: f32) -> f32
+		if level == 0
+			return 1
+		var d_err = _d_err
+		if level == 1
+			d_err += 1
+		return min(pow(10.0, d_err-1.0) * LOW_MAX, MID_MAX)
+
+	func win_get_bounds(ax1: vec3, ax2: vec3) -> Rect
+		var p: vec3[4]
+		let dest = canvas.area#_native
+		let pos0 = cam.pos
+		p[0] = canvas.unproject(vec2(dest.x1, dest.center().y), pos0)
+		p[1] = canvas.unproject(vec2(dest.x2, dest.center().y), pos0)
+		p[2] = canvas.unproject(vec2(dest.center().x, dest.y1), pos0)
+		p[3] = canvas.unproject(vec2(dest.center().x, dest.y2), pos0)
+		p[0] = canvas.unproject(dest.p00(), pos0)
+		p[1] = canvas.unproject(dest.p10(), pos0)
+		p[2] = canvas.unproject(dest.p01(), pos0)
+		p[3] = canvas.unproject(dest.p11(), pos0)
+
+		var r = Rect.ID
+		for i in 0:4
+			let x = vec3.dot(p[i], ax1)
+			let y = vec3.dot(p[i], ax2)
+			if i == 0 or x < r.x1
+				r.x1 = x
+			if i == 0 or x > r.x2
+				r.x2 = x
+			if i == 0 or y < r.y1
+				r.y1 = y
+			if i == 0 or y > r.y2
+				r.y2 = y
+		return r
+
+
+	func add_grid(r: Rect, out p: vec3[][4], out col: Color[][4], D: f32, DERR: f32, dir_1: vec3, dir_2: vec3, _alpha: f32)
+		let ix0 = int(ceil(r.x1 / D))
+		let ix1 = int(floor(r.x2 / D))
+		for i in ix0:ix1+1
+			let level = grid_level(i)
+			let dens = grid_density(level, DERR)
+			var c = color
+			c.a = _alpha * dens
+			p[level].add(dir_1 * f32(i)*D + dir_2 * r.y1)
+			p[level].add(dir_1 * f32(i)*D + dir_2 * r.y2)
+			col[level].add(c)
+			col[level].add(c)
+
+		let iy0 = i32(ceil(r.y1 / D))
+		let iy1 = i32(floor(r.y2 / D))
+		for i in iy0:iy1+1
+			let level = grid_level(i)
+			let dens = grid_density(level, DERR)
+			var c = color
+			c.a = _alpha * dens
+			p[level].add(dir_2 * f32(i)*D + dir_1 * r.x1)
+			p[level].add(dir_2 * f32(i)*D + dir_1 * r.x2)
+			col[level].add(c)
+			col[level].add(c)
 
 	func mut draw()
 		let x0 = -10.0
 		let x1 = 10.0
 		let dx = 1.0
 
+		let D = get_grid_d()
+		let DERR = log10(D) - log10(GRID_CONST / zoom())
+
+		let plane = if abs((cam.ang * vec3.EZ).z) > 0.7
+			2
+		else if abs((cam.ang * vec3.EZ).x) > 0.7
+			0
+		else
+			1
+
 		var e1 = vec3.EX
 		var e2 = vec3.EZ
-		if abs((cam.ang * vec3.EZ).z) > 0.7
+		if plane == 2
 			e1 = vec3.EX
 			e2 = vec3.EY
-		if abs((cam.ang * vec3.EZ).x) > 0.7
+		if plane == 0
 			e1 = vec3.EY
 			e2 = vec3.EZ
 
-		var v: vec3[]
-		for x in x0:x1+dx/2:dx
-			v.add(x * e1 + x0 * e2)
-			v.add(x * e1 + x1 * e2)
-		for y in x0:x1+dx/2:dx
-			v.add(y * e2 + x0 * e1)
-			v.add(y * e2 + x1 * e1)
-		let background_color = Color(0,0,0,1)
-		ctx.set_color(Color.mix(color, background_color, 0.7))
-		ctx.draw_lines(v, LineMode.SEPARATE)
+		let r = win_get_bounds(e1, e2)
 
-		v.clear()
-		v.add(x0 * e2)
-		v.add(x1 * e2)
-		v.add(x0 * e1)
-		v.add(x1 * e1)
-		ctx.set_color(color)
-		ctx.draw_lines(v, LineMode.SEPARATE)
+		var p: vec3[][4]
+		var col: Color[][4]
+		let alpha = if soft
+			0.2
+		else
+			0.4
+		add_grid(r, p, col, D, DERR, e1, e2, alpha)
+
+		ctx.set_blending(true)
+		ctx.set_line_width(2) #scheme.LINE_WIDTH_THIN);
+		for l in [3,2,1]
+			ctx.draw_lines_colored(p[l], col[l], LineMode.SEPARATE)
+		ctx.set_line_width(3) #scheme.LINE_WIDTH_MEDIUM);
+		ctx.draw_lines_colored(p[0], col[0], LineMode.SEPARATE)
+		ctx.set_blending(false)
+

@@ -1,12 +1,11 @@
 use simplevis as sv
-use simplevis.canvas
 use simplevis.cloud.PointCloudRenderer
 use octree.Octree
 use cloud
 
 
-class Canvas extends canvas.Canvas
-	var cr = PointCloudRenderer(&ctx)
+class Canvas extends sv.Canvas
+	var cr = PointCloudRenderer(&self)
 	var tree: Octree
 
 

@@ -1,7 +1,4 @@
-use os
-use kaba
 use hui
-use yrenderer.*
 use out .common.*
 use out .canvas.*
 

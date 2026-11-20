@@ -1,4 +1,4 @@
-use yrenderer
+use yrenderer as yr
 use yrenderer.gfx
 use .common.*
 use .canvas.*
@@ -12,7 +12,7 @@ enum ColorMode
 
 
 class PointCloudRenderer
-	var ctx: SimpleContext&
+	var ctx: Context&
 	var bounds: Box
 
 	# "regular" clouds
@@ -28,14 +28,14 @@ class PointCloudRenderer
 	var cloud_color_dirty = false
 
 	var matrix = mat4.ID
-	var material: owned![yrenderer.Material]
+	var material: owned![yr.Material]
 
 	var R = 2.0
 
 
 	func mut __init__()
-	func mut __init__(_ctx: SimpleContext&)
-		ctx := _ctx
+	func mut __init__(cv: Canvas&)
+		ctx := &cv.ctx
 
 
 	func mut draw()
@@ -49,7 +49,7 @@ class PointCloudRenderer
 		data["vmin:16"] = dyn(bounds.min)
 		data["vmax:32"] = dyn(bounds.max)
 		data["color_fixed:48"] = dyn(color)
-		yrenderer.apply_shader_data(ctx.cur_params, shader, data)
+		yr.apply_shader_data(ctx.cur_params, shader, data)
 		rd.draw(ctx.cur_params, weak(cloud_vb)!, gfx.PrimitiveTopology.POINTS)
 
 
@@ -95,7 +95,7 @@ class PointCloudRenderer
 
 
 	func mut initialize()
-		material = new yrenderer.Material()
+		material = new yr.Material()
 		material.pass0.shader_path = "point-cloud.shader"
 		material.pass0.cull_mode = gfx.CullMode.NONE
 	#	material.pass0.mode = yrenderer.TransparencyMode.FUNCTIONS

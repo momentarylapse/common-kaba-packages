@@ -44,7 +44,6 @@ package urdf
 package usb
 package vulkan
 package xedit
-package xhui
 package xmake
 package xml
 package yrenderer

@@ -10,7 +10,7 @@ let CELL_SIZE = 8
 class Canvas extends sv.Canvas
 	var tex: shared![Texture]
 	var buf: owned![ShaderStorageBuffer]
-	var vr = VolumeRenderer(&ctx)
+	var vr = VolumeRenderer(&self)
 
 	var ct: owned![ComputeTask]
 	var roll = 0.8

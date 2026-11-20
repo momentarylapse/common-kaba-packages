@@ -3,29 +3,30 @@ use kaba
 use image
 use obs
 use hui
-use yrenderer.*
+use yrenderer as yr
 use .common.*
 
 
 let UPDATE_DT = 0.02
 
 
-class SimpleEmitter extends MeshEmitter
+class SimpleEmitter extends yr.MeshEmitter
 	var canvas: Canvas&
-	var xx_vb: owned![VertexBuffer]
-	var xx_mat: Material&
+	var xx_vb: owned![yr.VertexBuffer]
+	var xx_mat: yr.Material&
 
 	func __init__(out c: Canvas&)
 		super.__init__(c.ctx.ctx, "simple")
 		canvas := c
-		xx_vb = new VertexBuffer("3f,3f,2f")
+		xx_vb = new yr.VertexBuffer("3f,3f,2f")
 		xx_mat := c.ctx.create_material()
 
-	func override prepare(params: RenderParams)
+	func override prepare(params: yr.RenderParams)
 		canvas.ctx.cur_params := &params
+		canvas.update_to_pixels()
 		canvas.on_prepare()
 
-	func override emit(params: RenderParams, rvd: RenderViewData, shadow_pass: bool)
+	func override emit(params: yr.RenderParams, rvd: yr.RenderViewData, shadow_pass: bool)
 		canvas.ctx.cur_params := &params
 		canvas.ctx.cur_rvd := &rvd
 		canvas.ctx.shadow_pass = shadow_pass
@@ -66,8 +67,12 @@ class ViewPort extends Object as obs.Node
 		radius = len(box.size()) * 1.5
 		out_changed()
 
-	func params() -> CameraParams
+	func params() -> yr.CameraParams
 		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000, [0,0])
+
+
+func scale_area(area: Rect, scale: f32) -> Rect
+	return Rect(area.p00() * scale, area.p11() * scale)
 
 
 struct MouseInfo
@@ -80,12 +85,13 @@ struct MouseInfo
 
 
 class Canvas extends hui.Panel as obs.Node
-	var yctx: owned![Context]
-	var ctx: SimpleContext
-	var xhui_renderer: owned[XhuiRenderer]
-	var hdr: owned[HDRResolver]
-	var render_path: owned[RenderPath]
-	var light: YLight
+	var yctx: owned![yr.Context]
+	var ctx: Context
+	var xhui_renderer: owned[yr.XhuiRenderer]
+	var hdr: owned[yr.HDRResolver]
+	var render_path: owned[yr.RenderPath]
+	var light: yr.YLight
+	var to_pixels: mat4
 	var emitter: shared[SimpleEmitter]
 	var cam: ViewPort
 	var light_cam_ang: Quaternion?
@@ -129,16 +135,6 @@ Panel canvas ''
 
 		event_x("area", "hui:draw", xdraw)
 		event_x("area", "hui:initialize", xinitialize)
-
-
-
-	func mut xinitialize(out p: hui.Painter)
-		yctx = api_init_hui(&p)
-		yctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
-		initialize(weak(yctx))
-
-		for mut w in get_window()
-			let _ = w.event_x("win", "hui:just-before-draw", xbefore_draw)
 
 
 	func mut begin_animation()
@@ -195,7 +191,7 @@ Panel canvas ''
 	func mut xmouse_wheel()
 		for w in get_window()
 			let d = w.get_scroll()
-			cam.zoom(exp(d.y * 0.1))
+			cam.zoom(exp(d.y * 0.03))
 
 			on_mouse_wheel(d)
 
@@ -215,38 +211,57 @@ Panel canvas ''
 			on_key_down(k)
 
 
-	func mut initialize(c: Context&)
-		ctx.ctx := c
-		xhui_renderer = new XhuiRenderer(ctx.ctx)
+	func mut xinitialize(out p: hui.Painter)
+		yctx = yr.api_init_hui(&p)
+		yctx.create_managers([], [kaba.packages_root() | "yrenderer/shader", kaba.packages_root() | "simplevis/shader"], [])
+		ctx.ctx := weak(yctx)
+
+		create_renderer()
+
+		on_initialize()
+
+		for mut w in get_window()
+			let _ = w.event_x(w.id, "hui:just-before-draw", xbefore_draw)
+
+		hui.run_later(0.01, request_redraw)
+		hui.run_later(1.0, request_redraw)
+		# FIXME events...
+		# - we miss the first before-draw, because initialize is INSIDE
+		# - Canvas.area is wrong, since the layout is decided later
+		# - before-draw should be per DrawingArea! (after initialize/layout)
 
 
-		hdr = new HDRResolver(ctx.ctx)
+	func mut create_renderer()
+		xhui_renderer = new yr.XhuiRenderer(ctx.ctx)
+
+		hdr = new yr.HDRResolver(ctx.ctx)
 #		hdr!.bloom_factor = 10
 		hdr!.exposure = temp_exposure
 
-		render_path = new RenderPathForward(ctx.ctx, 1024)
+		render_path = new yr.RenderPathForward(ctx.ctx, 1024)
 		#render_path = new RenderPathDeferred(ctx.ctx, 130, 100, 1024)
 		render_path!.background_color = temp_background
 
 		xhui_renderer!.add_child(hdr!)
 		hdr!.add_child(render_path!)
 
-		ctx.lines = new LineHelper()
+		ctx.lines = new yr.LineHelper()
 
 		emitter = new SimpleEmitter(&self)
 		render_path!.add_opaque_emitter(emitter!)
 
 
-		light.init(LightType.DIRECTIONAL, [1,1,1,1])
+		light.init(yr.LightType.DIRECTIONAL, [1,1,1,1])
 #		light.allow_shadow = true
 		light_cam_ang = Quaternion([0.5, -0.4, 0])
 
-		on_initialize()
-
-		hui.run_later(0.1, request_redraw)
-
 
 	func mut before_draw(out p: hui.Painter)
+		let a0 = p.area()
+		let na0 = p.native_area
+		p._area = area
+		p.native_area = scale_area(area, p.ui_scale)
+
 		for mut r in xhui_renderer
 			let params = r.extract_params(&p)
 
@@ -258,6 +273,9 @@ Panel canvas ''
 
 			r.before_draw(&p)
 			ctx.lines.start_frame(p.ui_scale)
+
+		p._area = a0
+		p.native_area = na0
 
 
 	func mut draw(out p: hui.Painter)
@@ -283,3 +301,27 @@ Panel canvas ''
 		temp_exposure = exposure
 		for mut h in hdr
 			h.exposure = exposure
+
+
+	func mut update_to_pixels()
+		let params = cam.params()
+		let projection = params.projection_matrix(area.width() / area.height())
+		let view = params.view_matrix()
+
+		# 3d -> pixel
+		to_pixels = mat4.translation([area.x1, area.y1, 0]) * mat4.scale(area.width()/2, area.height()/2, 1) * mat4.translation([1.0, 1.0, 0]) * projection * view
+
+
+	#func projection() -> mat4
+		#render_path!.b
+
+	func project(v: vec3) -> vec3
+		return to_pixels.project(v)
+
+	func unproject(v: vec2, zref: vec3) -> vec3
+		let op = project(zref)
+		return unproject(v, op.z)
+
+	func unproject(v: vec2, z: f32) -> vec3
+		let r = vec3(v.x, v.y, z)
+		return to_pixels.inverse().project(r)

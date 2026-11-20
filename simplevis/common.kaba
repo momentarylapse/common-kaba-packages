@@ -1,10 +1,10 @@
-use yrenderer.*
+use yrenderer as yr
 use polymesh.Mesh
 
 
-func mesh_to_vb(m: Mesh) -> xfer[VertexBuffer]
-		var vb = new VertexBuffer("3f,3f,2f")
-		var vertices: Vertex[]
+func mesh_to_vb(m: Mesh) -> xfer[yr.VertexBuffer]
+		var vb = new yr.VertexBuffer("3f,3f,2f")
+		var vertices: yr.Vertex[]
 		m.build(vertices)
 		vb.update(vertices)
 		return give(vb)
@@ -51,17 +51,17 @@ enum LineMode
 	PATH = 1 # CONNECTED
 
 
-class SimpleContext
-	var ctx: Context&
-	var lines: owned![LineHelper]
-	var cur_params: RenderParams&
-	var cur_rvd: RenderViewData&
+class Context
+	var ctx: yr.Context&
+	var lines: owned![yr.LineHelper]
+	var cur_params: yr.RenderParams&
+	var cur_rvd: yr.RenderViewData&
 	var shadow_pass = false
 
 	func mut __delete__()
 
 
-	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> Material&
+	func mut create_material(albedo=Color.WHITE, roughness=0.5, metal=0.2, emission=Color.BLACK) -> yr.Material&
 		var material = ctx.create_internal_material()
 		material.albedo = albedo
 		material.roughness = roughness
@@ -78,13 +78,25 @@ class SimpleContext
 		lines.set_line_width(w)
 
 
+	func mut set_z_test(enabled: bool)
+		lines.set_z_test(enabled)
+
+
+	func mut set_blending(enabled: bool)
+		lines.set_blending(enabled)
+
+
 	func mut draw_lines(points: vec3[], mode: LineMode)
 		lines.draw_lines(points, mode == LineMode.CONNECTED)
 
 
-	func mut draw_mesh(vb: VertexBuffer&, matrix: mat4, material: Material&)
+	func mut draw_lines_colored(points: vec3[], colors: Color[], mode: LineMode)
+		lines.draw_lines_colored(points, colors, mode == LineMode.CONNECTED)
+
+
+	func mut draw_mesh(vb: yr.VertexBuffer&, matrix: mat4, material: yr.Material&)
 		var shader = cur_rvd.get_shader(material, 0, "default", "", "")
-		var rd = cur_rvd.start(cur_params, matrix, shader, material, 0, PrimitiveTopology.TRIANGLES, vb)
+		var rd = cur_rvd.start(cur_params, matrix, shader, material, 0, yr.PrimitiveTopology.TRIANGLES, vb)
 		rd.draw_triangles(cur_params, vb)
 
 
@@ -101,4 +113,6 @@ class SimpleContext
 			p.add(r)
 		draw_lines([p[0],p[1], p[0],p[2], p[1],p[3], p[2],p[3], p[0],p[4], p[1],p[5], p[2],p[6], p[3],p[7], p[4],p[5], p[4],p[6], p[5],p[7], p[6],p[7]], LineMode.SEPARATE)
 
+	func mut draw_wire_cube(p: vec3, r: f32)
+		draw_wire_box([p - [r,r,r], p + [r,r,r]])
 

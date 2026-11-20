@@ -2,6 +2,7 @@ use hui
 use os
 use yrenderer
 use simplevis as sv
+use simplevis.grid.GridRenderer
 use image.Painter
 use .mesh
 use .common.Mesh
@@ -16,6 +17,7 @@ func create_vb(m: Mesh) -> xfer[yrenderer.VertexBuffer]
 
 
 class Canvas extends sv.Canvas
+	var grid = GridRenderer(&self)
 	var m: mesh.Mesh
 	var vb: owned![yrenderer.VertexBuffer]
 	var material: yrenderer.Material&
@@ -29,8 +31,15 @@ class Canvas extends sv.Canvas
 		cam.focus_on_box(m.bounding_box())
 
 	func override on_draw()
-		ctx.set_color(Color.GRAY)
+		grid.draw()
+
+		# bounding box
+		ctx.set_blending(true)
+		ctx.set_color(Color.GRAY.with_alpha(0.3))
+		ctx.set_line_width(1.5)
 		ctx.draw_wire_box(m.bounding_box())
+		ctx.set_blending(false)
+
 		ctx.draw_mesh(vb, mat4.ID, material)
 
 	func override on_draw_2d(out p: Painter)

@@ -5,8 +5,9 @@ use obs
 use image
 use image.Image
 use cloud
-use simplevis.*
-use simplevis.cloud.*
+use simplevis as sv
+use simplevis.cloud.PointCloudRenderer
+use simplevis.grid.GridRenderer
 use .helper.filepanel.*
 
 
@@ -19,9 +20,10 @@ func large_num(i: i32) -> string
 	return s
 
 
-class MyCanvas extends Canvas
+class MyCanvas extends sv.Canvas
 	var out_key_pressed = obs.XSource[i32](&self, &ind, "key-pressed")
-	var cloud_renderer = PointCloudRenderer(&ctx)
+	var cloud_renderer = PointCloudRenderer(&self)
+	var grid = GridRenderer(&self)
 	var points: vec3[]
 	var num_files_selected = 0
 
@@ -58,6 +60,7 @@ class MyCanvas extends Canvas
 
 
 	func override on_draw()
+		grid.draw()
 		cloud_renderer.draw()
 
 

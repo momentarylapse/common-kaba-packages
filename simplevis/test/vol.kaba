@@ -3,7 +3,7 @@ use simplevis.volume.VolumeRenderer
 
 
 class Canvas extends sv.Canvas
-	var vr = VolumeRenderer(&ctx)
+	var vr = VolumeRenderer(&self)
 
 
 	func override on_initialize()

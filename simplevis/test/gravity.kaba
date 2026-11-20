@@ -1,5 +1,4 @@
 use simplevis as sv
-use simplevis.canvas
 use simplevis.cloud.PointCloudRenderer
 use octree.Octree
 use hui
@@ -7,8 +6,8 @@ use time
 use image
 
 
-class Canvas extends canvas.Canvas
-	var cr = PointCloudRenderer(&ctx)
+class Canvas extends sv.Canvas
+	var cr = PointCloudRenderer(&self)
 	var tree: Octree
 
 	let N = 1024*2#*4

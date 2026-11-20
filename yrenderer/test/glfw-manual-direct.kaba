@@ -69,7 +69,7 @@ func main()
 
 		cube.matrix = mat4.rotation([t*0.4543,t*0.743,0])
 
-		sr.set_view(params, (vec3(0,0,-7), Quaternion.ID, pi/4, 0.1, 1000))
+		sr.set_view(params, (vec3(0,0,-7), Quaternion.ID, pi/4, 0.1, 1000, [0,0]))
 		scene_view.choose_lights([&light])
 
 		cube.material.emission.g = (1 + sin(t))*0.2

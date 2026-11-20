@@ -3,6 +3,7 @@ use image
 use .cloud
 use simplevis as sv
 use simplevis.cloud.PointCloudRenderer
+use simplevis.grid.GridRenderer
 
 
 func large_num(i: int) -> string
@@ -15,7 +16,8 @@ func large_num(i: int) -> string
 
 
 class Canvas extends sv.Canvas
-	var cr = PointCloudRenderer(&ctx)
+	var cr = PointCloudRenderer(&self)
+	var grid = GridRenderer(&self)
 	var points: vec3[]
 
 	func __init__(filename: os.Path)
@@ -29,6 +31,7 @@ class Canvas extends sv.Canvas
 		cr.R = 5
 
 	func override on_draw()
+		grid.draw()
 		cr.draw()
 
 	func override on_draw_2d(out p: image.Painter)

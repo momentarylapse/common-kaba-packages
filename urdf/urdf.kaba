@@ -1,12 +1,14 @@
 use xml
 use os
 
+
 func read_vec3(a: Any) -> vec3
 	let s = str(a)
 	let xx = s.parse_tokens("")
 	if len(xx) < 3
 		return vec3.0
 	return [f32(xx[0][:8]), f32(xx[1][:8]), f32(xx[2][:8])]
+
 
 struct Edge
 	enum Type
@@ -26,6 +28,7 @@ struct Edge
 		# tested against idat
 		# consistent with https://urdfpy.readthedocs.io/en/latest/generated/urdfpy.rpy_to_matrix.html
 		return mat4.translation(pos) * mat4.rotation_z(rpy.z) * mat4.rotation_y(rpy.y) * mat4.rotation_x(rpy.x)
+
 
 struct Tree
 	nodes: string[]
@@ -65,23 +68,25 @@ func parse(fn: os.Path) -> Tree
 		var edge: Edge
 		edge.parent = str(j["parent"]!["link"]!)
 		edge.child = str(j["child"]!["link"]!)
-		if j.has("origin")
-			edge.pos = read_vec3(j["origin"]!["xyz"]!)
-			edge.rpy = read_vec3(j["origin"]!["rpy"]!)
-		if str(j["type"]) == "fixed"
-			edge.type = Edge.Type.FIXED
-		else if str(j["type"]) == "prismatic"
-			edge.type = Edge.Type.PRISMATIC
-			edge.axis = read_vec3(j["axis"]!["xyz"]!)
-		else if str(j["type"]) == "revolute"
-			edge.type = Edge.Type.REVOLUTE
-			edge.axis = read_vec3(j["axis"]!)
-		else if str(j["type"]) == "floating"
-			edge.type = Edge.Type.FLOATING
-		else
-			print(j)
+		for o in j["origin"]
+			for xyz in o["xyz"]
+				edge.pos = read_vec3(xyz)
+			for rpy in o["rpy"]
+				edge.rpy = read_vec3(rpy)
+		match str(j["type"])
+			"fixed" =>
+				edge.type = Edge.Type.FIXED
+			"prismatic" =>
+				edge.type = Edge.Type.PRISMATIC
+				edge.axis = read_vec3(j["axis"]!["xyz"]!)
+			"revolute" =>
+				edge.type = Edge.Type.REVOLUTE
+				edge.axis = read_vec3(j["axis"]!)
+			"floating" =>
+				edge.type = Edge.Type.FLOATING
+			else =>
+				print(j)
 		tree.edges.add(edge)
-	#print(tree.edges)
 	return tree
 
 

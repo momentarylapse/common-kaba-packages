@@ -1,10 +1,9 @@
 use simplevis as sv
-use simplevis.canvas
 use simplevis.cloud.PointCloudRenderer
 
 
-class Canvas extends canvas.Canvas
-	var cr = PointCloudRenderer(&ctx)
+class Canvas extends sv.Canvas
+	var cr = PointCloudRenderer(&self)
 
 
 	func override on_initialize()

@@ -76,7 +76,7 @@ func main()
 
 		var xparams = params
 		xparams.target_is_window = false
-		sr.set_view(xparams, (vec3(0,0,-7), Quaternion.ID, pi/4, 0.1, 1000))
+		sr.set_view(xparams, (vec3(0,0,-7), Quaternion.ID, pi/4, 0.1, 1000, [0,0]))
 		scene_view.choose_lights([&light])
 
 	#	hdr.exposure = exp(sin(t)*2-0.8)

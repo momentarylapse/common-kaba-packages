@@ -1,4 +1,6 @@
-version 0.17
+version 1
 requires yrenderer
 requires hui@y
+suggests cloud
+suggests mesh
 

@@ -4,7 +4,7 @@ use simplevis.cloud.PointCloudRenderer
 
 
 class Canvas extends canvas.Canvas
-	var cr = PointCloudRenderer(&ctx)
+	var cr = PointCloudRenderer(&self)
 
 
 	func override on_initialize()
