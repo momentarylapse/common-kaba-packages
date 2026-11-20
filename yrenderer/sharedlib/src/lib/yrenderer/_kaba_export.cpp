@@ -344,6 +344,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->declare_class_element("CameraParams.fov", &CameraParams::fov);
 		ext->declare_class_element("CameraParams.min_depth", &CameraParams::min_depth);
 		ext->declare_class_element("CameraParams.max_depth", &CameraParams::max_depth);
+		ext->declare_class_element("CameraParams.offset", &CameraParams::offset);
 		ext->link_class_func("CameraParams.projection_matrix", &CameraParams::projection_matrix);
 		ext->link_class_func("CameraParams.view_matrix", &CameraParams::view_matrix);
 	}
@@ -502,9 +503,11 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 		ext->link_class_func("LineHelper.start_frame", &LineHelper::start_frame);
 		ext->link_class_func("LineHelper.begin_draw", &LineHelper::begin_draw);
 		ext->link_class_func("LineHelper.set_z_test", &LineHelper::set_z_test);
+		ext->link_class_func("LineHelper.set_blending", &LineHelper::set_blending);
 		ext->link_class_func("LineHelper.set_color", &LineHelper::set_color);
 		ext->link_class_func("LineHelper.set_line_width", &LineHelper::set_line_width);
 		ext->link_class_func("LineHelper.draw_lines", &LineHelper::draw_lines);
+		ext->link_class_func("LineHelper.draw_lines_colored", &LineHelper::draw_lines_colored);
 		ext->link_class_func("LineHelper.draw_circle", &LineHelper::draw_circle);
 	}
 
@@ -591,7 +594,7 @@ void _export_package_yrenderer_internal(kaba::IExporter* ext) {
 }
 
 void export_package_yrenderer(kaba::IExporter* ext) {
-	ext->package_info("yrenderer", "0.24");
+	ext->package_info("yrenderer", "0.25");
 	_export_package_yrenderer_internal(ext);
 }
 

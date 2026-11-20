@@ -67,7 +67,7 @@ class ViewPort extends Object as obs.Node
 		out_changed()
 
 	func params() -> CameraParams
-		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000)
+		return (pos - ang * [0,0,radius], ang, fov, radius*0.01, radius*1000, [0,0])
 
 
 struct MouseInfo
