@@ -131,27 +131,15 @@ func fullfull_dependencies(out list: PackageInfo[]) -> bool
 			IterStatus.ERROR => return false
 
 
-func copy_dir(source: os.Path, dest: os.Path) -> result[void]
-	os.fs.create_directory(dest)!
-	for e in os.fs.search(source, "*", "rd")
-		os.fs.create_directory(dest | e)!
-
-	for e in os.fs.search(source, "*", "rf")
-		let a = source | e
-		let b = dest | e
-		os.fs.copy(a, b)!
-
-	return result_ok
-
-
 # backup "packages" and some files
 func install_begin()
 	if os.fs.exists(conf.backup_dir())
 		print("{{os.terminal.RED}}previous backup found{{os.terminal.END}} {{conf.backup_dir()}}")
+		print("please restore or remove it manually")
 		os.exit(1)
 	os.fs.create_directory(conf.backup_dir())!
 
-	copy_dir(conf.packages_base, conf.backup_dir() | "packages")!
+	os.fs.copy(conf.packages_base, conf.backup_dir() | "packages")!
 
 	for e in os.fs.search(conf.kaba_base, "*", "f")
 		os.fs.copy(conf.kaba_base | e, conf.backup_dir() | e)!
